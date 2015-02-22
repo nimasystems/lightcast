@@ -1,0 +1,94 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+      <title>System Error - The Page is currently unavailable</title>
+      <style type="text/css">
+      body { font-family: Verdana; font-size: 12px; background-color: #dbdbda; margin:auto; background-image:url('/lib/custom_errors/img/background.gif'); background-repeat:repeat-x; background-position:top; }
+      .left { float:left; }
+	  .right { float:right; }
+	  .clear { clear:both; }
+      #exception { 
+           margin: auto; width: 800px;   
+			
+      }
+	  #exception .header { height:150px; }
+      #exception .inner { border: 1px solid #ccc; background-color: #fff; overflow: hidden; padding:20px; margin-top:10px; }
+      #exception .back_button { display: block; position: absolute;
+            background-color: white; border: 1px solid #ccc; }
+	  a.logo { margin-top:35px; background-image:url('/lib/custom_errors/img/logo.png'); background-repeat:no-repeat; width:166px; height:100px; display:block; }
+	  .lightcast-link  { margin-top:35px; font-size:11px;  }
+	  .footer { padding-top:5px; }
+	  .footer a { font-size:11px; }
+
+	/* WHITE BOX */  
+	.wbox {}
+	.wbox .wcontent { background-color:#FFFFFF; padding:20px; text-align:center;}
+	.wbox .wcontent .funcs { padding-top:3px; padding-bottom:3px; padding-right:5px; }
+	.wbox .wcontent .visits { padding-top:20px; text-align:right; color:#ababa9; padding-right:5px; }
+	
+	.wbox .top-corners {
+		background: transparent url('/lib/custom_errors/img/white_box_top_corners.gif') no-repeat scroll bottom right;
+		color: #FFFFFF; display:block; font-size:10px; height: 5px; padding-right: 8px; font-size:1px;
+	
+	}
+	.wbox .top-corners  span {
+		background: transparent url('/lib/custom_errors/img/white_box_top_corners.gif') no-repeat;
+		background-position:left bottom; display:block; line-height: 5px; padding: 0px 0px 0px 8px; cursor:pointer; font-size:1px;
+	}
+	.wbox .top-title {
+		background: transparent url('/lib/custom_errors/img/white_box_top_title.gif') no-repeat scroll top left; color: #373737; display:block; font-size:10px; background-color:#FFFFFF;
+		
+	}
+	.wbox .top-title .rcorner { background-image:url('/lib/custom_errors/img/white_box_top_title_right.gif'); background-repeat:no-repeat; height:20px; padding-top:5px; padding-left:30px; padding-right:5px; padding-bottom:2px; }
+	.wbox .top-title .rcorner a { color:#373737; }
+	.wbox .top-title .title { font-size:16px; font-family:Arial, Helvetica, sans-serif; color:#585858; padding-top:9px; padding-left:10px; color:#000000; _height:1%; /* IE6 FIX */ }
+	.wbox .top-title .title.green { color:#539f5a; }
+	.wbox .top-title .title a { color:#539f5a;}
+	
+	.wbox .bottom-corners {
+		background: transparent url('/lib/custom_errors/img/white_box_bottom_corners.gif') no-repeat scroll bottom right;
+		color: #FFFFFF; display:block; font-size:10px; height: 5px; padding-right: 8px; font-size:1px;
+	}
+	.wbox .bottom-corners  span {
+		background: transparent url('/lib/custom_errors/img/white_box_bottom_corners.gif') no-repeat;
+		background-position:left bottom; display:block; line-height: 5px; padding: 0px 0px 0px 8px; cursor:pointer; font-size:1px;
+	}
+	.error-title {  }
+</style>
+</head> 
+<body> 
+
+
+<div id="exception">
+     <div class="header"><a href="http://www.nimasystems.com/lightcast" class="left logo"></a></div>
+     <div class="clear"></div>
+      <div class="wbox">
+      		<div class="top-title">
+                <div class="left title"><img src="/lib/custom_errors/img/error.png" border="0" style="vertical-align:middle;" />&nbsp;&nbsp;<strong>Oops! Something went wrong...</strong></div>
+                <div class="right rcorner"><a href="http://www.nimasystems.com/lightcast" target="_blank">Lightcast Framework Project</a></div>
+                <div class="clear"></div>
+             </div>
+      		<div class="wcontent">
+                <div class="error-title">This Page is currently unavailable or there was a problem.</div>
+                 <br />
+                 <h4 style="color: red">{$error_subject}</h4>
+                 <br /><br />
+                 <a href="mailto:{$admin_email}">E-mail the Webmaster about this error</a>
+                 <br /><br />
+                  <br /><br />
+            </div>
+           <span class="bottom-corners"><span>&nbsp;</span></span>
+      </div>
+      <div class="footer">
+          <div class="left">
+              <input type="button" class="back_button" onclick="history.back()" value="Go Back" />
+          </div>
+          <div class="right">
+            
+            
+          </div>
+          <div class="clear"></div>
+		</div>
+</div>
+</body>
+</html>

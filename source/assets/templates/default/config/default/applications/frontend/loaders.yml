@@ -1,0 +1,15 @@
+---
+all:
+  loaders:
+    request: lcWebRequest
+    response: lcWebResponse
+    controller: lcFrontWebController
+    router: lcPatternRouting
+    logger: lcFileLoggerNG
+    storage: lcDbStorageExtended
+    user: SiteUser
+    i18n: lcDbLanguageSystem
+    mailer: lcPHPMailer
+    data_storage: lcVFSDataStorage
+    cache: lcAdvMemcacheCacheStorage
+...

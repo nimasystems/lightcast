@@ -1,0 +1,7 @@
+/*
+  The server returned a "{$error_subject}" - Domain: {$domain}, Code: {$error_code}.
+
+  {$exception_name}
+
+  Please report this error to {$admin_email}.
+*/

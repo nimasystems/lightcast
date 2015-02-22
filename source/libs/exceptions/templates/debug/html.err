@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+	<title>System Error - {$exception_name}</title>
+</head> 
+<body> 
+<style type="text/css">
+	body { font-family: Verdana; font-size: 12px; background-color: #f0f0f0; }
+	
+	#exception { 
+		margin: auto;  margin-top: 40px; border: 1px solid #ccc; 
+		background-color: #fff; overflow: hidden;
+	}
+	#exception .inner { padding: 4px; }
+	#exception .exception_title { margin-top: -25px; font-size: 16px; font-weight: bold; position: absolute; }
+	#exception .title { font-weight: bold; margin-top: 10px; margin-bottom: 10px; font-size: 15px; color: green; }
+	#exception .exception_type span { font-weight: bold; }
+	#exception .stack_trace { margin-top: 20px; margin-bottom: 20px;  }
+	#exception .stack_trace .title { color: gray; font-size: 12px; }
+	#exception .stack_trace .stack_line { line-height: 20px; font-size: 12px; }
+	#exception .back_button { display: block; position: absolute; margin-top: 10px; 
+		background-color: white; border: 1px solid #ccc; }
+</style>
+
+<div id="exception">
+	<div class="exception_title">System Error</div>
+	<div class="inner">
+		<div class="title">{$error_subject}</div>
+		<div class="exception_type"><span>Exception Type:</span> {$exception_name}</div><br />
+		<div class="exception_type"><span>Domain:</span> {$domain}</div><br />
+		<div class="exception_type"><span>Filename:</span> {$file}</div>
+		<div class="exception_type"><span>Line:</span> {$line}</div>
+		{$file_excerpt}
+		<div class="stack_trace">
+			<div class="title">Stack Trace</div>
+			<!-- BEGIN stackline --><div class="stack_line">{$stack_line}</div>
+			<!-- END stackline -->
+		</div>
+		<strong>Lightcast:</strong> {$lightcast_version}, <strong>PHP:</strong> {$php_version}
+	</div>
+	<input type="button" class="back_button" onclick="history.back()" value="Go Back" />
+</div>
+</body>
+</html>

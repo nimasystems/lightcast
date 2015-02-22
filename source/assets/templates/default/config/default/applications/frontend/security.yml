@@ -1,0 +1,17 @@
+---
+all:
+  security:
+    is_secure: false
+    login_module: members
+    login_action: login
+    logout_module: members
+    logout_action: logout
+    login_action_url: /members/login
+    logout_action_url: /members/logout
+    credentials_module: members
+    credentials_action: no_access
+    secure_login: false
+    password:
+      encryption: sha1
+      salt: ""
+...

@@ -1,0 +1,27 @@
+---
+all:
+  project: ~
+  settings:
+    timezone: Europe/Sofia
+    exception_http_header:
+      enabled: false
+      header: HTTP/1.1 500 Internal Server Error
+  tools:
+    htmldoc: /usr/bin/htmldoc
+  plugins:
+    locations:
+    - addons/plugins
+  exceptions:
+    module: ~
+    action: ~
+    mail:
+      enabled: false
+      recipient: ~
+      skip_exceptions: []
+      only_exceptions: []
+  cache:
+    default_lifetime: 3600
+    namespace: project_namespace
+    servers:
+    - 127.0.0.1:11211
+...

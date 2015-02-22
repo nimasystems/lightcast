@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="{$output_encoding}" ?>
+<error>
+	<system domain="{$domain}" code="{$error_code}" subject="{$error_subject}" message="{$exception_name}" pleasereportto="{$admin_email}" />
+</error>

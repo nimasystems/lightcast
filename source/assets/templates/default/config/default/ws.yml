@@ -1,0 +1,45 @@
+---
+settings:
+  admin_email: ~
+logger:
+  enabled: true
+  email_to: ~
+  email_threshold: crit
+  log_files: ~
+mailer:
+  charset: UTF-8
+  content_type: text/html
+  encoding: 8bit
+  testing_mode: false
+  use: ~
+  debug: false
+  smtp_host: ~
+  smtp_port: 25
+  security:
+    smtp_user: ~
+    smtp_pass: ~
+  default_sender: ~
+loaders:
+  request: lcWebRequest
+  response: lcWebResponse
+  controller: lcFrontWebServiceController
+  router: lcPatternRouting
+  logger: lcFileLoggerNG
+  mailer: lcPHPMailer
+security:
+  is_secure: false
+  login_module: members
+  login_action: login
+  logout_module: members
+  logout_action: logout
+  login_action_url: /members/login
+  logout_action_url: /members/logout
+  credentials_module: members
+  credentials_action: no_access
+  secure_login: false
+  password:
+    encryption: sha1
+    salt: ""
+plugins:
+  enabled: ~
+...

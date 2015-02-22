@@ -1,0 +1,19 @@
+---
+all:
+  plugins:
+    enabled:
+    - app_security
+    - cache
+    - ajax_rpc
+    - languages
+    - admin_layout
+    - live_search_form
+    - jquery
+    - countries
+    - fck_edit
+    - calendar_picker
+    - forms
+    - plupload
+    - vfs
+    - simple_cms
+...

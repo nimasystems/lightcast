@@ -1,0 +1,16 @@
+---
+all:
+  db:
+    use_database: true
+    databases:
+      primary:
+        classname: lcPropelDatabase
+        logging: true
+        caching: true
+        datasource: datasource
+        driver: mysql
+        url: mysql:host=localhost;dbname=dbname
+        user: root
+        password: ~
+        charset: utf8
+...

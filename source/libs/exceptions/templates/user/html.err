@@ -1,0 +1,33 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
+<html xmlns="http://www.w3.org/1999/xhtml"> 
+<head> 
+	<title>System Error - Page is currently unavailable</title>
+</head> 
+<body> 
+<style type="text/css">
+	body { font-family: Verdana; font-size: 12px; background-color: #f0f0f0; }
+	
+	#exception { 
+		margin: auto; width: 600px;  margin-top: 40px; border: 1px solid #ccc; 
+		background-color: #fff; overflow: hidden;
+	}
+	#exception .inner { padding: 4px; }
+	#exception .exception_title { margin-top: -25px; font-size: 16px; font-weight: bold; position: absolute; }
+	#exception .title { font-weight: bold; text-align: center; margin: 30px; font-size: 15px; color: green;  }
+	#exception .back_button { display: block; position: absolute; margin-top: 10px; 
+		background-color: white; border: 1px solid #ccc; }
+</style>
+
+<div id="exception">
+	<div class="exception_title">Oops! Something went wrong...</div>
+	<div class="inner">
+		<div class="title">This Page is currently unavailable or there was a problem.</div>
+		
+		<strong><a href="http://lightcast.nimasystems.com" target="_blank">Lightcast Framework Project</a></strong>
+		<br /><br />
+		<a href="mailto:{$admin_email}">E-mail the Webmaster about this error</a>
+	</div>
+	<input type="button" class="back_button" onclick="history.back()" value="Go Back" />
+</div>
+</body>
+</html>

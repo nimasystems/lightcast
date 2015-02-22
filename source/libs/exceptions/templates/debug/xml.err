@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="{$output_encoding}" ?>
+<error code="{$error_code}" domain="{$domain}" message="{$error_subject}">
+  <debug>
+    <name>{$error_subject}</name>
+    <message>{$exception_name}</message>
+    <traces>
+        <!-- BEGIN stackline --><trace>{$stack_line}</trace>
+		<!-- END stackline -->
+    </traces>
+  </debug>
+</error>

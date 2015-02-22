@@ -1,0 +1,9 @@
+Bad Bad Server!
+------------------
+
+The server returned a "[{$domain}] {$error_code} {$error_subject}".
+
+{$exception_name}
+
+If you feel you need to report this error please
+do so at {$admin_email}.

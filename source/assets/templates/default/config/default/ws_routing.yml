@@ -1,0 +1,7 @@
+---
+all:
+  routing:
+    send_http_errors: true
+    default_module: home
+    default_action: index
+...

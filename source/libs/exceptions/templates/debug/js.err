@@ -1,0 +1,11 @@
+/*
+[exception]  {$exception_name} | [{$domain}] {$error_code}
+[message]    {$error_subject}
+
+[stack trace]
+<!-- BEGIN stackline --><trace>{$stack_line}</trace>
+<!-- END stackline -->
+
+[lightcast]     v. {$lightcast_version}
+[PHP]         v. {$php_version}
+*/

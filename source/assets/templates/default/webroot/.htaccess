@@ -1,0 +1,23 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    #RewriteCond %{HTTP_HOST} !^www\.%{SERVER_NAME} [NC]
+    #RewriteRule ^(.*) http://www.%{SERVER_NAME}/$1 [L,R=301]
+
+    RewriteCond  %{DOCUMENT_ROOT}/%{REQUEST_FILENAME} !-f
+    RewriteRule  .*favicon\.ico$  favicon.ico [L]
+    RewriteRule  .*robots\.txt$   robots.txt [L]
+    RewriteRule ^noexist_(.*) - [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(css|js|img|files|pictures|documents)/(.*)$ - [L]
+
+    #RewriteCond %{HTTP_HOST} backend\.project\.com
+    #RewriteCond %{REQUEST_FILENAME} !-f
+    #RewriteCond %{REQUEST_FILENAME} !backend\.php
+    #RewriteRule ^(.*)$ backend.php/$1 [L]
+	
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$  index.php/$1 [QSA,L]
+</IfModule>

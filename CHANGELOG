@@ -1,0 +1,21 @@
+LIGHTCAST CHANGELOG:
+
+1.5.1.1470 /17.11.2013/
+
+- CONFIG: Added a new db config property in lcDatabasesConfigHandler: 'propel_custom.gen_dir' - which should be set to the 'gen' folder where the om/map files have been generated. If ommited the previous implementation is used (OM/MAP in the same dir as models)
+- PROPEL: Database model manager now checks the above new property and loads the model OM/MAP files from the appropriate directory.
+- CONFIG: All project models are now used (in the 'models/' dir only - not plugin models!) right away - no need to define them in the $used_models array. Still - if $used_models is defined and set - it is all up to the developer to load them properly.
+- I18N: Task i18n moved from framework to languages plugin - as it is gettext based and its place is not within the framework
+- I18N: Rebuilding task now builds compiled .mo files in the 'gen/' folder. No '.mo' files are created in plugins from now on. In order for the new system to be in effect a new rebuild once is necessary
+
+1.5.1.1469 /17.11.2013/
+
+- CONFIG: Gen folder: a new folder within the LC project: 'gen/' is to be used for assets generated and used by the project in its lifetime (example: propel om/map files). It is not config env based.
+- PROPEL: Added a new custom builder for Query based objects to be able to override the om/map target directory - lcPropelBaseQueryBuilder
+- PROPEL: Propel model building / rebuilding: no longer uses tmp/temp to store temporary files while generating - propel is now using the 'gen/propel/' folder for all generated om/map/xml/build files
+- PROPEL: Flush now removes obsolete om/map files from plugins/models/, models/ dir - so the only version is left in the gen/ folder
+- PROPEL: Flush is made before each OM
+- IMPORTANT: Because of the above changes a propel model rebuild MUST be done after setting up the new framework.
+- CONFIG: YAML parsing bug - unindented values were not parsed properly - when using the class based parser fixed
+- CONSOLE: Extra argv: --disable-db - to disable the database configuration
+- CONSOLE: Extra argv: --config-env - to use a different config environment than the default one
