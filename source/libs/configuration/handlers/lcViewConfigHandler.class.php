@@ -17,7 +17,9 @@
  * Plovdiv, Bulgaria
  * ZIP Code: 4000
  * Address: 95 "Kapitan Raycho" Str.
- * E-Mail: info@nimasystems.com */
+ * E-Mail: info@nimasystems.com
+
+ */
 
 /**
  * File Description
@@ -28,28 +30,29 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1532 $
  */
-
 class lcViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
         return array('view' => array(
-                'filters' => array(),
-                'content_type' => 'text/html',
-                'charset' => 'utf-8',
-                'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)', ),
-                'base' => null,
-                'dir' => 'ltr',
-        		'allow_javascripts' => true,
-        		'allow_stylesheets' => true,
-        		'allow_rss_feeds' => true,
-        		'allow_metatags' => true,
-                'has_layout' => true,
-                'decorator' => 'index',
-                'extension' => 'htm',
-                'google_analytics' => null,
-                'replacement_policy' => 'level'
-            ));
+            'filters' => array(),
+            'content_type' => 'text/html',
+            'charset' => 'utf-8',
+            'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)',),
+            'base' => null,
+            'dir' => 'ltr',
+            'allow_javascripts' => true,
+            'allow_stylesheets' => true,
+            'allow_rss_feeds' => true,
+            'allow_metatags' => true,
+            'has_layout' => true,
+            'decorator' => 'index',
+            'extension' => 'htm',
+            'google_analytics' => null,
+            'replacement_policy' => 'level',
+            'clientside_js' => false,
+        ));
     }
 }
+
 ?>

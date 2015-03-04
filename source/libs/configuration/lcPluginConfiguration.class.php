@@ -17,7 +17,9 @@
  * Plovdiv, Bulgaria
  * ZIP Code: 4000
  * Address: 95 "Kapitan Raycho" Str.
- * E-Mail: info@nimasystems.com */
+ * E-Mail: info@nimasystems.com
+
+ */
 
 /**
  * File Description
@@ -28,7 +30,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
@@ -41,8 +42,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     public function initialize()
     {
-        if (!$this->root_dir)
-        {
+        if (!$this->root_dir) {
             throw new lcSystemException('Plugin directory not valid');
         }
 
@@ -82,6 +82,11 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function setWebPath($web_path)
     {
         $this->web_path = $web_path;
+    }
+
+    public function getRoutes()
+    {
+        return $this['routes'];
     }
 
     public function getStartupType()
@@ -142,12 +147,12 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
                 'type' => 'private'
             ),
             'copyright' => 'Nimasystems Ltd 2007-2013 (&copy;) All Rights Reserved.',
-            'developers' => array( array(
-                    'email' => 'miracle@nimasystems.com',
-                    'team' => 'PHP Development',
-                    'role' => 'PHP Developer',
-                    'name' => 'Martin Kovachev'
-                ))
+            'developers' => array(array(
+                'email' => 'miracle@nimasystems.com',
+                'team' => 'PHP Development',
+                'role' => 'PHP Developer',
+                'name' => 'Martin Kovachev'
+            ))
         );
     }
 
@@ -225,6 +230,11 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 0;
     }
 
+    public function getImplementations()
+    {
+        // subclassers may override this
+    }
+
     public function getConfigDir()
     {
         return $this->getRootDir() . DS . 'config';
@@ -234,8 +244,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     {
         $plugin_name = $this->getName();
 
-        if (!$plugin_name)
-        {
+        if (!$plugin_name) {
             return null;
         }
 
@@ -267,4 +276,5 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
 }
+
 ?>
