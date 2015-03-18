@@ -147,7 +147,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
     public function setDispatchParams(array $dispatch_params = null)
     {
-        $this->dispatch_params = & $dispatch_params;
+        $this->dispatch_params = &$dispatch_params;
     }
 
     public function & getDispatchParams()
@@ -656,6 +656,25 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         if (!$render_result) {
             return null;
+        }
+
+        // notify / filter
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), array(
+            'content' => $render_result['content'],
+            'content_type' => $layout_content_type
+        ));
+
+        if ($event->isProcessed()) {
+            $r = $event->getReturnValue();
+
+            $layout_content = isset($r['content']) ? $r['content'] : null;
+            $layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
+
+            if (!$layout_content) {
+                return $layout_content;
+            }
+
+            $render_result['content'] = $layout_content;
         }
 
         $content = $render_result['content'];
