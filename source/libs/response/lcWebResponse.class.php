@@ -795,7 +795,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // content language
         if ($this->content_lang && $this->htmlver == 5) {
-            $this->content = preg_replace("/\<html/i", '<html ' . 'lang="' . $this->content_lang . '"', $this->content);
+            $content = preg_replace("/\<html/i", '<html ' . 'lang="' . $this->content_lang . '"', $content);
         }
 
         // stylesheets
