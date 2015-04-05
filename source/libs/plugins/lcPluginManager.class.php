@@ -591,12 +591,16 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        $class_name = lcInflector::subcamelize($plugin_name . '_config', false);
+        $class_name = lcInflector::camelize($plugin_name . '_config_configuration', false);
+
+        // this is now deprecated
+        $class_name_deprecated = lcInflector::subcamelize($plugin_name . '_config', false);
 
         // cache this so we don't need to call subcamelize several times
-        $this->included_plugin_classes[$plugin_name] = $class_name;
+        $ret = array($class_name, $class_name_deprecated);
+        $this->included_plugin_classes[$plugin_name] = $ret;
 
-        return $class_name;
+        return $ret;
     }
 
     public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path)
@@ -618,7 +622,23 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         // if the class is not available in the class path it means there is either no custom configuration
         // or some other error occured - in this case - load the default configuration
-        $class_name = class_exists($class_name, false) ? $class_name : self::DEFAULT_PLUGIN_CONFIG_CLASS_NAME;
+        if (is_array($class_name)) {
+            $existing_class = self::DEFAULT_PLUGIN_CONFIG_CLASS_NAME;
+
+            foreach ($class_name as $cls) {
+
+                if (class_exists($cls, false)) {
+                    $existing_class = $cls;
+                    break;
+                }
+
+                unset($cls);
+            }
+
+            $class_name = $existing_class;
+        } else {
+            $class_name = class_exists($class_name, false) ? $class_name : self::DEFAULT_PLUGIN_CONFIG_CLASS_NAME;
+        }
 
         // create the instance
         $configuration = new $class_name();

@@ -68,9 +68,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     /*
      * Initialization of the Request
     */
-    public function initialize()
+    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
     {
-        parent::initialize();
+        parent::initializeBeforeApp($event_dispatcher, $configuration);
 
         $this->resetPHPRequestGlobals();
 
@@ -165,8 +165,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         // reset all global vars
         $this->resetAllGlobals();
+    }
 
-        // connect listeners
+    public function initialize()
+    {
+        parent::initialize();
 
         // when router loads the detected params from request
         // it will notify us with this event

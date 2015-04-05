@@ -68,6 +68,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $allow_stylesheets;
     protected $allow_metatags;
 
+    protected $content_lang;
+    protected $htmlver;
+    protected $canonical_url;
+
     private $content_should_be_processed;
 
     /*
@@ -93,6 +97,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // base
         $this->html_base = (string)$this->configuration['view.base'];
+
+        // HTML5 or 4
+        $this->htmlver = $this->configuration['view.htmlver'];
 
         // dir
         $this->lang_dir = (string)$this->configuration['view.dir'];
@@ -494,6 +501,20 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    public function setCanonicalUrl($canonical_url)
+    {
+        // notify listeners
+        $event = $this->event_dispatcher->filter(
+            new lcEvent('response.set_canonical_url', $this, array()), $canonical_url);
+
+        if ($event->isProcessed()) {
+            $canonical_url = $event->getReturnValue();
+        }
+
+        $this->canonical_url = $canonical_url;
+    }
+
+
     public function getOutputContent()
     {
         return $this->output_content;
@@ -734,8 +755,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->processViewConfiguration();
 
         // meta equiv
-        // http-equiv="Content-Type" content="' . $this->content_type . ';
-        $head[] = '<meta charset=' . $this->server_charset . '" />';
+        // meta equiv
+        if ($this->htmlver == 5) {
+            $head[] = '<meta charset="' . $this->server_charset . '" />';
+        } else {
+            $head[] = '<meta http-equiv="Content-Type" content="' . $this->content_type . ' charset=' . $this->server_charset . '" />';
+        }
+
+        if ($this->canonical_url) {
+            $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->canonical_url) . '" />';
+        }
 
         // html5 compat
         //$head[] = '<!-- From HTML 5 Boilerplate: Use .htaccess instead. See: h5bp.com/i/378 -->';
@@ -763,6 +792,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
 
         unset($icon);
+
+        // content language
+        if ($this->content_lang && $this->htmlver == 5) {
+            $this->content = preg_replace("/\<html/i", '<html ' . 'lang="' . $this->content_lang . '"', $this->content);
+        }
 
         // stylesheets
         $stylesheets = $this->stylesheets;
@@ -1392,6 +1426,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setContentLanguage($content_language)
     {
+        $this->content_lang = $content_language;
         return $this->custom_headers->set('Content-Language', $content_language);
     }
 

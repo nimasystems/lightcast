@@ -41,6 +41,7 @@ class lcViewConfigHandler extends lcEnvConfigHandler
             'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)',),
             'base' => null,
             'dir' => 'ltr',
+            'htmlver' => '4',
             'allow_javascripts' => true,
             'allow_stylesheets' => true,
             'allow_rss_feeds' => true,

@@ -37,12 +37,12 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
     {
         return array(
             'logger',
+            'database_manager',
             'i18n',
             'cache',
             'mailer',
             'request',
             'response',
-            'database_manager',
             'router',
             'storage',
             'user',

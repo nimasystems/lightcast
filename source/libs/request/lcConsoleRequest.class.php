@@ -39,9 +39,9 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
 	/*
 	 * Initialization of the Request
 	*/
-	public function initialize()
-	{
-		parent::initialize();
+    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
+    {
+        parent::initializeBeforeApp($event_dispatcher, $configuration);
 
 		$this->argv = $this->env('argv');
 		$this->argc = $this->env('argc');

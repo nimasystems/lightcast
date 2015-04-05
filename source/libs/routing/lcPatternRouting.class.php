@@ -107,6 +107,25 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     {
         $url = isset($this->context['path_info']) ? (string)$this->context['path_info'] : null;
 
+        // allow others to filter and provider params before the router
+        $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, array(
+            'url' => $url,
+            'context' => $this->context
+        ), false), array(
+            'url' => $url,
+            'context' => $this->context
+        ));
+
+        if ($evn->isProcessed()) {
+            $rv = $evn->getReturnValue();
+            $this->context = $rv['context'];
+            $url = $rv['url'];
+
+            if (isset($rv['resolved_params'])) {
+                return $rv['resolved_params'];
+            }
+        }
+
         // detect the params
         $info = $this->findMatchingRoute($url);
 

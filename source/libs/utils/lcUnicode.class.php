@@ -64,6 +64,11 @@ class lcUnicode
     {
         return self::$has_mb ? mb_substr($str, $start, $length, $encoding) : substr($str, $start, $length);
     }
+
+    public static function strripos($haystack, $needle, $offset = null, $encoding = 'UTF8')
+    {
+        return self::$has_mb ? mb_strripos($haystack, $needle, $offset, $encoding) : strripos($haystack, $needle, $offset);
+    }
 }
 
 lcUnicode::$has_mb = function_exists('mb_strtolower');
