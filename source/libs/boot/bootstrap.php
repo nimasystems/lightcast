@@ -136,6 +136,7 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iAppDelegate.cla
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iSupportsVersions.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'iSupportsAutoload.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModels.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbViews.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
 
 // load base classes
