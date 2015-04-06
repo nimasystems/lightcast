@@ -30,6 +30,8 @@
  */
 class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 {
+    const TR_MULTILINE_DETECT_REP = '-----rtn----';
+
     protected $request;
 
     protected $status_code = lcHttpStatusCode::OK;
@@ -775,8 +777,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($metatags) {
             foreach ($metatags as $name => $value) {
+                if (!$value) {
+                    continue;
+                }
+
                 $head[] =
-                    '<meta name="' . $name . '" content="' . $value . '" />';
+                    '<meta name="' . htmlspecialchars($name) . '" content="' . htmlspecialchars($value) . '" />';
 
                 unset($name, $value);
             }
@@ -788,7 +794,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $icon = $this->icon;
 
         if ($icon) {
-            $head[] = '<link rel="icon" href="' . $icon['href'] . '" type="' . $icon['type'] . '" />';
+            $head[] = '<link rel="icon" href="' . htmlspecialchars($icon['href']) . '" type="' . htmlspecialchars($icon['type']) . '" />';
         }
 
         unset($icon);
@@ -997,6 +1003,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
 
         $content = $this->content;
+        $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
+
         $this->content = null;
 
         // if exit code is error - do not process content
@@ -1050,6 +1058,17 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
             unset($event);
         }
+
+        // disable all scripts
+        if ($this->content_type == 'text/html') {
+            $no_scripts = (bool)$this->configuration['view.no_scripts'];
+
+            if ($no_scripts) {
+                $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+            }
+        }
+
+        $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
 
         $this->output_content = $content;
 
