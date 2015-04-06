@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,35 +27,31 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcMailRecipient.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcMailRecipient extends lcObj
 {
-	private $email;
-	private $name;
+    private $email;
+    private $name;
 
-	public function __construct($email, $name = '')
-	{
-		$this->name = isset($name) ? (string)$name : null;
-		$this->email = (string)$email;
+    public function __construct($email, $name = '')
+    {
+        $this->name = isset($name) ? (string)$name : null;
+        $this->email = (string)$email;
 
-		if (!$this->email)
-		{
-			throw new lcSystemException('Email recipient cannot be empty');
-		}
-	}
+        if (!$this->email) {
+            throw new lcSystemException('Email recipient cannot be empty');
+        }
+    }
 
-	public function getEmail()
-	{
-		return $this->email;
-	}
+    public function getEmail()
+    {
+        return $this->email;
+    }
 
-	public function getName()
-	{
-		return $this->name;
-	}
+    public function getName()
+    {
+        return $this->name;
+    }
 }
-
-?>
