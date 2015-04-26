@@ -74,6 +74,74 @@ class lcDateTime
         return $timeDiff;
     }
 
+    public static function humanizeDateDifference($now, $otherDate = null, $offset = null, $config = array())
+    {
+        if ($otherDate != null) {
+            $offset = $now - $otherDate;
+        }
+
+        if ($offset != null) {
+            $deltaS = $offset % 60;
+            $offset /= 60;
+            $deltaM = $offset % 60;
+            $offset /= 60;
+            $deltaH = $offset % 24;
+            $offset /= 24;
+            $deltaD = ($offset > 1) ? ceil($offset) : $offset;
+        } else {
+            return null;
+        }
+
+        $localization_strings = (isset($config['localization']) ? $config['localization'] : array());
+
+        if ($deltaD > 1) {
+            if ($deltaD > 365) {
+                $years = ceil($deltaD / 365);
+                if ($years == 1) {
+                    return (isset($localization_strings['last_year']) ? $localization_strings['last_year'] : 'last year');
+                } else {
+                    return (isset($localization_strings['years_ago']) ? sprintf($localization_strings['years_ago'], $years) : sprintf('%s years ago', $years));
+                }
+            }
+
+            $t = (isset($localization_strings['days_ago']) ? sprintf($localization_strings['days_ago'], $deltaD) : sprintf('%s days ago', $deltaD));
+
+            if ($deltaD > 6) {
+                $tt = strtotime($t);
+                $y = date('Y', $tt);
+                $yy = date('Y');
+                return date((isset($config['default_date_format']) ? $config['default_date_format'] : ($y == $yy ? 'd M' : 'd M Y')), strtotime($t));
+            }
+
+            return $t;
+        }
+
+        if ($deltaD == 1) {
+            return (isset($localization_strings['yesterday']) ? $localization_strings['yesterday'] : 'yesterday');
+        }
+
+        if ($deltaH == 1) {
+            return (isset($localization_strings['last_hour']) ? $localization_strings['last_hour'] : 'last hour');
+        }
+
+        if ($deltaM == 1) {
+            return (isset($localization_strings['last_minute']) ? $localization_strings['last_minute'] : 'last minute');
+        }
+
+        if ($deltaH > 0) {
+            $t = (isset($localization_strings['hours_ago']) ? sprintf($localization_strings['hours_ago'], $deltaH) : sprintf('%s hours ago', $deltaH));
+            return $t;
+        }
+
+        if ($deltaM > 0) {
+            $t = (isset($localization_strings['minutes_ago']) ? sprintf($localization_strings['minutes_ago'], $deltaM) : sprintf('%s minutes ago', $deltaM));
+            return $t;
+        } else {
+            $t = (isset($localization_strings['few_seconds_ago']) ? $localization_strings['few_seconds_ago'] : 'a few seconds ago');
+            return $t;
+        }
+    }
+
     public static function secondsToTime($inputSeconds)
     {
         $secondsInAMinute = 60;

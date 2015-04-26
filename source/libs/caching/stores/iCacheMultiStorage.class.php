@@ -28,19 +28,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-interface iCacheStorage
+interface iCacheMultiStorage
 {
-    public function set($key, $value = null, $lifetime = null, $other_flags = null);
-
-    public function remove($key);
-
-    public function get($key);
-
-    public function has($key);
-
-    public function clear();
-
-    public function getStats();
-
-    public function getBackend();
+    public function getMulti($key);
 }

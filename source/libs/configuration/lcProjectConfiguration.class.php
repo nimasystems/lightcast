@@ -472,6 +472,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     protected function getDefaultCacheInstance($skip_cli_check = false)
     {
         require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheStorage.class.php');
+        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheMultiStorage.class.php');
         require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcAPC.class.php');
         require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcXCache.class.php');
 

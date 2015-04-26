@@ -24,23 +24,31 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: iCacheStorage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcMemcache.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-interface iCacheStorage
+class lcMemcached extends lcMemcache implements iCacheMultiStorage
 {
-    public function set($key, $value = null, $lifetime = null, $other_flags = null);
+    protected function initBackend()
+    {
+        // check for memcache
+        if (!class_exists('Memcached', false)) {
+            throw new Exception('Memcached is not available');
+        }
 
-    public function remove($key);
+        $this->memcache_backend = new Memcached();
+    }
 
-    public function get($key);
+    public function getMulti($key)
+    {
+        return $this->memcache_backend->getMulti($key);
+    }
 
-    public function has($key);
+    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    {
+        $ret = $this->memcache_backend->set($key, $value, $lifetime);
 
-    public function clear();
-
-    public function getStats();
-
-    public function getBackend();
+        return $ret;
+    }
 }

@@ -91,11 +91,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
 
-        // default output type
-        $this->content_type = (string)$this->configuration['view.content_type'];
-
-        // charset
-        $this->server_charset = (string)$this->configuration['view.charset'];
+        $this->server_charset = isset($this->configuration['view.charset']) ? (string)$this->configuration['view.charset'] : 'utf-8';
+        $this->content_type = isset($this->configuration['view.content_type']) ? (string)$this->configuration['view.content_type'] : 'text/html';
 
         // base
         $this->html_base = (string)$this->configuration['view.base'];
@@ -515,7 +512,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $this->canonical_url = $canonical_url;
     }
-
 
     public function getOutputContent()
     {
@@ -994,14 +990,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     protected function _internalSend()
     {
-        if (!$this->server_charset) {
-            $this->server_charset = isset($this->configuration['view.charset']) ? (string)$this->configuration['view.charset'] : 'utf-8';
-        }
-
-        if (!$this->content_type) {
-            $this->content_type = isset($this->configuration['view.content_type']) ? (string)$this->configuration['view.content_type'] : 'text/html';
-        }
-
         $content = $this->content;
         $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
 
@@ -1218,11 +1206,54 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    protected function minifyHtml($body)
+    {
+        $replace = array(
+            //remove tabs before and after HTML tags
+            '/\>[^\S ]+/s' => '>',
+            '/[^\S ]+\</s' => '<',
+            //shorten multiple whitespace sequences; keep new-line characters because they matter in JS!!!
+            '/([\t ])+/s' => ' ',
+            //remove leading and trailing spaces
+            '/^([\t ])+/m' => '',
+            '/([\t ])+$/m' => '',
+            // remove JS line comments (simple only); do NOT remove lines containing URL (e.g. 'src="http://server.com/"')!!!
+            '~//[a-zA-Z0-9 ]+$~m' => '',
+            //remove empty lines (sequence of line-end and white-space characters)
+            '/[\r\n]+([\t ]?[\r\n]+)+/s' => "\n",
+            //remove empty lines (between HTML tags); cannot remove just any line-end characters because in inline JS they can matter!
+            '/\>[\r\n\t ]+\</s' => '><',
+            //remove "empty" lines containing only JS's block end character; join with next line (e.g. "}\n}\n</script>" --> "}}</script>"
+            '/}[\r\n\t ]+/s' => '}',
+            '/}[\r\n\t ]+,[\r\n\t ]+/s' => '},',
+            //remove new-line after JS's function or condition start; join with next line
+            '/\)[\r\n\t ]?{[\r\n\t ]+/s' => '){',
+            '/,[\r\n\t ]?{[\r\n\t ]+/s' => ',{',
+            //remove new-line after JS's line end (only most obvious and safe cases)
+            '/\),[\r\n\t ]+/s' => '),',
+            //remove quotes from HTML attributes that does not contain spaces; keep quotes around URLs!
+            '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4', //$1 and $4 insert first white-space character found before/after attribute
+        );
+        $body = preg_replace(array_keys($replace), array_values($replace), $body);
+
+        //remove optional ending tags (see http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission )
+        $remove = array(
+            '</option>', '</li>', '</dt>', '</dd>', '</tr>', '</th>', '</td>'
+        );
+        $body = str_ireplace($remove, '', $body);
+
+        return $body;
+    }
+
     protected function _outputContent()
     {
         $this->clear();
 
         $content = $this->output_content;
+
+        if ($this->configuration['view.minify_html']) {
+            $content = $this->minifyHtml($content);
+        }
 
         if ($content && is_resource($content)) {
             fpassthru($content);
@@ -1258,11 +1289,15 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function redirect($url, $http_code = 302)
     {
+        $this->info('Will send HTTP Redirect (' . $http_code . '): ' . $url);
+
         $this->clear();
         $this->setStatusCode($http_code);
         $this->setLocation($url);
 
-        $this->info('Will send HTTP Redirect (' . $http_code . '): ' . $url);
+        // no processing for redirects
+        $this->content_type = null;
+        $this->content_should_be_processed = false;
 
         $this->sendResponse();
     }

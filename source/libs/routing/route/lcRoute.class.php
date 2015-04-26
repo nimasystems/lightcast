@@ -234,7 +234,7 @@ abstract class lcRoute extends lcObj
 			foreach($tkn as $_t) {
 				$tk = $_t;
 
-				$npos = strpos($f, $_t, $lpos);
+				$npos = lcUnicode::strpos($f, $_t, $lpos);
 
 				if ($npos !== false) {
 					break;
@@ -248,7 +248,7 @@ abstract class lcRoute extends lcObj
 				$npos = $fs;
 			}
 
-			$route_param = substr($f, $lpos, $npos - $lpos);
+			$route_param = lcUnicode::substr($f, $lpos, $npos - $lpos);
 			$lpos = $npos + 1;
 
 			if ($route_param) {
@@ -276,7 +276,7 @@ abstract class lcRoute extends lcObj
 			if ($route_param{0} == self::PARAM_MATCH)
 			{
 				$type = self::SEP_TYPE_PARAM;
-				$route_param = mb_substr($route_param, 1, mb_strlen($route_param));
+				$route_param = lcUnicode::substr($route_param, 1, mb_strlen($route_param));
 
 				if (!$route_param)
 				{
@@ -641,7 +641,7 @@ abstract class lcRoute extends lcObj
 
 		if ($route{mb_strlen($route)-1} == '/')
 		{
-			$route = mb_substr($route, 0, mb_strlen($route)-1);
+			$route = lcUnicode::substr($route, 0, mb_strlen($route)-1);
 		}
 
 		if (!$route)
