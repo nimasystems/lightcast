@@ -245,6 +245,17 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 $route = isset($controller_info['route']) ? $controller_info['route'] : null;
                 $action_type = isset($controller_info['action_type']) ? (string)$controller_info['action_type'] : null;
 
+                $has_error = false;
+                $error_message = null;
+                $error_trace = null;
+                $module = null;
+                $render_time = null;
+                $action = null;
+
+                if (DO_DEBUG) {
+                    $render_time = microtime(true);
+                }
+
                 if ($tag_name && $route && $action_type) {
                     // try to find a matching route
                     $found_route = $routing->findMatchingRoute($route);
@@ -268,14 +279,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
                         if (!$tag_name || !$route || !$module || !$action) {
                             continue;
-                        }
-
-                        $has_error = false;
-                        $error_message = null;
-                        $error_trace = null;
-
-                        if (DO_DEBUG) {
-                            $render_time = microtime(true);
                         }
 
                         try {

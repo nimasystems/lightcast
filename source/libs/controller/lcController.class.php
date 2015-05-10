@@ -808,24 +808,36 @@ abstract class lcController extends lcBaseController implements iDebuggable
             'type' => lcController::TYPE_PARTIAL
         );
 
-        // get an instance of the controller first
-        $controller_instance = $this->getControllerInstance($module);
+        $content = null;
 
-        if (!$controller_instance) {
-            throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
+        try {
+            // get an instance of the controller first
+            $controller_instance = $this->getControllerInstance($module);
+
+            if (!$controller_instance) {
+                throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
+            }
+
+            $this->prepareControllerInstance($controller_instance);
+            $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
+
+            // shutdown the controller after usage
+            $controller_instance->shutdown();
+
+            if (!$rendered_contents) {
+                return null;
+            }
+
+            $content = $rendered_contents['content'];
+        } catch (Exception $e) {
+            if (DO_DEBUG) {
+                $content =
+                    '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
+                    $e->getMessage() . "<br />\n<br />\n" . nl2br(htmlspecialchars($e->getTraceAsString())) . '</div>';
+            }
+
+            // silence if not debugging
         }
-
-        $this->prepareControllerInstance($controller_instance);
-        $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
-
-        // shutdown the controller after usage
-        $controller_instance->shutdown();
-
-        if (!$rendered_contents) {
-            return null;
-        }
-
-        $content = $rendered_contents['content'];
 
         return $content;
     }
