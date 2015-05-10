@@ -27,78 +27,87 @@
  * @changed $Id: lcMemcache.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcMemcache extends lcSysObj implements iCacheStorage
 {
-	private $memcache;
+    protected $memcache_backend;
 
-	const DEFAULT_PORT = 11211;
+    const DEFAULT_PORT = 11211;
 
-	public function __construct()
-	{
-		parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-		// check for memcache
-		if (!class_exists('Memcache', false))
-		{
-			throw new Exception('Memcache is not available');
-		}
+        $this->initBackend();
+    }
 
-		$this->memcache = new Memcache();
+    protected function initBackend()
+    {
+        // check for memcache
+        if (!class_exists('Memcache', false)) {
+            throw new Exception('Memcache is not available');
+        }
 
-		ini_set('memcache.compress_threshold', 0);
-		ini_set('memcache.protocol', 'ascii');
+        $this->memcache_backend = new Memcache();
 
-		//$this->memcache->setCompressThreshold(0, 1);
-	}
+        ini_set('memcache.compress_threshold', 0);
+        ini_set('memcache.protocol', 'ascii');
 
-	public function addServer($hostname, $port = self::DEFAULT_PORT)
-	{
-		$ret = $this->memcache->addServer($hostname, $port);
+        // disable compression
+        //$this->memcache_backend->setCompressThreshold(0, 1);
+    }
 
-		return $ret;
-	}
+    public function addServer($hostname, $port = self::DEFAULT_PORT)
+    {
+        $ret = $this->memcache_backend->addServer($hostname, $port);
 
-	public function getBackend()
-	{
-		$ret = $this->memcache;
+        return $ret;
+    }
 
-		return $ret;
-	}
+    public function getStats()
+    {
+        return $this->memcache_backend->getStats();
+    }
 
-	public function set($key, $value = null, $lifetime = null)
-	{
-		$ret = $this->memcache->set($key, $value, 0, isset($lifetime) ? (time() + $lifetime) : 0);
+    public function getBackend()
+    {
+        $ret = $this->memcache_backend;
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	public function remove($key)
-	{
-		$ret = $this->memcache->delete($key);
+    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    {
+        $ret = $this->memcache_backend->set($key, $value, $other_flags, $lifetime);
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	public function get($key)
-	{
-		$ret = $this->memcache->get($key);
+    public function remove($key)
+    {
+        $ret = $this->memcache_backend->delete($key);
 
-		return $ret;
-	}
+        return $ret;
+    }
 
-	public function has($key)
-	{
-		$has = (bool)$this->get($key) ? true : false;
+    public function get($key)
+    {
+        $ret = $this->memcache_backend->get($key);
 
-		return $has;
-	}
+        return $ret;
+    }
 
-	public function clear()
-	{
-		$ret = $this->memcache->flush();
+    public function has($key)
+    {
+        $has = (bool)$this->get($key) ? true : false;
 
-		return $ret;
-	}
+        return $has;
+    }
+
+    public function clear()
+    {
+        $ret = $this->memcache_backend->flush();
+
+        return $ret;
+    }
 }

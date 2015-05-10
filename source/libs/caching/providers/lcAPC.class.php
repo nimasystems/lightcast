@@ -51,7 +51,12 @@ class lcAPC extends lcSysObj implements iCacheStorage
 		$this->prefix = 'lc_';
 	}
 
-	public function set($key, $value = null, $lifetime = null)
+    public function getStats()
+    {
+        return false;
+    }
+
+	public function set($key, $value = null, $lifetime = null, $other_flags = null)
 	{
 		$key_prefixed = $this->prefix . $key;
 		
