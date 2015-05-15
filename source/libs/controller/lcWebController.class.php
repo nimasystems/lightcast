@@ -228,6 +228,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     {
         $routing = $this->routing;
 
+        if (!$this->getHasInitialized()) {
+            throw new Exception();
+        }
+
         if (!$routing) {
             return $content;
         }
@@ -289,10 +293,20 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                             }
 
                             $this->prepareControllerInstance($decorating_controller);
-                            $render_response = $this->renderControllerAction(
-                                $decorating_controller,
-                                $action,
-                                $params);
+
+                            $render_response = null;
+
+                            $decorating_controller->initialize();
+
+                            try {
+                                $render_response = $this->renderControllerAction(
+                                    $decorating_controller,
+                                    $action,
+                                    $params);
+                            } catch (Exception $e) {
+                                $decorating_controller->shutdown();
+                                throw $e;
+                            }
 
                             if ($render_response) {
                                 $controller_content = $render_response['content'];
@@ -318,7 +332,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 }
 
                 // add debugging information
-                if (DO_DEBUG && $this->show_extra_debugging) {
+                if ($this->show_extra_debugging) {
                     $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
 
                     $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $module . '/' . $action);
@@ -328,7 +342,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                                 "\n\n" . htmlspecialchars($error_trace) : null) . '">' .*/
                         (!$has_error ? $controller_content :
                             '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
-                            $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . '</div>') .
+                            $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . "\n\n" . nl2br(htmlspecialchars(($error_trace))) . '</div>') .
                         /*'</div>' .*/
                         '<!-- DecoratingControllerEnd (' . $_url . ') -->';
 
@@ -377,7 +391,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 }
 
                 // add debugging information
-                if (DO_DEBUG && $this->show_extra_debugging) {
+                if ($this->show_extra_debugging) {
                     $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
 
                     $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $module . '/' . $action);

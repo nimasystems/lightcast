@@ -818,11 +818,20 @@ abstract class lcController extends lcBaseController implements iDebuggable
                 throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
             }
 
-            $this->prepareControllerInstance($controller_instance);
-            $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
+            $rendered_contents = null;
 
-            // shutdown the controller after usage
-            $controller_instance->shutdown();
+            $controller_instance->initialize();
+
+            $this->prepareControllerInstance($controller_instance);
+
+            try {
+                $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
+            } catch (Exception $e) {
+                // shutdown the controller after usage
+                $controller_instance->shutdown();
+
+                throw $e;
+            }
 
             if (!$rendered_contents) {
                 return null;
