@@ -32,6 +32,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
     const DEFAULT_BASE_CONFIG_DIR = 'default';
+    const DEFAULT_CONFIG_ENV = 'production';
 
     const DEFAULT_PLUGINS_LOCATION = 'addons/plugins';
     const DEFAULT_PROJECT_NAME = 'default';
@@ -58,6 +59,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected $project_db_models;
 
+    protected $config_variation;
     protected $config_environment;
     protected $config_version;
 
@@ -76,7 +78,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         // set vars
         $this->root_dir = ROOT;
-        $this->config_environment = self::DEFAULT_BASE_CONFIG_DIR;
+        $this->config_variation = self::DEFAULT_BASE_CONFIG_DIR;
+        $this->config_environment = self::DEFAULT_CONFIG_ENV;
     }
 
     public function initialize()
@@ -156,6 +159,16 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->config_environment = $environment;
     }
 
+    public function setConfigVariation($variation)
+    {
+        $this->config_variation = $variation;
+    }
+
+    public function getConfigVariation()
+    {
+        return $this->config_variation;
+    }
+
     public function getConfigEnvironment()
     {
         return $this->config_environment;
@@ -163,7 +176,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getBaseConfigDir()
     {
-        $ret = $this->getConfigDir() . DS . $this->config_environment;
+        $ret = $this->getConfigDir() . DS . $this->config_variation;
         return $ret;
     }
 
