@@ -74,7 +74,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected $plugins;
 
     /**
-     * @var lcComponen[]
+     * @var lcComponent[]
      */
     protected $loaded_components;
 
