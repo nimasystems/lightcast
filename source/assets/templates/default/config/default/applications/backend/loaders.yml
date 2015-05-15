@@ -10,6 +10,5 @@ all:
     user: SiteUser
     i18n: lcDbLanguageSystem
     mailer: lcPHPMailer
-    data_storage: lcVFSDataStorage
     cache: lcAdvMemcacheCacheStorage
 ...

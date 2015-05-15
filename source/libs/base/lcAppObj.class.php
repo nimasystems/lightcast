@@ -77,11 +77,11 @@ abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
      */
     protected $dbc;
 
-    /*
-     * Returns an instance of the Request loader
-    *
-    * @returns object lcRequest
-    */
+    /**
+     * Returns an instance of the Response loader
+     *
+     * @return lcRequest
+     */
     public function getRequest()
     {
         return $this->request;
@@ -92,11 +92,11 @@ abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
         $this->request = $request;
     }
 
-    /*
+    /**
      * Returns an instance of the Response loader
-    *
-    * @returns object lcResponse
-    */
+     *
+     * @return lcResponse
+     */
     public function getResponse()
     {
         return $this->response;

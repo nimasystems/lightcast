@@ -10,7 +10,6 @@ AddDefaultCharset UTF-8
     RewriteRule ^lib/(.*) lib/$1 [L]
     RewriteRule ^sandbox/(.*) sandbox/$1 [L]
     RewriteRule ^addons/(.*) addons/$1 [L]
-    RewriteRule ^vfs/(.*) data/vfs/$1 [L]
 
     RewriteRule ^(.*)$ webroot/$1 [QSA,L]
 </IfModule>

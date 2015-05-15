@@ -90,7 +90,7 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
 		{
 			return null;
 		}
-		
+
 		// get the content from subclassed view
 		$view_content = $this->getViewContent();
 

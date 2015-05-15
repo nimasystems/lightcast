@@ -14,6 +14,7 @@ all:
     - calendar_picker
     - forms
     - plupload
-    - vfs
+    - mogilefs
+    - storage
     - simple_cms
 ...

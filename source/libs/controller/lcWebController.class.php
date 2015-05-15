@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -21,12 +22,10 @@
 */
 
 /**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcWebController.class.php 1544 2014-06-21 06:14:47Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1544 $
+ * Class lcWebController
+ *
+ * @method lcWebResponse getResponse() returns the web response
+ * @method lcWebRequest getRequest() returns the web request
  */
 abstract class lcWebController extends lcWebBaseController implements iKeyValueProvider, iViewDecorator
 {
@@ -547,5 +546,3 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->keywords;
     }
 }
-
-?>

@@ -17,7 +17,9 @@
  * Plovdiv, Bulgaria
  * ZIP Code: 4000
  * Address: 95 "Kapitan Raycho" Str.
- * E-Mail: info@nimasystems.com */
+ * E-Mail: info@nimasystems.com
+
+ */
 
 /**
  * File Description
@@ -88,7 +90,6 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                     '^\/img',
                     '^\/files',
                     '^\/images',
-                    '^\/vfs'
                 ),
                 'lang_code_match' => '^\/(([a-z]{2}(_[A-Z]{2})?\/)|([a-z]{2}(_[A-Z]{2})?)$)\/*',
                 'autodetect' => true

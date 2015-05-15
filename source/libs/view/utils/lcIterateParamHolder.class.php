@@ -25,325 +25,318 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcIterateParamHolder.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcIterateParamHolder extends lcObj implements ArrayAccess
 {
-	const REPLACE_LEVEL = 1;
-	const REPLACE_DEEP = 2;
+    const REPLACE_LEVEL = 1;
+    const REPLACE_DEEP = 2;
 
-	private $subnodes;
-	private $node_repeats;
+    /**
+     * @var lcIterateParamHolder[]
+     */
+    private $subnodes;
 
-	private $node_name;
-	private $params;
+    /**
+     * @var lcIterateParamHolder[]
+     */
+    private $node_repeats;
 
-	private $raw_text;
-	private $replacement_policy;
+    private $node_name;
 
-	public function __construct($node_name = null, array $params = null, $replacement_policy =
-			self::REPLACE_LEVEL)
-	{
-		parent::__construct();
+    /**
+     * @var array
+     */
+    private $params;
 
-		$this->node_name = $node_name;
-		$this->params = $params;
-		$this->node_repeats = array();
-		$this->replacement_policy = $replacement_policy;
-	}
-	
-	public function __destruct()
-	{
-		$this->clear();
-		
-		parent::__destruct();
-	}
+    private $raw_text;
+    private $replacement_policy;
 
-	public function clear()
-	{
-		$subnodes = $this->subnodes;
-		
-		if ($subnodes)
-		{
-			foreach($subnodes as $name => $subnode)
-			{
-				unset($this->subnodes[$name]);
-				unset($name, $subnode);
-			}
-		}
-		
-		$node_repeats = $this->node_repeats;
-		
-		if ($node_repeats)
-		{
-			foreach($node_repeats as $idx => $node)
-			{
-				unset($this->node_repeats[$idx]);
-				unset($idx, $node);
-			}
-		}
-		
-		$this->subnodes =
-		$this->node_repeats =
-		$this->params =
-		$this->raw_text =
-		$this->replacement_policy =
-		null;
-	}
+    public function __construct($node_name = null, array $params = null, $replacement_policy =
+    self::REPLACE_LEVEL)
+    {
+        parent::__construct();
 
-	public function setReplaceLevel()
-	{
-		$this->replacement_policy = self::REPLACE_LEVEL;
-	}
+        $this->node_name = $node_name;
+        $this->params = $params;
+        $this->node_repeats = array();
+        $this->replacement_policy = $replacement_policy;
+    }
 
-	public function setReplaceDeep()
-	{
-		$this->replacement_policy = self::REPLACE_DEEP;
-	}
+    public function __destruct()
+    {
+        $this->clear();
 
-	public function setReplacementPolicy($policy)
-	{
-		$this->replacement_policy = $policy;
-	}
+        parent::__destruct();
+    }
 
-	public function setReplacementPolicyStr($policy_str)
-	{
-		switch($policy_str)
-		{
-			case 'level':
-				{
-					$this->setReplacementPolicy(self::REPLACE_LEVEL);
-					break;
-				}
-			case 'deep':
-				{
-					$this->setReplacementPolicy(self::REPLACE_DEEP);
-					break;
-				}
-			default:
-				{
-					$this->setReplacementPolicy(self::REPLACE_LEVEL);
-					break;
-				}
-		}
-	}
+    public function clear()
+    {
+        $subnodes = $this->subnodes;
 
-	public function getReplacementPolicy()
-	{
-		return $this->replacement_policy;
-	}
-	
-	public function insertNode($name, lcIterateParamHolder $node) 
-	{
-		$this->subnodes[$name] = $node;
-		
-		return $node;
-	}
-	
-	public function copyNode($name, lcIterateParamHolder $node)
-	{
-		$copy = clone $node;
-		$copy->setNodeName($name);
-		$this->insertNode($name, $copy);
-		
-		return $copy;
-	}
+        if ($subnodes) {
+            foreach ($subnodes as $name => $subnode) {
+                unset($this->subnodes[$name]);
+                unset($name, $subnode);
+            }
+        }
 
-	public function & getNode($name, $params = null)
-	{
-		assert(isset($name));
+        $node_repeats = $this->node_repeats;
 
-		if (isset($this->subnodes[$name]))
-		{
-			return $this->subnodes[$name];
-		}
+        if ($node_repeats) {
+            foreach ($node_repeats as $idx => $node) {
+                unset($this->node_repeats[$idx]);
+                unset($idx, $node);
+            }
+        }
 
-		$subnode = new lcIterateParamHolder($name,$params);
+        $this->subnodes =
+        $this->node_repeats =
+        $this->params =
+        $this->raw_text =
+        $this->replacement_policy =
+            null;
+    }
 
-		$this->subnodes[$name] = $subnode;
+    public function setReplaceLevel()
+    {
+        $this->replacement_policy = self::REPLACE_LEVEL;
+    }
 
-		return $this->subnodes[$name];
-	}
+    public function setReplaceDeep()
+    {
+        $this->replacement_policy = self::REPLACE_DEEP;
+    }
 
-	public function & repeat($name, $params=null)
-	{
-		$rep = count($this->node_repeats);
+    public function setReplacementPolicy($policy)
+    {
+        $this->replacement_policy = $policy;
+    }
 
-		$this->node_repeats[$rep] = new lcIterateParamHolder($name,$params);;
+    public function setReplacementPolicyStr($policy_str)
+    {
+        switch ($policy_str) {
+            case 'level': {
+                $this->setReplacementPolicy(self::REPLACE_LEVEL);
+                break;
+            }
+            case 'deep': {
+                $this->setReplacementPolicy(self::REPLACE_DEEP);
+                break;
+            }
+            default: {
+                $this->setReplacementPolicy(self::REPLACE_LEVEL);
+                break;
+            }
+        }
+    }
 
-		return $this->node_repeats[$rep];
-	}
+    public function getReplacementPolicy()
+    {
+        return $this->replacement_policy;
+    }
 
-	public function getDeepNode($node_deep_name)
-	{
-		if ($node_deep_name{0} == '/')
-		{
-			$node_deep_name = substr($node_deep_name, 1, strlen($node_deep_name));
-		}
+    public function insertNode($name, lcIterateParamHolder $node)
+    {
+        $this->subnodes[$name] = $node;
 
-		if ($node_deep_name{strlen($node_deep_name)-1} == '/')
-		{
-			$node_deep_name = substr($node_deep_name, 0, strlen($node_deep_name)-1);
-		}
+        return $node;
+    }
 
-		$tmp = explode('/',$node_deep_name);
+    public function copyNode($name, lcIterateParamHolder $node)
+    {
+        $copy = clone $node;
+        $copy->setNodeName($name);
+        $this->insertNode($name, $copy);
 
-		if (count($tmp) < 2)
-		{
-			return isset($this->subnodes[$tmp[0]]) ? $this->subnodes[$tmp[0]] : null;
-		}
-		else
-		{
-			return $this->findNode($this->subnodes, $tmp);
-		}
-	}
+        return $copy;
+    }
 
-	protected function findNode($nodes, array $node_path)
-	{
-		if (!$node_path || !$nodes) 
-		{
-			return false;
-		}
-		
-		foreach ($nodes as $key=>$subnode)
-		{
-			if ($key == $node_path[0])
-			{
-				array_shift($node_path);
+    public function & getNode($name, $params = null)
+    {
+        assert(isset($name));
 
-				if (!$node_path) 
-				{
-					return $subnode;
-				}
+        if (isset($this->subnodes[$name])) {
+            return $this->subnodes[$name];
+        }
 
-				return $this->findNode($subnode->getNodes(), $node_path);
-			}
-		}
+        $subnode = new lcIterateParamHolder($name, $params);
 
-		return null;
-	}
+        $this->subnodes[$name] = $subnode;
 
-	public function getNodes()
-	{
-		return $this->subnodes;
-	}
+        return $this->subnodes[$name];
+    }
 
-	public function rawText($text = null)
-	{
-		if (isset($text))
-		{
-			$this->params = null;
-			$this->node_repeats = null;
-			$this->raw_text = $text;
-			$this->subnodes = null;
-		}
+    public function & repeat($name, $params = null)
+    {
+        $rep = count($this->node_repeats);
 
-		return $this->raw_text;
-	}
+        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);;
 
-	public function getRepeats()
-	{
-		return $this->node_repeats;
-	}
+        return $this->node_repeats[$rep];
+    }
 
-	public function getNodeName()
-	{
-		return $this->node_name;
-	}
+    public function getDeepNode($node_deep_name)
+    {
+        if ($node_deep_name{0} == '/') {
+            $node_deep_name = substr($node_deep_name, 1, strlen($node_deep_name));
+        }
 
-	public function setNodeName($name)
-	{
-		$this->node_name = $name;
-	}
+        if ($node_deep_name{strlen($node_deep_name) - 1} == '/') {
+            $node_deep_name = substr($node_deep_name, 0, strlen($node_deep_name) - 1);
+        }
 
-	public function getParams()
-	{
-		return $this->params;
-	}
+        $tmp = explode('/', $node_deep_name);
 
-	public function setParams(array $params = null)
-	{
-		$this->params = $params;
-	}
+        if (count($tmp) < 2) {
+            return isset($this->subnodes[$tmp[0]]) ? $this->subnodes[$tmp[0]] : null;
+        } else {
+            return $this->findNode($this->subnodes, $tmp);
+        }
+    }
 
-	public function setParam($name, $value)
-	{
-		$this->params[$name] = $value;
-	}
+    /**
+     * @param array $nodes lcIterateParamHolder[]
+     * @param array $node_path
+     * @return lcIterateParamHolder|null
+     */
+    protected function findNode(array $nodes, array $node_path)
+    {
+        if (!$node_path || !$nodes) {
+            return null;
+        }
 
-	public function set($name, $value)
-	{
-		return $this->setParam($name, $value);
-	}
+        foreach ($nodes as $key => $subnode) {
+            if ($key == $node_path[0]) {
+                array_shift($node_path);
 
-	public function getParam($name)
-	{
-		if (!isset($this->params[$name])) 
-		{
-			return null;
-		}
+                if (!$node_path) {
+                    return $subnode;
+                }
 
-		return $this->params[$name];
-	}
+                return $this->findNode($subnode->getNodes(), $node_path);
+            }
+        }
 
-	public function get($name)
-	{
-		return $this->getParam($name);
-	}
+        return null;
+    }
 
-	public function clearParams()
-	{
-		$this->params = null;
-	}
+    public function getNodes()
+    {
+        return $this->subnodes;
+    }
 
-	public function removeParam($name)
-	{
-		if (!isset($this->params[$name])) 
-		{
-			return false;
-		}
+    public function rawText($text = null)
+    {
+        if (isset($text)) {
+            $this->params = null;
+            $this->node_repeats = null;
+            $this->raw_text = $text;
+            $this->subnodes = null;
+        }
 
-		unset($this->params[$name]);
+        return $this->raw_text;
+    }
 
-		return true;
-	}
+    public function getRepeats()
+    {
+        return $this->node_repeats;
+    }
 
-	public function __set($name, $value = null)
-	{
-		return $this->set($name, $value);
-	}
+    public function getNodeName()
+    {
+        return $this->node_name;
+    }
 
-	public function __get($name)
-	{
-		return $this->get($name);
-	}
+    public function setNodeName($name)
+    {
+        $this->node_name = $name;
+    }
 
-	public function offsetExists($name)
-	{
-		return array_key_exists($name, $this->params);
-	}
+    public function getParams()
+    {
+        return $this->params;
+    }
 
-	public function offsetGet($name)
-	{
-		if (!array_key_exists($name, $this->params)) 
-		{
-			return null;
-		}
+    public function setParams(array $params = null)
+    {
+        $this->params = $params;
+    }
 
-		return $this->params[$name];
-	}
+    public function setParam($name, $value)
+    {
+        $this->params[$name] = $value;
+    }
 
-	public function offsetSet($name, $value)
-	{
-		$this->params[$name] = $value;
-	}
+    public function set($name, $value)
+    {
+        $this->setParam($name, $value);
+    }
 
-	public function offsetUnset($name)
-	{
-		unset($this->params[$name]);
-	}
+    public function getParam($name)
+    {
+        if (!isset($this->params[$name])) {
+            return null;
+        }
+
+        return $this->params[$name];
+    }
+
+    public function get($name)
+    {
+        return $this->getParam($name);
+    }
+
+    public function clearParams()
+    {
+        $this->params = null;
+    }
+
+    public function removeParam($name)
+    {
+        if (!isset($this->params[$name])) {
+            return false;
+        }
+
+        unset($this->params[$name]);
+
+        return true;
+    }
+
+    public function __set($name, $value = null)
+    {
+        $this->set($name, $value);
+    }
+
+    public function __get($name)
+    {
+        return $this->get($name);
+    }
+
+    public function offsetExists($name)
+    {
+        return array_key_exists($name, $this->params);
+    }
+
+    public function offsetGet($name)
+    {
+        if (!array_key_exists($name, $this->params)) {
+            return null;
+        }
+
+        return $this->params[$name];
+    }
+
+    public function offsetSet($name, $value)
+    {
+        $this->params[$name] = $value;
+    }
+
+    public function offsetUnset($name)
+    {
+        unset($this->params[$name]);
+    }
 }
 
 ?>

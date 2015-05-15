@@ -30,13 +30,17 @@
  */
 class lcArrays
 {
-    public static function filterNum(array $array)
+    public static function filterNum(array $array, $leave_empty_numbers = false)
     {
         if (!$array) {
             return $array;
         }
 
-        $ret = array_filter(array_filter($array, 'is_numeric'));
+        $ret = array_filter($array, 'is_numeric');
+
+        if (!$leave_empty_numbers) {
+            $ret = array_filter($ret);
+        }
 
         return $ret;
     }
