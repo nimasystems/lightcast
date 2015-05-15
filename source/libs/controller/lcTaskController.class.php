@@ -58,11 +58,17 @@ abstract class lcTaskController extends lcController implements iDebuggable
         // otherwise let the error handler handle it
     }
 
+    /**
+     * @return lcView
+     */
     public function getDefaultViewInstance()
     {
         return null;
     }
 
+    /**
+     * @return lcView
+     */
     public function getDefaultLayoutViewInstance()
     {
         // console tasks don't have layouts

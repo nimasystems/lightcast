@@ -30,9 +30,24 @@
  */
 class lcSystemComponentFactory extends lcSysObj implements iCacheable
 {
+    /**
+     * @var lcWebController[]
+     */
     protected $controller_modules;
+
+    /**
+     * @var lcWebServiceController[]
+     */
     protected $controller_web_services;
+
+    /**
+     * @var lcTaskController[]
+     */
     protected $controller_tasks;
+
+    /**
+     * @var lcComponent[]
+     */
     protected $controller_components;
 
     // store the ones from configuration separately and merge them later
@@ -92,6 +107,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     public function onPluginWillStartup(lcEvent $event)
     {
+        /** @var $plugin lcPlugin */
         $plugin = isset($event->params['plugin_instance']) ? $event->params['plugin_instance'] : null;
 
         if ($plugin) {

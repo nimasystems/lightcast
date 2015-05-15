@@ -43,6 +43,9 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         $this->send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ? (bool)$this->configuration['settings.send_server_timezone'] : true;
     }
 
+    /**
+     * @return lcView
+     */
     public function getDefaultLayoutViewInstance()
     {
         // web services don't have layouts

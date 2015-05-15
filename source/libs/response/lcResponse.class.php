@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,55 +28,57 @@
  * @subpackage File Subcategory
  * @changed $Id: lcResponse.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 abstract class lcResponse extends lcSysObj implements iProvidesCapabilities
 {
-	protected $exit_code = 0;
-	protected $response_sent;
+    protected $exit_code = 0;
+    protected $response_sent;
 
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-	public function shutdown()
-	{
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
 
-	public function getCapabilities()
-	{
-		return array(
-				'response'
-		);
-	}
-	
-	abstract public function clear();
+    public function getCapabilities()
+    {
+        return array(
+            'response'
+        );
+    }
 
-	abstract public function getContent();
-	abstract public function getOutputContent();
-	abstract public function setContent($content);
-	abstract public function setShouldExitUponSend($do_exit = true);
+    abstract public function clear();
 
-	abstract public function sendResponse();
+    abstract public function getContent();
 
-	public function getIsResponseSent()
-	{
-		return $this->response_sent;
-	}
+    abstract public function getOutputContent();
 
-	public function setExitCode($exit_code = 0)
-	{
-		assert($exit_code >= 0 && $exit_code <= 255);
-		$this->exit_code = (int)$exit_code;
-	}
+    abstract public function setContent($content);
 
-	public function getExitCode()
-	{
-		return $this->exit_code;
-	}
+    abstract public function setShouldExitUponSend($do_exit = true);
+
+    abstract public function sendResponse();
+
+    public function getIsResponseSent()
+    {
+        return $this->response_sent;
+    }
+
+    public function setExitCode($exit_code = 0)
+    {
+        assert($exit_code >= 0 && $exit_code <= 255);
+        $this->exit_code = (int)$exit_code;
+    }
+
+    public function getExitCode()
+    {
+        return $this->exit_code;
+    }
 }
 
 ?>

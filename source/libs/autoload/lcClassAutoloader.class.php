@@ -31,7 +31,11 @@
 
 class lcClassAutoloader extends lcSysObj implements iCacheable
 {
+    /**
+     * @var array
+     */
 	protected $registered_classes = array();
+
 	protected $spl_registered;
 
 	public function initialize()

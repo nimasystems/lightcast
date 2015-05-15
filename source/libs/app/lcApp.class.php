@@ -40,17 +40,54 @@ class lcApp extends lcObj
 
     protected $delegate;
 
+    /**
+     * @var lcApplicationConfiguration
+     */
     protected $configuration;
+
+    /**
+     * @var lcEventDispatcher
+     */
     protected $event_dispatcher;
+
+    /**
+     * @var lcClassAutoloader
+     */
     protected $class_autoloader;
+
+    /**
+     * @var lcLocalCacheManager
+     */
     protected $local_cache_manager;
+
+    /**
+     * @var lcLogger
+     */
     protected $logger;
+
+    /**
+     * @var lcErrorHandler
+     */
     protected $error_handler;
 
+    /**
+     * @var lcProfiler
+     */
     protected $profiler;
 
+    /**
+     * @var lcSysObj[]
+     */
     protected $loader_instances;
+
+    /**
+     * @var lcSysObj[]
+     */
     protected $initialized_objects;
+
+    /**
+     * @var array
+     */
     protected $platform_capabilities;
 
     private $initialized;

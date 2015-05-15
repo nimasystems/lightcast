@@ -26,55 +26,60 @@
  * @subpackage File Subcategory
  * @changed $Id: lcDatabase.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 abstract class lcDatabase extends lcSysObj
 {
-	protected $database_manager;
-	protected $options;
+    /**
+     * @var lcDatabaseManager
+     */
+    protected $database_manager;
 
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    /**
+     * @var array
+     */
+    protected $options;
 
-	public function shutdown()
-	{
-		$this->database_manager =
-		$this->options =
-		null;
-		
-		parent::shutdown();
-	}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-	public function setDatabaseManager(lcDatabaseManager $database_manager)
-	{
-		$this->database_manager = $database_manager;
-	}
+    public function shutdown()
+    {
+        $this->database_manager =
+        $this->options =
+            null;
 
-	public function setOptions(array $options)
-	{
-		$this->options = $options;
-	}
+        parent::shutdown();
+    }
 
-	public function connect()
-	{
-		$connection = $this->getConnection();
+    public function setDatabaseManager(lcDatabaseManager $database_manager)
+    {
+        $this->database_manager = $database_manager;
+    }
 
-		if (!$connection)
-		{
-			return false;
-		}
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+    }
 
-		return $connection;
-	}
+    public function connect()
+    {
+        $connection = $this->getConnection();
 
-	abstract public function disconnect();
-	abstract public function isConnected();
+        if (!$connection) {
+            return false;
+        }
 
-	abstract public function getConnection();
-	abstract public function getSQLCount();
+        return $connection;
+    }
+
+    abstract public function disconnect();
+
+    abstract public function isConnected();
+
+    abstract public function getConnection();
+
+    abstract public function getSQLCount();
 }
-
-?>

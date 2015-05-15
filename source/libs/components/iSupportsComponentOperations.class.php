@@ -25,5 +25,3 @@ interface iSupportsComponentOperations {
 
 	public function getUsedComponents();
 }
-
-?>

@@ -15,42 +15,43 @@
  *
  * @package File Category
  * @subpackage File Subcategory
- *             @changed $Id: lcHtmlComponent.class.php 1535 2014-06-05 17:11:56Z mkovachev $
+ * @changed $Id: lcHtmlComponent.class.php 1535 2014-06-05 17:11:56Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1535 $
- *         
+ *
  */
-abstract class lcHtmlComponent extends lcComponent {
+abstract class lcHtmlComponent extends lcComponent
+{
 
-	public function initialize() {
-		parent::initialize();
-		
-		if (!$this->view) {
-			// init with default view
-			$template_filename = $this->getControllerDirectory() . DS . 'templates' . DS . $this->getControllerName() . '.htm';
-			
-			$view = new lcHTMLTemplateView();
-			$view->setController($this);
-			$view->setEventDispatcher($this->event_dispatcher);
-			$view->setConfiguration($this->configuration);
-			$view->setTemplateFilename($template_filename);
-			$view->initialize();
-			
-			$this->setView($view);
-		}
-	}
+    public function initialize()
+    {
+        parent::initialize();
 
-	public function shutdown() {
-		// shutdown the view
-		if ($this->view) {
-			$this->view->shutdown();
-			$this->view = null;
-		}
-		
-		$this->controller = null;
-		
-		parent::shutdown();
-	}
+        if (!$this->view) {
+            // init with default view
+            $template_filename = $this->getControllerDirectory() . DS . 'templates' . DS . $this->getControllerName() . '.htm';
+
+            $view = new lcHTMLTemplateView();
+            $view->setController($this);
+            $view->setEventDispatcher($this->event_dispatcher);
+            $view->setConfiguration($this->configuration);
+            $view->setTemplateFilename($template_filename);
+            $view->initialize();
+
+            $this->setView($view);
+        }
+    }
+
+    public function shutdown()
+    {
+        // shutdown the view
+        if ($this->view) {
+            $this->view->shutdown();
+            $this->view = null;
+        }
+
+        $this->controller = null;
+
+        parent::shutdown();
+    }
 }
-
-?>

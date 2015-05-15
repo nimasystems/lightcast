@@ -35,9 +35,19 @@ abstract class lcMailer extends lcSysObj implements iProvidesCapabilities
 {
     const LOG_CHANNEL = 'mail';
 
+    /**
+     * @var lcMailRecipient[]
+     */
     protected $recipients;
+
+    /**
+     * @var lcMailRecipient
+     */
     protected $sender;
 
+    /**
+     * @var lcMailAttachment[]
+     */
     protected $attachments;
 
     protected $body;

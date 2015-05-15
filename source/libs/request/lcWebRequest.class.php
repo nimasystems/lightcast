@@ -30,9 +30,19 @@
  */
 class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyValueProvider
 {
+    /**
+     * @var lcHttpFilesCollection
+     */
     private $files;
 
+    /**
+     * @var lcArrayCollection
+     */
     private $post_params;
+
+    /**
+     * @var lcArrayCollection
+     */
     private $get_params;
 
     private $request_method; // ANY, GET, PUT, POST, HEAD - httpMethods
@@ -42,6 +52,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     private $accept_encoding;
     private $accept_charset;
 
+    /**
+     * @var lcCookiesCollection
+     */
     private $cookies;
 
     private $app_url;

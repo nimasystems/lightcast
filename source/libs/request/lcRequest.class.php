@@ -30,7 +30,14 @@
  */
 abstract class lcRequest extends lcSysObj implements iProvidesCapabilities, Serializable, ArrayAccess, iKeyValueProvider, iDebuggable
 {
+    /**
+     * @var lcArrayCollection
+     */
     protected $params;
+
+    /**
+     * @var array
+     */
     protected $env;
 
     protected $sapi;

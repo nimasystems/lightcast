@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,37 +27,34 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcMailAttachment.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcMailAttachment extends lcObj
 {
-	private $filename;
-	private $filepath;
-	private $mimetype;
+    private $filename;
+    private $filepath;
+    private $mimetype;
 
-	public function __construct($filepath, $mimetype, $filename = null)
-	{
-		$this->filepath = $filepath;
-		$this->mimetype = $mimetype;
-		$this->filename = isset($filename) ? $filename : basename($filepath);
-	}
+    public function __construct($filepath, $mimetype, $filename = null)
+    {
+        $this->filepath = $filepath;
+        $this->mimetype = $mimetype;
+        $this->filename = isset($filename) ? $filename : basename($filepath);
+    }
 
-	public function getFilePath()
-	{
-		return $this->filepath;
-	}
+    public function getFilePath()
+    {
+        return $this->filepath;
+    }
 
-	public function getMimetype()
-	{
-		return $this->mimetype;
-	}
+    public function getMimetype()
+    {
+        return $this->mimetype;
+    }
 
-	public function getFilename()
-	{
-		return $this->filename;
-	}
+    public function getFilename()
+    {
+        return $this->filename;
+    }
 }
-
-?>

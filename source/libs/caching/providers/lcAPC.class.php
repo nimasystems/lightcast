@@ -27,78 +27,112 @@
  * @changed $Id: lcAPC.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcAPC extends lcSysObj implements iCacheStorage
 {
-	private $prefix;
-	private $apc_exists_available;
+    /**
+     * @var string
+     */
+    private $prefix;
 
-	public function __construct()
-	{
-		// check for apc
-		if (!function_exists('apc_fetch'))
-		{
-			throw new lcSystemException('APC is not available');
-		}
+    /**
+     * @var bool
+     */
+    private $apc_exists_available;
 
-		// apc_exists is available after (PECL apc >= 3.1.4)
-		if (function_exists('apc_exists'))
-		{
-			$this->apc_exists_available = true;
-		}
+    /**
+     * @throws lcSystemException
+     */
+    public function __construct()
+    {
+        // check for apc
+        if (!function_exists('apc_fetch')) {
+            throw new lcSystemException('APC is not available');
+        }
 
-		$this->prefix = 'lc_';
-	}
+        // apc_exists is available after (PECL apc >= 3.1.4)
+        if (function_exists('apc_exists')) {
+            $this->apc_exists_available = true;
+        }
 
+        $this->prefix = 'lc_';
+    }
+
+    /**
+     * @return bool
+     */
     public function getStats()
     {
         return false;
     }
 
-	public function set($key, $value = null, $lifetime = null, $other_flags = null)
-	{
-		$key_prefixed = $this->prefix . $key;
-		
-		// apc persistently stores the value until it expires or is manually removed
-		// so it must be removed first in order to see the live changes on the next load
-		if (1)
-		{
-			$this->remove($key);
-		}
-		
-		return apc_add($key_prefixed, $value, $lifetime);
-	}
+    /**
+     * @param $key
+     * @param null $value
+     * @param null $lifetime
+     * @param null $other_flags
+     * @return bool
+     */
+    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    {
+        $key_prefixed = $this->prefix . $key;
 
-	public function remove($key)
-	{
-		$key = $this->prefix . $key;
-		return apc_delete($key);
-	}
+        // apc persistently stores the value until it expires or is manually removed
+        // so it must be removed first in order to see the live changes on the next load
+        if (1) {
+            $this->remove($key);
+        }
 
-	public function get($key)
-	{
-		$key = $this->prefix . $key;
-		return apc_fetch($key);
-	}
+        return apc_add($key_prefixed, $value, $lifetime);
+    }
 
-	public function has($key)
-	{
-		$apc_exists_available = $this->apc_exists_available;
+    /**
+     * @param $key
+     * @return bool|string[]
+     */
+    public function remove($key)
+    {
+        $key = $this->prefix . $key;
+        return apc_delete($key);
+    }
 
-		$key = $this->prefix . $key;
-		$has = $apc_exists_available ? apc_exists($key) : (bool)apc_fetch($key);
+    /**
+     * @param $key
+     * @return mixed
+     */
+    public function get($key)
+    {
+        $key = $this->prefix . $key;
+        return apc_fetch($key);
+    }
 
-		return $has;
-	}
+    /**
+     * @param $key
+     * @return bool|string[]
+     */
+    public function has($key)
+    {
+        $apc_exists_available = $this->apc_exists_available;
 
-	public function clear()
-	{
-		return apc_clear_cache();
-	}
+        $key = $this->prefix . $key;
+        $has = $apc_exists_available ? apc_exists($key) : (bool)apc_fetch($key);
 
-	public function getBackend()
-	{
-		return null;
-	}
+        return $has;
+    }
+
+    /**
+     * @return bool
+     */
+    public function clear()
+    {
+        return apc_clear_cache();
+    }
+
+    /**
+     * @return null
+     */
+    public function getBackend()
+    {
+        return null;
+    }
 }

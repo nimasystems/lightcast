@@ -38,18 +38,44 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     protected $translation_context_type;
     protected $translation_context_name;
 
+    /**
+     * @var lcPlugin
+     */
     protected $parent_plugin;
+
     protected $context_type;
     protected $context_name;
 
+    /**
+     * @var lcLogger
+     */
     protected $logger;
+
+    /**
+     * @var lcI18n
+     */
     protected $i18n;
+
+    /**
+     * @var lcPluginManager
+     */
     protected $plugin_manager;
 
     private $has_initialized = false;
 
+    /**
+     * @var lcClassAutoloader
+     */
     protected $class_autoloader;
+
+    /**
+     * @var lcEventDispatcher
+     */
     protected $event_dispatcher;
+
+    /**
+     * @var lcConfiguration
+     */
     protected $configuration;
 
     public function __construct()

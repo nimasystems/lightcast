@@ -38,17 +38,41 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     const WEB_SERVICES_PATH = 'ws';
     const TASKS_PATH = 'tasks';
 
+    /**
+     * @var lcApp
+     */
     protected $app_context;
+
     protected $app_initialize_done;
 
+    /**
+     * @var lcDatabaseModelManager
+     */
     protected $database_model_manager;
+
+    /**
+     * @var lcSystemComponentFactory
+     */
     protected $system_component_factory;
 
+    /**
+     * @var lcPluginConfiguration
+     */
     protected $plugin_configuration;
 
+    /**
+     * @var array
+     */
     protected $use_models;
+
+    /**
+     * @var array
+     */
     protected $use_components;
 
+    /**
+     * @var lcComponent[]
+     */
     protected $loaded_components;
 
     protected $controller_name;
@@ -186,6 +210,11 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->loaded_components = $loaded_components;
     }
 
+    /**
+     * @param $component_name
+     * @return lcComponent|null
+     * @throws lcComponentException
+     */
     protected function getComponent($component_name)
     {
         $component_instance = null;
@@ -294,11 +323,18 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $this->plugin_manager;
     }
 
+    /**
+     * @param $plugin_name
+     * @return lcPlugin
+     */
     protected function getPlugin($plugin_name)
     {
         return $this->plugin_manager->getPlugin($plugin_name);
     }
 
+    /**
+     * @return lcPluginConfiguration
+     */
     public function getPluginConfiguration()
     {
         return $this->plugin_configuration;

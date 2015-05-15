@@ -44,26 +44,52 @@ abstract class lcController extends lcBaseController implements iDebuggable
     const VAUTH = 'is_authenticated';
     const VNAUTH = 'not_authenticated';
 
+    /**
+     * @var lcControllerStack
+     */
     protected $controller_stack;
 
+    /**
+     * @var lcActionFilter[]
+     */
     protected $action_filters;
+
+    /**
+     * @var lcActionFilterChain
+     */
     protected $action_filter_chain;
 
     protected $action_name;
     protected $action_params;
     protected $action_type;
 
+    /**
+     * @var array
+     */
     protected $dispatch_params;
 
     protected $action_result;
 
+    /**
+     * @var lcController
+     */
     protected $root_controller;
+
+    /**
+     * @var lcController
+     */
     protected $parent_controller;
 
     protected $render_time;
 
+    /**
+     * @var lcView
+     */
     protected $layout_view;
 
+    /**
+     * @return lcView
+     */
     abstract public function getDefaultLayoutViewInstance();
 
     abstract protected function classMethodForAction($action_name, array $action_params = null);

@@ -32,6 +32,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 {
     const TR_MULTILINE_DETECT_REP = '-----rtn----';
 
+    /**
+     * @var lcWebRequest
+     */
     protected $request;
 
     protected $status_code = lcHttpStatusCode::OK;
@@ -40,6 +43,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     protected $exit_upon_send;
 
+    /**
+     * @var lcArrayCollection
+     */
     protected $custom_headers;
 
     protected $server_charset = 'utf-8';
@@ -50,19 +56,54 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $content;
     protected $output_content;
 
+    /**
+     * @var lcCookiesCollection
+     */
     private $cookies;
 
+    /**
+     * @var array
+     */
     protected $javascripts;
+
+    /**
+     * @var array
+     */
     protected $javascripts_end;
+
+    /**
+     * @var array
+     */
     protected $stylesheets;
+
+    /**
+     * @var array
+     */
     protected $metatags;
+
+    /**
+     * @var array
+     */
     protected $rssfeeds;
+
     protected $icon;
     protected $html_base;
     protected $title;
     protected $lang_dir;
+
+    /**
+     * @var array
+     */
     protected $body_tags;
+
+    /**
+     * @var array
+     */
     protected $html_head_custom;
+
+    /**
+     * @var array
+     */
     protected $html_body_custom;
 
     protected $allow_javascripts;

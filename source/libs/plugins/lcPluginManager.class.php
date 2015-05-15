@@ -34,21 +34,41 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     protected $should_load_plugins = true;
 
+    /**
+     * @var lcSystemComponentFactory
+     */
     protected $system_component_factory;
+
+    /**
+     * @var lcDatabaseModelManager
+     */
     protected $database_model_manager;
 
+    /**
+     * @var lcPlugin[]
+     */
     protected $plugins;
+
+    /**
+     * @var lcPluginConfiguration[]
+     */
     protected $plugin_configurations;
 
     protected $runtime_plugins;
     protected $enabled_plugins;
 
+    /**
+     * @var lcRouting
+     */
     protected $routing;
 
     private $plugin_configurations_cached;
     private $included_plugin_classes;
     private $plugin_autostart_events;
 
+    /**
+     * @var lcApp
+     */
     protected $app_context;
 
     public function initialize()
@@ -561,6 +581,13 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return isset($this->plugins[$plugin_name]);
     }
 
+    /**
+     * @param $plugin_name
+     * @param bool $try_initialize
+     * @return lcPlugin|null
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     */
     public function getPlugin($plugin_name, $try_initialize = true)
     {
         if (!isset($this->plugins[$plugin_name]) && $try_initialize) {

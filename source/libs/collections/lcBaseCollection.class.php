@@ -25,238 +25,234 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcBaseCollection.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 abstract class lcBaseCollection extends lcObj
 {
-	protected $list;
+    /**
+     * @var ArrayIterator
+     */
+    protected $list;
 
-	const SPL_OBJECT_NAME = 'ArrayIterator';
+    const SPL_OBJECT_NAME = 'ArrayIterator';
 
-	/*
-	 * Construct a new array iterator from anything that has a hash table.
-	* That is any Array or Object.
-	*/
-	public function __construct(array $data = null)
-	{
-		parent::__construct();
+    /*
+     * Construct a new array iterator from anything that has a hash table.
+    * That is any Array or Object.
+    */
+    public function __construct(array $data = null)
+    {
+        parent::__construct();
 
-		if (!class_exists(self::SPL_OBJECT_NAME, false))
-		{
-			throw new lcSystemException('Cannot load SPL Object: '.self::SPL_OBJECT_NAME);
-		}
+        if (!class_exists(self::SPL_OBJECT_NAME, false)) {
+            throw new lcSystemException('Cannot load SPL Object: ' . self::SPL_OBJECT_NAME);
+        }
 
-		$splclass = self::SPL_OBJECT_NAME;
-		$this->list = new $splclass($data ? $data : array());
-	}
+        $splclass = self::SPL_OBJECT_NAME;
+        $this->list = new $splclass($data ? $data : array());
+    }
 
-	public function __destruct()
-	{
-		unset($this->list);
+    public function __destruct()
+    {
+        unset($this->list);
 
-		parent::__destruct();
-	}
+        parent::__destruct();
+    }
 
-	protected function appendColl($value)
-	{
-		$this->list->append($value);
-	}
+    protected function appendColl($value)
+    {
+        $this->list->append($value);
+    }
 
-	public function offsetExists($index)
-	{
-		return $this->list->offsetExists($index);
-	}
+    public function offsetExists($index)
+    {
+        return $this->list->offsetExists($index);
+    }
 
-	public function offsetGet($index)
-	{
-		return $this->list->offsetGet($index);
-	}
+    public function offsetGet($index)
+    {
+        $this->list->offsetGet($index);
+    }
 
-	protected function offsetSetColl($index, $value)
-	{
-		return $this->list->offsetSet($index, $value);
-	}
+    protected function offsetSetColl($index, $value)
+    {
+        $this->list->offsetSet($index, $value);
+    }
 
-	protected function offsetUnset($index)
-	{
-		return $this->list->offsetUnset($index);
-	}
+    protected function offsetUnset($index)
+    {
+        $this->list->offsetUnset($index);
+    }
 
-	protected function setColl($value, $offset=null)
-	{
-		return $this->list->offsetSet($offset ? $offset : $this->list->key(),$value);
-	}
+    protected function setColl($value, $offset = null)
+    {
+        $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
+    }
 
-	protected function delete($offset=null)
-	{
-		return $this->list->offsetUnset($offset ? $offset : $this->key());
-	}
+    protected function delete($offset = null)
+    {
+        $this->list->offsetUnset($offset ? $offset : $this->key());
+    }
 
-	protected function clear()
-	{
-		$spl = self::SPL_OBJECT_NAME;
-		$this->list = new $spl;
-	}
+    protected function clear()
+    {
+        $spl = self::SPL_OBJECT_NAME;
+        $this->list = new $spl;
+    }
 
-	public function getArrayCopy()
-	{
-		return $this->list->getArrayCopy();
-	}
+    public function getArrayCopy()
+    {
+        return $this->list->getArrayCopy();
+    }
 
-	/*
-	 * Get vars
-	*/
-	public function count()
-	{
-		return $this->list->count();
-	}
+    /*
+     * Get vars
+    */
+    public function count()
+    {
+        return $this->list->count();
+    }
 
-	public function key()
-	{
-		return $this->list->key();
-	}
+    public function key()
+    {
+        return $this->list->key();
+    }
 
-	public function pos()
-	{
-		return $this->key();
-	}
+    public function pos()
+    {
+        return $this->key();
+    }
 
-	public function isValid()
-	{
-		return $this->list->valid();
-	}
+    public function isValid()
+    {
+        return $this->list->valid();
+    }
 
-	/*
-	 * Manage Position of List
-	*/
-	public function current()
-	{
-		return $this->list->current();
-	}
+    /*
+     * Manage Position of List
+    */
+    public function current()
+    {
+        return $this->list->current();
+    }
 
-	public function selected()
-	{
-		return $this->current();
-	}
+    public function selected()
+    {
+        return $this->current();
+    }
 
-	public function previous()
-	{
-		if (!$this->offsetExists($this->list->key()-1)) 
-		{
-			return null;
-		}
-		
-		return $this->list->seek($this->list->key()-1);
-	}
+    public function previous()
+    {
+        if (!$this->offsetExists($this->list->key() - 1)) {
+            return null;
+        }
 
-	public function next()
-	{
-		return $this->list->current();
-	}
+        $this->list->seek($this->list->key() - 1);
+    }
 
-	public function seek($position)
-	{
-		return $this->list->seek($position);
-	}
+    public function next()
+    {
+        return $this->list->current();
+    }
 
-	public function rewind()
-	{
-		return $this->list->rewind();
-	}
+    public function seek($position)
+    {
+        $this->list->seek($position);
+    }
 
-	public function first()
-	{
-		return $this->rewind();
-	}
+    public function rewind()
+    {
+        $this->list->rewind();
+    }
 
-	public function last()
-	{
-		if ($this->pos() == $this->count()-1)
-		{
-			return;
-		}
+    public function first()
+    {
+        $this->rewind();
+    }
 
-		$this->list->seek($this->count()-1);
-	}
+    public function last()
+    {
+        if ($this->pos() == $this->count() - 1) {
+            return;
+        }
 
-	public function getAll()
-	{
-		return $this->list;
-	}
+        $this->list->seek($this->count() - 1);
+    }
 
-	/*
-	 * Sorting functions
-	*/
-	protected function asort()
-	{
-		return $this->list->asort();
-	}
+    public function getAll()
+    {
+        return $this->list;
+    }
 
-	protected function ksort()
-	{
-		return $this->list->ksort();
-	}
+    /*
+     * Sorting functions
+    */
+    protected function asort()
+    {
+        $this->list->asort();
+    }
 
-	protected function natcasesort()
-	{
-		return $this->list->natcasesort();
-	}
+    protected function ksort()
+    {
+        $this->list->ksort();
+    }
 
-	protected function natsort()
-	{
-		return $this->list->natsort();
-	}
+    protected function natcasesort()
+    {
+        $this->list->natcasesort();
+    }
 
-	protected function uasort()
-	{
-		return $this->list->uasort();
-	}
+    protected function natsort()
+    {
+        $this->list->natsort();
+    }
 
-	protected function uksort()
-	{
-		return $this->list->uksort();
-	}
+    protected function uasort($cmp_function)
+    {
+        $this->list->uasort($cmp_function);
+    }
 
-	/*
-	 * Other
-	*/
-	protected function setSPLFlags($flags)
-	{
-		return $this->list->setFlags($flags);
-	}
+    protected function uksort($cmp_function)
+    {
+        $this->list->uksort($cmp_function);
+    }
 
-	public function getSPLFlags()
-	{
-		return $this->list->getFlags();
-	}
+    /*
+     * Other
+    */
+    protected function setSPLFlags($flags)
+    {
+        $this->list->setFlags($flags);
+    }
 
-	public function __toString()
-	{
-		$out = '';
+    public function getSPLFlags()
+    {
+        return $this->list->getFlags();
+    }
 
-		if ($this->count())
-		{
-			$a = array();
-			$list = $this->list;
+    public function __toString()
+    {
+        $out = '';
 
-			if ($list && is_array($list))
-			{
-				foreach ($list as $val)
-				{
-					$a[] = (is_string($val) ? $val : var_export($val, true));
+        if ($this->count()) {
+            $a = array();
+            $list = $this->list;
 
-					unset($val);
-				}
-			}
+            if ($list && is_array($list)) {
+                foreach ($list as $val) {
+                    $a[] = (is_string($val) ? $val : var_export($val, true));
 
-			$out = implode(', ',$a);
-			unset($a);
-		}
+                    unset($val);
+                }
+            }
 
-		return $out;
-	}
+            $out = implode(', ', $a);
+            unset($a);
+        }
+
+        return $out;
+    }
 }
 
 ?>

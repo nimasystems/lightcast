@@ -26,72 +26,79 @@
  * @subpackage File Subcategory
  * @changed $Id: lcRouting.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 abstract class lcRouting extends lcSysObj implements iProvidesCapabilities, iDebuggable
 {
-	protected $request;
-	protected $context;
+    /**
+     * @var lcRequest
+     */
+    protected $request;
 
-	protected $default_module;
-	protected $default_action;
+    /**
+     * @var lcApp
+     */
+    protected $context;
 
-	abstract public function getParams();
-	abstract public function getParamsByCriteria($criteria);
+    protected $default_module;
+    protected $default_action;
 
-	public function initialize()
-	{
-		parent::initialize();
+    abstract public function getParams();
 
-		$this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
-		$this->context = $this->request->getRequestContext();
+    abstract public function getParamsByCriteria($criteria);
 
-		assert(isset($this->context) && is_array($this->context));
+    public function initialize()
+    {
+        parent::initialize();
 
-		// config
-		$this->default_module = (string)$this->configuration['routing.default_module'];
-		$this->default_action = (string)$this->configuration['routing.default_action'];
+        $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
+        $this->context = $this->request->getRequestContext();
 
-		$this->context['default_module'] = $this->default_module;
-		$this->context['default_action'] = $this->default_action;
-	}
+        assert(isset($this->context) && is_array($this->context));
 
-	public function shutdown()
-	{
-		$this->context =
-		$this->request =
-		null;
+        // config
+        $this->default_module = (string)$this->configuration['routing.default_module'];
+        $this->default_action = (string)$this->configuration['routing.default_action'];
 
-		parent::shutdown();
-	}
+        $this->context['default_module'] = $this->default_module;
+        $this->context['default_action'] = $this->default_action;
+    }
 
-	public function getCapabilities()
-	{
-		return array(
-				'routing'
-		);
-	}
-	
-	public function getDebugInfo()
-	{
-		$debug = array(
-				'default_module' => $this->default_module,
-				'default_action' => $this->default_action
-				);
+    public function shutdown()
+    {
+        $this->context =
+        $this->request =
+            null;
 
-		return $debug;
-	}
+        parent::shutdown();
+    }
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+    public function getCapabilities()
+    {
+        return array(
+            'routing'
+        );
+    }
 
-	public function getContext()
-	{
-		return $this->context;
-	}
+    public function getDebugInfo()
+    {
+        $debug = array(
+            'default_module' => $this->default_module,
+            'default_action' => $this->default_action
+        );
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
+
+    public function getContext()
+    {
+        return $this->context;
+    }
 }
 
 ?>

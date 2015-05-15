@@ -25,65 +25,59 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcValueCollection.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcValueCollection extends lcBaseCollection
 {
-	public function append($value)
-	{
-		return parent::append($value);
-	}
+    public function append($value)
+    {
+        return parent::append($value);
+    }
 
-	public function offsetSet($index, $value)
-	{
-		return parent::offsetSet($index, $value);
-	}
+    public function offsetSet($index, $value)
+    {
+        return parent::offsetSet($index, $value);
+    }
 
-	public function offsetUnset($index)
-	{
-		return parent::offsetUnset($index);
-	}
+    public function offsetUnset($index)
+    {
+        return parent::offsetUnset($index);
+    }
 
-	public function get($value)
-	{
-		$this->first();
+    public function get($value)
+    {
+        $this->first();
 
-		$all = $this->getAll();
+        $all = $this->getAll();
 
-		if ($all && is_array($all))
-		{
-			foreach ($all as $el)
-			{
-				if ($el == $value)
-				{
-					return $el;
-				}
+        if ($all && is_array($all)) {
+            foreach ($all as $el) {
+                if ($el == $value) {
+                    return $el;
+                }
 
-				unset($el);
-			}
-		}
+                unset($el);
+            }
+        }
 
-		unset($all);
+        unset($all);
 
-		return false;
-	}
+        return false;
+    }
 
-	public function set($value, $offset=null)
-	{
-		return parent::set($value, $offset);
-	}
+    public function set($value, $offset = null)
+    {
+        return parent::set($value, $offset);
+    }
 
-	public function delete($offset=null)
-	{
-		return parent::delete($offset);
-	}
+    public function delete($offset = null)
+    {
+        return parent::delete($offset);
+    }
 
-	public function clear()
-	{
-		return parent::clear();
-	}
+    public function clear()
+    {
+        return parent::clear();
+    }
 }
-
-?>

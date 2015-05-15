@@ -35,12 +35,31 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     const RENDER_NONE = 2;
     const RENDER_VIEW = 3;
 
+    /**
+     * @var lcSystemComponentFactory
+     */
     protected $system_component_factory;
+
+    /**
+     * @var lcPluginManager
+     */
     protected $plugin_manager;
+
+    /**
+     * @var lcDatabaseManager
+     */
     protected $database_model_manager;
 
+    /**
+     * @var lcView
+     */
     protected $view;
+
+    /**
+     * @var lcViewFilterChain
+     */
     protected $view_filter_chain;
+
     protected $view_render_type;
 
     protected $use_models;
@@ -48,9 +67,17 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected $use_plugins;
 
     protected $dependancies_loaded;
+
+    /**
+     * @var lcPlugin[]
+     */
     protected $plugins;
 
+    /**
+     * @var lcComponen[]
+     */
     protected $loaded_components;
+
     private $loaded_components_usage;
 
     protected $controller_name;
@@ -333,6 +360,16 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $controller->setSystemComponentFactory($this->system_component_factory);
     }
 
+    /**
+     * @param $component_name
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcComponent
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
     protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
     {
         if (!$this->system_component_factory) {
@@ -396,7 +433,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                             $e);
                     }
 
-                    $plugins[$context_plugin_name] = & $my_plugin;
+                    $plugins[$context_plugin_name] = &$my_plugin;
                 }
             }
 
@@ -422,7 +459,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                             $e);
                     }
 
-                    $plugins[$plugin_name] = & $plugin;
+                    $plugins[$plugin_name] = &$plugin;
 
                     unset($plugin_name, $plugin);
                 }

@@ -30,7 +30,11 @@
  */
 class lcConsoleResponse extends lcResponse
 {
+    /**
+     * @var lcConsoleRequest
+     */
     protected $request;
+
     protected $exit_upon_send;
 
     private $content;
