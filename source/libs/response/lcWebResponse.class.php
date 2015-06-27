@@ -66,6 +66,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      */
     protected $javascripts;
 
+    protected $js_at_end_forced;
+    protected $css_at_end_forced;
+
+    protected $javascripts_async;
+
     /**
      * @var array
      */
@@ -140,6 +145,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // HTML5 or 4
         $this->htmlver = $this->configuration['view.htmlver'];
+
+        $this->js_at_end_forced = (bool)$this->configuration['view.javascripts_at_end'];
+        $this->css_at_end_forced = (bool)$this->configuration['view.stylesheets_at_end'];
+        $this->javascripts_async = (bool)$this->configuration['view.javascripts_async'];
 
         // dir
         $this->lang_dir = (string)$this->configuration['view.dir'];
@@ -357,6 +366,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function javascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
     {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
         return $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
     }
 
@@ -366,6 +377,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
     {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
         if (is_array($src)) {
             foreach ($src as $s) {
                 $this->setJavascript($s, $type, $language, $at_end, $other_attribs);
@@ -389,6 +402,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function prependJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
     {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
         $new = array();
         $new[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
 
@@ -868,6 +883,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                         unset($key, $v);
                     }
                 }
+
+                if ($this->javascripts_async) {
+                    $oattr[] = 'async';
+                }
+
                 $scr = '<script type="' . $data['type'] . '" src="' . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $head[] = $scr;
 
@@ -887,6 +907,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                         unset($key, $v);
                     }
                 }
+
+                if ($this->javascripts_async) {
+                    $oattr[] = 'async';
+                }
+
                 $scr = '<script type="' . $data['type'] . '" src="' . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $this->html_body_custom['end'][] = $scr;
 

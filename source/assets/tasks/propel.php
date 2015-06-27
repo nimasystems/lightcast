@@ -170,6 +170,23 @@ EOD;
         return true;
     }
 
+    private $plugin_configs = array();
+
+    private function getPluginConfig($plugin_name, $plugin_path)
+    {
+        if (!isset($this->plugin_configs[$plugin_name])) {
+            $pl_config = $this->getPluginManager()->getInstanceOfPluginConfiguration($plugin_path, $plugin_name, null);
+
+            if (!$pl_config) {
+                return null;
+            }
+
+            $this->plugin_configs[$plugin_name] = $pl_config;
+        }
+
+        return $this->plugin_configs[$plugin_name];
+    }
+
     private function getPluginSchemas()
     {
         $schemas = array();
@@ -178,7 +195,10 @@ EOD;
 
         if ($plugins) {
             foreach ($plugins as $plugin_name => $plugin_data) {
-                if (file_exists($plugin_data['path'] . DS . 'config' . DS . self::SCHEMA_FILE)) {
+
+                $plconf = $this->getPluginConfig($plugin_name, $plugin_data['path']);
+
+                if ($plconf && $plconf instanceof iSupportsDbModels) {
                     $schemas[$plugin_data['name']] = array(
                         'plugin_data' => $plugin_data,
                         'schema_filename' => $plugin_data['path'] . DS . 'config' . DS . self::SCHEMA_FILE
@@ -194,7 +214,7 @@ EOD;
         return $schemas;
     }
 
-    private function getSchemaDirs(array $only_entities = null)
+    private function getSchemaDetails(array $only_entities = null)
     {
         // holder for all folders containing schemas
         // all schemas will be looked up - *-schema.xml, schema.xml
@@ -204,7 +224,8 @@ EOD;
         $schemas[lcSysObj::CONTEXT_PROJECT] = array();
 
         if ((isset($only_entities)) && (in_array('project', $only_entities)) || (!isset($only_entities))) {
-            $schemas[lcSysObj::CONTEXT_PROJECT][] = $this->configuration->getConfigDir();
+            $schemas[lcSysObj::CONTEXT_PROJECT]['main']['path'] = $this->configuration->getConfigDir();
+            $schemas[lcSysObj::CONTEXT_PROJECT]['main']['models'] = $this->getProjectModels();
         }
 
         // plugin schemas
@@ -218,7 +239,14 @@ EOD;
                     continue;
                 }
 
-                $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']] = $plugin_data['path'] . DS . 'config';
+                $models = $this->getPluginModels($plugin_name, $plugin_data['path']);
+
+                if (!$models) {
+                    continue;
+                }
+
+                $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']]['path'] = $plugin_data['path'] . DS . 'config';
+                $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']]['models'] = $models;
 
                 unset($plugin_data, $plugin_name);
             }
@@ -232,6 +260,8 @@ EOD;
     /* Remove propel temporary stuff, oms, maps, sql files */
     private function propelFlush()
     {
+        $this->display('Flushing runtime data...');
+
         $dir = $this->configuration->getAppRootDir();
         $gen_dir = $this->configuration->getGenDir();
 
@@ -383,7 +413,7 @@ EOD;
                 $cPath = $data['schema_filename'];
 
                 try {
-                    $pl_config = $plugin_manager->getInstanceOfPluginConfiguration($plugin_data['path'], $plugin_name, null);
+                    $pl_config = $this->getPluginConfig($plugin_name, $plugin_data['path']);
 
                     if (!$pl_config) {
                         throw new lcSystemException('Could not obtain plugin configuration');
@@ -407,7 +437,7 @@ EOD;
                     if ($fix_plugin_schemas && ((is_array($fix_plugin_schemas) && in_array($plugin_name, $fix_plugin_schemas)) || is_bool($fix_plugin_schemas))) {
                         $this->consoleDisplay('Fixing plugin schema (' . $plugin_name . '), tables: ' . implode(', ', $plugin_tables));
 
-                        $temp_rebuilt_schema_filename = $this->work_dir . DS . 'plugin_' . $plugin_name . '_schema-schema.xml';
+                        $temp_rebuilt_schema_filename = $this->work_dir . DS . 'plugin_' . $plugin_name . '-schema.xml';
                         $this->pluginSchemaCleanup($reversedSchemaFile, $plugin_name, $cPath, $temp_rebuilt_schema_filename, $plugin_tables, $plugin_propel_schema);
                     }
                 } catch (Exception $e) {
@@ -438,6 +468,11 @@ EOD;
     private function fixCopyValidatorsFromOriginalToReversedSchema($original_schema_path, $reversed_schema_path)
     {
         $this->consoleDisplay('Copying back custom validators from original schema: ' . $original_schema_path);
+
+        // original schema missing
+        if (!file_exists($original_schema_path)) {
+            return;
+        }
 
         // load the original
         $original_schema = new DOMDocument();
@@ -496,6 +531,11 @@ EOD;
     private function fixCopyCustomAttributes($original_schema_path, $reversed_schema_path)
     {
         $this->consoleDisplay('Copying back custom attributes from original schema: ' . $original_schema_path);
+
+        // original schema missing
+        if (!file_exists($original_schema_path)) {
+            return;
+        }
 
         // load the original
         $original_schema = new DOMDocument();
@@ -704,50 +744,49 @@ EOD;
         //$default_translator = isset($propel_config['propel.defaultTranslator'])
         // ? (string)$propel_config['propel.defaultTranslator'] : null;
 
-        $schemas = $this->getSchemaDirs($ent);
+        $schemas = $this->getSchemaDetails($ent);
 
         // walk schemas
-        foreach ($schemas as $type => $schema_paths) {
+        foreach ($schemas as $type => $schema_item_details) {
             $type_name = lcController::getContextTypeAsString($type);
             assert(!is_null($type_name));
 
-            foreach ($schema_paths as $name => $path) {
-                if ($found = glob($path . DS . '*' . self::SCHEMA_FILE)) {
-                    foreach ($found as $filename) {
-                        $f = lcFiles::splitFileName(basename($filename));
-                        $f = $f['name'];
+            foreach ($schema_item_details as $name => $schema_details) {
+                $path = $schema_details['path'];
 
-                        lcFiles::copy($filename, $this->work_dir . DS . $type_name . '_' . $name . '_' . $f . '-' . self::SCHEMA_FILE);
+                $source_filename = $path . DS . self::SCHEMA_FILE;
+                $rf = $type_name . '_' . $name . '-' . self::SCHEMA_FILE;
+                $target_filename = $this->work_dir . DS . $rf;
 
-                        $this->schema_files_tmp[$path][] = array(
-                            $filename,
-                            $type_name . '_' . $name . '_' . $f . '-' . self::SCHEMA_FILE
-                        );
-
-                        $full_schema_filename = $this->work_dir . DS . $type_name . '_' . $name . '_' . $f . '-' . self::SCHEMA_FILE;
-
-                        // fix CASCADE/RESTRICT/SET NULL problems on windows
-                        // (uppercase)
-                        $this->fixWindowsUppercaseRestrictions($full_schema_filename);
-
-                        $options = array('datasource' => $datasource_name);
-
-                        $options['context_type'] = $type_name;
-
-                        // project name workaround
-                        $options['context_name'] = (is_numeric($name) ? '' : $name);
-
-                        // if a plugin - set package, otherwise 'models'
-                        $options['package'] = ($type_name == 'plugin') ? 'addons.plugins.' . htmlspecialchars($name) . '.models' : 'models';
-
-                        $this->fixSchema($full_schema_filename, $options);
-
-                        unset($filename, $f, $full_schema_filename, $options);
-                    }
-
+                if (file_exists($source_filename)) {
+                    lcFiles::copy($source_filename, $target_filename);
+                } else {
+                    // create it
+                    lcFiles::putFile($target_filename, $this->getDefaultSchemaContent());
                 }
 
-                unset($found, $path, $name);
+                $this->schema_files_tmp[$path][] = array(
+                    $source_filename,
+                    $rf
+                );
+
+                // fix CASCADE/RESTRICT/SET NULL problems on windows
+                // (uppercase)
+                $this->fixWindowsUppercaseRestrictions($target_filename);
+
+                $options = array('datasource' => $datasource_name);
+
+                $options['context_type'] = $type_name;
+
+                // project name workaround
+                $options['context_name'] = (is_numeric($name) ? '' : $name);
+
+                // if a plugin - set package, otherwise 'models'
+                $options['package'] = ($type_name == 'plugin') ? 'addons.plugins.' . htmlspecialchars($name) . '.models' : 'models';
+
+                $this->fixSchema($target_filename, $options, $schema_details['models']);
+
+                unset($name, $schema_details, $path, $source_filename, $target_filename, $rf, $options);
             }
 
             unset($type, $type_name, $schema_paths);
@@ -758,6 +797,22 @@ EOD;
         $this->schemas_initialized = true;
 
         return true;
+    }
+
+    private function getDefaultSchemaContent()
+    {
+        return '<?xml version="1.0" encoding="utf-8"?><database package="models" defaultIdMethod="native" baseClass="lcBasePropelObject" defaultTranslateMethod="$this-&gt;translate"></database>';
+    }
+
+    private function getProjectModels()
+    {
+        return $this->configuration['db.generator.project.models'];
+    }
+
+    private function getPluginModels($plugin_name, $plugin_path)
+    {
+        $plcfg = $this->getPluginConfig($plugin_name, $plugin_path);
+        return ($plcfg && $plcfg instanceof iSupportsDbModels ? $plcfg->getDbModels() : null);
     }
 
     private function fixWindowsUppercaseRestrictions($filename)
@@ -793,7 +848,7 @@ EOD;
         return $ret;
     }
 
-    private function fixSchema($filename, array $options)
+    private function fixSchema($filename, array $options, array $supported_models)
     {
         $fdata = @file_get_contents($filename);
 
@@ -818,11 +873,23 @@ EOD;
         // preferrably this would be set to DATABASE but when propel merges the
         // multiply
         // xml schema files
+        // add missing tables
+        // remove obsolete tables
         $tables_xpath_search = new DOMXPath($pXml);
         $tables_dom = $tables_xpath_search->query('/database/table');
 
+        $db_q = $tables_xpath_search->query('/database');
+
         if ($tables_dom->length) {
             foreach ($tables_dom as $table) {
+
+                $table_name = $table->getAttribute('name');
+
+                // remove if not in supported models
+                if (!in_array($table_name, $supported_models)) {
+                    $table->parentNode->removeChild($table);
+                }
+
                 if (isset($options['context_type']) && $options['context_type']) {
                     $table->setAttribute(lcPropel::CONTEXT_TYPE_ATTR, $options['context_type']);
                 }
@@ -833,6 +900,36 @@ EOD;
 
                 unset($table);
             }
+        }
+
+        // add the missing ones
+        foreach ($supported_models as $model_name) {
+
+            $found = false;
+
+            if ($tables_dom->length) {
+                foreach ($tables_dom as $table) {
+
+                    $table_name = $table->getAttribute('name');
+
+                    if ($table_name == $model_name) {
+                        $found = true;
+                        break;
+                    }
+
+                    unset($table);
+                }
+            }
+
+            if (!$found) {
+                $tmp = $pXml->createElement("table");
+                $tmp->setAttribute('name', $model_name);
+                $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
+                $tmp->setAttribute('idMethod', 'native');
+                $db_q->item(0)->appendChild($tmp);
+            }
+
+            unset($model_name);
         }
 
         unset($tables_dom, $tables_xpath_search);
