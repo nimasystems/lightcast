@@ -344,6 +344,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
     }
 
+    // TODO: Remove this when Configurations are combined
+    // it is here because it's a frequently accessed method and it is slow
+    // to call it with magic
+    public function getGenDir()
+    {
+        return $this->project_configuration->getGenDir();
+    }
 }
 
 ?>
