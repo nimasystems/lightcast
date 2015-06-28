@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/../BaseSchemaParser.php';
  * Mysql database schema parser.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1443 $
+ * @version    $Revision: 1592 $
  * @package    propel.generator.reverse.mysql
  */
 class MysqlSchemaParser extends BaseSchemaParser
@@ -23,7 +23,7 @@ class MysqlSchemaParser extends BaseSchemaParser
     /**
      * @var        boolean
      */
-    private $addVendorInfo = false;
+    protected $addVendorInfo = false;
 
     /**
      * Map MySQL native types to Propel types.

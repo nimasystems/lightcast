@@ -1705,7 +1705,7 @@ class PHPMailer
         }
         $result .= $this->HeaderLine('Message-ID', $this->lastMessageID);
         $result .= $this->headerLine('X-Priority', $this->Priority);
-        if ($this->XMailer == '') {
+        /*if ($this->XMailer == '') {
             $result .= $this->headerLine(
                 'X-Mailer',
                 'PHPMailer ' . $this->Version . ' (https://github.com/PHPMailer/PHPMailer/)'
@@ -1715,7 +1715,7 @@ class PHPMailer
             if ($myXmailer) {
                 $result .= $this->headerLine('X-Mailer', $myXmailer);
             }
-        }
+        }*/
 
         if ($this->ConfirmReadingTo != '') {
             $result .= $this->headerLine('Disposition-Notification-To', '<' . trim($this->ConfirmReadingTo) . '>');
