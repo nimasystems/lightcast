@@ -25,9 +25,9 @@
  *
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcBaseController.class.php 1535 2014-06-05 17:11:56Z mkovachev $
+ * @changed $Id: lcBaseController.class.php 1595 2015-06-22 11:21:45Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1535 $
+ * @version $Revision: 1595 $
  */
 abstract class lcBaseController extends lcAppObj implements iProvidesCapabilities, iDebuggable, iCacheable, iPluginContained,
     iSupportsDbModelOperations, iSupportsPluginOperations, iSupportsComponentOperations
@@ -77,7 +77,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
      * @var lcComponent[]
      */
     protected $loaded_components;
-
     private $loaded_components_usage;
 
     protected $controller_name;
@@ -591,6 +590,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $plugin = isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
 
         if (!$plugin) {
+            /** @noinspection PhpToStringImplementationInspection */
             throw new lcNotAvailableException('Plugin \'' . $plugin_name . '\' has not been required');
         }
 

@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcDirs.class.php 1558 2014-10-15 12:42:40Z mkovachev $
+ * @changed $Id: lcDirs.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1558 $
+ * @version $Revision: 1592 $
  */
 class lcDirs
 {
@@ -137,6 +137,7 @@ class lcDirs
 
     public static function removeDirDelimiter($dirname)
     {
+        /** @noinspection PhpExpressionResultUnusedInspection */
         ($dirname{strlen($dirname) - 1} == DS) ?
             $dirname = substr($dirname, 0, strlen($dirname) - 1) :
             $dirname;
@@ -148,8 +149,7 @@ class lcDirs
      * Copy a file, or recursively copy a folder and its contents
      * @param string $source Source path
      * @param string $dest Destination path
-     * @param string $permissions New folder creation permissions
-     *
+     * @param int|string $permissions New folder creation permissions
      * @return bool Returns true on success, false on failure
      */
     public static function xcopy($source, $dest, $permissions = 0755)

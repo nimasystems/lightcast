@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcConsoleResponse.class.php 1568 2015-01-28 21:33:31Z mkovachev $
+ * @changed $Id: lcConsoleResponse.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1568 $
+ * @version $Revision: 1592 $
  */
 class lcConsoleResponse extends lcResponse
 {
@@ -208,5 +208,3 @@ class lcConsoleResponse extends lcResponse
         }
     }
 }
-
-?>

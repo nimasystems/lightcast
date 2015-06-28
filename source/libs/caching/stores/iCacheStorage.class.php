@@ -26,21 +26,16 @@
  * @subpackage File Subcategory
  * @changed $Id: iCacheStorage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
+* @version $Revision: 1455 $
+*/
+
 interface iCacheStorage
 {
-    public function set($key, $value = null, $lifetime = null, $other_flags = null);
+	public function set($key, $value = null, $lifetime = null);
+	public function remove($key);
+	public function get($key);
+	public function has($key);
+	public function clear();
 
-    public function remove($key);
-
-    public function get($key);
-
-    public function has($key);
-
-    public function clear();
-
-    public function getStats();
-
-    public function getBackend();
+	public function getBackend();
 }

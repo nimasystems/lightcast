@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcPatternRouting.class.php 1544 2014-06-21 06:14:47Z mkovachev $
+ * @changed $Id: lcPatternRouting.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1544 $
+ * @version $Revision: 1592 $
  */
 class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheable, iDebuggable
 {
@@ -245,6 +245,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
         // if no params given - return the current request uri
         if (!count($params)) {
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $ret = $this->context['request_uri'];
         }
 
@@ -258,6 +259,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         } // if not - find a route that matches the given params
         else {
             if (!$route = $this->getRouteThatMatchesParams($params)) {
+                /** @noinspection PhpUnusedLocalVariableInspection */
                 $ret = $this->context['request_uri'];
             }
         }
@@ -280,7 +282,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         return $ret;
     }
 
-    public function connect(lcRoute $route)
+    public function connect(lcNamedRoute $route)
     {
         // do not allow routes changing after class cache has loaded them
         if ($this->routes_are_cached) {
@@ -296,7 +298,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         return $ret;
     }
 
-    public function prependRoute(lcRoute $route)
+    public function prependRoute(lcNamedRoute $route)
     {
         // do not allow routes changing after class cache has loaded them
         if ($this->routes_are_cached) {
@@ -336,7 +338,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         return true;
     }
 
-    public function appendRoute(lcRoute $route)
+    public function appendRoute(lcNamedRoute $route)
     {
         // do not allow routes changing after class cache has loaded them
         if ($this->routes_are_cached) {

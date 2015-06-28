@@ -24,297 +24,280 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: HtmlDoc.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: HtmlDoc.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
-*/
-
-
+ * @version $Revision: 1592 $
+ */
 class HtmlDoc extends lcObj
 {
-	protected $configuration;
+    protected $configuration;
 
-	const HTMLDOCPATH = '/usr/bin/htmldoc';
+    const HTMLDOCPATH = '/usr/bin/htmldoc';
 
-	const DEFAULT_PAGE_FORMAT = 'a4';
-	const DEFAULT_CHARSET = 'cp-1251';
+    const DEFAULT_PAGE_FORMAT = 'a4';
+    const DEFAULT_CHARSET = 'cp-1251';
 
-	const DEFAULT_HEADER = '...';
-	const DEFAULT_FOOTER = '...';
+    const DEFAULT_HEADER = '...';
+    const DEFAULT_FOOTER = '...';
 
-	# up to 100
-	const DEFAULT_JPEG_QUALITY = 80;
+    # up to 100
+    const DEFAULT_JPEG_QUALITY = 80;
 
-	const DEFAULT_LEFT_MARGIN = 10;
-	const DEFAULT_RIGHT_MARGIN = 10;
-	const DEFAULT_TOP_MARGIN = 10;
-	const DEFAULT_BOTTOM_MARGIN = 10;
+    const DEFAULT_LEFT_MARGIN = 10;
+    const DEFAULT_RIGHT_MARGIN = 10;
+    const DEFAULT_TOP_MARGIN = 10;
+    const DEFAULT_BOTTOM_MARGIN = 10;
 
-	# htmldoc command
-	private $htmldoc_cmd = self::HTMLDOCPATH;
+    # htmldoc command
+    private $htmldoc_cmd = self::HTMLDOCPATH;
 
-	# the filename for the inline created page
-	private $pdf_filename;
+    # the filename for the inline created page
+    private $pdf_filename;
 
-	# the size of the page
-	private $page_format;
+    # the size of the page
+    private $page_format;
 
-	# the generated pdf content in a temp file
-	private $generated_filename;
-	private $generated_fpointer;
+    # the generated pdf content in a temp file
+    private $generated_filename;
+    private $generated_fpointer;
 
-	# the input html document
-	private $html_doc;
+    # the input html document
+    private $html_doc;
 
-	# the pheader format string
-	private $pheader;
+    # the pheader format string
+    private $pheader;
 
-	# the pfooter format string
-	private $pfooter = 'Business solutions for the internet - NIMASYSTEMS (www.nimasystems.com)';
+    # the pfooter format string
+    private $pfooter = 'Business solutions for the internet - NIMASYSTEMS (www.nimasystems.com)';
 
-	# the left margin of the pages
-	private $lmargin;
+    # the left margin of the pages
+    private $lmargin;
 
-	# the right margin of the pages
-	private $rmargin;
+    # the right margin of the pages
+    private $rmargin;
 
-	# the top margin of the pages
-	private $tmargin;
+    # the top margin of the pages
+    private $tmargin;
 
-	# the bottom margin of the pages
-	private $bmargin;
+    # the bottom margin of the pages
+    private $bmargin;
 
-	# html doc charset
-	private $charset;
+    # html doc charset
+    private $charset;
 
-	# jpeg quality
-	private $jpeg_quality;
+    # jpeg quality
+    private $jpeg_quality;
 
-	# web referrer
-	private $referrer;
+    # web referrer
+    private $referrer;
 
-	public function __construct($htmldoc_path=self::HTMLDOCPATH)
-	{
-		parent::__construct();
+    public function __construct($htmldoc_path = self::HTMLDOCPATH)
+    {
+        parent::__construct();
 
-		if (isset($htmldoc_path))
-		{
-			$this->htmldoc_cmd = $htmldoc_path;
-		}
+        if (isset($htmldoc_path)) {
+            $this->htmldoc_cmd = $htmldoc_path;
+        }
 
-		# init default values
-		$this->page_format = self::DEFAULT_PAGE_FORMAT;
-		$this->pheader = self::DEFAULT_HEADER;
-		$this->pfooter = self::DEFAULT_FOOTER;
-		$this->lmargin = self::DEFAULT_LEFT_MARGIN;
-		$this->rmargin = self::DEFAULT_RIGHT_MARGIN;
-		$this->tmargin = self::DEFAULT_TOP_MARGIN;
-		$this->bmargin = self::DEFAULT_BOTTOM_MARGIN;
-		$this->charset = self::DEFAULT_CHARSET;
-		$this->jpeg_quality = self::DEFAULT_JPEG_QUALITY;
-	}
+        # init default values
+        $this->page_format = self::DEFAULT_PAGE_FORMAT;
+        $this->pheader = self::DEFAULT_HEADER;
+        $this->pfooter = self::DEFAULT_FOOTER;
+        $this->lmargin = self::DEFAULT_LEFT_MARGIN;
+        $this->rmargin = self::DEFAULT_RIGHT_MARGIN;
+        $this->tmargin = self::DEFAULT_TOP_MARGIN;
+        $this->bmargin = self::DEFAULT_BOTTOM_MARGIN;
+        $this->charset = self::DEFAULT_CHARSET;
+        $this->jpeg_quality = self::DEFAULT_JPEG_QUALITY;
+    }
 
-	public function __destruct()
-	{
-		unset($this->data);
-		unset($this->html_doc);
+    public function __destruct()
+    {
+        unset($this->data);
+        unset($this->html_doc);
 
-		if ($this->generated_fpointer)
-		{
-			fclose($this->generated_fpointer);
+        if ($this->generated_fpointer) {
+            fclose($this->generated_fpointer);
 
-			if (file_exists($this->generated_filename))
-			{
-				lcFiles::rm($this->generated_filename);
-			}
-		}
+            if (file_exists($this->generated_filename)) {
+                lcFiles::rm($this->generated_filename);
+            }
+        }
 
-		parent::__destruct();
-	}
+        parent::__destruct();
+    }
 
-	public function setConfiguration(lcConfiguration $configuration)
-	{
-		$this->configuration = $configuration;
-	}
+    public function setConfiguration(lcConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
+    }
 
-	public function getConfiguration()
-	{
-		return $this->configuration;
-	}
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
 
-	public function setHtmlDocument($htmlfile, $fname=null)
-	{
-		$this->html_doc = $htmlfile;
+    public function setHtmlDocument($htmlfile, $fname = null)
+    {
+        $this->html_doc = $htmlfile;
 
-		if (!isset($fname))
-		{
-			$this->pdf_filename = basename($htmlfile);
-		}
-		else
-		{
-			$this->pdf_filename = $fname;
-		}
+        if (!isset($fname)) {
+            $this->pdf_filename = basename($htmlfile);
+        } else {
+            $this->pdf_filename = $fname;
+        }
 
-		$this->pdf_filename = lcFiles::splitFileName($this->pdf_filename);
-		$this->pdf_filename = $this->pdf_filename['name'] . '.pdf';
-	}
+        $this->pdf_filename = lcFiles::splitFileName($this->pdf_filename);
+        $this->pdf_filename = $this->pdf_filename['name'] . '.pdf';
+    }
 
-	public function generatePDF()
-	{
-		// TODO: wrong implementation. Needs workaround!
-		$configuration = $this->configuration;
+    public function generatePDF()
+    {
+        // TODO: wrong implementation. Needs workaround!
+        $configuration = $this->configuration;
 
-		assert(isset($configuration));
+        assert(isset($configuration));
 
-		$this->generated_filename = $configuration->getTempDir() . DS .
-		lcStrings::randomString(20) . '.pdf';
+        $this->generated_filename = $configuration->getTempDir() . DS .
+            lcStrings::randomString(20) . '.pdf';
 
-		$cmd = array();
-		$cmd[] = $this->htmldoc_cmd;
-		$cmd[] = '--no-compression';
-		$cmd[] = '--bodyfont times';
-		$cmd[] = '-t pdf14';
-		$cmd[] = '--quiet';
-		$cmd[] = '--jpeg='.$this->jpeg_quality;
-		$cmd[] = '--charset '.$this->charset;
-		$cmd[] = '--webpage';
-		$cmd[] = '--header '.$this->pheader;
-		$cmd[] = '--footer '.$this->pfooter;
-		$cmd[] = '--referer'.$this->referrer;
-		$cmd[] = '--size '.$this->page_format;
-		$cmd[] = '--left '.$this->lmargin . 'mm';
-		$cmd[] = '--right '.$this->rmargin . 'mm';
-		$cmd[] = '--top '.$this->tmargin . 'mm';
-		$cmd[] = '--bottom '.$this->bmargin . 'mm';
-		$cmd[] = $this->html_doc;
-		$cmd[] = ' > '.$this->generated_filename;
+        $cmd = array();
+        $cmd[] = $this->htmldoc_cmd;
+        $cmd[] = '--no-compression';
+        $cmd[] = '--bodyfont times';
+        $cmd[] = '-t pdf14';
+        $cmd[] = '--quiet';
+        $cmd[] = '--jpeg=' . $this->jpeg_quality;
+        $cmd[] = '--charset ' . $this->charset;
+        $cmd[] = '--webpage';
+        $cmd[] = '--header ' . $this->pheader;
+        $cmd[] = '--footer ' . $this->pfooter;
+        $cmd[] = '--referer' . $this->referrer;
+        $cmd[] = '--size ' . $this->page_format;
+        $cmd[] = '--left ' . $this->lmargin . 'mm';
+        $cmd[] = '--right ' . $this->rmargin . 'mm';
+        $cmd[] = '--top ' . $this->tmargin . 'mm';
+        $cmd[] = '--bottom ' . $this->bmargin . 'mm';
+        $cmd[] = $this->html_doc;
+        $cmd[] = ' > ' . $this->generated_filename;
 
-		$cmd = implode(' ',$cmd);
+        $cmd = implode(' ', $cmd);
 
-		# generate it
-		passthru($cmd,$res);
+        # generate it
+        passthru($cmd, $res);
 
-		if (!$res)
-		{
-			throw new lcSystemException('Cannot generated the PDF - Parser returned errors');
-		}
+        if (!$res) {
+            throw new lcSystemException('Cannot generated the PDF - Parser returned errors');
+        }
 
-		# get the generated data
-		if (!$this->generated_fpointer = fopen($this->generated_filename, 'rb'))
-		{
-			throw new lcSystemException('Cannot write generated PDF file');
-		}
+        # get the generated data
+        if (!$this->generated_fpointer = fopen($this->generated_filename, 'rb')) {
+            throw new lcSystemException('Cannot write generated PDF file');
+        }
 
-		return $this->generated_fpointer;
-	}
+        return $this->generated_fpointer;
+    }
 
-	public function getPDFPointer()
-	{
-		return $this->generated_fpointer;
-	}
+    public function getPDFPointer()
+    {
+        return $this->generated_fpointer;
+    }
 
-	public function setTopMargin($value)
-	{
-		$this->tmargin = $value;
-	}
+    public function setTopMargin($value)
+    {
+        $this->tmargin = $value;
+    }
 
-	public function setBottomMargin($value)
-	{
-		$this->bmargin = $value;
-	}
+    public function setBottomMargin($value)
+    {
+        $this->bmargin = $value;
+    }
 
-	public function setLeftMargin($value)
-	{
-		$this->lmargin = $value;
-	}
+    public function setLeftMargin($value)
+    {
+        $this->lmargin = $value;
+    }
 
-	public function setRightMargin($value)
-	{
-		$this->rmargin = $value;
-	}
+    public function setRightMargin($value)
+    {
+        $this->rmargin = $value;
+    }
 
-	public function setCharset($charset)
-	{
-		$this->charset = $charset;
-	}
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+    }
 
-	public function HtmldocCommand($cmdline)
-	{
-		$this->htmldoc_cmd = $cmdline;
-	}
+    public function HtmldocCommand($cmdline)
+    {
+        $this->htmldoc_cmd = $cmdline;
+    }
 
-	public function setJPEGQuality($quality_level)
-	{
-		$this->jpeg_quality = $quality_level;
-	}
+    public function setJPEGQuality($quality_level)
+    {
+        $this->jpeg_quality = $quality_level;
+    }
 
-	public function setPageFormat($page_format)
-	{
-		$this->page_format = $page_format;
-	}
+    public function setPageFormat($page_format)
+    {
+        $this->page_format = $page_format;
+    }
 
-	public function setPageFooter($value)
-	{
-		if (!$this->checkHeaderFooterSyntax($value))
-		{
-			throw new lcSystemException('Invalid Page Footer');
-		}
+    public function setPageFooter($value)
+    {
+        if (!$this->checkHeaderFooterSyntax($value)) {
+            throw new lcSystemException('Invalid Page Footer');
+        }
 
-		$this->pfooter = $value;
-	}
+        $this->pfooter = $value;
+    }
 
-	public function setPageHeader($value)
-	{
-		if (!$this->checkHeaderFooterSyntax($value))
-		{
-			throw new lcSystemException('Invalid Page Header');
-		}
+    public function setPageHeader($value)
+    {
+        if (!$this->checkHeaderFooterSyntax($value)) {
+            throw new lcSystemException('Invalid Page Header');
+        }
 
-		$this->pheader = $value;
-	}
+        $this->pheader = $value;
+    }
 
-	public function setOutputFilename($filename)
-	{
-		$this->pdf_filename = $filename;
-	}
+    public function setOutputFilename($filename)
+    {
+        $this->pdf_filename = $filename;
+    }
 
-	private function checkHeaderFooterSyntax($value)
-	{
-		# Defines the valid characters for the format string
-		$validchars = './:1aAcCdDhiIltT';
+    private function checkHeaderFooterSyntax($value)
+    {
+        # Defines the valid characters for the format string
+        $validchars = './:1aAcCdDhiIltT';
 
-		# The format string must have a length of 3 chars
-		if (strlen($value) <> 3)
-		{
-			return false;
-		}
+        # The format string must have a length of 3 chars
+        if (strlen($value) <> 3) {
+            return false;
+        }
 
-		if (!strstr($validchars,substr($value,0,1)) ||
-				!strstr($validchars,substr($value,1,1)) ||
-				!strstr($validchars,substr($value,2,1)))
-		{
-			return false;
-		}
+        if (!strstr($validchars, substr($value, 0, 1)) ||
+            !strstr($validchars, substr($value, 1, 1)) ||
+            !strstr($validchars, substr($value, 2, 1))
+        ) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	public function outputPdf($download = false)
-	{
-		if (!$this->generated_fpointer) 
-		{
-			$this->generatePDF();
-		}
+    public function outputPdf($download = false)
+    {
+        if (!$this->generated_fpointer) {
+            $this->generatePDF();
+        }
 
-		header('Content-Type: application/pdf');
+        header('Content-Type: application/pdf');
 
-		if ($download)
-		{
-			header('Content-Disposition: attachment; filename='. $this->pdf_filename);
-		}
+        if ($download) {
+            header('Content-Disposition: attachment; filename=' . $this->pdf_filename);
+        }
 
-		fpassthru($this->generated_fpointer);
-	}
+        fpassthru($this->generated_fpointer);
+    }
 }
-
-?>

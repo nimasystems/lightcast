@@ -26,9 +26,7 @@
 
 /**
  * Framework Application Bootstrap
-*/
+ */
 
 require_once(dirname(__FILE__) . '/../../../source/libs/boot/bootstrap.php');
 require_once(dirname(__FILE__) . '/../config/lcFrameworkConfiguration.class.php');
-
-?>

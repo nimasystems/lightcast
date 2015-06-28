@@ -27,10 +27,9 @@
  * @changed $Id: lcBaseMigrationsTarget.class.php 1455 2013-10-25 20:29:31Z
  * mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1475 $
+ * @version $Revision: 1592 $
  */
-
-class lcMigrationsTarget extends lcSysObj implements iDatabaseMigrationsTarget, iLoggable
+abstract class lcMigrationsTarget extends lcSysObj implements iDatabaseMigrationsTarget, iLoggable
 {
     const MAGIC_METHOD_SCHEMA_UPGRADE_PREFIX = 'upgradeSchemaTo_';
     const MAGIC_METHOD_SCHEMA_DOWNGRADE_PREFIX = 'downgradeSchemaTo_';
@@ -87,16 +86,14 @@ class lcMigrationsTarget extends lcSysObj implements iDatabaseMigrationsTarget, 
         $from_version = (int)$from_version;
         $to_version = (int)$to_version;
 
-        if (!$from_version || !$to_version)
-        {
+        if (!$from_version || !$to_version) {
             throw new lcInvalidArgumentException('Invalid from/to migration version');
         }
 
         // call a magic method
         $method_name = self::MAGIC_METHOD_SCHEMA_UPGRADE_PREFIX . $to_version;
 
-        if ($this->methodExists($method_name))
-        {
+        if ($this->methodExists($method_name)) {
             $this->$method_name();
         }
 
@@ -108,16 +105,14 @@ class lcMigrationsTarget extends lcSysObj implements iDatabaseMigrationsTarget, 
         $from_version = (int)$from_version;
         $to_version = (int)$to_version;
 
-        if (!$from_version || !$to_version)
-        {
+        if (!$from_version || !$to_version) {
             throw new lcInvalidArgumentException('Invalid from/to migration version');
         }
 
         // call a magic method
         $method_name = self::MAGIC_METHOD_SCHEMA_DOWNGRADE_PREFIX . $to_version;
 
-        if ($this->methodExists($method_name))
-        {
+        if ($this->methodExists($method_name)) {
             $this->$method_name();
         }
 
@@ -178,8 +173,7 @@ class lcMigrationsTarget extends lcSysObj implements iDatabaseMigrationsTarget, 
 
     public function log($message_code, $severity = null, $channel = null)
     {
-        if ($this->logger)
-        {
+        if ($this->logger) {
             $this->loggger->log($message_code, $severity, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
         }
     }

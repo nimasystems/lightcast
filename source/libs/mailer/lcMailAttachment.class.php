@@ -26,15 +26,21 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcMailAttachment.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcMailAttachment.class.php 1594 2015-06-20 18:47:08Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
+ * @version $Revision: 1594 $
  */
 class lcMailAttachment extends lcObj
 {
     private $filename;
     private $filepath;
     private $mimetype;
+
+    public static function create($filepath, $mimetype, $filename = null)
+    {
+        $obj = new lcMailAttachment($filepath, $mimetype, $filename);
+        return $obj;
+    }
 
     public function __construct($filepath, $mimetype, $filename = null)
     {

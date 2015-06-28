@@ -27,7 +27,7 @@
  * @changed $Id: lcDatabaseMigrationsManager.class.php 1455 2013-10-25 20:29:31Z
  * mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1475 $
+ * @version $Revision: 1592 $
  */
 
 class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigrationsManager
@@ -61,7 +61,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
             throw new lcConfigException('Invalid database migration table: \'' . $migration_table_name . '\'');
         }
 
-        $migrations_target_class_name = $cfg['db.migrations.migrations_target_class_name'];
+        //$migrations_target_class_name = $cfg['db.migrations.migrations_target_class_name'];
 
         $this->migration_table_name = $migration_table_name;
     }

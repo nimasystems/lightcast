@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcArrayCollection.class.php 1528 2014-05-31 09:39:09Z mkovachev $
+ * @changed $Id: lcArrayCollection.class.php 1592 2015-05-22 13:28:31Z mkovachev $
 * @author $Author: mkovachev $
-* @version $Revision: 1528 $
+* @version $Revision: 1592 $
 */
 
 class lcArrayCollection extends lcBaseCollection implements ArrayAccess
@@ -200,5 +200,3 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 		return (string)$out;
 	}
 }
-
-?>

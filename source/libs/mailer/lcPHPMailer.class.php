@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcPHPMailer.class.php 1547 2014-06-24 14:51:46Z mkovachev $
+ * @changed $Id: lcPHPMailer.class.php 1594 2015-06-20 18:47:08Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1547 $
+ * @version $Revision: 1594 $
  */
 class lcPHPMailer extends lcMailer
 {
@@ -36,6 +36,18 @@ class lcPHPMailer extends lcMailer
 
     private $last_error;
     private $enable_debugging;
+
+    /** @var lcMailRecipient[] */
+    protected $cc_recipients;
+
+    /** @var lcMailRecipient[] */
+    protected $bcc_recipients;
+
+    /** @var lcMailRecipient */
+    protected $reply_to_address;
+
+    /** @var string */
+    protected $alt_body;
 
     public function initialize()
     {
@@ -61,6 +73,36 @@ class lcPHPMailer extends lcMailer
     public function getLastError()
     {
         return $this->last_error;
+    }
+
+    public function setCCRecipients(array $recipients)
+    {
+        $this->cc_recipients = $recipients;
+    }
+
+    public function setBCCRecipients(array $recipients)
+    {
+        $this->bcc_recipients = $recipients;
+    }
+
+    public function setReplyTo(lcMailRecipient $recipient)
+    {
+        $this->reply_to_address = $recipient;
+    }
+
+    public function setAltBody($alt_body)
+    {
+        $this->alt_body = $alt_body;
+    }
+
+    public function clear()
+    {
+        parent::clear();
+
+        $this->cc_recipients = null;
+        $this->bcc_recipients = null;
+        $this->reply_to_address = null;
+        $this->alt_body = null;
     }
 
     protected function sendMailInternal()
@@ -106,7 +148,7 @@ class lcPHPMailer extends lcMailer
         $mailer->FromName = $this->getSender()->getName();
         $mailer->Subject = $this->getSubject();
         $mailer->IsHTML(true);
-        $mailer->AltBody = strip_tags($this->getBody());
+        $mailer->AltBody = ($this->alt_body ? $this->alt_body : strip_tags($this->getBody()));
         $mailer->Mailer = $this->getMailerType();
 
         // check mail type
@@ -185,6 +227,27 @@ class lcPHPMailer extends lcMailer
         }
 
         unset($recipients);
+
+        // cc
+        if ($this->cc_recipients) {
+            foreach ($this->cc_recipients as $recipient) {
+                $mailer->addCC($recipient->getEmail(), $recipient->getName());
+                unset($recipient);
+            }
+        }
+
+        // bcc
+        if ($this->bcc_recipients) {
+            foreach ($this->bcc_recipients as $recipient) {
+                $mailer->addBCC($recipient->getEmail(), $recipient->getName());
+                unset($recipient);
+            }
+        }
+
+        // reply-to
+        if ($this->reply_to_address) {
+            $mailer->addReplyTo($this->reply_to_address->getEmail(), $this->reply_to_address->getName());
+        }
 
         // PHPMail outputs raw content in case of errors! we must hide it
         ob_start();

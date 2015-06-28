@@ -26,23 +26,25 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcMailRecipient.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcMailRecipient.class.php 1594 2015-06-20 18:47:08Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
+ * @version $Revision: 1594 $
  */
 class lcMailRecipient extends lcObj
 {
     private $email;
     private $name;
 
+    public static function create($email, $name = null)
+    {
+        $obj = new lcMailRecipient($email, $name);
+        return $obj;
+    }
+
     public function __construct($email, $name = '')
     {
         $this->name = isset($name) ? (string)$name : null;
         $this->email = (string)$email;
-
-        if (!$this->email) {
-            throw new lcSystemException('Email recipient cannot be empty');
-        }
     }
 
     public function getEmail()

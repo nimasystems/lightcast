@@ -17,16 +17,18 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcTableMap.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcTableMap.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
+* @version $Revision: 1592 $
 */
 
 class lcTableMap extends TableMap
@@ -80,10 +82,12 @@ class lcTableMap extends TableMap
 	{
 		$this->lc_title_plural = $title;
 	}
-	
-	/**
-	 * Translated a validator string by using i18n
-	 */
+
+    /**
+     * Translated a validator string by using i18n
+     * @param $string
+     * @return null
+     */
 	public function translate($string)
 	{
 		if (!$string)
@@ -100,21 +104,23 @@ class lcTableMap extends TableMap
 
 		return $string;
 	}
-	
-	/**
-	 * Overriden method - to allow us to set a custom inherited class of ColumnMap - lcColumnMap
-	 * Add a column to the table.
-	 *
-	 * @param      string name A String with the column name.
-	 * @param  string    $type         A string specifying the Propel type.
-	 * @param  boolean   $isNotNull    Whether column does not allow NULL values.
-	 * @param  int       $size         An int specifying the size.
-	 * @param  boolean   $pk           True if column is a primary key.
-	 * @param  string    $fkTable      A String with the foreign key table name.
-	 * @param            $fkColumn     A String with the foreign key column name.
-	 * @param  string    $defaultValue The default value for this column.
-	 * @return ColumnMap The newly created column.
-	 */
+
+    /**
+     * Overriden method - to allow us to set a custom inherited class of ColumnMap - lcColumnMap
+     * Add a column to the table.
+     *
+     * @param string $name
+     * @param string $phpName
+     * @param  string $type A string specifying the Propel type.
+     * @param  boolean $isNotNull Whether column does not allow NULL values.
+     * @param  int $size An int specifying the size.
+     * @param  string $defaultValue The default value for this column.
+     * @param  boolean $pk True if column is a primary key.
+     * @param  string $fkTable A String with the foreign key table name.
+     * @param            $fkColumn     A String with the foreign key column name.
+     * @return ColumnMap The newly created column.
+     * @internal param name $string A String with the column name.
+     */
 	public function addColumn($name, $phpName, $type, $isNotNull = false, $size = null, $defaultValue = null, $pk = false, $fkTable = null, $fkColumn = null)
 	{
 		$col = new lcColumnMap($name, $this);

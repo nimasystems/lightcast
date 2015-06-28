@@ -244,9 +244,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function get($name)
     {
-        // @codingStandardsIgnoreStart
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $configuration = $this->configuration;
-        // @codingStandardsIgnoreEnd
 
         $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
         $arr_str = '(isset(' . $arr_str . ') ? ' . $arr_str . ' : null)';
@@ -263,9 +262,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     {
         $tmp = null;
 
-        // @codingStandardsIgnoreStart
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $configuration = $this->configuration;
-        // @codingStandardsIgnoreEnd
 
         $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
 

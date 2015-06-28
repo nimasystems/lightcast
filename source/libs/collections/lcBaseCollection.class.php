@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcBaseCollection.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcBaseCollection.class.php 1593 2015-05-28 10:02:17Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
+ * @version $Revision: 1593 $
  */
 abstract class lcBaseCollection extends lcObj
 {
@@ -72,7 +72,7 @@ abstract class lcBaseCollection extends lcObj
 
     public function offsetGet($index)
     {
-        $this->list->offsetGet($index);
+        return $this->list->offsetGet($index);
     }
 
     protected function offsetSetColl($index, $value)
@@ -208,14 +208,14 @@ abstract class lcBaseCollection extends lcObj
         $this->list->natsort();
     }
 
-    protected function uasort($cmp_function)
+    protected function uasort($cpm_function)
     {
-        $this->list->uasort($cmp_function);
+        $this->list->uasort($cpm_function);
     }
 
-    protected function uksort($cmp_function)
+    protected function uksort($cpm_function)
     {
-        $this->list->uksort($cmp_function);
+        $this->list->uksort($cpm_function);
     }
 
     /*

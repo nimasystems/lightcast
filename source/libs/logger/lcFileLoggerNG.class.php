@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcFileLoggerNG.class.php 1561 2014-11-07 08:24:18Z mkovachev $
+ * @changed $Id: lcFileLoggerNG.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1561 $
+ * @version $Revision: 1592 $
  */
 class lcFileLoggerNG extends lcLogger
 {
@@ -135,8 +135,8 @@ class lcFileLoggerNG extends lcLogger
         if ($logs) {
             $max_len = (int)ini_get('log_errors_max_len');
 
-            foreach ($logs as $filename => $logs) {
-                $str = implode('', $logs);
+            foreach ($logs as $filename => $logs1) {
+                $str = implode('', $logs1);
                 $last_pos = 0;
 
                 while ($sub = substr($str, $last_pos, $max_len)) {
@@ -152,7 +152,7 @@ class lcFileLoggerNG extends lcLogger
                     //error_log(implode("\n", $logs), 3, $filename);
                     unset($log);
                 }*/
-                unset($filename, $logs, $str);
+                unset($filename, $logs1, $str);
             }
         }
 

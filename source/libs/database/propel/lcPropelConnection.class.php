@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcPropelConnection.class.php 1512 2014-04-29 21:58:51Z mkovachev $
+ * @changed $Id: lcPropelConnection.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1512 $
+ * @version $Revision: 1592 $
  */
 
 class lcPropelConnection extends PropelPDO
@@ -179,8 +179,6 @@ class lcPropelConnection extends PropelPDO
 		$this->query_count++;
 
 		$args = func_get_args();
-
-		$return = false;
 
 		// php 5.3 or lower handles this differently
 		if ($this->is_php53_or_lower)

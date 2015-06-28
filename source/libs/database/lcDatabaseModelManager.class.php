@@ -157,7 +157,6 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         );
 
         // use custom gen dir or in place with models
-        $gen_classes = array();
         $path_to_gen_classes = $this->models_gen_dir ? $this->models_gen_dir : $path_to_model;
 
         $gen_classes = array(

@@ -26,9 +26,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcUnicode.class.php 1556 2014-10-15 12:36:35Z mkovachev $
+ * @changed $Id: lcUnicode.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1556 $
+ * @version $Revision: 1592 $
  */
 class lcUnicode
 {

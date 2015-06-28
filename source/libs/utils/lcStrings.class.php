@@ -26,9 +26,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcStrings.class.php 1563 2014-12-09 14:09:50Z mkovachev $
+ * @changed $Id: lcStrings.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1563 $
+ * @version $Revision: 1592 $
  */
 class lcStrings
 {
@@ -487,8 +487,6 @@ class lcStrings
             return null;
         }
 
-        $ret = array();
-
         switch ($format) {
             case 1:
                 preg_match_all(self::WORD_COUNT_MASK, $string, $matches);
@@ -525,6 +523,7 @@ class lcStrings
      * Licensed under the BSD open source license
      *
      *
+     * @param $string
      * @return bool true if $string is valid UTF-8 and false otherwise.
      */
     public static function isUTF8($string)
@@ -713,7 +712,8 @@ class lcStrings
     /**
      *    Calculates Age by birh date
      *
-     * @return (int)
+     * @param $date
+     * @return bool|string
      */
     public static function getAgeByBirthDate($date)
     {
@@ -732,10 +732,12 @@ class lcStrings
 
     /**
      * Gets a random word from the dictionary database, minimum len is 3, max is 12
-     * @param <int> $minLen
-     * @param <int> $maxLen
+     * @param int $minLen
+     * @param int $maxLen
+     * @return  <string> $word
+     * @internal param $ <int> $minLen
+     * @internal param $ <int> $maxLen
      *
-     * @return <string> $word
      */
     public static function getWord($minLen = 3, $maxLen = 12)
     {
@@ -772,8 +774,8 @@ class lcStrings
             $ret .= rand(0, 9);
         }
 
-        return $ret .= $suffix;
+        $ret .= $suffix;
+
+        return $ret;
     }
 }
-
-?>

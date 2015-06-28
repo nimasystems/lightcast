@@ -26,9 +26,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: iRequiresCapabilities.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: iRequiresCapabilities.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
+* @version $Revision: 1592 $
 */
 
 interface iRequiresCapabilities

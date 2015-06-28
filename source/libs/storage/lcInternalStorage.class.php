@@ -24,160 +24,160 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcInternalStorage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @changed $Id: lcInternalStorage.class.php 1592 2015-05-22 13:28:31Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class lcInternalStorage extends lcStorage implements iDebuggable
 {
-	const DEFAULT_NAMESPACE = 'global';
+    const DEFAULT_NAMESPACE = 'global';
 
-	protected $storage;
+    protected $storage;
 
-	public function initialize()
-	{
-		parent::initialize();
+    public function initialize()
+    {
+        parent::initialize();
 
-		$this->storage = array();
-	}
+        $this->storage = array();
+    }
 
-	public function shutdown()
-	{
-		$this->storage = null;
+    public function shutdown()
+    {
+        $this->storage = null;
 
-		parent::shutdown();
-	}
+        parent::shutdown();
+    }
 
-	public function getDebugInfo()
-	{
-		return false;
-	}
+    public function getDebugInfo()
+    {
+        return false;
+    }
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	public function has($key, $namespace = null)
-	{
-		return $this->get($key, $namespace) ? true : false;
-	}
+    public function has($key, $namespace = null)
+    {
+        return $this->get($key, $namespace) ? true : false;
+    }
 
-	public function get($key, $namespace = null)
-	{
-		if (!$key)
-		{
-			assert(false);
-			return null;
-		}
+    public function get($key, $namespace = null)
+    {
+        if (!$key) {
+            assert(false);
+            return null;
+        }
 
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		$res = isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
+        $res = isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
 
-		return $res;
-	}
+        return $res;
+    }
 
-	public function set($key, $value = null, $namespace = null)
-	{
-		if (!$key)
-		{
-			assert(false);
-			return null;
-		}
+    /**
+     * @param string $key
+     * @param string $namespace
+     */
+    public function set($key, $value = null, $namespace = null)
+    {
+        if (!$key) {
+            assert(false);
+            return null;
+        }
 
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		$this->storage[$n][$key] = $value;
-	}
+        $this->storage[$n][$key] = $value;
+    }
 
-	public function remove($key, $namespace = null)
-	{
-		if (!$key)
-		{
-			assert(false);
-			return null;
-		}
 
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+    /**
+     * @param string $key
+     * @param string $namespace
+     */
+    public function remove($key, $namespace = null)
+    {
+        if (!$key) {
+            assert(false);
+            return;
+        }
 
-		if (!isset($this->storage[$n]))
-		{
-			return false;
-		}
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		unset($this->storage[$n][$key]);
-	}
+        if (!isset($this->storage[$n])) {
+            return false;
+        }
 
-	public function clear($namespace = null)
-	{
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+        unset($this->storage[$n][$key]);
+    }
 
-		if (!isset($this->storage[$n]))
-		{
-			return false;
-		}
+    public function clear($namespace = null)
+    {
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		unset($this->storage[$n]);
-	}
+        if (!isset($this->storage[$n])) {
+            return false;
+        }
 
-	public function clearAll()
-	{
-		$this->storage = array();
-	}
+        unset($this->storage[$n]);
+    }
 
-	public function hasValues($namespace = null)
-	{
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+    public function clearAll()
+    {
+        $this->storage = array();
+    }
 
-		if (!isset($this->storage[$n]))
-		{
-			return false;
-		}
+    public function hasValues($namespace = null)
+    {
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		$has = count($this->storage) ? true : false;
+        if (!isset($this->storage[$n])) {
+            return false;
+        }
 
-		return $has;
-	}
+        $has = count($this->storage) ? true : false;
 
-	public function count($namespace = null)
-	{
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+        return $has;
+    }
 
-		if (!isset($this->storage[$n]))
-		{
-			return false;
-		}
+    public function count($namespace = null)
+    {
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		$count = count($this->storage[$n]);
+        if (!isset($this->storage[$n])) {
+            return false;
+        }
 
-		return $count;
-	}
+        $count = count($this->storage[$n]);
 
-	public function getAll($namespace = null)
-	{
-		$n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
+        return $count;
+    }
 
-		if (!isset($this->storage[$n]))
-		{
-			return false;
-		}
+    public function getAll($namespace = null)
+    {
+        $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-		$res = $this->storage[$n];
+        if (!isset($this->storage[$n])) {
+            return false;
+        }
 
-		return $res;
-	}
+        $res = $this->storage[$n];
 
-	public function getBackendData()
-	{
-		return $this->storage;
-	}
+        return $res;
+    }
 
-	public function getNamespaces()
-	{
-		return array_keys($this->storage);
-	}
+    public function getBackendData()
+    {
+        return $this->storage;
+    }
+
+    public function getNamespaces()
+    {
+        return array_keys($this->storage);
+    }
 }
 
 ?>

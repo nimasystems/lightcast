@@ -133,7 +133,8 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
 		if ($class_registered)
 		{
 			// try to include it
-			$included = (bool)include($this->registered_classes[$class_name]);
+            /** @noinspection PhpIncludeInspection */
+            $included = (bool)include($this->registered_classes[$class_name]);
 		}
 
 		if (!$included)

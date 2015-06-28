@@ -26,9 +26,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcSpatialUtils.class.php 1553 2014-08-13 21:57:44Z mkovachev $
+ * @changed $Id: lcSpatialUtils.class.php 1587 2015-05-07 15:18:38Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1553 $
+ * @version $Revision: 1587 $
  */
 /*SELECT
  SQL_NO_CACHE
@@ -59,6 +59,52 @@ class lcSpatialUtils
     const DEG_KM = 111.045;
 
     const MILE_KM = 0.621371192;
+
+    public static function getCenter(array $points)
+    {
+        if (!$points) {
+            return;
+        }
+
+        $minlat = false;
+        $minlng = false;
+        $maxlat = false;
+        $maxlng = false;
+
+        foreach ($points as $data_element) {
+            $data_coords = array($data_element->getLatitude(), $data_element->getLongtitude());
+
+            if (isset($data_coords[1])) {
+                if ($minlat === false) {
+                    $minlat = $data_coords[0];
+                } else {
+                    $minlat = ($data_coords[0] < $minlat) ? $data_coords[0] : $minlat;
+                }
+                if ($maxlat === false) {
+                    $maxlat = $data_coords[0];
+                } else {
+                    $maxlat = ($data_coords[0] > $maxlat) ? $data_coords[0] : $maxlat;
+                }
+                if ($minlng === false) {
+                    $minlng = $data_coords[1];
+                } else {
+                    $minlng = ($data_coords[1] < $minlng) ? $data_coords[1] : $minlng;
+                }
+                if ($maxlng === false) {
+                    $maxlng = $data_coords[1];
+                } else {
+                    $maxlng = ($data_coords[1] > $maxlng) ? $data_coords[1] : $maxlng;
+                }
+            }
+        }
+
+        $lat = $maxlat - (($maxlat - $minlat) / 2);
+        $lng = $maxlng - (($maxlng - $minlng) / 2);
+
+        $pt = new lcLatLng($lat, $lng);
+
+        return $pt;
+    }
 
     public static function calcDistance(lcLatLng $p1, lcLatLng $p2)
     {

@@ -148,7 +148,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 		$this->validateForward($action_name, $controller_name);
 
 		// get an instance of the controller
-		$controller = $this->getControllerInstance($controller_name);
+		$controller = ($controller_name ? $this->getControllerInstance($controller_name) : null);
 
 		// if unavailable process and output the error
 		if (!$controller)

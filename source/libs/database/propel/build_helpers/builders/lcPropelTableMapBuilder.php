@@ -270,6 +270,7 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
             $php_name_title_pl = ($last_char == 's' || $last_char == 'z') ? $php_name_title_pl . 'es' : $php_name_title_pl . 's';
 
             $lc_title_plural = $col->getAttribute('lcTitlePlural');
+            /** @noinspection PhpUnusedLocalVariableInspection */
             $lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
 
             $script .= "

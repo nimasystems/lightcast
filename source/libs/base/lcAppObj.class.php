@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcAppObj.class.php 1535 2014-06-05 17:11:56Z mkovachev $
+ * @changed $Id: lcAppObj.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1535 $
+ * @version $Revision: 1592 $
  */
 abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
 {
@@ -245,5 +245,3 @@ abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
         $this->cache = $cache;
     }
 }
-
-?>

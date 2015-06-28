@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcPluginManager.class.php 1510 2014-04-27 22:48:08Z mkovachev $
+ * @changed $Id: lcPluginManager.class.php 1589 2015-05-17 16:50:29Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1510 $
+ * @version $Revision: 1589 $
  */
 class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEventObserver
 {

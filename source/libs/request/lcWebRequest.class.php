@@ -21,28 +21,19 @@
 */
 
 /**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcWebRequest.class.php 1541 2014-06-20 14:08:58Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1541 $
+ * Class lcWebRequest
+ *
+ * @method string getRemoteAddr()
  */
 class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyValueProvider
 {
-    /**
-     * @var lcHttpFilesCollection
-     */
+    /** @var lcHttpFilesCollection */
     private $files;
 
-    /**
-     * @var lcArrayCollection
-     */
+    /** @var lcArrayCollection */
     private $post_params;
 
-    /**
-     * @var lcArrayCollection
-     */
+    /** @var lcArrayCollection */
     private $get_params;
 
     private $request_method; // ANY, GET, PUT, POST, HEAD - httpMethods
@@ -544,8 +535,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $addr = ($first && is_array($this->real_remote_addr) && count($this->real_remote_addr) ?
             $this->real_remote_addr[0] : $this->real_remote_addr);
         return $addr;
-
-        return $addr;
     }
 
     /*
@@ -963,7 +952,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
                     $file['error'] = (array)$file['error'];
                     $file['size'] = (array)$file['size'];
 
-                    foreach ($file['size'] as $key => $filesize) {
+                    foreach ($file['size'] as $key2 => $filesize) {
                         if ($filesize < 1) {
                             continue;
                         }
@@ -971,12 +960,12 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
                         $files->append(
                             new lcHttpFile(
                                 $file['key'],
-                                $file['name'][$key],
-                                $file['tmp_name'][$key],
-                                $file['error'][$key],
-                                $file['size'][$key],
-                                $file['type'][$key],
-                                $key
+                                $file['name'][$key2],
+                                $file['tmp_name'][$key2],
+                                $file['error'][$key2],
+                                $file['size'][$key2],
+                                $file['type'][$key2],
+                                $key2
                             )
                         );
                     }

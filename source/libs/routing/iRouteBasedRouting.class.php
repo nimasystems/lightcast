@@ -24,11 +24,10 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: iRouteBasedRouting.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @changed $Id: iRouteBasedRouting.class.php 1592 2015-05-22 13:28:31Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 /*
  * Console Argument Routing
 * cmd.bat [application] [controller] [action] parameter1 parameter2 parameterN
@@ -40,13 +39,15 @@
 
 interface iRouteBasedRouting
 {
-	public function connect(lcRoute $route);
-	public function prependRoute(lcRoute $route);
-	public function appendRoute(lcRoute $route);
+    public function connect(lcNamedRoute $route);
 
-	public function getRoutes();
-	public function hasRoutes();
-	public function clearRoutes();
+    public function prependRoute(lcNamedRoute $route);
+
+    public function appendRoute(lcNamedRoute $route);
+
+    public function getRoutes();
+
+    public function hasRoutes();
+
+    public function clearRoutes();
 }
-
-?>

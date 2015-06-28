@@ -24,9 +24,9 @@
  * File Description
  * @package FileCategory
  * @subpackage FileSubcategory
- * @changed $Id: bootstrap.php 1564 2015-01-28 21:15:43Z mkovachev $
+ * @changed $Id: bootstrap.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1564 $
+ * @version $Revision: 1592 $
  */
 
 // setup proper initial error reporting before booting
@@ -195,5 +195,3 @@ require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'uagent_info' . DS . 
 
 // UTF8Compat - too heavy on memory - must be included separately
 //require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'UTF8Compat' . DS . 'UTF8Compat.php');
-
-?>

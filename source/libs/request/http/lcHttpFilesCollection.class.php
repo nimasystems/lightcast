@@ -26,64 +26,59 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcHttpFilesCollection.class.php 1548 2014-06-26 16:52:35Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1548 $
-*/
-
+ * @changed $Id: lcHttpFilesCollection.class.php 1592 2015-05-22 13:28:31Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
 {
-	public function __construct(array $values=null)
-	{
-		parent::__construct();
+    public function __construct(array $values = null)
+    {
+        parent::__construct();
 
-		if (isset($values))
-		{
-			foreach ($values as $key=>$val)
-			{
-				$this->append(new HttpFile($key,$val));
-			}
-		}
-	}
+        if (isset($values)) {
+            foreach ($values as $key => $val) {
+                $this->append(new lcHttpFile($key, $val));
+            }
+        }
+    }
 
-	public function append(lcHttpFile $file)
-	{
-		return parent::appendColl($file);
-	}
+    public function append(lcHttpFile $file)
+    {
+        return parent::appendColl($file);
+    }
 
-	public function offsetSet ($offset, $value)
-	{
-		return parent::offsetSet($offset, $value);
-	}
+    public function offsetSet($offset, $value)
+    {
+        return parent::offsetSet($offset, $value);
+    }
 
-	public function offsetUnset($index)
-	{
-		return parent::offsetUnset($index);
-	}
+    public function offsetUnset($index)
+    {
+        return parent::offsetUnset($index);
+    }
 
-	public function set(lcHttpFile $value, $offset=null)
-	{
-		return parent::set($value, $offset);
-	}
+    public function set(lcHttpFile $value, $offset = null)
+    {
+        return parent::set($value, $offset);
+    }
 
-	public function delete($offset=null)
-	{
-		return parent::delete($offset);
-	}
+    public function delete($offset = null)
+    {
+        return parent::delete($offset);
+    }
 
-	public function clear()
-	{
-		return parent::clear();
-	}
+    public function clear()
+    {
+        return parent::clear();
+    }
 
     public function getByFormFieldName($name)
     {
         $this->first();
 
-        foreach ($this->list as $el)
-        {
-            if ($el->getFormName() == $name)
-            {
+        foreach ($this->list as $el) {
+            if ($el->getFormName() == $name) {
                 return $el;
             }
         }
@@ -91,20 +86,18 @@ class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
         return null;
     }
 
-	public function getByName($name)
-	{
-		$this->first();
+    public function getByName($name)
+    {
+        $this->first();
 
-		foreach ($this->list as $el)
-		{
-			if ($el->getName() == $name) 
-			{
-				return $el;
-			}
-		}
+        foreach ($this->list as $el) {
+            if ($el->getName() == $name) {
+                return $el;
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 }
 
 ?>

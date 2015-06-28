@@ -24,154 +24,155 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcObj.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcObj.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
+* @version $Revision: 1592 $
+*/
+
 abstract class lcObj
 {
     private $tag;
-    private $_reflection;
+	
+	public function __construct()
+	{
+		//
+	}
 
-    public function __construct()
-    {
-        //
-    }
+	public function __destruct()
+	{
+		$this->_reflection = null;
+	}
 
-    public function __destruct()
-    {
-        $this->_reflection = null;
-    }
+	public function __toString()
+	{
+		return e($this,true);
+	}
 
-    public function __toString()
-    {
-        return e($this, true);
-    }
+	public function __call($method, array $params = null)
+	{
+		fnothing($params);
+		throw new Exception('Class Method \'' . get_class($this) . '::' . $method . '\' does not exist');
+	}
 
-    public function __call($method, array $params = null)
-    {
-        fnothing($params);
-        throw new Exception('Class Method \'' . get_class($this) . '::' . $method . '\' does not exist');
-    }
+	public function __set($property, $value = null)
+	{
+		fnothing($value);
+		throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
+	}
 
-    public function __set($property, $value = null)
-    {
-        fnothing($value);
-        throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
-    }
+	public function __get($property)
+	{
+		throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
+	}
 
-    public function __get($property)
-    {
-        throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
-    }
+	public function methodExists($methodname)
+	{
+		return method_exists($this,$methodname);
+	}
 
-    public function methodExists($methodname)
-    {
-        return method_exists($this, $methodname);
-    }
+	public function propertyExists($property)
+	{
+		return property_exists($this,$property);
+	}
 
-    public function propertyExists($property)
-    {
-        return property_exists($this, $property);
-    }
+	public function getClassName()
+	{
+		return get_class($this);
+	}
 
-    public function getClassName()
-    {
-        return get_class($this);
-    }
+	public function getParentName()
+	{
+		return get_parent_class($this);
+	}
 
-    public function getParentName()
-    {
-        return get_parent_class($this);
-    }
+	public function isChildOf($classname)
+	{
+		return is_subclass_of($this,$classname);
+	}
+	
+	public function getReflection()
+	{
+		$reflection = $this->_reflection ? $this->_reflection : new ReflectionClass($this);
+		
+		if (!$this->_reflection)
+		{
+			$this->_reflection = $reflection;
+		}
+		
+		return $reflection;
+	}
 
-    public function isChildOf($classname)
-    {
-        return is_subclass_of($this, $classname);
-    }
+	public function getClassInfo()
+	{
+		return $this->getReflection();
+	}
 
-    public function getReflection()
-    {
-        $reflection = $this->_reflection ? $this->_reflection : new ReflectionClass($this);
+	public function isFinal()
+	{
+		return $this->getReflection()->isFinal();
+	}
 
-        if (!$this->_reflection) {
-            $this->_reflection = $reflection;
-        }
+	public function getClassFilename()
+	{
+		return $this->getReflection()->getFileName();
+	}
 
-        return $reflection;
-    }
+	public function getClassStartLine()
+	{
+		return $this->getReflection()->getStartLine();
+	}
 
-    public function getClassInfo()
-    {
-        return $this->getReflection();
-    }
+	public function getClassEndLine()
+	{
+		return $this->getReflection()->getEndline();
+	}
 
-    public function isFinal()
-    {
-        return $this->getReflection()->isFinal();
-    }
+	public function getClassModifiers()
+	{
+		return $this->getReflection()->getModifiers();
+	}
 
-    public function getClassFilename()
-    {
-        return $this->getReflection()->getFileName();
-    }
+	public function getClassImplements()
+	{
+		return $this->getReflection()->getInterfaces();
+	}
 
-    public function getClassStartLine()
-    {
-        return $this->getReflection()->getStartLine();
-    }
+	public function getClassConstants()
+	{
+		return $this->getReflection()->getConstants();
+	}
 
-    public function getClassEndLine()
-    {
-        return $this->getReflection()->getEndline();
-    }
+	public function getClassProperties()
+	{
+		return $this->getReflection()->getProperties();
+	}
 
-    public function getClassModifiers()
-    {
-        return $this->getReflection()->getModifiers();
-    }
+	public function getClassMethods()
+	{
+		return $this->getReflection()->getMethods();
+	}
 
-    public function getClassImplements()
-    {
-        return $this->getReflection()->getInterfaces();
-    }
+	public function implementsInterface($interface_name)
+	{
+		return $this->getReflection()->implementsInterface($interface_name);
+	}
 
-    public function getClassConstants()
-    {
-        return $this->getReflection()->getConstants();
-    }
+	public function assert($condition, $error_str = null)
+	{
+		fnothing($error_str);
+		
+		if ($condition) 
+		{
+			return true;
+		}
 
-    public function getClassProperties()
-    {
-        return $this->getReflection()->getProperties();
-    }
+		assert($condition);
+	}
 
-    public function getClassMethods()
-    {
-        return $this->getReflection()->getMethods();
-    }
-
-    public function implementsInterface($interface_name)
-    {
-        return $this->getReflection()->implementsInterface($interface_name);
-    }
-
-    public function assert($condition, $error_str = null)
-    {
-        fnothing($error_str);
-
-        if ($condition) {
-            return true;
-        }
-
-        assert($condition);
-    }
-
-    public function description()
-    {
-        return $this->__toString();
-    }
-
+	public function description()
+	{
+		return $this->__toString();
+	}
     public function setTag($tag)
     {
         $this->tag = $tag;

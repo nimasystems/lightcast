@@ -53,7 +53,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         // compile deep
         $params = $this->view->getParams();
-
         $content = $this->parseNodeTemplate($params, $content);
         $content = $this->postCompile($content);
 

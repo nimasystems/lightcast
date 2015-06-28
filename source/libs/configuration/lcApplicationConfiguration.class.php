@@ -82,6 +82,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
                 case 5 :
                     return $this->project_configuration->$func($args[0], $args[1], $args[2], $args[3], $args[4]);
                 default :
+                    /** @noinspection PhpParamsInspection */
                     return call_user_func_array($this->project_configuration->$func, $args);
             }
         }

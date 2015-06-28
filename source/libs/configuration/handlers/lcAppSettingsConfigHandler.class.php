@@ -90,6 +90,7 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                     '^\/img',
                     '^\/files',
                     '^\/images',
+                    '^\/vfs'
                 ),
                 'lang_code_match' => '^\/(([a-z]{2}(_[A-Z]{2})?\/)|([a-z]{2}(_[A-Z]{2})?)$)\/*',
                 'autodetect' => true

@@ -232,6 +232,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         }
 
         // try to include it
+        /** @noinspection PhpIncludeInspection */
         include_once ($migrations_filename);
 
         // check if the class exists

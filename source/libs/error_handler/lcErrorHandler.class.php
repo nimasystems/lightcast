@@ -266,7 +266,7 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
                 "<strong>Client IP:</strong> " . $ipaddr . "<br />\n" : null) .
 
             "<strong>Date/Time of Event:</strong> " . date('d.m.y H:i:s') . "<br />\n" .
-            "<strong>Exception:</strong> <u>" . $type . "</u> / Code: " . $exception_code . " (" . $exception_domain . "): " . "<br />\n" .
+            "<strong>Exception:</strong> <cite>" . $type . "</cite> / Code: " . $exception_code . " (" . $exception_domain . "): " . "<br />\n" .
             "<strong>Filename:</strong> " . $exception_file . ' (' . $exception_line . ')' . "<br />\n" .
             "<strong>Message:</strong> " . $exception_message . "<br />\n<br />\n" .
             ($exception_cause ? "<strong>Exception Cause:</strong>: " . gettype($exception_cause) . "<br />\n" : null) .

@@ -24,53 +24,43 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcStringValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcStringValidator.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
+ * @version $Revision: 1592 $
  */
-
 class lcStringValidator extends lcValidator
 {
-	public function validate($data)
-	{
-		if (!is_string($data) && !is_numeric($data))
-		{
-			return false;
-		}
+    public function validate($data)
+    {
+        if (!is_string($data) && !is_numeric($data)) {
+            return false;
+        }
 
-		$min_length = isset($this->options['min_length']) ? (int)$this->options['min_length'] : 0;
-		$max_length = isset($this->options['max_length']) ? (int)$this->options['max_length'] : 0;
-		$min_length = isset($this->options['min_length']) ? (int)$this->options['min_length'] : 0;
-		$max_length = isset($this->options['max_length']) ? (int)$this->options['max_length'] : 0;
-		$alphanum_only = isset($this->options['alpha_numeric']) ? (int)$this->options['alpha_numeric'] : false;
-		$allow_whitespace = isset($this->options['allow_whitespace']) ? (int)$this->options['allow_whitespace'] : false;
+        $max_length = isset($this->options['max_length']) ? (int)$this->options['max_length'] : 0;
+        $min_length = isset($this->options['min_length']) ? (int)$this->options['min_length'] : 0;
+        $alphanum_only = isset($this->options['alpha_numeric']) ? (int)$this->options['alpha_numeric'] : false;
+        $allow_whitespace = isset($this->options['allow_whitespace']) ? (int)$this->options['allow_whitespace'] : false;
 
-		// min length
-		if((isset($min_length) && $min_length && strlen($data) < $min_length))
-		{
-			return false;
-		}
+        // min length
+        if (($min_length && strlen($data) < $min_length)) {
+            return false;
+        }
 
-		// max length
-		if((isset($max_length) && $max_length && strlen($data) > $max_length))
-		{
-			return false;
-		}
-		
-		// space
-		if (!$allow_whitespace && strpos($data, ' ') !== false)
-		{
-			return false;
-		}
+        // max length
+        if (($max_length && strlen($data) > $max_length)) {
+            return false;
+        }
 
-		// alpha numeric only
-		if ($alphanum_only)
-		{
-			return (bool)preg_match('/^[\w\d' . ($allow_whitespace ? '\s' : '') . ']+$/', $data);
-		}
-		
-		return true;
-	}
+        // space
+        if (!$allow_whitespace && strpos($data, ' ') !== false) {
+            return false;
+        }
+
+        // alpha numeric only
+        if ($alphanum_only) {
+            return (bool)preg_match('/^[\w\d' . ($allow_whitespace ? '\s' : '') . ']+$/', $data);
+        }
+
+        return true;
+    }
 }
-
-?>

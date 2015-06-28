@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcRoute.class.php 1518 2014-05-17 15:43:35Z mkovachev $
+ * @changed $Id: lcRoute.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1518 $
+ * @version $Revision: 1592 $
  */
 
 abstract class lcRoute extends lcObj
@@ -140,12 +140,13 @@ abstract class lcRoute extends lcObj
 		$this->live_params = $live_params;
 	}
 
-	/**
-	 * Tokenizes the current route to separate
-	 * URL / PARAMS
-	 * Returns the found params
-	 * @return string
-	 */
+    /**
+     * Tokenizes the current route to separate
+     * URL / PARAMS
+     * Returns the found params
+     * @return string
+     * @throws lcInvalidArgumentException
+     */
 	protected function compile()
 	{
 		// if already compiled return

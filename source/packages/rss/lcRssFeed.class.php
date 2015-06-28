@@ -24,193 +24,181 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcRssFeed.class.php 1469 2013-10-31 17:33:25Z mkovachev $
+ * @changed $Id: lcRssFeed.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1469 $
-*/
-
-
+ * @version $Revision: 1592 $
+ */
 class lcRssFeed extends lcObj
 {
-	const RSS_MIMETYPE = 'application/rss+xml';
-	const RSS_TIME_FORMAT = 'D, d M Y H:i:s O';
+    const RSS_MIMETYPE = 'application/rss+xml';
+    const RSS_TIME_FORMAT = 'D, d M Y H:i:s O';
 
-	private $items = array(); //of RSSItem
-	private $language = 'en';
-	private $encoding = 'utf-8';
-	private $builddate = 0; //unixtime
-	private $feed_title;
-	private $feed_link;
-	private $feed_descr;
-	private $managingEditor;
-	private $webMaster;
-	private $feedUrl;
+    private $items = array(); //of RSSItem
+    private $language = 'en';
+    private $encoding = 'utf-8';
+    private $builddate = 0; //unixtime
+    private $feed_title;
+    private $feed_link;
+    private $feed_descr;
+    private $managingEditor;
+    private $webMaster;
+    private $feedUrl;
 
-	public function __construct($feed_title, $feed_link, $builddate = 0,
-			$language = 'en', $feed_descr = null)
-	{
-		parent::__construct();
+    public function __construct($feed_title, $feed_link, $builddate = 0,
+                                $language = 'en', $feed_descr = null)
+    {
+        parent::__construct();
 
-		$this->items = array();
+        $this->items = array();
 
-		$this->setFeedTitle($feed_title);
-		$this->setFeedLink($feed_link);
-		$this->setBuildDate($builddate);
-		$this->setLanguage($language);
-		$this->setFeedDescription($feed_descr);
-	}
+        $this->setFeedTitle($feed_title);
+        $this->setFeedLink($feed_link);
+        $this->setBuildDate($builddate);
+        $this->setLanguage($language);
+        $this->setFeedDescription($feed_descr);
+    }
 
-	public function setFeedTitle($title)
-	{
-		$this->feed_title = $title;
-	}
+    public function setFeedTitle($title)
+    {
+        $this->feed_title = $title;
+    }
 
-	public function setFeedLink($link)
-	{
-		$this->feed_link = $link;
-	}
+    public function setFeedLink($link)
+    {
+        $this->feed_link = $link;
+    }
 
-	public function setBuildDate($bdate)
-	{
-		if ($bdate < 1) 
-		{
-			$bdate = time();
-		}
-		
-		$this->builddate = (int)$bdate;
-	}
+    public function setBuildDate($bdate)
+    {
+        if ($bdate < 1) {
+            $bdate = time();
+        }
 
-	public function setLanguage($lang='en')
-	{
-		$this->language = $lang;
-	}
+        $this->builddate = (int)$bdate;
+    }
 
-	public function setEncoding($encoding='utf-8')
-	{
-		$this->encoding = $encoding;
-	}
+    public function setLanguage($lang = 'en')
+    {
+        $this->language = $lang;
+    }
 
-	public function setFeedDescription($descr)
-	{
-		$this->feed_descr = $descr;
-	}
+    public function setEncoding($encoding = 'utf-8')
+    {
+        $this->encoding = $encoding;
+    }
 
-	public function setManagingEditor($value)
-	{
-		$this->managingEditor = $value;
-	}
+    public function setFeedDescription($descr)
+    {
+        $this->feed_descr = $descr;
+    }
 
-	public function setWebmaster($value)
-	{
-		$this->webMaster = $value;
-	}
+    public function setManagingEditor($value)
+    {
+        $this->managingEditor = $value;
+    }
 
-	public function setFeedURL($value)
-	{
-		$this->feedUrl = $value;
-	}
+    public function setWebmaster($value)
+    {
+        $this->webMaster = $value;
+    }
 
-	public function getFeedTitle()
-	{
-		return $this->feed_title;
-	}
+    public function setFeedURL($value)
+    {
+        $this->feedUrl = $value;
+    }
 
-	public function getFeedLink()
-	{
-		return $this->feed_link;
-	}
+    public function getFeedTitle()
+    {
+        return $this->feed_title;
+    }
 
-	public function getBuildDate($format=__RSS_FEED_GENERATOR_STAMP_FORMAT)
-	{
-		if ($format)
-		{
-			return date($format,$this->builddate);
-		}
-		else
-		{
-			return (int)$this->builddate;
-		}
-	}
+    public function getFeedLink()
+    {
+        return $this->feed_link;
+    }
 
-	public function getLanguage()
-	{
-		return $this->language;
-	}
+    public function getBuildDate($format = __RSS_FEED_GENERATOR_STAMP_FORMAT)
+    {
+        if ($format) {
+            return date($format, $this->builddate);
+        } else {
+            return (int)$this->builddate;
+        }
+    }
 
-	public function getEncoding()
-	{
-		return $this->encoding;
-	}
+    public function getLanguage()
+    {
+        return $this->language;
+    }
 
-	public function getFeedDescription()
-	{
-		return $this->feed_descr;
-	}
+    public function getEncoding()
+    {
+        return $this->encoding;
+    }
 
-	public function addItem(lcRssItem $item)
-	{
-		$max = count($this->items);
-		$this->items[$max] = $item;
-		return $max;
-	}
+    public function getFeedDescription()
+    {
+        return $this->feed_descr;
+    }
 
-	public function generateFeed()
-	{
-		if (!$this->feed_title || !$this->feed_link || !$this->language || !$this->encoding || $this->builddate < 1)
-		{
-			return false;
-		}
+    public function addItem(lcRssItem $item)
+    {
+        $max = count($this->items);
+        $this->items[$max] = $item;
+        return $max;
+    }
 
-		$rss  = '';
-		$rss .= "<?xml version=\"1.0\" encoding=\"{$this->encoding}\" ?>\n";
-		$rss .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
-		$rss .= "	<channel>\n";
-		$rss .= "	<atom:link href=\"{$this->feedUrl}\" rel=\"self\" type=\"application/rss+xml\" />\n";
-		$rss .= "		<title>{$this->feed_title}</title>\n";
-		$rss .= "		<link>{$this->feed_link}</link>\n";
-		$rss .= "		<language>{$this->language}</language>\n";
-		$rss .= "		<description>{$this->feed_descr}</description>\n";
-		$rss .= "		<docs>http://feedvalidator.org/docs/rss2.html</docs>\n";
-		$rss .= "		<generator>Nimasystems RSS2 Feed Generator - http://www.nimasystems.com</generator>\n";
-		$rss .= "		<managingEditor>{$this->managingEditor}</managingEditor>\n";
-		$rss .= "		<webMaster>{$this->webMaster}</webMaster>\n";
-		$rss .= "		<copyright>Copyright 2006, Nimasystems Ltd, RSS2 Feed Generator: Nimasystems</copyright>\n";
-		$rss .= "		<lastBuildDate>".$this->GetBuildDate(self::RSS_TIME_FORMAT)."</lastBuildDate>\n";
+    public function generateFeed()
+    {
+        if (!$this->feed_title || !$this->feed_link || !$this->language || !$this->encoding || $this->builddate < 1) {
+            return false;
+        }
 
-		foreach ($this->items as $item)
-		{
-			if (!$item->getTitle() || !$item->getLink()) 
-			{
-				continue;
-			}
+        $rss = '';
+        $rss .= "<?xml version=\"1.0\" encoding=\"{$this->encoding}\" ?>\n";
+        $rss .= "<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
+        $rss .= "	<channel>\n";
+        $rss .= "	<atom:link href=\"{$this->feedUrl}\" rel=\"self\" type=\"application/rss+xml\" />\n";
+        $rss .= "		<title>{$this->feed_title}</title>\n";
+        $rss .= "		<link>{$this->feed_link}</link>\n";
+        $rss .= "		<language>{$this->language}</language>\n";
+        $rss .= "		<description>{$this->feed_descr}</description>\n";
+        $rss .= "		<docs>http://feedvalidator.org/docs/rss2.html</docs>\n";
+        $rss .= "		<generator>Nimasystems RSS2 Feed Generator - http://www.nimasystems.com</generator>\n";
+        $rss .= "		<managingEditor>{$this->managingEditor}</managingEditor>\n";
+        $rss .= "		<webMaster>{$this->webMaster}</webMaster>\n";
+        $rss .= "		<copyright>Copyright 2006, Nimasystems Ltd, RSS2 Feed Generator: Nimasystems</copyright>\n";
+        $rss .= "		<lastBuildDate>" . $this->GetBuildDate(self::RSS_TIME_FORMAT) . "</lastBuildDate>\n";
 
-			$title = $item->getTitle();
+        foreach ($this->items as $item) {
+            if (!$item->getTitle() || !$item->getLink()) {
+                continue;
+            }
 
-			if ($enc = $item->getEnclosure())
-			{
-				$enc = '<enclosure url="'.$enc['url'].'"' .
-						($enc['length'] ? ' length="'.$enc['length'].'"' : null) .
-						($enc['type'] ? ' type="'.$enc['type'].'"' : null) .
-						' />';
-			}
+            $title = $item->getTitle();
 
-			$rss .= "		<item>\n";
-			$rss .= "			<title>".$title."</title>\n";
-			$rss .= "			<link>".$item->getLink()."</link>\n";
-			$rss .= "			<guid isPermaLink=\"".($item->isGuidPermanent() ? 'true':'false')."\">".'1234567890'.($item->getGuid())."</guid>\n";
-			$rss .= "			<description>".$item->getDescription()."</description>\n";
-			$rss .= "			<pubDate>".$item->getPublishDate()."</pubDate>\n";
-			$rss .= $enc ? "			" . $enc . "\n" : null;
-			$rss .= "		</item>\n";
+            if ($enc = $item->getEnclosure()) {
+                $enc = '<enclosure url="' . $enc['url'] . '"' .
+                    ($enc['length'] ? ' length="' . $enc['length'] . '"' : null) .
+                    ($enc['type'] ? ' type="' . $enc['type'] . '"' : null) .
+                    ' />';
+            }
 
-			unset($title, $enc, $item);
-		}
+            $rss .= "		<item>\n";
+            $rss .= "			<title>" . $title . "</title>\n";
+            $rss .= "			<link>" . $item->getLink() . "</link>\n";
+            $rss .= "			<guid isPermaLink=\"" . ($item->isGuidPermanent() ? 'true' : 'false') . "\">" . '1234567890' . ($item->getGuid()) . "</guid>\n";
+            $rss .= "			<description>" . $item->getDescription() . "</description>\n";
+            $rss .= "			<pubDate>" . $item->getPublishDate() . "</pubDate>\n";
+            $rss .= $enc ? "			" . $enc . "\n" : null;
+            $rss .= "		</item>\n";
 
-		$rss .= "	</channel>\n";
-		$rss .= "</rss>";
+            unset($title, $enc, $item);
+        }
 
-		return $rss;
-	}
+        $rss .= "	</channel>\n";
+        $rss .= "</rss>";
+
+        return $rss;
+    }
 }
-
-?>

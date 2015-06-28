@@ -17,16 +17,18 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcTransliterate.class.php 1524 2014-05-26 10:00:52Z mkovachev $
+ * @changed $Id: lcTransliterate.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1524 $
+ * @version $Revision: 1592 $
  */
 
 class lcTransliterate
@@ -53,5 +55,3 @@ class lcTransliterate
 		return $str;
 	}
 }
-
-?>

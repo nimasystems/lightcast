@@ -24,9 +24,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: CountryHelper.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: CountryHelper.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
+* @version $Revision: 1592 $
 */
 
 
@@ -329,12 +329,6 @@ class CountryHelper
 						"country_localized_name" => "Chile",
 						"phone_code" => "+56 ",
 						"language_iso" => "es",
-				),
-				"CN" => array(
-						"country_name" => "China",
-						"country_localized_name" => "中國/中国",
-						"phone_code" => "+86 ",
-						"language_iso" => "zh",
 				),
 				"CX" => array(
 						"country_name" => "Christmas Island",
@@ -1554,7 +1548,6 @@ class CountryHelper
 				"Central African Republic" => "CF",
 				"Chad" => "TD",
 				"Chile" => "CL",
-				"China" => "CN",
 				"Christmas Island" => "CX",
 				"Cocos (Keeling) Islands" => "CC",
 				"Colombia" => "CO",

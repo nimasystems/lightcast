@@ -25,9 +25,9 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcSys.class.php 1472 2013-11-16 14:30:20Z mkovachev $
+ * @changed $Id: lcSys.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1472 $
+ * @version $Revision: 1592 $
 */
 
 class lcSys
@@ -144,12 +144,11 @@ class lcSys
 		return false;
 	}*/
 
-	/**
-	 * Get path to php cli.
-	 *
-	 * @throws sfException If no php cli found
-	 * @return string
-	 */
+    /**
+     * Get path to php cli.
+     * @return string If no php cli found
+     * @throws lcSystemException
+     */
 	public static function getPhpCli()
 	{
 		$path = getenv('PATH') ? getenv('PATH') : getenv('Path');

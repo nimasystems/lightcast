@@ -38,5 +38,3 @@ interface iSupportsAutoload
      */
 	public function getAutoloadClasses();
 }
-
-?>

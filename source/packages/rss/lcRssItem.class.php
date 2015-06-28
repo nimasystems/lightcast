@@ -24,117 +24,110 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
- * @changed $Id: lcRssItem.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @changed $Id: lcRssItem.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
- * @version $Revision: 1455 $
-*/
-
-
+ * @version $Revision: 1592 $
+ */
 class lcRssItem extends lcObj
 {
-	private $title;
-	private $link;
-	private $descr;
-	private $permlink = false;
-	private $guid;
-	private $publishdate = 0; //unix timestamp
-	private $enclosure;
+    private $title;
+    private $link;
+    private $descr;
+    private $permlink = false;
+    private $guid;
+    private $publishdate = 0; //unix timestamp
+    private $enclosure;
 
-	public function __construct($title, $link, $publishdate=0, $guid = null,
-			$permlink = false,$descr = null)
-	{
-		parent::__construct();
+    public function __construct($title, $link, $publishdate = 0, $guid = null,
+                                $permlink = false, $descr = null)
+    {
+        parent::__construct();
 
-		$this->setTitle($title);
-		$this->setLink($link);
-		$this->setPublishDate($publishdate);
-		$this->setGuid($guid,$permlink);
-		$this->setDescription($descr);
-	}
+        $this->setTitle($title);
+        $this->setLink($link);
+        $this->setPublishDate($publishdate);
+        $this->setGuid($guid, $permlink);
+        $this->setDescription($descr);
+    }
 
-	public function setTitle($title)
-	{
-		$this->title = $title;
-	}
+    public function setTitle($title)
+    {
+        $this->title = $title;
+    }
 
-	public function setEnclosure($url, $length = null, $type = null)
-	{
-		$this->enclosure = array(
-				'url' => $url,
-				'length' => $length,
-				'type' => $type
-		);
-	}
+    public function setEnclosure($url, $length = null, $type = null)
+    {
+        $this->enclosure = array(
+            'url' => $url,
+            'length' => $length,
+            'type' => $type
+        );
+    }
 
-	public function getEnclosure()
-	{
-		return $this->enclosure;
-	}
+    public function getEnclosure()
+    {
+        return $this->enclosure;
+    }
 
-	public function setLink($link)
-	{
-		$this->link = $link;
-	}
+    public function setLink($link)
+    {
+        $this->link = $link;
+    }
 
-	public function setDescription($descr)
-	{
-		$this->descr = $descr;
-	}
+    public function setDescription($descr)
+    {
+        $this->descr = $descr;
+    }
 
-	public function setGUID($guid, $permlink = false)
-	{
-		$this->guid = $guid;
-		$this->permlink = $permlink;
-	}
+    public function setGUID($guid, $permlink = false)
+    {
+        $this->guid = $guid;
+        $this->permlink = $permlink;
+    }
 
-	public function setPublishDate($pdate)
-	{
-		$this->publishdate = $pdate;
-	}
+    public function setPublishDate($pdate)
+    {
+        $this->publishdate = $pdate;
+    }
 
-	public function getTitle()
-	{
-		return $this->fFixTags($this->title);
-	}
+    public function getTitle()
+    {
+        return $this->fFixTags($this->title);
+    }
 
-	public function getLink()
-	{
-		return $this->link;
-	}
+    public function getLink()
+    {
+        return $this->link;
+    }
 
-	private function fFixTags($content)
-	{
-		$content = str_replace('<','&lt;',$content);
-		$content = str_replace('>','&gt;',$content);
-		return $content;
-	}
+    private function fFixTags($content)
+    {
+        $content = str_replace('<', '&lt;', $content);
+        $content = str_replace('>', '&gt;', $content);
+        return $content;
+    }
 
-	public function getDescription()
-	{
-		return $this->fFixTags($this->descr);
-	}
+    public function getDescription()
+    {
+        return $this->fFixTags($this->descr);
+    }
 
-	public function getGuid()
-	{
-		if (strlen($this->guid) > 0)
-		{
-			return $this->guid;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    public function getGuid()
+    {
+        if (strlen($this->guid) > 0) {
+            return $this->guid;
+        } else {
+            return false;
+        }
+    }
 
-	public function isGuidPermanent()
-	{
-		return $this->permlink;
-	}
+    public function isGuidPermanent()
+    {
+        return $this->permlink;
+    }
 
-	public function getPublishDate()
-	{
-		return $this->publishdate;
-	}
+    public function getPublishDate()
+    {
+        return $this->publishdate;
+    }
 }
-
-?>
