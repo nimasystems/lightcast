@@ -1,0 +1,12 @@
+# built application files
+*.mo
+*.swp
+/gen
+
+# Mac OS X clutter
+*.DS_Store
+
+# Windows clutter
+Thumbs.db
+
+.idea/
