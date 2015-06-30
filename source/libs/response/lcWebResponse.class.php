@@ -94,6 +94,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $icon;
     protected $html_base;
     protected $title;
+    protected $title_suffix;
     protected $lang_dir;
 
     /**
@@ -501,6 +502,22 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     }
 
     /*
+     * Set Title Suffix
+    */
+    public function setTitleSuffix($title)
+    {
+        $this->title_suffix = $title;
+    }
+
+    /*
+     * Get Title Suffix
+    */
+    public function getTitleSuffix()
+    {
+        return $this->title_suffix;
+    }
+
+    /*
      * Set Title
     */
     public function setTitle($title)
@@ -784,7 +801,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // title
         if ($this->title) {
-            $head[] = '<title>' . htmlspecialchars($this->title) . '</title>';
+            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
         }
 
         // flush based on allowances

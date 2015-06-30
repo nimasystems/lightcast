@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,111 +28,111 @@
  * @subpackage File Subcategory
  * @changed $Id: lcCookie.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcCookie extends lcObj
 {
-	const DEFAULT_PATH = '/';
+    const DEFAULT_PATH = '/';
 
-	protected $name;
-	protected $value;
-	protected $path;
-	protected $domain;
-	protected $expires;
-	protected $secure;
+    protected $name;
+    protected $value;
+    protected $path;
+    protected $domain;
+    protected $expires;
+    protected $secure;
 
-	public function __construct($name, $value = null, $path = self::DEFAULT_PATH, $domain = null, $expires = null, $secure = false)
-	{
-		parent::__construct();
+    public function __construct($name, $value = null, $path = self::DEFAULT_PATH, $domain = null, $expires = null, $secure = false)
+    {
+        parent::__construct();
 
-		$name = (string)$name;
-		$value = isset($value) ? (string)$value : null;
-		$path = isset($path) ? (string)$path : self::DEFAULT_PATH;
-		$domain = isset($domain) ? (string)$domain : null;
-		$expires = isset($expires) ? (int)$expires : null;
-		$secure = isset($secure) ? (bool)$secure : false;
+        $name = (string)$name;
+        // $value can be an array?
+        $value = isset($value) ? $value : null;
+        $path = isset($path) ? (string)$path : self::DEFAULT_PATH;
+        $domain = isset($domain) ? (string)$domain : null;
+        $expires = isset($expires) ? (int)$expires : null;
+        $secure = isset($secure) ? (bool)$secure : false;
 
-		$this->name = $name;
-		$this->value = $value;
-		$this->path = $path;
-		$this->domain = $domain;
-		$this->expires = $expires;
-		$this->secure = $secure;
-	}
+        $this->name = $name;
+        $this->value = $value;
+        $this->path = $path;
+        $this->domain = $domain;
+        $this->expires = $expires;
+        $this->secure = $secure;
+    }
 
-	public function getName()
-	{
-		return $this->name;
-	}
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	public function getValue()
-	{
-		return $this->value;
-	}
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	public function getPath()
-	{
-		return $this->path;
-	}
+    public function getPath()
+    {
+        return $this->path;
+    }
 
-	public function getDomain()
-	{
-		return $this->domain;
-	}
+    public function getDomain()
+    {
+        return $this->domain;
+    }
 
-	public function getExpiration()
-	{
-		return $this->expires;
-	}
+    public function getExpiration()
+    {
+        return $this->expires;
+    }
 
-	public function isSecure()
-	{
-		return $this->secure;
-	}
+    public function isSecure()
+    {
+        return $this->secure;
+    }
 
-	public function setName($name)
-	{
-		$this->name = $name;
-	}
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	public function setValue($value)
-	{
-		$this->value = $value;
-	}
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
 
-	public function setPath($path)
-	{
-		$this->path = $path;
-	}
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
 
-	public function setDomain($domain)
-	{
-		$this->domain = $domain;
-	}
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+    }
 
-	public function setExpiration($expires)
-	{
-		$this->expires = (int)$expires;
-	}
+    public function setExpiration($expires)
+    {
+        $this->expires = (int)$expires;
+    }
 
-	public function setSecure($secure)
-	{
-		$this->secure = $secure;
-	}
+    public function setSecure($secure)
+    {
+        $this->secure = $secure;
+    }
 
-	public function __toString()
-	{
-		$str = "lcCookie: \n" .
-				"Name: " . $this->name . "\n" .
-				"Value: " . $this->value . "\n" .
-				"Path: " . $this->path . "\n" .
-				"Domain: " . $this->domain . "\n" .
-				"Expires: " . $this->expires . "\n" .
-				"Is Secure: " . $this->secure . "\n\n";
+    public function __toString()
+    {
+        $str = "lcCookie: \n" .
+            "Name: " . $this->name . "\n" .
+            "Value: " . $this->value . "\n" .
+            "Path: " . $this->path . "\n" .
+            "Domain: " . $this->domain . "\n" .
+            "Expires: " . $this->expires . "\n" .
+            "Is Secure: " . $this->secure . "\n\n";
 
-		return $str;
-	}
+        return $str;
+    }
 }
 
 ?>

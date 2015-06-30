@@ -460,6 +460,8 @@ EOD;
 
         $this->schemas_initialized = false;
 
+        //$this->propelFlush();
+
         $this->propelOm();
 
         return true;
