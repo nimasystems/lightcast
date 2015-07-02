@@ -30,7 +30,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1475 $
  */
-
 class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
 {
     protected $model_paths = array();
@@ -48,8 +47,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         // setup models_gen_dir
         $propel_custom_gen_dir = (string)$cfg['db.propel_custom.gen_dir'];
 
-        if ($propel_custom_gen_dir)
-        {
+        if ($propel_custom_gen_dir) {
             $this->models_gen_dir = $cfg->getGenDir() . DS . $propel_custom_gen_dir . DS . 'models';
         }
 
@@ -69,8 +67,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
     {
         $path_to_models = isset($event->params['path_to_models']) ? $event->params['path_to_models'] : null;
 
-        if ($path_to_models && $models && is_array($models))
-        {
+        if ($path_to_models && $models && is_array($models)) {
             $this->registerModelClasses($path_to_models, $models);
             $event->setProcessed(true);
         }
@@ -80,8 +77,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
 
     public function onUseModels(lcEvent $event, $models)
     {
-        if ($models && is_array($models))
-        {
+        if ($models && is_array($models)) {
             $this->useModels($models);
             $event->setProcessed(true);
         }
@@ -106,14 +102,10 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
 
     public function useModels(array $models)
     {
-        foreach ($models as $model_name)
-        {
-            try
-            {
+        foreach ($models as $model_name) {
+            try {
                 $this->useModel($model_name);
-            }
-            catch(Exception $e)
-            {
+            } catch (Exception $e) {
                 throw new lcDatabaseException('Could not use model \'' . $model_name . '\': ' . $e->getMessage(), $e->getCode(), $e);
             }
 
@@ -123,19 +115,16 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
 
     public function useModel($model_name)
     {
-        if (!$model_name)
-        {
+        if (!$model_name) {
             throw new lcInvalidArgumentException('Invalid params');
         }
 
         // check if already used
-        if (in_array($model_name, $this->used_models))
-        {
+        if (in_array($model_name, $this->used_models)) {
             return true;
         }
 
-        if (!isset($this->registered_models[$model_name]))
-        {
+        if (!isset($this->registered_models[$model_name])) {
             throw new lcNotAvailableException('Model not available');
         }
 
@@ -170,8 +159,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
 
         $class_autoloader = $this->class_autoloader;
 
-        foreach ($classes as $class_name => $filename)
-        {
+        foreach ($classes as $class_name => $filename) {
             $class_autoloader->addClass($class_name, $filename);
             unset($class_name, $filename);
         }
@@ -205,36 +193,30 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
          }
          }*/
 
-        if (DO_DEBUG)
-        {
+        if (DO_DEBUG) {
             $this->debug('Used db model: ' . $model_name);
         }
     }
 
     public function registerModelClasses($path_to_models, array $models)
     {
-        if (!$path_to_models || !$models)
-        {
+        if (!$path_to_models || !$models) {
             throw new lcInvalidArgumentException('Invalid path / models');
         }
 
         $path_index = array_keys($this->model_paths, $path_to_models);
 
-        if (!$path_index)
-        {
+        if (!$path_index) {
             $path_index = count($this->model_paths);
             $this->model_paths[$path_index] = $path_to_models;
-        }
-        else
-        {
+        } else {
             $path_index = $path_index[0];
         }
 
-        foreach ($models as $model)
-        {
-            if (isset($this->registered_models[$model]))
-            {
-                throw new lcDatabaseException('Duplicate model registration (' . $model . ' / ' . $path_to_models . '), ' . 'previously declared in: ' . $this->registered_models[$model]['path']);
+        foreach ($models as $model) {
+            if (isset($this->registered_models[$model])) {
+                throw new lcDatabaseException('Duplicate model registration (' . $model . ' / ' . $path_to_models . '), ' .
+                    'previously declared in: ' . $this->model_paths[$this->registered_models[$model]]);
             }
 
             $this->registered_models[$model] = $path_index;
@@ -242,11 +224,11 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
             unset($model);
         }
 
-        if (DO_DEBUG)
-        {
+        if (DO_DEBUG) {
             $this->debug('Registered db models at path (' . $path_to_models . '): ' . print_r($models, true));
         }
     }
 
 }
+
 ?>

@@ -806,9 +806,14 @@ EOD;
         return '<?xml version="1.0" encoding="utf-8"?><database package="models" defaultIdMethod="native" baseClass="lcBasePropelObject" defaultTranslateMethod="$this-&gt;translate"></database>';
     }
 
+    private function getProjectViews()
+    {
+        return ($this->configuration instanceof iSupportsDbViews ? $this->configuration->getDbViews() : null);
+    }
+
     private function getProjectModels()
     {
-        return $this->configuration['db.generator.project.models'];
+        return ($this->configuration instanceof iSupportsDbModels ? $this->configuration->getDbModels() : null);
     }
 
     private function getPluginModels($plugin_name, $plugin_path)
@@ -850,7 +855,7 @@ EOD;
         return $ret;
     }
 
-    private function fixSchema($filename, array $options, array $supported_models)
+    private function fixSchema($filename, array $options, array $supported_models = null)
     {
         $fdata = @file_get_contents($filename);
 
@@ -888,7 +893,7 @@ EOD;
                 $table_name = $table->getAttribute('name');
 
                 // remove if not in supported models
-                if (!in_array($table_name, $supported_models)) {
+                if ($supported_models && !in_array($table_name, $supported_models)) {
                     $table->parentNode->removeChild($table);
                 }
 
@@ -905,33 +910,35 @@ EOD;
         }
 
         // add the missing ones
-        foreach ($supported_models as $model_name) {
+        if ($supported_models) {
+            foreach ($supported_models as $model_name) {
 
-            $found = false;
+                $found = false;
 
-            if ($tables_dom->length) {
-                foreach ($tables_dom as $table) {
+                if ($tables_dom->length) {
+                    foreach ($tables_dom as $table) {
 
-                    $table_name = $table->getAttribute('name');
+                        $table_name = $table->getAttribute('name');
 
-                    if ($table_name == $model_name) {
-                        $found = true;
-                        break;
+                        if ($table_name == $model_name) {
+                            $found = true;
+                            break;
+                        }
+
+                        unset($table);
                     }
-
-                    unset($table);
                 }
-            }
 
-            if (!$found) {
-                $tmp = $pXml->createElement("table");
-                $tmp->setAttribute('name', $model_name);
-                $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
-                $tmp->setAttribute('idMethod', 'native');
-                $db_q->item(0)->appendChild($tmp);
-            }
+                if (!$found) {
+                    $tmp = $pXml->createElement("table");
+                    $tmp->setAttribute('name', $model_name);
+                    $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
+                    $tmp->setAttribute('idMethod', 'native');
+                    $db_q->item(0)->appendChild($tmp);
+                }
 
-            unset($model_name);
+                unset($model_name);
+            }
         }
 
         unset($tables_dom, $tables_xpath_search);

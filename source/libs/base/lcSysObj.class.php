@@ -302,6 +302,10 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         return $i18n->translateInContext($context_type, $context_name, $string, $translation_domain);
     }
 
+    /**
+     * @param $text string
+     * @return string
+     */
     public function t($text)
     {
         return $this->translate($text);
