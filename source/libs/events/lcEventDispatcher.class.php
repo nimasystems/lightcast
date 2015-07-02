@@ -46,6 +46,9 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
     protected $object_listeners;
     protected $object_listeners_objects;
 
+    protected $connect_listeners;
+    protected $connect_listeners_objects;
+
     protected $max_filter_requests = array(
         'response.send_response' => 1,
         'request.set_context' => 1,
@@ -74,6 +77,9 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
         $this->object_listeners = array();
         $this->object_listeners_objects = array();
+
+        $this->connect_listeners = array();
+        $this->connect_listeners_objects = array();
     }
 
     public function addObserver(iEventObserver $event_observer)
@@ -131,8 +137,27 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return $this->total_notifications_sent;
     }
 
-    public function connect($event_name, lcObj & $listener, $callback_func)
+    public function connect($event_name, lcObj & $listener, $callback_func, $once = true)
     {
+        $notify_event = $this->notifyOnConnectForEvent($event_name, $listener, $callback_func);
+
+        if ($notify_event) {
+
+            if (is_callable($callback_func)) {
+                $callback_func($notify_event);
+            } else {
+                $listener->$callback_func($notify_event);
+            }
+
+            if (DO_DEBUG) {
+                $this->notifications[] = array('event_name' => $event_name, 'subject' => get_class($notify_event->subject));
+            }
+
+            if ($once) {
+                return;
+            }
+        }
+
         $listeners = $this->listeners;
         $listener_events = $this->listener_events;
 
@@ -309,7 +334,11 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                     continue;
                 }
 
-                $listener->$callback_func($event);
+                if (is_callable($callback_func)) {
+                    $callback_func($event);
+                } else {
+                    $listener->$callback_func($event);
+                }
 
                 if (DO_DEBUG) {
                     $this->notifications[] = array('event_name' => $event_name, 'subject' => get_class($event->subject));
@@ -403,7 +432,12 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             $found_listener = $listeners_objects[$listener_index];
 
             $event->processed = false;
-            $value_out = $found_listener->$callback_func($event, $new_value);
+
+            if (is_callable($callback_func)) {
+                $value_out = $callback_func($event, $new_value);
+            } else {
+                $value_out = $found_listener->$callback_func($event, $new_value);
+            }
 
             if ($event->isProcessed() || $new_value !== $value) {
                 $event->actual_processing_iterations++;
@@ -496,7 +530,12 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                         $event = new lcEvent($object_name, $listener, $params);
 
                         try {
-                            $return_value = $callee->$callback_func($event);
+                            if (is_callable($callback_func)) {
+                                $return_value = $callback_func($event);
+                            } else {
+                                $return_value = $callee->$callback_func($event);
+                            }
+
                             $event->return_value = $return_value;
                         } catch (Exception $e) {
                             $message = 'Could not provide object: ' . $object_name . ': ' . $e;
@@ -519,6 +558,64 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
         return $event;
     }
-}
 
-?>
+    public function attachConnectListener($event_name, lcObj & $listener, $callback_func = null)
+    {
+        $listener_name = get_class($listener);
+
+        $this->connect_listeners[$event_name][] = array($listener_name, $callback_func);
+        $this->connect_listeners_objects[$listener_name] = &$listener;
+    }
+
+    /**
+     * @param $event_name
+     * @param lcObj $listener
+     * @param $callback_func
+     * @param bool $once
+     * @return lcEvent|null
+     * @throws Exception
+     */
+    public function notifyOnConnectForEvent($event_name, lcObj & $listener, $callback_func, $once = true)
+    {
+        $listeners = $this->connect_listeners;
+
+        if ($listeners) {
+            foreach ($listeners as $key => $data) {
+
+                if ($key == $event_name) {
+                    // return the first found object
+                    $listener_name = $data[0][0];
+                    $callback_func = $data[0][1];
+
+                    $callee = $this->connect_listeners_objects[$listener_name];
+
+                    try {
+                        if ($callback_func) {
+                            if (is_callable($callback_func)) {
+                                $return_value = $callback_func();
+                            } else {
+                                $return_value = $callee->$callback_func();
+                            }
+                        } else {
+                            $return_value = new lcEvent($event_name, $callee);
+                        }
+
+                        if ($return_value instanceof lcEvent) {
+                            return $return_value;
+                        }
+
+                    } catch (Exception $e) {
+                        $message = 'Could not notify on connect: ' . $event_name . ': ' . $e;
+                        $this->err($message);
+
+                        throw $e;
+                    }
+                }
+
+                unset($key, $data);
+            }
+        }
+
+        return null;
+    }
+}

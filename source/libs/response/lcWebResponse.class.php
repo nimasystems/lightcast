@@ -475,6 +475,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    public function getHtmlVer()
+    {
+        return $this->htmlver;
+    }
+
     /*
      * Set a Favorite Icon
     * <link rel="icon" href="" type="image/png" />

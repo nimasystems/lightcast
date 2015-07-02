@@ -661,6 +661,7 @@ class lcApp extends lcObj
                 }
 
                 // register object provider
+                // TODO: Remove these
                 $this->event_dispatcher->registerProvider('loader.' . $loader, $this, 'getLoader');
 
             } catch (Exception $e) {
@@ -851,6 +852,7 @@ class lcApp extends lcObj
 
         // notify - startup
         $this->event_dispatcher->notify(new lcEvent($object_type . '.startup', $obj));
+        $this->event_dispatcher->attachConnectListener($object_type . '.startup', $obj);
     }
 
     public function setLoadersOntoObject(lcSysObj $app_obj)
