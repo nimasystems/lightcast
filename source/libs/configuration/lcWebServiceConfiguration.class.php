@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcWebServiceConfiguration extends lcApplicationConfiguration
 {
     const DEFAULT_APP_NAME = 'ws';
@@ -89,6 +88,4 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
 
         return $app_map;
     }
-
 }
-?>

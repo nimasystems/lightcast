@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,45 +28,42 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagLegend.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagLegend extends lcHtmlTag
 {
-	public function __construct($content, $accesskey = null)
-	{
-		parent::__construct('legend', true);
+    public function __construct($content, $accesskey = null)
+    {
+        parent::__construct('legend', true);
 
-		$this->setContent($content);
-		$this->setAccessKey($accesskey);
-	}
+        $this->setContent($content);
+        $this->setAccessKey($accesskey);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('accesskey');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('accesskey');
+    }
 
-	public function setContent($content)
-	{
-		parent::setContent($content);
-		return $this;
-	}
+    public function setContent($content)
+    {
+        parent::setContent($content);
+        return $this;
+    }
 
-	public function setAccessKey($value = null)
-	{
-		$this->setAttribute('accesskey', $value);
-		return $this;
-	}
+    public function setAccessKey($value = null)
+    {
+        $this->setAttribute('accesskey', $value);
+        return $this;
+    }
 
-	public function getAccessKey()
-	{
-		return $this->getAttribute('accesskey');
-	}
+    public function getAccessKey()
+    {
+        return $this->getAttribute('accesskey');
+    }
 }
-
-?>

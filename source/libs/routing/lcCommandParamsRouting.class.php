@@ -25,10 +25,9 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcCommandParamsRouting.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 /*
  * Console Argument Routing
 * cmd.bat [application] [controller] [action] parameter1 parameter2 parameterN
@@ -40,173 +39,158 @@
 
 class lcCommandParamsRouting extends lcRouting implements iDebuggable
 {
-	protected $request;
-	protected $detected_params;
+    protected $request;
+    protected $detected_params;
 
-	public function initialize()
-	{
-		parent::initialize();
+    public function initialize()
+    {
+        parent::initialize();
 
-		$this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
+        $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
 
-		// allow others to be notified when base routes have been loaded
-		$this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
-				'context' => $this->context
-				)));
+        // allow others to be notified when base routes have been loaded
+        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
+            'context' => $this->context
+        )));
 
-		// try to detect the parameters from request
-		$this->detectParameters();
-	}
+        // try to detect the parameters from request
+        $this->detectParameters();
+    }
 
-	public function shutdown()
-	{
-		$this->request = null;
+    public function shutdown()
+    {
+        $this->request = null;
 
-		parent::shutdown();
-	}
+        parent::shutdown();
+    }
 
-	public function getDebugInfo()
-	{
-		$debug_parent = (array)parent::getDebugInfo();
+    public function getDebugInfo()
+    {
+        $debug_parent = (array)parent::getDebugInfo();
 
-		$debug = array(
-				'detected_params' => $this->detected_params
-				);
+        $debug = array(
+            'detected_params' => $this->detected_params
+        );
 
-		$debug = array_merge($debug_parent, $debug);
+        $debug = array_merge($debug_parent, $debug);
 
-		return $debug;
-	}
+        return $debug;
+    }
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	public function onFilterParameters(lcEvent $event, $params)
-	{
-		$this->context = $event->getParams();
+    public function onFilterParameters(lcEvent $event, $params)
+    {
+        $this->context = $event->getParams();
 
-		if (false === $params_ret = $this->parse($event['argv']))
-		{
-			return $params;
-		}
+        if (false === $params_ret = $this->parse($event['argv'])) {
+            return $params;
+        }
 
-		$pars = array_merge((array)$params, (array)$params_ret);
+        $pars = array_merge((array)$params, (array)$params_ret);
 
-		return $pars;
-	}
+        return $pars;
+    }
 
-	private function detectParameters()
-	{
-		$context = $this->context;
+    private function detectParameters()
+    {
+        $context = $this->context;
 
-		assert(isset($context) && is_array($context) && $context);
+        assert(isset($context) && is_array($context) && $context);
 
-		if (!isset($context['argv']) || !isset($context['argc']) || !is_array($context['argv']) || !$context['argv'] || !$context['argc'])
-		{
-			throw new lcInvalidArgumentException('Invalid request context');
-		}
+        if (!isset($context['argv']) || !isset($context['argc']) || !is_array($context['argv']) || !$context['argv'] || !$context['argc']) {
+            throw new lcInvalidArgumentException('Invalid request context');
+        }
 
-		$argv = $context['argv'];
-		$argc = (int)$context['argc'];
+        $argv = $context['argv'];
+        $argc = (int)$context['argc'];
 
-		$compiled_params = array();
+        $compiled_params = array();
 
-		// parse the params
-		$value_next = false;
+        // parse the params
+        $value_next = false;
 
-		for($i=1;$i<=$argc-1;$i++)
-		{
-			$param = $argv[$i];
+        for ($i = 1; $i <= $argc - 1; $i++) {
+            $param = $argv[$i];
 
-			if ($i == 1 && !strstr($param, '--'))
-			{
-				// module
-				$compiled_params['module'] = (string)$param;
-				continue;
-			}
-			elseif ($i == 2 && !strstr($param, '--'))
-			{
-				// action
-				$compiled_params['action'] = (string)$param;
-				continue;
-			}
+            if ($i == 1 && !strstr($param, '--')) {
+                // module
+                $compiled_params['module'] = (string)$param;
+                continue;
+            } elseif ($i == 2 && !strstr($param, '--')) {
+                // action
+                $compiled_params['action'] = (string)$param;
+                continue;
+            }
 
-			// parse the rest of the params
-			$ex = array_filter(explode('=', $param));
+            // parse the rest of the params
+            $ex = array_filter(explode('=', $param));
 
-			if ($ex && is_array($ex))
-			{
-				if (count($ex) == 1 && isset($argv[$i+1]) && substr($argv[$i+1], 0, 2) != '--')
-				{
-					$value_next = true;
-					continue;
-				}
+            if ($ex && is_array($ex)) {
+                if (count($ex) == 1 && isset($argv[$i + 1]) && substr($argv[$i + 1], 0, 2) != '--') {
+                    $value_next = true;
+                    continue;
+                }
 
-				$pkey = null;
-				$pval = null;
+                $pkey = null;
+                $pval = null;
 
-				if (count($ex) == 1 && $value_next)
-				{
-					// when expecting a value now from a previous iteration
-					$tmpx = array_filter(explode('=', $argv[$i-1]));
-					$pkey = strtolower((string)$tmpx[0]);
-					$pval = isset($ex[0]) ? (string)$ex[0] : true;
-					unset($tmpx);
-					$value_next = false;
-				}
-				else
-				{
-					$pkey = strtolower((string)$ex[0]);
-					$pval = isset($ex[1]) ? (string)$ex[1] : true;
-				}
+                if (count($ex) == 1 && $value_next) {
+                    // when expecting a value now from a previous iteration
+                    $tmpx = array_filter(explode('=', $argv[$i - 1]));
+                    $pkey = strtolower((string)$tmpx[0]);
+                    $pval = isset($ex[0]) ? (string)$ex[0] : true;
+                    unset($tmpx);
+                    $value_next = false;
+                } else {
+                    $pkey = strtolower((string)$ex[0]);
+                    $pval = isset($ex[1]) ? (string)$ex[1] : true;
+                }
 
-				assert(!is_null($pkey));
+                assert(!is_null($pkey));
 
-				// strip the key prefix
-				if (substr($pkey, 0, 2) == '--')
-				{
-					assert(!$value_next);
-					$pkey = substr($pkey, 2, strlen($pkey));
-				}
+                // strip the key prefix
+                if (substr($pkey, 0, 2) == '--') {
+                    assert(!$value_next);
+                    $pkey = substr($pkey, 2, strlen($pkey));
+                }
 
-				if ($pkey && $pkey != 'module' && $pkey != 'action')
-				{
-					$compiled_params[$pkey] = $pval;
-				}
+                if ($pkey && $pkey != 'module' && $pkey != 'action') {
+                    $compiled_params[$pkey] = $pval;
+                }
 
-				unset($pkey, $pval);
-			}
+                unset($pkey, $pval);
+            }
 
-			unset($ex);
-			unset($param);
-		}
+            unset($ex);
+            unset($param);
+        }
 
-		// add defaults if missing
-		$compiled_params['module'] = isset($compiled_params['module']) ? $compiled_params['module'] : $this->default_module;
-		$compiled_params['action'] = isset($compiled_params['action']) ? $compiled_params['action'] : $this->default_action;
+        // add defaults if missing
+        $compiled_params['module'] = isset($compiled_params['module']) ? $compiled_params['module'] : $this->default_module;
+        $compiled_params['action'] = isset($compiled_params['action']) ? $compiled_params['action'] : $this->default_action;
 
-		$this->detected_params = $compiled_params;
+        $this->detected_params = $compiled_params;
 
-		$this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, array(
-				'params' => $compiled_params,
-				'default_module' => $this->default_module,
-				'default_action' => $this->default_action
-				)));
-	}
+        $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, array(
+            'params' => $compiled_params,
+            'default_module' => $this->default_module,
+            'default_action' => $this->default_action
+        )));
+    }
 
-	// TODO: Finish this implementation
-	public function getParams()
-	{
-		return $this->detected_params;
-	}
+    // TODO: Finish this implementation
+    public function getParams()
+    {
+        return $this->detected_params;
+    }
 
-	public function getParamsByCriteria($criteria)
-	{
-		fnothing($criteria);
-		return false;
-	}
+    public function getParamsByCriteria($criteria)
+    {
+        fnothing($criteria);
+        return false;
+    }
 }
-
-?>

@@ -1188,5 +1188,3 @@ class Browser
 
     }
 }
-
-?>

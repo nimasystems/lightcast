@@ -26,42 +26,40 @@
  * @subpackage File Subcategory
  * @changed $Id: db.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @version $Revision: 1592 $
+ */
 class tDb extends lcTaskController
 {
-	public function getHelpInfo()
-	{
-		$help =
-		lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
-		lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
-		lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
-		'{fgcolor:red}schema:upgrade{/fgcolor} - Upgrades the current project\'s and plugins schemas to the latest version possible.' . "\n" .
-		' {fgcolor:green}--only-project{/fgcolor} - Upgrade only the project\'s schema' . "\n" .
-		' {fgcolor:green}--only-plugin=[PLUGIN_NAME]{/fgcolor} - Upgrade only the specified plugin\'s schema';
+    public function getHelpInfo()
+    {
+        $help =
+            lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
+            lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
+            lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
+            '{fgcolor:red}schema:upgrade{/fgcolor} - Upgrades the current project\'s and plugins schemas to the latest version possible.' . "\n" .
+            ' {fgcolor:green}--only-project{/fgcolor} - Upgrade only the project\'s schema' . "\n" .
+            ' {fgcolor:green}--only-plugin=[PLUGIN_NAME]{/fgcolor} - Upgrade only the specified plugin\'s schema';
 
-		return $help;
-	}
+        return $help;
+    }
 
-	public function executeTask()
-	{
-		$action = $this->getRequest()->getParam('action');
+    public function executeTask()
+    {
+        $action = $this->getRequest()->getParam('action');
 
-		switch($action)
-		{
-			/* schema:upgrade */
-			case 'schema:upgrade':
-				return $this->upgradeSchema();
+        switch ($action) {
+            /* schema:upgrade */
+            case 'schema:upgrade':
+                return $this->upgradeSchema();
 
-			default:
-				$this->display($this->getHelpInfo(), false);
-				return true;
-		}
-	}
+            default:
+                $this->display($this->getHelpInfo(), false);
+                return true;
+        }
+    }
 
-	private function upgradeSchema()
-	{
-		return true;
-	}
+    private function upgradeSchema()
+    {
+        return true;
+    }
 }

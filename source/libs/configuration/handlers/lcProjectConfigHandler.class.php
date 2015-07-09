@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcProjectConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
@@ -58,6 +57,4 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
             )
         );
     }
-
 }
-?>

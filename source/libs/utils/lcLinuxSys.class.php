@@ -27,42 +27,35 @@
  * @changed $Id: lcLinuxSys.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcLinuxSys extends lcSys
 {
 
-	public static function getProcessorCount()
-	{
-		if(self::isOSWin()) 
-		{
-			return false;
-		}
-			
-		return shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
-	}
+    public static function getProcessorCount()
+    {
+        if (self::isOSWin()) {
+            return false;
+        }
 
-	public static function getMimetype($file)
-	{
-		if(self::isOSWin()) 
-		{
-			return lcFiles::getMimetype($file);
-		}
-			
-		$mime = shell_exec('file -i "'.$file.'"');
+        return shell_exec('cat /proc/cpuinfo | grep processor | wc -l');
+    }
 
-		$mime = explode(' ',$mime);
+    public static function getMimetype($file)
+    {
+        if (self::isOSWin()) {
+            return lcFiles::getMimetype($file);
+        }
 
-		$mime = trim($mime[1]);
+        $mime = shell_exec('file -i "' . $file . '"');
 
-		if($mime)
-		{
-			return $mime;
-		}
-		else
-		{
-			return false;
-		}
-	}
+        $mime = explode(' ', $mime);
+
+        $mime = trim($mime[1]);
+
+        if ($mime) {
+            return $mime;
+        } else {
+            return false;
+        }
+    }
 }
-?>

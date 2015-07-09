@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,30 +27,29 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcSourceParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 abstract class lcSourceParser extends lcObj
 {
-	public function __construct($source = null)
-	{
-		parent::__construct();
+    public function __construct($source = null)
+    {
+        parent::__construct();
 
-		if (isset($source))
-		{
-			$this->open($source);
-		}
-	}
+        if (isset($source)) {
+            $this->open($source);
+        }
+    }
 
-	abstract public function open($source);
-	abstract public function save($source = null);
-	abstract public function close();
+    abstract public function open($source);
 
-	abstract public function getSourceName();
-	abstract public function isOpen();
+    abstract public function save($source = null);
 
-	abstract protected function & getSource();
+    abstract public function close();
+
+    abstract public function getSourceName();
+
+    abstract public function isOpen();
+
+    abstract protected function & getSource();
 }
-
-?>

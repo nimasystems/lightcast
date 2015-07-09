@@ -25,59 +25,56 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcRawContentView.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcRawContentView extends lcView implements iDebuggable
 {
-	const DEFAULT_CONTENT_TYPE = 'text/html';
-	
-	protected $content;
-	protected $content_type = self::DEFAULT_CONTENT_TYPE;
+    const DEFAULT_CONTENT_TYPE = 'text/html';
 
-	public function shutdown()
-	{
-		$this->content = null;
+    protected $content;
+    protected $content_type = self::DEFAULT_CONTENT_TYPE;
 
-		parent::shutdown();
-	}
-	
-	public function getSupportedContentTypes()
-	{
-		// any type
-		return null;
-	}
-	
-	protected function getViewContent()
-	{
-		assert(($this->content && (is_null($this->content) || is_string($this->content))) || !$this->content);
-		return $this->content;
-	}
+    public function shutdown()
+    {
+        $this->content = null;
 
-	public function getDebugInfo()
-	{
-		$debug_parent = (array)parent::getDebugInfo();
+        parent::shutdown();
+    }
 
-		$debug = array(
-				'content_type' => $this->content_type,
-				'content_length' => strlen((string)$this->content)
-		);
+    public function getSupportedContentTypes()
+    {
+        // any type
+        return null;
+    }
 
-		$debug = array_merge($debug_parent, $debug);
+    protected function getViewContent()
+    {
+        assert(($this->content && (is_null($this->content) || is_string($this->content))) || !$this->content);
+        return $this->content;
+    }
 
-		return $debug;
-	}
+    public function getDebugInfo()
+    {
+        $debug_parent = (array)parent::getDebugInfo();
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
-	
-	public function setContent($content)
-	{
-		$this->content = $content;
-	}
+        $debug = array(
+            'content_type' => $this->content_type,
+            'content_length' => strlen((string)$this->content)
+        );
+
+        $debug = array_merge($debug_parent, $debug);
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
 }
-
-?>

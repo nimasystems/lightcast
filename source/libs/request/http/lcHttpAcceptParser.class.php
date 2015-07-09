@@ -26,233 +26,202 @@
  * @subpackage File Subcategory
  * @changed $Id: lcHttpAcceptParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcHttpAcceptParser extends lcObj
 {
-	private $type;
-	private $hasparsed;
-	private $accepts = array();
-	private $acceptstring;
+    private $type;
+    private $hasparsed;
+    private $accepts = array();
+    private $acceptstring;
 
-	public function __construct($type,$parse_string)
-	{
-		parent::__construct();
+    public function __construct($type, $parse_string)
+    {
+        parent::__construct();
 
-		$this->type = $type;
-		$this->acceptstring = $parse_string;
-	}
+        $this->type = $type;
+        $this->acceptstring = $parse_string;
+    }
 
-	// checks if response can be sent with a specific mimetype
-	public function check($accept_test)
-	{
-		$this->_parseInternal();
+    // checks if response can be sent with a specific mimetype
+    public function check($accept_test)
+    {
+        $this->_parseInternal();
 
-		if ($this->type == lcHttpAcceptType::ACCEPT_MIMETYPES)
-		{
-			return $this->_check_mimetype($accept_test);
-		}
-		elseif ($this->type == lcHttpAcceptType::ACCEPT_LANGUAGE)
-		{
-			return $this->_check_language($accept_test);
-		}
-		else
-		{
-			return $this->_check_general($accept_test);
-		}
-	}
+        if ($this->type == lcHttpAcceptType::ACCEPT_MIMETYPES) {
+            return $this->_check_mimetype($accept_test);
+        } elseif ($this->type == lcHttpAcceptType::ACCEPT_LANGUAGE) {
+            return $this->_check_language($accept_test);
+        } else {
+            return $this->_check_general($accept_test);
+        }
+    }
 
-	private function _check_mimetype($mimetype)
-	{
-		if (!lcMimetype::isMimetype($mimetype))
-		{
-			return false;
-		}
+    private function _check_mimetype($mimetype)
+    {
+        if (!lcMimetypeHelper::isMimetype($mimetype)) {
+            return false;
+        }
 
-		if (in_array('*/*',$this->accepts))
-		{
-			return true;
-		}
+        if (in_array('*/*', $this->accepts)) {
+            return true;
+        }
 
-		$m = explode('/',$mimetype);
+        $m = explode('/', $mimetype);
 
-		foreach ($this->accepts as $key=>$accept)
-		{
-			if (strcasecmp($mimetype, $accept) == 0)
-			{
-				return true;
-			}
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($mimetype, $accept) == 0) {
+                return true;
+            }
 
-			$a = explode('/',$accept);
+            $a = explode('/', $accept);
 
-			// check for subtype=ANY
-			if (($m[0] == $a[0]) && ($a[1] == '*'))
-			{
-				return true;
-			}
+            // check for subtype=ANY
+            if (($m[0] == $a[0]) && ($a[1] == '*')) {
+                return true;
+            }
 
-			// check for type=ANY
-			if (($m[1] = $a[1]) && ($a[0] == '*'))
-			{
-				return true;
-			}
+            // check for type=ANY
+            if (($m[1] = $a[1]) && ($a[0] == '*')) {
+                return true;
+            }
 
-			unset($key, $accept);
-		}
-	}
+            unset($key, $accept);
+        }
 
-	private function _check_general($accept_test)
-	{
-		if (in_array('*',$this->accepts))
-		{
-			return true;
-		}
+        return false;
+    }
 
-		foreach ($this->accepts as $key=>$accept)
-		{
-			if (strcasecmp($accept_test, $accept) == 0)
-			{
-				return true;
-			}
-				
-			unset($key, $accept);
-		}
-	}
+    private function _check_general($accept_test)
+    {
+        if (in_array('*', $this->accepts)) {
+            return true;
+        }
 
-	private function _check_language($locale)
-	{
-		if (in_array('*',$this->accepts)) 
-		{
-			return true;
-		}
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($accept_test, $accept) == 0) {
+                return true;
+            }
 
-		foreach ($this->accepts as $key=>$accept)
-		{
-			if (strcasecmp($locale, $accept) == 0) 
-			{
-				return true;
-			}
+            unset($key, $accept);
+        }
 
-			$e = @explode('-',$locale);
-			$a = @explode('-',$accept);
+        return false;
+    }
 
-			// TODO - not too sure if this is really valid!
-			if ($e[0] == $a[0]) 
-			{
-				return true;
-			}
+    private function _check_language($locale)
+    {
+        if (in_array('*', $this->accepts)) {
+            return true;
+        }
 
-			unset($key, $accept);
-		}
-	}
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($locale, $accept) == 0) {
+                return true;
+            }
 
-	public function getAsString()
-	{
-		return $this->acceptstring;
-	}
+            $e = @explode('-', $locale);
+            $a = @explode('-', $accept);
 
-	public function getPreferred()
-	{
-		$this->_parseInternal();
+            // TODO - not too sure if this is really valid!
+            if ($e[0] == $a[0]) {
+                return true;
+            }
 
-		return $this->accepts;
-	}
+            unset($key, $accept);
+        }
 
-	private function _parseInternal()
-	{
-		if ($this->hasparsed) 
-		{
-			return true;
-		}
+        return false;
+    }
 
-		if ($this->type == lcHttpAcceptType::ACCEPT_MIMETYPES)
-		{
-			$this->_parseMimetypes();
-		}
-		else
-		{
-			$this->_parseGeneral();
-		}
-	}
+    public function getAsString()
+    {
+        return $this->acceptstring;
+    }
 
-	private function _parseMimetypes()
-	{
-		if ((!$this->acceptstring) || (strlen($this->acceptstring) < 1))
-		{
-			array_push($this->accepts,'*/*');
-		}
+    public function getPreferred()
+    {
+        $this->_parseInternal();
 
-		$e = explode(',',$this->acceptstring);
+        return $this->accepts;
+    }
 
-		if (count($e) > 0)
-		{
-			$narr = array();
-			$narr2 = array();
+    private function _parseInternal()
+    {
+        if ($this->hasparsed) {
+            return;
+        }
 
-			foreach ($e as $key=>$val)
-			{
-				$ex1 = explode(';q=',$val);
+        if ($this->type == lcHttpAcceptType::ACCEPT_MIMETYPES) {
+            $this->_parseMimetypes();
+        } else {
+            $this->_parseGeneral();
+        }
+    }
 
-				if (count($ex1) < 2)
-				{
-					$narr[] = $val;
-				}
-				else
-				{
-					$narr2[$ex1[0]] = $ex1[1];
-				}
-			}
+    private function _parseMimetypes()
+    {
+        if ((!$this->acceptstring) || (strlen($this->acceptstring) < 1)) {
+            array_push($this->accepts, '*/*');
+        }
 
-			arsort($narr2,SORT_NUMERIC);
-			$narr2 = array_flip($narr2);
+        $e = explode(',', $this->acceptstring);
 
-			$this->accepts = array_merge($narr,$narr2);
+        if (count($e) > 0) {
+            $narr = array();
+            $narr2 = array();
 
-			unset($key, $val);
-		}
+            foreach ($e as $key => $val) {
+                $ex1 = explode(';q=', $val);
 
-		$this->hasparsed = true;
-	}
+                if (count($ex1) < 2) {
+                    $narr[] = $val;
+                } else {
+                    $narr2[$ex1[0]] = $ex1[1];
+                }
+            }
 
-	private function _parseGeneral()
-	{
-		if ((!$this->acceptstring) || (strlen($this->acceptstring) < 1))
-		{
-			array_push($this->accepts,'*');
-		}
+            arsort($narr2, SORT_NUMERIC);
+            $narr2 = array_flip($narr2);
 
-		$e = explode(',',$this->acceptstring);
+            $this->accepts = array_merge($narr, $narr2);
 
-		if (count($e) > 0)
-		{
-			$narr = array();
-			$narr2 = array();
+            unset($key, $val);
+        }
 
-			foreach ($e as $key=>$val)
-			{
-				$ex1 = explode(';q=',$val);
+        $this->hasparsed = true;
+    }
 
-				if (count($ex1) < 2)
-				{
-					$narr[] = $val;
-				}
-				else
-				{
-					$narr2[$ex1[0]] = $ex1[1];
-				}
+    private function _parseGeneral()
+    {
+        if ((!$this->acceptstring) || (strlen($this->acceptstring) < 1)) {
+            array_push($this->accepts, '*');
+        }
 
-				unset($key, $val);
-			}
+        $e = explode(',', $this->acceptstring);
 
-			arsort($narr2,SORT_NUMERIC);
-			$narr2 = array_flip($narr2);
+        if (count($e) > 0) {
+            $narr = array();
+            $narr2 = array();
 
-			$this->accepts = array_merge($narr,$narr2);
-		}
+            foreach ($e as $key => $val) {
+                $ex1 = explode(';q=', $val);
 
-		$this->hasparsed = true;
-	}
+                if (count($ex1) < 2) {
+                    $narr[] = $val;
+                } else {
+                    $narr2[$ex1[0]] = $ex1[1];
+                }
+
+                unset($key, $val);
+            }
+
+            arsort($narr2, SORT_NUMERIC);
+            $narr2 = array_flip($narr2);
+
+            $this->accepts = array_merge($narr, $narr2);
+        }
+
+        $this->hasparsed = true;
+    }
 }
-
-?>

@@ -28,69 +28,62 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-
 abstract class lcActionFilter extends lcSysObj
 {
-	protected $next;
+    /** @var lcActionFilter|null */
+    protected $next;
 
-	abstract public function getFilterCategory();
-	abstract protected function getShouldApplyFilter();
-	abstract protected function applyFilter(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null);
-	
-	public function shutdown()
-	{
-		if ($this->next)
-		{
-			$this->next->shutdown();
-			$this->next = null;
-		}
-		
-		parent::shutdown();
-	}
+    abstract public function getFilterCategory();
 
-	public function setNext(lcActionFilter $filter)
-	{
-		assert($filter !== $this);
-		$this->next = $filter;
-	}
+    abstract protected function getShouldApplyFilter();
 
-	public function filterAction(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
-	{
-		if ($this->getShouldApplyFilter())
-		{
-			try
-			{
-				// if a filter returns true it means it takes responsibility
-				// over the action and we stop further processing
-				$filter_result = $this->applyFilter($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
-				
-				if ($filter_result)
-				{
-					return array(
-							'filter' => &$this,
-							'result' => $filter_result
-							);
-				}
-			}
-			catch(Exception $e)
-			{
-				throw new lcFilterException('Could not apply action filter (' . get_class($this) . '): ' .
-						$e->getMessage(),
-						$e->getCode(),
-						$e
-						);
-			}
-		}
+    abstract protected function applyFilter(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null);
 
-		// process the next filter
-		if ($this->next)
-		{
-			return $this->next->filterAction($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
-		}
+    public function shutdown()
+    {
+        if ($this->next) {
+            $this->next->shutdown();
+            $this->next = null;
+        }
 
-		// no filter has taken responsibility - take no further action
-		return false;
-	}
+        parent::shutdown();
+    }
+
+    public function setNext(lcActionFilter $filter)
+    {
+        assert($filter !== $this);
+        $this->next = $filter;
+    }
+
+    public function filterAction(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
+    {
+        if ($this->getShouldApplyFilter()) {
+            try {
+                // if a filter returns true it means it takes responsibility
+                // over the action and we stop further processing
+                $filter_result = $this->applyFilter($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
+
+                if ($filter_result) {
+                    return array(
+                        'filter' => &$this,
+                        'result' => $filter_result
+                    );
+                }
+            } catch (Exception $e) {
+                throw new lcFilterException('Could not apply action filter (' . get_class($this) . '): ' .
+                    $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+
+        // process the next filter
+        if ($this->next) {
+            return $this->next->filterAction($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
+        }
+
+        // no filter has taken responsibility - take no further action
+        return false;
+    }
 }
-
-?>

@@ -28,25 +28,24 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1498 $
  */
-
 class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithCache
 {
     const PROPEL_CONNECTION_CLASS = 'lcPropelConnection';
     const DEFAULT_CHARSET = 'utf8';
 
+    /** @var lcPropelConnection */
     protected $conn;
-    protected $db_cache;
-	protected $propel_logger;
     
+    protected $db_cache;
+    protected $propel_logger;
+
     public function shutdown()
     {
         // check if we have a loose transaction somewhere
-        if ($this->conn && $this->conn->isInTransaction())
-        {
+        if ($this->conn && $this->conn->isInTransaction()) {
             $this->err('Unfinished propel transactions were detected: ' . $this->conn->getNestedTransactionCount());
 
-            if (DO_DEBUG)
-            {
+            if (DO_DEBUG) {
                 throw new lcDatabaseException($this->t('Unfinished propel transactions (' . $this->conn->getNestedTransactionCount() . ')'));
             }
         }
@@ -80,28 +79,28 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
         return $debug;
     }
-    
-    public function getDatabaseCache() 
+
+    public function getDatabaseCache()
     {
-    	return $this->db_cache;
+        return $this->db_cache;
     }
-    
+
     public function setDatabaseCache(iDatabaseCacheProvider $cache_storage = null)
     {
-    	$this->db_cache = $cache_storage;
-    	
-    	if ($this->conn) {
-	    	$this->conn->setQueryCacheBacked($this->db_cache);
-    	}
+        $this->db_cache = $cache_storage;
+
+        if ($this->conn) {
+            $this->conn->setQueryCacheBacked($this->db_cache);
+        }
     }
-    
-    public function setPropelLogger(lcPropelLogger $logger = null) 
+
+    public function setPropelLogger(lcPropelLogger $logger = null)
     {
-    	$this->propel_logger = $logger;
-    	
-    	if ($this->conn) {
-    		$this->conn->setLogger($this->propel_logger);
-    	}
+        $this->propel_logger = $logger;
+
+        if ($this->conn) {
+            $this->conn->setLogger($this->propel_logger);
+        }
     }
 
     public function getSQLCount()
@@ -110,11 +109,10 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
         return $this->conn->getQueryCount();
     }
-    
+
     public function getConnection()
     {
-        if (!$this->conn)
-        {
+        if (!$this->conn) {
             $this->connect();
         }
 
@@ -128,31 +126,27 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function connect()
     {
-        if ($this->conn)
-        {
+        if ($this->conn) {
             return $this->conn;
         }
 
-        try
-        {
+        try {
             $this->conn = lcPropel::getConnection($this->options['datasource']);
 
             // debugging
-            if (DO_DEBUG)
-            {
+            if (DO_DEBUG) {
                 $this->conn->useDebug(true);
             }
 
-            if ($this->propel_logger)
-            {
-            	$this->conn->setLogger($this->propel_logger);
+            if ($this->propel_logger) {
+                $this->conn->setLogger($this->propel_logger);
             }
-            
+
             // set the default charset
             // IMPORTANT: SQL quote / escaping methods are HIGHLY affected by
             // this!
             $charset = isset($this->options['charset']) ? (string)$this->options['charset'] : self::DEFAULT_CHARSET;
-            
+
             $this->conn->exec('SET NAMES \'' . $this->conn->quoteTrimmed($charset) . '\'');
 
             // initialize the connection with lightcast specific vars
@@ -160,20 +154,16 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
             $this->conn->setLightcastConfiguration($this->configuration);
 
             // cache enabled or not
-            if (isset($this->options['caching']) && (bool)$this->options['caching'])
-            {
-            	$this->conn->setQueryCacheEnabled(true);
+            if (isset($this->options['caching']) && (bool)$this->options['caching']) {
+                $this->conn->setQueryCacheEnabled(true);
             }
-            
-            if ($this->db_cache && $this->db_cache instanceof iDatabaseCacheProvider)
-            {
+
+            if ($this->db_cache && $this->db_cache instanceof iDatabaseCacheProvider) {
                 $this->conn->setQueryCacheBacked($this->db_cache);
             }
 
             return $this->conn;
-        }
-        catch(Exception $e)
-        {
+        } catch (Exception $e) {
             throw new lcDatabaseException('Cannot connect to database: ' . $e->getMessage(), null, $e);
         }
     }
@@ -182,10 +172,8 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
     {
         $this->disconnect();
 
-        if ($res = $this->connect())
-        {
-            if (DO_DEBUG)
-            {
+        if ($res = $this->connect()) {
+            if (DO_DEBUG) {
                 $this->debug('Database reconnected');
             }
         }
@@ -195,15 +183,13 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function disconnect()
     {
-        if (!$this->conn)
-        {
+        if (!$this->conn) {
             return true;
         }
 
         $this->conn = null;
 
-        if (DO_DEBUG)
-        {
+        if (DO_DEBUG) {
             $this->debug('Database disconnected');
         }
 
@@ -228,4 +214,3 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
     }
 
 }
-?>

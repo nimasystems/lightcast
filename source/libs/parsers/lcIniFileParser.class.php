@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,86 +27,77 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcIniFileParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 
 require_once('parsers' . DS . 'lcFileParser.class.php');
 
 class lcIniFileParser extends lcFileParser
 {
-	const DEFAULT_EXT = '.ini';
-	
-	public function parse()
-	{
-		$filename = $this->filename;
-		
-		$data = @file_get_contents($filename);
+    const DEFAULT_EXT = '.ini';
 
-		if (!$data || !is_array($data))
-		{
-			return false;
-		}
+    public function parse()
+    {
+        $filename = $this->filename;
 
-		$data = (array)array_filter(explode("\n", $data));
+        $data = @file_get_contents($filename);
 
-		$vals = array();
+        if (!$data || !is_array($data)) {
+            return false;
+        }
 
-		foreach ($data as $k => $line)
-		{
-			if (!$line = trim($line))
-			{
-				continue;
-			}
-				
-			if ($line{0} == '#')
-			{
-				continue;
-			}
+        $data = (array)array_filter(explode("\n", $data));
 
-			$ex = (array)array_filter(explode('=', $line));
+        $vals = array();
 
-			if (count($ex) != 2)
-			{
-				continue;
-			}
+        foreach ($data as $k => $line) {
+            if (!$line = trim($line)) {
+                continue;
+            }
 
-			foreach ($ex as $kk=>$vv)
-			{
-				$ex[$kk] = trim($vv);
-				unset($kk, $vv);
-			}
+            if ($line{0} == '#') {
+                continue;
+            }
 
-			$vals[$ex[0]] = $ex[1];
+            $ex = (array)array_filter(explode('=', $line));
 
-			unset($k, $line);
-		}
+            if (count($ex) != 2) {
+                continue;
+            }
 
-		unset($data);
+            foreach ($ex as $kk => $vv) {
+                $ex[$kk] = trim($vv);
+                unset($kk, $vv);
+            }
 
-		return $vals;
-	}
+            $vals[$ex[0]] = $ex[1];
 
-	public function writeData($data, array $options = null)
-	{
-		fnothing($options);
-		$data = is_array($data) ? $data : null;
-		
-		$str = array();
+            unset($k, $line);
+        }
 
-		foreach ($data as $name => $value)
-		{
-			// TODO: ini file data escaping must be done here
-			$str[] = $name . ' = ' . $value;
-			unset($name, $value);
-		}
+        unset($data);
 
-		$str = implode("\n", $str);
+        return $vals;
+    }
 
-		$ret = lcFiles::putFile($this->filename, $str);
-		
-		return $ret;
-	}
+    public function writeData($data, array $options = null)
+    {
+        fnothing($options);
+        $data = is_array($data) ? $data : null;
+
+        $str = array();
+
+        foreach ($data as $name => $value) {
+            // TODO: ini file data escaping must be done here
+            $str[] = $name . ' = ' . $value;
+            unset($name, $value);
+        }
+
+        $str = implode("\n", $str);
+
+        $ret = lcFiles::putFile($this->filename, $str);
+
+        return $ret;
+    }
 }
-
-?>

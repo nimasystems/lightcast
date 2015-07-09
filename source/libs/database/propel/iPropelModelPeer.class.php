@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,15 +27,12 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: iPropelModelPeer.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 interface iPropelModelPeer
 {
-	public static function _getColumnReplacementValues($column_name, $value_id=null);
-	public static function _getColumnHumanizedTitle($column_name);
+    public static function _getColumnReplacementValues($column_name, $value_id = null);
+
+    public static function _getColumnHumanizedTitle($column_name);
 }
-
-
-?>

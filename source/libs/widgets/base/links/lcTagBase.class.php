@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,38 +28,35 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagBase.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagBase extends lcHtmlTag
 {
-	public function __construct($href)
-	{
-		parent::__construct('base', false);
+    public function __construct($href)
+    {
+        parent::__construct('base', false);
 
-		$this->setHref($href);
-	}
+        $this->setHref($href);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('href');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('href');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array();
-	}
+    public static function getOptionalAttributes()
+    {
+        return array();
+    }
 
-	public function getHref()
-	{
-		return $this->getAttribute('href');
-	}
+    public function getHref()
+    {
+        return $this->getAttribute('href');
+    }
 
-	public function setHref($href)
-	{
-		$this->setAttribute('href', $href);
-		return $this;
-	}
+    public function setHref($href)
+    {
+        $this->setAttribute('href', $href);
+        return $this;
+    }
 }
-
-?>

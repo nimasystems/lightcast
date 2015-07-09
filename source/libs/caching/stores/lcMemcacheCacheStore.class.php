@@ -34,7 +34,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     const MAX_KEY_SIZE = 250;
 
+    /** @var lcMemcache */
     protected $memcache;
+
     private $namespace_prefix;
 
     private $should_use_internal_storage;
@@ -157,6 +159,12 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $this->memcache->has($key);
     }
 
+    /**
+     * @param string $key
+     * @return array|null
+     * @throws Exception
+     * @throws lcInvalidArgumentException
+     */
     public function get($key)
     {
         $use_internal_storage = $this->should_use_internal_storage;
@@ -293,12 +301,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
     // max object size: 1 MB!
     public function set($key, $value = null, $lifetime = null, $flags = null)
     {
-        $is_multi_write = false;
         $all_kv = array();
 
         if (is_array($key)) {
-
-            $is_multi_write = true;
 
             foreach ($key as $kk) {
 
@@ -312,7 +317,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                 $kk = $this->keyWithNamespace($kk);
 
                 if (strlen($kk) > self::MAX_KEY_SIZE) {
-                    throw new lcParamException('Invalid key size for memcached object: ' . $kk);
+                    throw new lcInvalidArgumentException('Invalid key size for memcached object: ' . $kk);
                 }
 
                 $val = (($value && is_array($value) && isset($value[$kk_prev])) ? $value[$kk_prev] : $value);
@@ -332,7 +337,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
             $key = $this->keyWithNamespace($key);
 
             if (strlen($key) > self::MAX_KEY_SIZE) {
-                throw new lcParamException('Invalid key size for memcached object: ' . $key);
+                throw new lcInvalidArgumentException('Invalid key size for memcached object: ' . $key);
             }
 
             $all_kv[$key] = $value;
@@ -441,7 +446,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
     public function removeDbCache($namespace, $key)
     {
         $key = $namespace . ':' . $key;
-        return $this->remove($key);
+        $this->remove($key);
     }
 
     public function removeDbCacheForNamespace($namespace)
@@ -464,5 +469,3 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $this->has($key);
     }
 }
-
-?>

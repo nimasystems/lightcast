@@ -134,5 +134,3 @@ class lcCookie extends lcObj
         return $str;
     }
 }
-
-?>

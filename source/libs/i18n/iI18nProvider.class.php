@@ -26,17 +26,17 @@
  * @subpackage File Subcategory
  * @changed $Id: iI18nProvider.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iI18nProvider
 {
-	public function translate($string);
-	public function translateInContext($context_type, $context_name, $string, $translation_domain = null);
-	
-	public function setTranslationContext($context_type, $context_name = null);
-	public function getTranslationContextType();
-	public function getTranslationContextName();
-}
+    public function translate($string);
 
-?>
+    public function translateInContext($context_type, $context_name, $string, $translation_domain = null);
+
+    public function setTranslationContext($context_type, $context_name = null);
+
+    public function getTranslationContextType();
+
+    public function getTranslationContextName();
+}

@@ -26,66 +26,61 @@
  * @subpackage File Subcategory
  * @changed $Id: lcActionFilterChain.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcActionFilterChain extends lcSysObj
 {
-	protected $first_filter;
-	protected $last_filter;
-	
-	public function shutdown()
-	{
-		$this->removeAllFilters();
-		
-		parent::shutdown();
-	}
-	
-	public function execute(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
-	{
-		if (!$this->first_filter)
-		{
-			return false;
-		}
+    /** @var lcActionFilter */
+    protected $first_filter;
 
-		$ret = $this->first_filter->filterAction($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
-		return $ret;
-	}
-	
-	public function addFilter(lcActionFilter $filter)
-	{
-		if (!$this->first_filter)
-		{
-			$this->first_filter = $filter;
-			$this->last_filter = $this->first_filter;
-		}
-		else
-		{
-			$this->last_filter->setNext($filter);
-			$this->last_filter = $filter;
-		}
-	}
-	
-	public function removeAllFilters()
-	{
-		if ($this->first_filter)
-		{
-			$this->first_filter->shutdown();
-			$this->first_filter = null;
-		}
-		
-		$this->last_filter = null;
-	}
-	
-	public function getFirstFilter()
-	{
-		return $this->first_filter;
-	}
-	
-	public function getLastFilter()
-	{
-		return $this->last_filter;
-	}
+    /** @var lcActionFilter */
+    protected $last_filter;
+
+    public function shutdown()
+    {
+        $this->removeAllFilters();
+
+        parent::shutdown();
+    }
+
+    public function execute(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
+    {
+        if (!$this->first_filter) {
+            return false;
+        }
+
+        $ret = $this->first_filter->filterAction($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
+        return $ret;
+    }
+
+    public function addFilter(lcActionFilter $filter)
+    {
+        if (!$this->first_filter) {
+            $this->first_filter = $filter;
+            $this->last_filter = $this->first_filter;
+        } else {
+            $this->last_filter->setNext($filter);
+            $this->last_filter = $filter;
+        }
+    }
+
+    public function removeAllFilters()
+    {
+        if ($this->first_filter) {
+            $this->first_filter->shutdown();
+            $this->first_filter = null;
+        }
+
+        $this->last_filter = null;
+    }
+
+    public function getFirstFilter()
+    {
+        return $this->first_filter;
+    }
+
+    public function getLastFilter()
+    {
+        return $this->last_filter;
+    }
 }
-
-?>

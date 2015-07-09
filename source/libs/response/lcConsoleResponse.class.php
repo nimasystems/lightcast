@@ -68,7 +68,7 @@ class lcConsoleResponse extends lcResponse
     private function compileOutputModifiers()
     {
         if (!$this->output_formatters) {
-            return false;
+            return;
         }
 
         $formatters = $this->output_formatters;
@@ -103,6 +103,8 @@ class lcConsoleResponse extends lcResponse
 
             echo $this->formatOutput($data);
         }
+
+        return null;
     }
 
     protected function formatOutput($output)
@@ -131,6 +133,7 @@ class lcConsoleResponse extends lcResponse
                 return $ret;
             }
 
+            return null;
         }, $output);
         $this->compiled_output_modifier_methods = $compiled_output_modifier_methods;
 
@@ -191,7 +194,7 @@ class lcConsoleResponse extends lcResponse
     public function sendResponse()
     {
         if ($this->response_sent) {
-            return false;
+            return;
         }
 
         // content output

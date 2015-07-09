@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,34 +27,31 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcTagInputFile.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcTagInputFile extends lcTagInput
 {
-	public function __construct($name = null, $id = null, $value = null, $accept = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
-	{
-		parent::__construct('file', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
+    public function __construct($name = null, $id = null, $value = null, $accept = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    {
+        parent::__construct('file', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
-		$this->setAccept($accept);
-	}
+        $this->setAccept($accept);
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array_implode(array('accept'), parent::getOptionalAttributes());
-	}
+    public static function getOptionalAttributes()
+    {
+        return implode(array('accept'), parent::getOptionalAttributes());
+    }
 
-	public function getAccept()
-	{
-		return $this->getAttribute('accept');
-	}
+    public function getAccept()
+    {
+        return $this->getAttribute('accept');
+    }
 
-	public function setAccept($value = null)
-	{
-		$this->setAttribute('accept', $value);
-		return $this;
-	}
+    public function setAccept($value = null)
+    {
+        $this->setAttribute('accept', $value);
+        return $this;
+    }
 }
-
-?>

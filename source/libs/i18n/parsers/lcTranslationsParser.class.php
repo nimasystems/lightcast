@@ -27,221 +27,195 @@
  * @changed $Id: lcTranslationsParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 abstract class lcTranslationsParser extends lcObj
 {
-	const DEFAULT_CATEGORY_NAME = 'default';
-	const ALL_SUBDIRS = '*';
+    const DEFAULT_CATEGORY_NAME = 'default';
+    const ALL_SUBDIRS = '*';
 
-	protected $event_dispatcher;
-	protected $configuration;
+    protected $event_dispatcher;
+    protected $configuration;
 
-	protected $base_dir;
+    protected $base_dir;
 
-	const TR_MULTILINE_DETECT_REP = '-----tn----';
+    const TR_MULTILINE_DETECT_REP = '-----tn----';
 
-	protected $conditions = array(
-			'template' => array(
-					array("/\{t\}(.*?)\{\/t\}/i" => '1'),
-			),
-			'php' => array(
-					array("/this-\>(t|translate)\(('|\")(.*?)('|\")(\)?)/i" => '3'),
-					array("/__\(('|\")(.*?)('|\")\)/i" => '2')
-			)
-	);
+    protected $conditions = array(
+        'template' => array(
+            array("/\{t\}(.*?)\{\/t\}/i" => '1'),
+        ),
+        'php' => array(
+            array("/this-\>(t|translate)\(('|\")(.*?)('|\")(\)?)/i" => '3'),
+            array("/__\(('|\")(.*?)('|\")\)/i" => '2')
+        )
+    );
 
-	protected $results;
+    protected $results;
 
-	public function __construct(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration, $base_dir)
-	{
-		parent::__construct();
+    public function __construct(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration, $base_dir)
+    {
+        parent::__construct();
 
-		$this->event_dispatcher = $event_dispatcher;
-		$this->configuration = $configuration;
-		$this->base_dir = $base_dir;
-	}
+        $this->event_dispatcher = $event_dispatcher;
+        $this->configuration = $configuration;
+        $this->base_dir = $base_dir;
+    }
 
-	abstract public function getDirsToParse();
+    abstract public function getDirsToParse();
 
-	/*
-	 * If translations should be separated and categorized by dirs
-	* Should return an array of 'dir' => 'category name'
-	*/
-	public function getCategorizationMap()
-	{
-		return false;
-	}
+    /*
+     * If translations should be separated and categorized by dirs
+    * Should return an array of 'dir' => 'category name'
+    */
+    public function getCategorizationMap()
+    {
+        return false;
+    }
 
-	public function setConditions($file_type, array $conditions)
-	{
-		$this->conditions[$file_type] = $conditions;
-	}
+    public function setConditions($file_type, array $conditions)
+    {
+        $this->conditions[$file_type] = $conditions;
+    }
 
-	public function internalParseFile($filename, $category_name = self::DEFAULT_CATEGORY_NAME)
-	{
-		$scope = $this->getConditionScopeByFilename($filename);
+    public function internalParseFile($filename, $category_name = self::DEFAULT_CATEGORY_NAME)
+    {
+        $scope = $this->getConditionScopeByFilename($filename);
 
-		if (!$scope)
-		{
-			return false;
-		}
+        if (!$scope) {
+            return false;
+        }
 
-		$parsed = $this->parseFile($filename, $scope);
+        $parsed = $this->parseFile($filename, $scope);
 
-		if (!$parsed)
-		{
-			return false;
-		}
+        if (!$parsed) {
+            return false;
+        }
 
-		$this->results[$category_name][] = array(
-				'filename' => $filename,
-				'strings' => $parsed
-		);
+        $this->results[$category_name][] = array(
+            'filename' => $filename,
+            'strings' => $parsed
+        );
 
-		return true;
-	}
+        return true;
+    }
 
-	public function parse()
-	{
-		$this->results = array();
+    public function parse()
+    {
+        $this->results = array();
 
-		$base_dir = $this->base_dir;
+        $base_dir = $this->base_dir;
 
-		// walk and parse
-		$dirs = $this->getDirsToParse();
+        // walk and parse
+        $dirs = $this->getDirsToParse();
 
-		// get the categorization map
-		$categorization_map = $this->getCategorizationMap();
+        // get the categorization map
+        $categorization_map = $this->getCategorizationMap();
 
-		if ($dirs)
-		{
-			if ($dirs == self::ALL_SUBDIRS)
-			{
-				lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'));
-			}
-			elseif (is_array($dirs))
-			{
-				// parse the base dir first
-				lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'), array(self::DEFAULT_CATEGORY_NAME), false);
+        if ($dirs) {
+            if ($dirs == self::ALL_SUBDIRS) {
+                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'));
+            } elseif (is_array($dirs)) {
+                // parse the base dir first
+                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'), array(self::DEFAULT_CATEGORY_NAME), false);
 
-				foreach($dirs as $dir)
-				{
-					$category = isset($categorization_map[$dir]) ? $categorization_map[$dir] : self::DEFAULT_CATEGORY_NAME;
-					$fullpath = $base_dir . DS . $dir;
+                foreach ($dirs as $dir) {
+                    $category = isset($categorization_map[$dir]) ? $categorization_map[$dir] : self::DEFAULT_CATEGORY_NAME;
+                    $fullpath = $base_dir . DS . $dir;
 
-					lcDirs::recursiveFilesCallback($fullpath, array($this, 'internalParseFile'), array($category));
+                    lcDirs::recursiveFilesCallback($fullpath, array($this, 'internalParseFile'), array($category));
 
-					unset($dir, $fullpath, $category);
-				}
-			}
+                    unset($dir, $fullpath, $category);
+                }
+            }
 
-			unset($dirs);
-		}
+            unset($dirs);
+        }
 
-		return $this->results;
-	}
+        return $this->results;
+    }
 
-	public function parseFile($filename, $filetype)
-	{
-		$filename = (string)$filename;
-		$filetype = (string)$filetype;
+    public function parseFile($filename, $filetype)
+    {
+        $filename = (string)$filename;
+        $filetype = (string)$filetype;
 
-		if (!$filename || !$filetype)
-		{
-			throw new lcInvalidArgumentException('Invalid params');
-		}
+        if (!$filename || !$filetype) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
 
-		$fbase = basename($filename);
+        $fbase = basename($filename);
 
-		// skip hidden files
-		if ($fbase{0} == '.')
-		{
-			return false;
-		}
+        // skip hidden files
+        if ($fbase{0} == '.') {
+            return false;
+        }
 
-		$matched = array();
+        $matched = array();
 
-		$conditions = isset($this->conditions[$filetype]) ? $this->conditions[$filetype] : null;
-		
-		if (!$conditions || !is_array($conditions))
-		{
-			assert(false);
-			return false;
-		}
+        $conditions = isset($this->conditions[$filetype]) ? $this->conditions[$filetype] : null;
 
-		try
-		{
-			$data = @file_get_contents($filename);
+        if (!$conditions || !is_array($conditions)) {
+            assert(false);
+            return false;
+        }
 
-			if (!$data)
-			{
-				return false;
-			}
+        try {
+            $data = @file_get_contents($filename);
 
-			// remove new lines (make them a single space)
-			$data = preg_replace("/\s*\n\s*/i", ' ', $data);
+            if (!$data) {
+                return false;
+            }
 
-			foreach ($conditions as $condGroupKey => $cond)
-			{
-				$cond_orig = $cond;
-				$ak = is_array($cond) ? array_keys($cond) : null;
-				$preg_index = is_array($cond) ? $cond[$ak[0]] : 1;
-				$cond = is_array($cond) ? $ak[0] : $cond;
+            // remove new lines (make them a single space)
+            $data = preg_replace("/\s*\n\s*/i", ' ', $data);
 
-				$res = preg_match_all($cond, $data, $matches);
+            foreach ($conditions as $condGroupKey => $cond) {
+                $cond_orig = $cond;
+                $ak = is_array($cond) ? array_keys($cond) : null;
+                $preg_index = is_array($cond) ? $cond[$ak[0]] : 1;
+                $cond = is_array($cond) ? $ak[0] : $cond;
 
-				if ($res)
-				{
-					if (!isset($matches[$preg_index]))
-					{
-						continue;
-					}
+                $res = preg_match_all($cond, $data, $matches);
 
-					foreach ($matches[$preg_index] as $match)
-					{
-						if (in_array($match, $matched))
-						{
-							continue;
-						}
+                if ($res) {
+                    if (!isset($matches[$preg_index])) {
+                        continue;
+                    }
 
-						if (!$match || strlen($match) <= 1)
-						{
-							continue;
-						}
+                    foreach ($matches[$preg_index] as $match) {
+                        if (in_array($match, $matched)) {
+                            continue;
+                        }
 
-						$matched[] = stripslashes($match);
-						unset($match);
-					}
+                        if (!$match || strlen($match) <= 1) {
+                            continue;
+                        }
 
-					unset($matches);
-				}
+                        $matched[] = stripslashes($match);
+                        unset($match);
+                    }
 
-				unset($cond_orig, $cond, $res, $condGroupKey);
-			}
-		}
-		catch(Exception $e)
-		{
-			throw new lcParsingException('Error while parsing translations in file ' . $filename . ': ' .
-					$e->getMessage(), $e->getCode(), $e);
-		}
+                    unset($matches);
+                }
 
-		$matched = array_filter($matched);
+                unset($cond_orig, $cond, $res, $condGroupKey);
+            }
+        } catch (Exception $e) {
+            throw new lcParsingException('Error while parsing translations in file ' . $filename . ': ' .
+                $e->getMessage(), $e->getCode(), $e);
+        }
 
-		return $matched;
-	}
+        $matched = array_filter($matched);
 
-	private function getConditionScopeByFilename($filename)
-	{
-		if (substr(basename($filename), -3) == 'php')
-		{
-			return 'php';
-		}
-		else
-		{
-			return 'template';
-		}
-	}
+        return $matched;
+    }
+
+    private function getConditionScopeByFilename($filename)
+    {
+        if (substr(basename($filename), -3) == 'php') {
+            return 'php';
+        } else {
+            return 'template';
+        }
+    }
 }
-
-?>

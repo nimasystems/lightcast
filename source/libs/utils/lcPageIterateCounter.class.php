@@ -27,95 +27,84 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcPageIterateCounter.class.php 1592 2015-05-22 13:28:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class lcPageIterateCounter
 {
-	const DEFAULT_GROUP_LIMIT = 10;
+    const DEFAULT_GROUP_LIMIT = 10;
 
-	public static function getStats($numHits, $limit, $page, $group_limiter = self::DEFAULT_GROUP_LIMIT)
-	{
-		$numHits = (int)$numHits;
-		$limit = (int)$limit;
-		$page = (int)$page;
-		$group_limiter = (int)$group_limiter;
+    public static function getStats($numHits, $limit, $page, $group_limiter = self::DEFAULT_GROUP_LIMIT)
+    {
+        $numHits = (int)$numHits;
+        $limit = (int)$limit;
+        $page = (int)$page;
+        $group_limiter = (int)$group_limiter;
 
-		if (!$limit || !$page || !$group_limiter)
-		{
-			throw new lcInvalidArgumentException('Invalid params');
-		}
+        if (!$limit || !$page || !$group_limiter) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
 
-		$default = array(
-				'rows_from' => 0,
-				'rows_to' => 0,
-				'total_rows' => 0,
-				'total_pages' => 0,
-				'previous_page' => 0,
-				'next_page' => 0
-		);
+        $default = array(
+            'rows_from' => 0,
+            'rows_to' => 0,
+            'total_rows' => 0,
+            'total_pages' => 0,
+            'previous_page' => 0,
+            'next_page' => 0
+        );
 
-		if (!$numHits)
-		{
-			return $default;
-		}
+        if (!$numHits) {
+            return $default;
+        }
 
-		// if $numHits = 0
-		$numHits = $numHits ? $numHits : 0;
+        // if $numHits = 0
+        $numHits = $numHits ? $numHits : 0;
 
-		$total = (int)$numHits;
-		$limit = max((int) $limit,1);
-		$page = (int)$page;
-		$num_pages = ceil($numHits/$limit);
-		$page = min(max($page,1),$num_pages);
-		$offset = ($page -1)*$limit;
+        $total = (int)$numHits;
+        $limit = max((int)$limit, 1);
+        $page = (int)$page;
+        $num_pages = ceil($numHits / $limit);
+        $page = min(max($page, 1), $num_pages);
+        $offset = ($page - 1) * $limit;
 
-		if($group_limiter)
-		{
-			$count = 0;
-			$cur_page = $page;
-			$cur_page = max($cur_page - floor($group_limiter/2),1);
-			$cur_page = min($cur_page,$num_pages-$group_limiter+1);
-			$cur_page = max($cur_page,1);
-		}
-		else
-		{
-			$cur_page = 1;
-		}
+        $count = 0;
+        
+        if ($group_limiter) {
+            $cur_page = $page;
+            $cur_page = max($cur_page - floor($group_limiter / 2), 1);
+            $cur_page = min($cur_page, $num_pages - $group_limiter + 1);
+            $cur_page = max($cur_page, 1);
+        } else {
+            $cur_page = 1;
+        }
 
-		$result = array();
+        $result = array();
 
-		for($i=$cur_page;$i<=$num_pages;$i++)
-		{
+        for ($i = $cur_page; $i <= $num_pages; $i++) {
 
-			if($group_limiter)
-			{
-				if($count >= $group_limiter)
-				{
-					break;
-				}
+            if ($group_limiter) {
+                if ($count >= $group_limiter) {
+                    break;
+                }
 
-				++$count;
-			}
+                ++$count;
+            }
 
-			if($i==$page)
-			{
-				$result['selected_page'] = $i;
-			}
+            if ($i == $page) {
+                $result['selected_page'] = $i;
+            }
 
-			$result['active_pages'][] = $i;
-		}
+            $result['active_pages'][] = $i;
+        }
 
-		$result['rows_from'] = $offset+1;
-		$result['rows_to'] = $offset+$limit;
-		$result['total_rows'] = $total;
-		$result['total_pages'] = $num_pages;
-		$result['previous_page'] = ($page != 1)?$page-1:null;
-		$result['next_page'] = ($page!=$num_pages)?$page+1:null;
+        $result['rows_from'] = $offset + 1;
+        $result['rows_to'] = $offset + $limit;
+        $result['total_rows'] = $total;
+        $result['total_pages'] = $num_pages;
+        $result['previous_page'] = ($page != 1) ? $page - 1 : null;
+        $result['next_page'] = ($page != $num_pages) ? $page + 1 : null;
 
-		return $result;
-	}
+        return $result;
+    }
 }
-
-?>

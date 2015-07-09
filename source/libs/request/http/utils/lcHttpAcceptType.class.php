@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,16 +27,13 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcHttpAcceptType.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcHttpAcceptType
 {
-	const ACCEPT_LANGUAGE = 1;
-	const ACCEPT_ENCODING = 2;
-	const ACCEPT_CHARSET = 3;
-	const ACCEPT_MIMETYPES = 4;
+    const ACCEPT_LANGUAGE = 1;
+    const ACCEPT_ENCODING = 2;
+    const ACCEPT_CHARSET = 3;
+    const ACCEPT_MIMETYPES = 4;
 }
-
-?>

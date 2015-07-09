@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 abstract class lcWebConfiguration extends lcApplicationConfiguration
 {
     const CONTROLLER_ASSETS_DIR = 'templates';
@@ -60,7 +59,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array('app_dir' => $this->app_dir, );
+        $debug = array('app_dir' => $this->app_dir,);
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -122,13 +121,11 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         $config_data = parent::loadConfigurationData();
 
         // reset loaders to their defaults in case the property is set
-        if ($this->should_use_default_loaders)
-        {
+        if ($this->should_use_default_loaders) {
             $lhandler = new lcLoadersConfigHandler();
             $ldata = $lhandler->getDefaultValues();
 
-            if ($ldata && is_array($ldata) && isset($config_data['loaders']))
-            {
+            if ($ldata && is_array($ldata) && isset($config_data['loaders'])) {
                 $config_data['loaders'] = $ldata;
             }
 
@@ -148,11 +145,11 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         $parent_locations = $this->project_configuration ? $this->project_configuration->getControllerModuleLocations() : array();
 
         // app modules
-        $controller_locations = array( array(
-                'context_type' => lcSysObj::CONTEXT_APP,
-                'context_name' => $this->getApplicationName(),
-                'path' => $this->app_dir . DS . 'modules'
-            ), );
+        $controller_locations = array(array(
+            'context_type' => lcSysObj::CONTEXT_APP,
+            'context_name' => $this->getApplicationName(),
+            'path' => $this->app_dir . DS . 'modules'
+        ),);
 
         $locations = array_merge((array)$parent_locations, $controller_locations);
 
@@ -173,6 +170,4 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
     {
         return $this->app_dir . DS . 'layouts';
     }
-
 }
-?>

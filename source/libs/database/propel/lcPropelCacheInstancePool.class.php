@@ -25,13 +25,10 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcPropelCacheInstancePool.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcPropelCacheInstancePool extends lcObj
 {
 
 }
-
-?>

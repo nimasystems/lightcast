@@ -30,6 +30,12 @@
  */
 abstract class lcTaskController extends lcController implements iDebuggable
 {
+    /** @var lcConsoleRequest */
+    protected $request;
+
+    /** @var lcConsoleResponse */
+    protected $response;
+
     public function initialize()
     {
         parent::initialize();
@@ -39,6 +45,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function onAppException(lcEvent $event)
     {
+        /** @var Exception $exception */
         $exception = isset($event->params['exception']) ? $event->params['exception'] : null;
 
         // if the exception is a lcControllerNotFoundException then just display the message
@@ -56,6 +63,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         }
 
         // otherwise let the error handler handle it
+        return false;
     }
 
     /**
@@ -85,7 +93,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         // if unsuccessfull
         if ((is_numeric($action_result) && $action_result != 0) || !$action_result) {
             $execute_status = is_numeric($execute_status) ? $execute_status : 1;
-            $content = $this->displayError('Task did not finish successfully', true, true);
+            $this->displayError('Task did not finish successfully', true, true);
         }
 
         $response = $this->getResponse();
@@ -157,19 +165,19 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function display($data, $prefixed = true, $return = false)
     {
-        return $this->consoleDisplay($data, $prefixed, $return);
+        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function displayError($data, $prefixed = true, $return = false)
     {
         $data = lcConsolePainter::formatColoredConsoleText($data, 'red');
-        return $this->consoleDisplay($data, $prefixed, $return);
+        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function displayWarning($data, $prefixed = true, $return = false)
     {
         $data = lcConsolePainter::formatColoredConsoleText($data, 'yellow');
-        return $this->consoleDisplay($data, $prefixed, $return);
+        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function consoleDisplay($data, $prefixed = true, $return = false)
@@ -196,7 +204,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
     public function getHelpInformation()
     {
         $this->consoleDisplay('No help information provided by: \'' . $this->getControllerName() . '\'');
+        return false;
     }
 }
-
-?>

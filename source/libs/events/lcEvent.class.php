@@ -112,5 +112,3 @@ class lcEvent extends lcObj
             'Is Processed: ' . $this->processed . ", \n";
     }
 }
-
-?>

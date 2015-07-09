@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,33 +27,25 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcHttpContentEncodingType.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcHttpContentEncodingType
 {
-	const ENCODING_GZIP = 1;
+    const ENCODING_GZIP = 1;
 
-	const ENCODING_DEFLATE = 2;
+    const ENCODING_DEFLATE = 2;
 
-	public static function getType($string)
-	{
-		$string = strtolower($string);
+    public static function getType($string)
+    {
+        $string = strtolower($string);
 
-		if ($string == 'gzip')
-		{
-			return self::ENCODING_GZIP;
-		}
-		elseif ($string == 'deflate')
-		{
-			return self::ENCODING_DEFLATE;
-		}
-		else
-		{
-			return false;
-		}
-	}
+        if ($string == 'gzip') {
+            return self::ENCODING_GZIP;
+        } elseif ($string == 'deflate') {
+            return self::ENCODING_DEFLATE;
+        } else {
+            return false;
+        }
+    }
 }
-
-?>

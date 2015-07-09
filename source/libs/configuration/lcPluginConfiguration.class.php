@@ -233,6 +233,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function getImplementations()
     {
         // subclassers may override this
+        return null;
     }
 
     public function getConfigDir()
@@ -274,7 +275,4 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
         return $config_map;
     }
-
 }
-
-?>

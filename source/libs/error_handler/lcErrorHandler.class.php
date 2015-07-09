@@ -32,11 +32,22 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
 {
     const AJAX_REQUEST_CONTENT_TYPE = 'application/json';
 
+    /** @var lcController */
     protected $controller;
+
+    /** @var lcMailer */
     protected $mailer;
+
+    /** @var lcRequest */
     protected $request;
+
+    /** @var lcResponse */
     protected $response;
+
+    /** @var lcLogger */
     protected $logger;
+
+    /** @var lcApp */
     protected $app_context;
 
     private $is_debugging;
@@ -225,8 +236,11 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
 
         if (!$in_cli) {
             $application_name = $configuration->getApplicationName();
-            $ipaddr = $this->request->getRealRemoteAddr();
-            $hostname = $this->request->getFullHostname();
+
+            if ($this->request instanceof lcWebRequest) {
+                $ipaddr = $this->request->getRealRemoteAddr();
+                $hostname = $this->request->getFullHostname();
+            }
         } else {
             $application_name = 'cli';
         }
@@ -360,7 +374,7 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
         $in_cli = lcSys::isRunningCLI();
 
         // check request Accept to determine if response should output html or something else
-        $request_content_type = (isset($this->request) && $this->request && !$in_cli) ? $this->request->getAcceptMimetype()->getPreferred() : null;
+        $request_content_type = (isset($this->request) && $this->request && !$in_cli && $this->request instanceof lcWebRequest) ? $this->request->getAcceptMimetype()->getPreferred() : null;
         $request_content_type = $request_content_type && is_array($request_content_type) && count($request_content_type) ? $request_content_type[0] : null;
 
         $content_type = null;
@@ -368,7 +382,7 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
         if ($request_content_type) {
             $content_type = $request_content_type;
         } else {
-            $content_type = (isset($this->response) && $this->response && !$in_cli) ? $this->response->getContentType() :
+            $content_type = (isset($this->response) && $this->response && !$in_cli && $this->response instanceof lcWebResponse) ? $this->response->getContentType() :
                 ($in_cli ? 'text/plain' : 'text/html');
         }
 
@@ -428,7 +442,9 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
             $exceptions_custom_module = (string)$configuration['exceptions.module'];
             $exceptions_custom_action = (string)$configuration['exceptions.action'];
 
-            if (!DO_DEBUG && $this->request && !$in_cli && $this->request->isGet() && !$this->response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action) {
+            if (!DO_DEBUG && $this->request && !$in_cli && $this->request instanceof lcWebRequest &&
+                $this->request->isGet() && !$this->response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action
+            ) {
                 $front_controller = $this->controller;
 
                 if ($front_controller) {
@@ -705,13 +721,17 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
         $trace = ($previous !== null) ? $this->getStackTrace($previous, $compiled_stack_trace) : $exception->getTrace();
 
         if (!$trace) {
-            return;
+            return null;
         }
 
-        foreach ($trace as $key => $trace1) {
-            array_push($compiled_stack_trace, $trace1);
-            unset($key, $trace1);
+        if ($trace) {
+            foreach ($trace as $key => $trace1) {
+                array_push($compiled_stack_trace, $trace1);
+                unset($key, $trace1);
+            }
         }
+
+        return $trace;
     }
 
     private function showTrace($_trace, $_i)
@@ -911,6 +931,3 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
         return '<ol start="' . max($line - 6, 1) . '">' . implode("\n", $lines) . '</ol>';
     }
 }
-
-
-?>

@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,29 +27,26 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: RelAttributeType.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class RelAttributeType
 {
-	const ALTERNATE = 'alternate';
-	const APPENDIX = 'appendix';
-	const BOOKMARK = 'bookmark';
-	const CHAPTER = 'chapter';
-	const CONTENTS = 'contents';
-	const COPYRIGHT = 'copyright';
-	const GLOSSARY = 'glossary';
-	const HELP = 'help';
-	const INDEX = 'index';
-	const NEXT = 'next';
-	const PREV = 'prev';
-	const PREVIOUS = 'previous';
-	const SECTION = 'section';
-	const SHORTCUT_ICON = 'shortcut icon';
-	const START = 'start';
-	const STYLESHEET = 'stylesheet';
-	const SUBSECTION = 'subsection';
+    const ALTERNATE = 'alternate';
+    const APPENDIX = 'appendix';
+    const BOOKMARK = 'bookmark';
+    const CHAPTER = 'chapter';
+    const CONTENTS = 'contents';
+    const COPYRIGHT = 'copyright';
+    const GLOSSARY = 'glossary';
+    const HELP = 'help';
+    const INDEX = 'index';
+    const NEXT = 'next';
+    const PREV = 'prev';
+    const PREVIOUS = 'previous';
+    const SECTION = 'section';
+    const SHORTCUT_ICON = 'shortcut icon';
+    const START = 'start';
+    const STYLESHEET = 'stylesheet';
+    const SUBSECTION = 'subsection';
 }
-
-?>

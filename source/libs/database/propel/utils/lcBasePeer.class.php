@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,19 +28,15 @@
  * @subpackage File Subcategory
  * @changed $Id: lcBasePeer.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcBasePeer extends BasePeer
 {
-	const ATTR_TABLE_LC_TITLE = 'lcTitle';
-	
-	/**
-	 * lcTitle type - human friendly title of a column
-	 * e.g. 'Author Id'
-	 */
-	const TYPE_LC_TITLE = 'lcTitle';
+    const ATTR_TABLE_LC_TITLE = 'lcTitle';
+
+    /**
+     * lcTitle type - human friendly title of a column
+     * e.g. 'Author Id'
+     */
+    const TYPE_LC_TITLE = 'lcTitle';
 }
-
-
-?>

@@ -30,7 +30,10 @@
  */
 abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
 {
+    /** @var lcViewFilterChain */
     protected $view_filter_chain;
+
+    /** @var iViewDecorator */
     protected $view_decorator;
 
     protected $view_debugging_enabled;
@@ -38,7 +41,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
 
     protected $action_result;
 
+    /** @var lcController */
     protected $controller;
+
     protected $label;
     protected $options;
 
@@ -219,5 +224,3 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->options;
     }
 }
-
-?>

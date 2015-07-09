@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,35 +27,31 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcControllerStackItem.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcControllerStackItem extends lcSysObj
 {
-	private $controller_instance;
+    /** @var lcController */
+    private $controller_instance;
 
-	public function shutdown()
-	{
-		if ($this->controller_instance)
-		{
-			$this->controller_instance->shutdown();
-			$this->controller_instance = null;
-		}
-		
-		parent::shutdown();
-	}
-	
-	public function setControllerInstance(lcBaseController $controller_instance)
-	{
-		$this->controller_instance = $controller_instance;
-	}
-	
-	public function getControllerInstance()
-	{
-		return $this->controller_instance;
-	}
+    public function shutdown()
+    {
+        if ($this->controller_instance) {
+            $this->controller_instance->shutdown();
+            $this->controller_instance = null;
+        }
+
+        parent::shutdown();
+    }
+
+    public function setControllerInstance(lcController $controller_instance)
+    {
+        $this->controller_instance = $controller_instance;
+    }
+
+    public function getControllerInstance()
+    {
+        return $this->controller_instance;
+    }
 }
-
-
-?>

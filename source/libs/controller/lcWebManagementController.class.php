@@ -27,15 +27,11 @@
  * @changed $Id: lcWebManagementController.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 abstract class lcWebManagementController extends lcWebController
 {
-	protected function getMeetsRequirements()
-	{
-		return ($this->configuration instanceof lcWebManagementConfiguration);
-	}
-	
+    protected function getMeetsRequirements()
+    {
+        return ($this->configuration instanceof lcWebManagementConfiguration);
+    }
 }
-
-?>

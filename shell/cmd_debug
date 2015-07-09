@@ -10,5 +10,3 @@ require_once(dirname(__FILE__) . '/../source/framework_app/lib/boot.php');
 $configuration = new lcConsoleConfiguration(realpath(dirname(__FILE__) . '/../source/framework_app/'), new lcFrameworkConfiguration());
 $configuration->setIsDebugging(true);
 lcApp::bootstrap($configuration)->dispatch();
-
-?>

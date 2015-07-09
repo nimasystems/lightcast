@@ -28,11 +28,11 @@
  * @subpackage File Subcategory
  * @changed $Id: iDecoratingView.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iDecoratingView
 {
-	public function getControllerActionsToDecorate();
-	public function getFragmentsToDecorate();
+    public function getControllerActionsToDecorate();
+
+    public function getFragmentsToDecorate();
 }

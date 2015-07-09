@@ -17,7 +17,9 @@
  * Plovdiv, Bulgaria
  * ZIP Code: 4000
  * Address: 95 "Kapitan Raycho" Str.
- * E-Mail: info@nimasystems.com */
+ * E-Mail: info@nimasystems.com
+
+ */
 
 /**
  * File Description
@@ -28,7 +30,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 {
     private $config_namespaces;
@@ -36,8 +37,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function getNamespaces()
     {
-        if (!$this->config_namespaces)
-        {
+        if (!$this->config_namespaces) {
             return null;
         }
 
@@ -56,12 +56,9 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function set($namespace, $name, $value = null)
     {
-        if (!isset($this->config_namespaces[$namespace]) || !isset($this->config_namespaces[$namespace][$name]))
-        {
+        if (!isset($this->config_namespaces[$namespace]) || !isset($this->config_namespaces[$namespace][$name])) {
             $this->config_namespaces[$namespace][$name] = $value;
-        }
-        else
-        {
+        } else {
             $this->config_namespaces[$namespace][$name] = $value;
         }
 
@@ -77,10 +74,8 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
     {
         $this->config_namespaces[$namespace] = $values ? $values : array();
 
-        if (isset($values))
-        {
-            foreach ($values as $key => $val)
-            {
+        if (isset($values)) {
+            foreach ($values as $key => $val) {
                 $this->idx[$namespace . '.' . $key] = array(
                     $namespace,
                     $key
@@ -93,9 +88,8 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function remove($namespace, $name)
     {
-        if (!isset($this->config_namespaces[$namespace]))
-        {
-            return false;
+        if (!isset($this->config_namespaces[$namespace])) {
+            return;
         }
 
         unset($this->config_namespaces[$namespace]);
@@ -115,8 +109,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function offsetExists($short_config_name)
     {
-        if (!isset($this->idx[$short_config_name]))
-        {
+        if (!isset($this->idx[$short_config_name])) {
             return false;
         }
 
@@ -125,8 +118,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function offsetGet($short_config_name)
     {
-        if (!$this->offsetExists($short_config_name))
-        {
+        if (!$this->offsetExists($short_config_name)) {
             return null;
         }
 
@@ -161,4 +153,3 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
     }
 
 }
-?>

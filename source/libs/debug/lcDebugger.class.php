@@ -28,150 +28,117 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1482 $
  */
+class lcDebugger
+{
 
-class lcDebugger {
+    private static $instance;
 
-	private static $instance;
+    public static function getInstance()
+    {
+        if (self::$instance) {
+            return self::$instance;
+        }
 
-	public static function getInstance() {
-		if (self::$instance) {
-			return self::$instance;
-		}
+        self::$instance = new lcDebugger();
+        return self::$instance;
+    }
 
-		self::$instance = new lcDebugger();
-		return self::$instance;
-	}
+    public function backtrace($traces_to_ignore = 1)
+    {
+        $fulltrace = debug_backtrace();
 
-	public function backtrace($traces_to_ignore = 1) {
-		$fulltrace = debug_backtrace();
+        $traces = array();
+        $i = 0;
 
-		$traces = array();
-		$i = 0;
+        foreach ($fulltrace as $trace) {
+            if ($traces_to_ignore && $i < $traces_to_ignore) {
+                ++$i;
+                continue;
+            }
 
-		foreach ($fulltrace as $trace)
-		{
-			if ($traces_to_ignore && $i < $traces_to_ignore) {
-				++$i;
-				continue;
-			}
-				
-			$traces[] = $this->showTextTrace($trace, $i);
-			++$i;
-			unset($trace);
-		}
+            $traces[] = $this->showTextTrace($trace, $i);
+            ++$i;
+            unset($trace);
+        }
 
-		$ret = implode("\n", $traces);
-		return $ret;
-	}
+        $ret = implode("\n", $traces);
+        return $ret;
+    }
 
-	private function showTextTrace($_trace, $_i)
-	{
-		$htmldoc = ' #'.$_i.' ';
+    private function showTextTrace($_trace, $_i)
+    {
+        $htmldoc = ' #' . $_i . ' ';
 
-		if (array_key_exists('file',$_trace))
-		{
-			$htmldoc.= $_trace['file'];
-		}
+        if (array_key_exists('file', $_trace)) {
+            $htmldoc .= $_trace['file'];
+        }
 
-		if (array_key_exists('line',$_trace))
-		{
-			$htmldoc.= '('.$_trace["line"].'): ';
-		}
+        if (array_key_exists('line', $_trace)) {
+            $htmldoc .= '(' . $_trace["line"] . '): ';
+        }
 
-		if (array_key_exists('class',$_trace) && array_key_exists('type',$_trace))
-		{
-			$htmldoc.= $_trace['class'].$_trace['type'];
-		}
+        if (array_key_exists('class', $_trace) && array_key_exists('type', $_trace)) {
+            $htmldoc .= $_trace['class'] . $_trace['type'];
+        }
 
-		if (array_key_exists('function',$_trace))
-		{
-			$htmldoc.= $_trace["function"].'(';
+        if (array_key_exists('function', $_trace)) {
+            $htmldoc .= $_trace["function"] . '(';
 
-			if (array_key_exists('args',$_trace))
-			{
-				if (count($_trace['args']) > 0)
-				{
-					$prep = array();
+            if (array_key_exists('args', $_trace)) {
+                if (count($_trace['args']) > 0) {
+                    $prep = array();
 
-					foreach($_trace['args'] as $arg)
-					{
-						$type = gettype($arg);
-						$value = $arg;
-						$str = '';
+                    foreach ($_trace['args'] as $arg) {
+                        $type = gettype($arg);
+                        $value = $arg;
+                        $str = '';
 
-						if ($type == 'boolean')
-						{
-							if ($value)
-							{
-								$str.= 'true';
-							}
-							else
-							{
-								$str.= 'false';
-							}
-						}
-						elseif ($type == 'integer' || $type == 'double')
-						{
-							if (settype($value, 'string'))
-							{
-								$str.= $value;
-							}
-							else
-							{
-								if ($type == 'integer' )
-								{
-									$str.= '? integer ?';
-								}
-								else
-								{
-									$str.= '? double or float ?';
-								}
-							}
-						}
-						elseif ($type == 'string')
-						{
-							$str.= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
-						}
-						elseif ($type == 'array')
-						{
-							$str.= 'Array';
-						}
-						elseif ($type == 'object')
-						{
-							$str.= 'Object';
-						}
-						elseif ($type == 'resource')
-						{
-							$str.= 'Resource';
-						}
-						elseif ($type == 'NULL')
-						{
-							$str.= 'null';
-						}
-						elseif ($type == 'unknown type')
-						{
-							$str.= '? unknown type ?';
-						}
+                        if ($type == 'boolean') {
+                            if ($value) {
+                                $str .= 'true';
+                            } else {
+                                $str .= 'false';
+                            }
+                        } elseif ($type == 'integer' || $type == 'double') {
+                            if (settype($value, 'string')) {
+                                $str .= $value;
+                            } else {
+                                if ($type == 'integer') {
+                                    $str .= '? integer ?';
+                                } else {
+                                    $str .= '? double or float ?';
+                                }
+                            }
+                        } elseif ($type == 'string') {
+                            $str .= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
+                        } elseif ($type == 'array') {
+                            $str .= 'Array';
+                        } elseif ($type == 'object') {
+                            $str .= 'Object';
+                        } elseif ($type == 'resource') {
+                            $str .= 'Resource';
+                        } elseif ($type == 'NULL') {
+                            $str .= 'null';
+                        } elseif ($type == 'unknown type') {
+                            $str .= '? unknown type ?';
+                        }
 
-						$prep[] = $str;
+                        $prep[] = $str;
 
-						unset($type);
-						unset($value);
-						unset($arg);
-					}
+                        unset($type);
+                        unset($value);
+                        unset($arg);
+                    }
 
-					if ($prep)
-					{
-						$htmldoc .= implode(', ', $prep);
-					}
-				}
-			}
+                    if ($prep) {
+                        $htmldoc .= implode(', ', $prep);
+                    }
+                }
+            }
 
-			$htmldoc.= ')';
-		}
+            $htmldoc .= ')';
+        }
 
-		return $htmldoc;
-	}
+        return $htmldoc;
+    }
 }
-
-?>

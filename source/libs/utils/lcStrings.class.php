@@ -83,6 +83,8 @@ class lcStrings
 
         $key_ = isset($key_cols) ? implode($key_separator, $key_cols) : null;
 
+        $keywords_ = null;
+
         if (isset($keywords)) {
             $keys = array();
 

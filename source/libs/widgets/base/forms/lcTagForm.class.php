@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,130 +28,121 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagForm.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagForm extends lcHtmlTag
 {
-	public function __construct($content = null, $action = null, $method = null, $enctype = null,
-			$accept = null, $accept_charset = null)
-	{
-		parent::__construct('form', true);
+    public function __construct($content = null, $action = null, $method = null, $enctype = null,
+                                $accept = null, $accept_charset = null)
+    {
+        parent::__construct('form', true);
 
-		if (isset($content))
-		{
-			$this->setContent($content);
-		}
-		
-		if (isset($action))
-		{
-			$this->setAction($action);
-		}
-		
-		$this->setMethod($method ? $method : 'post');
-		
-		if (isset($enctype))
-		{
-			$this->setEnctype($enctype);
-		}
-		
-		if (isset($accept))
-		{
-			$this->setAccept($accept);
-		}
-		
-		if (isset($accept_charset))
-		{
-			$this->setAcceptCharset($accept_charset);
-		}
-	}
+        if (isset($content)) {
+            $this->setContent($content);
+        }
 
-	public function setName($name)
-	{
-		$this->setAttribute('name', $name);
-		return $this;
-	}
+        if (isset($action)) {
+            $this->setAction($action);
+        }
 
-	public function getName()
-	{
-		return $this->getAttribute('name');
-	}
+        $this->setMethod($method ? $method : 'post');
 
-	public static function getRequiredAttributes()
-	{
-		return array('action');
-	}
+        if (isset($enctype)) {
+            $this->setEnctype($enctype);
+        }
 
-	public static function getOptionalAttributes()
-	{
-		return array('method', 'enctype', 'accept');
-	}
+        if (isset($accept)) {
+            $this->setAccept($accept);
+        }
 
-	public function setContent($content)
-	{
-		parent::setContent($content);
-		return $this;
-	}
+        if (isset($accept_charset)) {
+            $this->setAcceptCharset($accept_charset);
+        }
+    }
 
-	public function setAction($value)
-	{
-		$this->setAttribute('action', $value);
-		return $this;
-	}
+    public function setName($name)
+    {
+        $this->setAttribute('name', $name);
+        return $this;
+    }
 
-	public function getAction()
-	{
-		return $this->getAttribute('action');
-	}
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
 
-	public function setMethod($value)
-	{
-		if ($value != 'post' && $value != 'get')
-		{
-			throw new lcInvalidArgumentException('Invalid form method type: ' . $value);
-		}
+    public static function getRequiredAttributes()
+    {
+        return array('action');
+    }
 
-		$this->setAttribute('method', $value);
-		return $this;
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('method', 'enctype', 'accept');
+    }
 
-	public function getMethod()
-	{
-		return $this->getAttribute('method');
-	}
+    public function setContent($content)
+    {
+        parent::setContent($content);
+        return $this;
+    }
 
-	public function setEnctype($accesskey = null)
-	{
-		$this->setAttribute('enctype', $accesskey);
-		return $this;
-	}
+    public function setAction($value)
+    {
+        $this->setAttribute('action', $value);
+        return $this;
+    }
 
-	public function getEnctype()
-	{
-		return $this->getAttribute('enctype');
-	}
+    public function getAction()
+    {
+        return $this->getAttribute('action');
+    }
 
-	public function setAccept($value = null)
-	{
-		$this->setAttribute('accept', $value);
-		return $this;
-	}
+    public function setMethod($value)
+    {
+        if ($value != 'post' && $value != 'get') {
+            throw new lcInvalidArgumentException('Invalid form method type: ' . $value);
+        }
 
-	public function getAccept()
-	{
-		return $this->getAttribute('accept');
-	}
+        $this->setAttribute('method', $value);
+        return $this;
+    }
 
-	public function setAcceptCharset($value = null)
-	{
-		$this->setAttribute('accept-charset', $value);
-		return $this;
-	}
+    public function getMethod()
+    {
+        return $this->getAttribute('method');
+    }
 
-	public function getAcceptCharset()
-	{
-		return $this->getAttribute('accept-charset');
-	}
+    public function setEnctype($accesskey = null)
+    {
+        $this->setAttribute('enctype', $accesskey);
+        return $this;
+    }
+
+    public function getEnctype()
+    {
+        return $this->getAttribute('enctype');
+    }
+
+    public function setAccept($value = null)
+    {
+        $this->setAttribute('accept', $value);
+        return $this;
+    }
+
+    public function getAccept()
+    {
+        return $this->getAttribute('accept');
+    }
+
+    public function setAcceptCharset($value = null)
+    {
+        $this->setAttribute('accept-charset', $value);
+        return $this;
+    }
+
+    public function getAcceptCharset()
+    {
+        return $this->getAttribute('accept-charset');
+    }
 }
-
-?>

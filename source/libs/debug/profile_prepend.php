@@ -30,15 +30,13 @@
  */
 
 // currently not supported
-if(php_sapi_name() == 'cli')
-{
-	return;
+if (php_sapi_name() == 'cli') {
+    return;
 }
 
-if (!function_exists('xhprof_enable'))
-{
-	echo 'XHProf is not available on this system';
-	exit(1);
+if (!function_exists('xhprof_enable')) {
+    echo 'XHProf is not available on this system';
+    exit(1);
 }
 
 /*
@@ -47,32 +45,26 @@ if (!function_exists('xhprof_enable'))
 */
 xhprof_enable(XHPROF_FLAGS_MEMORY | XHPROF_FLAGS_CPU | (defined('PROFILER_XHPROF_EXTRA_FLAGS') ? PROFILER_XHPROF_EXTRA_FLAGS : null));
 
-register_shutdown_function(function()
-{
-	// by registering register_shutdown_function at the end of the file
-	// I make sure that all execution data, including that of the earlier
-	// registered register_shutdown_function, is collected.
+register_shutdown_function(function () {
+    // by registering register_shutdown_function at the end of the file
+    // I make sure that all execution data, including that of the earlier
+    // registered register_shutdown_function, is collected.
 
-	$xhprof_data = xhprof_disable();
+    $xhprof_data = xhprof_disable();
 
-	if(function_exists('fastcgi_finish_request'))
-	{
-		fastcgi_finish_request();
-	}
+    if (function_exists('fastcgi_finish_request')) {
+        fastcgi_finish_request();
+    }
 
-	if (!$xhprof_data)
-	{
-		return;
-	}
+    if (!$xhprof_data) {
+        return;
+    }
 
-	if (defined('PROFILER_CALLBACK'))
-	{
-		$callback_func = PROFILER_CALLBACK;
-		$callback_func = strstr(':', $callback_func) ? explode(':', $callback_func) : $callback_func;
-		$callback_func = is_array($callback_func) ? array($callback_func[0], $callback_func[1]) : $callback_func;
+    if (defined('PROFILER_CALLBACK')) {
+        $callback_func = PROFILER_CALLBACK;
+        $callback_func = strstr(':', $callback_func) ? explode(':', $callback_func) : $callback_func;
+        $callback_func = is_array($callback_func) ? array($callback_func[0], $callback_func[1]) : $callback_func;
 
-		call_user_func_array($callback_func, array($xhprof_data));
-	}
+        call_user_func_array($callback_func, array($xhprof_data));
+    }
 });
-
-?>

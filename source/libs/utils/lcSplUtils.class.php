@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,21 +28,17 @@
  * @subpackage File Subcategory
  * @changed $Id: lcSplUtils.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcSplUtils
 {
-	public static function getAvailableClasses()
-	{
-		return spl_classes();
-	}
+    public static function getAvailableClasses()
+    {
+        return spl_classes();
+    }
 
-	public static function hasClass($classname)
-	{
-		return (in_array($classname, self::getAvailableClasses()));
-	}
+    public static function hasClass($classname)
+    {
+        return (in_array($classname, self::getAvailableClasses()));
+    }
 }
-
-
-?>

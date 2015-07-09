@@ -27,20 +27,18 @@
  * @changed $Id: lcValidationException.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcValidationException extends lcException
 {
-	protected $validation_failures;
+    protected $validation_failures;
 
-	public function setValidationFailures(array $failures)
-	{
-		$this->validation_failures = $failures;
-	}
+    public function setValidationFailures(array $failures)
+    {
+        $this->validation_failures = $failures;
+    }
 
-	public function getValidationFailures()
-	{
-		return $this->validation_failures;
-	}
+    public function getValidationFailures()
+    {
+        return $this->validation_failures;
+    }
 }
-?>

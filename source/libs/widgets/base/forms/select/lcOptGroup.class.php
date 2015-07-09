@@ -32,6 +32,7 @@
  */
 class lcOptGroup extends lcHtmlTag
 {
+    /** @var lcTagOption[] */
     private $options;
 
     public function __construct($label, $content = null, $disabled = null)
@@ -102,7 +103,6 @@ class lcOptGroup extends lcHtmlTag
         $options_html = null;
 
         if (!$this->content && $this->options) {
-            $options_html = '';
             $all_rendered = array();
 
             foreach ($this->options as $opt) {
@@ -118,5 +118,3 @@ class lcOptGroup extends lcHtmlTag
         return parent::asHtml();
     }
 }
-
-?>

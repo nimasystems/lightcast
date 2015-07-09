@@ -26,27 +26,23 @@
  * @subpackage File Subcategory
  * @changed $Id: lcUsernameValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcUsernameValidator extends lcStringValidator
 {
-	public function validate($data)
-	{
-		if (!parent::validate($data))
-		{
-			return false;
-		}
-		
-		$default_chars = '-_.';
-		$allowed_chars = isset($this->options['allowed_chars']) ? (string)$this->options['allowed_chars'] : $default_chars;
+    public function validate($data)
+    {
+        if (!parent::validate($data)) {
+            return false;
+        }
 
-		$ret = (bool)preg_match("/^[\w\d" . preg_quote($allowed_chars) . "]+$/", $data);
-		
-		//$ret = (bool)preg_match("/^[\w\d-_\.]+$/", $data);
-		
-		return $ret;
-	}
+        $default_chars = '-_.';
+        $allowed_chars = isset($this->options['allowed_chars']) ? (string)$this->options['allowed_chars'] : $default_chars;
+
+        $ret = (bool)preg_match("/^[\w\d" . preg_quote($allowed_chars) . "]+$/", $data);
+
+        //$ret = (bool)preg_match("/^[\w\d-_\.]+$/", $data);
+
+        return $ret;
+    }
 }
-
-?>

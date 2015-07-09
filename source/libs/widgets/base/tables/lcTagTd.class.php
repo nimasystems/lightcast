@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,165 +28,160 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagTd.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagTd extends lcHtmlTag
 {
-	public function __construct($content = null, $colspan = null, $rowspan = null, $abbr = null, $axis = null,
-			$headers = null, $scope = null,  $align = null, $valign = null, $char = null, $charoff = null)
-	{
-		parent::__construct('td', true);
+    public function __construct($content = null, $colspan = null, $rowspan = null, $abbr = null, $axis = null,
+                                $headers = null, $scope = null, $align = null, $valign = null, $char = null, $charoff = null)
+    {
+        parent::__construct('td', true);
 
-		$this->setContent($content);
-		$this->setColspan($colspan);
-		$this->setRowspan($rowspan);
-		$this->setAbbr($abbr);
-		$this->setAxis($axis);
-		$this->setHeaders($headers);
-		$this->setScope($scope);
+        $this->setContent($content);
+        $this->setColspan($colspan);
+        $this->setRowspan($rowspan);
+        $this->setAbbr($abbr);
+        $this->setAxis($axis);
+        $this->setHeaders($headers);
+        $this->setScope($scope);
 
-		$this->setAlign($align);
-		$this->setValign($valign);
-		$this->setChar($char);
-		$this->setCharoff($charoff);
-	}
+        $this->setAlign($align);
+        $this->setValign($valign);
+        $this->setChar($char);
+        $this->setCharoff($charoff);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
-				'align', 'valign', 'char', 'charoff');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
+            'align', 'valign', 'char', 'charoff');
+    }
 
-	public function setScope($value = null)
-	{
-		$this->setAttribute('scope', $value);
-		return $this;
-	}
+    public function setScope($value = null)
+    {
+        $this->setAttribute('scope', $value);
+        return $this;
+    }
 
-	public function getScope()
-	{
-		return $this->getAttribute('scope');
-	}
+    public function getScope()
+    {
+        return $this->getAttribute('scope');
+    }
 
-	public function setHeaders($value = null)
-	{
-		$this->setAttribute('headers', $value);
-		return $this;
-	}
+    public function setHeaders($value = null)
+    {
+        $this->setAttribute('headers', $value);
+        return $this;
+    }
 
-	public function getHeaders()
-	{
-		return $this->getAttribute('axis');
-	}
+    public function getHeaders()
+    {
+        return $this->getAttribute('axis');
+    }
 
-	public function setAxis($value = null)
-	{
-		$this->setAttribute('axis', $value);
-		return $this;
-	}
+    public function setAxis($value = null)
+    {
+        $this->setAttribute('axis', $value);
+        return $this;
+    }
 
-	public function getAxis()
-	{
-		return $this->getAttribute('axis');
-	}
+    public function getAxis()
+    {
+        return $this->getAttribute('axis');
+    }
 
-	public function setAbbr($value = null)
-	{
-		$this->setAttribute('abbr', $value);
-		return $this;
-	}
+    public function setAbbr($value = null)
+    {
+        $this->setAttribute('abbr', $value);
+        return $this;
+    }
 
-	public function getAbbr()
-	{
-		return $this->getAttribute('abbr');
-	}
+    public function getAbbr()
+    {
+        return $this->getAttribute('abbr');
+    }
 
-	public function setRowspan($value = null)
-	{
-		$this->setAttribute('rowspan', $value);
-		return $this;
-	}
+    public function setRowspan($value = null)
+    {
+        $this->setAttribute('rowspan', $value);
+        return $this;
+    }
 
-	public function getRowspan()
-	{
-		return $this->getAttribute('rowspan');
-	}
+    public function getRowspan()
+    {
+        return $this->getAttribute('rowspan');
+    }
 
-	public function setColspan($value = null)
-	{
-		$this->setAttribute('colspan', $value);
-		return $this;
-	}
+    public function setColspan($value = null)
+    {
+        $this->setAttribute('colspan', $value);
+        return $this;
+    }
 
-	public function getColspan()
-	{
-		return $this->getAttribute('colspan');
-	}
+    public function getColspan()
+    {
+        return $this->getAttribute('colspan');
+    }
 
-	public function setAlign($value = null)
-	{
-		if (isset($value) &&
-				($value != 'left' && $value != 'center' && $value != 'right' && $value != 'justify' &&
-						$value != 'char')
-		)
-		{
-			throw new lcInvalidArgumentException('Invalid value for \'align\' attribute for tag colgroup: '.$value);
-		}
+    public function setAlign($value = null)
+    {
+        if (isset($value) &&
+            ($value != 'left' && $value != 'center' && $value != 'right' && $value != 'justify' &&
+                $value != 'char')
+        ) {
+            throw new lcInvalidArgumentException('Invalid value for \'align\' attribute for tag colgroup: ' . $value);
+        }
 
-		$this->setAttribute('align', $value);
-		return $this;
-	}
+        $this->setAttribute('align', $value);
+        return $this;
+    }
 
-	public function getAlign()
-	{
-		return $this->getAttribute('align');
-	}
+    public function getAlign()
+    {
+        return $this->getAttribute('align');
+    }
 
-	public function setValign($value = null)
-	{
-		if (isset($value) &&
-				($value != 'top' && $value != 'middle' && $value != 'bottom' && $value != 'baseline')
-		)
-		{
-			throw new lcInvalidArgumentException('Invalid value for \'valign\' attribute for tag colgroup: '.$value);
-		}
+    public function setValign($value = null)
+    {
+        if (isset($value) &&
+            ($value != 'top' && $value != 'middle' && $value != 'bottom' && $value != 'baseline')
+        ) {
+            throw new lcInvalidArgumentException('Invalid value for \'valign\' attribute for tag colgroup: ' . $value);
+        }
 
-		$this->setAttribute('valign', $value);
-		return $this;
-	}
+        $this->setAttribute('valign', $value);
+        return $this;
+    }
 
-	public function getValign()
-	{
-		return $this->getAttribute('valign');
-	}
+    public function getValign()
+    {
+        return $this->getAttribute('valign');
+    }
 
-	public function setChar($value = null)
-	{
-		$this->setAttribute('char', $value);
-		return $this;
-	}
+    public function setChar($value = null)
+    {
+        $this->setAttribute('char', $value);
+        return $this;
+    }
 
-	public function getChar()
-	{
-		return $this->getAttribute('char');
-	}
+    public function getChar()
+    {
+        return $this->getAttribute('char');
+    }
 
-	public function setCharoff($value = null)
-	{
-		$this->setAttribute('charoff', $value);
-		return $this;
-	}
+    public function setCharoff($value = null)
+    {
+        $this->setAttribute('charoff', $value);
+        return $this;
+    }
 
-	public function getCharoff()
-	{
-		return $this->getAttribute('charoff');
-	}
+    public function getCharoff()
+    {
+        return $this->getAttribute('charoff');
+    }
 }
-
-?>

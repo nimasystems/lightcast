@@ -254,5 +254,3 @@ abstract class lcBaseCollection extends lcObj
         return $out;
     }
 }
-
-?>

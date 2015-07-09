@@ -30,7 +30,10 @@
  */
 abstract class lcSecurityUser extends lcUser implements iDebuggable
 {
+    /** @var array */
     protected $authentication_data;
+
+    /** @var lcStorage */
     protected $storage;
 
     protected $user_id;
@@ -171,6 +174,8 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             */
             return true;
         }
+
+        return false;
     }
 
     public function getUserId()
@@ -423,5 +428,3 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return $str;
     }
 }
-
-?>

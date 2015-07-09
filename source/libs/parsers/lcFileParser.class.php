@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,33 +27,30 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcFileParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 abstract class lcFileParser extends lcObj
 {
-	protected $filename;
-	
-	abstract public function parse();
-	abstract public function writeData($data, array $options = null);
+    protected $filename;
 
-	public function __construct($filename)
-	{
-		parent::__construct();
+    abstract public function parse();
 
-		if (!$filename)
-		{
-			throw new lcInvalidArgumentException('Invalid filename');
-		}
-		
-		$this->filename = $filename;
-	}
-	
-	public function getFilename()
-	{
-		return $this->filename;
-	}
+    abstract public function writeData($data, array $options = null);
+
+    public function __construct($filename)
+    {
+        parent::__construct();
+
+        if (!$filename) {
+            throw new lcInvalidArgumentException('Invalid filename');
+        }
+
+        $this->filename = $filename;
+    }
+
+    public function getFilename()
+    {
+        return $this->filename;
+    }
 }
-
-?>

@@ -38,11 +38,18 @@ class lcPropel extends Propel
     const CONTEXT_TYPE_ATTR = 'lcContextType';
     const CONTEXT_NAME_ATTR = 'lcContextName';
 
+    /** @var iCacheStorage */
     protected static $cache;
+
     protected static $cache_key;
 
+    /** @var lcI18n */
     protected static $i18n;
+
+    /** @var lcEventDispatcher */
     protected static $event_dispatcher;
+
+    /** @var lcConfiguration */
     protected static $app_configuration;
 
     public static function shutdown()
@@ -79,13 +86,13 @@ class lcPropel extends Propel
     /*
      * Validators
      */
-    public static function translateValidatorMessage($string, TableMap $map_object, $locale = null)
+    public static function translateValidatorMessage($string, lcTableMap $map_object, $locale = null)
     {
         fnothing($locale);
         return self::translateTableMapString($string, $map_object);
     }
 
-    public static function translateTableMapString($string, TableMap $map_object)
+    public static function translateTableMapString($string, lcTableMap $map_object)
     {
         if (!$string || !$map_object) {
             return $string;
@@ -109,5 +116,3 @@ class lcPropel extends Propel
         return $translated_string;
     }
 }
-
-?>

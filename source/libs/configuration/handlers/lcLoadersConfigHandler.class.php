@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcLoadersConfigHandler extends lcEnvConfigHandler
 {
     // TODO: think of a better place for this method
@@ -115,20 +114,18 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
     public function getDefaultValues()
     {
         return array('loaders' => array(
-                'logger' => 'lcFileLoggerNG',
-                'cache' => '',
-                'request' => 'lcWebRequest',
-                'response' => 'lcWebResponse',
-                'database_manager' => 'lcDatabaseManager',
-                'controller' => 'lcFrontWebController',
-                'router' => 'lcPatternRouting',
-                'storage' => '',
-                'i18n' => '',
-                'user' => '',
-                'mailer' => 'lcPHPMailer',
-                'data_storage' => '',
-            ), );
+            'logger' => 'lcFileLoggerNG',
+            'cache' => '',
+            'request' => 'lcWebRequest',
+            'response' => 'lcWebResponse',
+            'database_manager' => 'lcDatabaseManager',
+            'controller' => 'lcFrontWebController',
+            'router' => 'lcPatternRouting',
+            'storage' => '',
+            'i18n' => '',
+            'user' => '',
+            'mailer' => 'lcPHPMailer',
+            'data_storage' => '',
+        ),);
     }
-
 }
-?>

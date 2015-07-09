@@ -25,10 +25,9 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: PropelLightcastCacheBehavior.class.php 1592 2015-05-22 13:28:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class PropelLightcastCacheBehavior extends Behavior
 {
     /**
@@ -36,10 +35,10 @@ class PropelLightcastCacheBehavior extends Behavior
      * can use Memcached or whatever other cache you want to use
      * @param $script
      */
-	public function peerFilter(&$script)
-	{
-		$keyname = $this->getTable()->getPhpName();
-		$newAddInstanceToPool = "
+    public function peerFilter(&$script)
+    {
+        $keyname = $this->getTable()->getPhpName();
+        $newAddInstanceToPool = "
     public static function addInstanceToPool(\$obj, \$key = null)
     {
         if (Propel::isInstancePoolingEnabled()) {
@@ -54,12 +53,12 @@ class PropelLightcastCacheBehavior extends Behavior
         }
     }
     ";
-		$newAddInstanceToPool = sprintf($newAddInstanceToPool, $keyname, $keyname);
-		$parser = new PropelPHPParser($script, true);
-		$parser->replaceMethod('addInstanceToPool', $newAddInstanceToPool);
-		$script = $parser->getCode();
+        $newAddInstanceToPool = sprintf($newAddInstanceToPool, $keyname, $keyname);
+        $parser = new PropelPHPParser($script, true);
+        $parser->replaceMethod('addInstanceToPool', $newAddInstanceToPool);
+        $script = $parser->getCode();
 
-		$newRemoveInstanceFromPool = "
+        $newRemoveInstanceFromPool = "
     public static function removeInstanceFromPool(\$value)
     {
         if (Propel::isInstancePoolingEnabled() && \$value !== null) {
@@ -83,12 +82,12 @@ class PropelLightcastCacheBehavior extends Behavior
     }
     ";
 
-		$newRemoveInstanceFromPool = sprintf($newRemoveInstanceFromPool, $keyname, $keyname, $keyname, $keyname);
-		//$parser = new PropelPHPParser($script, true);
-		$parser->replaceMethod('removeInstanceFromPool', $newRemoveInstanceFromPool);
-		$script = $parser->getCode();
+        $newRemoveInstanceFromPool = sprintf($newRemoveInstanceFromPool, $keyname, $keyname, $keyname, $keyname);
+        //$parser = new PropelPHPParser($script, true);
+        $parser->replaceMethod('removeInstanceFromPool', $newRemoveInstanceFromPool);
+        $script = $parser->getCode();
 
-		$newGetInstanceFromPool = "
+        $newGetInstanceFromPool = "
     public static function getInstanceFromPool(\$key)
     {
         if (Propel::isInstancePoolingEnabled()) {
@@ -102,12 +101,12 @@ class PropelLightcastCacheBehavior extends Behavior
     }
     ";
 
-		$newGetInstanceFromPool = sprintf($newGetInstanceFromPool, $keyname);
-		//$parser = new PropelPHPParser($script, true);
-		$parser->replaceMethod('getInstanceFromPool', $newGetInstanceFromPool);
-		$script = $parser->getCode();
+        $newGetInstanceFromPool = sprintf($newGetInstanceFromPool, $keyname);
+        //$parser = new PropelPHPParser($script, true);
+        $parser->replaceMethod('getInstanceFromPool', $newGetInstanceFromPool);
+        $script = $parser->getCode();
 
-		$newClearInstancePool = "
+        $newClearInstancePool = "
     public static function clearInstancePool()
     {
         \$cache = Propel::getConnection()->getCacheInstancePool();
@@ -116,12 +115,9 @@ class PropelLightcastCacheBehavior extends Behavior
     }
     ";
 
-		$newClearInstancePool = sprintf($newClearInstancePool, $keyname);
-		//$parser = new PropelPHPParser($script, true);
-		$parser->replaceMethod('clearInstancePool', $newClearInstancePool);
-		$script = $parser->getCode();
-	}
-
+        $newClearInstancePool = sprintf($newClearInstancePool, $keyname);
+        //$parser = new PropelPHPParser($script, true);
+        $parser->replaceMethod('clearInstancePool', $newClearInstancePool);
+        $script = $parser->getCode();
+    }
 }
-
-?>

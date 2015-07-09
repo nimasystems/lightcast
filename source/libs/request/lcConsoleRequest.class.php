@@ -45,18 +45,23 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
     /*
      * Initialization of the Request
     */
-    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
+    public function initialize()
     {
-        parent::initializeBeforeApp($event_dispatcher, $configuration);
+        parent::initialize();
+    }
 
+    protected function beforeRegisterEvents()
+    {
         $this->argv = $this->env('argv');
         $this->argc = $this->env('argc');
         $this->params = new lcArrayCollection($this->argv);
+    }
 
-        // when router loads the detected params from request
-        // it will notify us with this event
-        // and request will set its local params to the ones detected by router
-        $this->event_dispatcher->connect('router.detect_parameters', $this, 'onRouterDetectParameters');
+    public function getListenerEvents()
+    {
+        return array(
+            'router.detect_parameters' => 'onRouterDetectParameters'
+        );
     }
 
     public function getDebugInfo()
@@ -118,5 +123,3 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         return $this->argc;
     }
 }
-
-?>

@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 abstract class lcEnvConfigHandler extends lcConfigHandler
 {
     const ENVIRONMENT_ALL = 'all';
@@ -42,8 +41,7 @@ abstract class lcEnvConfigHandler extends lcConfigHandler
         $env_data = ($environment && isset($data[$environment])) ? (array)$data[$environment] : array();
         $all_data = isset($data[lcEnvConfigHandler::ENVIRONMENT_ALL]) ? (array)$data[lcEnvConfigHandler::ENVIRONMENT_ALL] : array();
 
-        if (!$env_data && !$all_data)
-        {
+        if (!$env_data && !$all_data) {
             return $data;
         }
 
@@ -51,6 +49,4 @@ abstract class lcEnvConfigHandler extends lcConfigHandler
 
         return $env_data;
     }
-
 }
-?>

@@ -30,7 +30,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-abstract class lcResponse extends lcSysObj implements iProvidesCapabilities
+abstract class lcResponse extends lcResidentObj implements iProvidesCapabilities
 {
     protected $exit_code = 0;
     protected $response_sent;
@@ -80,5 +80,3 @@ abstract class lcResponse extends lcSysObj implements iProvidesCapabilities
         return $this->exit_code;
     }
 }
-
-?>

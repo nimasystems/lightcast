@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,90 +28,85 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagTbody.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagTbody extends lcHtmlTag
 {
-	public function __construct($content = null, $align = null, $valign = null, $char = null, $charoff = null)
-	{
-		parent::__construct('tbody', true);
+    public function __construct($content = null, $align = null, $valign = null, $char = null, $charoff = null)
+    {
+        parent::__construct('tbody', true);
 
-		$this->setContent($content);
-		$this->setAlign($align);
-		$this->setValign($valign);
-		$this->setChar($char);
-		$this->setCharoff($charoff);
-	}
+        $this->setContent($content);
+        $this->setAlign($align);
+        $this->setValign($valign);
+        $this->setChar($char);
+        $this->setCharoff($charoff);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('align', 'valign', 'char', 'charoff');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('align', 'valign', 'char', 'charoff');
+    }
 
-	public function setAlign($value = null)
-	{
-		if (isset($value) &&
-				($value != 'left' && $value != 'center' && $value != 'right' && $value != 'justify' &&
-						$value != 'char')
-		)
-		{
-			throw new lcInvalidArgumentException('Invalid value for \'align\' attribute for tag colgroup: '.$value);
-		}
+    public function setAlign($value = null)
+    {
+        if (isset($value) &&
+            ($value != 'left' && $value != 'center' && $value != 'right' && $value != 'justify' &&
+                $value != 'char')
+        ) {
+            throw new lcInvalidArgumentException('Invalid value for \'align\' attribute for tag colgroup: ' . $value);
+        }
 
-		$this->setAttribute('align', $value);
-		return $this;
-	}
+        $this->setAttribute('align', $value);
+        return $this;
+    }
 
-	public function getAlign()
-	{
-		return $this->getAttribute('align');
-	}
+    public function getAlign()
+    {
+        return $this->getAttribute('align');
+    }
 
-	public function setValign($value = null)
-	{
-		if (isset($value) &&
-				($value != 'top' && $value != 'middle' && $value != 'bottom' && $value != 'baseline')
-		)
-		{
-			throw new lcInvalidArgumentException('Invalid value for \'valign\' attribute for tag colgroup: '.$value);
-		}
+    public function setValign($value = null)
+    {
+        if (isset($value) &&
+            ($value != 'top' && $value != 'middle' && $value != 'bottom' && $value != 'baseline')
+        ) {
+            throw new lcInvalidArgumentException('Invalid value for \'valign\' attribute for tag colgroup: ' . $value);
+        }
 
-		$this->setAttribute('valign', $value);
-		return $this;
-	}
+        $this->setAttribute('valign', $value);
+        return $this;
+    }
 
-	public function getValign()
-	{
-		return $this->getAttribute('valign');
-	}
+    public function getValign()
+    {
+        return $this->getAttribute('valign');
+    }
 
-	public function setChar($value = null)
-	{
-		$this->setAttribute('char', $value);
-		return $this;
-	}
+    public function setChar($value = null)
+    {
+        $this->setAttribute('char', $value);
+        return $this;
+    }
 
-	public function getChar()
-	{
-		return $this->getAttribute('char');
-	}
+    public function getChar()
+    {
+        return $this->getAttribute('char');
+    }
 
-	public function setCharoff($value = null)
-	{
-		$this->setAttribute('charoff', $value);
-		return $this;
-	}
+    public function setCharoff($value = null)
+    {
+        $this->setAttribute('charoff', $value);
+        return $this;
+    }
 
-	public function getCharoff()
-	{
-		return $this->getAttribute('charoff');
-	}
+    public function getCharoff()
+    {
+        return $this->getAttribute('charoff');
+    }
 }
-
-?>

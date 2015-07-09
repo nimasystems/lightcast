@@ -26,178 +26,171 @@
  * @subpackage File Subcategory
  * @changed $Id: lcUser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-abstract class lcUser extends lcSysObj implements iProvidesCapabilities, ArrayAccess, iKeyValueProvider, iDebuggable
+ * @version $Revision: 1455 $
+ */
+abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, ArrayAccess, iKeyValueProvider, iDebuggable
 {
-	protected $attributes = array();
+    protected $attributes = array();
 
-	abstract public function setFlash($flash_message = null);
-	abstract public function hasFlash();
-	abstract public function getFlash();
-	abstract public function clearFlash();
-	abstract public function getAndClearFlash();
-	
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    abstract public function setFlash($flash_message = null);
 
-	public function shutdown()
-	{
-		parent::shutdown();
-	}
+    abstract public function hasFlash();
 
-	public function getCapabilities()
-	{
-		return array(
-				'user'
-		);
-	}
-	
-	public function getDebugInfo()
-	{
-		$attributes = $this->getAttributes();
+    abstract public function getFlash();
 
-		$out = array();
+    abstract public function clearFlash();
 
-		if ($attributes)
-		{
-			foreach($attributes as $key => $value)
-			{
-				if (!$value)
-				{
-					continue;
-				}
+    abstract public function getAndClearFlash();
 
-				if (!is_numeric($value) && !is_string($value) && !is_array($value) && !is_bool($value))
-				{
-					$value = '(complex)';
-				}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-				// shorten
-				if (is_string($value) && strlen($value) > 255)
-				{
-					$value = substr($value, 0, 255) . '...';
-				}
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
 
-				$out[$key] = $value;
+    public function getCapabilities()
+    {
+        return array(
+            'user'
+        );
+    }
 
-				unset($key, $value);
-			}
-		}
+    public function getDebugInfo()
+    {
+        $attributes = $this->getAttributes();
 
-		$debug = array(
-				'attributes' => $out
-		);
+        $out = array();
 
-		return $debug;
-	}
+        if ($attributes) {
+            foreach ($attributes as $key => $value) {
+                if (!$value) {
+                    continue;
+                }
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+                if (!is_numeric($value) && !is_string($value) && !is_array($value) && !is_bool($value)) {
+                    $value = '(complex)';
+                }
 
-	public function getAttributes()
-	{
-		return $this->attributes;
-	}
+                // shorten
+                if (is_string($value) && strlen($value) > 255) {
+                    $value = substr($value, 0, 255) . '...';
+                }
 
-	public function getAttribute($name)
-	{
-		$value = isset($this->attributes[$name]) ?
-		$this->attributes[$name] : null;
-		return $value;
-	}
+                $out[$key] = $value;
 
-	public function setAttribute($name, $value)
-	{
-		$this->attributes[$name] = $value;
-	}
+                unset($key, $value);
+            }
+        }
 
-	public function setAttributes(array $attributes = null)
-	{
-		$this->attributes = isset($attributes) ? $attributes : array();
-	}
+        $debug = array(
+            'attributes' => $out
+        );
 
-	public function unsetAttribute($name)
-	{
-		if (isset($this->attributes[$name]))
-		{
-			unset($this->attributes[$name]);
-		}
-	}
+        return $debug;
+    }
 
-	public function unsetAttributes()
-	{
-		$this->attributes = array();
-	}
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	public function hasAttribute($name)
-	{
-		return isset($this->attributes[$name]);
-	}
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
 
-	public function offsetExists ($offset)
-	{
-		return isset($this->attributes[$offset]);
-	}
+    public function getAttribute($name)
+    {
+        $value = isset($this->attributes[$name]) ?
+            $this->attributes[$name] : null;
+        return $value;
+    }
 
-	public function offsetGet ($offset)
-	{
-		return $this->getAttribute($offset);
-	}
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
+    }
 
-	public function offsetSet ($offset, $value)
-	{
-		return $this->setAttribute($offset, $value);
-	}
+    public function setAttributes(array $attributes = null)
+    {
+        $this->attributes = isset($attributes) ? $attributes : array();
+    }
 
-	public function offsetUnset ($offset)
-	{
-		return $this->unsetAttribute($offset);
-	}
+    public function unsetAttribute($name)
+    {
+        if (isset($this->attributes[$name])) {
+            unset($this->attributes[$name]);
+        }
+    }
 
-	public function getAttributeNames()
-	{
-		if (!$this->attributes)
-		{
-			return false;
-		}
+    public function unsetAttributes()
+    {
+        $this->attributes = array();
+    }
 
-		$ret = array_keys($this->attributes);
+    public function hasAttribute($name)
+    {
+        return isset($this->attributes[$name]);
+    }
 
-		return $ret;
-	}
+    public function offsetExists($offset)
+    {
+        return isset($this->attributes[$offset]);
+    }
 
-	public function __toString()
-	{
-		$str = "lcUser: " .
-				"Attributes: " . var_export($this->attributes, true) . "\n\n";
+    public function offsetGet($offset)
+    {
+        return $this->getAttribute($offset);
+    }
 
-		return $str;
-	}
+    public function offsetSet($offset, $value)
+    {
+        $this->setAttribute($offset, $value);
+    }
 
-	#pragma mark - iKeyValueProvider
+    public function offsetUnset($offset)
+    {
+        $this->unsetAttribute($offset);
+    }
 
-	public function getAllKeys()
-	{
-		$ret = $this->getAttributeNames();
-		return $ret;
-	}
+    public function getAttributeNames()
+    {
+        if (!$this->attributes) {
+            return false;
+        }
 
-	public function getValueForKey($key)
-	{
-		if (!$key)
-		{
-			throw new lcInvalidArgumentException('Invalid params');
-		}
+        $ret = array_keys($this->attributes);
 
-		$ret = $this->getAttribute($key);
-		return $ret;
-	}
+        return $ret;
+    }
+
+    public function __toString()
+    {
+        $str = "lcUser: " .
+            "Attributes: " . var_export($this->attributes, true) . "\n\n";
+
+        return $str;
+    }
+
+    #pragma mark - iKeyValueProvider
+
+    public function getAllKeys()
+    {
+        $ret = $this->getAttributeNames();
+        return $ret;
+    }
+
+    public function getValueForKey($key)
+    {
+        if (!$key) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
+
+        $ret = $this->getAttribute($key);
+        return $ret;
+    }
 }
-
-?>

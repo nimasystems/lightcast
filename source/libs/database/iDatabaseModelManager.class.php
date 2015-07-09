@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,17 +28,17 @@
  * @subpackage File Subcategory
  * @changed $Id: iDatabaseModelManager.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iDatabaseModelManager
 {
-	public function registerModelClasses($path_to_models, array $models);
-	public function getRegisteredModels();
-	
-	public function getUsedModels();
-	public function useModels(array $models);
-	public function useModel($model_name);
-}
+    public function registerModelClasses($path_to_models, array $models);
 
-?>
+    public function getRegisteredModels();
+
+    public function getUsedModels();
+
+    public function useModels(array $models);
+
+    public function useModel($model_name);
+}

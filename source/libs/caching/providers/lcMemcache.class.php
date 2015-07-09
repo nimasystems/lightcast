@@ -27,10 +27,10 @@
  * @changed $Id: lcMemcache.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcMemcache extends lcSysObj implements iCacheStorage
 {
+    /** @var Memcache */
     protected $memcache_backend;
 
     const DEFAULT_PORT = 11211;

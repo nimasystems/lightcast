@@ -178,11 +178,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function getDebugInfo()
     {
         // compile cookies
-        $c = $this->cookies;
+        $cc1 = $this->cookies;
         $ca = array();
 
-        if ($c) {
-            $c = $c->getArrayCopy();
+        if ($cc1) {
+            /** @var lcNameValuePair[] $c */
+            $c = $cc1->getArrayCopy();
 
             if ($c) {
                 foreach ($c as $cc) {
@@ -271,7 +272,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function clear()
     {
         if ($this->response_sent) {
-            return false;
+            return;
         }
 
         $this->javascripts = null;
@@ -369,7 +370,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         $at_end = ($this->js_at_end_forced ? true : $at_end);
 
-        return $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
+        $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
     }
 
     /*
@@ -421,7 +422,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function css($href, $media = 'all', $type = 'text/css')
     {
-        return $this->setStylesheet($href, $media, $type);
+        $this->setStylesheet($href, $media, $type);
     }
 
     /*
@@ -637,7 +638,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function send()
     {
-        return $this->sendResponse();
+        $this->sendResponse();
     }
 
     /*
@@ -648,11 +649,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function sendResponse()
     {
         if ($this->headersSent()) {
-            return false;
+            return;
         }
 
         if ($this->response_sent) {
-            return false;
+            return;
         }
 
         // check if response sending is allowed
@@ -794,7 +795,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     private function processHtmlContent($content)
     {
         if (!$content) {
-            return;
+            return null;
         }
 
         $head = array();
@@ -1455,7 +1456,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      * gets the raw apache response headers (must flush the script before that!)
     * Platform-specific
     */
-    private function getApacheRawResponseHeaders()
+    /*private function getApacheRawResponseHeaders()
     {
         if (!function_exists('apache_response_headers')) {
             throw new lcSystemException('Cannot obtain apache response headers. Are you running on apache?');
@@ -1464,7 +1465,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         flush();
 
         return apache_response_headers();
-    }
+    }*/
 
     /*
      * Set a custom HTTP Response Code/Reason
@@ -1523,7 +1524,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setVia($via)
     {
-        return $this->custom_headers->set('Via', $via);
+        $this->custom_headers->set('Via', $via);
     }
 
     /*
@@ -1532,7 +1533,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setLocation($location)
     {
-        return $this->custom_headers->set('Location', $location);
+        $this->custom_headers->set('Location', $location);
     }
 
     /*
@@ -1541,7 +1542,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setContentVersion($version)
     {
-        return $this->custom_headers->set('Version', $version);
+        $this->custom_headers->set('Version', $version);
     }
 
     /*
@@ -1550,7 +1551,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setContentDisposition($content_disposition)
     {
-        return $this->custom_headers->set('Content-Disposition', $content_disposition);
+        $this->custom_headers->set('Content-Disposition', $content_disposition);
     }
 
     /*
@@ -1559,7 +1560,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setContentEncoding($content_encoding)
     {
-        return $this->custom_headers->set('Content-Encoding', $content_encoding);
+        $this->custom_headers->set('Content-Encoding', $content_encoding);
     }
 
     /*
@@ -1569,7 +1570,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function setContentLanguage($content_language)
     {
         $this->content_lang = $content_language;
-        return $this->custom_headers->set('Content-Language', $content_language);
+        $this->custom_headers->set('Content-Language', $content_language);
     }
 
     /*
@@ -1578,7 +1579,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setAcceptRanges($accept_ranges)
     {
-        return $this->custom_headers->set('Accept-Ranges', $accept_ranges);
+        $this->custom_headers->set('Accept-Ranges', $accept_ranges);
     }
 
     /*
@@ -1587,7 +1588,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setAge($age)
     {
-        return $this->custom_headers->set('Age', $age);
+        $this->custom_headers->set('Age', $age);
     }
 
     /*
@@ -1596,7 +1597,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setETag($etag)
     {
-        return $this->custom_headers->set('ETag', $etag);
+        $this->custom_headers->set('ETag', $etag);
     }
 
     /*
@@ -1605,7 +1606,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setProxyAuthenticate($proxy_authenticate)
     {
-        return $this->custom_headers->set('Proxy-Authenticate', $proxy_authenticate);
+        $this->custom_headers->set('Proxy-Authenticate', $proxy_authenticate);
     }
 
     /*
@@ -1614,7 +1615,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setRetryAfter($retry_after)
     {
-        return $this->custom_headers->set('Retry-After', $retry_after);
+        $this->custom_headers->set('Retry-After', $retry_after);
     }
 
     /*
@@ -1623,7 +1624,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setServer($server)
     {
-        return $this->custom_headers->set('Server', $server);
+        $this->custom_headers->set('Server', $server);
     }
 
     /*
@@ -1632,7 +1633,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setVary($vary)
     {
-        return $this->custom_headers->set('Vary', $vary);
+        $this->custom_headers->set('Vary', $vary);
     }
 
     /*
@@ -1641,7 +1642,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setWWWAuthenticate($www_authenticate)
     {
-        return $this->custom_headers->set('WWW-Authenticate', $www_authenticate);
+        $this->custom_headers->set('WWW-Authenticate', $www_authenticate);
     }
 
     /*
@@ -1650,7 +1651,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setConnection($connection)
     {
-        return $this->custom_headers->set('Connection', $connection);
+        $this->custom_headers->set('Connection', $connection);
     }
 
     /*
@@ -1659,7 +1660,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setPragma($pragma)
     {
-        return $this->custom_headers->set('Pragma', $pragma);
+        $this->custom_headers->set('Pragma', $pragma);
     }
 
     /*
@@ -1668,7 +1669,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setExpires($expires)
     {
-        return $this->custom_headers->set('Expires', $expires);
+        $this->custom_headers->set('Expires', $expires);
     }
 
     /*
@@ -1677,7 +1678,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setLastModified($last_modified)
     {
-        return $this->custom_headers->set('Last-Modified', $last_modified);
+        $this->custom_headers->set('Last-Modified', $last_modified);
     }
 
     /*
@@ -1686,7 +1687,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setCacheControl($cache_control)
     {
-        return $this->custom_headers->set('Cache-Control', $cache_control);
+        $this->custom_headers->set('Cache-Control', $cache_control);
     }
 
     /*
@@ -1695,7 +1696,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setMessageId($message_id)
     {
-        return $this->custom_headers->set('Message-Id', $message_id);
+        $this->custom_headers->set('Message-Id', $message_id);
     }
 
     /*
@@ -1704,7 +1705,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setHttpUri($http_uri)
     {
-        return $this->custom_headers->set('URI', $http_uri);
+        $this->custom_headers->set('URI', $http_uri);
     }
 
     /*
@@ -1713,7 +1714,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setVersion($version)
     {
-        return $this->custom_headers->set('Version', $version);
+        $this->custom_headers->set('Version', $version);
     }
 
     /*
@@ -1722,7 +1723,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setDerivedFrom($derived_from)
     {
-        return $this->custom_headers->set('Derived-From', $derived_from);
+        $this->custom_headers->set('Derived-From', $derived_from);
     }
 
     /*
@@ -1731,7 +1732,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setCost($cost)
     {
-        return $this->custom_headers->set('Cost', $cost);
+        $this->custom_headers->set('Cost', $cost);
     }
 
     /*
@@ -1740,7 +1741,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function setLink($link)
     {
-        return $this->custom_headers->set('Link', $link);
+        $this->custom_headers->set('Link', $link);
     }
 
     /*
@@ -1748,8 +1749,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     */
     public function clearHeaders()
     {
-        return $this->custom_headers->clear();
+        $this->custom_headers->clear();
     }
 }
-
-?>

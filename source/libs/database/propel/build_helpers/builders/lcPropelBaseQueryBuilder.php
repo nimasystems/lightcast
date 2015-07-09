@@ -14,12 +14,9 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
     {
         $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
 
-        if ($overriden_path)
-        {
+        if ($overriden_path) {
             return $overriden_path;
-        }
-        else
-        {
+        } else {
             return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
     }

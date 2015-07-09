@@ -30,6 +30,9 @@
  */
 class lcMemcached extends lcMemcache implements iCacheMultiStorage
 {
+    /** @var Memcached */
+    protected $memcache_backend;
+
     protected function initBackend()
     {
         // check for memcache

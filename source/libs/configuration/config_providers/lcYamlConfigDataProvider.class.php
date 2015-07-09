@@ -30,7 +30,7 @@
  * @version $Revision: 1473 $
  */
 
-require_once ('parsers' . DS . 'lcYamlFileParser.class.php');
+require_once('parsers' . DS . 'lcYamlFileParser.class.php');
 
 class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
 {
@@ -40,8 +40,7 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
 
     protected function trimYamlValue($val)
     {
-        if (is_array($val))
-        {
+        if (is_array($val)) {
             return $val;
         }
 
@@ -54,8 +53,7 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
 
-        if (!$config_key || !$dir)
-        {
+        if (!$config_key || !$dir) {
             throw new lcInvalidArgumentException('Invalid config file / directory');
         }
 
@@ -69,8 +67,7 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
 
-        if (!$config_key || !$dir)
-        {
+        if (!$config_key || !$dir) {
             throw new lcInvalidArgumentException('Invalid config file / directory');
         }
 
@@ -87,4 +84,3 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
     }
 
 }
-?>

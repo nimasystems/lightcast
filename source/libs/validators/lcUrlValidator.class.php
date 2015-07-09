@@ -26,17 +26,14 @@
  * @subpackage File Subcategory
  * @changed $Id: lcUrlValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcUrlValidator extends lcValidator
 {
-	public function validate($data)
-	{
-		return
-		preg_match("/(((ht|f)tps*:\/\/)*)((([a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,6}))|(([0-9]{1,6}\.){4}([0-9]{1,6})))((\/|\?)[a-z0-9~#%&'_\+=:\?\.-]*)*)$/",
-				$data);
-	}
+    public function validate($data)
+    {
+        return
+            preg_match("/(((ht|f)tps*:\/\/)*)((([a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,6}))|(([0-9]{1,6}\.){4}([0-9]{1,6})))((\/|\?)[a-z0-9~#%&'_\+=:\?\.-]*)*)$/",
+                $data);
+    }
 }
-
-?>

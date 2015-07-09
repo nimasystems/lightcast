@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,121 +28,117 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagArea.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagArea extends lcHtmlTag
 {
-	public function __construct($alt, $content = null,  $shape = null, $coords = null,
-			$href = null, $nohref = null, $accesskey = null, $tabindex = null)
-	{
-		parent::__construct('area', true);
+    public function __construct($alt, $content = null, $shape = null, $coords = null,
+                                $href = null, $nohref = null, $accesskey = null, $tabindex = null)
+    {
+        parent::__construct('area', true);
 
-		$this->setContent($content);
-		$this->setAlt($alt);
-		$this->setShape($shape);
-		$this->setCoords($coords);
-		$this->setHref($href);
-		$this->setNoHref($nohref);
-		$this->setAccessKey($accesskey);
-		$this->setTabIndex($tabindex);
-	}
+        $this->setContent($content);
+        $this->setAlt($alt);
+        $this->setShape($shape);
+        $this->setCoords($coords);
+        $this->setHref($href);
+        $this->setNoHref($nohref);
+        $this->setAccessKey($accesskey);
+        $this->setTabIndex($tabindex);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('alt');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('alt');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex');
+    }
 
-	public function setAlt($value)
-	{
-		$this->setAttribute('alt', $value);
-		return $this;
-	}
+    public function setAlt($value)
+    {
+        $this->setAttribute('alt', $value);
+        return $this;
+    }
 
-	public function getAlt()
-	{
-		return $this->getAttribute('alt');
-	}
+    public function getAlt()
+    {
+        return $this->getAttribute('alt');
+    }
 
-	public function setShape($value = null)
-	{
-		if (isset($value) &&
-				!(
-						$value == 'rect' || $value == 'circle' || $value == 'poly' || $value == 'default'
-				)
-		)
-		{
-			throw new lcInvalidArgumentException('tag \'area\' - shape \''.$value.'\' is not a valid argument');
-		}
+    public function setShape($value = null)
+    {
+        if (isset($value) &&
+            !(
+                $value == 'rect' || $value == 'circle' || $value == 'poly' || $value == 'default'
+            )
+        ) {
+            throw new lcInvalidArgumentException('tag \'area\' - shape \'' . $value . '\' is not a valid argument');
+        }
 
-		$this->setAttribute('shape', $value);
-		return $this;
-	}
+        $this->setAttribute('shape', $value);
+        return $this;
+    }
 
-	public function getShape()
-	{
-		return $this->getAttribute('shape');
-	}
+    public function getShape()
+    {
+        return $this->getAttribute('shape');
+    }
 
-	public function setCoords($value = null)
-	{
-		$this->setAttribute('coords', $value);
-		return $this;
-	}
+    public function setCoords($value = null)
+    {
+        $this->setAttribute('coords', $value);
+        return $this;
+    }
 
-	public function getCoords()
-	{
-		return $this->getAttribute('coords');
-	}
+    public function getCoords()
+    {
+        return $this->getAttribute('coords');
+    }
 
-	public function setHref($value = null)
-	{
-		$this->setAttribute('href', $value);
-		return $this;
-	}
+    public function setHref($value = null)
+    {
+        $this->setAttribute('href', $value);
+        return $this;
+    }
 
-	public function getHref()
-	{
-		return $this->getAttribute('href');
-	}
+    public function getHref()
+    {
+        return $this->getAttribute('href');
+    }
 
-	public function setNoHref($value = false)
-	{
-		$this->setAttribute('nohref', $value);
-		return $this;
-	}
+    public function setNoHref($value = false)
+    {
+        $this->setAttribute('nohref', $value);
+        return $this;
+    }
 
-	public function getNoHref()
-	{
-		return $this->getAttribute('nohref') ? true : false;
-	}
+    public function getNoHref()
+    {
+        return $this->getAttribute('nohref') ? true : false;
+    }
 
-	public function setAccessKey($value = null)
-	{
-		$this->setAttribute('accesskey', $value);
-		return $this;
-	}
+    public function setAccessKey($value = null)
+    {
+        $this->setAttribute('accesskey', $value);
+        return $this;
+    }
 
-	public function getAccessKey()
-	{
-		return $this->getAttribute('accesskey');
-	}
+    public function getAccessKey()
+    {
+        return $this->getAttribute('accesskey');
+    }
 
-	public function setTabIndex($value = null)
-	{
-		$this->setAttribute('tabindex', $value);
-		return $this;
-	}
+    public function setTabIndex($value = null)
+    {
+        $this->setAttribute('tabindex', $value);
+        return $this;
+    }
 
-	public function getTabIndex()
-	{
-		return $this->getAttribute('tabindex');
-	}
+    public function getTabIndex()
+    {
+        return $this->getAttribute('tabindex');
+    }
 }
-
-?>

@@ -60,10 +60,14 @@ class lcSpatialUtils
 
     const MILE_KM = 0.621371192;
 
+    /**
+     * @param lcLatLng[] $points
+     * @return lcLatLng|null
+     */
     public static function getCenter(array $points)
     {
         if (!$points) {
-            return;
+            return null;
         }
 
         $minlat = false;
@@ -190,5 +194,3 @@ class lcSpatialUtils
         return $ret;
     }
 }
-
-?>

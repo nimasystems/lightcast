@@ -33,7 +33,9 @@ class lcRssFeed extends lcObj
     const RSS_MIMETYPE = 'application/rss+xml';
     const RSS_TIME_FORMAT = 'D, d M Y H:i:s O';
 
+    /** @var lcRssItem[] */
     private $items = array(); //of RSSItem
+
     private $language = 'en';
     private $encoding = 'utf-8';
     private $builddate = 0; //unixtime
@@ -117,7 +119,7 @@ class lcRssFeed extends lcObj
         return $this->feed_link;
     }
 
-    public function getBuildDate($format = __RSS_FEED_GENERATOR_STAMP_FORMAT)
+    public function getBuildDate($format = self::RSS_TIME_FORMAT)
     {
         if ($format) {
             return date($format, $this->builddate);

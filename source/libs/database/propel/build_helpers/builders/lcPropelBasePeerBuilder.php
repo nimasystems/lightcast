@@ -19,12 +19,9 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
     {
         $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
 
-        if ($overriden_path)
-        {
+        if ($overriden_path) {
             return $overriden_path;
-        }
-        else
-        {
+        } else {
             return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
     }
@@ -83,52 +80,45 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
      */
     protected static \$lcTitles = array (
         BasePeer::TYPE_PHPNAME => array (";
-        foreach ($tableColumns as $col)
-        {
+        foreach ($tableColumns as $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
             $script .= "'" . $col->getPhpName() . "' => '" . $lc_title . "', ";
         }
         $script .= "),
         BasePeer::TYPE_STUDLYPHPNAME => array (";
-        foreach ($tableColumns as $col)
-        {
+        foreach ($tableColumns as $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
             $script .= "'" . $col->getStudlyPhpName() . "' => '" . $lc_title . "', ";
         }
         $script .= "),
         BasePeer::TYPE_COLNAME => array (";
-        foreach ($tableColumns as $col)
-        {
+        foreach ($tableColumns as $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
             $script .= $this->getColumnConstant($col, $this->getPeerClassname()) . " => '" . $lc_title . "', ";
         }
         $script .= "),
         BasePeer::TYPE_RAW_COLNAME => array (";
-        foreach ($tableColumns as $col)
-        {
+        foreach ($tableColumns as $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
             $script .= "'" . $col->getConstantColumnName() . "' => '" . $lc_title . "', ";
         }
         $script .= "),
         BasePeer::TYPE_FIELDNAME => array (";
-        foreach ($tableColumns as $col)
-        {
+        foreach ($tableColumns as $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
             $script .= "'" . $col->getName() . "' => '" . $lc_title . "', ";
         }
         $script .= "),
         BasePeer::TYPE_NUM => array (";
-        foreach ($tableColumns as $num => $col)
-        {
+        foreach ($tableColumns as $num => $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
-            $script .= $num . " => '" . $lc_title . "', ";
-            ;
+            $script .= $num . " => '" . $lc_title . "', ";;
         }
         $script .= ")
     );

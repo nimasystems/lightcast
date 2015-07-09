@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,16 +28,12 @@
  * @subpackage File Subcategory
  * @changed $Id: lcXMLUtils.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcXMLUtils
 {
-	public static function cdata($value)
-	{
-		return preg_replace('/&(?!\w+;)/', '&amp;', $value);
-	}
+    public static function cdata($value)
+    {
+        return preg_replace('/&(?!\w+;)/', '&amp;', $value);
+    }
 }
-
-
-?>

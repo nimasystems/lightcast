@@ -2,22 +2,18 @@
 
 class lcMath
 {
-	public static function bigRand($length)
-	{
-		$length = (int)$length;
-		
-		$ret = '';
+    public static function bigRand($length)
+    {
+        $length = (int)$length;
 
-		srand();
+        $ret = '';
 
-		for($i = 0; $i < $length; $i++)
-		{
-			$ret .= rand(0,9);
-		}
+        srand();
 
-		return $ret;
-	}
+        for ($i = 0; $i < $length; $i++) {
+            $ret .= rand(0, 9);
+        }
+
+        return $ret;
+    }
 }
-
-
-?>

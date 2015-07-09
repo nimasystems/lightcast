@@ -28,39 +28,34 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1506 $
  */
-
 class lcDataView extends lcRawContentView
 {
-	public function getViewContent()
-	{
-		$content = $this->formatContent();
-		return $content;
-	}
+    public function getViewContent()
+    {
+        $content = $this->formatContent();
+        return $content;
+    }
 
-	protected function formatContent()
-	{
-		$content = $this->content;
+    protected function formatContent()
+    {
+        $content = $this->content;
 
-		if (!$content)
-		{
-			return null;
-		}
+        if (!$content) {
+            return null;
+        }
 
-		// we currently support only json representation
-		if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-			$content = json_encode($content, JSON_UNESCAPED_UNICODE);
-		} else {
-			$content = json_encode($content);
-		}
+        // we currently support only json representation
+        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $content = json_encode($content, JSON_UNESCAPED_UNICODE);
+        } else {
+            $content = json_encode($content);
+        }
 
-		// make the output pretty while debugging
-		if (DO_DEBUG)
-		{
-			$content = lcVars::indentJson($content);
-		}
+        // make the output pretty while debugging
+        if (DO_DEBUG) {
+            $content = lcVars::indentJson($content);
+        }
 
-		return $content;
-	}
+        return $content;
+    }
 }
-
-?>

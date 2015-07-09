@@ -30,19 +30,9 @@
  */
 class lcValueCollection extends lcBaseCollection
 {
-    public function append($value)
-    {
-        return parent::append($value);
-    }
-
-    public function offsetSet($index, $value)
-    {
-        return parent::offsetSet($index, $value);
-    }
-
     public function offsetUnset($index)
     {
-        return parent::offsetUnset($index);
+        parent::offsetUnset($index);
     }
 
     public function get($value)
@@ -66,18 +56,13 @@ class lcValueCollection extends lcBaseCollection
         return false;
     }
 
-    public function set($value, $offset = null)
-    {
-        return parent::set($value, $offset);
-    }
-
     public function delete($offset = null)
     {
-        return parent::delete($offset);
+        parent::delete($offset);
     }
 
     public function clear()
     {
-        return parent::clear();
+        parent::clear();
     }
 }

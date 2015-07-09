@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,43 +28,33 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagFieldSet.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagFieldSet extends lcHtmlTag
 {
-	private $legend;
+    private $legend;
 
-	public function __construct($content = null, $legend = null)
-	{
-		parent::__construct('fieldset', true);
+    public function __construct($content = null, $legend = null)
+    {
+        parent::__construct('fieldset', true);
 
-		$this->legend = isset($legend) ?
-		new lcTagLegend($legend) :
-		null;
-			
-		$this->setContent($content);
-	}
+        $this->legend = new lcTagLegend($legend);
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+        $this->setContent($content);
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public function getLegend()
-	{
-		if (!isset($this->legend)) 
-		{
-			$this->legend = new lcTagLegend();
-		}
+    public static function getOptionalAttributes()
+    {
+        return array();
+    }
 
-		return $this->legend;
-	}
+    public function getLegend()
+    {
+        return $this->legend;
+    }
 }
-
-?>

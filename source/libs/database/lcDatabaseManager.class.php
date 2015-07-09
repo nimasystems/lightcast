@@ -29,13 +29,16 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1498 $
  */
-class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iDatabaseManager, iDebuggable
+class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, iDatabaseManager, iDebuggable
 {
     const DEFAULT_DB = 'primary';
 
+    /** @var lcDatabaseMigrationsManager */
     protected $migrations_manager;
 
+    /** @var array lcDatabase[] */
     private $dbs = array();
+
     private $default_database = self::DEFAULT_DB;
 
     public function initialize()
@@ -56,6 +59,8 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         // shutdown databases
         if ($this->dbs && is_array($this->dbs)) {
             foreach ($this->dbs as $name => $obj) {
+                /** @var lcDatabase $obj */
+
                 // send a shutdown event
                 $this->getEventDispatcher()->notify(new lcEvent('db.shutdown', $obj));
 
@@ -148,6 +153,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
             }
 
             // init it
+            /** @var lcDatabaseMigrationsManager $manager */
             $manager = new $clname();
 
             if (!$manager || !($manager instanceof iDatabaseMigrationsManager)) {
@@ -168,8 +174,6 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         } catch (Exception $e) {
             throw new lcSystemException('Could not initialize migrations manager \'' . $clname . '\': ' . $e->getMessage(), $e->getCode(), $e);
         }
-
-        return false;
     }
 
     public function getProjectMigrationsTarget($name = lcDatabasesConfigHandler::DEFAULT_PRIMARY_ADAPTER_NAME)
@@ -221,6 +225,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         }
 
         // init and verify the class
+        /** @var iDatabaseMigrationsTarget $cl */
         $cl = new $clname();
 
         if (!$cl || !($cl instanceof iDatabaseMigrationsTarget)) {
@@ -297,7 +302,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
 
                     // try to connect if option set
                     if (isset($db['autoconnect']) && (bool)$db['autoconnect']) {
-                        $this->dbs[$name]->connect();
+                        $db_object->connect();
                     }
 
                     // send an event ONCE - for the default db only!
@@ -305,7 +310,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
                         $res = array(
                             'is_default' => $db['is_default'],
                             'name' => $db['name'],
-                            'connection' => $this->dbs[$name]->getConnection()
+                            'connection' => $db_object->getConnection()
                         );
 
                         $connection = $this->dbs[$name];
@@ -344,6 +349,10 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         return $db->getConnection();
     }
 
+    /**
+     * @param null $name
+     * @return lcDatabase
+     */
     public function getDatabase($name = null)
     {
         if (!isset($name)) {
@@ -360,6 +369,7 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
 
     #pragma mark - Propel
 
+    /** @var lcLogger */
     protected $propel_logger;
     protected $propel_config;
     private $propel_initialized;
@@ -601,5 +611,3 @@ class lcDatabaseManager extends lcSysObj implements iProvidesCapabilities, iData
         $this->propel_config = $propel_config;
     }
 }
-
-?>

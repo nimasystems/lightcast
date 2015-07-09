@@ -21,18 +21,17 @@
 
 /**
  * File Description
-* @package File Category
-* @subpackage File Subcategory
-* @changed $Id: propelPhoneValidator.class.php 1325 2013-06-22 14:46:08Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1325 $
-*/
-
+ * @package File Category
+ * @subpackage File Subcategory
+ * @changed $Id: propelPhoneValidator.class.php 1325 2013-06-22 14:46:08Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1325 $
+ */
 class propelPhoneValidator implements BasicValidator
 {
-	public function isValid (ValidatorMap $map, $str)
-	{
-		fnothing($map);
-		return lcValidator::validatePhone($str);
-	}
+    public function isValid(ValidatorMap $map, $str)
+    {
+        fnothing($map);
+        return lcValidator::validatePhone($str);
+    }
 }

@@ -32,6 +32,9 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 {
     protected $debug;
 
+    /** @var lcHTMLTemplateView */
+    protected $view;
+
     protected function getShouldApplyFilter()
     {
         // we support only lcHTMLTemplateView
@@ -88,6 +91,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         } elseif ($category == 'urldecode' || $category == 'decode') {
             return urldecode($name);
         } elseif ($category == 'env') {
+            /** @var lcWebRequest $request */
             $request = $this->view->getController()->getRequest();
             $env = $request->getEnv();
             $value = strtoupper($name);
@@ -106,6 +110,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             }
         } else {
             // try to fetch from loaders - through the view's controller
+            /** @var lcWebController $controller */
             $controller = $this->view->getController();
 
             $loaders = array(
@@ -127,6 +132,8 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
             return $ret;
         }
+
+        return null;
     }
 
     protected function parseNodeTemplate(lcIterateParamHolder $params, $data)
@@ -393,5 +400,3 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $data;
     }
 }
-
-?>

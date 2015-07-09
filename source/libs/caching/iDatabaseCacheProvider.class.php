@@ -27,13 +27,16 @@
  * @changed $Id: iDatabaseCacheProvider.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 interface iDatabaseCacheProvider
 {
-	public function setDbCache($namespace, $key, $value = null, $lifetime = null);
-	public function removeDbCache($namespace, $key);
-	public function removeDbCacheForNamespace($namespace);
-	public function getDbCache($namespace, $key);
-	public function hasDbCache($namespace, $key);
+    public function setDbCache($namespace, $key, $value = null, $lifetime = null);
+
+    public function removeDbCache($namespace, $key);
+
+    public function removeDbCacheForNamespace($namespace);
+
+    public function getDbCache($namespace, $key);
+
+    public function hasDbCache($namespace, $key);
 }

@@ -46,7 +46,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected $plugin_manager;
 
     /**
-     * @var lcDatabaseManager
+     * @var lcDatabaseModelManager
      */
     protected $database_model_manager;
 
@@ -74,9 +74,10 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected $plugins;
 
     /**
-     * @var lcComponent[]
+     * @var array
      */
     protected $loaded_components;
+
     private $loaded_components_usage;
 
     protected $controller_name;
@@ -135,7 +136,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
         if ($loaded_components) {
             foreach ($loaded_components as $idx => $component) {
-                $component['instance']->shutdown();
+                /** @var lcComponent $cinstance */
+                $cinstance = $component['instance'];
+                $cinstance->shutdown();
                 unset($this->loaded_components[$idx]);
 
                 unset($component, $idx);
@@ -164,12 +167,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function getDebugInfo()
     {
-        $is_front_c = $this->isFrontController();
-
         $debug = array(
             'translation_context_type' => $this->translation_context_type,
             'translation_context_name' => $this->translation_context_name,
-            'is_front_controller' => $is_front_c
         );
 
         return $debug;
@@ -743,18 +743,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         }
     }
 
-    public function generateUrl(array $params = null, $route = null, $absolute_url = false)
-    {
-        $router = $this->routing;
-
-        if (!$router) {
-            throw new lcNotAvailableException('Router not available');
-        }
-
-        $url = $router->generate($params, $absolute_url, $route);
-        return $url;
-    }
-
     protected function createNotFoundException($message = 'Not Found', Exception $previous_exception = null)
     {
         return new lcNotAvailableException($message, null, $previous_exception);
@@ -778,5 +766,3 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         // subclassers may override this to read their caches
     }
 }
-
-?>

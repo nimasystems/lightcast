@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,22 +27,17 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcNotImplemented.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcNotImplemented extends lcException
 {
-	public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
-	{
-		if (!isset($message))
-		{
-			$message = 'Operation is unavailable. Not implemented';
-		}
+    public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
+    {
+        if (!isset($message)) {
+            $message = 'Operation is unavailable. Not implemented';
+        }
 
-		parent::__construct($message, $code, $cause, $extra_data, $domain);
-	}
+        parent::__construct($message, $code, $cause, $extra_data, $domain);
+    }
 }
-
-
-?>

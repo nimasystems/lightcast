@@ -25,178 +25,164 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcArrayCollection.class.php 1592 2015-05-22 13:28:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 {
-	public function __construct(array $values = null)
-	{
-		parent::__construct();
+    public function __construct(array $values = null)
+    {
+        parent::__construct();
 
-		if (isset($values))
-		{
-			foreach ($values as $key => $val)
-			{
-				$this->append($key, $val);
-				unset($key, $val);
-			}
-		}
-	}
+        if (isset($values)) {
+            foreach ($values as $key => $val) {
+                $this->append($key, $val);
+                unset($key, $val);
+            }
+        }
+    }
 
-	public function append($key, $value = null)
-	{
-		if (!$this->setPositionByKey($key))
-		{
-			return parent::appendColl(new lcNameValuePair($key, $value));
-		}
-		else
-		{
-			$this->current()->setValue($value);
-		}
-	}
+    public function append($key, $value = null)
+    {
+        if (!$this->setPositionByKey($key)) {
+            parent::appendColl(new lcNameValuePair($key, $value));
+        } else {
+            $this->current()->setValue($value);
+        }
+    }
 
-	public function set($key, $value = null)
-	{
-		return $this->append($key, $value);
-	}
-	
-	public function has($key) {
-		return $this->setPositionByKey($key);
-	}
+    public function set($key, $value = null)
+    {
+        $this->append($key, $value);
+    }
 
-	public function get($key)
-	{
-		if (!$this->setPositionByKey($key))
-		{
-			return null;
-		}
+    public function has($key)
+    {
+        return $this->setPositionByKey($key);
+    }
 
-		return $this->current()->getValue();
-	}
+    public function get($key)
+    {
+        if (!$this->setPositionByKey($key)) {
+            return null;
+        }
 
-	public function delete($key = null)
-	{
-		if (!$this->setPositionByKey($key))
-		{
-			return false;
-		}
+        return $this->current()->getValue();
+    }
 
-		parent::delete($this->key());
-	}
+    public function delete($key = null)
+    {
+        if (!$this->setPositionByKey($key)) {
+            return;
+        }
 
-	private function setPositionByKey($key)
-	{
-		$this->first();
+        parent::delete($this->key());
+    }
 
-		$all = $this->getAll();
+    private function setPositionByKey($key)
+    {
+        $this->first();
 
-		foreach ($all as $el)
-		{
-			if ($el->getName() == $key)
-			{
-				return true;
-			}
+        $all = $this->getAll();
 
-			unset($el);
-		}
+        foreach ($all as $el) {
+            if ($el->getName() == $key) {
+                return true;
+            }
 
-		unset($all);
+            unset($el);
+        }
 
-		return false;
-	}
+        unset($all);
 
-	public function clear()
-	{
-		return parent::clear();
-	}
+        return false;
+    }
 
-	public function mergeWithCollection(lcArrayCollection $collection)
-	{
-		foreach($collection->getAll() as $item)
-		{
-			$this->set($item->getName(), $item->getValue());
+    public function clear()
+    {
+        parent::clear();
+    }
 
-			unset($item);
-		}
-	}
+    public function mergeWithCollection(lcArrayCollection $collection)
+    {
+        foreach ($collection->getAll() as $item) {
+            $this->set($item->getName(), $item->getValue());
 
-	public function offsetExists($name)
-	{
-		return $this->get($name) ? true : false;
-	}
+            unset($item);
+        }
+    }
 
-	public function offsetGet($name)
-	{
-		return $this->get($name);
-	}
+    public function offsetExists($name)
+    {
+        return $this->get($name) ? true : false;
+    }
 
-	public function offsetSet($name, $value)
-	{
-		return $this->set($name, $value);
-	}
+    public function offsetGet($name)
+    {
+        return $this->get($name);
+    }
 
-	public function offsetUnset($name)
-	{
-		return $this->delete($name);
-	}
-	
-	public function toArray()
-	{
-		return $this->getKeyValueArray();
-	}
+    public function offsetSet($name, $value)
+    {
+        $this->set($name, $value);
+    }
 
-	public function getKeyValueArray()
-	{
-		$out = array();
+    public function offsetUnset($name)
+    {
+        $this->delete($name);
+    }
 
-		if ($this->count())
-		{
-			$all = $this->getAll()->getArrayCopy();
+    public function toArray()
+    {
+        return $this->getKeyValueArray();
+    }
 
-			if ($all && is_array($all))
-			{
-				foreach ($all as $val)
-				{
-					$out[$val->getName()] = $val->getValue();
+    public function getKeyValueArray()
+    {
+        $out = array();
 
-					unset($val);
-				}
-			}
+        if ($this->count()) {
+            $all = $this->getAll()->getArrayCopy();
 
-			unset($all);
-		}
+            if ($all && is_array($all)) {
+                foreach ($all as $val) {
+                    /** @var lcNameValuePair $val */
+                    $out[$val->getName()] = $val->getValue();
 
-		return $out;
-	}
+                    unset($val);
+                }
+            }
 
-	public function __toString()
-	{
-		$out = '';
+            unset($all);
+        }
 
-		if ($this->count())
-		{
-			$a = array();
+        return $out;
+    }
 
-			$all = $this->getAll()->getArrayCopy();
+    public function __toString()
+    {
+        $out = '';
 
-			if ($all && is_array($all))
-			{
-				foreach ($all as $val)
-				{
-					$value = $val->getValue();
-					$a[] = $val->getName() . '=' . (is_string($value) ? $value : var_export($value, true));
+        if ($this->count()) {
+            $a = array();
 
-					unset($val);
-				}
-			}
+            $all = $this->getAll()->getArrayCopy();
 
-			$out = implode(', ',$a);
+            if ($all && is_array($all)) {
+                foreach ($all as $val) {
+                    /** @var lcNameValuePair $val */
+                    $value = $val->getValue();
+                    $a[] = $val->getName() . '=' . (is_string($value) ? $value : var_export($value, true));
 
-			unset($a, $all);
-		}
+                    unset($val);
+                }
+            }
 
-		return (string)$out;
-	}
+            $out = implode(', ', $a);
+
+            unset($a, $all);
+        }
+
+        return (string)$out;
+    }
 }

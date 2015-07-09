@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,51 +28,48 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagBody.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagBody extends lcHtmlTag
 {
-	public function __construct($content = null, $onload = null, $onunload = null)
-	{
-		parent::__construct('body', true);
+    public function __construct($content = null, $onload = null, $onunload = null)
+    {
+        parent::__construct('body', true);
 
-		$this->setContent($content);
-		$this->setOnLoad($onload);
-		$this->setOnUnload($onunload);
-	}
+        $this->setContent($content);
+        $this->setOnLoad($onload);
+        $this->setOnUnload($onunload);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('onload', 'onunload');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('onload', 'onunload');
+    }
 
-	public function getOnLoad()
-	{
-		return $this->attributes->get('onload');
-	}
+    public function getOnLoad()
+    {
+        return $this->attributes->get('onload');
+    }
 
-	public function setOnLoad($value = null)
-	{
-		$this->setAttribute('onload', $value);
-		return $this;
-	}
+    public function setOnLoad($value = null)
+    {
+        $this->setAttribute('onload', $value);
+        return $this;
+    }
 
-	public function getOnUnload()
-	{
-		return $this->attributes->get('onunload');
-	}
+    public function getOnUnload()
+    {
+        return $this->attributes->get('onunload');
+    }
 
-	public function setOnUnload($value = null)
-	{
-		$this->setAttribute('onunload', $value);
-		return $this;
-	}
+    public function setOnUnload($value = null)
+    {
+        $this->setAttribute('onunload', $value);
+        return $this;
+    }
 }
-
-?>

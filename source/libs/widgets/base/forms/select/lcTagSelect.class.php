@@ -28,158 +28,150 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagSelect.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagSelect extends lcHtmlTag
 {
-	protected $options;
+    /** @var lcTagOption[] */
+    protected $options;
 
-	public function __construct($name = null, $id = null, $size = null, $disabled = false, $multiple = false, $tabindex = false, $content = null)
-	{
-		parent::__construct('select', true);
+    public function __construct($name = null, $id = null, $size = null, $disabled = false, $multiple = false, $tabindex = false, $content = null)
+    {
+        parent::__construct('select', true);
 
-		$this->setContent($content);
-		$this->setId($id);
-		$this->setName($name);
-		$this->setSize($size);
-		$this->setIsMultiple($multiple);
-		$this->setIsDisabled($disabled);
-		$this->setTabIndex($tabindex);
-	}
-	
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+        $this->setContent($content);
+        $this->setId($id);
+        $this->setName($name);
+        $this->setSize($size);
+        $this->setIsMultiple($multiple);
+        $this->setIsDisabled($disabled);
+        $this->setTabIndex($tabindex);
+    }
 
-	/*
-	 * Can be option or option group
-	*/
-	public function addOption($option)
-	{
-		if ((!$option instanceof lcTagOption) && (!$option instanceof lcOptGroup))
-		{
-			throw new lcInvalidArgumentException('Select options can be either \'option\' or \'option group\'');
-		}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-		$this->options[] = $option;
-		return $this;
-	}
+    /*
+     * Can be option or option group
+    */
+    public function addOption($option)
+    {
+        if ((!$option instanceof lcTagOption) && (!$option instanceof lcOptGroup)) {
+            throw new lcInvalidArgumentException('Select options can be either \'option\' or \'option group\'');
+        }
 
-	public function getOptions()
-	{
-		return $this->options;
-	}
+        $this->options[] = $option;
+        return $this;
+    }
 
-	public function getOption($id)
-	{
-		if (!$this->options) 
-		{
-			return null;
-		}
+    public function getOptions()
+    {
+        return $this->options;
+    }
 
-		foreach($this->options as $option)
-		{
-			if (strcmp($option->getValue(), $id) == 0)
-			{
-				return $option;
-			}
+    public function getOption($id)
+    {
+        if (!$this->options) {
+            return null;
+        }
 
-			unset($option);
-		}
+        foreach ($this->options as $option) {
+            if (strcmp($option->getValue(), $id) == 0) {
+                return $option;
+            }
 
-		return null;
-	}
+            unset($option);
+        }
 
-	public function clearOptions()
-	{
-		$this->options = null;
-		return $this;
-	}
+        return null;
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('name', 'size', 'multiply', 'disabled', 'tabindex');
-	}
+    public function clearOptions()
+    {
+        $this->options = null;
+        return $this;
+    }
 
-	public function setName($value = null)
-	{
-		$this->setAttribute('name', $value);
-		return $this;
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('name', 'size', 'multiply', 'disabled', 'tabindex');
+    }
 
-	public function getName()
-	{
-		return $this->getAttribute('name');
-	}
+    public function setName($value = null)
+    {
+        $this->setAttribute('name', $value);
+        return $this;
+    }
 
-	public function setSize($value = null)
-	{
-		$this->setAttribute('size', $value);
-		return $this;
-	}
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
 
-	public function getSize()
-	{
-		return $this->getAttribute('size');
-	}
+    public function setSize($value = null)
+    {
+        $this->setAttribute('size', $value);
+        return $this;
+    }
 
-	public function setIsMultiple($value = false)
-	{
-		$this->setAttribute('multiple', $value ? 'multiple' : null);
-		return $this;
-	}
+    public function getSize()
+    {
+        return $this->getAttribute('size');
+    }
 
-	public function getIsMultiple()
-	{
-		return $this->getAttribute('multiple') ? true : false;
-	}
+    public function setIsMultiple($value = false)
+    {
+        $this->setAttribute('multiple', $value ? 'multiple' : null);
+        return $this;
+    }
 
-	public function setIsDisabled($value = false)
-	{
-		$this->setAttribute('disabled', $value ? 'disabled' : null);
-		return $this;
-	}
+    public function getIsMultiple()
+    {
+        return $this->getAttribute('multiple') ? true : false;
+    }
 
-	public function getIsDisabled()
-	{
-		return $this->getAttribute('disabled') ? true : false;
-	}
+    public function setIsDisabled($value = false)
+    {
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        return $this;
+    }
 
-	public function setTabIndex($value = null)
-	{
-		$this->setAttribute('tabindex', $value);
-		return $this;
-	}
+    public function getIsDisabled()
+    {
+        return $this->getAttribute('disabled') ? true : false;
+    }
 
-	public function getTabIndex()
-	{
-		return $this->getAttribute('tabindex');
-	}
+    public function setTabIndex($value = null)
+    {
+        $this->setAttribute('tabindex', $value);
+        return $this;
+    }
 
-	public function asHtml()
-	{
-		$options_html = null;
+    public function getTabIndex()
+    {
+        return $this->getAttribute('tabindex');
+    }
 
-		if ($this->options)
-		{
-			$all_rendered = array();
-			
-			foreach ($this->options as $opt)
-			{
-				$all_rendered[] = $opt->asHtml();
-				unset($opt);
-			}
-			
-			$options_html = implode("\n", $all_rendered);
-		}
+    public function asHtml()
+    {
+        $options_html = null;
 
-		return
-		'<select ' . $this->getAttributes()->asHtml() . '>' . "\n" .
-		$options_html . "\n" .
-		'</select>';
-	}
+        if ($this->options) {
+            $all_rendered = array();
+
+            foreach ($this->options as $opt) {
+                $all_rendered[] = $opt->asHtml();
+                unset($opt);
+            }
+
+            $options_html = implode("\n", $all_rendered);
+        }
+
+        return
+            '<select ' . $this->getAttributes()->asHtml() . '>' . "\n" .
+            $options_html . "\n" .
+            '</select>';
+    }
 }
-
-?>

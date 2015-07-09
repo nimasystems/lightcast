@@ -29,58 +29,47 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1472 $
  */
-
 class lcConsoleConfiguration extends lcApplicationConfiguration
 {
     const DEFAULT_APP_NAME = 'console';
 
     public function __construct($project_dir = null, lcProjectConfiguration $project_configuration = null)
     {
-        if (!$project_dir)
-        {
+        if (!$project_dir) {
             throw new lcInvalidArgumentException('Invalid project dir');
         }
 
         parent::__construct($project_dir, $project_configuration);
 
-        if ($this->project_configuration)
-        {
+        if ($this->project_configuration) {
             // shortcuts to enable debugging / disable plugins / disable loaders
             // / disable db while in CLI
-            if (in_array('--disable-plugins', $_SERVER['argv']))
-            {
+            if (in_array('--disable-plugins', $_SERVER['argv'])) {
                 $this->setShouldLoadPlugins(false);
             }
 
-            if (in_array('--disable-db', $_SERVER['argv']))
-            {
+            if (in_array('--disable-db', $_SERVER['argv'])) {
                 $this->should_disable_databases = true;
             }
 
-            if (in_array('--disable-loaders', $_SERVER['argv']))
-            {
+            if (in_array('--disable-loaders', $_SERVER['argv'])) {
                 $this->should_use_default_loaders = true;
             }
 
-            if (in_array('--disable-models', $_SERVER['argv']))
-            {
+            if (in_array('--disable-models', $_SERVER['argv'])) {
                 $this->should_disable_models = true;
             }
 
-            if (in_array('--debug', $_SERVER['argv']))
-            {
+            if (in_array('--debug', $_SERVER['argv'])) {
                 $this->project_configuration->setIsDebugging(true);
             }
 
             // pick a different environment
-            foreach ($_SERVER['argv'] as $v)
-            {
-                if (strstr($v, '--config-env='))
-                {
+            foreach ($_SERVER['argv'] as $v) {
+                if (strstr($v, '--config-env=')) {
                     $env = substr($v, strpos($v, '=') + 1, strlen($v));
 
-                    if ($env)
-                    {
+                    if ($env) {
                         $this->setConfigEnvironment($env);
                     }
 
@@ -111,14 +100,14 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         $parent_map = (array)parent::getConfigHandleMap();
 
         // maps the configuration values to handlers
-        $config_map = array( array(
-                'handler' => 'console',
-                'dirs' => array(
-                    $this->getBaseConfigDir(),
-                    $this->getConfigDir()
-                ),
-                'config_key' => 'console'
-            ), );
+        $config_map = array(array(
+            'handler' => 'console',
+            'dirs' => array(
+                $this->getBaseConfigDir(),
+                $this->getConfigDir()
+            ),
+            'config_key' => 'console'
+        ),);
 
         $app_map = array_merge($parent_map, $config_map);
 
@@ -133,13 +122,11 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         $config_data = parent::loadConfigurationData();
 
         // reset loaders to their defaults in case the property is set
-        if ($this->should_use_default_loaders)
-        {
+        if ($this->should_use_default_loaders) {
             $lhandler = new lcConsoleConfigHandler();
             $ldata = $lhandler->getDefaultValues();
 
-            if ($ldata && is_array($ldata) && isset($config_data['loaders']) && $config_data['loaders'])
-            {
+            if ($ldata && is_array($ldata) && isset($config_data['loaders']) && $config_data['loaders']) {
                 $config_data['loaders'] = $ldata['loaders'];
             }
 
@@ -147,13 +134,10 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         }
 
         // disable database configuration if requested
-        if ($this->should_disable_databases)
-        {
+        if ($this->should_disable_databases) {
             unset($config_data['db']);
         }
 
         return $config_data;
     }
-
 }
-?>

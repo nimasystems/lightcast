@@ -48,11 +48,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
      */
     private $cookies;
 
-    private $app_url;
+    //private $app_url;
     private $app_server;
     private $uri_as_path;
 
-    private $request_fext;
+    //private $request_fext;
 
     private $prefix;
     private $context;
@@ -72,10 +72,13 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     /*
      * Initialization of the Request
     */
-    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
+    public function initialize()
     {
-        parent::initializeBeforeApp($event_dispatcher, $configuration);
+        parent::initialize();
+    }
 
+    protected function beforeRegisterEvents()
+    {
         $this->resetPHPRequestGlobals();
 
         // fix REQUEST_URI - it is not url escaped
@@ -171,14 +174,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $this->resetAllGlobals();
     }
 
-    public function initialize()
+    public function getListenerEvents()
     {
-        parent::initialize();
-
-        // when router loads the detected params from request
-        // it will notify us with this event
-        // and request will set its local params to the ones detected by router
-        $this->event_dispatcher->connect('router.detect_parameters', $this, 'onRouterDetectParameters');
+        return array(
+            'router.detect_parameters' => 'onRouterDetectParameters'
+        );
     }
 
     public function shutdown()
@@ -215,11 +215,12 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $debug_parent = parent::getDebugInfo();
 
         // compile cookies
-        $c = $this->cookies;
+        $cc1 = $this->cookies;
         $ca = array();
 
-        if ($c) {
-            $c = $c->getArrayCopy();
+        if ($cc1) {
+            /** @var lcNameValuePair[] $c */
+            $c = $cc1->getArrayCopy();
 
             if ($c) {
                 foreach ($c as $cc) {
@@ -750,6 +751,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     {
         static $cached_headers;
 
+        $ret = null;
+
         if ($cached_headers) {
             return $cached_headers;
         } elseif (!function_exists('apache_request_headers')) {
@@ -807,6 +810,14 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function isGet()
     {
         return ($this->request_method == lcHttpMethod::METHOD_GET);
+    }
+
+    /*
+     * Checks if the request method is PUT
+    */
+    public function isPut()
+    {
+        return ($this->request_method == lcHttpMethod::METHOD_PUT);
     }
 
     /*
@@ -1058,11 +1069,13 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     /*
      * Sets a clear path version of the url - internal
     */
-    private function _set_request_uri($in_url = null, $app_url = null)
+    private function _set_request_uri($in_url = null)
     {
-        if (!isset($app_url)) {
+        /*if (!isset($app_url)) {
             $app_url = $this->app_url;
-        }
+        }*/
+
+        $uri = null;
 
         if (!isset($in_url)) {
             $checkin = array('HTTP_X_REWRITE_URL', 'REQUEST_URI', 'argv');
@@ -1124,7 +1137,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         if (substr($this->uri_as_path, strlen($this->uri_as_path) - 1, strlen($this->uri_as_path)) == '/') {
             $this->uri_as_path = substr($this->uri_as_path, 0, strlen($this->uri_as_path) - 1);
         }
+
+        return '';
     }
 }
-
-?>

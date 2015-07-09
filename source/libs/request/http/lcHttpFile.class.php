@@ -217,5 +217,3 @@ class lcHttpFile extends lcObj
         return $str;
     }
 }
-
-?>

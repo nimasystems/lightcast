@@ -26,157 +26,152 @@
  * @subpackage File Subcategory
  * @changed $Id: lcStorage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-abstract class lcStorage extends lcSysObj implements iProvidesCapabilities, ArrayAccess, iDebuggable
+ * @version $Revision: 1455 $
+ */
+abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities, ArrayAccess, iDebuggable
 {
-	protected $ignore_time_tracking;
-	
-	public function initialize()
-	{
-		parent::initialize();
-		
-		$this->readFromStorage();
-	}
+    protected $ignore_time_tracking;
 
-	public function shutdown()
-	{
-		if (!$this->ignore_time_tracking)
-		{
-			$this->trackTime();
-		}
-		
-		$this->writeToStorage();
-		
-		parent::shutdown();
-	}
+    public function initialize()
+    {
+        parent::initialize();
 
-	public function getCapabilities()
-	{
-		return array(
-				'storage'
-		);
-	}
-	
-	public function getDebugInfo()
-	{
-		$namespaces = $this->getNamespaces();
+        $this->readFromStorage();
+    }
 
-		$out = array();
+    public function shutdown()
+    {
+        if (!$this->ignore_time_tracking) {
+            $this->trackTime();
+        }
 
-		if ($namespaces)
-		{
-			foreach($namespaces as $namespace)
-			{
-				$vals = $this->getAll($namespace);
+        $this->writeToStorage();
 
-				$out[$namespace]['total_items'] = (is_array($vals) ? count($vals) : 0);
+        parent::shutdown();
+    }
 
-				if ($vals)
-				{
-					foreach($vals as $key => $value)
-					{
-						if (!$value)
-						{
-							continue;
-						}
+    public function getCapabilities()
+    {
+        return array(
+            'storage'
+        );
+    }
 
-						if (!is_numeric($value) && !is_string($value) && !is_array($value) && !is_bool($value))
-						{
-							$value = '(complex)';
-						}
+    public function getDebugInfo()
+    {
+        $namespaces = $this->getNamespaces();
 
-						// shorten
-						if (is_string($value) && strlen($value) > 255)
-						{
-							$value = substr($value, 0, 255) . '...';
-						}
+        $out = array();
 
-						$out[$namespace]['items'][$key] = $value;
+        if ($namespaces) {
+            foreach ($namespaces as $namespace) {
+                $vals = $this->getAll($namespace);
 
-						unset($key, $value);
-					}
-				}
+                $out[$namespace]['total_items'] = (is_array($vals) ? count($vals) : 0);
 
-				unset($namespace);
-			}
-		}
+                if ($vals) {
+                    foreach ($vals as $key => $value) {
+                        if (!$value) {
+                            continue;
+                        }
 
-		$debug = array(
-				'items' => $out
-				);
+                        if (!is_numeric($value) && !is_string($value) && !is_array($value) && !is_bool($value)) {
+                            $value = '(complex)';
+                        }
 
-		return $debug;
-	}
+                        // shorten
+                        if (is_string($value) && strlen($value) > 255) {
+                            $value = substr($value, 0, 255) . '...';
+                        }
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
-	
-	public function setIgnoreTimeTracking($ignore_time_tracking = false)
-	{
-		$this->ignore_time_tracking = $ignore_time_tracking;
-	}
+                        $out[$namespace]['items'][$key] = $value;
 
-	protected function trackTime()
-	{
-		// to be overriden by subclassers
-	}
-	
-	protected function writeToStorage()
-	{
-		// to be overriden by subclassers
-	}
-	
-	protected function readFromStorage()
-	{
-		// to be overriden by subclassers
-	}
-	
-	abstract public function has($key, $namespace = null);
-	abstract public function get($key,$namespace = null);
-	abstract public function set($key, $value, $namespace = null);
-	abstract public function remove($key, $namespace = null);
+                        unset($key, $value);
+                    }
+                }
 
-	abstract public function clear($namespace = null);
+                unset($namespace);
+            }
+        }
 
-	abstract public function clearAll();
+        $debug = array(
+            'items' => $out
+        );
 
-	abstract public function hasValues($namespace = null);
-	abstract public function count($namespace = null);
+        return $debug;
+    }
 
-	abstract public function getNamespaces();
-	abstract public function getAll($namespace = null);
-	abstract public function getBackendData();
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	public function offsetExists($name)
-	{
-		return $this->get($name) ? true : false;
-	}
+    public function setIgnoreTimeTracking($ignore_time_tracking = false)
+    {
+        $this->ignore_time_tracking = $ignore_time_tracking;
+    }
 
-	public function offsetGet($name)
-	{
-		return $this->get($name);
-	}
+    protected function trackTime()
+    {
+        // to be overriden by subclassers
+    }
 
-	public function offsetSet($name, $value)
-	{
-		return $this->set($name, $value);
-	}
+    protected function writeToStorage()
+    {
+        // to be overriden by subclassers
+    }
 
-	public function offsetUnset($name)
-	{
-		return $this->remove($name);
-	}
+    protected function readFromStorage()
+    {
+        // to be overriden by subclassers
+    }
 
-	public function __toString()
-	{
-		$all = $this->getBackendData();
+    abstract public function has($key, $namespace = null);
 
-		return (string)e($all, true);
-	}
+    abstract public function get($key, $namespace = null);
+
+    abstract public function set($key, $value, $namespace = null);
+
+    abstract public function remove($key, $namespace = null);
+
+    abstract public function clear($namespace = null);
+
+    abstract public function clearAll();
+
+    abstract public function hasValues($namespace = null);
+
+    abstract public function count($namespace = null);
+
+    abstract public function getNamespaces();
+
+    abstract public function getAll($namespace = null);
+
+    abstract public function getBackendData();
+
+    public function offsetExists($name)
+    {
+        return $this->get($name) ? true : false;
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->get($name);
+    }
+
+    public function offsetSet($name, $value)
+    {
+        return $this->set($name, $value);
+    }
+
+    public function offsetUnset($name)
+    {
+        return $this->remove($name);
+    }
+
+    public function __toString()
+    {
+        $all = $this->getBackendData();
+
+        return (string)e($all, true);
+    }
 }
-
-?>

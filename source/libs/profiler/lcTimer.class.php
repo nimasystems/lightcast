@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,56 +28,51 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTimer.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTimer extends lcObj
 {
-	private $start_time = null;
-	private $total_time = null;
-	private $name = '';
-	private $calls = 0;
+    private $start_time = null;
+    private $total_time = null;
+    private $name = '';
+    private $calls = 0;
 
-	public function __construct($name = '')
-	{
-		$this->name = $name;
-		$this->start();
-	}
+    public function __construct($name = '')
+    {
+        $this->name = $name;
+        $this->start();
+    }
 
-	public function start()
-	{
-		$this->start_time = microtime(true);
-	}
+    public function start()
+    {
+        $this->start_time = microtime(true);
+    }
 
-	public function getName()
-	{
-		return $this->name;
-	}
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	public function addTime()
-	{
-		$spend = microtime(true) - $this->start_time;
-		$this->total_time += $spend;
-		++$this->calls;
+    public function addTime()
+    {
+        $spend = microtime(true) - $this->start_time;
+        $this->total_time += $spend;
+        ++$this->calls;
 
-		return $spend;
-	}
+        return $spend;
+    }
 
-	public function getCalls()
-	{
-		return $this->calls;
-	}
+    public function getCalls()
+    {
+        return $this->calls;
+    }
 
-	public function getElapsedTime()
-	{
-		if (null === $this->total_time)
-		{
-			$this->addTime();
-		}
+    public function getElapsedTime()
+    {
+        if (null === $this->total_time) {
+            $this->addTime();
+        }
 
-		return $this->total_time;
-	}
+        return $this->total_time;
+    }
 }
-
-
-?>

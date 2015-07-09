@@ -26,15 +26,19 @@
  * @subpackage File Subcategory
  * @changed $Id: iDatabaseMigrationsManager.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iDatabaseMigrationsManager
 {
-	public function installSchema(lcBaseMigrationsTarget $target);
-	public function removeSchema(lcBaseMigrationsTarget $target);
-	public function installData(lcBaseMigrationsTarget $target);
-	public function removeData(lcBaseMigrationsTarget $target);
-	public function upgradeSchema(lcBaseMigrationsTarget $target, $to = null);
-	public function downgradeSchema(lcBaseMigrationsTarget $target, $to = null);
+    public function installSchema(lcBaseMigrationsTarget $target);
+
+    public function removeSchema(lcBaseMigrationsTarget $target);
+
+    public function installData(lcBaseMigrationsTarget $target);
+
+    public function removeData(lcBaseMigrationsTarget $target);
+
+    public function upgradeSchema(lcBaseMigrationsTarget $target, $to = null);
+
+    public function downgradeSchema(lcBaseMigrationsTarget $target, $to = null);
 }

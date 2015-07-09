@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,61 +28,59 @@
  * @subpackage File Subcategory
  * @changed $Id: lcCacheStore.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-abstract class lcCacheStore extends lcSysObj implements ArrayAccess, iCacheStorage
+ * @version $Revision: 1455 $
+ */
+abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCacheStorage
 {
-	protected $default_lifetime;
+    protected $default_lifetime;
 
-	public function initialize()
-	{
-		parent::initialize();
+    public function initialize()
+    {
+        parent::initialize();
 
-		// set the default lifetime
-		$this->default_lifetime = isset($this->configuration['cache']['default_lifetime']) ?
-			(int)$this->configuration['cache']['default_lifetime'] : 0;
-	}
+        // set the default lifetime
+        $this->default_lifetime = isset($this->configuration['cache']['default_lifetime']) ?
+            (int)$this->configuration['cache']['default_lifetime'] : 0;
+    }
 
-	public function shutdown()
-	{
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
 
-	public function getDefaultLifetime()
-	{
-		return $this->default_lifetime;
-	}
+    public function getDefaultLifetime()
+    {
+        return $this->default_lifetime;
+    }
 
-	abstract public function hasValues();
-	abstract public function count();
+    abstract public function hasValues();
 
-	abstract public function getCachingSystem();
+    abstract public function count();
 
-	public function offsetExists($name)
-	{
-		return $this->get($name) ? true : false;
-	}
+    abstract public function getCachingSystem();
 
-	public function offsetGet($name)
-	{
-		return $this->get($name);
-	}
+    public function offsetExists($name)
+    {
+        return $this->get($name) ? true : false;
+    }
 
-	public function offsetSet($name, $value)
-	{
-		return $this->set($name, $value);
-	}
+    public function offsetGet($name)
+    {
+        return $this->get($name);
+    }
 
-	public function offsetUnset($name)
-	{
-		return $this->remove($name);
-	}
+    public function offsetSet($name, $value)
+    {
+        return $this->set($name, $value);
+    }
 
-	public function getBackend()
-	{
-		return $this->getCachingSystem();
-	}
+    public function offsetUnset($name)
+    {
+        return $this->remove($name);
+    }
+
+    public function getBackend()
+    {
+        return $this->getCachingSystem();
+    }
 }
-
-?>

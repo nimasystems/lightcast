@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,12 +27,9 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcNotAvailableException.class.php 1517 2014-05-15 12:25:06Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1517 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1517 $
+ */
 class lcNotAvailableException extends lcException
 {
 }
-
-?>

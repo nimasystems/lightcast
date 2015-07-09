@@ -42,14 +42,31 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     const MODELS_DIR_NAME = 'models';
     const CACHE_DIR_NAME = 'cache';
 
+    /** @var iAppDelegate */
     protected $app_delegate;
+
+    /** @var lcClassAutoloader */
     protected $class_autoloader;
+
+    /** @var lcEventDispatcher */
     protected $event_dispatcher;
+
+    /** @var lcPluginManager */
     protected $plugin_manager;
+
+    /** @var lcErrorHandler */
     protected $error_handler;
+
+    /** @var lcCacheStore */
     protected $cache;
+
+    /** @var lcLocalCacheManager */
     protected $local_cache_manager;
+
+    /** @var lcSystemComponentFactory */
     protected $system_component_factory;
+
+    /** @var lcDatabaseModelManager */
     protected $database_model_manager;
 
     protected $use_models;
@@ -57,6 +74,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected $use_class_cache = true;
 
+    /** @var array|null */
     protected $project_db_models;
 
     protected $config_variation;
@@ -935,5 +953,3 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $cache;
     }
 }
-
-?>

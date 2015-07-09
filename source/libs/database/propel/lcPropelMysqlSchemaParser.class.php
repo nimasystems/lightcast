@@ -96,6 +96,3 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
         return count($tables);
     }
 }
-
-
-?>

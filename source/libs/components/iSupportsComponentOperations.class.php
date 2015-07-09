@@ -12,16 +12,17 @@
 
 /**
  * File Description
- * 
+ *
  * @package File Category
  * @subpackage File Subcategory
- *             @changed $Id: iSupportsComponentOperations.class.php 1455 2013-10-25 20:29:31Z
+ * @changed $Id: iSupportsComponentOperations.class.php 1455 2013-10-25 20:29:31Z
  *             mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1535 $
- *         
+ *
  */
-interface iSupportsComponentOperations {
+interface iSupportsComponentOperations
+{
 
-	public function getUsedComponents();
+    public function getUsedComponents();
 }

@@ -28,7 +28,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1592 $
  */
-abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
+abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggable
 {
     /**
      * @var lcRequest
@@ -56,7 +56,7 @@ abstract class lcAppObj extends lcSysObj implements iI18nProvider, iLoggable
     protected $storage;
 
     /**
-     * @var lcUser
+     * @var lcSecurityUser
      */
     protected $user;
 

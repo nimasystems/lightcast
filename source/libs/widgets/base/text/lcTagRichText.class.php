@@ -27,40 +27,38 @@
  * @changed $Id: lcTagRichText.class.php 1464 2013-10-29 02:38:39Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1464 $
-*/
-
+ */
 class lcTagRichText extends lcTagInput
 {
-	protected $fck_component;
+    /** @var componentFckEdit */
+    protected $fck_component;
 
-	private $width = 700;
+    private $width = 700;
 
-	public function __construct($name, $width)
-	{
-		$this->width = $width;
+    public function __construct($name, $width)
+    {
+        $this->width = $width;
 
-		parent::__construct('',$name);
-	}
+        parent::__construct('', $name);
+    }
 
-	public function setFckComponent(componentFckEdit $editor)
-	{
-		$this->fck_component = $editor;
-	}
+    public function setFckComponent(componentFckEdit $editor)
+    {
+        $this->fck_component = $editor;
+    }
 
-	public function asHtml()
-	{
-		$fck = $this->fck_component;
+    public function asHtml()
+    {
+        $fck = $this->fck_component;
 
-		assert(isset($fck));
+        assert(isset($fck));
 
-		$fck->setWidth($this->width);
-		$fck->setInstanceName($this->getName());
-		$fck->setValue($this->getValue());
+        $fck->setWidth($this->width);
+        $fck->setInstanceName($this->getName());
+        $fck->setValue($this->getValue());
 
-		$e = $fck->execute();
+        $e = $fck->execute();
 
-		return (string)$e;
-	}
+        return (string)$e;
+    }
 }
-
-?>

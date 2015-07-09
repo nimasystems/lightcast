@@ -306,8 +306,8 @@ EOD;
     {
         throw new lcSystemException('Unimplemented');
 
-        $this->propelInitSchemas();
-        return $this->phingExecute('migrate');
+        /*$this->propelInitSchemas();
+        return $this->phingExecute('migrate');*/
     }
 
     private function getMainPropelSchemaConfig($schema_name = null)
@@ -322,7 +322,7 @@ EOD;
 
             // for the moment - fetch the first available schema only
             if (!$data || !is_array($data) || !isset($data['schemas']) || !is_array($data['schemas']) || !$data['schemas']) {
-                return;
+                return null;
             }
 
             $data = $data['schemas'];
@@ -354,7 +354,7 @@ EOD;
         $cfg_filename = $plugin_path . DS . 'config' . DS . 'propel.yml';
 
         if (!file_exists($cfg_filename)) {
-            return;
+            return null;
         }
 
         $parser = new lcYamlFileParser($cfg_filename);
@@ -362,7 +362,7 @@ EOD;
 
         // for the moment - fetch the first available schema only
         if (!$data || !is_array($data) || !isset($data['schemas']) || !is_array($data['schemas']) || !$data['schemas']) {
-            return;
+            return null;
         }
 
         $data = $data['schemas'];
@@ -403,7 +403,7 @@ EOD;
         $plugin_schemas = $this->getPluginSchemas();
         $plugin_all_tables = array();
 
-        $plugin_manager = $this->getPluginManager();
+        //$plugin_manager = $this->getPluginManager();
 
         if ($plugin_schemas) {
             $this->consoleDisplay('Working with plugin schemas...');
@@ -503,6 +503,7 @@ EOD;
         $this->consoleDisplay('Found ' . $total . ' validators which need to be copied to the reversed schema');
 
         foreach ($result as $dom_elem) {
+            /** @var DomElement $dom_elem */
             $table_name = $dom_elem->parentNode->getAttribute('name');
             $validator_column = $dom_elem->getAttribute('column');
 
@@ -566,6 +567,7 @@ EOD;
         $this->consoleDisplay('Found ' . $total . ' tables');
 
         foreach ($result as $dom_elem) {
+            /** @var DomElement $dom_elem */
             $table_name = $dom_elem->getAttribute('name');
             $lc_table_title = $dom_elem->getAttribute(lcBasePeer::ATTR_TABLE_LC_TITLE);
 
@@ -591,6 +593,7 @@ EOD;
                 continue;
             }
 
+            /** @var DomElement $new_node */
             $new_node = $result2->item(0);
             $new_node->setAttribute(lcBasePeer::ATTR_TABLE_LC_TITLE, $lc_table_title);
 
@@ -601,6 +604,7 @@ EOD;
 
             if ($col_result->length) {
                 foreach ($col_result as $col_dom_elem) {
+                    /** @var DomElement $col_dom_elem */
                     $column_name = $col_dom_elem->getAttribute('name');
                     $lc_col_title = $col_dom_elem->getAttribute(lcBasePeer::ATTR_TABLE_LC_TITLE);
 
@@ -651,17 +655,21 @@ EOD;
         $len = $result->length;
 
         $overriden_view_config = $propel_config_schema && isset($propel_config_schema['views']) ? $propel_config_schema['views'] : null;
-        $overriden_table_config = $propel_config_schema && isset($propel_config_schema['tables']) ? $propel_config_schema['tables'] : null;
+        //$overriden_table_config = $propel_config_schema && isset($propel_config_schema['tables']) ? $propel_config_schema['tables'] : null;
 
         for ($i = 0; $i < $len; $i++) {
-            $tbl_name = $result->item($i)->getAttribute('name');
+            /** @var DomElement $itm */
+            $itm = $result->item($i);
+
+            $tbl_name = $itm->getAttribute('name');
             $sub = substr($tbl_name, 0, 5);
 
             $is_view = ($overriden_view_config && is_array($overriden_view_config) && isset($overriden_view_config[$tbl_name]));
 
             //fix view's buggy primary keys - requirement by propel
             if ($is_view) {
-                foreach ($result->item($i)->getElementsByTagName('column') as $col) {
+                foreach ($itm->getElementsByTagName('column') as $col) {
+                    /** @var DomElement $col */
 
                     $tbl_config = (isset($overriden_view_config[$tbl_name]['primary_keys']) ? $overriden_view_config[$tbl_name]['primary_keys'] : null);
 
@@ -679,13 +687,18 @@ EOD;
 
             //begin fix propel foreign key bug
             $aForeignKeys = array();
-            $oForeignKeys = $result->item($i)->getElementsByTagName('foreign-key');
+            $oForeignKeys = $itm->getElementsByTagName('foreign-key');
             // all foreign keys as dom elements selection
             $sForeignKeysLen = $oForeignKeys->length;
 
             for ($j = 0; $j < $sForeignKeysLen; $j++) {
-                $oForeignKeyReference = $oForeignKeys->item($j)->getElementsByTagName('reference')->item(0);
-                $aForeignKeys[$oForeignKeyReference->getAttribute('local')][] = $oForeignKeys->item($j)->getAttribute('name');
+                /** @var DomElement $itmj */
+                $itmj = $oForeignKeys->item($j);
+                /** @var DomElement $oForeignKeyReference */
+                $oForeignKeyReference = $itmj->getElementsByTagName('reference')->item(0);
+                /** @var DomElement $foritem */
+                $foritem = $oForeignKeys->item($j);
+                $aForeignKeys[$oForeignKeyReference->getAttribute('local')][] = $foritem->getAttribute('name');
             }
 
             if (!empty($aForeignKeys)) {
@@ -696,7 +709,9 @@ EOD;
                         //we have a propel bug, should fix it
                         $foreign_key_name_to_remove = $foreign_key_names[0];
                         for ($j = 0; $j < $sForeignKeysLen; $j++) {
-                            if ($oForeignKeys->item($j)->getAttribute('name') == $foreign_key_name_to_remove) {
+                            /** @var DomElement $ofork */
+                            $ofork = $oForeignKeys->item($j);
+                            if ($ofork->getAttribute('name') == $foreign_key_name_to_remove) {
                                 //remove
                                 $result->item($i)->removeChild($oForeignKeys->item($j));
                                 break;
@@ -813,7 +828,7 @@ EOD;
 
     private function getProjectModels()
     {
-        return ($this->configuration instanceof iSupportsDbModels ? $this->configuration->getDbModels() : null);
+        return ($this->configuration->getProjectConfiguration() instanceof iSupportsDbModels ? $this->configuration->getProjectConfiguration()->getDbModels() : null);
     }
 
     private function getPluginModels($plugin_name, $plugin_path)
@@ -860,7 +875,7 @@ EOD;
         $fdata = @file_get_contents($filename);
 
         if (!$fdata) {
-            return false;
+            return;
         }
 
         $pXml = new DOMDocument;
@@ -889,6 +904,7 @@ EOD;
 
         if ($tables_dom->length) {
             foreach ($tables_dom as $table) {
+                /** @var DomElement $table */
 
                 $table_name = $table->getAttribute('name');
 
@@ -1017,7 +1033,9 @@ EOD;
             $len = $result2->length;
 
             for ($i = 0; $i < $len; $i++) {
-                if (in_array($result2->item($i)->getAttribute('name'), $plugin_tables)) {
+                /** @var DomElement $rel */
+                $rel = $result2->item($i);
+                if (in_array($rel->getAttribute('name'), $plugin_tables)) {
                     // copy into plugin schema
                     $node = $pXml->importNode($result2->item($i), true);
                     $pXmlDatabaseNode->appendChild($node);
@@ -1054,7 +1072,9 @@ EOD;
 
             for ($i = 0; $i < $len; $i++) {
                 foreach ($plugin_tables as $plugin_name => $tables) {
-                    if (in_array($result->item($i)->getAttribute('name'), $tables)) {
+                    /** @var DomElement $ritm */
+                    $ritm = $result->item($i);
+                    if (in_array($ritm->getAttribute('name'), $tables)) {
                         $element->removeChild($result->item($i));
                     }
 

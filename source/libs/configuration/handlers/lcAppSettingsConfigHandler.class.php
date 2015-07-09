@@ -30,7 +30,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcAppSettingsConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
@@ -68,7 +67,7 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                 'enabled' => true,
                 'timeout' => 60
             ),
-            'cache' => array('enabled' => true, ),
+            'cache' => array('enabled' => true,),
             'i18n' => array(
                 'enabled' => true,
                 'locale' => 'en_US',
@@ -113,4 +112,3 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
     }
 
 }
-?>

@@ -135,6 +135,8 @@ class lcVm
 
             return $output[1] * 1024;
         }
+
+        return null;
     }
 
     public static function php_check_syntax($filename, &$error_message = null)
@@ -154,5 +156,3 @@ class lcVm
         return $res;
     }
 }
-
-?>

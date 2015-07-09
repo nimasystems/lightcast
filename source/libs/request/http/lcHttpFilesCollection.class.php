@@ -32,45 +32,34 @@
  */
 class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
 {
-    public function __construct(array $values = null)
-    {
-        parent::__construct();
-
-        if (isset($values)) {
-            foreach ($values as $key => $val) {
-                $this->append(new lcHttpFile($key, $val));
-            }
-        }
-    }
-
     public function append(lcHttpFile $file)
     {
-        return parent::appendColl($file);
+        parent::appendColl($file);
     }
 
     public function offsetSet($offset, $value)
     {
-        return parent::offsetSet($offset, $value);
+        $this->set($value, $offset);
     }
 
     public function offsetUnset($index)
     {
-        return parent::offsetUnset($index);
+        parent::offsetUnset($index);
     }
 
     public function set(lcHttpFile $value, $offset = null)
     {
-        return parent::set($value, $offset);
+        parent::offsetSetColl($offset, $value);
     }
 
     public function delete($offset = null)
     {
-        return parent::delete($offset);
+        parent::delete($offset);
     }
 
     public function clear()
     {
-        return parent::clear();
+        parent::clear();
     }
 
     public function getByFormFieldName($name)
@@ -99,5 +88,3 @@ class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
         return null;
     }
 }
-
-?>

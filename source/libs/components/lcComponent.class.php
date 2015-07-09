@@ -131,5 +131,3 @@ abstract class lcComponent extends lcBaseController
         }
     }
 }
-
-?>

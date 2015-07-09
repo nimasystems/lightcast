@@ -36,6 +36,7 @@
 
 class lcEventDispatcher extends lcSysObj implements iDebuggable
 {
+    /** @var iEventObserver[] */
     protected $observers;
 
     protected $listeners;
@@ -154,7 +155,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             }
 
             if ($once) {
-                return;
+                return true;
             }
         }
 

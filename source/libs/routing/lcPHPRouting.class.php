@@ -26,136 +26,134 @@
  * @subpackage File Subcategory
  * @changed $Id: lcPHPRouting.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcPHPRouting extends lcRouting
 {
-	protected $request;
+    /** @var lcWebRequest */
+    protected $request;
 
-	public function initialize()
-	{
-		parent::initialize();
+    protected $context;
 
-		$this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
+    public function initialize()
+    {
+        parent::initialize();
 
-		// allow others to be notified when base routes have been loaded
-		$this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
-				'context' => $this->context
-				)));
+        $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
 
-		// try to detect the parameters from request
-		$this->detectParameters();
-	}
+        $this->context = $this->request->getRequestContext();
+        $this->context['default_module'] = $this->default_module;
+        $this->context['default_action'] = $this->default_action;
 
-	public function shutdown()
-	{
-		$this->request = null;
+        // allow others to be notified when base routes have been loaded
+        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
+            'context' => $this->context
+        )));
 
-		parent::shutdown();
-	}
+        // try to detect the parameters from request
+        $this->detectParameters();
+    }
 
-	private function detectParameters()
-	{
-		$res = $this->parse($this->context['request_uri']);
-		$result = null;
+    public function shutdown()
+    {
+        $this->request = null;
 
-		if ($res && isset($res['module']) && isset($res['action']))
-		{
-			$result = array('params' => $res);
-		}
+        parent::shutdown();
+    }
 
-		$this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, $result));
-	}
+    private function detectParameters()
+    {
+        $res = $this->parse($this->context['request_uri']);
+        $result = null;
 
-	// TODO: Finish this implementation
-	public function getParams()
-	{
-		return false;
-	}
+        if ($res && isset($res['module']) && isset($res['action'])) {
+            $result = array('params' => $res);
+        }
 
-	public function getParamsByCriteria($criteria)
-	{
-		fnothing($criteria);
-		return false;
-	}
+        $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, $result));
+    }
 
-	public function generate($params = array(), $absolute = false, $name = null)
-	{
-		fnothing($name);
+    // TODO: Finish this implementation
+    public function getParams()
+    {
+        return false;
+    }
 
-		!isset($params['application']) ?
-		$params['application'] = $this->getDefaultParams()->get('application') :
-		null;
+    public function getParamsByCriteria($criteria)
+    {
+        fnothing($criteria);
+        return false;
+    }
 
-		!isset($params['controller']) ?
-		$params['controller'] = $this->getDefaultParams()->get('controller') :
-		null;
+    public function generate($params = array(), $absolute = false, $name = null)
+    {
+        fnothing($name);
 
-		!isset($params['action']) ?
-		$params['action'] = $this->getDefaultParams()->get('action') :
-		null;
+        !isset($params['application']) ?
+            $params['application'] = $this->getDefaultParams()->get('application') :
+            null;
 
-		$params = http_build_query($params, null, '&');
+        !isset($params['controller']) ?
+            $params['controller'] = $this->getDefaultParams()->get('controller') :
+            null;
 
-		return $this->fixGeneratedUrl('/'.($params ? '?'.$params : ''), $absolute);
-	}
+        !isset($params['action']) ?
+            $params['action'] = $this->getDefaultParams()->get('action') :
+            null;
 
-	public function parse($url)
-	{
-		// TODO: What is $url for here?
-		fnothing($url);
-		
-		// get the prefixes of URL matching vars
-		$this->context['application_prefix'] = $this->configuration['routing.application_prefix'] ?
-		$this->configuration['routing.application_prefix'] : 'application';
+        $params = http_build_query($params, null, '&');
 
-		$this->context['module_prefix'] = $this->configuration['routing.module_prefix'] ?
-		$this->configuration['routing.module_prefix'] : 'module';
+        return $this->fixGeneratedUrl('/' . ($params ? '?' . $params : ''), $absolute);
+    }
 
-		$this->context['action_prefix'] = $this->configuration['routing.action_prefix'] ?
-		$this->configuration['routing.action_prefix'] :  'action';
+    public function parse($url)
+    {
+        // TODO: What is $url for here?
+        fnothing($url);
 
-		$params = array();
+        // get the prefixes of URL matching vars
+        $this->context['application_prefix'] = $this->configuration['routing.application_prefix'] ?
+            $this->configuration['routing.application_prefix'] : 'application';
 
-		// not really sure about this - but we know the application name for sure (as it was booted with it)
-		$params['application'] = $this->configuration->getApplicationName();
+        $this->context['module_prefix'] = $this->configuration['routing.module_prefix'] ?
+            $this->configuration['routing.module_prefix'] : 'module';
 
-		$get_params = $this->context['get_params']->getArrayCopy();
+        $this->context['action_prefix'] = $this->configuration['routing.action_prefix'] ?
+            $this->configuration['routing.action_prefix'] : 'action';
 
-		// set all GET params into params
-		if ($get_params)
-		{
-			foreach($get_params as $param)
-			{
-				$value = $param->getValue();
+        $params = array();
 
-				if (!is_string($value))
-				{
-					continue;
-				}
+        // not really sure about this - but we know the application name for sure (as it was booted with it)
+        $params['application'] = $this->configuration->getApplicationName();
 
-				$params[$param->getName()] = $value;
+        $get_params = $this->context['get_params']->getArrayCopy();
 
-				unset($param, $value);
-			}
+        // set all GET params into params
+        if ($get_params) {
+            foreach ($get_params as $param) {
+                $value = $param->getValue();
 
-			unset($get_params);
-		}
+                if (!is_string($value)) {
+                    continue;
+                }
 
-		// find if we have the rest in the GET vars
-		if ($module = $this->context['get_params']->get($this->context['module_prefix']))
-		{
-			$params['module'] = $module;
-		}
+                $params[$param->getName()] = $value;
 
-		if ($action = $this->context['get_params']->get($this->context['action_prefix']))
-		{
-			$params['action'] = $action;
-		}
+                unset($param, $value);
+            }
 
-		return $params;
-	}
+            unset($get_params);
+        }
+
+        // find if we have the rest in the GET vars
+        if ($module = $this->context['get_params']->get($this->context['module_prefix'])) {
+            $params['module'] = $module;
+        }
+
+        if ($action = $this->context['get_params']->get($this->context['action_prefix'])) {
+            $params['action'] = $action;
+        }
+
+        return $params;
+    }
 }
-
-?>

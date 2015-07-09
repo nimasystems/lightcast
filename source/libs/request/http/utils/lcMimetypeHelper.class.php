@@ -48,7 +48,7 @@ class lcMimetypeHelper
     public static function findMimeByExt($ext)
     {
         if (!$ext) {
-            return false;
+            return null;
         }
 
         $ext = lcFiles::fixFileExt($ext);
@@ -62,6 +62,8 @@ class lcMimetypeHelper
 
             return $key;
         }
+
+        return null;
     }
 
     public static function findExtsByMime($mimetype)
@@ -2204,7 +2206,4 @@ class lcMimetypeHelper
 
         return $mimetypes;
     }
-
 }
-
-?>

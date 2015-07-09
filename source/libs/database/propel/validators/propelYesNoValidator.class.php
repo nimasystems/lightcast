@@ -21,21 +21,20 @@
 
 /**
  * File Description
-* @package File Category
-* @subpackage File Subcategory
-* @changed $Id: propelYesNoValidator.class.php 1325 2013-06-22 14:46:08Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1325 $
-*/
-
+ * @package File Category
+ * @subpackage File Subcategory
+ * @changed $Id: propelYesNoValidator.class.php 1325 2013-06-22 14:46:08Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1325 $
+ */
 class propelYesNoValidator implements BasicValidator
 {
-	public function isValid (ValidatorMap $map, $str)
-	{
-		fnothing($map);
+    public function isValid(ValidatorMap $map, $str)
+    {
+        fnothing($map);
 
-		$valid_enums = array('yes','no');
+        $valid_enums = array('yes', 'no');
 
-		return in_array($str, $valid_enums);
-	}
+        return in_array($str, $valid_enums);
+    }
 }

@@ -25,155 +25,151 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcXCacheCacheStore.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcXCacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, ArrayAccess, iDebuggable
 {
-	protected $xcache;
-	private $namespace_prefix;
+    /** @var lcXCache */
+    protected $xcache;
 
-	public function initialize()
-	{
-		parent::initialize();
+    private $namespace_prefix;
 
-		$this->xcache = new lcXCache();
+    public function initialize()
+    {
+        parent::initialize();
 
-		// global application / project namespace prefix
-		$this->namespace_prefix = isset($this->configuration['cache.namespace']) ? ((string)$this->configuration['cache.namespace']) . '_' : 'lc_';
-		assert(isset($this->namespace_prefix));
-	}
+        $this->xcache = new lcXCache();
 
-	public function shutdown()
-	{
-		$this->xcache = null;
+        // global application / project namespace prefix
+        $this->namespace_prefix = isset($this->configuration['cache.namespace']) ? ((string)$this->configuration['cache.namespace']) . '_' : 'lc_';
+        assert(isset($this->namespace_prefix));
+    }
 
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        $this->xcache = null;
 
-	public function getDebugInfo()
-	{
-		$debug = array(
-				'namespace_prefix' => $this->namespace_prefix,
-		);
+        parent::shutdown();
+    }
 
-		return $debug;
-	}
+    public function getDebugInfo()
+    {
+        $debug = array(
+            'namespace_prefix' => $this->namespace_prefix,
+        );
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+        return $debug;
+    }
 
-	protected function keyWithNamespace($key)
-	{
-		$k = $this->namespace_prefix . $key;
-		return $k;
-	}
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	public function has($key)
-	{
-		return $this->xcache->has($key);
-	}
+    protected function keyWithNamespace($key)
+    {
+        $k = $this->namespace_prefix . $key;
+        return $k;
+    }
 
-	public function get($key)
-	{
-		if (is_array($key))
-		{
-			throw new lcInvalidArgumentException('Multiply key fetching is not supported');
-		}
+    public function has($key)
+    {
+        return $this->xcache->has($key);
+    }
 
-		$key1 = $this->keyWithNamespace($key);
-		$ret = $this->xcache->get($key1);
+    public function get($key)
+    {
+        if (is_array($key)) {
+            throw new lcInvalidArgumentException('Multiply key fetching is not supported');
+        }
 
-		return $ret;
-	}
+        $key1 = $this->keyWithNamespace($key);
+        $ret = $this->xcache->get($key1);
 
-	// lifetime passed in seconds!
-	// max object size: 1 MB!
-	public function set($key, $value = null, $lifetime = null)
-	{
-		$key = (string)$key;
+        return $ret;
+    }
 
-		if (!$key)
-		{
-			throw new lcInvalidArgumentException('Invalid params');
-		}
+    // lifetime passed in seconds!
+    // max object size: 1 MB!
+    public function set($key, $value = null, $lifetime = null)
+    {
+        $key = (string)$key;
 
-		$key1 = $this->keyWithNamespace($key);
+        if (!$key) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
 
-		$res = $this->xcache->set($key1, $value, $lifetime);
+        $key1 = $this->keyWithNamespace($key);
 
-		// throw an exception only if debugging
-		if (!$res && DO_DEBUG)
-		{
-			throw new lcSystemException('Cannot write data to XCache, key: ' . $key1 . ', life: ' . $lifetime);
-		}
+        $res = $this->xcache->set($key1, $value, $lifetime);
 
-		return true;
-	}
+        // throw an exception only if debugging
+        if (!$res && DO_DEBUG) {
+            throw new lcSystemException('Cannot write data to XCache, key: ' . $key1 . ', life: ' . $lifetime);
+        }
 
-	public function remove($key)
-	{
-		$namespaced_key = $this->keyWithNamespace($key);
+        return true;
+    }
 
-		$this->xcache->remove($namespaced_key);
-	}
+    public function remove($key)
+    {
+        $namespaced_key = $this->keyWithNamespace($key);
 
-	public function clear()
-	{
-		$this->xcache->clear();
-	}
+        $this->xcache->remove($namespaced_key);
+    }
 
-	public function hasValues()
-	{
-		throw new lcSystemException('Unimplemented');
-	}
+    public function clear()
+    {
+        $this->xcache->clear();
+    }
 
-	public function count()
-	{
-		throw new lcSystemException('Unimplemented');
-	}
+    public function hasValues()
+    {
+        throw new lcSystemException('Unimplemented');
+    }
 
-	public function getCachingSystem()
-	{
-		return $this->xcache->getBackend();
-	}
+    public function count()
+    {
+        throw new lcSystemException('Unimplemented');
+    }
 
-	#pragma mark - Database Caching
+    public function getCachingSystem()
+    {
+        return $this->xcache->getBackend();
+    }
 
-	public function setDbCache($namespace, $key, $value = null, $lifetime = null)
-	{
-		$key = $namespace . ':' . $key;
-		return $this->set($key, $value, $lifetime);
-	}
+    #pragma mark - Database Caching
 
-	public function removeDbCache($namespace, $key)
-	{
-		$key = $namespace . ':' . $key;
-		return $this->remove($key);
-	}
+    public function setDbCache($namespace, $key, $value = null, $lifetime = null)
+    {
+        $key = $namespace . ':' . $key;
+        return $this->set($key, $value, $lifetime);
+    }
 
-	public function removeDbCacheForNamespace($namespace)
-	{
-		fnothing($namespace);
+    public function removeDbCache($namespace, $key)
+    {
+        $key = $namespace . ':' . $key;
+        $this->remove($key);
+    }
 
-		// cannot be implemented - no namespace support
-		return false;
-	}
+    public function removeDbCacheForNamespace($namespace)
+    {
+        fnothing($namespace);
 
-	public function getDbCache($namespace, $key)
-	{
-		$key = $namespace . ':' . $key;
-		return $this->get($key);
-	}
+        // cannot be implemented - no namespace support
+        return false;
+    }
 
-	public function hasDbCache($namespace, $key)
-	{
-		$key = $namespace . ':' . $key;
-		return $this->has($key);
-	}
+    public function getDbCache($namespace, $key)
+    {
+        $key = $namespace . ':' . $key;
+        return $this->get($key);
+    }
+
+    public function hasDbCache($namespace, $key)
+    {
+        $key = $namespace . ':' . $key;
+        return $this->has($key);
+    }
 }
-
-?>

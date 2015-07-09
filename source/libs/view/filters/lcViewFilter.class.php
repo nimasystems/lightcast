@@ -28,63 +28,57 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-
 abstract class lcViewFilter extends lcSysObj
 {
-	protected $view;
+    /** @var lcView */
+    protected $view;
 
-	protected $next;
+    /** @var lcViewFilter */
+    protected $next;
 
-	abstract protected function getShouldApplyFilter();
-	abstract protected function applyFilter($content, $content_type = null);
+    abstract protected function getShouldApplyFilter();
 
-	public function shutdown()
-	{
-		if ($this->next)
-		{
-			$this->next->shutdown();
-			$this->next = null;
-		}
-		
-		$this->view = null;
+    abstract protected function applyFilter($content, $content_type = null);
 
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        if ($this->next) {
+            $this->next->shutdown();
+            $this->next = null;
+        }
 
-	public function setNext(lcViewFilter $view_filter)
-	{
-		assert($view_filter !== $this);
-		$this->next = $view_filter;
-	}
+        $this->view = null;
 
-	public function filterView(lcView $view, $content, $content_type = null)
-	{
-		$this->view = $view;
+        parent::shutdown();
+    }
 
-		if ($this->getShouldApplyFilter())
-		{
-			try
-			{
-				$content = $this->applyFilter($content, $content_type);
-			}
-			catch(Exception $e)
-			{
-				throw new lcFilterException('Could not apply view filter (' . get_class($this) . '): ' .
-						$e->getMessage(),
-						$e->getCode(),
-						$e
-						);
-			}
-		}
+    public function setNext(lcViewFilter $view_filter)
+    {
+        assert($view_filter !== $this);
+        $this->next = $view_filter;
+    }
 
-		// process the next filter
-		if ($this->next)
-		{
-			$content = $this->next->filterView($view, $content, $content_type);
-		}
+    public function filterView(lcView $view, $content, $content_type = null)
+    {
+        $this->view = $view;
 
-		return $content;
-	}
+        if ($this->getShouldApplyFilter()) {
+            try {
+                $content = $this->applyFilter($content, $content_type);
+            } catch (Exception $e) {
+                throw new lcFilterException('Could not apply view filter (' . get_class($this) . '): ' .
+                    $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                );
+            }
+        }
+
+        // process the next filter
+        if ($this->next) {
+            $content = $this->next->filterView($view, $content, $content_type);
+        }
+
+        return $content;
+    }
 }
-
-?>

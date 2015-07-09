@@ -26,13 +26,9 @@
  * @subpackage File Subcategory
  * @changed $Id: iHTTPException.class.php 1513 2014-05-13 20:16:21Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1513 $
-*/
-
+ * @version $Revision: 1513 $
+ */
 interface iHTTPException
 {
-	public function getStatusCode();
+    public function getStatusCode();
 }
-
-
-?>

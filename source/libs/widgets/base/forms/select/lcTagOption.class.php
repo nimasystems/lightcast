@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,58 +28,55 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagOption.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagOption extends lcHtmlTag
 {
-	public function __construct($content = null, $value = null, $selected = false, $class = null)
-	{
-		parent::__construct('option', true);
+    public function __construct($content = null, $value = null, $selected = false, $class = null)
+    {
+        parent::__construct('option', true);
 
-		$this->setContent($content);
-		$this->setSelected($selected);
-		$this->setValue($value);
-		$this->setClass($class);
-	}
+        $this->setContent($content);
+        $this->setSelected($selected);
+        $this->setValue($value);
+        $this->setClass($class);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('selected', 'value');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('selected', 'value');
+    }
 
-	public function setContent($content)
-	{
-		parent::setContent($content);
-		return $this;
-	}
+    public function setContent($content)
+    {
+        parent::setContent($content);
+        return $this;
+    }
 
-	public function setSelected($selected = false)
-	{
-		$this->setAttribute('selected', $selected ? 'selected' : null);
-		return $this;
-	}
+    public function setSelected($selected = false)
+    {
+        $this->setAttribute('selected', $selected ? 'selected' : null);
+        return $this;
+    }
 
-	public function getSelected()
-	{
-		return $this->getAttribute('selected') ? true : false;
-	}
+    public function getSelected()
+    {
+        return $this->getAttribute('selected') ? true : false;
+    }
 
-	public function setValue($value = null)
-	{
-		$this->setAttribute('value', $value);
-		return $this;
-	}
+    public function setValue($value = null)
+    {
+        $this->setAttribute('value', $value);
+        return $this;
+    }
 
-	public function getValue()
-	{
-		return $this->getAttribute('value');
-	}
+    public function getValue()
+    {
+        return $this->getAttribute('value');
+    }
 }
-
-?>

@@ -26,14 +26,11 @@
  * @subpackage File Subcategory
  * @changed $Id: iDomainException.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iDomainException
 {
-	public function getDomain();
-	public function setDomain($domain);
+    public function getDomain();
+
+    public function setDomain($domain);
 }
-
-
-?>

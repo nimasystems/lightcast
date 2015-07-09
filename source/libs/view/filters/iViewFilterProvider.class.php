@@ -28,10 +28,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-
 interface iViewFilterProvider
 {
-	public function getViewFilters();
+    public function getViewFilters();
 }
-
-?>

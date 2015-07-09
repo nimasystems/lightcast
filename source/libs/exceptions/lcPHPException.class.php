@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,21 +27,17 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcPHPException.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcPHPException extends lcException
 {
-	public function __construct($errmsg, $errno, $filename, $linenum, $vars = null)
-	{
-		fnothing($vars);
+    public function __construct($errmsg, $errno, $filename, $linenum, $vars = null)
+    {
+        fnothing($vars);
 
-		$message = 'PHP Error: ' . $errmsg . ', Code: ' . $errno . ', File: ' . $filename . ', Line: ' . $linenum;
+        $message = 'PHP Error: ' . $errmsg . ', Code: ' . $errno . ', File: ' . $filename . ', Line: ' . $linenum;
 
-		parent::__construct($message, $errno);
-	}
+        parent::__construct($message, $errno);
+    }
 }
-
-
-?>

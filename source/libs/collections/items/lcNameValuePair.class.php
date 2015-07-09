@@ -27,44 +27,42 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcNameValuePair.class.php 1592 2015-05-22 13:28:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1592 $
+ */
 class lcNameValuePair extends lcObj
 {
-	protected $name;
-	protected $value;
+    protected $name;
+    protected $value;
 
-	public function __construct($name, $value = null)
-	{
-		parent::__construct();
+    public function __construct($name, $value = null)
+    {
+        parent::__construct();
 
-		$this->name = $name;
+        $this->name = $name;
 
-		if (isset($value))
-		{
-			$this->value = $value;
-		}
-	}
+        if (isset($value)) {
+            $this->value = $value;
+        }
+    }
 
-	public function getName()
-	{
-		return $this->name;
-	}
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	public function getValue()
-	{
-		return $this->value;
-	}
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	public function setName($name)
-	{
-		$this->name = $name;
-	}
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	public function setValue($value = null)
-	{
-		$this->value = $value;
-	}
+    public function setValue($value = null)
+    {
+        $this->value = $value;
+    }
 }

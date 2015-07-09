@@ -28,11 +28,14 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 abstract class lcConfigHandler extends lcObj
 {
+    /** @var iConfigDataProvider */
     protected $data_provider;
+
+    /** @var array */
     protected $options;
+
     protected $environments;
 
     public function getDefaultValues()
@@ -62,6 +65,11 @@ abstract class lcConfigHandler extends lcObj
         return $this->data_provider;
     }
 
+    /**
+     * @param $handler_type
+     * @return lcConfigHandler
+     * @throws lcSystemException
+     */
     public static function & getConfigHandler($handler_type)
     {
         $handler_type = lcInflector::camelize($handler_type, false);
@@ -70,16 +78,14 @@ abstract class lcConfigHandler extends lcObj
 
         $clname = 'lc' . $handler_type . 'ConfigHandler';
 
-        if (!class_exists($clname))
-        {
+        if (!class_exists($clname)) {
             throw new lcSystemException('Config Handler ' . $handler_type . ' does not exist');
         }
 
         $handler = new $clname;
 
         // check class type
-        if (!$handler instanceof lcConfigHandler)
-        {
+        if (!$handler instanceof lcConfigHandler) {
             throw new lcSystemException('Invalid configuration handler: ' . $handler_type . '. Class does not inherit from lcConfigHandler');
         }
 
@@ -103,20 +109,17 @@ abstract class lcConfigHandler extends lcObj
 
     public function getConfigurationData($config_key, $environment, array $source_defaults = null)
     {
-        if (!$this->data_provider)
-        {
+        if (!$this->data_provider) {
             throw new lcConfigException('No data provider set');
         }
 
         assert(!is_null($environment));
 
-        if ($environment == lcEnvConfigHandler::ENVIRONMENT_ALL)
-        {
+        if ($environment == lcEnvConfigHandler::ENVIRONMENT_ALL) {
             throw new lcConfigException('Environment \'all\' is special and cannot be set as the currently active one!');
         }
 
-        if ($environment && (!is_array($this->environments) || !in_array($environment, $this->environments)))
-        {
+        if ($environment && (!is_array($this->environments) || !in_array($environment, $this->environments))) {
             throw new lcConfigException('Environment \'' . $environment . '\' was set as the currently active one but it is not defined in configuration');
         }
 
@@ -129,18 +132,15 @@ abstract class lcConfigHandler extends lcObj
         $options = $this->options;
         $dirs = isset($options['dirs']) && is_array($options['dirs']) ? $options['dirs'] : null;
 
-        if ($dirs)
-        {
+        if ($dirs) {
             // try to load configurations from specific dirs
             // stop on first successful load
-            foreach ($dirs as $dir)
-            {
+            foreach ($dirs as $dir) {
                 $opts = $this->options;
                 $opts['dir'] = $dir;
                 $data = $this->data_provider->readConfigData($config_key, $opts);
 
-                if ($data && is_array($data))
-                {
+                if ($data && is_array($data)) {
                     break;
                 }
 
@@ -157,10 +157,8 @@ abstract class lcConfigHandler extends lcObj
         $data = (array)lcArrays::mergeRecursiveDistinct($source_defaults, $defaults, $data);
 
         // unset any environment based configs now after we've got them
-        if ($this->environments)
-        {
-            foreach ($this->environments as $env)
-            {
+        if ($this->environments) {
+            foreach ($this->environments as $env) {
                 unset($data[$env]);
                 unset($env);
             }
@@ -177,4 +175,3 @@ abstract class lcConfigHandler extends lcObj
         return $data;
     }
 }
-?>

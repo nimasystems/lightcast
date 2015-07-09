@@ -264,5 +264,3 @@ class lcPHPMailer extends lcMailer
         return $ret;
     }
 }
-
-?>

@@ -28,62 +28,68 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1527 $
  */
-
 class lcRand
 {
-	public static function randomFloat($max) {
-		$v = rand() / getrandmax();
-		$v = $v * $max;
-		return $v;
-	}
+    public static function randomFloat($max)
+    {
+        $v = rand() / getrandmax();
+        $v = $v * $max;
+        return $v;
+    }
 
-	public static function randomGeoLat() {
-		return (double)(rand(-90, 90) . '.' . rand(0, 10000000));
-	}
+    public static function randomGeoLat()
+    {
+        return (double)(rand(-90, 90) . '.' . rand(0, 10000000));
+    }
 
-	public static function randomGeoLon() {
-		return (double)(rand(-180, 180) . '.' . rand(0, 10000000));
-	}
+    public static function randomGeoLon()
+    {
+        return (double)(rand(-180, 180) . '.' . rand(0, 10000000));
+    }
 
-	public static function randomIp() {
-		$str = rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254);
-		return $str;
-	}
+    public static function randomIp()
+    {
+        $str = rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254);
+        return $str;
+    }
 
-	public static function randomWords($len) {
-		$str_out = null;
+    public static function randomWords($len)
+    {
+        $str_out = null;
 
-		while(strlen($str_out) < $len) {
-			$str_out .= lcStrings::randomString(rand(2, 20), true) . ' ';
-		}
+        while (strlen($str_out) < $len) {
+            $str_out .= lcStrings::randomString(rand(2, 20), true) . ' ';
+        }
 
-		$str_out = trim($str_out);
+        $str_out = trim($str_out);
 
-		return $str_out;
-	}
+        return $str_out;
+    }
 
-	public static function randomDateTimeStr() {
-		$t = mktime(rand(0,24), rand(0,59), rand(0,59), rand(1, 12), rand(1,28), rand(2005,2014));
-		$t = date('Y-m-d H:i:s', $t);
-		return $t;
-	}
+    public static function randomDateTimeStr()
+    {
+        $t = mktime(rand(0, 24), rand(0, 59), rand(0, 59), rand(1, 12), rand(1, 28), rand(2005, 2014));
+        $t = date('Y-m-d H:i:s', $t);
+        return $t;
+    }
 
-	public static function randomDateStr() {
-		$t = mktime(rand(0,24), rand(0,59), rand(0,59), rand(1, 12), rand(1,28), rand(2005,2014));
-		$t = date('Y-m-d', $t);
-		return $t;
-	}
+    public static function randomDateStr()
+    {
+        $t = mktime(rand(0, 24), rand(0, 59), rand(0, 59), rand(1, 12), rand(1, 28), rand(2005, 2014));
+        $t = date('Y-m-d', $t);
+        return $t;
+    }
 
-	public static function randomTimestamp() {
-		$t = mktime(rand(0,24), rand(0,59), rand(0,59), rand(1, 12), rand(1,28), rand(2005,2014));
-		return $t;
-	}
+    public static function randomTimestamp()
+    {
+        $t = mktime(rand(0, 24), rand(0, 59), rand(0, 59), rand(1, 12), rand(1, 28), rand(2005, 2014));
+        return $t;
+    }
 
-	public static function randomArrayVal(array $arr) {
-		$r = rand(0, count($arr)-1);
-		$ret = $arr[$r];
-		return $ret;
-	}
+    public static function randomArrayVal(array $arr)
+    {
+        $r = rand(0, count($arr) - 1);
+        $ret = $arr[$r];
+        return $ret;
+    }
 }
-
-?>

@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,58 +28,54 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagBdo.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagBdo extends lcHtmlTag
 {
-	const DEFAULT_DIR = 'ltr';
+    const DEFAULT_DIR = 'ltr';
 
-	public function __construct($content = null, $dir = self::DEFAULT_DIR, $xml_lang = null)
-	{
-		parent::__construct('bdo', true);
+    public function __construct($content = null, $dir = self::DEFAULT_DIR, $xml_lang = null)
+    {
+        parent::__construct('bdo', true);
 
-		$this->setContent($content);
-		$this->setDir($dir);
-		$this->setXmlLang($xml_lang);
-	}
+        $this->setContent($content);
+        $this->setDir($dir);
+        $this->setXmlLang($xml_lang);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('dir');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('dir');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('xml:lang');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('xml:lang');
+    }
 
-	public function getDir()
-	{
-		return $this->attributes->get('dir');
-	}
+    public function getDir()
+    {
+        return $this->attributes->get('dir');
+    }
 
-	public function setDir($value = self::DEFAULT_DIR)
-	{
-		if ($value != 'ltr' && $value != 'rtl')
-		{
-			throw new lcInvalidArgumentException('Bdo tag has an invalid dir attribute: '.$value);
-		}
+    public function setDir($value = self::DEFAULT_DIR)
+    {
+        if ($value != 'ltr' && $value != 'rtl') {
+            throw new lcInvalidArgumentException('Bdo tag has an invalid dir attribute: ' . $value);
+        }
 
-		$this->setAttribute('dir', $value);
-		return $this;
-	}
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
 
-	public function getXmlLang()
-	{
-		return $this->attributes->get('xml:lang');
-	}
+    public function getXmlLang()
+    {
+        return $this->attributes->get('xml:lang');
+    }
 
-	public function setXmlLang($value = null)
-	{
-		$this->setAttribute('xml:lang', $value);
-		return $this;
-	}
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
 }
-
-?>

@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,118 +28,115 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagTextarea.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagTextarea extends lcHtmlTag
 {
-	public function __construct($rows = null, $cols = null, $content = null, $name = null, $disabled = false,
-			$readonly = false, $accesskey = null, $tabindex = null)
-	{
-		parent::__construct('textarea', true);
+    public function __construct($rows = null, $cols = null, $content = null, $name = null, $disabled = false,
+                                $readonly = false, $accesskey = null, $tabindex = null)
+    {
+        parent::__construct('textarea', true);
 
-		$this->setContent($content);
-		$this->setRows($rows);
-		$this->setCols($cols);
-		$this->setName($name);
-		$this->setIsDisabled($disabled);
-		$this->setIsReadonly($readonly);
-		$this->setTabIndex($tabindex);
-		$this->setAccessKey($accesskey);
-	}
+        $this->setContent($content);
+        $this->setRows($rows);
+        $this->setCols($cols);
+        $this->setName($name);
+        $this->setIsDisabled($disabled);
+        $this->setIsReadonly($readonly);
+        $this->setTabIndex($tabindex);
+        $this->setAccessKey($accesskey);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('rows', 'cols');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('rows', 'cols');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('name', 'disabled', 'readonly', 'accesskey', 'tabindex');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('name', 'disabled', 'readonly', 'accesskey', 'tabindex');
+    }
 
-	public function setContent($content)
-	{
-		parent::setContent($content);
-		return $this;
-	}
+    public function setContent($content)
+    {
+        parent::setContent($content);
+        return $this;
+    }
 
-	public function setRows($value)
-	{
-		$this->setAttribute('rows', $value);
-		return $this;
-	}
+    public function setRows($value)
+    {
+        $this->setAttribute('rows', $value);
+        return $this;
+    }
 
-	public function getRows()
-	{
-		return $this->getAttribute('rows');
-	}
+    public function getRows()
+    {
+        return $this->getAttribute('rows');
+    }
 
-	public function setCols($value)
-	{
-		$this->setAttribute('cols', $value);
-		return $this;
-	}
+    public function setCols($value)
+    {
+        $this->setAttribute('cols', $value);
+        return $this;
+    }
 
-	public function getCols()
-	{
-		return $this->getAttribute('cols');
-	}
+    public function getCols()
+    {
+        return $this->getAttribute('cols');
+    }
 
-	public function setName($value = null)
-	{
-		$this->setAttribute('name', $value);
-		return $this;
-	}
+    public function setName($value = null)
+    {
+        $this->setAttribute('name', $value);
+        return $this;
+    }
 
-	public function getName()
-	{
-		return $this->getAttribute('name');
-	}
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
 
-	public function setTabIndex($value = null)
-	{
-		$this->setAttribute('tabindex', $value);
-		return $this;
-	}
+    public function setTabIndex($value = null)
+    {
+        $this->setAttribute('tabindex', $value);
+        return $this;
+    }
 
-	public function getTabIndex()
-	{
-		return $this->getAttribute('tabindex');
-	}
+    public function getTabIndex()
+    {
+        return $this->getAttribute('tabindex');
+    }
 
-	public function setIsReadonly($value = false)
-	{
-		$this->setAttribute('readonly', $value ? 'readonly' : null);
-		return $this;
-	}
+    public function setIsReadonly($value = false)
+    {
+        $this->setAttribute('readonly', $value ? 'readonly' : null);
+        return $this;
+    }
 
-	public function getIsReadonly()
-	{
-		return $this->getAttribute('readonly') ? true : false;
-	}
+    public function getIsReadonly()
+    {
+        return $this->getAttribute('readonly') ? true : false;
+    }
 
-	public function setIsDisabled($value = false)
-	{
-		$this->setAttribute('disabled', $value ? 'disabled' : null);
-		return $this;
-	}
+    public function setIsDisabled($value = false)
+    {
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        return $this;
+    }
 
-	public function getIsDisabled()
-	{
-		return $this->getAttribute('disabled') ? true : false;
-	}
+    public function getIsDisabled()
+    {
+        return $this->getAttribute('disabled') ? true : false;
+    }
 
-	public function setAccessKey($accesskey = null)
-	{
-		$this->setAttribute('accesskey', $accesskey);
-		return $this;
-	}
+    public function setAccessKey($accesskey = null)
+    {
+        $this->setAttribute('accesskey', $accesskey);
+        return $this;
+    }
 
-	public function getAccessKey()
-	{
-		return $this->getAttribute('accesskey');
-	}
+    public function getAccessKey()
+    {
+        return $this->getAttribute('accesskey');
+    }
 }
-
-?>

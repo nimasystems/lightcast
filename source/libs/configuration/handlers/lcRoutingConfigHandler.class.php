@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1592 $
  */
-
 class lcRoutingConfigHandler extends lcEnvConfigHandler
 {
     protected function postReadConfigData($environment, array $data)
@@ -40,8 +39,7 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
         // so we add the default routes ONLY if there are no other routes
         // detected
 
-        if (!isset($data['routing']['routes']))
-        {
+        if (!isset($data['routing']['routes'])) {
             $data['routing']['routes'] = $this->getDefaultRoutes();
         }
 
@@ -75,10 +73,9 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
     public function getDefaultValues()
     {
         return array('routing' => array(
-                'send_http_errors' => true,
-                'default_module' => 'home',
-                'default_action' => 'index',
-            ));
+            'send_http_errors' => true,
+            'default_module' => 'home',
+            'default_action' => 'index',
+        ));
     }
-
 }

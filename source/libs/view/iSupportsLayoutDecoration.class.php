@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,18 +28,17 @@
  * @subpackage File Subcategory
  * @changed $Id: iSupportsLayoutDecoration.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iSupportsLayoutDecoration extends iViewRenderer
 {
-	public function getReplacementString();
-	public function setReplacementString($replacement_string);
-	
-	public function setDecorateContent($content, $content_type = null);
-	public function getDecorateContent();
-	public function getDecorateContentType();
+    public function getReplacementString();
+
+    public function setReplacementString($replacement_string);
+
+    public function setDecorateContent($content, $content_type = null);
+
+    public function getDecorateContent();
+
+    public function getDecorateContentType();
 }
-
-
-?>

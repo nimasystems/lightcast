@@ -29,8 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 abstract class lcWebManagementConfiguration extends lcWebConfiguration
 {
 }
-?>

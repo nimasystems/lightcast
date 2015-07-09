@@ -26,21 +26,27 @@
  * @subpackage File Subcategory
  * @changed $Id: iDatabaseMigrationsTarget.class.php 1473 2013-11-17 10:38:32Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1473 $
-*/
-
+ * @version $Revision: 1473 $
+ */
 interface iDatabaseMigrationsTarget
 {
-	public function getSchemaIdentifier();
-	public function getMigrationsVersion();
+    public function getSchemaIdentifier();
 
-	public function executeMigrationUpgrade($from_version, $to_version);
-	public function executeMigrationDowngrade($from_version, $to_version);
+    public function getMigrationsVersion();
 
-	public function executeSchemaInstall();
-	public function executeSchemaRemove();
-	public function executeDataInstall();
-	public function executeDataRemove();
-	public function beforeExecute();
-	public function afterExecute();
+    public function executeMigrationUpgrade($from_version, $to_version);
+
+    public function executeMigrationDowngrade($from_version, $to_version);
+
+    public function executeSchemaInstall();
+
+    public function executeSchemaRemove();
+
+    public function executeDataInstall();
+
+    public function executeDataRemove();
+
+    public function beforeExecute();
+
+    public function afterExecute();
 }

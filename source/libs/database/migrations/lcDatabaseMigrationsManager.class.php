@@ -29,7 +29,6 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1592 $
  */
-
 class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigrationsManager
 {
     const DEFAULT_MIGRATION_TABLE_NAME = 'db_migration';
@@ -56,8 +55,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         // custom migration table name
         $migration_table_name = isset($cfg['db.migrations.table_name']) ? (string)$cfg['db.migrations.table_name'] : self::DEFAULT_MIGRATION_TABLE_NAME;
 
-        if (!$migration_table_name)
-        {
+        if (!$migration_table_name) {
             throw new lcConfigException('Invalid database migration table: \'' . $migration_table_name . '\'');
         }
 
@@ -71,15 +69,13 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $prcfg = $this->configuration->getProjectConfiguration();
         $filename = $prcfg->getConfigDir() . DS . 'migrations.php';
 
-        if (!file_exists($filename))
-        {
+        if (!file_exists($filename)) {
             return null;
         }
 
         require_once($filename);
 
-        if (!class_exists('ProjectMigrations'))
-        {
+        if (!class_exists('ProjectMigrations')) {
             return null;
         }
 
@@ -97,8 +93,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $this->prepareWithTarget($target);
 
         // if version > 0 - then it is already installed
-        if ($this->current_migrations_version)
-        {
+        if ($this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Schema already installed', self::ERR_SCHEMA_ALREADY_INSTALLED);
         }
 
@@ -129,8 +124,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $this->prepareWithTarget($target);
 
         // if version > 0 - then it is already installed
-        if (!$this->current_migrations_version)
-        {
+        if (!$this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Schema is not installed', self::ERR_SCHEMA_NOT_INSTALLED);
         }
 
@@ -200,29 +194,23 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         assert($to);
 
         // check if schema is installed
-        if (!$this->current_migrations_version)
-        {
+        if (!$this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Schema is not installed', self::ERR_SCHEMA_NOT_INSTALLED);
         }
 
-        if (!$to || $to < 2)
-        {
+        if (!$to || $to < 2) {
             throw new lcInvalidArgumentException('Schema version is invalid');
         }
 
-        if ($to > $target->getMigrationsVersion())
-        {
+        if ($to > $target->getMigrationsVersion()) {
             throw new lcInvalidArgumentException('Schema version is higher than the highest possible one (' . $target->getMigrationsVersion());
         }
 
         // check the version
-        if ($to == $this->current_migrations_version)
-        {
+        if ($to == $this->current_migrations_version) {
             // version is the same nothing to upgrade
             return true;
-        }
-        elseif ($to < $this->current_migrations_version)
-        {
+        } elseif ($to < $this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Invalid version to upgrade to. The current version is higher: ' . $this->current_migrations_version);
         }
 
@@ -236,14 +224,12 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         // for each found version call the schema migration method
         // between each successful iteration - store the version back to the
         // schema table
-        for ($i = $this->current_migrations_version; $i < $to; $i++)
-        {
+        for ($i = $this->current_migrations_version; $i < $to; $i++) {
             $_from = $i;
             $_to = $i + 1;
             $this->info('Running (' . $_from . ' -> ' . $_to . ')...');
 
-            try
-            {
+            try {
                 // call the migration method
                 $target->executeMigrationUpgrade($this->current_migrations_version, $_to);
 
@@ -254,9 +240,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
                 $this->updateSchemaVersionToMigrationTable($target, $reached_version);
 
                 $this->current_migrations_version = $reached_version;
-            }
-            catch(Exception $e)
-            {
+            } catch (Exception $e) {
                 throw new lcDatabaseSchemaException('Schema upgrade error (' . $_from . ' -> ' . $_to . '): ' . $e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -280,29 +264,23 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         assert($to);
 
         // check if schema is installed
-        if (!$this->current_migrations_version)
-        {
+        if (!$this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Schema is not installed', self::ERR_SCHEMA_NOT_INSTALLED);
         }
 
-        if (!$to || $to < 1)
-        {
+        if (!$to || $to < 1) {
             throw new lcInvalidArgumentException('Schema version is invalid');
         }
 
-        if ($to >= $target->getMigrationsVersion())
-        {
+        if ($to >= $target->getMigrationsVersion()) {
             throw new lcInvalidArgumentException('Schema version is higher than the highest possible one (' . ($target->getMigrationsVersion() - 1) . ')');
         }
 
         // check the version
-        if ($to == $this->current_migrations_version)
-        {
+        if ($to == $this->current_migrations_version) {
             // version is the same nothing to upgrade
             return true;
-        }
-        elseif ($to > $this->current_migrations_version)
-        {
+        } elseif ($to > $this->current_migrations_version) {
             throw new lcDatabaseSchemaException('Invalid version to downgrade to. The current version is lower: ' . $this->current_migrations_version);
         }
 
@@ -316,14 +294,12 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         // for each found version call the schema migration method
         // between each successful iteration - store the version back to the
         // schema table
-        for ($i = $this->current_migrations_version; $i > $to; $i--)
-        {
+        for ($i = $this->current_migrations_version; $i > $to; $i--) {
             $_from = $i;
             $_to = $i - 1;
             $this->info('Running (' . $_from . ' -> ' . $_to . ')...');
 
-            try
-            {
+            try {
                 // call the migration method
                 $target->executeMigrationDowngrade($this->current_migrations_version, $_to);
 
@@ -334,9 +310,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
                 $this->updateSchemaVersionToMigrationTable($target, $reached_version);
 
                 $this->current_migrations_version = $reached_version;
-            }
-            catch(Exception $e)
-            {
+            } catch (Exception $e) {
                 throw new lcDatabaseSchemaException('Schema downgrade error (' . $_from . ' -> ' . $_to . '): ' . $e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -367,8 +341,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
     {
         $valid = $target && $target->getDatabase() && $target->getSchemaIdentifier() && $target->getMigrationsVersion() && is_numeric($target->getMigrationsVersion());
 
-        if (!$valid)
-        {
+        if (!$valid) {
             throw new lcSystemException('Schema migration target ' . ($target ? get_class($target) : null) . ' is invalid: ' . $target);
         }
     }
@@ -385,8 +358,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $sql = 'REPLACE INTO ' . $conn->quoteTableName($this->migration_table_name) . ' (schema_identifier, schema_version, last_updated) VALUES(' . $conn->quote($target->getSchemaIdentifier()) . ', ' . $version . ', CURRENT_TIMESTAMP)';
         $conn->exec($sql);
 
-        if (DO_DEBUG)
-        {
+        if (DO_DEBUG) {
             $this->debug('Schema table updated (Changed version: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ' -> ' . $version . ')');
         }
     }
@@ -400,8 +372,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $sql = 'DELETE FROM ' . $conn->quoteTableName($this->migration_table_name) . ' WHERE schema_identifier = ' . $conn->quote($target->getSchemaIdentifier());
         $conn->exec($sql);
 
-        if (DO_DEBUG)
-        {
+        if (DO_DEBUG) {
             $this->debug('Schema table updated (Removed schema: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ')');
         }
     }
@@ -417,8 +388,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
 
         $current_schema_version = 0;
 
-        if ($res->rowCount())
-        {
+        if ($res->rowCount()) {
             $row = $res->fetch(PDO::FETCH_ASSOC);
             $current_schema_version = (int)$row['schema_version'];
         }
@@ -430,16 +400,14 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         // check if for some reason the installed version is higher than the
         // target's one
         // that should never happen!
-        if ($this->current_migrations_version > $target->getMigrationsVersion())
-        {
+        if ($this->current_migrations_version > $target->getMigrationsVersion()) {
             throw new lcDatabaseSchemaException('The schema object\'s version identifier is invalid - it is lower than the currently active installed schema version!' . ' (currently installed: ' . $this->current_migrations_version . ', Schema target version: ' . $target->getMigrationsVersion() . ')');
         }
     }
 
     private function createMigrationTable(lcDatabase $database)
     {
-        if (!$database)
-        {
+        if (!$database) {
             throw new lcInvalidArgumentException('Invalid database');
         }
 
@@ -453,8 +421,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $query = 'SHOW TABLES LIKE ' . $conn->quote($mtable);
         $ret = $conn->query($query)->fetch(PDO::FETCH_ASSOC);
 
-        if (!$ret)
-        {
+        if (!$ret) {
             $this->info('Creating schema migrations table (' . $mtable . ')');
 
             // not existing - create it

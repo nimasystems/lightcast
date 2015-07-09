@@ -103,6 +103,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $plugins = array_reverse($plugins, true);
 
             foreach ($plugins as $plugin) {
+                /** @var lcPlugin $plugin */
                 $name = $plugin->getName();
 
                 try {
@@ -383,55 +384,57 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     {
         $response = $event->getSubject();
 
-        $plugins = $this->plugins;
+        if ($response instanceof lcWebResponse) {
+            $plugins = $this->plugins;
 
-        if ($plugins) {
-            foreach ($plugins as $plugin) {
-                $plugin_configuration = $plugin->getPluginConfiguration();
+            if ($plugins) {
+                foreach ($plugins as $plugin) {
+                    $plugin_configuration = $plugin->getPluginConfiguration();
 
-                // stylesheets
-                if ($t = $plugin_configuration['view.stylesheets']) {
-                    foreach ($t as $media => $files) {
-                        if ($files && is_array($files)) {
-                            foreach ($files as $file) {
-                                $href = $plugin->getAssetsWebpath() . 'css/' . $file;
-                                $response->setStylesheet($href, $media);
+                    // stylesheets
+                    if ($t = $plugin_configuration['view.stylesheets']) {
+                        foreach ($t as $media => $files) {
+                            if ($files && is_array($files)) {
+                                foreach ($files as $file) {
+                                    $href = $plugin->getAssetsWebpath() . 'css/' . $file;
+                                    $response->setStylesheet($href, $media);
 
-                                unset($file, $href);
+                                    unset($file, $href);
+                                }
                             }
+
+                            unset($media, $files);
                         }
 
-                        unset($media, $files);
+                        unset($t);
                     }
 
-                    unset($t);
-                }
+                    // javascripts
+                    $t = $plugin_configuration['view.javascripts'];
 
-                // javascripts
-                $t = $plugin_configuration['view.javascripts'];
+                    if ($t && is_array($t)) {
+                        foreach ($t as $file) {
+                            $response->setJavascript($plugin->getAssetsWebpath() . 'js/' . $file);
 
-                if ($t && is_array($t)) {
-                    foreach ($t as $file) {
-                        $response->setJavascript($plugin->getAssetsWebpath() . 'js/' . $file);
+                            unset($file);
+                        }
 
-                        unset($file);
+                        unset($t);
                     }
 
-                    unset($t);
-                }
+                    // metatags
+                    $t = $plugin_configuration['view.metatags'];
 
-                // metatags
-                $t = $plugin_configuration['view.metatags'];
-
-                if ($t && is_array($t)) {
-                    foreach ($t as $title => $value1) {
-                        $response->setMetatag($title, $value1);
-                        unset($title, $value1);
+                    if ($t && is_array($t)) {
+                        foreach ($t as $title => $value1) {
+                            $response->setMetatag($title, $value1);
+                            unset($title, $value1);
+                        }
+                        unset($t);
                     }
-                    unset($t);
-                }
 
-                unset($plugin);
+                    unset($plugin);
+                }
             }
         }
 
@@ -463,7 +466,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         if ($plugin->getHasAppInitialized()) {
             // skip plugins which have already been notified
             // may happen because we initialize plugin dynamically in time now
-            return false;
+            return;
         }
 
         // validate required capabilities
@@ -718,6 +721,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 throw new lcNotAvailableException('System Component Factory not available');
             }
 
+            /** @var lcPlugin $plugin_object */
             $plugin_object = $system_component_factory->getSystemPluginInstance($plugin_name);
 
             if (!$plugin_object) {
@@ -786,13 +790,13 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $implementations = $plugin_config->getImplementations();
 
         if (!($plugin_config instanceof iPluginRequirements && !in_array('iPluginRequirements', (array)$implementations))) {
-            return false;
+            return;
         }
 
         $requirements = (array)$plugin_config->getRequiredPlugins();
 
         if (!$requirements || !is_array($requirements)) {
-            return false;
+            return;
         }
 
         $plugin_configurations = $this->plugin_configurations;

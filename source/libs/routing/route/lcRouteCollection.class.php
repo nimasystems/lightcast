@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,134 +27,122 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcRouteCollection.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcRouteCollection extends lcBaseCollection
 {
-	public function connect($name, $route, array $params=null, array $requirements=null)
-	{
-		return parent::append(new lcNamedRoute($name, $route, $params, $requirements));
-	}
+    public function connect($name, $route, array $params = null, array $requirements = null)
+    {
+        parent::appendColl(new lcNamedRoute($name, $route, $params, $requirements));
+    }
 
-	public function append(lcNamedRoute $route)
-	{
-		return parent::appendColl($route);
-	}
+    public function append(lcNamedRoute $route)
+    {
+        parent::appendColl($route);
+    }
 
-	public function prepend($name, $route, array $params=null, array $requirements=null)
-	{
-		$all = $this->list;
+    public function prepend($name, $route, array $params = null, array $requirements = null)
+    {
+        $all = $this->list;
 
-		$this->clear();
+        $this->clear();
 
-		$this->append(new lcNamedRoute($name, $route, $params, $requirements));
+        $this->append(new lcNamedRoute($name, $route, $params, $requirements));
 
-		foreach ($all as $route)
-		{
-			$this->append($route);
-			unset($route);
-		}
+        foreach ($all as $route) {
+            $this->append($route);
+            unset($route);
+        }
 
-		unset($all);
-	}
+        unset($all);
+    }
 
-	public function get($name)
-	{
-		$this->first();
+    public function get($name)
+    {
+        $this->first();
 
-		$all = $this->getAll();
+        $all = $this->getAll();
 
-		foreach($all as $route)
-		{
-			if ($route->getName() == $name)
-			{
-				return $route;
-			}
-			unset($route);
-		}
+        foreach ($all as $route) {
+            if ($route->getName() == $name) {
+                return $route;
+            }
+            unset($route);
+        }
 
-		unset($all);
+        unset($all);
 
-		return null;
-	}
+        return null;
+    }
 
-	public function offsetExists($name)
-	{
-		$this->first();
+    public function offsetExists($name)
+    {
+        $this->first();
 
-		$all = $this->getAll();
+        $all = $this->getAll();
 
-		foreach ($all as $route)
-		{
-			if ($route->getName() == $name)
-			{
-				return true;
-			}
-			unset($route);
-		}
+        foreach ($all as $route) {
+            if ($route->getName() == $name) {
+                return true;
+            }
+            unset($route);
+        }
 
-		unset($all);
+        unset($all);
 
-		return false;
-	}
+        return false;
+    }
 
-	public function offsetGet($name)
-	{
-		$this->first();
+    public function offsetGet($name)
+    {
+        $this->first();
 
-		$all = $this->getAll();
+        $all = $this->getAll();
 
-		foreach ($all as $route)
-		{
-			if ($route->getName() == $name)
-			{
-				return $route;
-			}
-			unset($route);
-		}
+        foreach ($all as $route) {
+            if ($route->getName() == $name) {
+                return $route;
+            }
+            unset($route);
+        }
 
-		unset($all);
+        unset($all);
 
-		return null;
-	}
+        return null;
+    }
 
-	public function offsetSet($name, $value)
-	{
-		fnothing($name, $value);
-		throw new lcUnsupportedException('Cannot change collection params');
-	}
+    public function offsetSet($name, $value)
+    {
+        fnothing($name, $value);
+        throw new lcUnsupportedException('Cannot change collection params');
+    }
 
-	public function offsetUnset($name)
-	{
-		fnothing($name);
-		throw new lcUnsupportedException('Cannot change collection params');
-	}
+    public function offsetUnset($name)
+    {
+        fnothing($name);
+        throw new lcUnsupportedException('Cannot change collection params');
+    }
 
-	public function __toString()
-	{
-		$all = $this->getAll();
+    public function __toString()
+    {
+        $all = $this->getAll();
 
-		if (!$all->count())
-		{
-			return false;
-		}
+        if (!$all->count()) {
+            return false;
+        }
 
-		$str = array();
+        $str = array();
 
-		foreach ($all as $route)
-		{
-			$str[] = $route->getName() . ' (' . $route->getRoute() . ')';
-			unset($route);
-		}
+        foreach ($all as $route) {
+            $str[] = $route->getName() . ' (' . $route->getRoute() . ')';
+            unset($route);
+        }
 
-		unset($all);
+        unset($all);
 
-		$str = 'Routes: ' . implode(', ', $str);
+        $str = 'Routes: ' . implode(', ', $str);
 
-		return $str;
-	}
+        return $str;
+    }
 }
-
-?>

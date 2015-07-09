@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,51 +28,48 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagDel.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagDel extends lcHtmlTag
 {
-	public function __construct($content = null, $cite = null, $datetime = null)
-	{
-		parent::__construct('del', true);
+    public function __construct($content = null, $cite = null, $datetime = null)
+    {
+        parent::__construct('del', true);
 
-		$this->setContent($content);
-		$this->setCite($cite);
-		$this->setDateTime($datetime);
-	}
+        $this->setContent($content);
+        $this->setCite($cite);
+        $this->setDateTime($datetime);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('cite');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('cite');
+    }
 
-	public function setCite($cite = null)
-	{
-		$this->setAttribute('cite', $cite);
-		return $this;
-	}
+    public function setCite($cite = null)
+    {
+        $this->setAttribute('cite', $cite);
+        return $this;
+    }
 
-	public function getCite()
-	{
-		return $this->getAttribute('cite');
-	}
+    public function getCite()
+    {
+        return $this->getAttribute('cite');
+    }
 
-	public function setDateTime($value = null)
-	{
-		$this->setAttribute('datetime', $value);
-		return $this;
-	}
+    public function setDateTime($value = null)
+    {
+        $this->setAttribute('datetime', $value);
+        return $this;
+    }
 
-	public function getDateTime()
-	{
-		return $this->getAttribute('datetime');
-	}
+    public function getDateTime()
+    {
+        return $this->getAttribute('datetime');
+    }
 }
-
-?>

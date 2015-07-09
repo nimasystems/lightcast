@@ -26,44 +26,41 @@
  * @subpackage File Subcategory
  * @changed $Id: lcValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 abstract class lcValidator extends lcValidatorBase implements ArrayAccess
 {
-	protected $options;
-	
-	abstract public function validate($data);
-	
-	public function setOptions(array $options)
-	{
-		$this->options = $options;
-	}
-	
-	public function getOptions()
-	{
-		return $this->options;
-	}
-	
-	public function offsetExists($name)
-	{
-		return isset($this->options[$name]);
-	}
+    protected $options;
 
-	public function offsetGet($name)
-	{
-		return $this->options[$name];
-	}
+    abstract public function validate($data);
 
-	public function offsetSet($name, $value)
-	{
-		$this->options[$name] = $value;
-	}
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+    }
 
-	public function offsetUnset($name)
-	{
-		unset($this->options[$name]);
-	}
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    public function offsetExists($name)
+    {
+        return isset($this->options[$name]);
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->options[$name];
+    }
+
+    public function offsetSet($name, $value)
+    {
+        $this->options[$name] = $value;
+    }
+
+    public function offsetUnset($name)
+    {
+        unset($this->options[$name]);
+    }
 }
-
-?>

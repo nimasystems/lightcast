@@ -63,6 +63,11 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         return $this->get($key, $namespace) ? true : false;
     }
 
+    /**
+     * @param string $key
+     * @param string $namespace
+     * @return mixed
+     */
     public function get($key, $namespace = null)
     {
         if (!$key) {
@@ -79,7 +84,9 @@ class lcInternalStorage extends lcStorage implements iDebuggable
 
     /**
      * @param string $key
+     * @param mixed $value
      * @param string $namespace
+     * @return mixed
      */
     public function set($key, $value = null, $namespace = null)
     {
@@ -92,7 +99,6 @@ class lcInternalStorage extends lcStorage implements iDebuggable
 
         $this->storage[$n][$key] = $value;
     }
-
 
     /**
      * @param string $key
@@ -108,7 +114,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
         if (!isset($this->storage[$n])) {
-            return false;
+            return;
         }
 
         unset($this->storage[$n][$key]);
@@ -119,7 +125,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
         if (!isset($this->storage[$n])) {
-            return false;
+            return;
         }
 
         unset($this->storage[$n]);
@@ -179,5 +185,3 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         return array_keys($this->storage);
     }
 }
-
-?>

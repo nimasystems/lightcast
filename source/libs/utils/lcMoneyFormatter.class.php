@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,24 +27,20 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcMoneyFormatter.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcMoneyFormatter
 {
-	public static function thousandsSeparated($number)
-	{
-		return number_format($number, 0, ',', ' ');
-	}
+    public static function thousandsSeparated($number)
+    {
+        return number_format($number, 0, ',', ' ');
+    }
 
-	public static function standartOutput($value)
-	{
-		$value = round($value, 2);
+    public static function standartOutput($value)
+    {
+        $value = round($value, 2);
 
-		return sprintf('%01.2f', $value);
-	}
+        return sprintf('%01.2f', $value);
+    }
 }
-
-
-?>

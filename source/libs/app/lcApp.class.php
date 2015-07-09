@@ -38,10 +38,11 @@ class lcApp extends lcObj
     const SYSTEM_OBJECTS_CACHE_PREFIX = 'sys_';
     const LOADERS_OBJECT_CACHE_PREFIX = 'loader_';
 
+    /** @var iAppDelegate */
     protected $delegate;
 
     /**
-     * @var lcApplicationConfiguration
+     * @var lcProjectConfiguration, lcApplicationConfiguration
      */
     protected $configuration;
 
@@ -214,6 +215,8 @@ class lcApp extends lcObj
         if ($this->delegate) {
             $this->delegate->didInitializeApp($this);
         }
+
+        return true;
     }
 
     public function setDelegate(iAppDelegate $delegate)
@@ -412,7 +415,7 @@ class lcApp extends lcObj
                 }
 
                 try {
-                    $this->configureSystemObject($object, $object_name, get_class($object), true);
+                    $this->configureResidentObject($object, $object_name, get_class($object), true);
                 } catch (Exception $e) {
                     throw new lcSystemException('Could not initialize system object (' . $object_name . '): ' .
                         $e->getMessage(),
@@ -485,6 +488,7 @@ class lcApp extends lcObj
 
     private function initPluginManager()
     {
+        /** @var lcPluginManager $plugin_manager */
         $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
 
         if (!$plugin_manager) {
@@ -503,6 +507,7 @@ class lcApp extends lcObj
 
     private function notifyPluginsOfAppInitialization()
     {
+        /** @var lcPluginManager $plugin_manager */
         $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
 
         if (!$plugin_manager) {
@@ -514,6 +519,7 @@ class lcApp extends lcObj
 
     protected function startRuntimePlugins()
     {
+        /** @var lcPluginManager $plugin_manager */
         $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
 
         if (!$plugin_manager) {
@@ -550,7 +556,7 @@ class lcApp extends lcObj
         $loader_requirements = lcLoadersConfigHandler::getLoaderRequirements();
 
         if (!$loaders || !is_array($loaders) || !$loading_order) {
-            return false;
+            return;
         }
 
         $component_loaders = $this->configuration->getSystemComponentFactory()->getSystemLoaderDetails();
@@ -592,9 +598,14 @@ class lcApp extends lcObj
                     throw new lcSystemException('Class (' . $class_name . ') does not exist');
                 }
 
+                /** @var lcResidentObj $obj */
                 $obj = new $class_name();
 
-                $this->configureSystemObject($obj, $loader, $class_name);
+                if (!($obj instanceof lcResidentObj)) {
+                    continue;
+                }
+
+                $this->configureResidentObject($obj, $loader, $class_name);
 
                 // if it comes from a plugin - assign proper context type / name
                 if (isset($component_loaders[$class_name])) {
@@ -642,6 +653,7 @@ class lcApp extends lcObj
 
                 // db models usage
                 if ($db_manager && $obj instanceof iSupportsDbModelOperations) {
+                    /** @var iSupportsDbModelOperations $obj */
                     $models = $obj->getUsedDbModels();
 
                     if ($models && is_array($models)) {
@@ -653,6 +665,7 @@ class lcApp extends lcObj
 
                 // provided capabilities
                 if ($obj instanceof iProvidesCapabilities) {
+                    /** @var iProvidesCapabilities $obj */
                     $capabilities = $obj->getCapabilities();
 
                     if ($capabilities && is_array($capabilities)) {
@@ -675,7 +688,7 @@ class lcApp extends lcObj
         }
     }
 
-    protected function configureSystemObject(lcSysObj $obj, $object_type, $class_name, $add_local_cache = false)
+    protected function configureResidentObject(lcResidentObj $obj, $object_type, $class_name, $add_local_cache = false)
     {
         assert(!is_null($obj) && !is_null($class_name) && !is_null($object_type));
 
@@ -713,8 +726,9 @@ class lcApp extends lcObj
         $this->initialized_objects[$object_type] = $obj;
 
         // send event - initialize
-        $this->event_dispatcher->notify(new lcEvent($object_type . '.initialize', $obj));
-        $obj->initializeBeforeApp($this->event_dispatcher, $this->configuration);
+        //$this->event_dispatcher->notify(new lcEvent($object_type . '.initialize', $obj));
+
+        $obj->attachRegisteredEvents();
     }
 
     protected function addAutoloadClassesFromObject(iSupportsAutoload $obj)
@@ -741,7 +755,7 @@ class lcApp extends lcObj
             return;
         }
 
-        // project_configuration
+        /** @var lcProjectConfiguration $project_configuration */
         $project_configuration = $this->configuration->getProjectConfiguration();
 
         if ($project_configuration instanceof iSupportsDbModels) {
@@ -768,10 +782,13 @@ class lcApp extends lcObj
     {
         $configuration = $this->configuration;
 
+        /** @var lcProjectConfiguration $project_configuration */
+        $project_configuration = $configuration->getProjectConfiguration();
+
         // assign the configuration to be the delegate of the app
         // if it implements iAppDelegate and the current delegate is null
-        if (!$this->delegate && ($configuration->getProjectConfiguration() instanceof iAppDelegate)) {
-            $this->delegate = $configuration->getProjectConfiguration();
+        if (!$this->delegate && ($project_configuration instanceof iAppDelegate)) {
+            $this->delegate = $project_configuration;
         }
 
         // register to class cache
@@ -782,8 +799,8 @@ class lcApp extends lcObj
         // configuration - execute before
         $configuration->executeBefore();
 
-        if ($configuration->getProjectConfiguration()) {
-            $configuration->getProjectConfiguration()->executeBefore();
+        if ($project_configuration) {
+            $project_configuration->executeBefore();
         }
 
         $configuration->initialize();
@@ -802,8 +819,8 @@ class lcApp extends lcObj
             unset($memory_limit);
         }
 
-        if ($configuration->getProjectConfiguration()) {
-            $configuration->getProjectConfiguration()->executeAfter();
+        if ($project_configuration) {
+            $project_configuration->executeAfter();
         }
 
         // configuration - execute after
@@ -1073,13 +1090,14 @@ class lcApp extends lcObj
             throw new lcSystemException('App not initialized');
         }
 
+        /** @var lcFrontController $ctrl */
         $ctrl = isset($this->initialized_objects['controller']) ? $this->initialized_objects['controller'] : null;
 
         if (!$ctrl) {
             throw new lcNotAvailableException('Controller not found');
         }
 
-        if (!($ctrl instanceof iFrontController)) {
+        if (!($ctrl instanceof lcFrontController)) {
             throw new lcSystemException('Front controller is not valid');
         }
 
@@ -1244,6 +1262,7 @@ class lcApp extends lcObj
 
     public function getPlugin($plugin_name)
     {
+        /** @var lcPluginManager $plugin_manager */
         $plugin_manager = $this->getPluginManager();
         return $plugin_manager ? $plugin_manager->getPlugin($plugin_name) : null;
     }

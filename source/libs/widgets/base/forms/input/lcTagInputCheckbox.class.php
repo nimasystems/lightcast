@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,34 +27,31 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcTagInputCheckbox.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcTagInputCheckbox extends lcTagInput
 {
-	public function __construct($name = null, $id = null, $value, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
-	{
-		parent::__construct('checkbox', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
+    public function __construct($name = null, $id = null, $value, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    {
+        parent::__construct('checkbox', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
-		$this->setIsChecked($checked);
-	}
+        $this->setIsChecked($checked);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array_implode(array('value'), parent::getRequiredAttributes());
-	}
+    public static function getRequiredAttributes()
+    {
+        return implode(array('value'), parent::getRequiredAttributes());
+    }
 
-	public function getIsChecked()
-	{
-		return $this->getAttribute('checked') ? true : false;
-	}
+    public function getIsChecked()
+    {
+        return $this->getAttribute('checked') ? true : false;
+    }
 
-	public function setIsChecked($value = false)
-	{
-		$this->setAttribute('checked', $value ? 'checked' : null);
-		return $this;
-	}
+    public function setIsChecked($value = false)
+    {
+        $this->setAttribute('checked', $value ? 'checked' : null);
+        return $this;
+    }
 }
-
-?>

@@ -197,9 +197,9 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     }
 
     /**
-     * @param array $nodes lcIterateParamHolder[]
+     * @param lcIterateParamHolder[] $nodes
      * @param array $node_path
-     * @return lcIterateParamHolder|null
+     * @return null
      */
     protected function findNode(array $nodes, array $node_path)
     {
@@ -338,5 +338,3 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         unset($this->params[$name]);
     }
 }
-
-?>

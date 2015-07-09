@@ -228,7 +228,4 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
             $this->debug('Registered db models at path (' . $path_to_models . '): ' . print_r($models, true));
         }
     }
-
 }
-
-?>

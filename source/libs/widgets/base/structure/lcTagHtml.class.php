@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,77 +28,72 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagHtml.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
 {
-	public function __construct($content = null, $xmlns = null, $xml_lang = null, $lang = null, $dir = null)
-	{
-		parent::__construct('html', true);
+    public function __construct($content = null, $xmlns = null, $xml_lang = null, $lang = null, $dir = null)
+    {
+        parent::__construct('html', true);
 
-		$this->setContent($content);
-		$this->setDir($dir);
-		$this->setXmlLang($xml_lang);
-		$this->setLang($lang);
-		$this->setXmlNs($xmlns);
-	}
+        $this->setContent($content);
+        $this->setDir($dir);
+        $this->setXmlLang($xml_lang);
+        $this->setLang($lang);
+        $this->setXmlNs($xmlns);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('xmlns');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('xmlns');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('dir', 'lang', 'xml:lang');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('dir', 'lang', 'xml:lang');
+    }
 
-	public function getDir()
-	{
-		return $this->attributes->get('dir');
-	}
+    public function getDir()
+    {
+        return $this->attributes->get('dir');
+    }
 
-	public function setDir($value = null)
-	{
-		$this->setAttribute('dir', $value);
-		return $this;
-	}
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
 
-	public function getXmlLang()
-	{
-		return $this->attributes->get('xml:lang');
-	}
+    public function getXmlLang()
+    {
+        return $this->attributes->get('xml:lang');
+    }
 
-	public function setXmlLang($value = null)
-	{
-		$this->setAttribute('xml:lang', $value);
-		return $this;
-	}
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
 
-	public function getLang()
-	{
-		return $this->attributes->get('lang');
-	}
+    public function getLang()
+    {
+        return $this->attributes->get('lang');
+    }
 
-	public function setLang($value = null)
-	{
-		$this->setAttribute('lang', $value);
-		return $this;
-	}
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
 
-	public function getXmlNs()
-	{
-		return $this->attributes->get('xmlns');
-	}
+    public function getXmlNs()
+    {
+        return $this->attributes->get('xmlns');
+    }
 
-	public function setXmlNs($value = null)
-	{
-		$this->setAttribute('xmlns', $value);
-		return $this;
-	}
-
-
+    public function setXmlNs($value = null)
+    {
+        $this->setAttribute('xmlns', $value);
+        return $this;
+    }
 }
-
-?>

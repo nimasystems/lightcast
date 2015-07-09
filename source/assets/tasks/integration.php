@@ -28,81 +28,69 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-
 class tIntegration extends lcTaskController
 {
-	public function getHelpInfo()
-	{
-		return
-		'Possible commands:' . "\n\n" .
-		'Validation:' . "\n\n" .
-		lcConsolePainter::formatConsoleText('validate-php-files', 'info') . ' - Validates the syntax of all PHP files ' . "\n" .
-		"\t- directory - specify the directory which should be checked (recursively)\n" .
-		"\n";
-	}
+    public function getHelpInfo()
+    {
+        return
+            'Possible commands:' . "\n\n" .
+            'Validation:' . "\n\n" .
+            lcConsolePainter::formatConsoleText('validate-php-files', 'info') . ' - Validates the syntax of all PHP files ' . "\n" .
+            "\t- directory - specify the directory which should be checked (recursively)\n" .
+            "\n";
+    }
 
-	public function executeTask()
-	{
-		switch($this->getRequest()->getParam('action'))
-		{
-			case 'validate-php-files':
-				return $this->validatePhpFiles();
-			default:
-				return $this->displayHelp();
-		}
+    public function executeTask()
+    {
+        switch ($this->getRequest()->getParam('action')) {
+            case 'validate-php-files':
+                return $this->validatePhpFiles();
+            default:
+                return $this->displayHelp();
+        }
+    }
 
-		return false;
-	}
+    private function displayHelp()
+    {
+        $this->consoleDisplay($this->getHelpInfo(), false);
+        return true;
+    }
 
-	private function displayHelp()
-	{
-		$this->consoleDisplay($this->getHelpInfo(),false);
-		return true;
-	}
+    public function _validatePhpFiles($filename)
+    {
+        if (lcFiles::getFileExt($filename) != '.php') {
+            return;
+        }
 
-	public function _validatePhpFiles($filename)
-	{
-		if (lcFiles::getFileExt($filename) != '.php')
-		{
-			return;
-		}
-		
-		$result = null;
-		$ret = lcSys::execCmd('php -l ' . escapeshellarg($filename), $result);
-		
-		if ($result !== 0)
-		{
-			$this->displayError('Validation error (' . $filename . '): ' . $ret);
-		}
-		else
-		{
-			$this->display('OK: ' . $filename);
-		}
-	}
-	
-	private function validatePhpFiles()
-	{
-		$r = $this->request;
-		$root_dir = $r->getParam('directory');
+        $result = null;
+        $ret = lcSys::execCmd('php -l ' . escapeshellarg($filename), $result);
 
-		if (!$root_dir)
-		{
-			throw new lcInvalidArgumentException('A directory must be specified');
-		}
-		
-		if (!is_dir($root_dir) || !is_readable($root_dir))
-		{
-			throw new lcIOException('Directory is not readable');
-		}
-		
-		$root_dir = realpath($root_dir) ? realpath($root_dir) : $root_dir;
-		
-		$this->display('Validating PHP syntax in: ' . $root_dir);
-		
-		lcDirs::recursiveFilesCallback($root_dir, array($this, '_validatePhpFiles'), array(), true);
+        if ($result !== 0) {
+            $this->displayError('Validation error (' . $filename . '): ' . $ret);
+        } else {
+            $this->display('OK: ' . $filename);
+        }
+    }
 
-		return true;
-	}
+    private function validatePhpFiles()
+    {
+        $r = $this->request;
+        $root_dir = $r->getParam('directory');
+
+        if (!$root_dir) {
+            throw new lcInvalidArgumentException('A directory must be specified');
+        }
+
+        if (!is_dir($root_dir) || !is_readable($root_dir)) {
+            throw new lcIOException('Directory is not readable');
+        }
+
+        $root_dir = realpath($root_dir) ? realpath($root_dir) : $root_dir;
+
+        $this->display('Validating PHP syntax in: ' . $root_dir);
+
+        lcDirs::recursiveFilesCallback($root_dir, array($this, '_validatePhpFiles'), array(), true);
+
+        return true;
+    }
 }
-
-?>

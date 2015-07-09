@@ -26,86 +26,81 @@
  * @subpackage File Subcategory
  * @changed $Id: lcHTMLTemplateLayoutView.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcHTMLTemplateLayoutView extends lcHTMLTemplateView implements iSupportsLayoutDecoration
 {
-	const DEFAULT_CONTENT_TYPE = 'text/html';
+    const DEFAULT_CONTENT_TYPE = 'text/html';
 
-	protected $replacement_string;
-	protected $decorate_content;
-	protected $decorate_content_type;
-	
-	public function shutdown()
-	{
-		$this->decorate_content =
-		null;
-		
-		parent::shutdown();
-	}
-	
-	public function getContentType()
-	{
-		return self::DEFAULT_CONTENT_TYPE;
-	}
-	
-	public function getSupportedContentTypes()
-	{
-		return array(self::DEFAULT_CONTENT_TYPE);	
-	}
-	
-	public function getReplacementString()
-	{
-		return $this->replacement_string;
-	}
-	
-	public function setReplacementString($replacement_string)
-	{
-		$this->replacement_string = $replacement_string;
-	}
-	
-	public function setDecorateContent($content, $content_type = null)
-	{
-		$this->decorate_content = $content;
-		$this->decorate_content_type = $content_type;
-	}
-	
-	public function getDecorateContent()
-	{
-		return $this->decorate_content;
-	}
-	
-	public function getDecorateContentType()
-	{
-		return $this->decorate_content_type;
-	}
-	
-	protected function getViewContent()
-	{
-		$c = parent::getViewContent();
-		return $c;
-	}
-	
-	public function render()
-	{
-		if (!$this->replacement_string)
-		{
-			throw new lcInvalidArgumentException('Replacement string not set');
-		}
-		
-		$decorator_content = parent::render();
-		
-		if (!$decorator_content)
-		{
-			return $this->decorate_content;
-		}
-		
-		// decorate now
-		$decorator_content = str_replace($this->replacement_string, $this->decorate_content, $decorator_content);
-		
-		return $decorator_content;
-	}
+    protected $replacement_string;
+    protected $decorate_content;
+    protected $decorate_content_type;
+
+    public function shutdown()
+    {
+        $this->decorate_content =
+            null;
+
+        parent::shutdown();
+    }
+
+    public function getContentType()
+    {
+        return self::DEFAULT_CONTENT_TYPE;
+    }
+
+    public function getSupportedContentTypes()
+    {
+        return array(self::DEFAULT_CONTENT_TYPE);
+    }
+
+    public function getReplacementString()
+    {
+        return $this->replacement_string;
+    }
+
+    public function setReplacementString($replacement_string)
+    {
+        $this->replacement_string = $replacement_string;
+    }
+
+    public function setDecorateContent($content, $content_type = null)
+    {
+        $this->decorate_content = $content;
+        $this->decorate_content_type = $content_type;
+    }
+
+    public function getDecorateContent()
+    {
+        return $this->decorate_content;
+    }
+
+    public function getDecorateContentType()
+    {
+        return $this->decorate_content_type;
+    }
+
+    protected function getViewContent()
+    {
+        $c = parent::getViewContent();
+        return $c;
+    }
+
+    public function render()
+    {
+        if (!$this->replacement_string) {
+            throw new lcInvalidArgumentException('Replacement string not set');
+        }
+
+        $decorator_content = parent::render();
+
+        if (!$decorator_content) {
+            return $this->decorate_content;
+        }
+
+        // decorate now
+        $decorator_content = str_replace($this->replacement_string, $this->decorate_content, $decorator_content);
+
+        return $decorator_content;
+    }
 }
-
-?>

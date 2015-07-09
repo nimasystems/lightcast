@@ -27,13 +27,9 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcConfigException.class.php 1545 2014-06-21 06:30:24Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1545 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1545 $
+ */
 class lcConfigException extends lcException
 {
 }
-
-
-?>

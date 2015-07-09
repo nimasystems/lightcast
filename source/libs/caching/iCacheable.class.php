@@ -27,10 +27,10 @@
  * @changed $Id: iCacheable.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 interface iCacheable
 {
-	public function writeClassCache();
-	public function readClassCache(array $cached_data);
+    public function writeClassCache();
+
+    public function readClassCache(array $cached_data);
 }

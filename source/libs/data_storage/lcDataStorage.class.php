@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,41 +28,38 @@
  * @subpackage File Subcategory
  * @changed $Id: lcDataStorage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-abstract class lcDataStorage extends lcSysObj implements iProvidesCapabilities
+ * @version $Revision: 1455 $
+ */
+abstract class lcDataStorage extends lcResidentObj implements iProvidesCapabilities
 {
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-	public function shutdown()
-	{
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
 
-	public function getCapabilities()
-	{
-		return array(
-				'data_storage'
-		);
-	}
-	
-	// Save a file into the data storage - pass an array of $item_info metadata objects
-	// Optionally pass either the file data or a pointer to the data
-	// returns lcDataStorageItem on success, throws an exception on error
-	abstract public function set($item_info, $data = null, &$data_pointer = null);
+    public function getCapabilities()
+    {
+        return array(
+            'data_storage'
+        );
+    }
 
-	// must return a lcDataStorageItem instance or null if unavailable
-	abstract public function get($item_info);
+    // Save a file into the data storage - pass an array of $item_info metadata objects
+    // Optionally pass either the file data or a pointer to the data
+    // returns lcDataStorageItem on success, throws an exception on error
+    abstract public function set($item_info, $data = null, &$data_pointer = null);
 
-	// returns true on success, throws an exception on error
-	abstract public function remove($item_info);
+    // must return a lcDataStorageItem instance or null if unavailable
+    abstract public function get($item_info);
 
-	// returns true if item exists, false if it does not
-	abstract public function has($item_info);
+    // returns true on success, throws an exception on error
+    abstract public function remove($item_info);
+
+    // returns true if item exists, false if it does not
+    abstract public function has($item_info);
 }
-
-?>

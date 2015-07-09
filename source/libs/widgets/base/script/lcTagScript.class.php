@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,87 +28,84 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagScript.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagScript extends lcHtmlBaseTag
 {
-	const DEFAULT_TYPE = 'text/javascript';
+    const DEFAULT_TYPE = 'text/javascript';
 
-	public function __construct($src = null, $content = null, $type = self::DEFAULT_TYPE, $defer = false, $charset = null)
-	{
-		parent::__construct('script', true);
+    public function __construct($src = null, $content = null, $type = self::DEFAULT_TYPE, $defer = false, $charset = null)
+    {
+        parent::__construct('script', true);
 
-		$this->setContent($content);
-		$this->setType($type);
-		$this->setSrc($src);
-		$this->setDefer($defer);
-		$this->setCharset($charset);
-	}
+        $this->setContent($content);
+        $this->setType($type);
+        $this->setSrc($src);
+        $this->setDefer($defer);
+        $this->setCharset($charset);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array('type');
-	}
+    public static function getRequiredAttributes()
+    {
+        return array('type');
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('src', 'charset', 'defer');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('src', 'charset', 'defer');
+    }
 
-	public function setType($type = self::DEFAULT_TYPE)
-	{
-		$this->setAttribute('type', $type);
-		return $this;
-	}
+    public function setType($type = self::DEFAULT_TYPE)
+    {
+        $this->setAttribute('type', $type);
+        return $this;
+    }
 
-	public function getType()
-	{
-		return $this->getAttribute('type');
-	}
+    public function getType()
+    {
+        return $this->getAttribute('type');
+    }
 
-	public function setSrc($value = null)
-	{
-		$this->setAttribute('src', $value);
-		return $this;
-	}
+    public function setSrc($value = null)
+    {
+        $this->setAttribute('src', $value);
+        return $this;
+    }
 
-	public function getSrc()
-	{
-		return $this->getAttribute('src');
-	}
+    public function getSrc()
+    {
+        return $this->getAttribute('src');
+    }
 
-	public function setCharset($value = null)
-	{
-		$this->setAttribute('charset', $value);
-		return $this;
-	}
+    public function setCharset($value = null)
+    {
+        $this->setAttribute('charset', $value);
+        return $this;
+    }
 
-	public function getCharset()
-	{
-		return $this->getAttribute('charset');
-	}
+    public function getCharset()
+    {
+        return $this->getAttribute('charset');
+    }
 
-	public function setDefer($value = false)
-	{
-		$this->setAttribute('defer', $value ? 'defer' : null);
-		return $this;
-	}
+    public function setDefer($value = false)
+    {
+        $this->setAttribute('defer', $value ? 'defer' : null);
+        return $this;
+    }
 
-	public function getDefer()
-	{
-		return $this->getAttribute('defer') ? true : false;
-	}
+    public function getDefer()
+    {
+        return $this->getAttribute('defer') ? true : false;
+    }
 
-	public function asHtml()
-	{
-		return
-		'<script ' . $this->getAttributes()->asHtml() .'>' . "\n" .
-		'/* <![CDATA[ */' . "\n" .
-		$this->getContent() . "\n" .
-		'/* ]]> */' . "\n" .
-		'</script>';
-	}
+    public function asHtml()
+    {
+        return
+            '<script ' . $this->getAttributes()->asHtml() . '>' . "\n" .
+            '/* <![CDATA[ */' . "\n" .
+            $this->getContent() . "\n" .
+            '/* ]]> */' . "\n" .
+            '</script>';
+    }
 }
-
-?>

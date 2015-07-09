@@ -56,6 +56,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     {
         fnothing($controller);
 
+        /** @var lcWebResponse $response */
         $response = $this->getResponse();
 
         // send the output
@@ -207,11 +208,13 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     {
         // custom handling of exceptions in web service mode
         try {
-            return parent::forwardToAction($parent_controller, $action_name, $controller_name, $custom_params);
+            parent::forwardToControllerAction($parent_controller, $action_name, $controller_name, $custom_params);
         } catch (Exception $e) {
-            $this->sendErrorResponseFromException($e);
+            $front_controller = $this->getRootController();
+
+            if ($front_controller && $front_controller instanceof lcFrontWebServiceController) {
+                $front_controller->sendErrorResponseFromException($e);
+            }
         }
     }
 }
-
-?>

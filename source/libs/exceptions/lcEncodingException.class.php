@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,13 +27,9 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcEncodingException.class.php 1497 2014-01-08 18:25:32Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1497 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1497 $
+ */
 class lcEncodingException extends lcException
 {
 }
-
-
-?>

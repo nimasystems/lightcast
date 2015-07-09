@@ -31,7 +31,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1547 $
  */
-abstract class lcMailer extends lcSysObj implements iProvidesCapabilities
+abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 {
     const LOG_CHANNEL = 'mail';
 
@@ -278,5 +278,3 @@ abstract class lcMailer extends lcSysObj implements iProvidesCapabilities
 
     abstract public function getLastError();
 }
-
-?>

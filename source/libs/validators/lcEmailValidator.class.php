@@ -26,15 +26,12 @@
  * @subpackage File Subcategory
  * @changed $Id: lcEmailValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcEmailValidator extends lcValidator
 {
-	public function validate($data)
-	{
-		return (bool)preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data);
-	}
+    public function validate($data)
+    {
+        return (bool)preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data);
+    }
 }
-
-?>

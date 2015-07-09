@@ -30,6 +30,7 @@
  */
 abstract class lcWebController extends lcWebBaseController implements iKeyValueProvider, iViewDecorator
 {
+    const DEFAULT_HAS_LAYOUT = true;
     const DEFAULT_LAYOUT_NAME = 'index';
     const DEFAULT_LAYOUT_EXT = 'htm';
     const LAYOUT_CONTENT_REPLACEMENT = '[PAGE_CONTENT]';
@@ -109,6 +110,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         } elseif ($key == 'my_action_path') {
             return $this->getMyActionPath();
         }
+        return null;
     }
 
     protected function actionExists($action_name, array $action_params = null)
@@ -194,7 +196,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function setCustomTemplate($filename)
     {
         $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
-        return $this->view->setTemplateFilename($full_filename);
+        $this->view->setTemplateFilename($full_filename);
     }
 
     public function getDefaultViewInstance()
@@ -205,13 +207,14 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     public function unsetDecorator()
     {
-        return $this->unsetDecoratorView();
+        $this->unsetDecoratorView();
     }
 
     public function setDecorator($decorator_template_name = null, $extension = 'htm')
     {
         if (!$decorator_template_name) {
-            return $this->unsetDecoratorView();
+            $this->unsetDecoratorView();
+            return;
         }
 
         $extension = $extension ? $extension : $this->default_decorator_extension;
@@ -221,12 +224,12 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $view = $this->getDefaultLayoutViewInstance();
 
         if (!$view) {
-            return false;
+            return;
         }
 
         $view->setTemplateFilename($full_template_name);
 
-        return $this->setDecoratorView($view);
+        $this->setDecoratorView($view);
     }
 
     public function decorateViewContent(lcView $view, $content)
@@ -241,181 +244,184 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return $content;
         }
 
-        $controllers = $view->getControllerActionsToDecorate();
-        $fragments = $view->getFragmentsToDecorate();
+        if ($view instanceof lcHtmlTemplateView) {
+            $controllers = $view->getControllerActionsToDecorate();
+            $fragments = $view->getFragmentsToDecorate();
 
-        // compile controlers
-        if ($controllers) {
-            foreach ($controllers as $controller_info) {
-                $controller_content = null;
+            // compile controlers
+            if ($controllers) {
+                foreach ($controllers as $controller_info) {
+                    $controller_content = null;
 
-                $tag_name = isset($controller_info['tag_name']) ? $controller_info['tag_name'] : null;
-                $route = isset($controller_info['route']) ? $controller_info['route'] : null;
-                $action_type = isset($controller_info['action_type']) ? (string)$controller_info['action_type'] : null;
+                    $tag_name = isset($controller_info['tag_name']) ? $controller_info['tag_name'] : null;
+                    $route = isset($controller_info['route']) ? $controller_info['route'] : null;
+                    $action_type = isset($controller_info['action_type']) ? (string)$controller_info['action_type'] : null;
 
-                $has_error = false;
-                $error_message = null;
-                $error_trace = null;
-                $module = null;
-                $render_time = null;
-                $action = null;
+                    $has_error = false;
+                    $error_message = null;
+                    $error_trace = null;
+                    $module = null;
+                    $render_time = null;
+                    $action = null;
 
-                if (DO_DEBUG) {
-                    $render_time = microtime(true);
-                }
+                    if ($this->show_extra_debugging) {
+                        $render_time = microtime(true);
+                    }
 
-                if ($tag_name && $route && $action_type) {
-                    // try to find a matching route
-                    $found_route = $routing->findMatchingRoute($route);
+                    if ($tag_name && $route && $action_type) {
+                        // try to find a matching route
+                        $found_route = $routing->findMatchingRoute($route);
 
-                    if ($found_route) {
-                        $module = $found_route['params']['module'];
-                        $action = $found_route['params']['action'];
-                        $params = $found_route['params'];
+                        if ($found_route) {
+                            $module = $found_route['params']['module'];
+                            $action = $found_route['params']['action'];
+                            $params = $found_route['params'];
 
-                        $params = array(
-                            'request' => array_merge(
-                                array(
-                                    'module' => $module,
-                                    'action' => $action,
-                                    'type' => $action_type,
+                            $params = array(
+                                'request' => array_merge(
+                                    array(
+                                        'module' => $module,
+                                        'action' => $action,
+                                        'type' => $action_type,
+                                    ),
+                                    (array)$params
                                 ),
-                                (array)$params
-                            ),
-                            'type' => $action_type
-                        );
+                                'type' => $action_type
+                            );
 
-                        if (!$tag_name || !$route || !$module || !$action) {
-                            continue;
-                        }
-
-                        try {
-                            // obtain an instance of the controller
-                            $decorating_controller = $this->getControllerInstance($module);
-
-                            if (!$decorating_controller) {
-                                throw new lcControllerNotFoundException('Controller not found');
+                            if (!$tag_name || !$route || !$module || !$action) {
+                                continue;
                             }
-
-                            $this->prepareControllerInstance($decorating_controller);
-
-                            $render_response = null;
-
-                            $decorating_controller->initialize();
 
                             try {
-                                $render_response = $this->renderControllerAction(
-                                    $decorating_controller,
-                                    $action,
-                                    $params);
-                            } catch (Exception $e) {
-                                $decorating_controller->shutdown();
-                                throw $e;
-                            }
+                                // obtain an instance of the controller
+                                $decorating_controller = $this->getControllerInstance($module);
 
-                            if ($render_response) {
-                                $controller_content = $render_response['content'];
-                                $controller_content_type = isset($render_response['content_type']) ? $render_response['content_type'] : null;
-
-                                if ($controller_content_type && $controller_content_type != 'text/html') {
-                                    throw new lcUnsupportedException('Content unsupported - ' . $controller_content_type);
+                                if (!$decorating_controller) {
+                                    throw new lcControllerNotFoundException('Controller not found');
                                 }
 
-                                unset($controller_content_type);
+                                $this->prepareControllerInstance($decorating_controller);
+
+                                $render_response = null;
+
+                                $decorating_controller->initialize();
+
+                                try {
+                                    $render_response = $this->renderControllerAction(
+                                        $decorating_controller,
+                                        $action,
+                                        $params);
+                                } catch (Exception $e) {
+                                    $decorating_controller->shutdown();
+                                    throw $e;
+                                }
+
+                                if ($render_response) {
+                                    $controller_content = $render_response['content'];
+                                    $controller_content_type = isset($render_response['content_type']) ? $render_response['content_type'] : null;
+
+                                    if ($controller_content_type && $controller_content_type != 'text/html') {
+                                        throw new lcUnsupportedException('Content unsupported - ' . $controller_content_type);
+                                    }
+
+                                    unset($controller_content_type);
+                                }
+
+                                unset($render_response);
+                            } catch (Exception $e) {
+                                $has_error = true;
+                                $controller_content = null;
+                                $error_message = 'Decorating error (' . $module . '/' . $action . '): ' . $e->getMessage();
+                                $error_trace = "Trace:\n\n" . $e->getTraceAsString();
+
+                                $this->err('Could not get render decorator action (' . $module . '/' . $action . '): ' . $e->getMessage());
                             }
-
-                            unset($render_response);
-                        } catch (Exception $e) {
-                            $has_error = true;
-                            $controller_content = null;
-                            $error_message = 'Decorating error (' . $module . '/' . $action . '): ' . $e->getMessage();
-                            $error_trace = "Trace:\n\n" . $e->getTraceAsString();
-
-                            $this->err('Could not get render decorator action (' . $module . '/' . $action . '): ' . $e->getMessage());
                         }
                     }
-                }
 
-                // add debugging information
-                if ($this->show_extra_debugging) {
-                    $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
+                    // add debugging information
+                    if ($this->show_extra_debugging) {
+                        $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
 
-                    $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $module . '/' . $action);
-                    $controller_content =
-                        '<!-- DecoratingControllerBegin (' . $_url . '), time: ' . $total_render_time . ' ms. -->' . "\n" .
-                        /*'<div title="Decorating controller (' . $_url . ')' . ($has_error ? "\n\nError:\n\n" . htmlspecialchars($error_message) .
-                                "\n\n" . htmlspecialchars($error_trace) : null) . '">' .*/
-                        (!$has_error ? $controller_content :
-                            '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
-                            $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . "\n\n" . nl2br(htmlspecialchars(($error_trace))) . '</div>') .
-                        /*'</div>' .*/
-                        '<!-- DecoratingControllerEnd (' . $_url . ') -->';
+                        $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $module . '/' . $action);
+                        $controller_content =
+                            '<!-- DecoratingControllerBegin (' . $_url . '), time: ' . $total_render_time . ' ms. -->' . "\n" .
+                            /*'<div title="Decorating controller (' . $_url . ')' . ($has_error ? "\n\nError:\n\n" . htmlspecialchars($error_message) .
+                                    "\n\n" . htmlspecialchars($error_trace) : null) . '">' .*/
+                            (!$has_error ? $controller_content :
+                                '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
+                                $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . "\n\n" . nl2br(htmlspecialchars(($error_trace))) . '</div>') .
+                            /*'</div>' .*/
+                            '<!-- DecoratingControllerEnd (' . $_url . ') -->';
 
-                    unset($total_render_time, $_url, $render_time);
-                }
-
-                $content = str_replace($tag_name, $controller_content, $content);
-
-                unset($tag_name, $route, $controller_info, $module, $action, $action_type, $params, $error_message, $error_trace, $has_error);
-            }
-        }
-
-        // compile fragments
-        if ($fragments && is_array($fragments)) {
-            foreach ($fragments as $fragment_info) {
-                $tag_name = isset($fragment_info['tag_name']) ? $fragment_info['tag_name'] : null;
-                $url = isset($fragment_info['url']) ? $fragment_info['url'] : null;
-                $type = isset($fragment_info['type']) ? $fragment_info['type'] : null;
-
-                if (!$tag_name || !$url || !$type) {
-                    continue;
-                }
-
-                $fragment_content = null;
-                $has_error = false;
-                $error_message = null;
-                $error_trace = null;
-
-                if (DO_DEBUG) {
-                    $render_time = microtime(true);
-                }
-
-                try {
-                    $fragment_content = $this->renderFragment($type, $url);
-
-                    if ($fragment_content && !is_string($fragment_content)) {
-                        throw new lcUnsupportedException('Content unsupported - not a string');
+                        unset($total_render_time, $_url, $render_time);
                     }
-                } catch (Exception $e) {
-                    $has_error = true;
+
+                    $content = str_replace($tag_name, $controller_content, $content);
+
+                    unset($tag_name, $route, $controller_info, $module, $action, $action_type, $params, $error_message, $error_trace, $has_error);
+                }
+            }
+
+            // compile fragments
+            if ($fragments && is_array($fragments)) {
+                foreach ($fragments as $fragment_info) {
+                    $tag_name = isset($fragment_info['tag_name']) ? $fragment_info['tag_name'] : null;
+                    $url = isset($fragment_info['url']) ? $fragment_info['url'] : null;
+                    $type = isset($fragment_info['type']) ? $fragment_info['type'] : null;
+
+                    if (!$tag_name || !$url || !$type) {
+                        continue;
+                    }
+
                     $fragment_content = null;
-                    $error_message = 'Decorating error (' . $module . '/' . $action . '): ' . $e->getMessage();
-                    $error_trace = "Trace:\n\n" . $e->getTraceAsString();
+                    $has_error = false;
+                    $error_message = null;
+                    $error_trace = null;
+                    $render_time = null;
 
-                    $this->err('Could not get fragment: ' . $e->getMessage());
+                    if ($this->show_extra_debugging) {
+                        $render_time = microtime(true);
+                    }
+
+                    try {
+                        $fragment_content = $this->renderFragment($type, $url);
+
+                        if ($fragment_content && !is_string($fragment_content)) {
+                            throw new lcUnsupportedException('Content unsupported - not a string');
+                        }
+                    } catch (Exception $e) {
+                        $has_error = true;
+                        $fragment_content = null;
+                        $error_message = 'Decorating error: ' . $e->getMessage();
+                        $error_trace = "Trace:\n\n" . $e->getTraceAsString();
+
+                        $this->err('Could not get fragment: ' . $e->getMessage());
+                    }
+
+                    // add debugging information
+                    if ($this->show_extra_debugging) {
+                        $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
+
+                        $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $url);
+                        $fragment_content =
+                            '<!-- DecoratingFragmentBegin (' . $_url . '), time: ' . $total_render_time . ' ms. -->' . "\n" .
+                            '<div title="Decorating fragment (' . $_url . ')' . ($has_error ? "\n\nError:\n\n" . htmlspecialchars($error_message) .
+                                "\n\n" . htmlspecialchars($error_trace) : null) . '">' .
+                            (!$has_error ? $fragment_content :
+                                '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
+                                $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . '</div>') .
+                            '</div>' .
+                            '<!-- DecoratingFragmentBegin (' . $_url . ') -->';
+
+                        unset($total_render_time, $_url, $render_time);
+                    }
+
+                    $content = str_replace($tag_name, $fragment_content, $content);
+
+                    unset($tag_name, $url, $type, $fragment_content);
                 }
-
-                // add debugging information
-                if ($this->show_extra_debugging) {
-                    $total_render_time = sprintf('%.0f', (microtime(true) - $render_time) * 1000);
-
-                    $_url = htmlspecialchars(($this->parent_plugin ? $this->parent_plugin->getPluginName() . ' :: ' : null) . $module . '/' . $action);
-                    $fragment_content =
-                        '<!-- DecoratingFragmentBegin (' . $_url . '), time: ' . $total_render_time . ' ms. -->' . "\n" .
-                        '<div title="Decorating fragment (' . $_url . ')' . ($has_error ? "\n\nError:\n\n" . htmlspecialchars($error_message) .
-                            "\n\n" . htmlspecialchars($error_trace) : null) . '">' .
-                        (!$has_error ? $fragment_content :
-                            '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
-                            $_url . "\n\n" . nl2br(htmlspecialchars($error_message)) . '</div>') .
-                        '</div>' .
-                        '<!-- DecoratingFragmentBegin (' . $_url . ') -->';
-
-                    unset($total_render_time, $_url, $render_time);
-                }
-
-                $content = str_replace($tag_name, $fragment_content, $content);
-
-                unset($tag_name, $url, $type, $fragment_content);
             }
         }
 
@@ -427,7 +433,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     */
     protected function processViewResponse(lcWebController $controller)
     {
-        return $this->outputViewContents($controller, $this->view->render(), $this->view->getContentType());
+        $this->outputViewContents($controller, $this->view->render(), $this->view->getContentType());
     }
 
     protected function configureControllerView()
@@ -476,6 +482,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             unset($total_render_time, $_url, $render_time);
         }*/
 
+        /** @var lcWebResponse $response */
         $response = $this->getResponse();
 
         // send the output
@@ -483,24 +490,26 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             $response->setContentType($content_type);
         }
 
-        /* page metadata */
-        $title = $controller->getTitle();
+        if ($controller instanceof lcWebController) {
+            /* page metadata */
+            $title = $controller->getTitle();
 
-        if ($title) {
-            $response->setTitle($title);
-            //$response->setMetatag('title', $title);
-        }
+            if ($title) {
+                $response->setTitle($title);
+                //$response->setMetatag('title', $title);
+            }
 
-        $description = $controller->getDescription();
+            $description = $controller->getDescription();
 
-        if ($description) {
-            $response->setMetatag('description', $description);
-        }
+            if ($description) {
+                $response->setMetatag('description', $description);
+            }
 
-        $keywords = $controller->getKeywords();
+            $keywords = $controller->getKeywords();
 
-        if ($keywords) {
-            $response->setMetatag('keywords', $keywords);
+            if ($keywords) {
+                $response->setMetatag('keywords', $keywords);
+            }
         }
 
         $response->setContent($content);

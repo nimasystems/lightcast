@@ -26,366 +26,333 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcDeviceDetective.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcDeviceDetective
 {
-	private $useragent;
-	private $httpaccept;
+    private $useragent;
+    private $httpaccept;
 
-	private $request;
+    private $request;
 
-	private static $device_strings = array
-	(
-			'symbian' => 'symbian',
-			'windows ce' => 'winmobile',
-			'windows' => 'winmobile',
-			'iemobile' => 'winmobile',
-			'wm5 pie' => 'winmobile', //old winmobile device :?
-			'blackberry' => 'blackberry',
-			'iphone'	=> 'iphone',
-			'ipad'	=> 'ipad',
-			'android' => 'android'
-	);
+    private static $device_strings = array
+    (
+        'symbian' => 'symbian',
+        'windows ce' => 'winmobile',
+        'windows' => 'winmobile',
+        'iemobile' => 'winmobile',
+        'wm5 pie' => 'winmobile', //old winmobile device :?
+        'blackberry' => 'blackberry',
+        'iphone' => 'iphone',
+        'ipad' => 'ipad',
+        'android' => 'android'
+    );
 
-	//Device Versions//
-	private static $versions = array
-	(
-			'symbian' => array('series60', 'series70', 'series80', 'series90')
-	);
-
-
-	private static $browsers = array
-	(
-			'opera',
-			'netfront', //common os browsers
-			'teleca q',
-			'safari',
-	);
-
-	private static $device_breads= array
-	(
-			'pda', 'mini', 'mobile', 'mobi'
-	);
-
-	//webkits engines//
-	private static $web_kits = array
-	(
-			'webkit', 'android', 'iphone', 'ipod'
-	);
+    //Device Versions//
+    /*private static $versions = array
+    (
+        'symbian' => array('series60', 'series70', 'series80', 'series90')
+    );*/
 
 
-	//rare custom stuff//
-	private static $operators = array
-	(
-			'docomo', 'kddi', 'vodafone'
-	);
+    /*private static $browsers = array
+    (
+        'opera',
+        'netfront', //common os browsers
+        'teleca q',
+        'safari',
+    );*/
 
-	private static $manufacturer = array
-	(
-			'sonyericsson', 'ericsson', 'sec-sgh', 'sony', 'apple', 'htc'
-	);
+    /*private static $device_breads = array
+    (
+        'pda', 'mini', 'mobile', 'mobi'
+    );*/
 
-	//mobile agents//
-	private static $mobile_agents = array
-	(
-			'w3c ','acs-','alav','alca','amoi','audi','avan','benq','bird','blac',
-			'blaz','brew','cell','cldc','cmd-','dang','doco','eric','hipt','inno',
-			'ipaq','java','jigs','kddi','keji','leno','lg-c','lg-d','lg-g','lge-',
-			'maui','maxo','midp','mits','mmef','mobi','mot-','moto','mwbp','nec-',
-			'newt','noki','palm','pana','pant','phil','play','port','prox',
-			'qwap','sage','sams','sany','sch-','sec-','send','seri','sgh-','shar',
-			'sie-','siem','smal','smar','sony','sph-','symb','t-mo','teli','tim-',
-			'tosh','tsm-','upg1','upsi','vk-v','voda','wap-','wapa','wapi','wapp',
-			'wapr','webc','winw','winw','xda','xda-'
-	);
+    //webkits engines//
+    /*private static $web_kits = array
+    (
+        'webkit', 'android', 'iphone', 'ipod'
+    );*/
 
-	public function __construct(lcRequest $request)
-	{
-		$this->request = $request;
 
-		$this->useragent = strtolower($this->request->env('HTTP_USER_AGENT'));
-		$this->httpaccept = strtolower($this->request->env('HTTP_ACCEPT'));
+    //rare custom stuff//
+    /*private static $operators = array
+    (
+        'docomo', 'kddi', 'vodafone'
+    );*/
 
-		//$this->useragent = strtolower('Mozilla/5.0 (SymbianOS/9.4; Series60/3.1 NokiaN97-1/12.0.024');
-		//$this->useragent = strtolower('th_touch_prot722 opera mini/9.50 (windows nt 5.1; u; en)');
-	}
+    /*private static $manufacturer = array
+    (
+        'sonyericsson', 'ericsson', 'sec-sgh', 'sony', 'apple', 'htc'
+    );*/
 
-	public function isWapRequest()
-	{
-		if((strpos(strtolower($this->request->env('HTTP_ACCEPT')),'application/vnd.wap.xhtml+xml')>0) ||
-				((($this->request->env('HTTP_X_WAP_PROFILE')) || ($this->request->env('HTTP_PROFILE')))))
-		{
-			return true;
-		}
-	}
+    //mobile agents//
+    private static $mobile_agents = array
+    (
+        'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
+        'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
+        'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
+        'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
+        'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox',
+        'qwap', 'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar',
+        'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
+        'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
+        'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-'
+    );
 
-	public function detectMobileDevice()
-	{
-		if(!$this->isMobileBrowser())
-		{
-			return array();
-		}
+    public function __construct(lcRequest $request)
+    {
+        $this->request = $request;
 
-		$data = array();
+        $this->useragent = strtolower($this->request->env('HTTP_USER_AGENT'));
+        $this->httpaccept = strtolower($this->request->env('HTTP_ACCEPT'));
 
-		foreach(self::$device_strings as $haystack => $device_key)
-		{
-			//find device key and proccess it//
-			if(stripos($this->useragent, $haystack) > -1)
-			{
-				$data = $this->processDevice($device_key);
+        //$this->useragent = strtolower('Mozilla/5.0 (SymbianOS/9.4; Series60/3.1 NokiaN97-1/12.0.024');
+        //$this->useragent = strtolower('th_touch_prot722 opera mini/9.50 (windows nt 5.1; u; en)');
+    }
 
-				break;
-			}
-		}
+    public function isWapRequest()
+    {
+        return ((strpos(strtolower($this->request->env('HTTP_ACCEPT')), 'application/vnd.wap.xhtml+xml') > 0) ||
+            ((($this->request->env('HTTP_X_WAP_PROFILE')) || ($this->request->env('HTTP_PROFILE'))))
+        );
+    }
 
-		return $data;
-	}
+    public function detectMobileDevice()
+    {
+        if (!$this->isMobileBrowser()) {
+            return array();
+        }
 
-	public function processDevice($device_key)
-	{
-		switch($device_key)
-		{
-			case 'iphone':
-				{
-					// match iphone devices
-					preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+        $data = array();
 
-					if($matches && count($matches) == 2)
-					{
-						return array
-						(
-								'device' => 'iphone',
-								'sdk' =>  $matches[1][0]
-						);
-					}
+        foreach (self::$device_strings as $haystack => $device_key) {
+            //find device key and proccess it//
+            if (stripos($this->useragent, $haystack) > -1) {
+                $data = $this->processDevice($device_key);
 
-					//default case unknow symbian device//
-					return array
-					(
-							'device' => 'iphone',
-							'sdk' =>  null
-					);
+                break;
+            }
+        }
 
-					break;
-				}
-			case 'ipad':
-				{
-					// match iphone devices
-					preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+        return $data;
+    }
 
-					if($matches && count($matches) == 2)
-					{
-						return array
-						(
-								'device' => 'ipad',
-								'sdk' =>  $matches[1][0]
-						);
-					}
+    public function processDevice($device_key)
+    {
+        switch ($device_key) {
+            case 'iphone': {
+                // match iphone devices
+                preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-					//default case unknow symbian device//
-					return array
-					(
-							'device' => 'ipad',
-							'sdk' =>  null
-					);
+                if ($matches && count($matches) == 2) {
+                    return array
+                    (
+                        'device' => 'iphone',
+                        'sdk' => $matches[1][0]
+                    );
+                }
 
-					break;
-				}
-			case 'android':
-				{
-					// match android devices
-					preg_match_all('/Android\s(.*?);\s/i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+                //default case unknow symbian device//
+                return array
+                (
+                    'device' => 'iphone',
+                    'sdk' => null
+                );
 
-					if($matches && count($matches) == 2)
-					{
-						return array
-						(
-								'device' => 'android',
-								'sdk' =>  $matches[1][0]
-						);
-					}
+                break;
+            }
+            case 'ipad': {
+                // match iphone devices
+                preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-					//default case unknow android device//
-					return array
-					(
-							'device' => 'android',
-							'sdk' =>  null
-					);
+                if ($matches && count($matches) == 2) {
+                    return array
+                    (
+                        'device' => 'ipad',
+                        'sdk' => $matches[1][0]
+                    );
+                }
 
-					break;
-				}
-			case 'symbian':
-				{
-					//new headers
-					preg_match_all('/series(.*?)\/(.*?) /i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+                //default case unknow symbian device//
+                return array
+                (
+                    'device' => 'ipad',
+                    'sdk' => null
+                );
 
-					if($matches && count($matches) == 3)
-					{
-						return array
-						(
-								'device' => 'symbian',
-								'sdk' =>  (int)$matches[1][0],
-								'fp' => $this->getFpCodeByBrowser($matches[2][0])
-						);
-					}
+                break;
+            }
+            case 'android': {
+                // match android devices
+                preg_match_all('/Android\s(.*?);\s/i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-					//default case unknow symbian device//
-					return array
-					(
-							'device' => 'symbian',
-							'sdk' =>  0,
-							'fp' => false
-					);
+                if ($matches && count($matches) == 2) {
+                    return array
+                    (
+                        'device' => 'android',
+                        'sdk' => $matches[1][0]
+                    );
+                }
 
-					break;
-				}
-			case 'winmobile':
-				{
-					//ie//
-					preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+                //default case unknow android device//
+                return array
+                (
+                    'device' => 'android',
+                    'sdk' => null
+                );
 
-					if($matches && count($matches) ==2 )
-					{
-						return array
-						(
-								'device' => 'winmobile',
-								'os_version' => (float)$matches[1][0]
-						);
-					}
+                break;
+            }
+            case 'symbian': {
+                //new headers
+                preg_match_all('/series(.*?)\/(.*?) /i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-					//opera
-					preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
-					$matches = array_filter($matches);
+                if ($matches && count($matches) == 3) {
+                    return array
+                    (
+                        'device' => 'symbian',
+                        'sdk' => (int)$matches[1][0],
+                        'fp' => $this->getFpCodeByBrowser($matches[2][0])
+                    );
+                }
 
-					if($matches && count($matches) ==2 )
-					{
-						return array
-						(
-								'device' => 'winmobile',
-								'os_version' => (float)$matches[1][0]
-						);
-					}
+                //default case unknow symbian device//
+                return array
+                (
+                    'device' => 'symbian',
+                    'sdk' => 0,
+                    'fp' => false
+                );
 
-					//opera sucks//
-					if(stripos('opera', $this->useragent) > -1)
-					{
-						preg_match_all('/windows nt (.*?);/i', $this->useragent, $matches);
-						$matches = array_filter($matches);
+                break;
+            }
+            case 'winmobile': {
+                //ie//
+                preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-						if($matches && count($matches) ==2 )
-						{
-							return array
-							(
-									'device' => 'winmobile',
-									'os_version' => (float)$matches[1][0]
-							);
-						}
-					}
+                if ($matches && count($matches) == 2) {
+                    return array
+                    (
+                        'device' => 'winmobile',
+                        'os_version' => (float)$matches[1][0]
+                    );
+                }
 
-					//i dont know what are you!
-					return array
-					(
-							'device' => 'winmobile',
-							'os_version' => 0
-					);
-				}
-			default:
-				{
-					return array();
-				}
-		}
-	}
+                //opera
+                preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
+                $matches = array_filter($matches);
 
-	public function isMobileBrowser()
-	{
-		if(preg_match('/(up.browser|up.link|mmp|mobile|symbian|smartphone|midp|wap|android|htc|phone|windows ce|iemobile|wm5 pie)/i', $this->useragent))
-		{
-			return true;
-		}
+                if ($matches && count($matches) == 2) {
+                    return array
+                    (
+                        'device' => 'winmobile',
+                        'os_version' => (float)$matches[1][0]
+                    );
+                }
 
-		$mobile_ua = strtolower(substr($this->useragent,0,4));
+                //opera sucks//
+                if (stripos('opera', $this->useragent) > -1) {
+                    preg_match_all('/windows nt (.*?);/i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
 
-		if(in_array($mobile_ua, self::$mobile_agents))
-		{
-			return true;
-		}
+                    if ($matches && count($matches) == 2) {
+                        return array
+                        (
+                            'device' => 'winmobile',
+                            'os_version' => (float)$matches[1][0]
+                        );
+                    }
+                }
 
-		if(preg_match('/windows/i', $this->useragent))
-		{
-			if (stripos($this->useragent, 'opera') > -1)
-			{
-				if ((stripos($this->useragent, 'mini') > -1) || (stripos($this->useragent,'mobi') > -1))
-				{
-					return true;
-				}
-				else
-				{
-					return false;
-				}
-			}
-		}
+                //i dont know what are you!
+                return array
+                (
+                    'device' => 'winmobile',
+                    'os_version' => 0
+                );
+            }
+            default: {
+                return array();
+            }
+        }
+    }
 
-		if((strpos(strtolower($this->request->env('HTTP_ACCEPT')),'application/vnd.wap.xhtml+xml')>0) ||
-				((($this->request->env('HTTP_X_WAP_PROFILE')) || ($this->request->env('HTTP_PROFILE')))))
-		{
-			return true;
-		}
+    public function isMobileBrowser()
+    {
+        if (preg_match('/(up.browser|up.link|mmp|mobile|symbian|smartphone|midp|wap|android|htc|phone|windows ce|iemobile|wm5 pie)/i', $this->useragent)) {
+            return true;
+        }
 
-		return false;
-	}
+        $mobile_ua = strtolower(substr($this->useragent, 0, 4));
 
-	private function getFpCodeByBrowser($code)
-	{
-		$code = (float)$code;
+        if (in_array($mobile_ua, self::$mobile_agents)) {
+            return true;
+        }
 
-		//the furutre pack 1
-		if($code == 3.1)
-		{
-			return 1;
-		}
+        if (preg_match('/windows/i', $this->useragent)) {
+            if (stripos($this->useragent, 'opera') > -1) {
+                if ((stripos($this->useragent, 'mini') > -1) || (stripos($this->useragent, 'mobi') > -1)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
 
-		//some have 7.1//
-		if($code == 3.2)
-		{
-			return 2;
-		}
+        if ((strpos(strtolower($this->request->env('HTTP_ACCEPT')), 'application/vnd.wap.xhtml+xml') > 0) ||
+            ((($this->request->env('HTTP_X_WAP_PROFILE')) || ($this->request->env('HTTP_PROFILE'))))
+        ) {
+            return true;
+        }
 
-		if($code == 7.1 || $code ==7.0)
-		{
-			return 5;
-		}
+        return false;
+    }
 
-		//unsuported symbian
-		if($code < 3.1)
-		{
-			return false;
-		}
+    private function getFpCodeByBrowser($code)
+    {
+        $code = (float)$code;
 
-		//greater then future pack 1
-		if($code > 3.2)
-		{
-			return 2;
-		}
-	}
+        //the furutre pack 1
+        if ($code == 3.1) {
+            return 1;
+        }
 
-	public function debug()
-	{
-		e($this->useragent);
-	}
+        //some have 7.1//
+        if ($code == 3.2) {
+            return 2;
+        }
 
-	public function __toString()
-	{
-		return (string)$this->useragent;
-	}
+        if ($code == 7.1 || $code == 7.0) {
+            return 5;
+        }
+
+        //unsuported symbian
+        if ($code < 3.1) {
+            return false;
+        }
+
+        //greater then future pack 1
+        if ($code > 3.2) {
+            return 2;
+        }
+
+        return false;
+    }
+
+    public function debug()
+    {
+        e($this->useragent);
+    }
+
+    public function __toString()
+    {
+        return (string)$this->useragent;
+    }
 }
-
-?>

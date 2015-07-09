@@ -26,66 +26,61 @@
  * @subpackage File Subcategory
  * @changed $Id: lcViewFilterChain.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcViewFilterChain extends lcSysObj
 {
-	protected $first_view_filter;
-	protected $last_view_filter;
-	
-	public function shutdown()
-	{
-		$this->removeAllFilters();
-		
-		parent::shutdown();
-	}
-	
-	public function execute(lcView $view, $content, $content_type = null)
-	{
-		if (!$this->first_view_filter)
-		{
-			return $content;
-		}
+    /** @var lcViewFilter */
+    protected $first_view_filter;
 
-		$ret = $this->first_view_filter->filterView($view, $content, $content_type);
-		return $ret;
-	}
-	
-	public function addViewFilter(lcViewFilter $view_filter)
-	{
-		if (!$this->first_view_filter)
-		{
-			$this->first_view_filter = $view_filter;
-			$this->last_view_filter = $this->first_view_filter;
-		}
-		else
-		{
-			$this->last_view_filter->setNext($view_filter);
-			$this->last_view_filter = $view_filter;
-		}
-	}
-	
-	public function removeAllFilters()
-	{
-		if ($this->first_view_filter)
-		{
-			$this->first_view_filter->shutdown();
-			$this->first_view_filter = null;
-		}
-		
-		$this->last_view_filter = null;
-	}
-	
-	public function getFirstViewFilter()
-	{
-		return $this->first_view_filter;
-	}
-	
-	public function getLastViewFilter()
-	{
-		return $this->last_view_filter;
-	}
+    /** @var lcViewFilter */
+    protected $last_view_filter;
+
+    public function shutdown()
+    {
+        $this->removeAllFilters();
+
+        parent::shutdown();
+    }
+
+    public function execute(lcView $view, $content, $content_type = null)
+    {
+        if (!$this->first_view_filter) {
+            return $content;
+        }
+
+        $ret = $this->first_view_filter->filterView($view, $content, $content_type);
+        return $ret;
+    }
+
+    public function addViewFilter(lcViewFilter $view_filter)
+    {
+        if (!$this->first_view_filter) {
+            $this->first_view_filter = $view_filter;
+            $this->last_view_filter = $this->first_view_filter;
+        } else {
+            $this->last_view_filter->setNext($view_filter);
+            $this->last_view_filter = $view_filter;
+        }
+    }
+
+    public function removeAllFilters()
+    {
+        if ($this->first_view_filter) {
+            $this->first_view_filter->shutdown();
+            $this->first_view_filter = null;
+        }
+
+        $this->last_view_filter = null;
+    }
+
+    public function getFirstViewFilter()
+    {
+        return $this->first_view_filter;
+    }
+
+    public function getLastViewFilter()
+    {
+        return $this->last_view_filter;
+    }
 }
-
-?>

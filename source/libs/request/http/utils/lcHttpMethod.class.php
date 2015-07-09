@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 // main app action dispatcher
@@ -30,89 +32,59 @@
  * File Description
  * @package File Category
  * @subpackage File Subcategory
-* @changed $Id: lcHttpMethod.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @changed $Id: lcHttpMethod.class.php 1455 2013-10-25 20:29:31Z mkovachev $
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcHttpMethod
 {
-	const METHOD_ANY = 0;
-	const METHOD_GET = 1;
-	const METHOD_PUT = 2;
-	const METHOD_POST = 3;
-	const METHOD_HEAD = 4;
+    const METHOD_ANY = 0;
+    const METHOD_GET = 1;
+    const METHOD_PUT = 2;
+    const METHOD_POST = 3;
+    const METHOD_HEAD = 4;
 
-	const METHOD_CHECKOUT = 5;
-	const METHOD_SHOWMETHOD = 6;
-	const METHOD_LINK = 7;
-	const METHOD_UNLINK = 8;
-	const METHOD_CHECKIN = 9;
-	const METHOD_TEXTSEARCH = 10;
-	const METHOD_SPACEJUMP = 11;
-	const METHOD_SEARCH = 12;
+    const METHOD_CHECKOUT = 5;
+    const METHOD_SHOWMETHOD = 6;
+    const METHOD_LINK = 7;
+    const METHOD_UNLINK = 8;
+    const METHOD_CHECKIN = 9;
+    const METHOD_TEXTSEARCH = 10;
+    const METHOD_SPACEJUMP = 11;
+    const METHOD_SEARCH = 12;
 
-	public static function getType($string)
-	{
-		$string = strtolower($string);
+    public static function getType($string)
+    {
+        $string = strtolower($string);
 
-		if ($string == 'any')
-		{
-			return self::METHOD_ANY;
-		}
-		elseif ($string == 'get')
-		{
-			return self::METHOD_GET;
-		}
-		elseif ($string == 'put')
-		{
-			return self::METHOD_PUT;
-		}
-		elseif ($string == 'post')
-		{
-			return self::METHOD_POST;
-		}
-		elseif ($string == 'head')
-		{
-			return self::METHOD_HEAD;
-		}
-		elseif ($string == 'checkout')
-		{
-			return self::METHOD_CHECKOUT;
-		}
-		elseif ($string == 'showmethod')
-		{
-			return self::METHOD_SHOWMETHOD;
-		}
-		elseif ($string == 'link')
-		{
-			return self::METHOD_LINK;
-		}
-		elseif ($string == 'unlink')
-		{
-			return self::METHOD_UNLINK;
-		}
-		elseif ($string == 'checkin')
-		{
-			return self::METHOD_CHECKIN;
-		}
-		elseif ($string == 'textsearch')
-		{
-			return self::METHOD_TEXTSEARCH;
-		}
-		elseif ($string == 'spacejump')
-		{
-			return self::METHOD_SPACEJUMP;
-		}
-		elseif ($string == 'search')
-		{
-			return self::METHOD_SEARCH;
-		}
-		else
-		{
-			return false;
-		}
-	}
+        if ($string == 'any') {
+            return self::METHOD_ANY;
+        } elseif ($string == 'get') {
+            return self::METHOD_GET;
+        } elseif ($string == 'put') {
+            return self::METHOD_PUT;
+        } elseif ($string == 'post') {
+            return self::METHOD_POST;
+        } elseif ($string == 'head') {
+            return self::METHOD_HEAD;
+        } elseif ($string == 'checkout') {
+            return self::METHOD_CHECKOUT;
+        } elseif ($string == 'showmethod') {
+            return self::METHOD_SHOWMETHOD;
+        } elseif ($string == 'link') {
+            return self::METHOD_LINK;
+        } elseif ($string == 'unlink') {
+            return self::METHOD_UNLINK;
+        } elseif ($string == 'checkin') {
+            return self::METHOD_CHECKIN;
+        } elseif ($string == 'textsearch') {
+            return self::METHOD_TEXTSEARCH;
+        } elseif ($string == 'spacejump') {
+            return self::METHOD_SPACEJUMP;
+        } elseif ($string == 'search') {
+            return self::METHOD_SEARCH;
+        } else {
+            return false;
+        }
+    }
 }
-
-?>

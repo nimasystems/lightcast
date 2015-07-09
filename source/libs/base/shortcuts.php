@@ -26,8 +26,8 @@
  * @subpackage File Subcategory
  * @changed $Id: shortcuts.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
+ * @version $Revision: 1592 $
+ */
 
 define('NL', "\n");
 
@@ -45,95 +45,88 @@ define('L_TIME_YEAR', 32140800);
  */
 function __($param)
 {
-	return $param;
+    return $param;
 }
 
 function e($param, $return = false)
 {
-	if (!$return)
-	{
-		var_dump($param);
-		return;
-	}
+    if (!$return) {
+        var_dump($param);
+        return;
+    }
 
-	if (!is_string($param))
-	{
-		$param =
-		'<pre>'.
-		print_r($param,true).
-		'</pre>';
-	}
+    if (!is_string($param)) {
+        $param =
+            '<pre>' .
+            print_r($param, true) .
+            '</pre>';
+    }
 
-	if ($return)
-	{
-		return $param;
-	}
+    if ($return) {
+        return $param;
+    }
 
-	echo $param;
+    echo $param;
 }
 
 function ee($param, $return = false)
 {
-	$param =
-	'<pre>'.
-	print_r($param,true).
-	'</pre>';
+    $param =
+        '<pre>' .
+        print_r($param, true) .
+        '</pre>';
 
-	if ($return)
-	{
-		return $param;
-	}
+    if ($return) {
+        return $param;
+    }
 
-	echo $param;
+    echo $param;
 }
 
 function vd($val)
 {
-	if(is_array($val) OR is_object($val))
-	{
-		echo
-		'<pre>'.
-		print_r($val,true).
-		'</pre>';
-	}
-	else
-	{
-		var_dump($val);
-	}
+    if (is_array($val) OR is_object($val)) {
+        echo
+            '<pre>' .
+            print_r($val, true) .
+            '</pre>';
+    } else {
+        var_dump($val);
+    }
 }
 
 // fast string lowercase
 function low($string)
 {
-	return lcUnicode::strtolower($string);
+    return lcUnicode::strtolower($string);
 }
 
 // fast string uppercase
 function up($string)
 {
-	return strtoupper($string);
+    return strtoupper($string);
 }
 
 // fast str_replace
 function r($search, $replace, $subject)
 {
-	return str_replace($search, $replace, $subject);
+    return str_replace($search, $replace, $subject);
 }
 
 function ri($search, $replace, $subject)
 {
-	return str_ireplace($search, $replace, $subject);
+    return str_ireplace($search, $replace, $subject);
 }
 
 // fast explode
-function ex($sep,$arr)
+function ex($sep, $arr)
 {
-	return explode($sep,$arr);
+    return explode($sep, $arr);
 }
 
 function gc($objname)
 {
-	return get_class_methods($objname);
+    return get_class_methods($objname);
 }
 
 /*
@@ -142,5 +135,5 @@ function gc($objname)
  */
 function fnothing()
 {
-	//
+    //
 }

@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,25 +28,22 @@
  * @subpackage File Subcategory
  * @changed $Id: lcColumnMap.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcColumnMap extends ColumnMap
 {
-	/*
-	 * The human readable title of the table
-	 */
-	protected $lc_title;
-	
-	public function setLcTitle($title)
-	{
-		$this->lc_title = $title;
-	}
+    /*
+     * The human readable title of the table
+     */
+    protected $lc_title;
 
-	public function getLcTitle()
-	{
-		return $this->getTable()->translate($this->lc_title);
-	}
+    public function setLcTitle($title)
+    {
+        $this->lc_title = $title;
+    }
+
+    public function getLcTitle()
+    {
+        return $this->getTable()->translate($this->lc_title);
+    }
 }
-
-?>

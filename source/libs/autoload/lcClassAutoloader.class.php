@@ -28,207 +28,191 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1488 $
  */
-
 class lcClassAutoloader extends lcSysObj implements iCacheable
 {
     /**
      * @var array
      */
-	protected $registered_classes = array();
+    protected $registered_classes = array();
 
-	protected $spl_registered;
+    protected $spl_registered;
 
-	public function initialize()
-	{
-		parent::initialize();
+    public function initialize()
+    {
+        parent::initialize();
 
-		// register into system
-		$this->splRegister();
-	}
+        // register into system
+        $this->splRegister();
+    }
 
-	public function shutdown()
-	{
-		// unregister from system
-		$this->splUnregister();
+    public function shutdown()
+    {
+        // unregister from system
+        $this->splUnregister();
 
-		parent::shutdown();
-	}
+        parent::shutdown();
+    }
 
-	public function splRegister()
-	{
-		if ($this->spl_registered)
-		{
-			return true;
-		}
+    public function splRegister()
+    {
+        if ($this->spl_registered) {
+            return true;
+        }
 
-		$registered = spl_autoload_register(array($this, 'loadClass'));
+        $registered = spl_autoload_register(array($this, 'loadClass'));
 
-		$this->spl_registered = $registered;
+        $this->spl_registered = $registered;
 
-		return $registered;
-	}
+        return $registered;
+    }
 
-	public function splUnregister()
-	{
-		if (!$this->spl_registered)
-		{
-			return false;
-		}
+    public function splUnregister()
+    {
+        if (!$this->spl_registered) {
+            return false;
+        }
 
-		$registered = spl_autoload_unregister(array($this, 'loadClass'));
+        $registered = spl_autoload_unregister(array($this, 'loadClass'));
 
-		$this->spl_registered = false;
+        $this->spl_registered = false;
 
-		return $registered;
-	}
+        return $registered;
+    }
 
-	public function isSplRegistered()
-	{
-		return $this->spl_registered;
-	}
+    public function isSplRegistered()
+    {
+        return $this->spl_registered;
+    }
 
-	public function addClass($class_name, $filename)
-	{
-		// do not allow overwriting existing class registrations for security reasons
-		if (isset($this->registered_classes[$class_name]))
-		{
-			return false;
-		}
+    public function addClass($class_name, $filename)
+    {
+        // do not allow overwriting existing class registrations for security reasons
+        if (isset($this->registered_classes[$class_name])) {
+            return;
+        }
 
-		$this->registered_classes[$class_name] = $filename;
-	}
+        $this->registered_classes[$class_name] = $filename;
+    }
 
-	public function addClasses(array $classes)
-	{
-		$current_classes = (array)$this->registered_classes;
-		$new_classes = array_merge($current_classes, $classes);
-		$this->registered_classes = $new_classes;
-	}
+    public function addClasses(array $classes)
+    {
+        $current_classes = (array)$this->registered_classes;
+        $new_classes = array_merge($current_classes, $classes);
+        $this->registered_classes = $new_classes;
+    }
 
-	public function hasClass($class_name)
-	{
-		return isset($this->registered_classes[$class_name]);
-	}
+    public function hasClass($class_name)
+    {
+        return isset($this->registered_classes[$class_name]);
+    }
 
-	public function setRegisteredClasses(array $registered_classes = null)
-	{
-		$this->registered_classes = $registered_classes;
-	}
+    public function setRegisteredClasses(array $registered_classes = null)
+    {
+        $this->registered_classes = $registered_classes;
+    }
 
-	public function getRegisteredClasses()
-	{
-		return $this->registered_classes;
-	}
+    public function getRegisteredClasses()
+    {
+        return $this->registered_classes;
+    }
 
-	public function loadClass($class_name)
-	{
-		$included = false;
+    public function loadClass($class_name)
+    {
+        $included = false;
 
-		// check if class is registered
-		$class_registered = isset($this->registered_classes[$class_name]);
+        // check if class is registered
+        $class_registered = isset($this->registered_classes[$class_name]);
 
-		// we check if there are more than 2 autoloaders (this one and propel's one which is used for nothing)
-		// if there are - we do not throw an exception here but allow the other autoloaders to also try to load the class
+        // we check if there are more than 2 autoloaders (this one and propel's one which is used for nothing)
+        // if there are - we do not throw an exception here but allow the other autoloaders to also try to load the class
 
-		if ($class_registered)
-		{
-			// try to include it
+        if ($class_registered) {
+            // try to include it
             /** @noinspection PhpIncludeInspection */
             $included = (bool)include($this->registered_classes[$class_name]);
-		}
+        }
 
-		if (!$included)
-		{
-			$error_message = null;
-			$error_code = 0;
-			
-			// try other autoloaders if available
-			$autoloaders = spl_autoload_functions();
-			
-			if ($autoloaders)
-			{
-				// try with each loader
-				// store the first detected error
-				foreach($autoloaders as $autoloader)
-				{
-					$obj = $autoloader[0];
-					$func = $autoloader[1];
-					
-					// skip the current one
-					if ($obj === $this && $func == 'loadClass')
-					{
-						continue;
-					}
+        if (!$included) {
+            $error_message = null;
+            $error_code = 0;
 
-					try 
-					{
-						call_user_func_array(array($obj, $func), array($class_name));
+            // try other autoloaders if available
+            $autoloaders = spl_autoload_functions();
 
-						$included = class_exists($class_name, false);
-						
-						if ($included)
-						{
-							break;
-						}
-					}
-					catch(Exception $e)
-					{
-						if (!$error_message)
-						{
-							$error_message = $e->getMessage();
-						}
-						
-						if (!$error_code)
-						{
-							$error_code = $e->getCode();
-						}
-						
-						continue;
-					}
-					
-					unset($autoloader);
-				}
-			}
-			
-			// if we have a success
-			if ($included)
-			{
-				return true;
-			}
-			
-			// unfortunately - at this moment there is no way to distinguish between a class_exists() call or 
-			// trying to instantiate a missing class
-			// so if we throw an exception here - it might be an exception thrown to a class_exists() check
-			// that should not happen... 
-			// until PHP resolves this issue (because it IS an issue) we cannot apply this
-			// and we silently exit and do nothing further.... pitty..
-			return false;
+            if ($autoloaders) {
+                // try with each loader
+                // store the first detected error
+                foreach ($autoloaders as $autoloader) {
+                    $obj = $autoloader[0];
+                    $func = $autoloader[1];
 
-			/*
-			$this->event_dispatcher->notify(new lcEvent('class_autoloader.class_not_found', $this, array(
-					'class_name' => $class_name,
-					'error_message' => $error_message,
-					'error_code' => $error_code
-			)));
+                    // skip the current one
+                    if ($obj === $this && $func == 'loadClass') {
+                        continue;
+                    }
 
-			throw new Exception('Could not load class: ' . $class_name);*/
-		}
+                    try {
+                        call_user_func_array(array($obj, $func), array($class_name));
 
-		return true;
-	}
+                        $included = class_exists($class_name, false);
 
-	public function writeClassCache()
-	{
-		$cache = array(
-				'registered_classes' => $this->registered_classes,
-		);
-		return $cache;
-	}
+                        if ($included) {
+                            break;
+                        }
+                    } catch (Exception $e) {
+                        if (!$error_message) {
+                            $error_message = $e->getMessage();
+                        }
 
-	public function readClassCache(array $cached_data)
-	{
-		$this->registered_classes = isset($cached_data['registered_classes']) ? $cached_data['registered_classes'] : null;
-	}
+                        if (!$error_code) {
+                            $error_code = $e->getCode();
+                        }
+
+                        continue;
+                    }
+
+                    unset($autoloader);
+                }
+            }
+
+            // if we have a success
+            if ($included) {
+                return true;
+            }
+
+            // unfortunately - at this moment there is no way to distinguish between a class_exists() call or
+            // trying to instantiate a missing class
+            // so if we throw an exception here - it might be an exception thrown to a class_exists() check
+            // that should not happen...
+            // until PHP resolves this issue (because it IS an issue) we cannot apply this
+            // and we silently exit and do nothing further.... pitty..
+            return false;
+
+            /*
+            $this->event_dispatcher->notify(new lcEvent('class_autoloader.class_not_found', $this, array(
+                    'class_name' => $class_name,
+                    'error_message' => $error_message,
+                    'error_code' => $error_code
+            )));
+
+            throw new Exception('Could not load class: ' . $class_name);*/
+        }
+
+        return true;
+    }
+
+    public function writeClassCache()
+    {
+        $cache = array(
+            'registered_classes' => $this->registered_classes,
+        );
+        return $cache;
+    }
+
+    public function readClassCache(array $cached_data)
+    {
+        $this->registered_classes = isset($cached_data['registered_classes']) ? $cached_data['registered_classes'] : null;
+    }
 }
 
 ?>

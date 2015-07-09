@@ -26,29 +26,26 @@
  * @subpackage File Subcategory
  * @changed $Id: lcProjectTranslationsParser.class.php 1519 2014-05-19 09:11:03Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1519 $
-*/
-
+ * @version $Revision: 1519 $
+ */
 class lcProjectTranslationsParser extends lcTranslationsParser
 {
-	public function getCategorizationMap()
-	{
-		return array(
-				'models' => 'database_models',
-				'gen' => 'database_models',
-		);
-	}
+    public function getCategorizationMap()
+    {
+        return array(
+            'models' => 'database_models',
+            'gen' => 'database_models',
+        );
+    }
 
-	public function getDirsToParse()
-	{
-		return array(
-				'extensions',
-				'models',
-				'gen',
-				'tasks',
-				'ws'
-		);
-	}
+    public function getDirsToParse()
+    {
+        return array(
+            'extensions',
+            'models',
+            'gen',
+            'tasks',
+            'ws'
+        );
+    }
 }
-
-?>

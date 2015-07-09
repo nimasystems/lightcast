@@ -26,10 +26,9 @@
  * @subpackage File Subcategory
  * @changed $Id: iDatabaseManager.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 interface iDatabaseManager
 {
-	public function getConnection($name = null);
+    public function getConnection($name = null);
 }

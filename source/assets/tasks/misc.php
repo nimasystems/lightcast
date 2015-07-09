@@ -28,253 +28,222 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-
 class tMisc extends lcTaskController
 {
-	private $found_models;
-	private $found_php_files;
+    private $found_models;
+    private $found_php_files;
 
-	public function getHelpInfo()
-	{
-		return "\n" . '--find-models - Detect all used models in the project by scanning all php plugin / module files' . "\n";
-	}
+    public function getHelpInfo()
+    {
+        return "\n" . '--find-models - Detect all used models in the project by scanning all php plugin / module files' . "\n";
+    }
 
-	public function displayHelp()
-	{
-		$this->consoleDisplay($this->getHelpInfo(), false, false);
-		return true;
-	}
+    public function displayHelp()
+    {
+        $this->consoleDisplay($this->getHelpInfo(), false, false);
+        return true;
+    }
 
-	public function executeTask()
-	{
-		switch($this->getRequest()->getParam('action'))
-		{
-			case 'find-models':
-				return $this->findModels();
-			default:
-				return $this->displayHelp();
-		}
+    public function executeTask()
+    {
+        switch ($this->getRequest()->getParam('action')) {
+            case 'find-models':
+                return $this->findModels();
+            default:
+                return $this->displayHelp();
+        }
+    }
 
-		return false;
-	}
+    public function findModels()
+    {
+        $this->consoleDisplay('Find models started');
 
-	public function findModels()
-	{
-		$this->consoleDisplay('Find models started');
+        $this->found_models = array();
+        $this->found_php_files = array();
 
-		$this->found_models = array();
-		$this->found_php_files = array();
+        $this->_findModels();
 
-		$this->_findModels();
-		
-		// scan them now
-		$this->detectDbModelsInFile($this->found_models, $this->found_php_files);
-		
-		return true;
-	}
+        // scan them now
+        $this->detectDbModelsInFile($this->found_models, $this->found_php_files);
 
-	private function _findModels()
-	{
-		// plugins
-		$plugins = $this->system_component_factory->getSystemPluginDetails();
+        return true;
+    }
 
-		if ($plugins)
-		{
-			foreach($plugins as $name => $info)
-			{
-				$php_files = array();
-				$models = array();
+    private function _findModels()
+    {
+        // plugins
+        $plugins = $this->system_component_factory->getSystemPluginDetails();
 
-				// plugin master file
-				$php_files[] = $info['path'] . DS . $name . '.php';
+        if ($plugins) {
+            foreach ($plugins as $name => $info) {
+                $php_files = array();
+                $models = array();
 
-				// plugin modules
-				$modules_path = $info['path'] . DS . lcPlugin::MODULES_PATH;
+                // plugin master file
+                $php_files[] = $info['path'] . DS . $name . '.php';
 
-				$mods = lcDirs::getSubDirsOfDir($modules_path);
+                // plugin modules
+                $modules_path = $info['path'] . DS . lcPlugin::MODULES_PATH;
 
-				if ($mods)
-				{
-					foreach($mods as $mod_name)
-					{
-						$php_files[] = $modules_path . DS . $mod_name . DS . $mod_name . '.php';
-						unset($mod_name);
-					}
-				}
+                $mods = lcDirs::getSubDirsOfDir($modules_path);
 
-				unset($modules_path, $mods);
+                if ($mods) {
+                    foreach ($mods as $mod_name) {
+                        $php_files[] = $modules_path . DS . $mod_name . DS . $mod_name . '.php';
+                        unset($mod_name);
+                    }
+                }
 
-				// plugin tasks
-				$tasks_path = $info['path'] . DS . lcPlugin::TASKS_PATH;
+                unset($modules_path, $mods);
 
-				$tasks = lcDirs::searchDir($tasks_path, true);
+                // plugin tasks
+                $tasks_path = $info['path'] . DS . lcPlugin::TASKS_PATH;
 
-				if ($tasks)
-				{
-					foreach($tasks as $task_name)
-					{
-						$php_files[] = $tasks_path . DS . $task_name['name'];
-						unset($task_name);
-					}
-				}
+                $tasks = lcDirs::searchDir($tasks_path, true);
 
-				unset($tasks_path, $tasks);
-				
-				// web services
-				$ws_path = $info['path'] . DS . lcPlugin::WEB_SERVICES_PATH;
+                if ($tasks) {
+                    foreach ($tasks as $task_name) {
+                        $php_files[] = $tasks_path . DS . $task_name['name'];
+                        unset($task_name);
+                    }
+                }
 
-				$web_services = lcDirs::searchDir($ws_path, true);
+                unset($tasks_path, $tasks);
 
-				if ($web_services)
-				{
-					foreach($web_services as $web_service_name)
-					{
-						$php_files[] = $ws_path . DS . $web_service_name['name'];
-						unset($web_service_name);
-					}
-				}
-				
-				unset($ws_path, $web_services);
+                // web services
+                $ws_path = $info['path'] . DS . lcPlugin::WEB_SERVICES_PATH;
 
-				// models
-				$models_path = $info['path'] . DS . lcPlugin::MODELS_PATH;
-				$models_ = lcDirs::searchDir($models_path, true);
+                $web_services = lcDirs::searchDir($ws_path, true);
 
-				if ($models_)
-				{
-					foreach($models_ as $m)
-					{
-						$models[] = str_replace('.php', '', $m['name']);
-						unset($m);
-					}
-				}
+                if ($web_services) {
+                    foreach ($web_services as $web_service_name) {
+                        $php_files[] = $ws_path . DS . $web_service_name['name'];
+                        unset($web_service_name);
+                    }
+                }
 
-				$this->found_php_files = array_merge($this->found_php_files, $php_files);
-				$this->found_models = array_merge($this->found_models, $models);
+                unset($ws_path, $web_services);
 
-				unset($name, $info, $mods, $php_files, $models);
-			}
-		}
+                // models
+                $models_path = $info['path'] . DS . lcPlugin::MODELS_PATH;
+                $models_ = lcDirs::searchDir($models_path, true);
 
-		// apps
-		$apps = $this->system_component_factory->getAvailableProjectApplications();
+                if ($models_) {
+                    foreach ($models_ as $m) {
+                        $models[] = str_replace('.php', '', $m['name']);
+                        unset($m);
+                    }
+                }
 
-		if ($apps)
-		{
-			foreach($apps as $name => $details)
-			{
-				$php_files = array();
+                $this->found_php_files = array_merge($this->found_php_files, $php_files);
+                $this->found_models = array_merge($this->found_models, $models);
 
-				// app modules
-				$modules_path = DIR_APP . DS . 'applications' . DS . $name . DS . 'modules';
+                unset($name, $info, $mods, $php_files, $models);
+            }
+        }
 
-				$mods = lcDirs::getSubDirsOfDir($modules_path);
+        // apps
+        $apps = $this->system_component_factory->getAvailableProjectApplications();
 
-				if ($mods)
-				{
-					foreach($mods as $mod_name)
-					{
-						$php_files[] = $modules_path . DS . $mod_name . DS . $mod_name . '.php';
-						unset($mod_name);
-					}
-				}
+        if ($apps) {
+            foreach ($apps as $name => $details) {
+                $php_files = array();
 
-				unset($modules_path, $mods);
+                // app modules
+                $modules_path = DIR_APP . DS . 'applications' . DS . $name . DS . 'modules';
 
-				$this->found_php_files = array_merge($this->found_php_files, $php_files);
+                $mods = lcDirs::getSubDirsOfDir($modules_path);
 
-				unset($name, $info, $mods, $php_files, $details);
-			}
-		}
+                if ($mods) {
+                    foreach ($mods as $mod_name) {
+                        $php_files[] = $modules_path . DS . $mod_name . DS . $mod_name . '.php';
+                        unset($mod_name);
+                    }
+                }
 
-		// project tasks
-		$tasks_path = DIR_APP . DS . 'tasks';
+                unset($modules_path, $mods);
 
-		$tasks = lcDirs::searchDir($tasks_path, true);
+                $this->found_php_files = array_merge($this->found_php_files, $php_files);
 
-		if ($tasks)
-		{
-			$php_files = array();
+                unset($name, $info, $mods, $php_files, $details);
+            }
+        }
 
-			foreach($tasks as $task)
-			{
-				$task_name = $task['name'];
-				$php_files[] = $tasks_path . DS . $task_name;
-				unset($task_name);
-			}
+        // project tasks
+        $tasks_path = DIR_APP . DS . 'tasks';
 
-			$this->found_php_files = array_merge($this->found_php_files, $php_files);
-		}
+        $tasks = lcDirs::searchDir($tasks_path, true);
 
-		unset($tasks_path, $tasks);
+        if ($tasks) {
+            $php_files = array();
 
-		// project web services
-		$ws_path = DIR_APP . DS . 'ws';
-		
-		$web_services = lcDirs::searchDir($ws_path, true);
-		
-		if ($web_services)
-		{
-			$php_files = array();
-		
-			foreach($web_services as $web_service)
-			{
-				$web_service_name = $web_service['name'];
-				$php_files[] = $ws_path . DS . $web_service_name;
-				unset($web_service, $web_service_name);
-			}
-		
-			$this->found_php_files = array_merge($this->found_php_files, $php_files);
-		}
-		
-		unset($ws_path, $web_services);
-		
-		// project models
-		$models_path = DIR_APP . DS . 'models';
-		
-		$models_ = lcDirs::searchDir($models_path, true);
-		
-		if ($models_)
-		{
-			$models = array();
-		
-			foreach($models_ as $m)
-			{
-				$models[] = str_replace('.php', '', $m['name']);
-				unset($m);
-			}
-		
-			$this->found_php_files = array_merge($this->found_php_files, $php_files);
-			$this->found_models = array_merge($this->found_models, $models);
-		}
+            foreach ($tasks as $task) {
+                $task_name = $task['name'];
+                $php_files[] = $tasks_path . DS . $task_name;
+                unset($task_name);
+            }
 
-		unset($tasks_path, $tasks);
-	}
+            $this->found_php_files = array_merge($this->found_php_files, $php_files);
+        }
 
-	private function detectDbModelsInFile(array $models, array $files)
-	{
-		foreach($files as $filename)
-		{
-			$fdata = @file_get_contents($filename);
+        unset($tasks_path, $tasks);
 
-			if (!$fdata)
-			{
-				continue;
-			}
-			
-			foreach($models as $model)
-			{
-				if (preg_match("/\b" . preg_quote($model) . "\b/", $fdata))
-				{
-					$this->consoleDisplay($filename . ': ' . $model, false);
-				}
-				
-				unset($model);
-			}
-			
-			unset($filename);
-		}
-	}
+        // project web services
+        $ws_path = DIR_APP . DS . 'ws';
+
+        $web_services = lcDirs::searchDir($ws_path, true);
+
+        if ($web_services) {
+            $php_files = array();
+
+            foreach ($web_services as $web_service) {
+                $web_service_name = $web_service['name'];
+                $php_files[] = $ws_path . DS . $web_service_name;
+                unset($web_service, $web_service_name);
+            }
+
+            $this->found_php_files = array_merge($this->found_php_files, $php_files);
+        }
+
+        unset($ws_path, $web_services);
+
+        // project models
+        $models_path = DIR_APP . DS . 'models';
+
+        $models_ = lcDirs::searchDir($models_path, true);
+
+        if ($models_) {
+            $models = array();
+
+            foreach ($models_ as $m) {
+                $models[] = str_replace('.php', '', $m['name']);
+                unset($m);
+            }
+
+            $this->found_models = array_merge($this->found_models, $models);
+        }
+
+        unset($tasks_path, $tasks);
+    }
+
+    private function detectDbModelsInFile(array $models, array $files)
+    {
+        foreach ($files as $filename) {
+            $fdata = @file_get_contents($filename);
+
+            if (!$fdata) {
+                continue;
+            }
+
+            foreach ($models as $model) {
+                if (preg_match("/\b" . preg_quote($model) . "\b/", $fdata)) {
+                    $this->consoleDisplay($filename . ': ' . $model, false);
+                }
+
+                unset($model);
+            }
+
+            unset($filename);
+        }
+    }
 }
-
-?>

@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,37 +27,37 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcTranslationMessageSource.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 abstract class lcTranslationMessageSource extends lcObj
 {
-	public static function & getInstance($type)
-	{
-		$c = 'lc' . lcInflector::camelize($type, false) . 'TranslationSource';
+    public static function & getInstance($type)
+    {
+        $c = 'lc' . lcInflector::camelize($type, false) . 'TranslationSource';
 
-		if (!class_exists($c))
-		{
-			throw new lcSystemException('Invalid Translation Source: ' . $type);
-		}
+        if (!class_exists($c)) {
+            throw new lcSystemException('Invalid Translation Source: ' . $type);
+        }
 
-		$t = new $c;
+        $t = new $c;
 
-		unset($c);
+        unset($c);
 
-		return $t;
-	}
+        return $t;
+    }
 
-	abstract public function getLocale();
-	abstract public function setLocale($locale);
+    abstract public function getLocale();
 
-	abstract public function translationExists($original_string);
-	abstract public function getTranslation($original_string);
-	abstract public function getTranslations();
-	abstract public function setTranslation($original_string, $translated_string);
-	abstract public function setTranslations(array $translations);
+    abstract public function setLocale($locale);
+
+    abstract public function translationExists($original_string);
+
+    abstract public function getTranslation($original_string);
+
+    abstract public function getTranslations();
+
+    abstract public function setTranslation($original_string, $translated_string);
+
+    abstract public function setTranslations(array $translations);
 }
-
-?>

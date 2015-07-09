@@ -26,171 +26,153 @@
  * @subpackage File Subcategory
  * @changed $Id: lcI18n.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
-
-abstract class lcI18n extends lcSysObj implements iProvidesCapabilities, iKeyValueProvider, iI18nProvider, iDebuggable
+ * @version $Revision: 1592 $
+ */
+abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iKeyValueProvider, iI18nProvider, iDebuggable
 {
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-	public function shutdown()
-	{
-		parent::shutdown();
-	}
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
 
-	public function getCapabilities()
-	{
-		return array(
-				'i18n'
-		);
-	}
-	
-	public function getDebugInfo()
-	{
-		$debug = array(
-				'locale' => $this->getLocale(),
-				'context_type' => $this->getTranslationContextType(),
-				'context_name' => $this->getTranslationContextName()
-				);
+    public function getCapabilities()
+    {
+        return array(
+            'i18n'
+        );
+    }
 
-		return $debug;
-	}
+    public function getDebugInfo()
+    {
+        $debug = array(
+            'locale' => $this->getLocale(),
+            'context_type' => $this->getTranslationContextType(),
+            'context_name' => $this->getTranslationContextName()
+        );
 
-	public function getShortDebugInfo()
-	{
-		$debug = array(
-				'locale' => $this->getLocale(),
-		);
+        return $debug;
+    }
 
-		return $debug;
-	}
+    public function getShortDebugInfo()
+    {
+        $debug = array(
+            'locale' => $this->getLocale(),
+        );
 
-	abstract public function setLocale($locale);
-	abstract public function getLocale();
+        return $debug;
+    }
 
-	public function splitLocale($locale, $set_default_country = true)
-	{
-		$locale = (string)$locale;
+    abstract public function setLocale($locale);
 
-		if (!$locale)
-		{
-			return false;
-		}
+    abstract public function getLocale();
 
-		$delimiters = array('_', '-');
+    public function splitLocale($locale, $set_default_country = true)
+    {
+        $locale = (string)$locale;
 
-		$found_delimiter = null;
+        if (!$locale) {
+            return false;
+        }
 
-		foreach($delimiters as $delimiter)
-		{
-			if (strstr($locale, $delimiter))
-			{
-				$found_delimiter = $delimiter;
-				break;
-			}
+        $delimiters = array('_', '-');
 
-			unset($delimiter);
-		}
+        $found_delimiter = null;
 
-		$res = false;
+        foreach ($delimiters as $delimiter) {
+            if (strstr($locale, $delimiter)) {
+                $found_delimiter = $delimiter;
+                break;
+            }
 
-		if (!$found_delimiter)
-		{
-			$locale = strtolower($locale);
+            unset($delimiter);
+        }
 
-			$res = array('locale' => $locale, 'lang_code' => $locale, 'country_code' => null);
-		}
-		else
-		{
-			$locale = array_filter(explode($found_delimiter, $locale));
+        if (!$found_delimiter) {
+            $locale = strtolower($locale);
 
-			if (!isset($locale[0]))
-			{
-				return false;
-			}
+            $res = array('locale' => $locale, 'lang_code' => $locale, 'country_code' => null);
+        } else {
+            $locale = array_filter(explode($found_delimiter, $locale));
 
-			$country_code = isset($locale[1]) ? $locale[1] : null;
+            if (!isset($locale[0])) {
+                return false;
+            }
 
-			$lang_code = strtolower($locale[0]);
-			$country_code = strtoupper($country_code);
-			$locale = $lang_code . '_' . $country_code;
+            $country_code = isset($locale[1]) ? $locale[1] : null;
 
-			$res = array('locale' => $locale, 'lang_code' => $lang_code, 'country_code' => $country_code);
-		}
+            $lang_code = strtolower($locale[0]);
+            $country_code = strtoupper($country_code);
+            $locale = $lang_code . '_' . $country_code;
 
-		$res['locale_is_default'] = true;
+            $res = array('locale' => $locale, 'lang_code' => $lang_code, 'country_code' => $country_code);
+        }
 
-		//$country_code_is_default = true;
-		$default_country = null;
+        $res['locale_is_default'] = true;
 
-		// detect default country / locale
-		$defaults = i18nHelper::getAll();
-		$default_country = strtoupper(@$defaults[1][$res['lang_code']]);
+        //$country_code_is_default = true;
+        $default_country = null;
 
-		// set default country if none detected
-		if ($set_default_country)
-		{
-			if ($res['lang_code'] && !$res['country_code'])
-			{
-				if ($default_country)
-				{
-					$res['country_code'] = $default_country;
+        // detect default country / locale
+        $defaults = i18nHelper::getAll();
+        $default_country = strtoupper(@$defaults[1][$res['lang_code']]);
 
-					$res['locale'] = $res['lang_code'] . '_' . $res['country_code'];
-				}
-			}
-		}
+        // set default country if none detected
+        if ($set_default_country) {
+            if ($res['lang_code'] && !$res['country_code']) {
+                if ($default_country) {
+                    $res['country_code'] = $default_country;
 
-		if ($res['country_code'] != $default_country)
-		{
-			$res['default_country_code'] = $default_country;
-		}
+                    $res['locale'] = $res['lang_code'] . '_' . $res['country_code'];
+                }
+            }
+        }
 
-		$ak = array_flip($defaults[1]);
+        if ($res['country_code'] != $default_country) {
+            $res['default_country_code'] = $default_country;
+        }
 
-		if ($res['country_code'])
-		{
-			$default_locale = isset($ak[$res['country_code']]) ? $ak[$res['country_code']] : null;
+        $ak = array_flip($defaults[1]);
 
-			if (!$default_locale || $default_locale != $res['lang_code'])
-			{
-				$res['locale_is_default'] = false;
-			}
+        if ($res['country_code']) {
+            $default_locale = isset($ak[$res['country_code']]) ? $ak[$res['country_code']] : null;
 
-			unset($default_locale);
-		}
+            if (!$default_locale || $default_locale != $res['lang_code']) {
+                $res['locale_is_default'] = false;
+            }
 
-		unset($ak);
+            unset($default_locale);
+        }
 
-		return $res;
-	}
+        unset($ak);
 
-	#pragma mark - iKeyValueProvider
+        return $res;
+    }
 
-	public function getAllKeys()
-	{
-		$ret = array(
-				'locale'
-		);
-		return $ret;
-	}
+    #pragma mark - iKeyValueProvider
 
-	public function getValueForKey($key)
-	{
-		if (!$key)
-		{
-			throw new lcInvalidArgumentException('Invalid params');
-		}
+    public function getAllKeys()
+    {
+        $ret = array(
+            'locale'
+        );
+        return $ret;
+    }
 
-		if ($key == 'locale')
-		{
-			return $this->getLocale();
-		}
-	}
+    public function getValueForKey($key)
+    {
+        if (!$key) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
+
+        if ($key == 'locale') {
+            return $this->getLocale();
+        }
+
+        return null;
+    }
 }
-
-?>

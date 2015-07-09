@@ -26,15 +26,12 @@
  * @subpackage File Subcategory
  * @changed $Id: lcNumericValidator.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcNumericValidator extends lcValidator
 {
-	public function validate($data)
-	{
-		return (bool)preg_match("/^[0-9]*$/", $data);
-	}
+    public function validate($data)
+    {
+        return (bool)preg_match("/^[0-9]*$/", $data);
+    }
 }
-
-?>

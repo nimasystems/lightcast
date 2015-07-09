@@ -17,7 +17,9 @@
  * Plovdiv, Bulgaria
  * ZIP Code: 4000
  * Address: 95 "Kapitan Raycho" Str.
- * E-Mail: info@nimasystems.com */
+ * E-Mail: info@nimasystems.com
+
+ */
 
 /**
  * File Description
@@ -28,17 +30,14 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1473 $
  */
-
 class lcPluginViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
         return array('view' => array(
-                'metatags' => array(),
-                'stylesheets' => array('all' => array()),
-                'javascripts' => array()
-            ));
+            'metatags' => array(),
+            'stylesheets' => array('all' => array()),
+            'javascripts' => array()
+        ));
     }
-
 }
-?>

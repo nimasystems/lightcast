@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,16 +27,13 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcSystemException.class.php 1513 2014-05-13 20:16:21Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1513 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1513 $
+ */
 class lcSystemException extends lcException implements iHTTPException
 {
-	public function getStatusCode() {
-		return 500;
-	}
+    public function getStatusCode()
+    {
+        return 500;
+    }
 }
-
-
-?>

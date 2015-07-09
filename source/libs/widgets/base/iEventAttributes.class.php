@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,22 +27,28 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: iEventAttributes.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 interface iEventAttributes
 {
-	public function getOnClick();
-	public function getOnDblClick();
-	public function getOnMouseDown();
-	public function getOnMouseUp();
-	public function getOnMouseOver();
-	public function getOnMouseMove();
-	public function getOnMouseOut();
-	public function getOnKeyPress();
-	public function getOnKeyDown();
-	public function getOnKeyUp();
-}
+    public function getOnClick();
 
-?>
+    public function getOnDblClick();
+
+    public function getOnMouseDown();
+
+    public function getOnMouseUp();
+
+    public function getOnMouseOver();
+
+    public function getOnMouseMove();
+
+    public function getOnMouseOut();
+
+    public function getOnKeyPress();
+
+    public function getOnKeyDown();
+
+    public function getOnKeyUp();
+}

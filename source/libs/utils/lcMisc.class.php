@@ -28,72 +28,60 @@
  * @subpackage File Subcategory
  * @changed $Id: lcMisc.class.php 1592 2015-05-22 13:28:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1592 $
-*/
-
+ * @version $Revision: 1592 $
+ */
 class lcMisc
 {
-	public static function appendPathPrefix($path)
-	{
-		if ($path)
-		{
-			if ((string)$path{0} == DS)
-			{
-				return $path;
-			}
-			else
-			{
-				$path = DS . $path;
-			}
-		}
+    public static function appendPathPrefix($path)
+    {
+        if ($path) {
+            if ((string)$path{0} == DS) {
+                return $path;
+            } else {
+                $path = DS . $path;
+            }
+        }
 
-		return $path;
-	}
+        return $path;
+    }
 
-	public static function isPathAbsolute($path)
-	{
-		if ($path === false)
-		{
-			return false;
-		}
+    public static function isPathAbsolute($path)
+    {
+        if ($path === false) {
+            return false;
+        }
 
-		if (
-				$path{0} == '/' ||
-				$path{0} == '\\' ||
-				(
-						strlen($path) > 3 && ctype_alpha($path{0}) &&
-						$path{1} == ':' && ($path{2} == '\\' || $path{2} == '/')
-		)
-		)
-		{
-			return true;
-		}
+        if (
+            $path{0} == '/' ||
+            $path{0} == '\\' ||
+            (
+                strlen($path) > 3 && ctype_alpha($path{0}) &&
+                $path{1} == ':' && ($path{2} == '\\' || $path{2} == '/')
+            )
+        ) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public static function minifyJs($filename = null, $content = null)
-	{
-		if (!isset($filename) && !isset($content))
-		{
-			throw new lcSystemException('You must pass a filename or js content');
-		}
+    public static function minifyJs($filename = null, $content = null)
+    {
+        if (!isset($filename) && !isset($content)) {
+            throw new lcSystemException('You must pass a filename or js content');
+        }
 
-		// 3rdparty lib
-		if (!class_exists('JSMin'))
-		{
-			throw new lcSystemException('JSMin is not available');
-		}
+        // 3rdparty lib
+        if (!class_exists('JSMin')) {
+            throw new lcSystemException('JSMin is not available');
+        }
 
-		if (isset($filename))
-		{
-			// file
-			return JSMin::minify(file_get_contents($filename));
-		}
-		else
-		{
-			// content
-			return JSMin::minify($content);
-		}
-	}
+        if (isset($filename)) {
+            // file
+            return JSMin::minify(file_get_contents($filename));
+        } else {
+            // content
+            return JSMin::minify($content);
+        }
+    }
 }

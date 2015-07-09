@@ -26,21 +26,18 @@
  * @subpackage File Subcategory
  * @changed $Id: lcHTMLView.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 abstract class lcHTMLView extends lcView
 {
-	public function getContentType()
-	{
-		return 'text/html';
-	}
+    public function getContentType()
+    {
+        return 'text/html';
+    }
 
-	public function getSupportedContentTypes()
-	{
-		// only text/html supported
-		return array($this->getContentType());
-	}
+    public function getSupportedContentTypes()
+    {
+        // only text/html supported
+        return array($this->getContentType());
+    }
 }
-
-?>

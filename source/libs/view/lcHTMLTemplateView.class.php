@@ -27,273 +27,262 @@
  * @changed $Id: lcHTMLTemplateView.class.php 1569 2015-01-28 21:49:54Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1569 $
-*/
-
+ */
 class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable, iDecoratingView
 {
-	const FRAGMENT_PREFIX = 'f#';
-	const PARTIAL_PREFIX = 'p#';
-	
-	protected $view_contents;
-	protected $params;
+    const FRAGMENT_PREFIX = 'f#';
+    const PARTIAL_PREFIX = 'p#';
 
-	protected $found_controller_actions = array();
-	protected $found_fragments = array();
+    protected $view_contents;
+    protected $params;
 
-	protected $template_filename;
+    protected $found_controller_actions = array();
+    protected $found_fragments = array();
 
-	protected $enable_partials = true;
-	protected $enable_fragments = true;
+    protected $template_filename;
 
-	public function initialize()
-	{
-		parent::initialize();
+    protected $enable_partials = true;
+    protected $enable_fragments = true;
 
-		$this->params = new lcIterateParamHolder();
-	}
+    public function initialize()
+    {
+        parent::initialize();
 
-	public function shutdown()
-	{
-		if ($this->params)
-		{
-			$this->params = null;
-		}
+        $this->params = new lcIterateParamHolder();
+    }
 
-		$this->view_contents =
-		$this->found_controller_actions =
-		$this->found_fragments = null;
+    public function shutdown()
+    {
+        if ($this->params) {
+            $this->params = null;
+        }
 
-		parent::shutdown();
-	}
-	
-	public function __toString()
-	{
-		return 'Template filename: ' . $this->template_filename;
-	}
-	
-	public function getDebugInfo()
-	{
-		$debug_parent = (array)parent::getDebugInfo();
+        $this->view_contents =
+        $this->found_controller_actions =
+        $this->found_fragments = null;
 
-		$debug = array(
-				'template_filename' => $this->template_filename,
-				'total_params' => ($this->params ? count($this->params) : null)
-		);
+        parent::shutdown();
+    }
 
-		$debug = array_merge($debug_parent, $debug);
+    public function __toString()
+    {
+        return 'Template filename: ' . $this->template_filename;
+    }
 
-		return $debug;
-	}
+    public function getDebugInfo()
+    {
+        $debug_parent = (array)parent::getDebugInfo();
 
-	public function getShortDebugInfo()
-	{
-		return false;
-	}
+        $debug = array(
+            'template_filename' => $this->template_filename,
+            'total_params' => ($this->params ? count($this->params) : null)
+        );
 
-	public function getControllerActionsToDecorate()
-	{
-		return $this->found_controller_actions;
-	}
+        $debug = array_merge($debug_parent, $debug);
 
-	public function getFragmentsToDecorate()
-	{
-		return $this->found_fragments;
-	}
+        return $debug;
+    }
 
-	public function getTemplateFilename()
-	{
-		return $this->template_filename;
-	}
-	
-	public function setTemplateFilename($filename)
-	{
-		$this->template_filename = $filename;
-	}
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
 
-	protected function getViewContent()
-	{
-		return $this->getTemplateData();
-	}
-	
-	protected function didApplyFilters($content)
-	{
-		// parse the content to obtain partials / fragments
-		$content = $this->parseParticles($content);
-		return $content;
-	}
-	
-	protected function parseParticles($data)
-	{
-		// parse and find info of found partials
-		$self = $this;
-		$data = preg_replace_callback("/<!--\s*PARTIAL\s*(.*?)\s*-->/i", function($m) use ($self) {
-			return $self->parsePartialDetails(@$m[1]);
-		}, $data);
+    public function getControllerActionsToDecorate()
+    {
+        return $this->found_controller_actions;
+    }
 
-		// parse all find info of found fragments
-		$data = preg_replace_callback("/<!--\s*FRAGMENT\s*(.*?)\s*-->/i", function($m) use ($self) {
-			return $self->parseFragmentDetails(@$m[1]);
-		}, $data);
+    public function getFragmentsToDecorate()
+    {
+        return $this->found_fragments;
+    }
 
-		return $data;
-	}
+    public function getTemplateFilename()
+    {
+        return $this->template_filename;
+    }
 
-	/*
-	 * Keep public for PHP 5.3 compatibility
-	 */
-	public function parsePartialDetails($url)
-	{
-		if (!$url)
-		{
-			return null;
-		}
+    public function setTemplateFilename($filename)
+    {
+        $this->template_filename = $filename;
+    }
 
-		$url = stripslashes($url);
+    protected function getViewContent()
+    {
+        return $this->getTemplateData();
+    }
 
-		$rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions)+1) . '#' . $url . '#';
+    protected function didApplyFilters($content)
+    {
+        // parse the content to obtain partials / fragments
+        $content = $this->parseParticles($content);
+        return $content;
+    }
 
-		$this->found_controller_actions[] = array(
-				'tag_name' => $rep_tag,
-				'route' => $url,
-				'action_type' => 'partial'
-		);
-		
-		// return the tag as the replacement of the preg - this is
-		// how we'll match it later on to replace with actual content
-		return $rep_tag;
-	}
+    protected function parseParticles($data)
+    {
+        // parse and find info of found partials
+        $self = $this;
+        $data = preg_replace_callback("/<!--\s*PARTIAL\s*(.*?)\s*-->/i", function ($m) use ($self) {
+            return $self->parsePartialDetails(@$m[1]);
+        }, $data);
 
-	/*
-	 * Keep public for PHP 5.3 compatibility
-	 */
-	public function parseFragmentDetails($url)
-	{
-		if (!$url)
-		{
-			return null;
-		}
-		
-		$res = null;
-		$type = 'file';
+        // parse all find info of found fragments
+        $data = preg_replace_callback("/<!--\s*FRAGMENT\s*(.*?)\s*-->/i", function ($m) use ($self) {
+            return $self->parseFragmentDetails(@$m[1]);
+        }, $data);
 
-		// a web page
-		if ((substr($url, 0, 7) == 'http://') ||
-				(substr($url, 0, 8) == 'https://') ||
-				(substr($url, 0, 4) == 'www.')
-		)
-		{
-			$type = 'url';
-			$res = $url;
-		}
-		else
-		{
-			// if relative - search for the file within the assets folder of the module
-			// otherwise try to include it directly
-			$res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
+        return $data;
+    }
 
-			$do_include =
-			lcFiles::getFileExt($res) == '.php' ?
-			true : false;
-			
-			if ($do_include)
-			{
-				$type = 'php';
-			}
-		}
+    /*
+     * Keep public for PHP 5.3 compatibility
+     */
+    public function parsePartialDetails($url)
+    {
+        if (!$url) {
+            return null;
+        }
 
-		$rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments)+1);
-		$this->found_fragments[] = array(
-				'tag_name' => $rep_tag,
-				'url' => $res,
-				'type' => $type
-				);
+        $url = stripslashes($url);
 
-		return $rep_tag;
-	}
+        $rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions) + 1) . '#' . $url . '#';
 
-	protected function getTemplateData()
-	{
-		$template_filename = $this->template_filename;
+        $this->found_controller_actions[] = array(
+            'tag_name' => $rep_tag,
+            'route' => $url,
+            'action_type' => 'partial'
+        );
 
-		if (!isset($template_filename))
-		{
-			throw new lcInvalidArgumentException('No template filename has been set to view');
-		}
+        // return the tag as the replacement of the preg - this is
+        // how we'll match it later on to replace with actual content
+        return $rep_tag;
+    }
 
-		$data = @file_get_contents($template_filename);
+    /*
+     * Keep public for PHP 5.3 compatibility
+     */
+    public function parseFragmentDetails($url)
+    {
+        if (!$url) {
+            return null;
+        }
 
-		return $data;
-	}
+        $res = null;
+        $type = 'file';
 
-	public function getParams()
-	{
-		return $this->params;
-	}
+        // a web page
+        if ((substr($url, 0, 7) == 'http://') ||
+            (substr($url, 0, 8) == 'https://') ||
+            (substr($url, 0, 4) == 'www.')
+        ) {
+            $type = 'url';
+            $res = $url;
+        } else {
+            // if relative - search for the file within the assets folder of the module
+            // otherwise try to include it directly
+            $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
 
-	public function __set($name, $value = null)
-	{
-		return $this->params->__set($name, $value);
-	}
+            $do_include =
+                lcFiles::getFileExt($res) == '.php' ?
+                    true : false;
 
-	public function __get($name)
-	{
-		return $this->params->__get($name);
-	}
+            if ($do_include) {
+                $type = 'php';
+            }
+        }
 
-	public function & getNode($name, $params = null)
-	{
-		return $this->params->getNode($name, $params);
-	}
+        $rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments) + 1);
+        $this->found_fragments[] = array(
+            'tag_name' => $rep_tag,
+            'url' => $res,
+            'type' => $type
+        );
 
-	public function & repeat($name, $params=null)
-	{
-		return $this->params->repeat($name, $params);
-	}
+        return $rep_tag;
+    }
 
-	public function getDeepNode($node_deep_name)
-	{
-		return $this->params->getDeepNode($node_deep_name);
-	}
+    protected function getTemplateData()
+    {
+        $template_filename = $this->template_filename;
 
-	public function getNodes()
-	{
-		return $this->params->getNodes();
-	}
-	
-	public function insertNode($name, lcIterateParamHolder $node)
-	{
-		return $this->params->insertNode($name, $node);
-	}
-	
-	public function copyNode($name, lcIterateParamHolder $node)
-	{
-		return $this->params->copyNode($name, $node);
-	}
+        if (!isset($template_filename)) {
+            throw new lcInvalidArgumentException('No template filename has been set to view');
+        }
 
-	public function rawText($text = null)
-	{
-		return $this->params->rawText($text);
-	}
+        $data = @file_get_contents($template_filename);
 
-	public function offsetExists($name)
-	{
-		return $this->params->offsetExists($name);
-	}
+        return $data;
+    }
 
-	public function offsetGet($name)
-	{
-		return $this->params->offsetGet($name);
-	}
+    public function getParams()
+    {
+        return $this->params;
+    }
 
-	public function offsetSet($name, $value)
-	{
-		return $this->params->offsetSet($name, $value);
-	}
+    public function __set($name, $value = null)
+    {
+        return $this->params->__set($name, $value);
+    }
 
-	public function offsetUnset($name)
-	{
-		return $this->params->offsetUnset($name);
-	}
+    public function __get($name)
+    {
+        return $this->params->__get($name);
+    }
+
+    public function & getNode($name, $params = null)
+    {
+        return $this->params->getNode($name, $params);
+    }
+
+    public function & repeat($name, $params = null)
+    {
+        return $this->params->repeat($name, $params);
+    }
+
+    public function getDeepNode($node_deep_name)
+    {
+        return $this->params->getDeepNode($node_deep_name);
+    }
+
+    public function getNodes()
+    {
+        return $this->params->getNodes();
+    }
+
+    public function insertNode($name, lcIterateParamHolder $node)
+    {
+        return $this->params->insertNode($name, $node);
+    }
+
+    public function copyNode($name, lcIterateParamHolder $node)
+    {
+        return $this->params->copyNode($name, $node);
+    }
+
+    public function rawText($text = null)
+    {
+        return $this->params->rawText($text);
+    }
+
+    public function offsetExists($name)
+    {
+        return $this->params->offsetExists($name);
+    }
+
+    public function offsetGet($name)
+    {
+        return $this->params->offsetGet($name);
+    }
+
+    public function offsetSet($name, $value)
+    {
+        return $this->params->offsetSet($name, $value);
+    }
+
+    public function offsetUnset($name)
+    {
+        return $this->params->offsetUnset($name);
+    }
 }
-
-?>

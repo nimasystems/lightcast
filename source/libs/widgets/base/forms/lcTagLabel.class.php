@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,57 +28,54 @@
  * @subpackage File Subcategory
  * @changed $Id: lcTagLabel.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcTagLabel extends lcHtmlTag
 {
-	public function __construct($content = null, $for = null, $accesskey = null)
-	{
-		parent::__construct('label', true);
+    public function __construct($content = null, $for = null, $accesskey = null)
+    {
+        parent::__construct('label', true);
 
-		$this->setContent($content);
-		$this->setFor($for);
-		$this->setAccessKey($accesskey);
-	}
+        $this->setContent($content);
+        $this->setFor($for);
+        $this->setAccessKey($accesskey);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array();
-	}
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array('for', 'accesskey');
-	}
+    public static function getOptionalAttributes()
+    {
+        return array('for', 'accesskey');
+    }
 
-	public function setContent($content)
-	{
-		parent::setContent($content);
-		return $this;
-	}
+    public function setContent($content)
+    {
+        parent::setContent($content);
+        return $this;
+    }
 
-	public function setFor($value = null)
-	{
-		$this->setAttribute('for', $value);
-		return $this;
-	}
+    public function setFor($value = null)
+    {
+        $this->setAttribute('for', $value);
+        return $this;
+    }
 
-	public function getFor()
-	{
-		return $this->getAttribute('for');
-	}
+    public function getFor()
+    {
+        return $this->getAttribute('for');
+    }
 
-	public function setAccessKey($accesskey = null)
-	{
-		$this->setAttribute('accesskey', $accesskey);
-		return $this;
-	}
+    public function setAccessKey($accesskey = null)
+    {
+        $this->setAttribute('accesskey', $accesskey);
+        return $this;
+    }
 
-	public function getAccessKey()
-	{
-		return $this->getAttribute('accesskey');
-	}
+    public function getAccessKey()
+    {
+        return $this->getAttribute('accesskey');
+    }
 }
-
-?>

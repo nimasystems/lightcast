@@ -28,7 +28,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-abstract class lcRequest extends lcSysObj implements iProvidesCapabilities, Serializable, ArrayAccess, iKeyValueProvider, iDebuggable
+abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities, Serializable, ArrayAccess, iKeyValueProvider, iDebuggable
 {
     /**
      * @var lcArrayCollection
@@ -47,9 +47,9 @@ abstract class lcRequest extends lcSysObj implements iProvidesCapabilities, Seri
 
     protected $is_silent;
 
-    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
+    public function initialize()
     {
-        parent::initializeBeforeApp($event_dispatcher, $configuration);
+        parent::initialize();
 
         // init default vars
         $this->sapi = lcSys::get_sapi();
@@ -109,6 +109,7 @@ abstract class lcRequest extends lcSysObj implements iProvidesCapabilities, Seri
         $p = $this->getParams();
 
         if ($p) {
+            /** @var lcNameValuePair[] $pp */
             $pp = $p->getArrayCopy();
             $keys = array();
 
@@ -464,5 +465,3 @@ abstract class lcRequest extends lcSysObj implements iProvidesCapabilities, Seri
         list($this->env) = unserialize($serialized);
     }
 }
-
-?>

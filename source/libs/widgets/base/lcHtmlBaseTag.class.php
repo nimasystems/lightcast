@@ -28,156 +28,148 @@
  * @subpackage File Subcategory
  * @changed $Id: lcHtmlBaseTag.class.php 1529 2014-06-01 09:20:40Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1529 $
-*/
-
+ * @version $Revision: 1529 $
+ */
 abstract class lcHtmlBaseTag implements iAsHTML
 {
-	private $parent_widget;
-	
-	private $tagname;
-	private $content;
-	private $attributes;
-	private $is_closed;
+    protected $parent_widget;
 
-	public function __construct($tagname, $is_closed = false)
-	{
-		$this->tagname = $tagname;
-		$this->is_closed = $is_closed;
+    protected $tagname;
+    protected $content;
+    protected $attributes;
+    protected $is_closed;
 
-		$this->attributes = new lcHtmlAttributeCollection();
-	}
-	
-	public function __destruct()
-	{
-		//
-	}
+    public function __construct($tagname, $is_closed = false)
+    {
+        $this->tagname = $tagname;
+        $this->is_closed = $is_closed;
 
-	public static function getRequiredAttributes()
-	{
-		//
-	}
+        $this->attributes = new lcHtmlAttributeCollection();
+    }
 
-	public static function getOptionalAttributes()
-	{
-		//
-	}
-	
-	public function useWidget(lcHtmlBaseTag $widget)
-	{
-		$this->parent_widget = $widget;
-		return $widget;
-	}
-	
-	public function endUse()
-	{
-		return $this->parent_widget;
-	}
-	
-	public function attr($name, $value = null)
-	{
-		return $this->setAttribute($name, $value);
-	}
-	
-	public function setAttribute($name, $value = null)
-	{
-		if (!isset($value)) 
-		{
-			$this->attributes->remove($name);
-		} 
-		else 
-		{
-			$this->attributes->set($name, $value);
-		}
-		return $this;
-	}
+    public function __destruct()
+    {
+        //
+    }
 
-	public function removeAttribute($name)
-	{
-		$this->attributes->remove($name);
-		return $this;
-	}
+    public static function getRequiredAttributes()
+    {
+        //
+    }
 
-	public function removeAttributes()
-	{
-		$this->attributes->clear();
-		return $this;
-	}
+    public static function getOptionalAttributes()
+    {
+        //
+    }
 
-	public function getAttribute($name)
-	{
-		return $this->attributes->get($name);
-	}
+    public function useWidget(lcHtmlBaseTag $widget)
+    {
+        $this->parent_widget = $widget;
+        return $widget;
+    }
 
-	public function getAttributes()
-	{
-		return $this->attributes;
-	}
+    public function endUse()
+    {
+        return $this->parent_widget;
+    }
 
-	public function hasAttribute($name)
-	{
-		return $this->attributes->get($name) ? true : false;
-	}
+    public function attr($name, $value = null)
+    {
+        return $this->setAttribute($name, $value);
+    }
 
-	public function getName()
-	{
-		return $this->tagname;
-	}
+    public function setAttribute($name, $value = null)
+    {
+        if (!isset($value)) {
+            $this->attributes->remove($name);
+        } else {
+            $this->attributes->set($name, $value);
+        }
+        return $this;
+    }
 
-	public function __get($name)
-	{
-		return $this->attributes->get($name);
-	}
+    public function removeAttribute($name)
+    {
+        $this->attributes->remove($name);
+        return $this;
+    }
 
-	public function setContent($content)
-	{
-		if (!$this->is_closed)
-		{
-			throw new lcInvalidArgumentException('Tag '.$this->tagname.' is an open tag. You cannot set content in it');
-		}
+    public function removeAttributes()
+    {
+        $this->attributes->clear();
+        return $this;
+    }
 
-		$this->content = $content;
-		return $this;
-	}
+    public function getAttribute($name)
+    {
+        return $this->attributes->get($name);
+    }
 
-	public function getContent()
-	{
-		return $this->content;
-	}
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
 
-	protected function setIsClosed($is_closed = true)
-	{
-		$this->is_closed = $is_closed;
-		return $this;
-	}
+    public function hasAttribute($name)
+    {
+        return $this->attributes->get($name) ? true : false;
+    }
 
-	public function isClosed()
-	{
-		return $this->is_closed;
-	}
+    public function getName()
+    {
+        return $this->tagname;
+    }
 
-	public function asHtml()
-	{
-		return '<' . trim(implode(' ',
-				array(
-						$this->tagname,
-						$this->attributes->asHtml()
-				))
-		) .
-		($this->is_closed ? '>' . $this->content . '</' . $this->tagname . '>' : ' />');
-	}
+    public function __get($name)
+    {
+        return $this->attributes->get($name);
+    }
 
-	public function __toString()
-	{
-		$ret = null;
-		try {
-			$ret = $this->asHtml();
-		}
-		catch(Exception $e) {
-			$ret = 'error: ' . $e->getMessage();
-		}
-		return $ret;
-	}
+    public function setContent($content)
+    {
+        if (!$this->is_closed) {
+            throw new lcInvalidArgumentException('Tag ' . $this->tagname . ' is an open tag. You cannot set content in it');
+        }
+
+        $this->content = $content;
+        return $this;
+    }
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    protected function setIsClosed($is_closed = true)
+    {
+        $this->is_closed = $is_closed;
+        return $this;
+    }
+
+    public function isClosed()
+    {
+        return $this->is_closed;
+    }
+
+    public function asHtml()
+    {
+        return '<' . trim(implode(' ',
+                array(
+                    $this->tagname,
+                    $this->attributes->asHtml()
+                ))
+        ) .
+        ($this->is_closed ? '>' . $this->content . '</' . $this->tagname . '>' : ' />');
+    }
+
+    public function __toString()
+    {
+        $ret = null;
+        try {
+            $ret = $this->asHtml();
+        } catch (Exception $e) {
+            $ret = 'error: ' . $e->getMessage();
+        }
+        return $ret;
+    }
 }
-
-?>

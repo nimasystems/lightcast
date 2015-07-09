@@ -30,11 +30,22 @@
  */
 abstract class lcWebBaseController extends lcController
 {
+    /**
+     * @var lcPatternRouting
+     */
+    protected $routing;
+
+    /** @var lcWebRequest */
+    protected $request;
+
+    /** @var lcWebResponse */
+    protected $response;
+
     protected function renderRaw($content, $content_type = 'text/html', $decorated = false)
     {
         if (!$decorated) {
             // unset the decorator first
-            $this->unsetDecorator();
+            $this->unsetDecoratorView();
         }
 
         $view = new lcRawContentView();
@@ -94,6 +105,38 @@ abstract class lcWebBaseController extends lcController
         }
     }
 
+    public function generateUrl(array $params = null, $route = null, $absolute_url = false)
+    {
+        $router = $this->routing;
+
+        if (!$router) {
+            throw new lcNotAvailableException('Router not available');
+        }
+
+        $url = $router->generate($params, $absolute_url, $route);
+        return $url;
+    }
+
+    protected function validateRequestAndThrow()
+    {
+        $args = func_get_args();
+
+        if ($args) {
+            foreach ($args as $arg) {
+                if (($arg == self::VPOST && !$this->request->isPost()) ||
+                    ($arg == self::VPUT && !$this->request->isPut()) ||
+                    ($arg == self::VGET && !$this->request->isGet()) ||
+                    ($arg == self::VAJAX && !$this->request->isAjax()) ||
+                    ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
+                    ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||
+                    !$arg
+                ) {
+                    throw new lcInvalidRequestException($this->t('Invalid Request'));
+                }
+            }
+        }
+    }
+
     protected function redirect($url, $http_code = 302)
     {
         if (!$url) {
@@ -123,7 +166,7 @@ abstract class lcWebBaseController extends lcController
             $allow_redirect = $v && ((isset($v['allow_redirect']) && (bool)$v['allow_redirect']) || !isset($v['allow_redirect']));
 
             if (!$allow_redirect) {
-                return false;
+                return;
             }
 
             $http_code = isset($v['http_code']) ? (string)$v['http_code'] : $http_code;

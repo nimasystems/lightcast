@@ -104,11 +104,6 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         $this->has_initialized = false;
     }
 
-    public function initializeBeforeApp(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
-    {
-        //
-    }
-
     public function setPluginManager(lcPluginManager $plugin_manager)
     {
         $this->plugin_manager = $plugin_manager;

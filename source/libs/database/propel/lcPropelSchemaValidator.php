@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,64 +27,50 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcPropelSchemaValidator.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcPropelSchemaValidator
 {
-	private $xsd_filename;
-	private $schema_filename;
+    private $xsd_filename;
+    private $schema_filename;
 
-	public function __construct($schema_filename, $xsd_filename)
-	{
-		$this->schema_filename = $schema_filename;
-		$this->xsd_filename = $xsd_filename;
-	}
+    public function __construct($schema_filename, $xsd_filename)
+    {
+        $this->schema_filename = $schema_filename;
+        $this->xsd_filename = $xsd_filename;
+    }
 
-	public function validate()
-	{
-		if (!class_exists('DOMDocument', false))
-		{
-			throw new lcSystemException('You need DOM XML to validate the schema');
-		}
+    public function validate()
+    {
+        if (!class_exists('DOMDocument', false)) {
+            throw new lcSystemException('You need DOM XML to validate the schema');
+        }
 
-		try
-		{
-			$xmldata = lcFiles::getFile($this->schema_filename);
-		}
-		catch(Exception $e)
-		{
-			throw new lcIOException('Cannot open the schema file');
-		}
+        try {
+            $xmldata = lcFiles::getFile($this->schema_filename);
+        } catch (Exception $e) {
+            throw new lcIOException('Cannot open the schema file');
+        }
 
-		try
-		{
-			$schema = new DOMDocument();
-			$schema->loadXML($xmldata);
-		}
-		catch(Exception $e)
-		{
-			throw new lcSystemException('Error while loading schema xml: '.$e->getMessage());
-		}
-		unset($xmldata);
+        try {
+            $schema = new DOMDocument();
+            $schema->loadXML($xmldata);
+        } catch (Exception $e) {
+            throw new lcSystemException('Error while loading schema xml: ' . $e->getMessage());
+        }
+        unset($xmldata);
 
-		try
-		{
-			if (!$schema->schemaValidate($this->xsd_filename))
-			{
-				throw new Exception('Incorrect schema');
-			}
-		}
-		catch(Exception $e)
-		{
-			throw new lcSystemException('Cannot validate schema: ' . $e->getMessage());
-		}
+        try {
+            if (!$schema->schemaValidate($this->xsd_filename)) {
+                throw new Exception('Incorrect schema');
+            }
+        } catch (Exception $e) {
+            throw new lcSystemException('Cannot validate schema: ' . $e->getMessage());
+        }
 
-		unset($schema);
+        unset($schema);
 
-		return true;
-	}
+        return true;
+    }
 }
-
-?>

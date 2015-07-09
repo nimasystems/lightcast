@@ -30,7 +30,9 @@
  */
 class lcFileLoggerNG extends lcLogger
 {
+    /** @var lcSysLog */
     protected $syslog;
+
     protected $log_to_syslog;
     protected $syslog_priority;
     protected $syslog_severity;
@@ -258,7 +260,7 @@ class lcFileLoggerNG extends lcLogger
 
         // disable debug modes if not debugging
         if (!DO_DEBUG && $level == self::LOG_DEBUG) {
-            return false;
+            return;
         }
 
         $full_filename = $this->configuration->getLogDir() . lcMisc::appendPathPrefix($filename);
@@ -322,6 +324,9 @@ class lcFileLoggerNG extends lcLogger
 
             // TODO: think about this
             if ($this->request instanceof lcWebRequest) {
+                /** @var lcWebRequest $request */
+                $request = $this->request;
+
                 // initialize new log buffer
                 $buffer = array();
                 $buffer[] = '';
@@ -331,13 +336,13 @@ class lcFileLoggerNG extends lcLogger
                 // intro line
                 $buffer[] =
                     $this->request->getRealRemoteAddr() . ' ' .
-                    ($this->request->getXForwardedFor() ? '*-> ' . $this->request->getXForwardedFor() . '* ' : null) .
-                    '[' . date('r', $this->request->getRequestTime()) . '] ' .
+                    ($request->getXForwardedFor() ? '*-> ' . $request->getXForwardedFor() . '* ' : null) .
+                    '[' . date('r', $request->getRequestTime()) . '] ' .
                     '[' . $this->configuration->getApplicationName() . '] ' .
                     ($this->request->isXmlHttpRequest() ? '[XML-HTTP] ' : null) .
-                    '"' . $this->request->getRequestMethod() . ' ' . $this->request->getRequestUri() . '" ' .
-                    '"' . ($this->request->getHttpReferer() ? $this->request->getHttpReferer() : '-') . '" ' .
-                    '"' . ($this->request->getHttpUserAgent() ? $this->request->getHttpUserAgent() : '-') . '"';
+                    '"' . $request->getRequestMethod() . ' ' . $request->getRequestUri() . '" ' .
+                    '"' . ($request->getHttpReferer() ? $request->getHttpReferer() : '-') . '" ' .
+                    '"' . ($request->getHttpUserAgent() ? $request->getHttpUserAgent() : '-') . '"';
 
                 // params
 
@@ -408,7 +413,7 @@ class lcFileLoggerNG extends lcLogger
     private function internalLog($string, $severity = null, $custom_file = null, $cleartext = false, $channel = null, $logged_channel_name = null)
     {
         if (!isset($string)) {
-            return false;
+            return;
         }
 
         if (!is_string($string)) {
@@ -418,7 +423,7 @@ class lcFileLoggerNG extends lcLogger
         $severity = isset($severity) ? $severity : self::DEFAULT_SEVERITY;
 
         if (!isset($this->logs[$severity])) {
-            return false;
+            return;
         }
 
         $channels1 = $this->channels;
@@ -573,7 +578,7 @@ class lcFileLoggerNG extends lcLogger
     public function logExtended($message, $severity = null, $filename = null, $ignore_severity_check = false, $cleartext = false, $channel = null)
     {
         if (!$this->is_logging) {
-            return false;
+            return;
         }
 
         $message = (string)$message;
@@ -581,7 +586,7 @@ class lcFileLoggerNG extends lcLogger
         $channel = (string)$channel;
 
         if (!$message || !$severity) {
-            return false;
+            return;
         }
 
         if ($ignore_severity_check) {
@@ -589,7 +594,7 @@ class lcFileLoggerNG extends lcLogger
         }
 
         if (!$ignore_severity_check && !isset($this->logs[$severity])) {
-            return false;
+            return;
         }
 
         try {
@@ -603,8 +608,6 @@ class lcFileLoggerNG extends lcLogger
 
     public function log($message, $severity = null, $channel = null)
     {
-        return $this->logExtended($message, $severity, null, false, false, $channel);
+        $this->logExtended($message, $severity, null, false, false, $channel);
     }
 }
-
-?>

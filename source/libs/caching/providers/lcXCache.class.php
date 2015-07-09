@@ -27,58 +27,56 @@
  * @changed $Id: lcXCache.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
-*/
-
+ */
 class lcXCache extends lcSysObj implements iCacheStorage
 {
-	private $prefix;
+    private $prefix;
 
-	public function __construct()
-	{
-		parent::__construct();
+    public function __construct()
+    {
+        parent::__construct();
 
-		// check for xcache
-		if (!function_exists('xcache_get'))
-		{
-			throw new lcSystemException('XCache is not available');
-		}
+        // check for xcache
+        if (!function_exists('xcache_get')) {
+            throw new lcSystemException('XCache is not available');
+        }
 
-		$this->prefix = 'lc_';
-	}
+        $this->prefix = 'lc_';
+    }
 
-	public function set($key, $value = null, $lifetime = null)
-	{
-		$key = $this->prefix . $key;
-		return xcache_set($key, $value, $lifetime);
-	}
+    public function set($key, $value = null, $lifetime = null)
+    {
+        $key = $this->prefix . $key;
+        return xcache_set($key, $value, $lifetime);
+    }
 
-	public function remove($key)
-	{
-		$key = $this->prefix . $key;
-		return xcache_unset($key);
-	}
+    public function remove($key)
+    {
+        $key = $this->prefix . $key;
+        return xcache_unset($key);
+    }
 
-	public function get($key)
-	{
-		$key = $this->prefix . $key;
-		return xcache_get($key);
-	}
+    public function get($key)
+    {
+        $key = $this->prefix . $key;
+        return xcache_get($key);
+    }
 
-	public function has($key)
-	{
-		$key = $this->prefix . $key;
-		$has = (bool)xcache_get($key) ? true : false;
+    public function has($key)
+    {
+        $key = $this->prefix . $key;
+        $has = (bool)xcache_get($key) ? true : false;
 
-		return $has;
-	}
+        return $has;
+    }
 
-	public function clear()
-	{
-		return false;
-	}
+    public function clear()
+    {
+        return false;
+    }
 
-	public function getBackend()
-	{
-		return null;
-	}
+    public function getBackend()
+    {
+        return null;
+    }
 }

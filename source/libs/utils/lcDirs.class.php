@@ -39,7 +39,9 @@ class lcDirs
     public static function recursiveMove($src, $dest)
     {
         // If source is not a directory stop processing
-        if (!is_dir($src)) return false;
+        if (!is_dir($src)) {
+            return false;
+        }
 
         // If the destination directory does not exist create it
         if (!is_dir($dest)) {
@@ -59,6 +61,8 @@ class lcDirs
             }
         }
         rmdir($src);
+
+        return true;
     }
 
     /**
@@ -90,6 +94,8 @@ class lcDirs
                 self::recursiveCopy($f->getRealPath(), $dest . DS . $f);
             }
         }
+
+        return true;
     }
 
     public static function recursiveChmod($path, $filePerm = 0644, $dirPerm = 0755)
@@ -429,6 +435,3 @@ class lcDirs
         }
     }
 }
-
-
-?>

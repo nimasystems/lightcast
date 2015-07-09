@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -26,32 +28,24 @@
  * @subpackage File Subcategory
  * @changed $Id: lcHttpVersion.class.php 1455 2013-10-25 20:29:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @version $Revision: 1455 $
+ */
 class lcHttpVersion
 {
-	const HTTPVER_1_0 = 10;
-	const HTTPVER_1_0_STRING = 'HTTP/1.0';
+    const HTTPVER_1_0 = 10;
+    const HTTPVER_1_0_STRING = 'HTTP/1.0';
 
-	const HTTPVER_1_1 = 11;
-	const HTTPVER_1_1_STRING = 'HTTP/1.1';
+    const HTTPVER_1_1 = 11;
+    const HTTPVER_1_1_STRING = 'HTTP/1.1';
 
-	public static function getString($code)
-	{
-		if ($code == self::HTTPVER_1_0)
-		{
-			return self::HTTPVER_1_0_STRING;
-		}
-		elseif ($code == self::HTTPVER_1_1)
-		{
-			return self::HTTPVER_1_1_STRING;
-		}
-		else
-		{
-			return false;
-		}
-	}
+    public static function getString($code)
+    {
+        if ($code == self::HTTPVER_1_0) {
+            return self::HTTPVER_1_0_STRING;
+        } elseif ($code == self::HTTPVER_1_1) {
+            return self::HTTPVER_1_1_STRING;
+        } else {
+            return false;
+        }
+    }
 }
-
-?>

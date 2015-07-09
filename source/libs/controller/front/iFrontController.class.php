@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,16 +27,27 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: iFrontController.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 interface iFrontController
 {
-	public function getControllerInstance($controller_name, $context_type = null, $context_name = null);
-	public function filterForwardParams(array &$forward_params);
-	public function getControllerStack();
-	public function dispatch();
-}
+    /**
+     * @param $controller_name
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcController
+     */
+    public function getControllerInstance($controller_name, $context_type = null, $context_name = null);
 
-?>
+    public function filterForwardParams(array &$forward_params);
+
+    /**
+     * @return lcControllerStack
+     */
+    public function getControllerStack();
+
+    public function dispatch();
+
+    public function validateForward($action_name, $controller_name, array $custom_params = null);
+}

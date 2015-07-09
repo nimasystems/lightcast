@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,14 +27,12 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: iI18nAttributes.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 interface iI18nAttributes
 {
-	public function getDir();
-	public function getXMLLang();
-}
+    public function getDir();
 
-?>
+    public function getXMLLang();
+}

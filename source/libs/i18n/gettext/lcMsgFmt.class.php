@@ -27,51 +27,43 @@
  * @changed $Id: lcMsgFmt.class.php 1475 2013-11-26 16:51:48Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1475 $
-*/
-
+ */
 class lcMsgFmt extends lcObj
 {
-	const SHELL_CMD = 'msgfmt -c %s -o %s';
+    const SHELL_CMD = 'msgfmt -c %s -o %s';
 
-	public function process($filepath, $target_filename = null)
-	{
-		if (!$filepath)
-		{
-			throw new lcInvalidArgumentException('Invalid MO filename');
-		}
+    public function process($filepath, $target_filename = null)
+    {
+        if (!$filepath) {
+            throw new lcInvalidArgumentException('Invalid MO filename');
+        }
 
-		$f = lcFiles::splitFileName(basename($filepath));
+        $f = lcFiles::splitFileName(basename($filepath));
 
-		if (!$f)
-		{
-			throw new lcInvalidArgumentException('Invalid PO filename', 1);
-		}
+        if (!$f) {
+            throw new lcInvalidArgumentException('Invalid PO filename', 1);
+        }
 
-		$mo_filename = $target_filename ? $target_filename : (realpath(dirname($filepath)) . DS . $f['name'] . '.mo');
+        $mo_filename = $target_filename ? $target_filename : (realpath(dirname($filepath)) . DS . $f['name'] . '.mo');
 
-		if (!$mo_filename)
-		{
-			throw new lcInvalidArgumentException('Invalid MO filename', 2);
-		}
+        if (!$mo_filename) {
+            throw new lcInvalidArgumentException('Invalid MO filename', 2);
+        }
 
-		// remove it first
-		if (file_exists($mo_filename))
-		{
-			unlink($mo_filename);
-			touch($mo_filename);
-		}
+        // remove it first
+        if (file_exists($mo_filename)) {
+            unlink($mo_filename);
+            touch($mo_filename);
+        }
 
-		unset($f);
+        unset($f);
 
-		exec(sprintf(self::SHELL_CMD, $filepath, $mo_filename), $output, $return);
+        exec(sprintf(self::SHELL_CMD, $filepath, $mo_filename), $output, $return);
 
-		if ($return !== 0 && !empty($output))
-		{
-			throw new lcIOException(implode("\n", $output));
-		}
+        if ($return !== 0 && !empty($output)) {
+            throw new lcIOException(implode("\n", $output));
+        }
 
-		return true;
-	}
+        return true;
+    }
 }
-
-?>

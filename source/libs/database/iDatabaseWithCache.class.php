@@ -26,15 +26,17 @@
  * @subpackage File Subcategory
  * @changed $Id: iDatabaseWithCache.class.php 1498 2014-01-09 04:57:31Z mkovachev $
  * @author $Author: mkovachev $
-* @version $Revision: 1498 $
-*/
-
+ * @version $Revision: 1498 $
+ */
 interface iDatabaseWithCache
 {
-	public function getCachedSQLCount();
-	public function getCacheTimeout();
-	public function getIsCacheEnabled();
-	
-	public function setDatabaseCache(iDatabaseCacheProvider $cache_storage = null);
-	public function getDatabaseCache();
+    public function getCachedSQLCount();
+
+    public function getCacheTimeout();
+
+    public function getIsCacheEnabled();
+
+    public function setDatabaseCache(iDatabaseCacheProvider $cache_storage = null);
+
+    public function getDatabaseCache();
 }

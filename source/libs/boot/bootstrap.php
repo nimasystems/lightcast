@@ -142,6 +142,7 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseMo
 // load base classes
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcObj.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcSysObj.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcResidentObj.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcApp.class.php');
 
 // profiler

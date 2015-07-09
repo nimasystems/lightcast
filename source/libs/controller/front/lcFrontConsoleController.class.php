@@ -27,48 +27,49 @@
  * @changed $Id: lcFrontConsoleController.class.php 1493 2013-12-17 11:27:04Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1493 $
-*/
-
+ */
 class lcFrontConsoleController extends lcFrontController
 {
-	public function initialize()
-	{
-		parent::initialize();
-	}
+    /** @var lcConsoleResponse */
+    protected $response;
 
-	protected function beforeDispatch()
-	{
-		// custom code before dispatching
-	}
+    public function initialize()
+    {
+        parent::initialize();
+    }
 
-	protected function prepareDispatchParams(lcRequest $request)
-	{
-		$params = $request->getParams();
-		$tmp = array();
-	
-		if ($params)
-		{
-			$params = $params->getArrayCopy();
-	
-			foreach($params as $param)
-			{
-				$tmp[$param->getName()] = $param->getValue();
-	
-				unset($param);
-			}
-	
-			unset($params);
-		}
-	
-		return $tmp;
-	}
+    protected function beforeDispatch()
+    {
+        // custom code before dispatching
+    }
 
-	public function getConsoleIntro()
-	{
-		$ver = LIGHTCAST_VER;
-		$lyear = date('Y');
-	
-		$lcintro = <<<EOD
+    protected function prepareDispatchParams(lcRequest $request)
+    {
+        $params = $request->getParams();
+        $tmp = array();
+
+        if ($params) {
+            $params = $params->getArrayCopy();
+
+            foreach ($params as $param) {
+                /** @var lcNameValuePair $param */
+                $tmp[$param->getName()] = $param->getValue();
+
+                unset($param);
+            }
+
+            unset($params);
+        }
+
+        return $tmp;
+    }
+
+    public function getConsoleIntro()
+    {
+        $ver = LIGHTCAST_VER;
+        $lyear = date('Y');
+
+        $lcintro = <<<EOD
 ----------------------------------------------
 Lightcast $ver Console Control
 ----------------------------------------------
@@ -80,10 +81,10 @@ Please read the README and LICENSE files.
 ----------------------------------------------
 	
 EOD;
-	
-		$intro = lcConsolePainter::formatColoredConsoleText($lcintro, 'cyan');
-	
-		$intro .= <<<EOD
+
+        $intro = lcConsolePainter::formatColoredConsoleText($lcintro, 'cyan');
+
+        $intro .= <<<EOD
 	
 The Lightcast command line tool (console) can be
 used to launch existing project tasks.
@@ -109,91 +110,81 @@ Plugin Options:
 {fgcolor:green}--disable-loaders{/fgcolor} - Do not load the loaders specified in configuration. Fallback to default loaders
 	
 EOD;
-	
-		return $intro;
-	}
-	
-	protected function shouldDispatch($controller_name, $action_name, array $params = null)
-	{
-		// handler called just before dispatching by front controller
-		if (isset($params['help']) || ($controller_name && !$action_name))
-		{
-			$this->displayControllerHelp($controller_name);
-			return false;
-		}
-		elseif (!$controller_name && !$action_name)
-		{
-			// show console info
-			$this->response->consoleDisplay($this->getConsoleIntro(), false);
-			return false;
-		}
-	
-		return true;
-	}
-	
-	protected function getControllerHelpInformation($controller_name)
-	{
-		$controller = $this->getControllerInstance($controller_name);
-	
-		if (!$controller)
-		{
-			throw new lcControllerNotFoundException('Controller \'' . $controller_name . '\' not found');
-		}
-	
-		$controller->initialize();
-	
-		$help = $controller->getHelpInfo();
-	
-		$controller->shutdown();
-	
-		return $help;
-	}
-	
-	protected function displayControllerHelp($controller_name)
-	{
-		$help_info = $this->getControllerHelpInformation($controller_name);
-	
-		$output = $help_info ?
-		"\n\n" . $help_info . "\n\n" :
-		'Module does not provide help information';
-	
-		$this->response->consoleDisplay($output, false);
-	}
-	
-	public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
-	{
-		if (!$this->system_component_factory)
-		{
-			throw new lcNotAvailableException('System Component Factory not available');
-		}
 
-		$controller_instance = $this->system_component_factory->getControllerTaskInstance($controller_name, $context_type, $context_name);
+        return $intro;
+    }
 
-		if (!$controller_instance)
-		{
-			return null;
-		}
+    protected function shouldDispatch($controller_name, $action_name, array $params = null)
+    {
+        // handler called just before dispatching by front controller
+        if (isset($params['help']) || ($controller_name && !$action_name)) {
+            $this->displayControllerHelp($controller_name);
+            return false;
+        } elseif (!$controller_name && !$action_name) {
+            // show console info
+            $this->response->consoleDisplay($this->getConsoleIntro(), false);
+            return false;
+        }
 
-		// assign system objects
-		$this->prepareControllerInstance($controller_instance);
+        return true;
+    }
 
-		// resolve dependancies
-		try
-		{
-			$controller_instance->loadDependancies();
-		}
-		catch(Exception $e)
-		{
-			throw new lcRequirementException('Console task controller dependancies could not be loaded (' . $controller_name . '): ' .
-					$e->getMessage(),
-					$e->getCode(),
-					$e);
-		}
+    protected function getControllerHelpInformation($controller_name)
+    {
+        /** @var lcTaskController $controller */
+        $controller = $this->getControllerInstance($controller_name);
 
-		// do not initialize the object yet! leave it to the caller
+        if (!$controller) {
+            throw new lcControllerNotFoundException('Controller \'' . $controller_name . '\' not found');
+        }
 
-		return $controller_instance;
-	}
+        $controller->initialize();
+
+        $help = $controller->getHelpInformation();
+
+        $controller->shutdown();
+
+        return $help;
+    }
+
+    protected function displayControllerHelp($controller_name)
+    {
+        $help_info = $this->getControllerHelpInformation($controller_name);
+
+        $output = $help_info ?
+            "\n\n" . $help_info . "\n\n" :
+            'Module does not provide help information';
+
+        $this->response->consoleDisplay($output, false);
+    }
+
+    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->system_component_factory) {
+            throw new lcNotAvailableException('System Component Factory not available');
+        }
+
+        $controller_instance = $this->system_component_factory->getControllerTaskInstance($controller_name, $context_type, $context_name);
+
+        if (!$controller_instance) {
+            return null;
+        }
+
+        // assign system objects
+        $this->prepareControllerInstance($controller_instance);
+
+        // resolve dependancies
+        try {
+            $controller_instance->loadDependancies();
+        } catch (Exception $e) {
+            throw new lcRequirementException('Console task controller dependancies could not be loaded (' . $controller_name . '): ' .
+                $e->getMessage(),
+                $e->getCode(),
+                $e);
+        }
+
+        // do not initialize the object yet! leave it to the caller
+
+        return $controller_instance;
+    }
 }
-
-?>

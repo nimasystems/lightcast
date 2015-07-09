@@ -81,7 +81,7 @@ class lcDateTime
         }
 
         if ($offset != null) {
-            $deltaS = $offset % 60;
+            //$deltaS = $offset % 60;
             $offset /= 60;
             $deltaM = $offset % 60;
             $offset /= 60;
@@ -173,5 +173,3 @@ class lcDateTime
         return $obj;
     }
 }
-
-?>

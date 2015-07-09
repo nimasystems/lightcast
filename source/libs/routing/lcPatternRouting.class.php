@@ -34,15 +34,31 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     protected $cache_key;
     protected $routes_are_cached;
 
+    /** @var lcRouteCollection */
     private $routes;
 
+    /** @var lcWebRequest */
+    protected $request;
+
+    protected $context;
+
+    /** @var lcNamedRoute */
     private $current_route;
+
     private $current_internal_uri;
+
+    /** @var array */
     private $current_params;
 
     public function initialize()
     {
         parent::initialize();
+
+        $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
+
+        $this->context = $this->request->getRequestContext();
+        $this->context['default_module'] = $this->default_module;
+        $this->context['default_action'] = $this->default_action;
 
         // init local cache
         $this->local_cache = $this->configuration->getCache();
@@ -157,6 +173,8 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $result['default_action'] = $this->default_action;
 
         $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, $result));
+
+        return null;
     }
 
     public function getParamsByCriteria($criteria)
@@ -289,13 +307,11 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             return;
         }
 
-        $ret = $this->routes->append($route);
+        $this->routes->append($route);
 
         if (DO_DEBUG) {
             $this->debug(sprintf('Connect %-25s %s', $route->getName() . ':', $route->getRoute()));
         }
-
-        return $ret;
     }
 
     public function prependRoute(lcNamedRoute $route)
@@ -313,7 +329,8 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $prepend_route = $route;
 
         if (!$this->routes->count()) {
-            return $this->appendRoute($route);
+            $this->appendRoute($route);
+            return;
         }
 
         $newroutes = new lcRouteCollection();
@@ -334,8 +351,6 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         if (DO_DEBUG) {
             $this->debug(sprintf('Prepend %-25s %s', $prepend_route->getName() . ':', $prepend_route->getRoute()));
         }
-
-        return true;
     }
 
     public function appendRoute(lcNamedRoute $route)
@@ -350,7 +365,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             $route->reCompile();
         }
 
-        return $this->connect($route);
+        $this->connect($route);
     }
 
     private function normalizeUrl($url)
@@ -425,7 +440,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $all = $this->routes->getAll();
 
         foreach ($all as $name => $route) {
-            if ($route->matchesParams($params, $this->getContext())) {
+            if ($route->matchesParams($params, $this->context)) {
                 return $route;
             }
 
@@ -442,14 +457,14 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $url = $this->normalizeUrl($url);
 
         if (!$url) {
-            return;
+            return null;
         }
 
-        $context = $this->getContext();
+        $context = $this->context;
         $all = $this->routes->getAll();
 
         if (!$all) {
-            return false;
+            return null;
         }
 
         foreach ($all as $route) {
@@ -531,10 +546,10 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         // do not allow adding routes when
         // caching is enabled and routes are cached
         if ($this->routes_are_cached) {
-            return false;
+            return;
         }
 
-        return $this->routes->clear();
+        $this->routes->clear();
     }
 
     protected function updateCurrentInternalUri($name, array $params = null)
@@ -595,5 +610,3 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         }
     }
 }
-
-?>

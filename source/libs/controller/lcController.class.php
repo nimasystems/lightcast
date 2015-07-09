@@ -71,7 +71,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
     protected $action_result;
 
     /**
-     * @var lcController
+     * @var iFrontController
      */
     protected $root_controller;
 
@@ -83,7 +83,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
     protected $render_time;
 
     /**
-     * @var lcView
+     * @var lcView, iSupportsLayoutDecoration
      */
     protected $layout_view;
 
@@ -187,11 +187,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         if ($args) {
             foreach ($args as $arg) {
-                if (($arg == self::VPOST && !$this->request->isPost()) ||
-                    ($arg == self::VPUT && !$this->request->isPut()) ||
-                    ($arg == self::VGET && !$this->request->isGet()) ||
-                    ($arg == self::VAJAX && !$this->request->isAjax()) ||
-                    ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
+                if (($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
                     ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||
                     !$arg
                 ) {
@@ -226,7 +222,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
                 if (!$return_value) {
                     $this->info('setDecoratorView was disabled by an event handler');
-                    return false;
+                    return;
                 }
             }
         }
@@ -264,14 +260,14 @@ abstract class lcController extends lcBaseController implements iDebuggable
     protected function forwardIf($condition, $action_name, $controller_name = null)
     {
         if ($condition) {
-            return $this->forward($action_name, $controller_name);
+            $this->forward($action_name, $controller_name);
         }
     }
 
     protected function forwardUnless($condition, $action_name, $controller_name = null)
     {
         if (!$condition) {
-            return $this->forward($action_name, $controller_name);
+            $this->forward($action_name, $controller_name);
         }
     }
 
@@ -323,7 +319,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         // override the web controller's forward for the sake of using this method within
         // the context of the root view controller
-        return $this->forwardToControllerAction(
+        $this->forwardToControllerAction(
             $controller_instance,
             $this,
             $action_name, $action_params);
@@ -497,7 +493,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
 
                     if ($credentials_module && $credentials_action) {
-                        return $this->forward(
+                        $this->forward(
                             $credentials_action,
                             $credentials_module,
                             $action_params
@@ -580,7 +576,8 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
     protected function renderControllerView(lcBaseController $controller, lcView $view)
     {
-        if (!$controller || !$view) {
+        /** @var lcController $controller */
+        if (!$controller || !$view || !($controller instanceof lcController)) {
             return null;
         }
 
@@ -596,6 +593,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
             // set the decorator
             if ($controller instanceof iViewDecorator && $view instanceof iDecoratingView) {
+                /** @var lcView $view */
                 $view->setViewDecorator($controller);
             }
 
@@ -647,6 +645,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
     protected function renderLayoutView($layout_content, $layout_content_type = null)
     {
+        /** @var iSupportsLayoutDecoration $layout_view */
         $layout_view = $this->getDecoratorView();
 
         if (!$layout_view) {
@@ -677,7 +676,11 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $render_result = $this->renderControllerView($this, $layout_view);
 
         // unset / shutdown the view after we are done with it to preserve memory
-        $layout_view->shutdown();
+        if ($layout_view instanceof lcSysObj) {
+            /** @var lcSysObj $layout_view */
+            $layout_view->shutdown();
+        }
+
         $this->layout_view = null;
 
         if (!$render_result) {
@@ -694,7 +697,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $r = $event->getReturnValue();
 
             $layout_content = isset($r['content']) ? $r['content'] : null;
-            $layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
+            //$layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
 
             if (!$layout_content) {
                 return $layout_content;
@@ -927,6 +930,11 @@ abstract class lcController extends lcBaseController implements iDebuggable
         return $this->isRootController();
     }
 
+    public function isRootController()
+    {
+        return ($this->root_controller === null);
+    }
+
     public function isTopController()
     {
         $res = ($this->getTopController() === $this) ? false : true;
@@ -955,5 +963,3 @@ abstract class lcController extends lcBaseController implements iDebuggable
         return $controller;
     }
 }
-
-?>

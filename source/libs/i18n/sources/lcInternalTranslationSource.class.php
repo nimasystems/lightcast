@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,64 +27,59 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcInternalTranslationSource.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcInternalTranslationSource extends lcSerializedFileTranslationSource
 {
-	private $translations;
+    private $translations;
 
-	public function serialize()
-	{
-		return
-		serialize(
-				array(
-						$this->translations
-				)
-		);
-	}
+    public function serialize()
+    {
+        return
+            serialize(
+                array(
+                    $this->translations
+                )
+            );
+    }
 
-	public function unserialize($serialized)
-	{
-		list(
-				$this->translations
-		) = unserialize($serialized);
-	}
+    public function unserialize($serialized)
+    {
+        list(
+            $this->translations
+            ) = unserialize($serialized);
+    }
 
-	public function translationExists($original_string)
-	{
-		return isset($this->translations[$original_string]);
-	}
+    public function translationExists($original_string)
+    {
+        return isset($this->translations[$original_string]);
+    }
 
-	public function getTranslation($original_string)
-	{
-		if (!$this->translationExists($original_string))
-		{
-			return null;
-		}
+    public function getTranslation($original_string)
+    {
+        if (!$this->translationExists($original_string)) {
+            return null;
+        }
 
-		return $this->translations[$original_string];
-	}
+        return $this->translations[$original_string];
+    }
 
-	public function getTranslations()
-	{
-		return $this->translations;
-	}
+    public function getTranslations()
+    {
+        return $this->translations;
+    }
 
-	public function setTranslation($original_string, $translated_string)
-	{
-		$this->translations[$original_string] = $translated_string;
-	}
+    public function setTranslation($original_string, $translated_string)
+    {
+        $this->translations[$original_string] = $translated_string;
+    }
 
-	public function setTranslations(array $translations)
-	{
-		$this->translations = array_merge(
-				(array)$this->translations,
-				$translations
-		);
-	}
+    public function setTranslations(array $translations)
+    {
+        $this->translations = array_merge(
+            (array)$this->translations,
+            $translations
+        );
+    }
 }
-
-?>

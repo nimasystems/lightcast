@@ -17,7 +17,9 @@
 * Plovdiv, Bulgaria
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
+* E-Mail: info@nimasystems.com
+
+
 */
 
 /**
@@ -25,51 +27,48 @@
  * @package File Category
  * @subpackage File Subcategory
  * @changed $Id: lcTagInputImage.class.php 1455 2013-10-25 20:29:31Z mkovachev $
-* @author $Author: mkovachev $
-* @version $Revision: 1455 $
-*/
-
+ * @author $Author: mkovachev $
+ * @version $Revision: 1455 $
+ */
 class lcTagInputImage extends lcTagInput
 {
-	public function __construct($src, $name = null, $id = null, $value = null, $alt = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
-	{
-		parent::__construct('image', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
+    public function __construct($src, $name = null, $id = null, $value = null, $alt = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    {
+        parent::__construct('image', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
-		$this->setSrc($src);
-		$this->setAlt($alt);
-	}
+        $this->setSrc($src);
+        $this->setAlt($alt);
+    }
 
-	public static function getRequiredAttributes()
-	{
-		return array_implode(array('src'), parent::getRequiredAttributes());
-	}
+    public static function getRequiredAttributes()
+    {
+        return implode(array('src'), parent::getRequiredAttributes());
+    }
 
-	public static function getOptionalAttributes()
-	{
-		return array_implode(array('alt'), parent::getOptionalAttributes());
-	}
+    public static function getOptionalAttributes()
+    {
+        return implode(array('alt'), parent::getOptionalAttributes());
+    }
 
-	public function setSrc($value = null)
-	{
-		$this->setAttribute('src', $value);
-		return $this;
-	}
+    public function setSrc($value = null)
+    {
+        $this->setAttribute('src', $value);
+        return $this;
+    }
 
-	public function getSrc()
-	{
-		return $this->getAttribute('src');
-	}
+    public function getSrc()
+    {
+        return $this->getAttribute('src');
+    }
 
-	public function setAlt($value = null)
-	{
-		$this->setAttribute('alt', $value);
-	}
+    public function setAlt($value = null)
+    {
+        $this->setAttribute('alt', $value);
+    }
 
-	public function getAlt()
-	{
-		$this->getAttribute('alt');
-		return $this;
-	}
+    public function getAlt()
+    {
+        $this->getAttribute('alt');
+        return $this;
+    }
 }
-
-?>
