@@ -74,7 +74,6 @@ abstract class lcValidatorBase extends lcObj
 
     public static function validateUsername($username, $min_length = 6, $max_length = 30, &$errors = null)
     {
-        fnothing($errors);
         $options = array('min_length' => $min_length, 'max_length' => $max_length);
         $validator = new lcUsernameValidator($options);
         return $validator->validate($username);

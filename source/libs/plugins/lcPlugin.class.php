@@ -72,7 +72,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
 
     public function execute(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
     {
-        fnothing($event_dispatcher, $configuration);
         // subclassers may override this method
     }
 

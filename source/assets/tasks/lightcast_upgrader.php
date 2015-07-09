@@ -941,8 +941,6 @@ class tLightcastUpgrader extends lcTaskController
 
     private function fixAddRequiredComponents($item_type, array $details)
     {
-        fnothing($item_type);
-
         $filename = $details['filename'];
         $class = $details['class'];
         $c = file_get_contents($filename);
@@ -1001,8 +999,6 @@ class tLightcastUpgrader extends lcTaskController
 
     private function fixAddRequiredPlugins($item_type, array $details)
     {
-        fnothing($item_type);
-
         $filename = $details['filename'];
         $class = $details['class'];
         $c = file_get_contents($filename);

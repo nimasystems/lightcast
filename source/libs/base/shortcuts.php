@@ -130,6 +130,7 @@ function gc($objname)
 }
 
 /*
+ * @deprecated
  * Helper method to silence PHPSniffer unused function parameters error
  * wherever necessary
  */

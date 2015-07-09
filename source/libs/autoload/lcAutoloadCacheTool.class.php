@@ -143,7 +143,6 @@ class lcAutoloadCacheTool extends lcObj
             try {
                 $this->parseDir($dir, $dir, $found_classes);
             } catch (Exception $e) {
-                fnothing($e);
                 assert(false);
                 continue;
             }

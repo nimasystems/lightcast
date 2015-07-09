@@ -41,7 +41,6 @@ class lcFrontWebController extends lcFrontController
     protected function shouldDispatch($controller_name, $action_name, array $params = null)
     {
         // handler called just before dispatching by front controller
-        fnothing($controller_name, $action_name, $params);
         return true;
     }
 

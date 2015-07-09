@@ -31,7 +31,6 @@ class propelPhoneValidator implements BasicValidator
 {
     public function isValid(ValidatorMap $map, $str)
     {
-        fnothing($map);
         return lcValidator::validatePhone($str);
     }
 }

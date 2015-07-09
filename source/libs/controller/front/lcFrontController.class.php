@@ -184,8 +184,6 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
     public function validateForward($action_name, $controller_name, array $custom_params = null)
     {
-        fnothing($action_name, $controller_name, $custom_params);
-
         $disabled_modules = $this->disabled_modules;
         $enabled_modules = $this->enabled_modules;
 

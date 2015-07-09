@@ -297,8 +297,6 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
 
     protected function shouldUserAuthenticate($forced_by_user = false, $no_events = false)
     {
-        fnothing($no_events);
-
         // listen to an event with which authentication can be stopped
         $event = $this->event_dispatcher->filter(
             new lcEvent('user.should_authenticate',

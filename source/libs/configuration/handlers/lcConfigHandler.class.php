@@ -45,13 +45,11 @@ abstract class lcConfigHandler extends lcObj
 
     protected function preReadConfigData($environment, array $data)
     {
-        fnothing($environment);
         return $data;
     }
 
     protected function postReadConfigData($environment, array $data)
     {
-        fnothing($environment);
         return $data;
     }
 

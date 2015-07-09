@@ -85,8 +85,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)
     {
-        fnothing($content_type);
-
         $action_result = $controller->getActionResult();
         $execute_status = 0;
 
@@ -104,8 +102,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     protected function actionExists($action_name, array $action_params = null)
     {
-        fnothing($action_params);
-
         /*
          * We need to make this call with both is_callable, method_exists
         *  as the inherited classes may contain a __call()
@@ -125,7 +121,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     protected function classMethodForAction($action_name, array $action_params = null)
     {
-        fnothing($action_name, $action_params);
         return 'executeTask';
     }
 

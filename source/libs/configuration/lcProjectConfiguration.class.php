@@ -360,26 +360,22 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function willBeginInitializingApp(lcApp $app)
     {
         // subclassers may override this method to execute code before the initialization of the app
-        fnothing($app);
     }
 
     public function didInitializeApp(lcApp $app)
     {
         // subclassers may override this method to execute code after the initialization of the app
-        fnothing($app);
     }
 
     public function willShutdownApp(lcApp $app)
     {
         // subclassers may override this method to execute code before the shutdown of the app
-        fnothing($app);
     }
 
     public function didShutdownApp(lcApp $app)
     {
         // subclassers may override this method to execute code after the shutdown of the app
         // WARNING: At this stage the configuration object will had been already shutdown!
-        fnothing($app);
     }
 
     public function getAutoloadClasses()

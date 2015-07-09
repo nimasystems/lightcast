@@ -198,7 +198,6 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
 
     public function getParamsByCriteria($criteria)
     {
-        fnothing($criteria);
         return false;
     }
 }

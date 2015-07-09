@@ -54,8 +54,6 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)
     {
-        fnothing($controller);
-
         /** @var lcWebResponse $response */
         $response = $this->getResponse();
 
@@ -153,8 +151,6 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
 
     protected function actionExists($action_name, array $action_params = null)
     {
-        fnothing($action_params);
-
         /*
          * We need to make this call with both is_callable, method_exists
         *  as the inherited classes may contain a __call()

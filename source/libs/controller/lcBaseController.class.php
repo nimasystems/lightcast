@@ -762,7 +762,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function readClassCache(array $cached_data)
     {
-        fnothing($cached_data);
         // subclassers may override this to read their caches
     }
 }

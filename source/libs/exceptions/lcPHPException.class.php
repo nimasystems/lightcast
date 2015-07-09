@@ -34,8 +34,6 @@ class lcPHPException extends lcException
 {
     public function __construct($errmsg, $errno, $filename, $linenum, $vars = null)
     {
-        fnothing($vars);
-
         $message = 'PHP Error: ' . $errmsg . ', Code: ' . $errno . ', File: ' . $filename . ', Line: ' . $linenum;
 
         parent::__construct($message, $errno);

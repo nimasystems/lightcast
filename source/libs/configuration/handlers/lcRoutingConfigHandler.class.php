@@ -33,8 +33,6 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
 {
     protected function postReadConfigData($environment, array $data)
     {
-        fnothing($environment);
-
         // there is a problem with defaults merging here (order is broken)
         // so we add the default routes ONLY if there are no other routes
         // detected

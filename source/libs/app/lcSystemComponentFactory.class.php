@@ -676,9 +676,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
      */
     public function getControllerModuleInstance($controller_name, $context_type = null, $context_name = null)
     {
-        // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-        fnothing($context_type, $context_name);
-
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');
         }
@@ -720,7 +717,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function getControllerWebServiceInstance($controller_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-        fnothing($context_type, $context_name);
 
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');
@@ -763,7 +759,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function getControllerTaskInstance($controller_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-        fnothing($context_type, $context_name);
 
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');
@@ -827,7 +822,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function getSystemPluginInstance($plugin_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-        fnothing($context_type, $context_name);
 
         if (!$plugin_name) {
             throw new lcInvalidArgumentException('Invalid plugin name');
@@ -865,7 +859,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function getControllerComponentInstance($controller_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-        fnothing($context_type, $context_name);
 
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');

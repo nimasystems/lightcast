@@ -83,7 +83,6 @@ class lcIniFileParser extends lcFileParser
 
     public function writeData($data, array $options = null)
     {
-        fnothing($options);
         $data = is_array($data) ? $data : null;
 
         $str = array();

@@ -70,7 +70,6 @@ class lcPropelLogger extends lcSysObj
 
     public function log($message, $level = null, $channel = null)
     {
-        fnothing($channel);
         $level = $level ? $level : Propel::LOG_DEBUG;
 
         $logger_severity = $this->getInternalLoggerSeverity($level);

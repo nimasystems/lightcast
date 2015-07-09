@@ -50,13 +50,11 @@ abstract class lcObj
 
     public function __call($method, array $params = null)
     {
-        fnothing($params);
         throw new Exception('Class Method \'' . get_class($this) . '::' . $method . '\' does not exist');
     }
 
     public function __set($property, $value = null)
     {
-        fnothing($value);
         throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
     }
 
@@ -158,8 +156,6 @@ abstract class lcObj
 
     public function assert($condition, $error_str = null)
     {
-        fnothing($error_str);
-
         if ($condition) {
             return true;
         }

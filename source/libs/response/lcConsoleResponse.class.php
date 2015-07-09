@@ -183,7 +183,7 @@ class lcConsoleResponse extends lcResponse
     // for compatibility
     public function setContentType($content_type)
     {
-        fnothing($content_type);
+        //
     }
 
     public function setShouldExitUponSend($do_exit = true)

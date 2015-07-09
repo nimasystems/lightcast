@@ -268,7 +268,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         try {
             $debug_snapshot = $this->app_context ? $this->app_context->getDebugSnapshot(true) : null;
         } catch (Exception $e) {
-            fnothing($e);
             assert(false);
             return;
         }

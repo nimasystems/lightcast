@@ -206,9 +206,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $reqc->setPostVars($post);
         $reqc->setParamVars($user_params);
 
-        // TODO: For a future implementation
-        fnothing($cookies, $files);
-
         return $reqc;
     }
 
@@ -1044,8 +1041,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $HTTP_POST_VARS = $HTTP_POST_FILES = $HTTP_GET_VARS = $HTTP_COOKIE_VARS = $HTTP_ENV_VARS = $HTTP_SERVER_VARS = null;
         $_POST = $_FILES = $_GET = null;
         //$_SERVER = $_ENV = $_REQUEST = null; we leave these for compatibility with 3rd party software
-
-        fnothing($HTTP_POST_VARS, $HTTP_POST_FILES, $HTTP_GET_VARS, $HTTP_COOKIE_VARS, $HTTP_ENV_VARS, $HTTP_SERVER_VARS);
     }
 
     /*
@@ -1059,8 +1054,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $HTTP_COOKIE_VARS = $_COOKIE;
         $HTTP_ENV_VARS = $_ENV;
         $HTTP_SERVER_VARS = $_SERVER;
-
-        fnothing($HTTP_POST_VARS, $HTTP_POST_FILES, $HTTP_GET_VARS, $HTTP_COOKIE_VARS, $HTTP_ENV_VARS, $HTTP_SERVER_VARS);
     }
 
     public function getUriPath()

@@ -256,7 +256,6 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
     public function generate(array $params = null, $absolute = false, $name = null)
     {
-        fnothing($absolute);
         $ret = null;
 
         $params = array_filter($params);

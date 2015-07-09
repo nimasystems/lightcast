@@ -89,7 +89,6 @@ class lcSysLog extends lcObj
         try {
             $res = syslog($priority, $message);
         } catch (Exception $e) {
-            fnothing($e);
             closelog();
             assert(false);
 

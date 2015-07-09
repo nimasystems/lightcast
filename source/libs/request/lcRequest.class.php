@@ -184,13 +184,11 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function offsetSet($name, $value)
     {
-        fnothing($name, $value);
         throw new lcUnsupportedException('Changing env variables is not supported');
     }
 
     public function offsetUnset($name)
     {
-        fnothing($name);
         throw new lcUnsupportedException('Changing env variables is not supported');
     }
 

@@ -483,7 +483,6 @@ class lcFileLoggerNG extends lcLogger
                     die('Internal log error: ' . $e);
                 }
 
-                fnothing($e);
                 assert(false);
             }
         }

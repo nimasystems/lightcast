@@ -88,7 +88,6 @@ class lcPropel extends Propel
      */
     public static function translateValidatorMessage($string, lcTableMap $map_object, $locale = null)
     {
-        fnothing($locale);
         return self::translateTableMapString($string, $map_object);
     }
 

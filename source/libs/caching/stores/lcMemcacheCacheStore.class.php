@@ -451,8 +451,6 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function removeDbCacheForNamespace($namespace)
     {
-        fnothing($namespace);
-
         // cannot be implemented - no namespace support
         return false;
     }

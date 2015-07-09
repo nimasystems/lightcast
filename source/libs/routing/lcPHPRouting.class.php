@@ -81,14 +81,11 @@ class lcPHPRouting extends lcRouting
 
     public function getParamsByCriteria($criteria)
     {
-        fnothing($criteria);
         return false;
     }
 
     public function generate($params = array(), $absolute = false, $name = null)
     {
-        fnothing($name);
-
         !isset($params['application']) ?
             $params['application'] = $this->getDefaultParams()->get('application') :
             null;
@@ -108,9 +105,6 @@ class lcPHPRouting extends lcRouting
 
     public function parse($url)
     {
-        // TODO: What is $url for here?
-        fnothing($url);
-
         // get the prefixes of URL matching vars
         $this->context['application_prefix'] = $this->configuration['routing.application_prefix'] ?
             $this->configuration['routing.application_prefix'] : 'application';

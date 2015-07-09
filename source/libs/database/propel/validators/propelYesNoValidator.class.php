@@ -31,8 +31,6 @@ class propelYesNoValidator implements BasicValidator
 {
     public function isValid(ValidatorMap $map, $str)
     {
-        fnothing($map);
-
         $valid_enums = array('yes', 'no');
 
         return in_array($str, $valid_enums);

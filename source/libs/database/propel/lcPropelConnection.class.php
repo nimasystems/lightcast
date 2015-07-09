@@ -371,7 +371,6 @@ class lcPropelConnection extends PropelPDO
             $this->commit();
             parent::exec('COMMIT');
         } catch (Exception $e) {
-            fnothing($e);
             // in case a transaction is not running and PDO is complaining
         }
     }

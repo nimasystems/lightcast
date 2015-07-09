@@ -127,13 +127,11 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function offsetSet($short_config_name, $value)
     {
-        fnothing($short_config_name, $value);
         return false;
     }
 
     public function offsetUnset($short_config_name)
     {
-        fnothing($short_config_name);
         return false;
     }
 

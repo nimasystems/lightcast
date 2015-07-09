@@ -114,13 +114,11 @@ class lcRouteCollection extends lcBaseCollection
 
     public function offsetSet($name, $value)
     {
-        fnothing($name, $value);
         throw new lcUnsupportedException('Cannot change collection params');
     }
 
     public function offsetUnset($name)
     {
-        fnothing($name);
         throw new lcUnsupportedException('Cannot change collection params');
     }
 

@@ -73,7 +73,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     protected $mailer;
 
     /**
-     * @var lcDatabase
+     * @var lcPropelConnection
      */
     protected $dbc;
 
