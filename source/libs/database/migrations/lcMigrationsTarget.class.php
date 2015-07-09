@@ -38,6 +38,8 @@ abstract class lcMigrationsTarget extends lcSysObj implements iDatabaseMigration
 
     protected $conn;
     protected $database;
+
+    /** @var lcLogger */
     protected $logger;
 
     public function getDatabase()
@@ -174,7 +176,7 @@ abstract class lcMigrationsTarget extends lcSysObj implements iDatabaseMigration
     public function log($message_code, $severity = null, $channel = null)
     {
         if ($this->logger) {
-            $this->loggger->log($message_code, $severity, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
+            $this->logger->log($message_code, $severity, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
         }
     }
 

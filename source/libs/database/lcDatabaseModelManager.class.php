@@ -129,6 +129,8 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         }
 
         $this->_useModel($model_name);
+
+        return true;
     }
 
     protected function _useModel($model_name, $already_camelized = false)

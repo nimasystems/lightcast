@@ -214,5 +214,3 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
         $this->registered_classes = isset($cached_data['registered_classes']) ? $cached_data['registered_classes'] : null;
     }
 }
-
-?>

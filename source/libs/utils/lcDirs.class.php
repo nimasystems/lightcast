@@ -30,12 +30,6 @@
  */
 class lcDirs
 {
-    /**
-     * Recursively move files from one directory to another
-     *
-     * @param String $src - Source of files being moved
-     * @param String $dest - Destination of files being moved
-     */
     public static function recursiveMove($src, $dest)
     {
         // If source is not a directory stop processing
@@ -65,12 +59,6 @@ class lcDirs
         return true;
     }
 
-    /**
-     * Recursively copy files from one directory to another
-     *
-     * @param String $src - Source of files being moved
-     * @param String $dest - Destination of files being moved
-     */
     public static function recursiveCopy($src, $dest)
     {
 

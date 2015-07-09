@@ -173,5 +173,3 @@ class lcAPCCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, 
         return $this->has($key);
     }
 }
-
-?>

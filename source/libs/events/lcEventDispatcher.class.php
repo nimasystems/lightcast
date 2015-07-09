@@ -568,13 +568,6 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         $this->connect_listeners_objects[$listener_name] = &$listener;
     }
 
-    /**
-     * @param $event_name
-     * @param lcObj $listener
-     * @param $callback_func
-     * @return lcEvent|null
-     * @throws Exception
-     */
     public function notifyOnConnectForEvent($event_name)
     {
         $listeners = $this->connect_listeners;

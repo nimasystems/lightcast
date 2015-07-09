@@ -353,5 +353,3 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this->project_configuration->getGenDir();
     }
 }
-
-?>

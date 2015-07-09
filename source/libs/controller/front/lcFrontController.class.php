@@ -140,7 +140,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         // allow customized functionality before dispatching
         if (!$this->shouldDispatch($controller, $action, $request_params)) {
-            return false;
+            return;
         }
 
         // TODO: security.is_secure = TRUE - if a controller is not found

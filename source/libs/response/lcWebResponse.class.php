@@ -342,9 +342,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->stylesheets = null;
     }
 
-    /**
-     * Removes an included js file
-     */
     public function removeJavascript($js_src)
     {
         if (isset($this->javascripts[$js_src])) {
@@ -356,9 +353,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /**
-     * Removes an included css file
-     */
     public function removeStylesheet($css_src)
     {
         if (isset($this->stylesheets[$css_src])) {
