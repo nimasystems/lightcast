@@ -54,13 +54,6 @@ class lcPHPRouting extends lcRouting
         $this->detectParameters();
     }
 
-    public function shutdown()
-    {
-        $this->request = null;
-
-        parent::shutdown();
-    }
-
     private function detectParameters()
     {
         $res = $this->parse($this->context['request_uri']);
@@ -71,36 +64,6 @@ class lcPHPRouting extends lcRouting
         }
 
         $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, $result));
-    }
-
-    // TODO: Finish this implementation
-    public function getParams()
-    {
-        return false;
-    }
-
-    public function getParamsByCriteria($criteria)
-    {
-        return false;
-    }
-
-    public function generate($params = array(), $absolute = false, $name = null)
-    {
-        !isset($params['application']) ?
-            $params['application'] = $this->getDefaultParams()->get('application') :
-            null;
-
-        !isset($params['controller']) ?
-            $params['controller'] = $this->getDefaultParams()->get('controller') :
-            null;
-
-        !isset($params['action']) ?
-            $params['action'] = $this->getDefaultParams()->get('action') :
-            null;
-
-        $params = http_build_query($params, null, '&');
-
-        return $this->fixGeneratedUrl('/' . ($params ? '?' . $params : ''), $absolute);
     }
 
     public function parse($url)
@@ -149,5 +112,43 @@ class lcPHPRouting extends lcRouting
         }
 
         return $params;
+    }
+
+    // TODO: Finish this implementation
+
+    public function shutdown()
+    {
+        $this->request = null;
+
+        parent::shutdown();
+    }
+
+    public function getParams()
+    {
+        return false;
+    }
+
+    public function getParamsByCriteria($criteria)
+    {
+        return false;
+    }
+
+    public function generate($params = array(), $absolute = false, $name = null)
+    {
+        !isset($params['application']) ?
+            $params['application'] = $this->getDefaultParams()->get('application') :
+            null;
+
+        !isset($params['controller']) ?
+            $params['controller'] = $this->getDefaultParams()->get('controller') :
+            null;
+
+        !isset($params['action']) ?
+            $params['action'] = $this->getDefaultParams()->get('action') :
+            null;
+
+        $params = http_build_query($params, null, '&');
+
+        return $this->fixGeneratedUrl('/' . ($params ? '?' . $params : ''), $absolute);
     }
 }

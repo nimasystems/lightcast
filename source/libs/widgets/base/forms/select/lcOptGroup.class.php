@@ -44,6 +44,18 @@ class lcOptGroup extends lcHtmlTag
         $this->setIsDisabled($disabled);
     }
 
+    public function setLabel($value = null)
+    {
+        $this->setAttribute('label', $value);
+        return $this;
+    }
+
+    public function setIsDisabled($value = false)
+    {
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('label');
@@ -60,14 +72,14 @@ class lcOptGroup extends lcHtmlTag
         return $this;
     }
 
-    public function setOptions(array $options)
-    {
-        $this->options = $options;
-    }
-
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 
     public function clearOptions()
@@ -76,21 +88,9 @@ class lcOptGroup extends lcHtmlTag
         return $this;
     }
 
-    public function setIsDisabled($value = false)
-    {
-        $this->setAttribute('disabled', $value ? 'disabled' : null);
-        return $this;
-    }
-
     public function getIsDisabled()
     {
         return $this->getAttribute('disabled') ? true : false;
-    }
-
-    public function setLabel($value = null)
-    {
-        $this->setAttribute('label', $value);
-        return $this;
     }
 
     public function getLabel()

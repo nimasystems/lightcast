@@ -95,17 +95,24 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         }
     }
 
-    public function removeObservers()
-    {
-        $this->observers = null;
-    }
-
     public function shutdown()
     {
         $this->removeObservers();
         $this->disconnectAllListeners();
 
         parent::shutdown();
+    }
+
+    public function removeObservers()
+    {
+        $this->observers = null;
+    }
+
+    public function disconnectAllListeners()
+    {
+        $this->listeners =
+        $this->event_listeners =
+        $this->listener_events = null;
     }
 
     public function getDebugInfo()
@@ -206,11 +213,48 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return true;
     }
 
-    public function disconnectAllListeners()
+    public function notifyOnConnectForEvent($event_name)
     {
-        $this->listeners =
-        $this->event_listeners =
-        $this->listener_events = null;
+        $listeners = $this->connect_listeners;
+
+        if ($listeners) {
+            foreach ($listeners as $key => $data) {
+
+                if ($key == $event_name) {
+                    // return the first found object
+                    $listener_name = $data[0][0];
+                    $callback_func = $data[0][1];
+
+                    $callee = $this->connect_listeners_objects[$listener_name];
+
+                    try {
+                        if ($callback_func) {
+                            if (is_callable($callback_func)) {
+                                $return_value = $callback_func();
+                            } else {
+                                $return_value = $callee->$callback_func();
+                            }
+                        } else {
+                            $return_value = new lcEvent($event_name, $callee);
+                        }
+
+                        if ($return_value instanceof lcEvent) {
+                            return $return_value;
+                        }
+
+                    } catch (Exception $e) {
+                        $message = 'Could not notify on connect: ' . $event_name . ': ' . $e;
+                        $this->err($message);
+
+                        throw $e;
+                    }
+                }
+
+                unset($key, $data);
+            }
+        }
+
+        return null;
     }
 
     public function disconnectListener(lcObj & $listener)
@@ -566,49 +610,5 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
         $this->connect_listeners[$event_name][] = array($listener_name, $callback_func);
         $this->connect_listeners_objects[$listener_name] = &$listener;
-    }
-
-    public function notifyOnConnectForEvent($event_name)
-    {
-        $listeners = $this->connect_listeners;
-
-        if ($listeners) {
-            foreach ($listeners as $key => $data) {
-
-                if ($key == $event_name) {
-                    // return the first found object
-                    $listener_name = $data[0][0];
-                    $callback_func = $data[0][1];
-
-                    $callee = $this->connect_listeners_objects[$listener_name];
-
-                    try {
-                        if ($callback_func) {
-                            if (is_callable($callback_func)) {
-                                $return_value = $callback_func();
-                            } else {
-                                $return_value = $callee->$callback_func();
-                            }
-                        } else {
-                            $return_value = new lcEvent($event_name, $callee);
-                        }
-
-                        if ($return_value instanceof lcEvent) {
-                            return $return_value;
-                        }
-
-                    } catch (Exception $e) {
-                        $message = 'Could not notify on connect: ' . $event_name . ': ' . $e;
-                        $this->err($message);
-
-                        throw $e;
-                    }
-                }
-
-                unset($key, $data);
-            }
-        }
-
-        return null;
     }
 }

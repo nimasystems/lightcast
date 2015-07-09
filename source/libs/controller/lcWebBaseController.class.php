@@ -41,6 +41,18 @@ abstract class lcWebBaseController extends lcController
     /** @var lcWebResponse */
     protected $response;
 
+    public function generateUrl(array $params = null, $route = null, $absolute_url = false)
+    {
+        $router = $this->routing;
+
+        if (!$router) {
+            throw new lcNotAvailableException('Router not available');
+        }
+
+        $url = $router->generate($params, $absolute_url, $route);
+        return $url;
+    }
+
     protected function renderRaw($content, $content_type = 'text/html', $decorated = false)
     {
         if (!$decorated) {
@@ -63,17 +75,17 @@ abstract class lcWebBaseController extends lcController
         $this->view = $view;
     }
 
+    protected function render404($message = 'Page not found')
+    {
+        $this->renderHttpError(404, $message);
+    }
+
     protected function renderHttpError($error_code = 500, $reason_string = null)
     {
         $response = $this->response;
         $response->setStatusCode($error_code, $reason_string);
         $response->setContent($reason_string);
         $response->send();
-    }
-
-    protected function render404($message = 'Page not found')
-    {
-        $this->renderHttpError(404, $message);
     }
 
     protected function reloadPage()
@@ -89,52 +101,6 @@ abstract class lcWebBaseController extends lcController
         }
 
         $this->redirect($request_uri);
-    }
-
-    protected function redirectIfNot($url, $condition, $http_code = 302)
-    {
-        if (!$condition) {
-            $this->redirect($url, $http_code);
-        }
-    }
-
-    protected function redirectIf($url, $condition, $http_code = 302)
-    {
-        if ($condition) {
-            $this->redirect($url, $http_code);
-        }
-    }
-
-    public function generateUrl(array $params = null, $route = null, $absolute_url = false)
-    {
-        $router = $this->routing;
-
-        if (!$router) {
-            throw new lcNotAvailableException('Router not available');
-        }
-
-        $url = $router->generate($params, $absolute_url, $route);
-        return $url;
-    }
-
-    protected function validateRequestAndThrow()
-    {
-        $args = func_get_args();
-
-        if ($args) {
-            foreach ($args as $arg) {
-                if (($arg == self::VPOST && !$this->request->isPost()) ||
-                    ($arg == self::VPUT && !$this->request->isPut()) ||
-                    ($arg == self::VGET && !$this->request->isGet()) ||
-                    ($arg == self::VAJAX && !$this->request->isAjax()) ||
-                    ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
-                    ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||
-                    !$arg
-                ) {
-                    throw new lcInvalidRequestException($this->t('Invalid Request'));
-                }
-            }
-        }
     }
 
     protected function redirect($url, $http_code = 302)
@@ -174,5 +140,39 @@ abstract class lcWebBaseController extends lcController
         }
 
         $this->response->redirect($url, $http_code);
+    }
+
+    protected function redirectIfNot($url, $condition, $http_code = 302)
+    {
+        if (!$condition) {
+            $this->redirect($url, $http_code);
+        }
+    }
+
+    protected function redirectIf($url, $condition, $http_code = 302)
+    {
+        if ($condition) {
+            $this->redirect($url, $http_code);
+        }
+    }
+
+    protected function validateRequestAndThrow()
+    {
+        $args = func_get_args();
+
+        if ($args) {
+            foreach ($args as $arg) {
+                if (($arg == self::VPOST && !$this->request->isPost()) ||
+                    ($arg == self::VPUT && !$this->request->isPut()) ||
+                    ($arg == self::VGET && !$this->request->isGet()) ||
+                    ($arg == self::VAJAX && !$this->request->isAjax()) ||
+                    ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
+                    ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||
+                    !$arg
+                ) {
+                    throw new lcInvalidRequestException($this->t('Invalid Request'));
+                }
+            }
+        }
     }
 }

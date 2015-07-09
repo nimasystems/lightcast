@@ -44,11 +44,6 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return parent::asHtml();
     }
 
-    public function getClass()
-    {
-        return implode(' ', (array)$this->classes);
-    }
-
     public function getClasses()
     {
         return $this->classes;
@@ -61,18 +56,14 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this;
     }
 
-    public function removeClass($class_name)
+    public function setAttribute($name, $value = null)
     {
-        if ($this->hasClass($class_name)) {
-            unset($this->classes[$class_name]);
-            $this->setAttribute('class', $this->getClass());
+        if ($name == 'class') {
+            $this->setClass($value);
         }
-        return $this;
-    }
 
-    public function hasClass($class_name)
-    {
-        return isset($this->classes[$class_name]);
+        parent::setAttribute($name, $value);
+        return $this;
     }
 
     public function setClass($value = null)
@@ -93,14 +84,23 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this;
     }
 
-    public function setAttribute($name, $value = null)
+    public function getClass()
     {
-        if ($name == 'class') {
-            $this->setClass($value);
-        }
+        return implode(' ', (array)$this->classes);
+    }
 
-        parent::setAttribute($name, $value);
+    public function removeClass($class_name)
+    {
+        if ($this->hasClass($class_name)) {
+            unset($this->classes[$class_name]);
+            $this->setAttribute('class', $this->getClass());
+        }
         return $this;
+    }
+
+    public function hasClass($class_name)
+    {
+        return isset($this->classes[$class_name]);
     }
 
     public function getId()

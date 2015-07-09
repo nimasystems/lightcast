@@ -87,16 +87,16 @@ class lcEvent extends lcObj
         return $this->processed;
     }
 
+    public function getReturnValue()
+    {
+        return $this->return_value;
+    }
+
     public function setReturnValue($value)
     {
         // mark automatically as processed
         $this->processed = true;
         $this->return_value = $value;
-    }
-
-    public function getReturnValue()
-    {
-        return $this->return_value;
     }
 
     public function __toString()

@@ -30,14 +30,22 @@
  */
 abstract class lcRoute extends lcObj
 {
+    const PARAM_MATCH = ':';
+    const DEFAULT_TOKENIZER = '/';
+    const EXT_DELIMITER = '.';
+    const ANY_TOKEN = '*';
+    const REGEX_START = '`';
+    const SEP_TYPE_TOKEN = 1;
+    const SEP_TYPE_TEXT = 2;
+    const SEP_TYPE_PARAM = 3;
+    const SEP_TYPE_REGEX = 4;
+    const SEP_TYPE_ANY = 5;
     /**
      * The route pattern
      * Example: /:application/:controller/:action
      */
     protected $route;
-
     protected $default_params;
-
     /**
      * Preg match requirements that check if a param
      * matches a condition
@@ -48,53 +56,34 @@ abstract class lcRoute extends lcObj
      * int, float, minlen-x, maxlen-x, minvalue-x, maxvalue-x
      */
     protected $requirements;
-
     protected $options;
-
-    private $context;
-    private $live_params;
-
     /**
      * Predefined parameters that will be
      * set with the route with priority
      * Example: module: home or action: index
      */
     protected $params;
-
+    private $context;
+    private $live_params;
     private $fixed_route;
     private $compiled;
-
     private $tokens;
     private $ext;
     private $compare_regex;
-
     private $custom_param_validate = '\+';
-
-    const PARAM_MATCH = ':';
-    const DEFAULT_TOKENIZER = '/';
-    const EXT_DELIMITER = '.';
-    const ANY_TOKEN = '*';
-    const REGEX_START = '`';
-
-    const SEP_TYPE_TOKEN = 1;
-    const SEP_TYPE_TEXT = 2;
-    const SEP_TYPE_PARAM = 3;
-    const SEP_TYPE_REGEX = 4;
-    const SEP_TYPE_ANY = 5;
-
     private $tokenizers = array(
         '/',
         '.'
     );
 
-    public function setRoute($route)
-    {
-        $this->route = $route;
-    }
-
     public function getRoute()
     {
         return $this->route;
+    }
+
+    public function setRoute($route)
+    {
+        $this->route = $route;
     }
 
     public function getParams()
@@ -102,14 +91,14 @@ abstract class lcRoute extends lcObj
         return $this->params;
     }
 
-    public function setRequirements(array $requirements = null)
-    {
-        $this->requirements = $requirements;
-    }
-
     public function getRequirements()
     {
         return $this->requirements;
+    }
+
+    public function setRequirements(array $requirements = null)
+    {
+        $this->requirements = $requirements;
     }
 
     /*
@@ -118,25 +107,28 @@ abstract class lcRoute extends lcObj
     * - ajax_request_only - allow only AJAX requests
     * - security: (none|default) - omit security checks for the request
     */
-    public function setOptions(array $options = null)
-    {
-        $this->options = $options;
-    }
-
-    public function setDefaultParams(array $default_params = null)
-    {
-        $this->default_params = $default_params;
-    }
 
     public function getOptions()
     {
         return $this->options;
     }
 
+    public function setOptions(array $options = null)
+    {
+        $this->options = $options;
+    }
+
     public function setContext($context, array $live_params = null)
     {
         $this->context = $context;
         $this->live_params = $live_params;
+    }
+
+    public function reCompile()
+    {
+        $this->compiled = false;
+
+        return $this->compile();
     }
 
     /**
@@ -386,13 +378,6 @@ abstract class lcRoute extends lcObj
         return $this->compare_regex;
     }
 
-    public function reCompile()
-    {
-        $this->compiled = false;
-
-        return $this->compile();
-    }
-
     public function getPattern()
     {
         if (!$this->compiled) {
@@ -420,10 +405,6 @@ abstract class lcRoute extends lcObj
         return $this->tokens;
     }
 
-    /*
-     * Checks if the given URL matches the route
-    * and returns the params found
-    */
     public function matchesUrl($url, array $context)
     {
         $this->context = $context;
@@ -485,6 +466,11 @@ abstract class lcRoute extends lcObj
 
         return $newparams;
     }
+
+    /*
+     * Checks if the given URL matches the route
+    * and returns the params found
+    */
 
     public function matchesParams(array $params, array $context)
     {
@@ -597,6 +583,11 @@ abstract class lcRoute extends lcObj
     public function getDefaultParams()
     {
         return $this->default_params;
+    }
+
+    public function setDefaultParams(array $default_params = null)
+    {
+        $this->default_params = $default_params;
     }
 
     public function __toString()

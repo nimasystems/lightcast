@@ -123,19 +123,26 @@ abstract class lcMigrationsTarget extends lcSysObj implements iDatabaseMigration
 
     #pragma mark - Logger
 
-    public function setLogger(iLoggable $logger)
-    {
-        $this->logger = $logger;
-    }
-
     public function getLogger()
     {
         return $this->logger;
     }
 
+    public function setLogger(iLoggable $logger)
+    {
+        $this->logger = $logger;
+    }
+
     public function emerg($message_code, $channel = null)
     {
         $this->log($message_code, lcLogger::LOG_EMERG, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
+    }
+
+    public function log($message_code, $severity = null, $channel = null)
+    {
+        if ($this->logger) {
+            $this->logger->log($message_code, $severity, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
+        }
     }
 
     public function alert($message_code, $channel = null)
@@ -171,13 +178,6 @@ abstract class lcMigrationsTarget extends lcSysObj implements iDatabaseMigration
     public function debug($message_code, $channel = null)
     {
         $this->log($message_code, lcLogger::LOG_DEBUG, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
-    }
-
-    public function log($message_code, $severity = null, $channel = null)
-    {
-        if ($this->logger) {
-            $this->logger->log($message_code, $severity, (isset($channel) ? $channel : self::DEFAULT_LOG_CHANNEL));
-        }
     }
 
     #pragma mark - Helpers

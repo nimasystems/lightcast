@@ -69,7 +69,7 @@ class lcPageIterateCounter
         $offset = ($page - 1) * $limit;
 
         $count = 0;
-        
+
         if ($group_limiter) {
             $cur_page = $page;
             $cur_page = max($cur_page - floor($group_limiter / 2), 1);

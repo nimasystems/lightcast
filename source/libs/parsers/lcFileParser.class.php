@@ -34,10 +34,6 @@ abstract class lcFileParser extends lcObj
 {
     protected $filename;
 
-    abstract public function parse();
-
-    abstract public function writeData($data, array $options = null);
-
     public function __construct($filename)
     {
         parent::__construct();
@@ -48,6 +44,10 @@ abstract class lcFileParser extends lcObj
 
         $this->filename = $filename;
     }
+
+    abstract public function parse();
+
+    abstract public function writeData($data, array $options = null);
 
     public function getFilename()
     {

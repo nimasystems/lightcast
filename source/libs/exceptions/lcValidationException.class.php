@@ -33,13 +33,13 @@ class lcValidationException extends lcException
     /** @var lcValidatorFailure[] */
     protected $validation_failures;
 
-    public function setValidationFailures(array $failures)
-    {
-        $this->validation_failures = $failures;
-    }
-
     public function getValidationFailures()
     {
         return $this->validation_failures;
+    }
+
+    public function setValidationFailures(array $failures)
+    {
+        $this->validation_failures = $failures;
     }
 }

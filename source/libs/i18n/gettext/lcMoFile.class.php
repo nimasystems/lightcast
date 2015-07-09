@@ -49,19 +49,6 @@ class lcMoFile extends lcObj
         }
     }
 
-    public function __destruct()
-    {
-        if ($this->fp) {
-            @flock($this->fp, LOCK_UN);
-            if ($this->fp) {
-                @fclose($this->fp);
-            }
-            unset($this->fp);
-        }
-
-        parent::__destruct();
-    }
-
     public function openFile($filename)
     {
         $this->filename = $filename;
@@ -158,14 +145,58 @@ class lcMoFile extends lcObj
         }
     }
 
-    public function setMessages(array $messages)
+    private function read($bytes = 1)
     {
-        $this->messages = $messages;
+        if (0 < $bytes = abs($bytes)) {
+            return fread($this->fp, $bytes);
+        }
+
+        return null;
     }
 
-    public function setHeaders(array $headers)
+    private function readInt($big_endian = false)
     {
-        $this->headers = $headers;
+        $tmp = unpack($big_endian ? 'N' : 'V', $this->read(4));
+        return array_shift($tmp);
+    }
+
+    private function readStr($params)
+    {
+        fseek($this->fp, $params['offset']);
+
+        return $this->read($params['length']);
+    }
+
+    private function convertStrHeadersToArray($str)
+    {
+        $tmp = array();
+        $ex = explode("\n", $str);
+
+        foreach ($ex as $item) {
+            if (!$item = trim($item)) {
+                continue;
+            }
+
+            list($key, $value) = explode(':', $item, 2);
+            $tmp[trim($key)] = trim($value);
+        }
+
+        unset($ex);
+
+        return $tmp;
+    }
+
+    public function __destruct()
+    {
+        if ($this->fp) {
+            @flock($this->fp, LOCK_UN);
+            if ($this->fp) {
+                @fclose($this->fp);
+            }
+            unset($this->fp);
+        }
+
+        parent::__destruct();
     }
 
     public function getMessages()
@@ -173,9 +204,19 @@ class lcMoFile extends lcObj
         return (array)$this->messages;
     }
 
+    public function setMessages(array $messages)
+    {
+        $this->messages = $messages;
+    }
+
     public function getHeaders()
     {
         return (array)$this->headers;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
     }
 
     public function toPo($filename = null)
@@ -197,62 +238,6 @@ class lcMoFile extends lcObj
         $po->save($filename);
 
         unset($po);
-    }
-
-    private function readInt($big_endian = false)
-    {
-        $tmp = unpack($big_endian ? 'N' : 'V', $this->read(4));
-        return array_shift($tmp);
-    }
-
-    private function writeInt($int)
-    {
-        $this->write(pack($this->big_endian ? 'N' : 'V', (int)$int));
-    }
-
-    private function read($bytes = 1)
-    {
-        if (0 < $bytes = abs($bytes)) {
-            return fread($this->fp, $bytes);
-        }
-
-        return null;
-    }
-
-    private function readStr($params)
-    {
-        fseek($this->fp, $params['offset']);
-
-        return $this->read($params['length']);
-    }
-
-    private function write($data)
-    {
-        fwrite($this->fp, $data);
-    }
-
-    private function writeStr($string)
-    {
-        $this->write($string . "\0");
-    }
-
-    private function convertStrHeadersToArray($str)
-    {
-        $tmp = array();
-        $ex = explode("\n", $str);
-
-        foreach ($ex as $item) {
-            if (!$item = trim($item)) {
-                continue;
-            }
-
-            list($key, $value) = explode(':', $item, 2);
-            $tmp[trim($key)] = trim($value);
-        }
-
-        unset($ex);
-
-        return $tmp;
     }
 
     public function save($filename = null)
@@ -358,5 +343,20 @@ class lcMoFile extends lcObj
         }
 
         unset($file);
+    }
+
+    private function write($data)
+    {
+        fwrite($this->fp, $data);
+    }
+
+    private function writeInt($int)
+    {
+        $this->write(pack($this->big_endian ? 'N' : 'V', (int)$int));
+    }
+
+    private function writeStr($string)
+    {
+        $this->write($string . "\0");
     }
 }

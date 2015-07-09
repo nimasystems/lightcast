@@ -54,6 +54,78 @@ class lcTagObject extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    public function setClassId($value = null)
+    {
+        $this->setAttribute('classid', $value);
+        return $this;
+    }
+
+    public function setData($value = null)
+    {
+        $this->setAttribute('data', $value);
+        return $this;
+    }
+
+    public function setCodebase($value = null)
+    {
+        $this->setAttribute('codebase', $value);
+        return $this;
+    }
+
+    public function setDeclare($value = null)
+    {
+        $this->setAttribute('declare', $value ? 'declare' : null);
+        return $this;
+    }
+
+    public function setType($value = null)
+    {
+        $this->setAttribute('type', $value);
+        return $this;
+    }
+
+    public function setCodetype($value = null)
+    {
+        $this->setAttribute('codetype', $value);
+        return $this;
+    }
+
+    public function setArchive($value = null)
+    {
+        $this->setAttribute('archive', $value);
+        return $this;
+    }
+
+    public function setStandby($value = null)
+    {
+        $this->setAttribute('standby', $value);
+        return $this;
+    }
+
+    public function setWidth($value = null)
+    {
+        $this->setAttribute('width', $value);
+        return $this;
+    }
+
+    public function setHeight($value = null)
+    {
+        $this->setAttribute('height', $value);
+        return $this;
+    }
+
+    public function setName($value = null)
+    {
+        $this->setAttribute('name', $value);
+        return $this;
+    }
+
+    public function setTabIndex($value = null)
+    {
+        $this->setAttribute('tabindex', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -65,21 +137,9 @@ class lcTagObject extends lcHtmlTag
             'width', 'height', 'name', 'tabindex');
     }
 
-    public function setClassId($value = null)
-    {
-        $this->setAttribute('classid', $value);
-        return $this;
-    }
-
     public function getClassId()
     {
         return $this->getAttribute('classid');
-    }
-
-    public function setData($value = null)
-    {
-        $this->setAttribute('data', $value);
-        return $this;
     }
 
     public function getData()
@@ -87,21 +147,9 @@ class lcTagObject extends lcHtmlTag
         return $this->getAttribute('data');
     }
 
-    public function setCodebase($value = null)
-    {
-        $this->setAttribute('codebase', $value);
-        return $this;
-    }
-
     public function getCodebase()
     {
         return $this->getAttribute('codebase');
-    }
-
-    public function setDeclare($value = null)
-    {
-        $this->setAttribute('declare', $value ? 'declare' : null);
-        return $this;
     }
 
     public function getDeclare()
@@ -109,21 +157,9 @@ class lcTagObject extends lcHtmlTag
         return $this->getAttribute('declare') ? true : false;
     }
 
-    public function setType($value = null)
-    {
-        $this->setAttribute('type', $value);
-        return $this;
-    }
-
     public function getType()
     {
         return $this->getAttribute('type');
-    }
-
-    public function setCodetype($value = null)
-    {
-        $this->setAttribute('codetype', $value);
-        return $this;
     }
 
     public function getCodetype()
@@ -131,21 +167,9 @@ class lcTagObject extends lcHtmlTag
         return $this->getAttribute('codetype');
     }
 
-    public function setArchive($value = null)
-    {
-        $this->setAttribute('archive', $value);
-        return $this;
-    }
-
     public function getArchive()
     {
         return $this->getAttribute('archive');
-    }
-
-    public function setStandby($value = null)
-    {
-        $this->setAttribute('standby', $value);
-        return $this;
     }
 
     public function getStandby()
@@ -153,21 +177,9 @@ class lcTagObject extends lcHtmlTag
         return $this->getAttribute('standby');
     }
 
-    public function setWidth($value = null)
-    {
-        $this->setAttribute('width', $value);
-        return $this;
-    }
-
     public function getWidth()
     {
         return $this->getAttribute('width');
-    }
-
-    public function setHeight($value = null)
-    {
-        $this->setAttribute('height', $value);
-        return $this;
     }
 
     public function getHeight()
@@ -175,21 +187,9 @@ class lcTagObject extends lcHtmlTag
         return $this->getAttribute('height');
     }
 
-    public function setName($value = null)
-    {
-        $this->setAttribute('name', $value);
-        return $this;
-    }
-
     public function getName()
     {
         return $this->getAttribute('name');
-    }
-
-    public function setTabIndex($value = null)
-    {
-        $this->setAttribute('tabindex', $value);
-        return $this;
     }
 
     public function getTabIndex()

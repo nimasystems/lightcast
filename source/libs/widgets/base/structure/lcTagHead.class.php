@@ -43,6 +43,30 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public function setProfile($value = null)
+    {
+        $this->setAttribute('profile', $value);
+        return $this;
+    }
+
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('xmlns');
@@ -58,21 +82,9 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = null)
-    {
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
-    }
-
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
     }
 
     public function getLang()
@@ -80,20 +92,8 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('lang');
     }
 
-    public function setLang($value = null)
-    {
-        $this->setAttribute('lang', $value);
-        return $this;
-    }
-
     public function getProfile()
     {
         return $this->attributes->get('profile');
-    }
-
-    public function setProfile($value = null)
-    {
-        $this->setAttribute('profile', $value);
-        return $this;
     }
 }

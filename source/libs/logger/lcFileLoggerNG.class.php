@@ -30,36 +30,30 @@
  */
 class lcFileLoggerNG extends lcLogger
 {
+    const DEFAULT_LOG_BUFFER_SIZE = 200;
     /** @var lcSysLog */
     protected $syslog;
-
     protected $log_to_syslog;
     protected $syslog_priority;
     protected $syslog_severity;
     protected $syslog_facility;
     protected $syslog_prefix;
-
-    private $request;
-
     protected $saved_request_header;
     protected $request_header_has_been_outputed;
 
     protected $logs;
     protected $files;
     protected $channels;
-
-    private $is_logging;
-    private $is_in_cli;
+    protected $dont_log_request_header;
+    private $request;
 
     // flush log buffers at each 200 logs
-    const DEFAULT_LOG_BUFFER_SIZE = 200;
-
+    private $is_logging;
+    private $is_in_cli;
     private $buffered_logging = true;
     private $buffered_logging_threshold = self::DEFAULT_LOG_BUFFER_SIZE;
     private $buffered_logs = array();
     private $bufferend_logs_count = 0;
-
-    protected $dont_log_request_header;
 
     public function initialize()
     {
@@ -91,124 +85,6 @@ class lcFileLoggerNG extends lcLogger
         $this->dont_log_request_header = (bool)$this->configuration['logger.no_request_header'];
 
         $this->event_dispatcher->connect('request.load_parameters', $this, 'onRequestLoadParameters');
-    }
-
-    public function onAppException(lcEvent $event)
-    {
-        // flush the logs upon an exception
-        try {
-            $this->flushLogs();
-        } catch (Exception $e) {
-            //
-        }
-
-        parent::onAppException($event);
-    }
-
-    public function shutdown()
-    {
-        // close syslog if open
-        $this->syslog = null;
-
-        try {
-            $this->flushLogs();
-        } catch (Exception $e) {
-            //
-        }
-
-        parent::shutdown();
-    }
-
-    public function setEnableBufferedLogging($enabled, $flush_at = self::DEFAULT_LOG_BUFFER_SIZE)
-    {
-        $this->buffered_logging = $enabled;
-        $this->buffered_logging_threshold = (int)$flush_at;
-
-        if (!$enabled) {
-            $this->flushLogs();
-        }
-    }
-
-    public function flushLogs()
-    {
-        // write buffered logs
-        $logs = $this->buffered_logs;
-
-        if ($logs) {
-            $max_len = (int)ini_get('log_errors_max_len');
-
-            foreach ($logs as $filename => $logs1) {
-                $str = implode('', $logs1);
-                $last_pos = 0;
-
-                while ($sub = substr($str, $last_pos, $max_len)) {
-                    error_log($sub, 3, $filename);
-                    $last_pos += $max_len;
-                    unset($sub);
-                }
-
-                //error_log(implode('', $logs), 3, $filename);
-                /*foreach($logs as $log)
-                {
-                    error_log($log, 3, $filename);
-                    //error_log(implode("\n", $logs), 3, $filename);
-                    unset($log);
-                }*/
-                unset($filename, $logs1, $str);
-            }
-        }
-
-        // wipe them out now
-        $this->bufferend_logs_count = 0;
-        $this->buffered_logs = array();
-    }
-
-    private function initSyslog()
-    {
-        $this->log_to_syslog = (bool)$this->configuration['logger.syslog.enabled'];
-        $this->syslog_prefix = (string)$this->configuration['logger.syslog.prefix'];
-
-        $this->syslog_severity = self::strToErrType((string)$this->configuration['logger.syslog.severity']);
-
-        if (!$this->syslog_severity) {
-            $this->syslog_severity = self::LOG_INFO;
-        }
-
-        /*
-         * The following two configurations use the integrated PHP constants for logging
-        */
-        try {
-            if ($this->configuration['logger.syslog.priority']) {
-                $this->syslog_priority = constant((string)$this->configuration['logger.syslog.priority']);
-            }
-
-            $this->syslog_priority = $this->syslog_priority ? $this->syslog_priority : LOG_INFO;
-
-            if ($this->configuration['logger.syslog.facility']) {
-                $this->syslog_facility = constant((string)$this->configuration['logger.syslog.facility']);
-            }
-
-            $this->syslog_facility = $this->syslog_facility ? $this->syslog_facility : lcSysLog::DEFAULT_FACILITY;
-        } catch (Exception $e) {
-            throw new lcConfigException('Could not set syslog configuration - probably wrongly specified facility / priority: ' . $e->getMessage(), $e->getCode(), $e);
-        }
-
-        if (!$this->syslog_priority) {
-            $this->syslog_priority = LOG_INFO;
-        }
-
-        if ($this->log_to_syslog) {
-            $this->syslog = new lcSysLog();
-        }
-    }
-
-    public function logToSyslog($message, $priority = null, $facility = null, $prefix = null)
-    {
-        if (!$this->syslog) {
-            return false;
-        }
-
-        return $this->syslog->log($message, $priority, $facility, $prefix);
     }
 
     private function setupLogFiles(array $log_files)
@@ -302,12 +178,113 @@ class lcFileLoggerNG extends lcLogger
         unset($logs);
     }
 
-    private function getTimeTick()
+    private function initSyslog()
     {
-        $m = explode(' ', microtime());
-        $mili = substr($m[0], 1, strlen($m[0]) - 6);
+        $this->log_to_syslog = (bool)$this->configuration['logger.syslog.enabled'];
+        $this->syslog_prefix = (string)$this->configuration['logger.syslog.prefix'];
 
-        return date('d/m/Y H:i:s', $m[1]) . $mili;
+        $this->syslog_severity = self::strToErrType((string)$this->configuration['logger.syslog.severity']);
+
+        if (!$this->syslog_severity) {
+            $this->syslog_severity = self::LOG_INFO;
+        }
+
+        /*
+         * The following two configurations use the integrated PHP constants for logging
+        */
+        try {
+            if ($this->configuration['logger.syslog.priority']) {
+                $this->syslog_priority = constant((string)$this->configuration['logger.syslog.priority']);
+            }
+
+            $this->syslog_priority = $this->syslog_priority ? $this->syslog_priority : LOG_INFO;
+
+            if ($this->configuration['logger.syslog.facility']) {
+                $this->syslog_facility = constant((string)$this->configuration['logger.syslog.facility']);
+            }
+
+            $this->syslog_facility = $this->syslog_facility ? $this->syslog_facility : lcSysLog::DEFAULT_FACILITY;
+        } catch (Exception $e) {
+            throw new lcConfigException('Could not set syslog configuration - probably wrongly specified facility / priority: ' . $e->getMessage(), $e->getCode(), $e);
+        }
+
+        if (!$this->syslog_priority) {
+            $this->syslog_priority = LOG_INFO;
+        }
+
+        if ($this->log_to_syslog) {
+            $this->syslog = new lcSysLog();
+        }
+    }
+
+    public function onAppException(lcEvent $event)
+    {
+        // flush the logs upon an exception
+        try {
+            $this->flushLogs();
+        } catch (Exception $e) {
+            //
+        }
+
+        parent::onAppException($event);
+    }
+
+    public function flushLogs()
+    {
+        // write buffered logs
+        $logs = $this->buffered_logs;
+
+        if ($logs) {
+            $max_len = (int)ini_get('log_errors_max_len');
+
+            foreach ($logs as $filename => $logs1) {
+                $str = implode('', $logs1);
+                $last_pos = 0;
+
+                while ($sub = substr($str, $last_pos, $max_len)) {
+                    error_log($sub, 3, $filename);
+                    $last_pos += $max_len;
+                    unset($sub);
+                }
+
+                //error_log(implode('', $logs), 3, $filename);
+                /*foreach($logs as $log)
+                {
+                    error_log($log, 3, $filename);
+                    //error_log(implode("\n", $logs), 3, $filename);
+                    unset($log);
+                }*/
+                unset($filename, $logs1, $str);
+            }
+        }
+
+        // wipe them out now
+        $this->bufferend_logs_count = 0;
+        $this->buffered_logs = array();
+    }
+
+    public function shutdown()
+    {
+        // close syslog if open
+        $this->syslog = null;
+
+        try {
+            $this->flushLogs();
+        } catch (Exception $e) {
+            //
+        }
+
+        parent::shutdown();
+    }
+
+    public function setEnableBufferedLogging($enabled, $flush_at = self::DEFAULT_LOG_BUFFER_SIZE)
+    {
+        $this->buffered_logging = $enabled;
+        $this->buffered_logging_threshold = (int)$flush_at;
+
+        if (!$enabled) {
+            $this->flushLogs();
+        }
     }
 
     public function onRequestLoadParameters(lcEvent $event)
@@ -406,6 +383,50 @@ class lcFileLoggerNG extends lcLogger
             // nothing here
             if (DO_DEBUG) {
                 throw $e;
+            }
+        }
+    }
+
+    private function getTimeTick()
+    {
+        $m = explode(' ', microtime());
+        $mili = substr($m[0], 1, strlen($m[0]) - 6);
+
+        return date('d/m/Y H:i:s', $m[1]) . $mili;
+    }
+
+    public function log($message, $severity = null, $channel = null)
+    {
+        $this->logExtended($message, $severity, null, false, false, $channel);
+    }
+
+    public function logExtended($message, $severity = null, $filename = null, $ignore_severity_check = false, $cleartext = false, $channel = null)
+    {
+        if (!$this->is_logging) {
+            return;
+        }
+
+        $message = (string)$message;
+        $severity = (int)$severity;
+        $channel = (string)$channel;
+
+        if (!$message || !$severity) {
+            return;
+        }
+
+        if ($ignore_severity_check) {
+            $severity = null;
+        }
+
+        if (!$ignore_severity_check && !isset($this->logs[$severity])) {
+            return;
+        }
+
+        try {
+            $this->internalLog($message, $severity, $filename, $cleartext, $channel);
+        } catch (Exception $e) {
+            if (DO_DEBUG) {
+                die('Logger error: ' . $e);
             }
         }
     }
@@ -574,39 +595,12 @@ class lcFileLoggerNG extends lcLogger
         }
     }
 
-    public function logExtended($message, $severity = null, $filename = null, $ignore_severity_check = false, $cleartext = false, $channel = null)
+    public function logToSyslog($message, $priority = null, $facility = null, $prefix = null)
     {
-        if (!$this->is_logging) {
-            return;
+        if (!$this->syslog) {
+            return false;
         }
 
-        $message = (string)$message;
-        $severity = (int)$severity;
-        $channel = (string)$channel;
-
-        if (!$message || !$severity) {
-            return;
-        }
-
-        if ($ignore_severity_check) {
-            $severity = null;
-        }
-
-        if (!$ignore_severity_check && !isset($this->logs[$severity])) {
-            return;
-        }
-
-        try {
-            $this->internalLog($message, $severity, $filename, $cleartext, $channel);
-        } catch (Exception $e) {
-            if (DO_DEBUG) {
-                die('Logger error: ' . $e);
-            }
-        }
-    }
-
-    public function log($message, $severity = null, $channel = null)
-    {
-        $this->logExtended($message, $severity, null, false, false, $channel);
+        return $this->syslog->log($message, $priority, $facility, $prefix);
     }
 }

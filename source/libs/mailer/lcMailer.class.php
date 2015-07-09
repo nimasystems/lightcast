@@ -34,29 +34,24 @@
 abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 {
     const LOG_CHANNEL = 'mail';
-
-    /**
-     * @var lcMailRecipient[]
-     */
-    protected $recipients;
-
-    /**
-     * @var lcMailRecipient
-     */
-    protected $sender;
-
-    /**
-     * @var lcMailAttachment[]
-     */
-    protected $attachments;
-
-    protected $body;
-    protected $subject;
-
     const MAIL_CHARSET = 'utf-8';
     const MAIL_CONTENT_TYPE = 'text/html';
     const MAIL_ENCODING = '8bit';
     const ATTACHMENT_ENCODING = 'base64';
+    /**
+     * @var lcMailRecipient[]
+     */
+    protected $recipients;
+    /**
+     * @var lcMailRecipient
+     */
+    protected $sender;
+    /**
+     * @var lcMailAttachment[]
+     */
+    protected $attachments;
+    protected $body;
+    protected $subject;
 
     public function initialize()
     {
@@ -82,18 +77,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         );
     }
 
-    public function addRecipient(lcMailRecipient $recipient)
-    {
-        $email = $recipient->getEmail();
-
-        if (!$email || !$recipient) {
-            assert(false);
-            return;
-        }
-
-        $this->recipients[$email] = $recipient;
-    }
-
     public function getRecipients()
     {
         if (!count($this->recipients)) {
@@ -103,19 +86,14 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         return $this->recipients;
     }
 
-    public function setSender(lcMailRecipient $sender)
-    {
-        $this->sender = $sender;
-    }
-
     public function getSender()
     {
         return $this->sender;
     }
 
-    public function setSubject($subject)
+    public function setSender(lcMailRecipient $sender)
     {
-        $this->subject = $subject;
+        $this->sender = $sender;
     }
 
     public function getSubject()
@@ -123,14 +101,19 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         return $this->subject;
     }
 
-    public function setBody($body)
+    public function setSubject($subject)
     {
-        $this->body = $body;
+        $this->subject = $subject;
     }
 
     public function getBody()
     {
         return $this->body;
+    }
+
+    public function setBody($body)
+    {
+        $this->body = $body;
     }
 
     public function addAttachment(lcMailAttachment $attachment)
@@ -147,8 +130,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         return $this->attachments;
     }
 
-    // TODO: Remove or rework this
-    // It is just temporary here because lcApp sendMail method is no longer there
     public function sendMail(array $to, $message, $subject = null, $from = null)
     {
         if (!count($to) || !$message) {
@@ -176,8 +157,34 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         return $res;
     }
 
+    // TODO: Remove or rework this
+    // It is just temporary here because lcApp sendMail method is no longer there
+
+    public function clear()
+    {
+        $this->recipients = array();
+        $this->attachments = array();
+
+        $this->body = null;
+        $this->subject = null;
+        $this->sender = null;
+    }
+
     // TODO: Add a capability to test sending emails!
     // as we have now hidden the exceptions here!
+
+    public function addRecipient(lcMailRecipient $recipient)
+    {
+        $email = $recipient->getEmail();
+
+        if (!$email || !$recipient) {
+            assert(false);
+            return;
+        }
+
+        $this->recipients[$email] = $recipient;
+    }
+
     public function send()
     {
         if (!$this->sender) {
@@ -262,16 +269,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->clear();
 
         return $res;
-    }
-
-    public function clear()
-    {
-        $this->recipients = array();
-        $this->attachments = array();
-
-        $this->body = null;
-        $this->subject = null;
-        $this->sender = null;
     }
 
     abstract protected function sendMailInternal();

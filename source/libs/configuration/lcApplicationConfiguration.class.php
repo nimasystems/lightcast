@@ -40,12 +40,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     protected $should_use_default_loaders = false;
     protected $should_disable_models = false;
     protected $should_disable_databases = false;
-
-    private $project_dir;
-
     protected $unique_id_suffix;
-
-    abstract public function getApplicationName();
+    private $project_dir;
 
     public function __construct($project_dir = null, lcProjectConfiguration $project_configuration = null)
     {
@@ -173,6 +169,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $debug;
     }
 
+    abstract public function getApplicationName();
+
     public function setIsDebugging($debug = true)
     {
         if ($this->project_configuration) {
@@ -196,14 +194,14 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->environment = $environment;
     }
 
-    public function setShouldLoadPlugins($should_load_plugins = true)
-    {
-        $this->should_load_plugins = $should_load_plugins;
-    }
-
     public function getShouldLoadPlugins()
     {
         return $this->should_load_plugins;
+    }
+
+    public function setShouldLoadPlugins($should_load_plugins = true)
+    {
+        $this->should_load_plugins = $should_load_plugins;
     }
 
     public function getShouldDisableModels()
@@ -211,14 +209,14 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this->should_disable_models;
     }
 
-    public function setShouldUseDefaultLoaders($use_default_loaders = false)
-    {
-        $this->should_use_default_loaders = $use_default_loaders;
-    }
-
     public function getShouldUseDefaultLoaders()
     {
         return $this->should_use_default_loaders;
+    }
+
+    public function setShouldUseDefaultLoaders($use_default_loaders = false)
+    {
+        $this->should_use_default_loaders = $use_default_loaders;
     }
 
     public function getShortDebugInfo()

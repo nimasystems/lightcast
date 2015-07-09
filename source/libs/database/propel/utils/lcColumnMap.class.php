@@ -37,14 +37,14 @@ class lcColumnMap extends ColumnMap
      */
     protected $lc_title;
 
-    public function setLcTitle($title)
-    {
-        $this->lc_title = $title;
-    }
-
     public function getLcTitle()
     {
         $table = $this->getTable();
         return ($table instanceof lcTableMap ? $table->translate($this->lc_title) : null);
+    }
+
+    public function setLcTitle($title)
+    {
+        $this->lc_title = $title;
     }
 }

@@ -32,13 +32,13 @@
  */
 class lcSplUtils
 {
-    public static function getAvailableClasses()
-    {
-        return spl_classes();
-    }
-
     public static function hasClass($classname)
     {
         return (in_array($classname, self::getAvailableClasses()));
+    }
+
+    public static function getAvailableClasses()
+    {
+        return spl_classes();
     }
 }

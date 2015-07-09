@@ -48,6 +48,42 @@ class lcTagStyle extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public function setType($value = self::DEFAULT_TYPE)
+    {
+        $this->setAttribute('type', $value);
+        return $this;
+    }
+
+    public function setTitle($value = null)
+    {
+        $this->setAttribute('title', $value);
+        return $this;
+    }
+
+    public function setMedia($value = null)
+    {
+        $this->setAttribute('media', $value);
+        return $this;
+    }
+
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('type');
@@ -58,32 +94,14 @@ class lcTagStyle extends lcHtmlBaseTag implements iI18nAttributes
         return array('dir', 'lang', 'xml:lang', 'media', 'title');
     }
 
-    public function setType($value = self::DEFAULT_TYPE)
-    {
-        $this->setAttribute('type', $value);
-        return $this;
-    }
-
     public function getType()
     {
         return $this->getAttribute('type');
     }
 
-    public function setTitle($value = null)
-    {
-        $this->setAttribute('title', $value);
-        return $this;
-    }
-
     public function getTitle()
     {
         return $this->getAttribute('title');
-    }
-
-    public function setMedia($value = null)
-    {
-        $this->setAttribute('media', $value);
-        return $this;
     }
 
     public function getMedia()
@@ -96,31 +114,13 @@ class lcTagStyle extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = null)
-    {
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
     }
 
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
-    }
-
     public function getLang()
     {
         return $this->attributes->get('lang');
-    }
-
-    public function setLang($value = null)
-    {
-        $this->setAttribute('lang', $value);
-        return $this;
     }
 }

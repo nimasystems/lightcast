@@ -70,17 +70,17 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     protected $context_type;
     protected $context_name;
 
-    public function execute(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
-    {
-        // subclassers may override this method
-    }
-
     public function initialize()
     {
         parent::initialize();
 
         // call the plugins initialization method
         $this->execute($this->event_dispatcher, $this->configuration);
+    }
+
+    public function execute(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration)
+    {
+        // subclassers may override this method
     }
 
     public function initializeWebComponents()
@@ -114,6 +114,87 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
                 $e->getCode(),
                 $e);
         }
+    }
+
+    protected function initializeComponents()
+    {
+        $used_components = $this->use_components;
+
+        if (!$used_components) {
+            return;
+        }
+
+        $loaded_components = array();
+
+        foreach ($used_components as $component_name) {
+            try {
+                $component_instance = $this->getComponentControllerInstance($component_name);
+
+                if (!$component_instance) {
+                    throw new lcNotAvailableException('Not available');
+                }
+
+                // initialize it now
+                $component_instance->initialize();
+
+                // set it to the local array of initialized components
+                $loaded_components[$component_name] = $component_instance;
+            } catch (Exception $ee) {
+                throw new lcComponentException('Component initialization error (' . $component_name . '): ' .
+                    $ee->getMessage(),
+                    $ee->getCode(),
+                    $ee);
+            }
+
+            unset($component_name);
+        }
+
+        $this->loaded_components = $loaded_components;
+    }
+
+    protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->app_context || !$this->app_context->getIsInitialized()) {
+            throw new lcLogicException('App not available or not initialized yet');
+        }
+
+        if (!$this->system_component_factory) {
+            throw new lcNotAvailableException('System Component Factory not available');
+        }
+
+        /** @var lcComponent $controller_instance */
+        $controller_instance = $this->system_component_factory->getControllerComponentInstance($component_name, $context_type, $context_name);
+
+        if (!$controller_instance) {
+            return null;
+        }
+
+        // assign system objects
+        $controller_instance->setEventDispatcher($this->event_dispatcher);
+        $controller_instance->setConfiguration($this->configuration);
+        $controller_instance->setSystemComponentFactory($this->system_component_factory);
+        $controller_instance->setDatabaseModelManager($this->database_model_manager);
+        $controller_instance->setPluginManager($this->plugin_manager);
+
+        // translation context
+        $controller_instance->setTranslationContext($controller_instance->getContextType(), $controller_instance->getContextName());
+
+        // set loaders from app
+        $this->app_context->setLoadersOntoObject($controller_instance);
+
+        // resolve dependancies
+        try {
+            $controller_instance->loadDependancies();
+        } catch (Exception $e) {
+            throw new lcRequirementException('Component dependancies could not be loaded (' . $component_name . '): ' .
+                $e->getMessage(),
+                $e->getCode(),
+                $e);
+        }
+
+        // do not initialize the object yet! leave it to the caller
+
+        return $controller_instance;
     }
 
     public function getHasAppInitialized()
@@ -163,40 +244,146 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return false;
     }
 
-    protected function initializeComponents()
+    public function getUsedDbModels()
     {
-        $used_components = $this->use_components;
+        return $this->use_models;
+    }
 
-        if (!$used_components) {
-            return;
-        }
+    public function getUsedComponents()
+    {
+        return $this->use_components;
+    }
 
-        $loaded_components = array();
+    public function getDatabaseModelManager()
+    {
+        return $this->database_model_manager;
+    }
 
-        foreach ($used_components as $component_name) {
-            try {
-                $component_instance = $this->getComponentControllerInstance($component_name);
+    public function setDatabaseModelManager(lcDatabaseModelManager $database_model_manager = null)
+    {
+        $this->database_model_manager = $database_model_manager;
+    }
 
-                if (!$component_instance) {
-                    throw new lcNotAvailableException('Not available');
-                }
+    public function getSystemComponentFactory()
+    {
+        return $this->system_component_factory;
+    }
 
-                // initialize it now
-                $component_instance->initialize();
+    public function setSystemComponentFactory(lcSystemComponentFactory $component_factory = null)
+    {
+        $this->system_component_factory = $component_factory;
+    }
 
-                // set it to the local array of initialized components
-                $loaded_components[$component_name] = $component_instance;
-            } catch (Exception $ee) {
-                throw new lcComponentException('Component initialization error (' . $component_name . '): ' .
-                    $ee->getMessage(),
-                    $ee->getCode(),
-                    $ee);
-            }
+    public function getPluginConfiguration()
+    {
+        return $this->plugin_configuration;
+    }
 
-            unset($component_name);
-        }
+    public function setPluginConfiguration(lcConfiguration $configuration = null)
+    {
+        $this->plugin_configuration = $configuration;
+    }
 
-        $this->loaded_components = $loaded_components;
+    public function getControllerName()
+    {
+        return $this->controller_name;
+    }
+
+    public function setControllerName($controller_name)
+    {
+        $this->controller_name = $controller_name;
+    }
+
+    public function getControllerFilename()
+    {
+        return $this->controller_filename;
+    }
+
+    public function setControllerFilename($controller_filename)
+    {
+        $this->controller_filename = $controller_filename;
+    }
+
+    public function getContextType()
+    {
+        return $this->context_type;
+    }
+
+    public function setContextType($context_type)
+    {
+        $this->context_type = $context_type;
+    }
+
+    public function getContextName()
+    {
+        return $this->context_name;
+    }
+
+    public function setContextName($context_name)
+    {
+        $this->context_name = $context_name;
+    }
+
+    public function getName()
+    {
+        return $this->controller_name;
+    }
+
+    public function getPluginName()
+    {
+        return $this->controller_name;
+    }
+
+    public function getRootDir()
+    {
+        return $this->getPluginDir();
+    }
+
+    public function getPluginDir()
+    {
+        return $this->plugin_configuration->getPluginDir();
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function getComponentsDir()
+    {
+        return $this->getPluginDir() . DS . self::COMPONENTS_PATH;
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function getModelsDir()
+    {
+        return $this->getPluginDir() . DS . self::MODELS_PATH;
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function getModulesDir()
+    {
+        return $this->getPluginDir() . DS . self::MODULES_PATH;
+    }
+
+    public function getAssetsPath()
+    {
+        return $this->getPluginDir() . DS . self::ASSETS_PATH;
+    }
+
+    public function getAssetsWebPath()
+    {
+        return $this->getWebPath() . self::ASSETS_PATH . '/';
+    }
+
+    public function getWebPath()
+    {
+        return $this->plugin_configuration->getWebPath();
     }
 
     protected function getComponent($component_name)
@@ -223,79 +410,9 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $component_instance;
     }
 
-    protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
+    protected function getPluginManager()
     {
-        if (!$this->app_context || !$this->app_context->getIsInitialized()) {
-            throw new lcLogicException('App not available or not initialized yet');
-        }
-
-        if (!$this->system_component_factory) {
-            throw new lcNotAvailableException('System Component Factory not available');
-        }
-
-        /** @var lcComponent $controller_instance */
-        $controller_instance = $this->system_component_factory->getControllerComponentInstance($component_name, $context_type, $context_name);
-
-        if (!$controller_instance) {
-            return null;
-        }
-
-        // assign system objects
-        $controller_instance->setEventDispatcher($this->event_dispatcher);
-        $controller_instance->setConfiguration($this->configuration);
-        $controller_instance->setSystemComponentFactory($this->system_component_factory);
-        $controller_instance->setDatabaseModelManager($this->database_model_manager);
-        $controller_instance->setPluginManager($this->plugin_manager);
-
-        // translation context
-        $controller_instance->setTranslationContext($controller_instance->getContextType(), $controller_instance->getContextName());
-
-        // set loaders from app
-        $this->app_context->setLoadersOntoObject($controller_instance);
-
-        // resolve dependancies
-        try {
-            $controller_instance->loadDependancies();
-        } catch (Exception $e) {
-            throw new lcRequirementException('Component dependancies could not be loaded (' . $component_name . '): ' .
-                $e->getMessage(),
-                $e->getCode(),
-                $e);
-        }
-
-        // do not initialize the object yet! leave it to the caller
-
-        return $controller_instance;
-    }
-
-    public function getUsedDbModels()
-    {
-        return $this->use_models;
-    }
-
-    public function getUsedComponents()
-    {
-        return $this->use_components;
-    }
-
-    public function setDatabaseModelManager(lcDatabaseModelManager $database_model_manager = null)
-    {
-        $this->database_model_manager = $database_model_manager;
-    }
-
-    public function getDatabaseModelManager()
-    {
-        return $this->database_model_manager;
-    }
-
-    public function setSystemComponentFactory(lcSystemComponentFactory $component_factory = null)
-    {
-        $this->system_component_factory = $component_factory;
-    }
-
-    public function getSystemComponentFactory()
-    {
-        return $this->system_component_factory;
+        return $this->plugin_manager;
     }
 
     public function setPluginManager(lcPluginManager $plugin_manager = null)
@@ -303,122 +420,8 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->plugin_manager = $plugin_manager;
     }
 
-    protected function getPluginManager()
-    {
-        return $this->plugin_manager;
-    }
-
     protected function getPlugin($plugin_name)
     {
         return $this->plugin_manager->getPlugin($plugin_name);
-    }
-
-    public function getPluginConfiguration()
-    {
-        return $this->plugin_configuration;
-    }
-
-    public function setPluginConfiguration(lcConfiguration $configuration = null)
-    {
-        $this->plugin_configuration = $configuration;
-    }
-
-    public function setControllerName($controller_name)
-    {
-        $this->controller_name = $controller_name;
-    }
-
-    public function getControllerName()
-    {
-        return $this->controller_name;
-    }
-
-    public function setControllerFilename($controller_filename)
-    {
-        $this->controller_filename = $controller_filename;
-    }
-
-    public function getControllerFilename()
-    {
-        return $this->controller_filename;
-    }
-
-    public function setContextType($context_type)
-    {
-        $this->context_type = $context_type;
-    }
-
-    public function getContextType()
-    {
-        return $this->context_type;
-    }
-
-    public function setContextName($context_name)
-    {
-        $this->context_name = $context_name;
-    }
-
-    public function getContextName()
-    {
-        return $this->context_name;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getName()
-    {
-        return $this->controller_name;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getPluginName()
-    {
-        return $this->controller_name;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getRootDir()
-    {
-        return $this->getPluginDir();
-    }
-
-    public function getPluginDir()
-    {
-        return $this->plugin_configuration->getPluginDir();
-    }
-
-    public function getComponentsDir()
-    {
-        return $this->getPluginDir() . DS . self::COMPONENTS_PATH;
-    }
-
-    public function getModelsDir()
-    {
-        return $this->getPluginDir() . DS . self::MODELS_PATH;
-    }
-
-    public function getModulesDir()
-    {
-        return $this->getPluginDir() . DS . self::MODULES_PATH;
-    }
-
-    public function getWebPath()
-    {
-        return $this->plugin_configuration->getWebPath();
-    }
-
-    public function getAssetsPath()
-    {
-        return $this->getPluginDir() . DS . self::ASSETS_PATH;
-    }
-
-    public function getAssetsWebPath()
-    {
-        return $this->getWebPath() . self::ASSETS_PATH . '/';
     }
 }

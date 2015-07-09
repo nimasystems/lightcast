@@ -35,10 +35,6 @@ abstract class lcActionFilter extends lcSysObj
 
     abstract public function getFilterCategory();
 
-    abstract protected function getShouldApplyFilter();
-
-    abstract protected function applyFilter(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null);
-
     public function shutdown()
     {
         if ($this->next) {
@@ -86,4 +82,8 @@ abstract class lcActionFilter extends lcSysObj
         // no filter has taken responsibility - take no further action
         return false;
     }
+
+    abstract protected function getShouldApplyFilter();
+
+    abstract protected function applyFilter(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null);
 }

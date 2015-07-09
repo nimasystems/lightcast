@@ -43,6 +43,30 @@ class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
         $this->setXmlNs($xmlns);
     }
 
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
+
+    public function setXmlNs($value = null)
+    {
+        $this->setAttribute('xmlns', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('xmlns');
@@ -58,21 +82,9 @@ class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = null)
-    {
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
-    }
-
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
     }
 
     public function getLang()
@@ -80,20 +92,8 @@ class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('lang');
     }
 
-    public function setLang($value = null)
-    {
-        $this->setAttribute('lang', $value);
-        return $this;
-    }
-
     public function getXmlNs()
     {
         return $this->attributes->get('xmlns');
-    }
-
-    public function setXmlNs($value = null)
-    {
-        $this->setAttribute('xmlns', $value);
-        return $this;
     }
 }

@@ -45,6 +45,48 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public function setContent($value)
+    {
+        $this->setAttribute('content', $value);
+        return $this;
+    }
+
+    public function setName($value = null)
+    {
+        $this->setAttribute('name', $value);
+        return $this;
+    }
+
+    public function setHttpEquiv($value = null)
+    {
+        $this->setAttribute('http-equiv', $value);
+        return $this;
+    }
+
+    public function setScheme($value = null)
+    {
+        $this->setAttribute('scheme', $value);
+        return $this;
+    }
+
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('content');
@@ -60,38 +102,14 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = null)
-    {
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
     }
 
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
-    }
-
     public function getLang()
     {
         return $this->attributes->get('lang');
-    }
-
-    public function setLang($value = null)
-    {
-        $this->setAttribute('lang', $value);
-        return $this;
-    }
-
-    public function setContent($value)
-    {
-        $this->setAttribute('content', $value);
-        return $this;
     }
 
     public function getContent()
@@ -104,32 +122,14 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('name');
     }
 
-    public function setName($value = null)
-    {
-        $this->setAttribute('name', $value);
-        return $this;
-    }
-
     public function getHttpEquiv()
     {
         return $this->attributes->get('http-equiv');
     }
 
-    public function setHttpEquiv($value = null)
-    {
-        $this->setAttribute('http-equiv', $value);
-        return $this;
-    }
-
     public function getScheme()
     {
         return $this->attributes->get('scheme');
-    }
-
-    public function setScheme($value = null)
-    {
-        $this->setAttribute('scheme', $value);
-        return $this;
     }
 
     public function asHtml()

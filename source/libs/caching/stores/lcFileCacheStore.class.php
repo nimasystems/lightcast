@@ -30,32 +30,27 @@
  */
 class lcFileCacheStore extends lcCacheStore implements iDebuggable
 {
-    private $cache_folder;
-    private $total_entries = 0;
-
-    private $next_dir = 0;
-    private $next_subdir = 0;
-    private $next_file = 0;
-
     const FILE_MODE = 0777;
     const FILES_PER_BUCKET = 30;
     const CACHE_META_FILE = 'cache.meta';
-
     const READ_ALL = 1;
     const READ_TIMESTAMP = 2;
     const READ_FILENAME = 3;
     const READ_CHECK = 4;
     const READ_DATA = 5;
     const READ_METAINFO = 6;
-
     const WRITE_DATA = 1;
     const WRITE_REMOVE_DATA = 2;
-
-    //const FLAG_EXPIRED = 1;
     const FLAG_REMOVED = 2;
     const FLAG_OK = 3;
-
     const META_IDENT = '#LIGHTCAST_CACHE_META';
+    private $cache_folder;
+    private $total_entries = 0;
+
+    //const FLAG_EXPIRED = 1;
+    private $next_dir = 0;
+    private $next_subdir = 0;
+    private $next_file = 0;
 
     /*
      * File cache is stored in a special directory structure
@@ -91,44 +86,6 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         $this->next_file = 0;
 
         $this->initCache();
-    }
-
-    public function shutdown()
-    {
-        parent::shutdown();
-    }
-
-    public function getDebugInfo()
-    {
-        $debug = array(
-            'cache_folder' => $this->cache_folder,
-            'total_entries' => $this->total_entries
-        );
-
-        return $debug;
-    }
-
-    public function getShortDebugInfo()
-    {
-        $debug = array(
-            'total_entries' => $this->total_entries
-        );
-
-        return $debug;
-    }
-
-    public function reinitCache()
-    {
-        lcDirs::rmdirRecursive($this->cache_folder, true);
-
-        $this->total_entries = 0;
-        $this->next_dir = 0;
-        $this->next_subdir = 0;
-        $this->next_file = 0;
-
-        $this->initCache();
-
-        return true;
     }
 
     private function initCache()
@@ -181,6 +138,185 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         fwrite($f, $data);
 
         @fclose($f);
+    }
+
+    private function read($key = null, $get_type = self::READ_DATA)
+    {
+        if (!$key && $get_type != self::READ_METAINFO) {
+            throw new lcInvalidArgumentException('Missing KEY. Cannot obtain cache data');
+        }
+
+        try {
+            // open and lock the metafile
+            if (!$f = fopen($this->cache_folder . DS . self::CACHE_META_FILE, 'r')) {
+                throw new lcIOException('Cannot read from cache meta file. Key: ' . $key);
+            }
+
+            if (!flock($f, LOCK_SH)) {
+                throw new lcIOException('Cannot lock the cache meta file. Key: ' . $key);
+            }
+
+            $data = null;
+
+            // check the metadata file
+            if (!$line = explode(',', stream_get_line($f, 1000, "\n"))) {
+                throw new lcSystemException('Invalid cache. Reinitialization needed');
+            }
+
+            if (count($line) != 5) {
+                throw new lcSystemException('Invalid cache. Reinitialization needed');
+            }
+
+            if ($line[0] != self::META_IDENT) {
+                throw new lcSystemException('Invalid cache. Reinitialization needed');
+            }
+
+            // if we just want the total cache entries
+            if ($get_type == self::READ_METAINFO) {
+                return array(
+                    'total_entries' => (int)$line[1],
+                    'next_dir' => (int)$line[2],
+                    'next_subdir' => (int)$line[3],
+                    'next_file' => (int)$line[4]
+                );
+            }
+
+            $line = null;
+
+            // read the data from the meta file
+            while (!feof($f)) {
+                $line = stream_get_line($f, 1000, "\n");
+
+                if ($line = array_filter(explode("\t", $line))) {
+                    if (count($line) == 4) {
+                        // check if it is not deleted
+                        if ($line[1] == $key && $line[0] == self::FLAG_OK) {
+                            // check if it has not expired
+                            if ($line[2] > time()) {
+                                $data = $line;
+                                break;
+                            } else {
+                                $line = null;
+                            }
+                        } else {
+                            $line = null;
+                        }
+                    } else {
+                        $line = null;
+                    }
+                }
+            }
+
+            // close and unlock the metafile
+            if (!flock($f, LOCK_UN)) {
+                throw new lcIOException('Cannot unlock the cache meta file. Key: ' . $key);
+            }
+
+            @fclose($f);
+        } catch (Exception $e) {
+            throw new lcIOException('Error while reading the cache meta file: ' . $e->getMessage(), null, $e);
+        }
+
+        // if just checking
+        if ($get_type == self::READ_CHECK) {
+            return $data ? true : false;
+        }
+
+        // not found return nothing
+        if (!$data) {
+            return null;
+        }
+
+        // if just requesting the last time
+        if ($get_type == self::READ_ALL) {
+            return array(
+                'status' => $data[0],
+                'key' => $data[1],
+                'timestamp' => $data[2],
+                'cache_filename' => $data[3]
+            );
+        } elseif ($get_type == self::READ_FILENAME) {
+            return $data[3];
+        } elseif ($get_type == self::READ_TIMESTAMP) {
+            return $data[2];
+        }
+
+        // else read and return the cache
+
+        // open the cache file
+        $cachef = $this->cache_folder . DS . $data[3];
+
+        try {
+            if (!$f = fopen($cachef, 'rb')) {
+                throw new lcIOException('Cannot read from the file cache. Key: ' . $key);
+            }
+
+            // lock the cache file
+            if (!flock($f, LOCK_SH)) {
+                throw new lcIOException('Cannot lock the cache file. Key: ' . $key);
+            }
+
+            // read the cache
+            $cachedata = stream_get_contents($f);
+            //{
+            //	throw new lcIOException('Cannot read from the file cache. Key: '.$key);
+            //}
+
+            // close the cache
+            if (!flock($f, LOCK_UN)) {
+                throw new lcIOException('Cannot unlock the file cache. Key: ' . $key);
+            }
+
+            @fclose($f);
+        } catch (Exception $e) {
+            throw new lcIOException('Error while reading cache data (' . $cachef . '): ' . $e->getMessage(), null, $e);
+        }
+
+        if ($cachedata) {
+            try {
+                $cachedata = unserialize($cachedata);
+            } catch (Exception $e) {
+                throw new lcIOException('Error on unserializing cache data. Key: ' . $key, null, $e);
+            }
+        }
+
+        return $cachedata;
+    }
+
+    private function getMetadataInternal()
+    {
+        $data =
+            self::META_IDENT . ',' .
+            (int)$this->total_entries . ',' .
+            (int)$this->next_dir . ',' .
+            (int)$this->next_subdir . ',' .
+            (int)$this->next_file . "\n";
+
+        return $data;
+    }
+
+    public function shutdown()
+    {
+        parent::shutdown();
+    }
+
+    public function getDebugInfo()
+    {
+        $debug = array(
+            'cache_folder' => $this->cache_folder,
+            'total_entries' => $this->total_entries
+        );
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        $debug = array(
+            'total_entries' => $this->total_entries
+        );
+
+        return $debug;
     }
 
     public function compact()
@@ -237,43 +373,22 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         }
     }
 
-    private function getNextCacheFilename()
+    public function has($key)
     {
-        if ($this->next_file == self::FILES_PER_BUCKET) {
-            $this->next_file = 0;
-
-            if ($this->next_subdir == 9) {
-                $this->next_subdir = 0;
-
-                if ($this->next_dir == 9) {
-                    throw new lcSystemException('Cache maximum storage reached');
-                } else {
-                    ++$this->next_dir;
-                }
-            } else {
-                ++$this->next_subdir;
-            }
-        } else {
-            ++$this->next_file;
-        }
-
-        return
-            (int)$this->next_dir . DS .
-            (int)$this->next_subdir . DS .
-            (int)$this->next_file .
-            '.cache';
+        return $this->read($key, self::READ_CHECK);
     }
 
-    private function getMetadataInternal()
+    public function get($key)
     {
-        $data =
-            self::META_IDENT . ',' .
-            (int)$this->total_entries . ',' .
-            (int)$this->next_dir . ',' .
-            (int)$this->next_subdir . ',' .
-            (int)$this->next_file . "\n";
+        return $this->read($key, self::READ_DATA);
+    }
 
-        return $data;
+    public function set($key, $value = null, $lifetime = null)
+    {
+        if (!$lifetime) {
+            $lifetime = $this->default_lifetime;
+        }
+        return $this->write($key, $value, self::WRITE_DATA, $lifetime);
     }
 
     private function write($key, $data = null, $write_type = self::WRITE_DATA, $lifetime = null)
@@ -427,165 +542,31 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         return true;
     }
 
-    private function read($key = null, $get_type = self::READ_DATA)
+    private function getNextCacheFilename()
     {
-        if (!$key && $get_type != self::READ_METAINFO) {
-            throw new lcInvalidArgumentException('Missing KEY. Cannot obtain cache data');
-        }
+        if ($this->next_file == self::FILES_PER_BUCKET) {
+            $this->next_file = 0;
 
-        try {
-            // open and lock the metafile
-            if (!$f = fopen($this->cache_folder . DS . self::CACHE_META_FILE, 'r')) {
-                throw new lcIOException('Cannot read from cache meta file. Key: ' . $key);
-            }
+            if ($this->next_subdir == 9) {
+                $this->next_subdir = 0;
 
-            if (!flock($f, LOCK_SH)) {
-                throw new lcIOException('Cannot lock the cache meta file. Key: ' . $key);
-            }
-
-            $data = null;
-
-            // check the metadata file
-            if (!$line = explode(',', stream_get_line($f, 1000, "\n"))) {
-                throw new lcSystemException('Invalid cache. Reinitialization needed');
-            }
-
-            if (count($line) != 5) {
-                throw new lcSystemException('Invalid cache. Reinitialization needed');
-            }
-
-            if ($line[0] != self::META_IDENT) {
-                throw new lcSystemException('Invalid cache. Reinitialization needed');
-            }
-
-            // if we just want the total cache entries
-            if ($get_type == self::READ_METAINFO) {
-                return array(
-                    'total_entries' => (int)$line[1],
-                    'next_dir' => (int)$line[2],
-                    'next_subdir' => (int)$line[3],
-                    'next_file' => (int)$line[4]
-                );
-            }
-
-            $line = null;
-
-            // read the data from the meta file
-            while (!feof($f)) {
-                $line = stream_get_line($f, 1000, "\n");
-
-                if ($line = array_filter(explode("\t", $line))) {
-                    if (count($line) == 4) {
-                        // check if it is not deleted
-                        if ($line[1] == $key && $line[0] == self::FLAG_OK) {
-                            // check if it has not expired
-                            if ($line[2] > time()) {
-                                $data = $line;
-                                break;
-                            } else {
-                                $line = null;
-                            }
-                        } else {
-                            $line = null;
-                        }
-                    } else {
-                        $line = null;
-                    }
+                if ($this->next_dir == 9) {
+                    throw new lcSystemException('Cache maximum storage reached');
+                } else {
+                    ++$this->next_dir;
                 }
+            } else {
+                ++$this->next_subdir;
             }
-
-            // close and unlock the metafile
-            if (!flock($f, LOCK_UN)) {
-                throw new lcIOException('Cannot unlock the cache meta file. Key: ' . $key);
-            }
-
-            @fclose($f);
-        } catch (Exception $e) {
-            throw new lcIOException('Error while reading the cache meta file: ' . $e->getMessage(), null, $e);
+        } else {
+            ++$this->next_file;
         }
 
-        // if just checking
-        if ($get_type == self::READ_CHECK) {
-            return $data ? true : false;
-        }
-
-        // not found return nothing
-        if (!$data) {
-            return null;
-        }
-
-        // if just requesting the last time
-        if ($get_type == self::READ_ALL) {
-            return array(
-                'status' => $data[0],
-                'key' => $data[1],
-                'timestamp' => $data[2],
-                'cache_filename' => $data[3]
-            );
-        } elseif ($get_type == self::READ_FILENAME) {
-            return $data[3];
-        } elseif ($get_type == self::READ_TIMESTAMP) {
-            return $data[2];
-        }
-
-        // else read and return the cache
-
-        // open the cache file
-        $cachef = $this->cache_folder . DS . $data[3];
-
-        try {
-            if (!$f = fopen($cachef, 'rb')) {
-                throw new lcIOException('Cannot read from the file cache. Key: ' . $key);
-            }
-
-            // lock the cache file
-            if (!flock($f, LOCK_SH)) {
-                throw new lcIOException('Cannot lock the cache file. Key: ' . $key);
-            }
-
-            // read the cache
-            $cachedata = stream_get_contents($f);
-            //{
-            //	throw new lcIOException('Cannot read from the file cache. Key: '.$key);
-            //}
-
-            // close the cache
-            if (!flock($f, LOCK_UN)) {
-                throw new lcIOException('Cannot unlock the file cache. Key: ' . $key);
-            }
-
-            @fclose($f);
-        } catch (Exception $e) {
-            throw new lcIOException('Error while reading cache data (' . $cachef . '): ' . $e->getMessage(), null, $e);
-        }
-
-        if ($cachedata) {
-            try {
-                $cachedata = unserialize($cachedata);
-            } catch (Exception $e) {
-                throw new lcIOException('Error on unserializing cache data. Key: ' . $key, null, $e);
-            }
-        }
-
-        return $cachedata;
-    }
-
-    public function has($key)
-    {
-        return $this->read($key, self::READ_CHECK);
-    }
-
-    public function get($key)
-    {
-        return $this->read($key, self::READ_DATA);
-    }
-
-    public function set($key, $value = null, $lifetime = null)
-    {
-        if (!$lifetime) {
-            $lifetime = $this->default_lifetime;
-        }
-        return $this->write($key, $value, self::WRITE_DATA, $lifetime);
+        return
+            (int)$this->next_dir . DS .
+            (int)$this->next_subdir . DS .
+            (int)$this->next_file .
+            '.cache';
     }
 
     public function remove($key)
@@ -600,6 +581,20 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         }
 
         return $this->reinitCache();
+    }
+
+    public function reinitCache()
+    {
+        lcDirs::rmdirRecursive($this->cache_folder, true);
+
+        $this->total_entries = 0;
+        $this->next_dir = 0;
+        $this->next_subdir = 0;
+        $this->next_file = 0;
+
+        $this->initCache();
+
+        return true;
     }
 
     public function hasValues()

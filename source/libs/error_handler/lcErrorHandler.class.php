@@ -52,13 +52,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     private $is_debugging;
 
-    protected function beforeAttachRegisteredEvents()
-    {
-        parent::beforeAttachRegisteredEvents();
-
-        $this->is_debugging = $this->configuration->isDebugging();
-    }
-
     public function getListenerEvents()
     {
         return array(
@@ -98,51 +91,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         if ($exception) {
             $this->notifyOfException($exception);
         }
-    }
-
-    public function onAppStartup(lcEvent $event)
-    {
-        $this->app_context = $event->subject;
-    }
-
-    public function onRequestStartup(lcEvent $event)
-    {
-        $this->request = $event->subject;
-    }
-
-    public function onControllerStartup(lcEvent $event)
-    {
-        $this->controller = $event->subject;
-    }
-
-    public function onResponseStartup(lcEvent $event)
-    {
-        $this->response = $event->subject;
-    }
-
-    public function onMailerStartup(lcEvent $event)
-    {
-        $this->mailer = $event->subject;
-    }
-
-    private function getExceptionOverridenMessage(Exception $exception, $content_type = 'text/html')
-    {
-        $is_debugging = $this->is_debugging;
-        $message = $exception->getMessage();
-
-        // if overriden - append file / code
-        if ($is_debugging) {
-            $file = basename($exception->getFile());
-            $split_filename = lcFiles::splitFileName($file);
-            $code = $exception->getCode();
-            $line = $exception->getLine();
-
-            if ($content_type == 'text/html') {
-                $message .= "\n\n" . '[' . $split_filename['name'] . ' / ' . $line . ($code ? ' / ' . $code : null) . ']';
-            }
-        }
-
-        return $message;
     }
 
     public function notifyOfException(Exception $exception)
@@ -308,52 +256,174 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
     }
 
-    private function sendResponse($content, $content_type, $exit_code = 1, $status_code = 200)
+    private function getStackTrace(Exception $exception, array & $compiled_stack_trace)
     {
-        $response = $this->response;
+        $previous = ($exception instanceof lcException) ? $exception->getCause() : null;
 
-        assert($exit_code > 0);
+        $trace = ($previous !== null) ? $this->getStackTrace($previous, $compiled_stack_trace) : $exception->getTrace();
 
-        if (PHP_GREATER_EQUAL_54) {
-            http_response_code($status_code);
+        if (!$trace) {
+            return null;
         }
 
-        if ($response) {
-            // this might be an exception raised in the response send final moments
-            // at this stage we can no longer 're-send' the response
-            // so we directly flush the error output here
-            if ($response->getIsResponseSent()) {
-                // still show the last error
-                echo $content;
-                exit($exit_code);
+        if ($trace) {
+            foreach ($trace as $key => $trace1) {
+                array_push($compiled_stack_trace, $trace1);
+                unset($key, $trace1);
             }
-
-            try {
-                if ($response instanceof lcWebResponse) {
-                    $response->setStatusCode($status_code);
-                }
-
-                $response->removeObservers();
-                $response->clear();
-                $response->setExitCode($exit_code);
-                $response->setContent($content);
-                $response->setContentType($content_type);
-                $response->sendResponse();
-            } catch (Exception $e) {
-                if (DO_DEBUG) {
-                    echo 'Exception loop protection - error handler could not send the response properly: ' . "\n\n" . $e;
-                    exit(1);
-                }
-
-                // still show the last error
-                echo $content;
-                exit($exit_code);
-            }
-        } else {
-            echo $content;
         }
 
-        exit($exit_code);
+        return $trace;
+    }
+
+    private function getTextTrace(array $full_trace, $return_array = false)
+    {
+        if (!$full_trace) {
+            return false;
+        }
+
+        $txt_trace = array();
+
+        $i = 0;
+
+        foreach ($full_trace as $trace) {
+            $txt_trace[] = $this->showTextTrace($trace, $i);
+
+            ++$i;
+            unset($trace);
+        }
+
+        $str = !$return_array ? implode("\n", $txt_trace) : $txt_trace;
+
+        return $str;
+    }
+
+    private function showTextTrace($_trace, $_i)
+    {
+        $htmldoc = ' #' . $_i . ' ';
+
+        if (array_key_exists('file', $_trace)) {
+            $htmldoc .= $_trace['file'];
+        }
+
+        if (array_key_exists('line', $_trace)) {
+            $htmldoc .= '(' . $_trace["line"] . '): ';
+        }
+
+        if (array_key_exists('class', $_trace) && array_key_exists('type', $_trace)) {
+            $htmldoc .= $_trace['class'] . $_trace['type'];
+        }
+
+        if (array_key_exists('function', $_trace)) {
+            $htmldoc .= $_trace["function"] . '(';
+
+            if (array_key_exists('args', $_trace)) {
+                if (count($_trace['args']) > 0) {
+                    $prep = array();
+
+                    foreach ($_trace['args'] as $arg) {
+                        $type = gettype($arg);
+                        $value = $arg;
+                        $str = '';
+
+                        if ($type == 'boolean') {
+                            if ($value) {
+                                $str .= 'true';
+                            } else {
+                                $str .= 'false';
+                            }
+                        } elseif ($type == 'integer' || $type == 'double') {
+                            if (settype($value, 'string')) {
+                                $str .= $value;
+                            } else {
+                                if ($type == 'integer') {
+                                    $str .= '? integer ?';
+                                } else {
+                                    $str .= '? double or float ?';
+                                }
+                            }
+                        } elseif ($type == 'string') {
+                            $str .= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
+                        } elseif ($type == 'array') {
+                            $str .= 'Array';
+                        } elseif ($type == 'object') {
+                            $str .= 'Object';
+                        } elseif ($type == 'resource') {
+                            $str .= 'Resource';
+                        } elseif ($type == 'NULL') {
+                            $str .= 'null';
+                        } elseif ($type == 'unknown type') {
+                            $str .= '? unknown type ?';
+                        }
+
+                        $prep[] = $str;
+
+                        unset($type);
+                        unset($value);
+                        unset($arg);
+                    }
+
+                    if ($prep) {
+                        $htmldoc .= implode(', ', $prep);
+                    }
+                }
+
+                /*if (count($_trace['args']) > 1)
+                 {
+                $htmldoc .= implode(', ', $_trace['args']);
+                //$htmldoc.= ',...';
+                }*/
+            }
+
+            $htmldoc .= ')';
+        }
+
+        return $htmldoc;
+    }
+
+    private function getExceptionOverridenMessage(Exception $exception, $content_type = 'text/html')
+    {
+        $is_debugging = $this->is_debugging;
+        $message = $exception->getMessage();
+
+        // if overriden - append file / code
+        if ($is_debugging) {
+            $file = basename($exception->getFile());
+            $split_filename = lcFiles::splitFileName($file);
+            $code = $exception->getCode();
+            $line = $exception->getLine();
+
+            if ($content_type == 'text/html') {
+                $message .= "\n\n" . '[' . $split_filename['name'] . ' / ' . $line . ($code ? ' / ' . $code : null) . ']';
+            }
+        }
+
+        return $message;
+    }
+
+    public function onAppStartup(lcEvent $event)
+    {
+        $this->app_context = $event->subject;
+    }
+
+    public function onRequestStartup(lcEvent $event)
+    {
+        $this->request = $event->subject;
+    }
+
+    public function onControllerStartup(lcEvent $event)
+    {
+        $this->controller = $event->subject;
+    }
+
+    public function onResponseStartup(lcEvent $event)
+    {
+        $this->response = $event->subject;
+    }
+
+    public function onMailerStartup(lcEvent $event)
+    {
+        $this->mailer = $event->subject;
     }
 
     public function handleException(Exception $exception)
@@ -501,6 +571,54 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
             $this->sendResponse($message, $content_type, 2, $exception_http_status_code);
         }
+    }
+
+    private function sendResponse($content, $content_type, $exit_code = 1, $status_code = 200)
+    {
+        $response = $this->response;
+
+        assert($exit_code > 0);
+
+        if (PHP_GREATER_EQUAL_54) {
+            http_response_code($status_code);
+        }
+
+        if ($response) {
+            // this might be an exception raised in the response send final moments
+            // at this stage we can no longer 're-send' the response
+            // so we directly flush the error output here
+            if ($response->getIsResponseSent()) {
+                // still show the last error
+                echo $content;
+                exit($exit_code);
+            }
+
+            try {
+                if ($response instanceof lcWebResponse) {
+                    $response->setStatusCode($status_code);
+                }
+
+                $response->removeObservers();
+                $response->clear();
+                $response->setExitCode($exit_code);
+                $response->setContent($content);
+                $response->setContentType($content_type);
+                $response->sendResponse();
+            } catch (Exception $e) {
+                if (DO_DEBUG) {
+                    echo 'Exception loop protection - error handler could not send the response properly: ' . "\n\n" . $e;
+                    exit(1);
+                }
+
+                // still show the last error
+                echo $content;
+                exit($exit_code);
+            }
+        } else {
+            echo $content;
+        }
+
+        exit($exit_code);
     }
 
     private function prepareErrorOutput(Exception $exception, $content_type)
@@ -693,46 +811,21 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $data;
     }
 
-    private function getTextTrace(array $full_trace, $return_array = false)
+    protected function fileExcerpt($file, $line)
     {
-        if (!$full_trace) {
+        if (!is_readable($file)) {
             return false;
         }
 
-        $txt_trace = array();
+        $content = preg_split('#<br />#', highlight_file($file, true));
 
-        $i = 0;
+        $lines = array();
 
-        foreach ($full_trace as $trace) {
-            $txt_trace[] = $this->showTextTrace($trace, $i);
-
-            ++$i;
-            unset($trace);
+        for ($i = max($line - 6, 1), $max = min($line + 6, count($content)); $i <= $max; $i++) {
+            $lines[] = '<li' . ($i == $line ? ' class="selected"' : '') . '>' . $content[$i - 1] . '</li>';
         }
 
-        $str = !$return_array ? implode("\n", $txt_trace) : $txt_trace;
-
-        return $str;
-    }
-
-    private function getStackTrace(Exception $exception, array & $compiled_stack_trace)
-    {
-        $previous = ($exception instanceof lcException) ? $exception->getCause() : null;
-
-        $trace = ($previous !== null) ? $this->getStackTrace($previous, $compiled_stack_trace) : $exception->getTrace();
-
-        if (!$trace) {
-            return null;
-        }
-
-        if ($trace) {
-            foreach ($trace as $key => $trace1) {
-                array_push($compiled_stack_trace, $trace1);
-                unset($key, $trace1);
-            }
-        }
-
-        return $trace;
+        return '<ol start="' . max($line - 6, 1) . '">' . implode("\n", $lines) . '</ol>';
     }
 
     private function showTrace($_trace, $_i)
@@ -813,89 +906,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $htmldoc;
     }
 
-    private function showTextTrace($_trace, $_i)
-    {
-        $htmldoc = ' #' . $_i . ' ';
-
-        if (array_key_exists('file', $_trace)) {
-            $htmldoc .= $_trace['file'];
-        }
-
-        if (array_key_exists('line', $_trace)) {
-            $htmldoc .= '(' . $_trace["line"] . '): ';
-        }
-
-        if (array_key_exists('class', $_trace) && array_key_exists('type', $_trace)) {
-            $htmldoc .= $_trace['class'] . $_trace['type'];
-        }
-
-        if (array_key_exists('function', $_trace)) {
-            $htmldoc .= $_trace["function"] . '(';
-
-            if (array_key_exists('args', $_trace)) {
-                if (count($_trace['args']) > 0) {
-                    $prep = array();
-
-                    foreach ($_trace['args'] as $arg) {
-                        $type = gettype($arg);
-                        $value = $arg;
-                        $str = '';
-
-                        if ($type == 'boolean') {
-                            if ($value) {
-                                $str .= 'true';
-                            } else {
-                                $str .= 'false';
-                            }
-                        } elseif ($type == 'integer' || $type == 'double') {
-                            if (settype($value, 'string')) {
-                                $str .= $value;
-                            } else {
-                                if ($type == 'integer') {
-                                    $str .= '? integer ?';
-                                } else {
-                                    $str .= '? double or float ?';
-                                }
-                            }
-                        } elseif ($type == 'string') {
-                            $str .= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
-                        } elseif ($type == 'array') {
-                            $str .= 'Array';
-                        } elseif ($type == 'object') {
-                            $str .= 'Object';
-                        } elseif ($type == 'resource') {
-                            $str .= 'Resource';
-                        } elseif ($type == 'NULL') {
-                            $str .= 'null';
-                        } elseif ($type == 'unknown type') {
-                            $str .= '? unknown type ?';
-                        }
-
-                        $prep[] = $str;
-
-                        unset($type);
-                        unset($value);
-                        unset($arg);
-                    }
-
-                    if ($prep) {
-                        $htmldoc .= implode(', ', $prep);
-                    }
-                }
-
-                /*if (count($_trace['args']) > 1)
-                 {
-                $htmldoc .= implode(', ', $_trace['args']);
-                //$htmldoc.= ',...';
-                }*/
-            }
-
-            $htmldoc .= ')';
-        }
-
-        return $htmldoc;
-    }
-
     public function supportsAssertions()
     {
         return true;
@@ -915,20 +925,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         throw new lcPHPException($errmsg, $errno, $filename, $linenum, $vars);
     }
 
-    protected function fileExcerpt($file, $line)
+    protected function beforeAttachRegisteredEvents()
     {
-        if (!is_readable($file)) {
-            return false;
-        }
+        parent::beforeAttachRegisteredEvents();
 
-        $content = preg_split('#<br />#', highlight_file($file, true));
-
-        $lines = array();
-
-        for ($i = max($line - 6, 1), $max = min($line + 6, count($content)); $i <= $max; $i++) {
-            $lines[] = '<li' . ($i == $line ? ' class="selected"' : '') . '>' . $content[$i - 1] . '</li>';
-        }
-
-        return '<ol start="' . max($line - 6, 1) . '">' . implode("\n", $lines) . '</ol>';
+        $this->is_debugging = $this->configuration->isDebugging();
     }
 }

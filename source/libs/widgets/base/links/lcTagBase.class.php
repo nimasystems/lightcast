@@ -39,6 +39,12 @@ class lcTagBase extends lcHtmlTag
         $this->setHref($href);
     }
 
+    public function setHref($href)
+    {
+        $this->setAttribute('href', $href);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('href');
@@ -52,11 +58,5 @@ class lcTagBase extends lcHtmlTag
     public function getHref()
     {
         return $this->getAttribute('href');
-    }
-
-    public function setHref($href)
-    {
-        $this->setAttribute('href', $href);
-        return $this;
     }
 }

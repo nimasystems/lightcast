@@ -75,6 +75,37 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         return $models;
     }
 
+    public function registerModelClasses($path_to_models, array $models)
+    {
+        if (!$path_to_models || !$models) {
+            throw new lcInvalidArgumentException('Invalid path / models');
+        }
+
+        $path_index = array_keys($this->model_paths, $path_to_models);
+
+        if (!$path_index) {
+            $path_index = count($this->model_paths);
+            $this->model_paths[$path_index] = $path_to_models;
+        } else {
+            $path_index = $path_index[0];
+        }
+
+        foreach ($models as $model) {
+            if (isset($this->registered_models[$model])) {
+                throw new lcDatabaseException('Duplicate model registration (' . $model . ' / ' . $path_to_models . '), ' .
+                    'previously declared in: ' . $this->model_paths[$this->registered_models[$model]]);
+            }
+
+            $this->registered_models[$model] = $path_index;
+
+            unset($model);
+        }
+
+        if (DO_DEBUG) {
+            $this->debug('Registered db models at path (' . $path_to_models . '): ' . print_r($models, true));
+        }
+    }
+
     public function onUseModels(lcEvent $event, $models)
     {
         if ($models && is_array($models)) {
@@ -83,21 +114,6 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         }
 
         return $models;
-    }
-
-    public function getRegisteredModelNames()
-    {
-        return array_keys((array)$this->registered_models);
-    }
-
-    public function getRegisteredModels()
-    {
-        return $this->registered_models;
-    }
-
-    public function getUsedModels()
-    {
-        return $this->used_models;
     }
 
     public function useModels(array $models)
@@ -200,34 +216,18 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
         }
     }
 
-    public function registerModelClasses($path_to_models, array $models)
+    public function getRegisteredModelNames()
     {
-        if (!$path_to_models || !$models) {
-            throw new lcInvalidArgumentException('Invalid path / models');
-        }
+        return array_keys((array)$this->registered_models);
+    }
 
-        $path_index = array_keys($this->model_paths, $path_to_models);
+    public function getRegisteredModels()
+    {
+        return $this->registered_models;
+    }
 
-        if (!$path_index) {
-            $path_index = count($this->model_paths);
-            $this->model_paths[$path_index] = $path_to_models;
-        } else {
-            $path_index = $path_index[0];
-        }
-
-        foreach ($models as $model) {
-            if (isset($this->registered_models[$model])) {
-                throw new lcDatabaseException('Duplicate model registration (' . $model . ' / ' . $path_to_models . '), ' .
-                    'previously declared in: ' . $this->model_paths[$this->registered_models[$model]]);
-            }
-
-            $this->registered_models[$model] = $path_index;
-
-            unset($model);
-        }
-
-        if (DO_DEBUG) {
-            $this->debug('Registered db models at path (' . $path_to_models . '): ' . print_r($models, true));
-        }
+    public function getUsedModels()
+    {
+        return $this->used_models;
     }
 }

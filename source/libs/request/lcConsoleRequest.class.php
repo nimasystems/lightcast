@@ -50,15 +50,6 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         parent::initialize();
     }
 
-    protected function beforeAttachRegisteredEvents()
-    {
-        parent::beforeAttachRegisteredEvents();
-
-        $this->argv = $this->env('argv');
-        $this->argc = $this->env('argc');
-        $this->params = new lcArrayCollection($this->argv);
-    }
-
     public function getListenerEvents()
     {
         return array(
@@ -123,5 +114,14 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
     public function getArgc()
     {
         return $this->argc;
+    }
+
+    protected function beforeAttachRegisteredEvents()
+    {
+        parent::beforeAttachRegisteredEvents();
+
+        $this->argv = $this->env('argv');
+        $this->argc = $this->env('argc');
+        $this->params = new lcArrayCollection($this->argv);
     }
 }

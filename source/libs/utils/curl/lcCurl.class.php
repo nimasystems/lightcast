@@ -30,12 +30,10 @@
  */
 class lcCurl extends lcObj
 {
-    protected $configuration;
-
     const COOKIE_NAME = 'cookie.txt';
     const DEFAULT_TIMEOUT = 30;
     const DEFAULT_MAX_REDIRECTS = 4;
-
+    protected $configuration;
     private $user_agent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1';
     private $url;
     private $follow_location;
@@ -66,19 +64,14 @@ class lcCurl extends lcObj
         $this->url = $url;
     }
 
-    public function setConfiguration(lcConfiguration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
     public function getConfiguration()
     {
         return $this->configuration;
     }
 
-    public function setFollowLocation($do_follow = true)
+    public function setConfiguration(lcConfiguration $configuration)
     {
-        $this->follow_location = $do_follow;
+        $this->configuration = $configuration;
     }
 
     public function getFollowLocation()
@@ -86,14 +79,9 @@ class lcCurl extends lcObj
         return $this->follow_location;
     }
 
-    public function setTimeout($timeout = self::DEFAULT_TIMEOUT)
+    public function setFollowLocation($do_follow = true)
     {
-        $this->timeout = $timeout;
-    }
-
-    public function setMaxRedirects($max_redirects = self::DEFAULT_MAX_REDIRECTS)
-    {
-        $this->max_redirects = $max_redirects;
+        $this->follow_location = $do_follow;
     }
 
     public function getMaxRedirects()
@@ -101,9 +89,9 @@ class lcCurl extends lcObj
         return $this->max_redirects;
     }
 
-    public function setBinaryTransfer($binary_transfer = true)
+    public function setMaxRedirects($max_redirects = self::DEFAULT_MAX_REDIRECTS)
     {
-        $this->binary_transfer = $binary_transfer;
+        $this->max_redirects = $max_redirects;
     }
 
     public function getBinaryTransfer()
@@ -111,19 +99,29 @@ class lcCurl extends lcObj
         return $this->binary_transfer;
     }
 
+    public function setBinaryTransfer($binary_transfer = true)
+    {
+        $this->binary_transfer = $binary_transfer;
+    }
+
     public function getTimeout()
     {
         return $this->timeout;
     }
 
-    public function setUrl($url)
+    public function setTimeout($timeout = self::DEFAULT_TIMEOUT)
     {
-        $this->url = $url;
+        $this->timeout = $timeout;
     }
 
     public function getUrl()
     {
         return $this->url;
+    }
+
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     public function setAuthentication($auth_name, $auth_pass)
@@ -153,14 +151,14 @@ class lcCurl extends lcObj
         return $this->auth_pass;
     }
 
-    public function setReferer($referer)
-    {
-        $this->referer = $referer;
-    }
-
     public function getReferer()
     {
         return $this->referer;
+    }
+
+    public function setReferer($referer)
+    {
+        $this->referer = $referer;
     }
 
     public function setPost(array $post_fields = null)
@@ -184,14 +182,14 @@ class lcCurl extends lcObj
         return (is_array($this->post_fields) && isset($this->post_fields[$name]));
     }
 
-    public function setUserAgent($user_agent)
-    {
-        $this->user_agent = $user_agent;
-    }
-
     public function getUserAgent()
     {
         return $this->user_agent;
+    }
+
+    public function setUserAgent($user_agent)
+    {
+        $this->user_agent = $user_agent;
     }
 
     public function getHttpStatus()
@@ -211,28 +209,6 @@ class lcCurl extends lcObj
         }
 
         return $this->response;
-    }
-
-    private function getHttpPostFields()
-    {
-        if (!$this->post_fields) {
-            return null;
-        }
-
-        $ret = array();
-
-        foreach ($this->post_fields as $name => $value) {
-            $ret[] = $name . '=' . $value;
-
-            unset($name, $value);
-        }
-
-        return implode('&', $ret);
-    }
-
-    public function setHeader($header)
-    {
-        $this->headers[] = $header;
     }
 
     public function makeRequest($url = null)
@@ -298,6 +274,28 @@ class lcCurl extends lcObj
         }
 
         return $this->response;
+    }
+
+    private function getHttpPostFields()
+    {
+        if (!$this->post_fields) {
+            return null;
+        }
+
+        $ret = array();
+
+        foreach ($this->post_fields as $name => $value) {
+            $ret[] = $name . '=' . $value;
+
+            unset($name, $value);
+        }
+
+        return implode('&', $ret);
+    }
+
+    public function setHeader($header)
+    {
+        $this->headers[] = $header;
     }
 
 }

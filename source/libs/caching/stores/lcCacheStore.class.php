@@ -57,8 +57,6 @@ abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCache
 
     abstract public function count();
 
-    abstract public function getCachingSystem();
-
     public function offsetExists($name)
     {
         return $this->get($name) ? true : false;
@@ -83,4 +81,6 @@ abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCache
     {
         return $this->getCachingSystem();
     }
+
+    abstract public function getCachingSystem();
 }

@@ -58,18 +58,6 @@ class lcStrings
         return strstr($haystack, $needle);
     }
 
-    public static function getLatinChars()
-    {
-        $narr = array();
-        $str = self::LATIN_CHARS;
-
-        for ($i = 0; $i < strlen($str); $i++) {
-            $narr[] = $str{$i};
-        }
-
-        return $narr;
-    }
-
     public static function permaLink(array $key_cols, array $keywords, $prefix = null)
     {
         if (isset($prefix)) {
@@ -108,6 +96,25 @@ class lcStrings
         return $url;
     }
 
+    public static function keyLink($txt)
+    {
+        if (strlen($txt) < 1) {
+            return false;
+        }
+
+        $txt = str_replace('@', ' ', $txt);
+        $txt = str_replace('%', ' ', $txt);
+
+        $txt = str_replace('+', ' ', $txt);
+        $txt = str_replace('/', ' ', $txt);
+        $txt = str_replace('.', ' ', $txt);
+
+        $txt = str_replace('_', ' ', $txt);
+
+        $txt = urlencode($txt);
+        return $txt;
+    }
+
     public static function protectEmail($mail)
     {
         $len = strlen($mail);
@@ -122,18 +129,6 @@ class lcStrings
         }
 
         return 'javascript:location=\'ma\'+\'il\'+\'to:' . implode('\'+ \'', $par) . '\'';
-    }
-
-    public static function tokenize($string)
-    {
-        $tokens = array();
-        preg_match_all('/"[^"]+"|[^"\s,]+/', $string, $tokens);
-
-        if (!$tokens) {
-            return null;
-        }
-
-        return $tokens[0];
     }
 
     public static function getTopKeywords($string, $min_word_len = 3, $max_words = 30, $imploded = false)
@@ -200,7 +195,45 @@ class lcStrings
         return $narr;
     }
 
+    public static function tokenize($string)
+    {
+        $tokens = array();
+        preg_match_all('/"[^"]+"|[^"\s,]+/', $string, $tokens);
+
+        if (!$tokens) {
+            return null;
+        }
+
+        return $tokens[0];
+    }
+
     # prepare a string for javascript
+
+    public static function unhtmlentities($string)
+    {
+        $trans_tbl = get_html_translation_table(HTML_ENTITIES);
+        $trans_tbl = array_flip($trans_tbl);
+        $ret = strtr($string, $trans_tbl);
+
+        return preg_replace('/&#(\d+);/me', "chr('\\1')", $ret);
+    }
+
+    // stripslashes - recursive on arrays
+
+    public static function getLatinChars()
+    {
+        $narr = array();
+        $str = self::LATIN_CHARS;
+
+        for ($i = 0; $i < strlen($str); $i++) {
+            $narr[] = $str{$i};
+        }
+
+        return $narr;
+    }
+
+    // addslashes - recursive on arrays
+
     public static function slashJs($string)
     {
         $o = "";
@@ -238,7 +271,6 @@ class lcStrings
         return $o;
     }
 
-    // stripslashes - recursive on arrays
     public static function slashStrip($value)
     {
         if (is_array($value)) {
@@ -250,7 +282,6 @@ class lcStrings
         }
     }
 
-    // addslashes - recursive on arrays
     public static function slashAdd($value)
     {
         if (is_array($value)) {
@@ -372,15 +403,6 @@ class lcStrings
         return htmlspecialchars($string);
     }
 
-    public static function unhtmlentities($string)
-    {
-        $trans_tbl = get_html_translation_table(HTML_ENTITIES);
-        $trans_tbl = array_flip($trans_tbl);
-        $ret = strtr($string, $trans_tbl);
-
-        return preg_replace('/&#(\d+);/me', "chr('\\1')", $ret);
-    }
-
     public static function htmlToClearText($htmlcode, $no_new_lines = false)
     {
         $htmlcode = strip_tags($htmlcode);
@@ -392,6 +414,10 @@ class lcStrings
 
         return $htmlcode;
     }
+
+    /*
+     * Deprecated
+    */
 
     public static function getLongTailKeywords($str, $len = 3, $min = 2)
     {
@@ -436,28 +462,6 @@ class lcStrings
         return $return;
     }
 
-    /*
-     * Deprecated
-    */
-    public static function keyLink($txt)
-    {
-        if (strlen($txt) < 1) {
-            return false;
-        }
-
-        $txt = str_replace('@', ' ', $txt);
-        $txt = str_replace('%', ' ', $txt);
-
-        $txt = str_replace('+', ' ', $txt);
-        $txt = str_replace('/', ' ', $txt);
-        $txt = str_replace('.', ' ', $txt);
-
-        $txt = str_replace('_', ' ', $txt);
-
-        $txt = urlencode($txt);
-        return $txt;
-    }
-
     public static function keyLink_1($txt)
     {
         $t = (array)self::str_word_count_utf8($txt, 1);
@@ -469,18 +473,6 @@ class lcStrings
         $txt = implode('-', $t);
         $txt = self::sluggable($txt);
         return $txt;
-    }
-
-    public static function sluggable($string, $separator = '-')
-    {
-        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
-        $special_cases = array('&' => 'and');
-        $string = mb_strtolower(trim($string), 'UTF-8');
-        $string = str_replace(array_keys($special_cases), array_values($special_cases), $string);
-        $string = preg_replace($accents_regex, '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'));
-        $string = preg_replace("/[^\w\d]/u", "$separator", $string);
-        $string = preg_replace("/[$separator]+/u", "$separator", $string);
-        return $string;
     }
 
     public static function str_word_count_utf8($string, $format = 0)
@@ -509,6 +501,18 @@ class lcStrings
                 break;
         }
         return $ret;
+    }
+
+    public static function sluggable($string, $separator = '-')
+    {
+        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
+        $special_cases = array('&' => 'and');
+        $string = mb_strtolower(trim($string), 'UTF-8');
+        $string = str_replace(array_keys($special_cases), array_values($special_cases), $string);
+        $string = preg_replace($accents_regex, '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'));
+        $string = preg_replace("/[^\w\d]/u", "$separator", $string);
+        $string = preg_replace("/[$separator]+/u", "$separator", $string);
+        return $string;
     }
 
     public static function shorten($string, $max_len)
@@ -561,6 +565,36 @@ class lcStrings
         }
 
         return true;
+    }
+
+    public static function utf8_strlen($string)
+    {
+        return strlen(utf8_decode($string));
+    }
+
+    public static function prettyTrim($string, $len = 100, $formater = '..')
+    {
+        $overflow = false;
+
+        //if($formater instanceof HtmlBaseTag) $formater = $formater->asHtml();
+
+        if (strlen($string) > $len) {
+            $cut_to = (int)strpos($string, ' ', $len);
+
+            if ($cut_to - $len > 10) {
+                $overflow = true;
+            } elseif ($cut_to - $len < -10) {
+                $overflow = true;
+            }
+
+            if ($cut_to && !$overflow) {
+                $string = self::utf8_substr($string, 0, $cut_to) . $formater;
+            } else {
+                $string = self::utf8_substr($string, 0, $len);
+            }
+        }
+
+        return $string;
     }
 
     public static function utf8_substr($str, $offset, $length = null)
@@ -679,36 +713,6 @@ class lcStrings
         }
 
         return $match[1];
-    }
-
-    public static function utf8_strlen($string)
-    {
-        return strlen(utf8_decode($string));
-    }
-
-    public static function prettyTrim($string, $len = 100, $formater = '..')
-    {
-        $overflow = false;
-
-        //if($formater instanceof HtmlBaseTag) $formater = $formater->asHtml();
-
-        if (strlen($string) > $len) {
-            $cut_to = (int)strpos($string, ' ', $len);
-
-            if ($cut_to - $len > 10) {
-                $overflow = true;
-            } elseif ($cut_to - $len < -10) {
-                $overflow = true;
-            }
-
-            if ($cut_to && !$overflow) {
-                $string = self::utf8_substr($string, 0, $cut_to) . $formater;
-            } else {
-                $string = self::utf8_substr($string, 0, $len);
-            }
-        }
-
-        return $string;
     }
 
     /**

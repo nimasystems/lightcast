@@ -58,22 +58,19 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
      * @var lcI18n
      */
     protected $i18n;
-    private $has_initialized = false;
-
     /**
      * @var lcClassAutoloader
      */
     protected $class_autoloader;
-
     /**
      * @var lcEventDispatcher
      */
     protected $event_dispatcher;
-
     /**
      * @var lcConfiguration
      */
     protected $configuration;
+    private $has_initialized = false;
 
     public function __construct()
     {
@@ -82,137 +79,6 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         // set defaults
         $this->context_type = self::CONTEXT_FRAMEWORK;
         $this->translation_context_type = self::CONTEXT_FRAMEWORK;
-    }
-
-    public function initialize()
-    {
-        // the method is called after all system objects have been loaded into ram and configuration has been read
-        $this->has_initialized = true;
-    }
-
-    public function shutdown()
-    {
-        // remove all events from event dispatcher
-        $this->removeObservers();
-
-        $this->event_dispatcher =
-        $this->configuration =
-        $this->class_autoloader =
-        $this->parent_plugin =
-            null;
-
-        $this->has_initialized = false;
-    }
-
-    public function setPluginManager(lcPluginManager $plugin_manager)
-    {
-        $this->plugin_manager = $plugin_manager;
-    }
-
-    public function removeObservers()
-    {
-        if ($this->event_dispatcher) {
-            $this->event_dispatcher->disconnectListener($this);
-        }
-    }
-
-    public function _onI18nStartup(lcEvent $event)
-    {
-        $this->i18n = $event->subject;
-    }
-
-    public function _onLoggerStartup(lcEvent $event)
-    {
-        $this->logger = $event->subject;
-    }
-
-    public function getHasInitialized()
-    {
-        return $this->has_initialized;
-    }
-
-    public function getConfiguration()
-    {
-        return $this->configuration;
-    }
-
-    public function setConfiguration(lcConfiguration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
-    public function getEventDispatcher()
-    {
-        return $this->event_dispatcher;
-    }
-
-    public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
-    {
-        $this->event_dispatcher = $event_dispatcher;
-    }
-
-    public function setClassAutoloader(lcClassAutoloader $class_autoloader)
-    {
-        $this->class_autoloader = $class_autoloader;
-    }
-
-    public function getClassAutoloader()
-    {
-        return $this->class_autoloader;
-    }
-
-    #pragma mark - Context / Plugin containment
-
-    public function setContextName($context_name)
-    {
-        $this->context_name = $context_name;
-    }
-
-    public function getContextName()
-    {
-        return $this->context_name;
-    }
-
-    public function setContextType($context_type)
-    {
-        $this->context_type = $context_type;
-    }
-
-    public function getContextType()
-    {
-        return $this->context_type;
-    }
-
-    public function getParentPlugin()
-    {
-        return $this->parent_plugin;
-    }
-
-    public function setParentPlugin(lcPlugin $parent_plugin = null)
-    {
-        $this->parent_plugin = $parent_plugin;
-
-        if ($parent_plugin) {
-            $this->setContextName($parent_plugin->getPluginName());
-            $this->setContextType(lcSysObj::CONTEXT_PLUGIN);
-            $this->setTranslationContext(lcI18n::CONTEXT_PLUGIN, $parent_plugin->getPluginName());
-        }
-    }
-
-    public function getMyPlugin()
-    {
-        return $this->parent_plugin;
-    }
-
-    public function isContainedWithinPlugin()
-    {
-        return ($this->parent_plugin != null);
-    }
-
-    public function getContainerPluginName()
-    {
-        $ret = $this->parent_plugin ? $this->parent_plugin->getPluginName() : null;
-        return $ret;
     }
 
     public static function getContextTypeAsConst($context_type_str)
@@ -269,7 +135,144 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         return $str;
     }
 
+    public function initialize()
+    {
+        // the method is called after all system objects have been loaded into ram and configuration has been read
+        $this->has_initialized = true;
+    }
+
+    public function shutdown()
+    {
+        // remove all events from event dispatcher
+        $this->removeObservers();
+
+        $this->event_dispatcher =
+        $this->configuration =
+        $this->class_autoloader =
+        $this->parent_plugin =
+            null;
+
+        $this->has_initialized = false;
+    }
+
+    public function removeObservers()
+    {
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->disconnectListener($this);
+        }
+    }
+
+    public function setPluginManager(lcPluginManager $plugin_manager)
+    {
+        $this->plugin_manager = $plugin_manager;
+    }
+
+    public function _onI18nStartup(lcEvent $event)
+    {
+        $this->i18n = $event->subject;
+    }
+
+    public function _onLoggerStartup(lcEvent $event)
+    {
+        $this->logger = $event->subject;
+    }
+
+    public function getHasInitialized()
+    {
+        return $this->has_initialized;
+    }
+
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+    public function setConfiguration(lcConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    public function getEventDispatcher()
+    {
+        return $this->event_dispatcher;
+    }
+
+    public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
+    {
+        $this->event_dispatcher = $event_dispatcher;
+    }
+
+    #pragma mark - Context / Plugin containment
+
+    public function getClassAutoloader()
+    {
+        return $this->class_autoloader;
+    }
+
+    public function setClassAutoloader(lcClassAutoloader $class_autoloader)
+    {
+        $this->class_autoloader = $class_autoloader;
+    }
+
+    public function getContextName()
+    {
+        return $this->context_name;
+    }
+
+    public function setContextName($context_name)
+    {
+        $this->context_name = $context_name;
+    }
+
+    public function getContextType()
+    {
+        return $this->context_type;
+    }
+
+    public function setContextType($context_type)
+    {
+        $this->context_type = $context_type;
+    }
+
+    public function getParentPlugin()
+    {
+        return $this->parent_plugin;
+    }
+
+    public function setParentPlugin(lcPlugin $parent_plugin = null)
+    {
+        $this->parent_plugin = $parent_plugin;
+
+        if ($parent_plugin) {
+            $this->setContextName($parent_plugin->getPluginName());
+            $this->setContextType(lcSysObj::CONTEXT_PLUGIN);
+            $this->setTranslationContext(lcI18n::CONTEXT_PLUGIN, $parent_plugin->getPluginName());
+        }
+    }
+
+    public function setTranslationContext($context_type, $context_name = null)
+    {
+        $this->translation_context_type = $context_type;
+        $this->translation_context_name = $context_name;
+    }
+
+    public function getMyPlugin()
+    {
+        return $this->parent_plugin;
+    }
+
+    public function isContainedWithinPlugin()
+    {
+        return ($this->parent_plugin != null);
+    }
+
     #pragma mark - i18n
+
+    public function getContainerPluginName()
+    {
+        $ret = $this->parent_plugin ? $this->parent_plugin->getPluginName() : null;
+        return $ret;
+    }
 
     public function getI18n()
     {
@@ -279,6 +282,15 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     public function setI18n(lcI18n $i18n = null)
     {
         $this->i18n = $i18n;
+    }
+
+    /**
+     * @param $text string
+     * @return string
+     */
+    public function t($text)
+    {
+        return $this->translate($text);
     }
 
     public function translate($text)
@@ -295,21 +307,6 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         }
 
         return $i18n->translateInContext($context_type, $context_name, $string, $translation_domain);
-    }
-
-    /**
-     * @param $text string
-     * @return string
-     */
-    public function t($text)
-    {
-        return $this->translate($text);
-    }
-
-    public function setTranslationContext($context_type, $context_name = null)
-    {
-        $this->translation_context_type = $context_type;
-        $this->translation_context_name = $context_name;
     }
 
     public function getTranslationContextName()
@@ -339,6 +336,13 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         $this->log($message_code, lcLogger::LOG_EMERG, $channel);
     }
 
+    public function log($message_code, $severity = null, $channel = null)
+    {
+        if ($this->logger) {
+            $this->logger->log($message_code, $severity, $channel);
+        }
+    }
+
     public function alert($message_code, $channel = null)
     {
         $this->log($message_code, lcLogger::LOG_ALERT, $channel);
@@ -349,14 +353,15 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         $this->log($message_code, lcLogger::LOG_CRIT, $channel);
     }
 
+    /*
+     * LC 1.4 Compatibility method
+    */
+
     public function err($message_code, $channel = null)
     {
         $this->log($message_code, lcLogger::LOG_ERR, $channel);
     }
 
-    /*
-     * LC 1.4 Compatibility method
-    */
     public function warn($message_code, $channel = null)
     {
         $this->warning($message_code, $channel);
@@ -380,13 +385,6 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     public function debug($message_code, $channel = null)
     {
         $this->log($message_code, lcLogger::LOG_DEBUG, $channel);
-    }
-
-    public function log($message_code, $severity = null, $channel = null)
-    {
-        if ($this->logger) {
-            $this->logger->log($message_code, $severity, $channel);
-        }
     }
 
     public function logExtended($message, $severity = null, $filename = null, $ignore_severity_check = false, $cleartext = false, $channel = null)

@@ -137,17 +137,17 @@ class lcImages
         return $newSize;
     }
 
-    protected static function calcHeight($input_width, $input_height, $max_height = 0)
-    {
-        $newHp = (100 * $max_height) / $input_height;
-        $newWidth = ($input_width * $newHp) / 100;
-        return array('newWidth' => intval($newWidth), 'newHeight' => intval($max_height));
-    }
-
     protected static function calcWidth($input_width, $input_height, $max_width = 0)
     {
         $newWp = (100 * $max_width) / $input_width;
         $newHeight = ($input_height * $newWp) / 100;
         return array('newWidth' => intval($max_width), 'newHeight' => intval($newHeight));
+    }
+
+    protected static function calcHeight($input_width, $input_height, $max_height = 0)
+    {
+        $newHp = (100 * $max_height) / $input_height;
+        $newWidth = ($input_width * $newHp) / 100;
+        return array('newWidth' => intval($newWidth), 'newHeight' => intval($max_height));
     }
 }

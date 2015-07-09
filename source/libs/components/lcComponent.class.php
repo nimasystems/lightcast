@@ -58,14 +58,23 @@ abstract class lcComponent extends lcBaseController
         parent::shutdown();
     }
 
-    public function setController(lcController $controller)
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    public function setController(lcBaseController $controller)
     {
         $this->controller = $controller;
     }
 
-    public function getController()
+    public function __toString()
     {
-        return $this->controller;
+        try {
+            return $this->render();
+        } catch (Exception $e) {
+            return '';
+        }
     }
 
     protected function renderControllerView(lcBaseController $controller, lcView $view)
@@ -120,14 +129,5 @@ abstract class lcComponent extends lcBaseController
         );
 
         return $ret;
-    }
-
-    public function __toString()
-    {
-        try {
-            return $this->render();
-        } catch (Exception $e) {
-            return '';
-        }
     }
 }

@@ -30,19 +30,20 @@
  */
 abstract class lcGettext extends lcI18n implements iDebuggable
 {
+    const DEFAULT_LOCALE_UNIX = 'en_US';
+    const DEFAULT_LOCALE_WIN = 'us';
+    const DEFAULT_CATEGORY = LC_ALL;
+    const DEFAULT_CHARSET = 'UTF-8';
     protected $locale;
-
     protected $charset = self::DEFAULT_CHARSET;
     protected $category = self::DEFAULT_CATEGORY;
-
     protected $domain_path;
     protected $domain;
 
-    const DEFAULT_LOCALE_UNIX = 'en_US';
-    const DEFAULT_LOCALE_WIN = 'us';
-
-    const DEFAULT_CATEGORY = LC_ALL;
-    const DEFAULT_CHARSET = 'UTF-8';
+    public static function getDomainFullPath($locale_path, $locale)
+    {
+        return $locale_path . DS . $locale . DS . 'LC_MESSAGES' . DS . $locale . '.mo';
+    }
 
     public function initialize()
     {
@@ -73,6 +74,11 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         }
     }
 
+    public function getDefaultLocale()
+    {
+        return setlocale(LC_ALL, null);
+    }
+
     public function getDebugInfo()
     {
         $debug_parent = (array)parent::getDebugInfo();
@@ -94,9 +100,9 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         false;
     }
 
-    public function getDefaultLocale()
+    public function getDomainPath()
     {
-        return setlocale(LC_ALL, null);
+        return $this->domain_path;
     }
 
     public function setDomainPath($path)
@@ -104,14 +110,9 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         $this->domain_path = $path;
     }
 
-    public function getDomainPath()
+    public function getLocale()
     {
-        return $this->domain_path;
-    }
-
-    public static function getDomainFullPath($locale_path, $locale)
-    {
-        return $locale_path . DS . $locale . DS . 'LC_MESSAGES' . DS . $locale . '.mo';
+        return $this->locale;
     }
 
     public function setLocale($locale)
@@ -149,14 +150,14 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         $this->internalSetLocale($locale, $this->category);
     }
 
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
     public function getCharset()
     {
         return $this->charset;
+    }
+
+    public function getDomain()
+    {
+        return $this->domain;
     }
 
     public function setDomain($domain, $domain_path = null)
@@ -211,11 +212,6 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         } catch (Exception $e) {
             throw new lcI18NException('Gettext domain set error (' . $domain . ' / ' . $domain_path . '): ' . $e->getMessage(), $e->getCode(), $e);
         }
-    }
-
-    public function getDomain()
-    {
-        return $this->domain;
     }
 
     public function translate($string)

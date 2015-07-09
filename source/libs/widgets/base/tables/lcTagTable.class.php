@@ -47,52 +47,9 @@ class lcTagTable extends lcHtmlTag
         $this->setWidth($width);
     }
 
-    public static function getRequiredAttributes()
+    public function setBorder($value = null)
     {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('summary', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'width');
-    }
-
-    public function setWidth($value = null)
-    {
-        $this->setAttribute('width', $value);
-        return $this;
-    }
-
-    public function getWidth()
-    {
-        return $this->getAttribute('width');
-    }
-
-    public function setRules($value = null)
-    {
-        $this->setAttribute('rules', $value);
-        return $this;
-    }
-
-    public function getRules()
-    {
-        return $this->getAttribute('rules');
-    }
-
-    public function setFrame($value = null)
-    {
-        $this->setAttribute('frame', $value);
-        return $this;
-    }
-
-    public function getFrame()
-    {
-        return $this->getAttribute('frame');
-    }
-
-    public function setSummary($value = null)
-    {
-        $this->setAttribute('summary', $value);
+        $this->setAttribute('border', $value);
         return $this;
     }
 
@@ -108,10 +65,53 @@ class lcTagTable extends lcHtmlTag
         return $this;
     }
 
-    public function setBorder($value = null)
+    public function setSummary($value = null)
     {
-        $this->setAttribute('border', $value);
+        $this->setAttribute('summary', $value);
         return $this;
+    }
+
+    public function setFrame($value = null)
+    {
+        $this->setAttribute('frame', $value);
+        return $this;
+    }
+
+    public function setRules($value = null)
+    {
+        $this->setAttribute('rules', $value);
+        return $this;
+    }
+
+    public function setWidth($value = null)
+    {
+        $this->setAttribute('width', $value);
+        return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('summary', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'width');
+    }
+
+    public function getWidth()
+    {
+        return $this->getAttribute('width');
+    }
+
+    public function getRules()
+    {
+        return $this->getAttribute('rules');
+    }
+
+    public function getFrame()
+    {
+        return $this->getAttribute('frame');
     }
 
     public function getBorder()

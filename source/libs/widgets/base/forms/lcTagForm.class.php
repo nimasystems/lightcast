@@ -60,27 +60,6 @@ class lcTagForm extends lcHtmlTag
         }
     }
 
-    public function setName($name)
-    {
-        $this->setAttribute('name', $name);
-        return $this;
-    }
-
-    public function getName()
-    {
-        return $this->getAttribute('name');
-    }
-
-    public static function getRequiredAttributes()
-    {
-        return array('action');
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('method', 'enctype', 'accept');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -93,11 +72,6 @@ class lcTagForm extends lcHtmlTag
         return $this;
     }
 
-    public function getAction()
-    {
-        return $this->getAttribute('action');
-    }
-
     public function setMethod($value)
     {
         if ($value != 'post' && $value != 'get') {
@@ -108,20 +82,10 @@ class lcTagForm extends lcHtmlTag
         return $this;
     }
 
-    public function getMethod()
-    {
-        return $this->getAttribute('method');
-    }
-
     public function setEnctype($accesskey = null)
     {
         $this->setAttribute('enctype', $accesskey);
         return $this;
-    }
-
-    public function getEnctype()
-    {
-        return $this->getAttribute('enctype');
     }
 
     public function setAccept($value = null)
@@ -130,15 +94,51 @@ class lcTagForm extends lcHtmlTag
         return $this;
     }
 
-    public function getAccept()
-    {
-        return $this->getAttribute('accept');
-    }
-
     public function setAcceptCharset($value = null)
     {
         $this->setAttribute('accept-charset', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array('action');
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('method', 'enctype', 'accept');
+    }
+
+    public function setName($name)
+    {
+        $this->setAttribute('name', $name);
+        return $this;
+    }
+
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
+
+    public function getAction()
+    {
+        return $this->getAttribute('action');
+    }
+
+    public function getMethod()
+    {
+        return $this->getAttribute('method');
+    }
+
+    public function getEnctype()
+    {
+        return $this->getAttribute('enctype');
+    }
+
+    public function getAccept()
+    {
+        return $this->getAttribute('accept');
     }
 
     public function getAcceptCharset()

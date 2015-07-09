@@ -41,16 +41,6 @@ class lcTagLabel extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('for', 'accesskey');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -63,15 +53,25 @@ class lcTagLabel extends lcHtmlTag
         return $this;
     }
 
-    public function getFor()
-    {
-        return $this->getAttribute('for');
-    }
-
     public function setAccessKey($accesskey = null)
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('for', 'accesskey');
+    }
+
+    public function getFor()
+    {
+        return $this->getAttribute('for');
     }
 
     public function getAccessKey()

@@ -32,16 +32,6 @@
  */
 class lcTagInput extends lcHtmlTag
 {
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('name', 'type', 'value', 'maxlength', 'src', 'accept', 'disabled', 'readonly', 'accesskey', 'tabindex');
-    }
-
     public function __construct($type = null, $name = null, $id = null, $value = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
     {
         parent::__construct('input', false);
@@ -57,20 +47,10 @@ class lcTagInput extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public function getType()
-    {
-        return $this->getAttribute('type');
-    }
-
     public function setType($value = null)
     {
         $this->setAttribute('type', $value);
         return $this;
-    }
-
-    public function getName()
-    {
-        return $this->getAttribute('name');
     }
 
     public function setName($value = null)
@@ -79,20 +59,10 @@ class lcTagInput extends lcHtmlTag
         return $this;
     }
 
-    public function getId()
-    {
-        return $this->getAttribute('id');
-    }
-
     public function setId($value)
     {
         $this->setAttribute('id', $value);
         return $this;
-    }
-
-    public function getValue()
-    {
-        return $this->getAttribute('value');
     }
 
     public function setValue($value = null)
@@ -101,26 +71,74 @@ class lcTagInput extends lcHtmlTag
         return $this;
     }
 
-    public function getSize()
-    {
-        return $this->getAttribute('size');
-    }
-
     public function setSize($value = null)
     {
         $this->setAttribute('size', $value);
         return $this;
     }
 
-    public function getMaxSize()
-    {
-        return $this->getAttribute('maxsize');
-    }
-
     public function setMaxSize($value = null)
     {
         $this->setAttribute('maxsize', $value);
         return $this;
+    }
+
+    public function setIsDisabled($value = false)
+    {
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        return $this;
+    }
+
+    public function setIsReadOnly($value = false)
+    {
+        $this->setAttribute('readonly', $value ? 'readonly' : null);
+        return $this;
+    }
+
+    public function setAccessKey($value = null)
+    {
+        $this->setAttribute('accesskey', $value);
+        return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('name', 'type', 'value', 'maxlength', 'src', 'accept', 'disabled', 'readonly', 'accesskey', 'tabindex');
+    }
+
+    public function getType()
+    {
+        return $this->getAttribute('type');
+    }
+
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
+
+    public function getId()
+    {
+        return $this->getAttribute('id');
+    }
+
+    public function getValue()
+    {
+        return $this->getAttribute('value');
+    }
+
+    public function getSize()
+    {
+        return $this->getAttribute('size');
+    }
+
+    public function getMaxSize()
+    {
+        return $this->getAttribute('maxsize');
     }
 
     public function getMaxLength()
@@ -139,31 +157,13 @@ class lcTagInput extends lcHtmlTag
         return $this->getAttribute('accesskey');
     }
 
-    public function setAccessKey($value = null)
-    {
-        $this->setAttribute('accesskey', $value);
-        return $this;
-    }
-
     public function getIsDisabled()
     {
         return $this->getAttribute('disabled') ? true : false;
     }
 
-    public function setIsDisabled($value = false)
-    {
-        $this->setAttribute('disabled', $value ? 'disabled' : null);
-        return $this;
-    }
-
     public function getIsReadOnly()
     {
         return $this->getAttribute('readonly') ? true : false;
-    }
-
-    public function setIsReadOnly($value = false)
-    {
-        $this->setAttribute('readonly', $value ? 'readonly' : null);
-        return $this;
     }
 }

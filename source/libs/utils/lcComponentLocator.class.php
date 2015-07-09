@@ -59,6 +59,15 @@ class lcComponentLocator
         return $applications;
     }
 
+    public static function getProjectApplicationContextInfo($application_name, $path)
+    {
+        $ret = array(
+            'name' => $application_name,
+            'path' => $path,
+        );
+        return $ret;
+    }
+
     public static function getPluginsInPath($path, array $options = null)
     {
         if (!$path) {
@@ -85,6 +94,17 @@ class lcComponentLocator
         }
 
         return $plugins;
+    }
+
+    public static function getPluginContextInfo($plugin_name, $path)
+    {
+        $ret = array(
+            'name' => $plugin_name,
+            'path' => $path,
+            'filename' => $plugin_name . '.php',
+            'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false)
+        );
+        return $ret;
     }
 
     public static function getControllerComponentsInPath($path, array $options = null)
@@ -120,6 +140,17 @@ class lcComponentLocator
         return $components;
     }
 
+    public static function getControllerComponentContextInfo($controller_name, $path)
+    {
+        $ret = array(
+            'name' => $controller_name,
+            'path' => $path,
+            'filename' => $controller_name . '.class.php',
+            'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+        );
+        return $ret;
+    }
+
     public static function getControllerModulesInPath($path, array $options = null)
     {
         if (!$path) {
@@ -151,6 +182,17 @@ class lcComponentLocator
         }
 
         return $modules;
+    }
+
+    public static function getControllerModuleContextInfo($controller_name, $path)
+    {
+        $ret = array(
+            'name' => $controller_name,
+            'path' => $path,
+            'filename' => $controller_name . '.php',
+            'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+        );
+        return $ret;
     }
 
     public static function getControllerWebServicesInPath($path, array $options = null)
@@ -195,6 +237,17 @@ class lcComponentLocator
         return $web_services;
     }
 
+    public static function getControllerWebServiceContextInfo($controller_name, $path)
+    {
+        $ret = array(
+            'name' => $controller_name,
+            'path' => $path,
+            'filename' => $controller_name . '.php',
+            'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+        );
+        return $ret;
+    }
+
     public static function getControllerTasksInPath($path, array $options = null)
     {
         if (!$path) {
@@ -237,28 +290,6 @@ class lcComponentLocator
         return $tasks;
     }
 
-    public static function getControllerModuleContextInfo($controller_name, $path)
-    {
-        $ret = array(
-            'name' => $controller_name,
-            'path' => $path,
-            'filename' => $controller_name . '.php',
-            'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
-        return $ret;
-    }
-
-    public static function getControllerComponentContextInfo($controller_name, $path)
-    {
-        $ret = array(
-            'name' => $controller_name,
-            'path' => $path,
-            'filename' => $controller_name . '.class.php',
-            'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
-        return $ret;
-    }
-
     public static function getControllerTaskContextInfo($controller_name, $path)
     {
         $ret = array(
@@ -266,37 +297,6 @@ class lcComponentLocator
             'path' => $path,
             'filename' => $controller_name . '.php',
             'class' => self::TASK_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
-        return $ret;
-    }
-
-    public static function getControllerWebServiceContextInfo($controller_name, $path)
-    {
-        $ret = array(
-            'name' => $controller_name,
-            'path' => $path,
-            'filename' => $controller_name . '.php',
-            'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
-        return $ret;
-    }
-
-    public static function getPluginContextInfo($plugin_name, $path)
-    {
-        $ret = array(
-            'name' => $plugin_name,
-            'path' => $path,
-            'filename' => $plugin_name . '.php',
-            'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false)
-        );
-        return $ret;
-    }
-
-    public static function getProjectApplicationContextInfo($application_name, $path)
-    {
-        $ret = array(
-            'name' => $application_name,
-            'path' => $path,
         );
         return $ret;
     }

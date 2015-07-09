@@ -219,14 +219,48 @@ class lcApp extends lcObj
         return true;
     }
 
-    public function setDelegate(iAppDelegate $delegate)
+    private function initDefines()
     {
-        $this->delegate = $delegate;
-    }
+        $configuration = $this->configuration;
 
-    public function getDelegate()
-    {
-        return $this->delegate;
+        // app name
+        $app_name = $configuration->getApplicationName();
+
+        if (!$app_name) {
+            throw new lcSystemException('Invalid application name');
+        }
+
+        // app name
+        if (!defined('APP_NAME')) {
+            define('APP_NAME', $app_name);
+        } else {
+            assert(APP_NAME == $app_name);
+        }
+
+        // project version
+        if (!defined('APP_VER')) {
+            define('APP_VER', $this->configuration->getVersion());
+        }
+
+        // debugging
+        if (!defined('DO_DEBUG')) {
+            define('DO_DEBUG', $configuration->isDebugging());
+        }
+
+        /*
+         * Required path contstants
+        */
+        if (!defined('DIR_APP')) {
+            define('DIR_APP', $configuration->getProjectDir());
+        }
+
+        if (!defined('TMP_PATH')) {
+            define('TMP_PATH', $configuration->getTempDir());
+        }
+
+        if (!defined('CACHE_PATH')) {
+            define('CACHE_PATH', $configuration->getCacheDir());
+        }
     }
 
     private function initErrorHandler()
@@ -349,36 +383,6 @@ class lcApp extends lcObj
         $this->event_dispatcher->connect('class_autoloader.class_not_found', $this, 'onClassLoaderFailedLoadingClass');
     }
 
-    public function onClassLoaderFailedLoadingClass(lcEvent $event)
-    {
-        static $loop_protect;
-
-        if ($loop_protect) {
-            // do not loop in here
-            return;
-        }
-
-        $loop_protect = true;
-
-        $loaded = false;
-        $class_name = $event->params['class_name'];
-
-        // do something to handle it here
-
-        $loop_protect = false;
-
-        // if not loaded - throw an exception so we don't end up with a fatal error
-        if (!$loaded) {
-            // if debugging reload the framework cache right away so the class 'may'
-            // be available on the next reload
-            if (DO_DEBUG) {
-                $this->recreateFrameworkAutoloadCache();
-            }
-
-            throw new lcSystemException('Could not find class: ' . $class_name);
-        }
-    }
-
     protected function recreateFrameworkAutoloadCache()
     {
         $fname = ROOT . DS . self::FRAMEWORK_CACHE_FILENAME;
@@ -395,6 +399,20 @@ class lcApp extends lcObj
         // TODO: Investigate the speed difference in requiring files with absolute paths against paths with relative paths
         $tool->setWriteBasePath(false);
         $tool->createCache();
+    }
+
+    protected function addAutoloadClassesFromObject(iSupportsAutoload $obj)
+    {
+        $class_autoloader = $this->class_autoloader;
+        $autoload_classes = $obj->getAutoloadClasses();
+
+        if ($autoload_classes && is_array($autoload_classes)) {
+            foreach ($autoload_classes as $class_name => $filename) {
+                $filename = ($filename{0} == '/') ? $filename : DIR_APP . DS . $filename;
+                $class_autoloader->addClass($class_name, $filename);
+                unset($class_name, $filename);
+            }
+        }
     }
 
     private function createSystemObjects()
@@ -428,36 +446,112 @@ class lcApp extends lcObj
         }
     }
 
-    private function setSystemObjectsLogger()
+    protected function configureSystemObject(lcSysObj $obj, $object_type, $class_name, $add_local_cache = false)
     {
-        $logger = $this->logger;
+        assert(!is_null($obj) && !is_null($class_name) && !is_null($object_type));
 
-        if (!$logger) {
-            return;
+        $configuration = $this->configuration;
+        $event_dispatcher = $this->event_dispatcher;
+
+        // set configuration
+        $obj->setConfiguration($configuration);
+
+        // set dispatcher
+        $obj->setEventDispatcher($event_dispatcher);
+
+        // set class autoloader
+        if ($obj !== $this->class_autoloader) {
+            $obj->setClassAutoloader($this->class_autoloader);
         }
 
-        // system objects
-        $config_objects = $this->configuration->getSystemObjectInstances();
+        // autoload classes
+        if ($obj instanceof iSupportsAutoload) {
+            $this->addAutoloadClassesFromObject($obj);
+        }
 
-        if ($config_objects) {
-            // load and initialize all system objects
-            foreach ($config_objects as $object_name => $object) {
-                if (!$object) {
-                    continue;
-                }
+        // event observers
+        if ($obj instanceof iEventObserver) {
+            $event_dispatcher->addObserver($obj);
+        }
 
-                if ($object instanceof lcSysObj) {
-                    $object->setLogger($logger);
-                }
-
-                unset($object_name, $object);
+        // register to class cache
+        if ($add_local_cache) {
+            if ($this->local_cache_manager && ($obj instanceof iCacheable)) {
+                $this->local_cache_manager->registerCacheableObject($obj, self::SYSTEM_OBJECTS_CACHE_PREFIX . $object_type);
             }
         }
 
-        // pass to configuration
-        if ($this->configuration instanceof lcSysObj) {
-            $this->configuration->setLogger($logger);
+        $this->initialized_objects[$object_type] = $obj;
+
+        // send event - initialize
+        //$this->event_dispatcher->notify(new lcEvent($object_type . '.initialize', $obj));
+
+        // TODO: Change this
+        if ($obj instanceof lcResidentObj) {
+            $obj->attachRegisteredEvents();
         }
+    }
+
+    private function initConfiguration()
+    {
+        $configuration = $this->configuration;
+
+        /** @var lcProjectConfiguration $project_configuration */
+        $project_configuration = $configuration->getProjectConfiguration();
+
+        // assign the configuration to be the delegate of the app
+        // if it implements iAppDelegate and the current delegate is null
+        if (!$this->delegate && ($project_configuration instanceof iAppDelegate)) {
+            $this->delegate = $project_configuration;
+        }
+
+        // register to class cache
+        if ($this->local_cache_manager && ($configuration instanceof iCacheable)) {
+            $this->local_cache_manager->registerCacheableObject($configuration, self::SYSTEM_OBJECTS_CACHE_PREFIX . 'configuration');
+        }
+
+        // configuration - execute before
+        $configuration->executeBefore();
+
+        if ($project_configuration) {
+            $project_configuration->executeBefore();
+        }
+
+        $configuration->initialize();
+
+        // set timezone from configuration
+        $this->setSystemTimezone();
+
+        // set php limits
+        if ($time_limit = (int)$this->configuration['settings.time_limit']) {
+            set_time_limit($time_limit);
+            unset($time_limit);
+        }
+
+        if ($memory_limit = (string)$this->configuration['settings.memory_limit']) {
+            ini_set('memory_limit', $memory_limit);
+            unset($memory_limit);
+        }
+
+        if ($project_configuration) {
+            $project_configuration->executeAfter();
+        }
+
+        // configuration - execute after
+        $configuration->executeAfter();
+    }
+
+    protected function setSystemTimezone()
+    {
+        // set timezone
+        $tz = $this->configuration['settings.timezone'] ? (string)$this->configuration['settings.timezone'] :
+            lcVm::date_default_timezone_get();
+
+        if (!lcVm::date_default_timezone_set($tz)) {
+            throw new lcSystemException('Cannot set system timezone: ' . $tz);
+        }
+
+        unset($tz);
     }
 
     private function initDatabaseModelManager()
@@ -473,6 +567,20 @@ class lcApp extends lcObj
         }
 
         $this->initializeSystemObject('database_model_manager', $manager);
+    }
+
+    private function initializeSystemObject($object_type, lcSysObj $obj)
+    {
+        // if already initialized - do nothing else
+        if ($obj->getHasInitialized()) {
+            return;
+        }
+
+        $obj->initialize();
+
+        // notify - startup
+        $this->event_dispatcher->notify(new lcEvent($object_type . '.startup', $obj));
+        $this->event_dispatcher->attachConnectListener($object_type . '.startup', $obj);
     }
 
     private function initSystemComponentFactory()
@@ -505,16 +613,37 @@ class lcApp extends lcObj
         // register capabilities provided by plugins
     }
 
-    private function notifyPluginsOfAppInitialization()
+    protected function registerDbModels()
     {
-        /** @var lcPluginManager $plugin_manager */
-        $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
+        // add propel model classes to autoloader
+        // for objects which support iSupportsPropelDb
+        $db_manager = isset($this->initialized_objects['database_model_manager']) ? $this->initialized_objects['database_model_manager'] : null;
 
-        if (!$plugin_manager) {
+        if (!$db_manager || !($db_manager instanceof iDatabaseModelManager)) {
             return;
         }
 
-        $plugin_manager->initializePluginsForAppStartup();
+        /** @var lcProjectConfiguration $project_configuration */
+        $project_configuration = $this->configuration->getProjectConfiguration();
+
+        if ($project_configuration instanceof iSupportsDbModels) {
+            try {
+                $models = $project_configuration->getDbModels();
+
+                if ($models && is_array($models)) {
+                    $db_manager->registerModelClasses($project_configuration->getModelsDir(), $models);
+                }
+            } catch (Exception $e) {
+                throw new lcDatabaseException('Could not register database models from project: ' . $e->getMessage(),
+                    $e->getCode(),
+                    $e);
+            }
+        }
+
+        // use application/project-wide models if configuration supports it
+        if ($this->configuration instanceof iSupportsDbModelOperations) {
+            $db_manager->useModels($this->configuration->getUsedDbModels());
+        }
     }
 
     protected function startRuntimePlugins()
@@ -688,146 +817,36 @@ class lcApp extends lcObj
         }
     }
 
-    protected function configureSystemObject(lcSysObj $obj, $object_type, $class_name, $add_local_cache = false)
+    private function setSystemObjectsLogger()
     {
-        assert(!is_null($obj) && !is_null($class_name) && !is_null($object_type));
+        $logger = $this->logger;
 
-        $configuration = $this->configuration;
-        $event_dispatcher = $this->event_dispatcher;
-
-        // set configuration
-        $obj->setConfiguration($configuration);
-
-        // set dispatcher
-        $obj->setEventDispatcher($event_dispatcher);
-
-        // set class autoloader
-        if ($obj !== $this->class_autoloader) {
-            $obj->setClassAutoloader($this->class_autoloader);
-        }
-
-        // autoload classes
-        if ($obj instanceof iSupportsAutoload) {
-            $this->addAutoloadClassesFromObject($obj);
-        }
-
-        // event observers
-        if ($obj instanceof iEventObserver) {
-            $event_dispatcher->addObserver($obj);
-        }
-
-        // register to class cache
-        if ($add_local_cache) {
-            if ($this->local_cache_manager && ($obj instanceof iCacheable)) {
-                $this->local_cache_manager->registerCacheableObject($obj, self::SYSTEM_OBJECTS_CACHE_PREFIX . $object_type);
-            }
-        }
-
-        $this->initialized_objects[$object_type] = $obj;
-
-        // send event - initialize
-        //$this->event_dispatcher->notify(new lcEvent($object_type . '.initialize', $obj));
-
-        // TODO: Change this
-        if ($obj instanceof lcResidentObj) {
-            $obj->attachRegisteredEvents();
-        }
-    }
-
-    protected function addAutoloadClassesFromObject(iSupportsAutoload $obj)
-    {
-        $class_autoloader = $this->class_autoloader;
-        $autoload_classes = $obj->getAutoloadClasses();
-
-        if ($autoload_classes && is_array($autoload_classes)) {
-            foreach ($autoload_classes as $class_name => $filename) {
-                $filename = ($filename{0} == '/') ? $filename : DIR_APP . DS . $filename;
-                $class_autoloader->addClass($class_name, $filename);
-                unset($class_name, $filename);
-            }
-        }
-    }
-
-    protected function registerDbModels()
-    {
-        // add propel model classes to autoloader
-        // for objects which support iSupportsPropelDb
-        $db_manager = isset($this->initialized_objects['database_model_manager']) ? $this->initialized_objects['database_model_manager'] : null;
-
-        if (!$db_manager || !($db_manager instanceof iDatabaseModelManager)) {
+        if (!$logger) {
             return;
         }
 
-        /** @var lcProjectConfiguration $project_configuration */
-        $project_configuration = $this->configuration->getProjectConfiguration();
+        // system objects
+        $config_objects = $this->configuration->getSystemObjectInstances();
 
-        if ($project_configuration instanceof iSupportsDbModels) {
-            try {
-                $models = $project_configuration->getDbModels();
-
-                if ($models && is_array($models)) {
-                    $db_manager->registerModelClasses($project_configuration->getModelsDir(), $models);
+        if ($config_objects) {
+            // load and initialize all system objects
+            foreach ($config_objects as $object_name => $object) {
+                if (!$object) {
+                    continue;
                 }
-            } catch (Exception $e) {
-                throw new lcDatabaseException('Could not register database models from project: ' . $e->getMessage(),
-                    $e->getCode(),
-                    $e);
+
+                if ($object instanceof lcSysObj) {
+                    $object->setLogger($logger);
+                }
+
+                unset($object_name, $object);
             }
         }
 
-        // use application/project-wide models if configuration supports it
-        if ($this->configuration instanceof iSupportsDbModelOperations) {
-            $db_manager->useModels($this->configuration->getUsedDbModels());
+        // pass to configuration
+        if ($this->configuration instanceof lcSysObj) {
+            $this->configuration->setLogger($logger);
         }
-    }
-
-    private function initConfiguration()
-    {
-        $configuration = $this->configuration;
-
-        /** @var lcProjectConfiguration $project_configuration */
-        $project_configuration = $configuration->getProjectConfiguration();
-
-        // assign the configuration to be the delegate of the app
-        // if it implements iAppDelegate and the current delegate is null
-        if (!$this->delegate && ($project_configuration instanceof iAppDelegate)) {
-            $this->delegate = $project_configuration;
-        }
-
-        // register to class cache
-        if ($this->local_cache_manager && ($configuration instanceof iCacheable)) {
-            $this->local_cache_manager->registerCacheableObject($configuration, self::SYSTEM_OBJECTS_CACHE_PREFIX . 'configuration');
-        }
-
-        // configuration - execute before
-        $configuration->executeBefore();
-
-        if ($project_configuration) {
-            $project_configuration->executeBefore();
-        }
-
-        $configuration->initialize();
-
-        // set timezone from configuration
-        $this->setSystemTimezone();
-
-        // set php limits
-        if ($time_limit = (int)$this->configuration['settings.time_limit']) {
-            set_time_limit($time_limit);
-            unset($time_limit);
-        }
-
-        if ($memory_limit = (string)$this->configuration['settings.memory_limit']) {
-            ini_set('memory_limit', $memory_limit);
-            unset($memory_limit);
-        }
-
-        if ($project_configuration) {
-            $project_configuration->executeAfter();
-        }
-
-        // configuration - execute after
-        $configuration->executeAfter();
     }
 
     private function initializeSystemObjects()
@@ -859,20 +878,6 @@ class lcApp extends lcObj
         }
 
         $this->event_dispatcher->notify(new lcEvent('app.loaders_initialized', $this));
-    }
-
-    private function initializeSystemObject($object_type, lcSysObj $obj)
-    {
-        // if already initialized - do nothing else
-        if ($obj->getHasInitialized()) {
-            return;
-        }
-
-        $obj->initialize();
-
-        // notify - startup
-        $this->event_dispatcher->notify(new lcEvent($object_type . '.startup', $obj));
-        $this->event_dispatcher->attachConnectListener($object_type . '.startup', $obj);
     }
 
     public function setLoadersOntoObject(lcSysObj $app_obj)
@@ -915,47 +920,55 @@ class lcApp extends lcObj
         $app_obj->setI18n(($app_obj !== $i18n) ? $i18n : null);
     }
 
-    private function initDefines()
+    private function notifyPluginsOfAppInitialization()
     {
-        $configuration = $this->configuration;
+        /** @var lcPluginManager $plugin_manager */
+        $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
 
-        // app name
-        $app_name = $configuration->getApplicationName();
-
-        if (!$app_name) {
-            throw new lcSystemException('Invalid application name');
+        if (!$plugin_manager) {
+            return;
         }
 
-        // app name
-        if (!defined('APP_NAME')) {
-            define('APP_NAME', $app_name);
-        } else {
-            assert(APP_NAME == $app_name);
+        $plugin_manager->initializePluginsForAppStartup();
+    }
+
+    public function getDelegate()
+    {
+        return $this->delegate;
+    }
+
+    public function setDelegate(iAppDelegate $delegate)
+    {
+        $this->delegate = $delegate;
+    }
+
+    public function onClassLoaderFailedLoadingClass(lcEvent $event)
+    {
+        static $loop_protect;
+
+        if ($loop_protect) {
+            // do not loop in here
+            return;
         }
 
-        // project version
-        if (!defined('APP_VER')) {
-            define('APP_VER', $this->configuration->getVersion());
-        }
+        $loop_protect = true;
 
-        // debugging
-        if (!defined('DO_DEBUG')) {
-            define('DO_DEBUG', $configuration->isDebugging());
-        }
+        $loaded = false;
+        $class_name = $event->params['class_name'];
 
-        /*
-         * Required path contstants
-        */
-        if (!defined('DIR_APP')) {
-            define('DIR_APP', $configuration->getProjectDir());
-        }
+        // do something to handle it here
 
-        if (!defined('TMP_PATH')) {
-            define('TMP_PATH', $configuration->getTempDir());
-        }
+        $loop_protect = false;
 
-        if (!defined('CACHE_PATH')) {
-            define('CACHE_PATH', $configuration->getCacheDir());
+        // if not loaded - throw an exception so we don't end up with a fatal error
+        if (!$loaded) {
+            // if debugging reload the framework cache right away so the class 'may'
+            // be available on the next reload
+            if (DO_DEBUG) {
+                $this->recreateFrameworkAutoloadCache();
+            }
+
+            throw new lcSystemException('Could not find class: ' . $class_name);
         }
     }
 
@@ -967,50 +980,6 @@ class lcApp extends lcObj
     public function isDebugging()
     {
         return $this->configuration->isDebugging();
-    }
-
-    protected function shutdownLoaderInstances()
-    {
-        $loader_instances = $this->loader_instances;
-
-        if (!$loader_instances) {
-            return;
-        }
-
-        // shutdown in a reversed initialization way
-        $ak = array_reverse(array_keys($loader_instances));
-
-        foreach ($ak as $obj_type) {
-            try {
-                $obj = $loader_instances[$obj_type];
-
-                if (!$obj->getHasInitialized()) {
-                    unset($this->loader_instances[$obj_type]);
-                    continue;
-                }
-
-                // send event - shutdown
-                if ($this->event_dispatcher) {
-                    $this->event_dispatcher->notify(new lcEvent($obj_type . '.shutdown', $obj));
-                }
-
-                // shutdown the object
-                $obj->shutdown();
-                unset($this->loader_instances[$obj_type]);
-            } catch (Exception $e) {
-                if (DO_DEBUG) {
-                    // this cannot be handled otherwise
-                    // we cannot be certain of what will happen after all objects start taking off
-                    // and if errorHandler is available at all
-                    // so in release mode - we silently skip this error
-                    die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
-                }
-            }
-
-            unset($obj_type, $obj);
-        }
-
-        $this->loader_instances = null;
     }
 
     public function shutdown()
@@ -1087,6 +1056,50 @@ class lcApp extends lcObj
         }
     }
 
+    protected function shutdownLoaderInstances()
+    {
+        $loader_instances = $this->loader_instances;
+
+        if (!$loader_instances) {
+            return;
+        }
+
+        // shutdown in a reversed initialization way
+        $ak = array_reverse(array_keys($loader_instances));
+
+        foreach ($ak as $obj_type) {
+            try {
+                $obj = $loader_instances[$obj_type];
+
+                if (!$obj->getHasInitialized()) {
+                    unset($this->loader_instances[$obj_type]);
+                    continue;
+                }
+
+                // send event - shutdown
+                if ($this->event_dispatcher) {
+                    $this->event_dispatcher->notify(new lcEvent($obj_type . '.shutdown', $obj));
+                }
+
+                // shutdown the object
+                $obj->shutdown();
+                unset($this->loader_instances[$obj_type]);
+            } catch (Exception $e) {
+                if (DO_DEBUG) {
+                    // this cannot be handled otherwise
+                    // we cannot be certain of what will happen after all objects start taking off
+                    // and if errorHandler is available at all
+                    // so in release mode - we silently skip this error
+                    die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+                }
+            }
+
+            unset($obj_type, $obj);
+        }
+
+        $this->loader_instances = null;
+    }
+
     public function dispatch()
     {
         if (!$this->initialized) {
@@ -1109,66 +1122,6 @@ class lcApp extends lcObj
         $ctrl->setPluginManager($this->configuration->getPluginManager());
         $ctrl->setTranslationContext(lcSysObj::CONTEXT_APP, $this->configuration->getApplicationName());
         $ctrl->dispatch();
-    }
-
-    public function getDebugSnapshot($short = false)
-    {
-        $snapshot = array(
-            'is_debugging' => DO_DEBUG,
-            'lc_version' => LC_VER,
-            'app_version' => APP_VER,
-            'memory_usage' => lcSys::getMemoryUsage(true),
-            'php_ver' => lcSys::getPhpVer(),
-            'php_api' => lcSys::get_sapi()
-        );
-
-        $local_cache = $this->configuration->getCache();
-        $local_cache_name = $local_cache ? get_class($local_cache) : null;
-        $local_cache_used = $local_cache ? true : false;
-
-        $snapshot['cache_used'] = $local_cache_used;
-
-        if ($local_cache_used) {
-            $snapshot['cache_name'] = $local_cache_name;
-        }
-
-        unset($local_cache, $local_cache_name, $local_cache_used);
-
-        // fetch config debug info
-        $snapshot['config'] = $short ? $this->configuration->getShortDebugInfo() : $this->configuration->getDebugInfo();
-
-        // fetch debugging info from all loaders
-        $system_objects = $this->initialized_objects;
-
-        if ($system_objects) {
-            foreach ($system_objects as $type => $system_object) {
-                if (!$system_object instanceof iDebuggable) {
-                    continue;
-                }
-
-                $dbg = $short ? $system_object->getShortDebugInfo() : $system_object->getDebugInfo();
-                $debug_info = array_filter((array)$dbg);
-
-                $snapshot['system_objects'][$type] = $debug_info;
-
-                unset($system_object, $type, $dbg);
-            }
-        }
-
-        return $snapshot;
-    }
-
-    protected function setSystemTimezone()
-    {
-        // set timezone
-        $tz = $this->configuration['settings.timezone'] ? (string)$this->configuration['settings.timezone'] :
-            lcVm::date_default_timezone_get();
-
-        if (!lcVm::date_default_timezone_set($tz)) {
-            throw new lcSystemException('Cannot set system timezone: ' . $tz);
-        }
-
-        unset($tz);
     }
 
     public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars)
@@ -1232,6 +1185,53 @@ class lcApp extends lcObj
         }
     }
 
+    public function getDebugSnapshot($short = false)
+    {
+        $snapshot = array(
+            'is_debugging' => DO_DEBUG,
+            'lc_version' => LC_VER,
+            'app_version' => APP_VER,
+            'memory_usage' => lcSys::getMemoryUsage(true),
+            'php_ver' => lcSys::getPhpVer(),
+            'php_api' => lcSys::get_sapi()
+        );
+
+        $local_cache = $this->configuration->getCache();
+        $local_cache_name = $local_cache ? get_class($local_cache) : null;
+        $local_cache_used = $local_cache ? true : false;
+
+        $snapshot['cache_used'] = $local_cache_used;
+
+        if ($local_cache_used) {
+            $snapshot['cache_name'] = $local_cache_name;
+        }
+
+        unset($local_cache, $local_cache_name, $local_cache_used);
+
+        // fetch config debug info
+        $snapshot['config'] = $short ? $this->configuration->getShortDebugInfo() : $this->configuration->getDebugInfo();
+
+        // fetch debugging info from all loaders
+        $system_objects = $this->initialized_objects;
+
+        if ($system_objects) {
+            foreach ($system_objects as $type => $system_object) {
+                if (!$system_object instanceof iDebuggable) {
+                    continue;
+                }
+
+                $dbg = $short ? $system_object->getShortDebugInfo() : $system_object->getDebugInfo();
+                $debug_info = array_filter((array)$dbg);
+
+                $snapshot['system_objects'][$type] = $debug_info;
+
+                unset($system_object, $type, $dbg);
+            }
+        }
+
+        return $snapshot;
+    }
+
     public function __call($method, array $params = null)
     {
         // get an instance of a system object if available
@@ -1253,14 +1253,14 @@ class lcApp extends lcObj
         return $this->profiler;
     }
 
-    public function setConfiguration(lcApplicationConfiguration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
     public function getConfiguration()
     {
         return $this->configuration;
+    }
+
+    public function setConfiguration(lcApplicationConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
     }
 
     public function getPlugin($plugin_name)

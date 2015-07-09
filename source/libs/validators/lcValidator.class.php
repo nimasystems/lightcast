@@ -34,14 +34,14 @@ abstract class lcValidator extends lcValidatorBase implements ArrayAccess
 
     abstract public function validate($data);
 
-    public function setOptions(array $options)
-    {
-        $this->options = $options;
-    }
-
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 
     public function offsetExists($name)

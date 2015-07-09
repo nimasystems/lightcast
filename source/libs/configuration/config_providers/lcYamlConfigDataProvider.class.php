@@ -38,17 +38,6 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
     const INDENT_VALUE = 2;
     const WORD_WRAP_VALUE = 0;
 
-    protected function trimYamlValue($val)
-    {
-        if (is_array($val)) {
-            return $val;
-        }
-
-        $val = trim($val);
-
-        return $val;
-    }
-
     public function readConfigData($config_key, array $options = null)
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
@@ -81,6 +70,17 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
             'indent' => $indent,
             'word_wrap' => $word_wrap
         ));
+    }
+
+    protected function trimYamlValue($val)
+    {
+        if (is_array($val)) {
+            return $val;
+        }
+
+        $val = trim($val);
+
+        return $val;
     }
 
 }

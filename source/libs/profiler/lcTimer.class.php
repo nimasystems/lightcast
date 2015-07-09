@@ -53,15 +53,6 @@ class lcTimer extends lcObj
         return $this->name;
     }
 
-    public function addTime()
-    {
-        $spend = microtime(true) - $this->start_time;
-        $this->total_time += $spend;
-        ++$this->calls;
-
-        return $spend;
-    }
-
     public function getCalls()
     {
         return $this->calls;
@@ -74,5 +65,14 @@ class lcTimer extends lcObj
         }
 
         return $this->total_time;
+    }
+
+    public function addTime()
+    {
+        $spend = microtime(true) - $this->start_time;
+        $this->total_time += $spend;
+        ++$this->calls;
+
+        return $spend;
     }
 }

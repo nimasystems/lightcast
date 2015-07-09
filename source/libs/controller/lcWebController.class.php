@@ -77,137 +77,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
     }
 
-    public function setDefaultDecorator($default_decorator, $decorator_filename_ext = self::DEFAULT_LAYOUT_EXT)
-    {
-        $this->default_decorator = $default_decorator;
-        $this->default_decorator_extension = $decorator_filename_ext;
-    }
-
-    public function getDefaultLayoutViewInstance()
-    {
-        $view = new lcHTMLTemplateLayoutView();
-
-        $view->setEventDispatcher($this->event_dispatcher);
-        $view->setConfiguration($this->configuration);
-        $view->setController($this);
-        $view->setReplacementString(self::LAYOUT_CONTENT_REPLACEMENT);
-        $view->initialize();
-
-        return $view;
-    }
-
-    public function getAllKeys()
-    {
-        return array(
-            'my_webpath',
-        );
-    }
-
-    public function getValueForKey($key)
-    {
-        if ($key == 'my_webpath' || $key == 'my_path') {
-            return $this->web_path;
-        } elseif ($key == 'my_action_path') {
-            return $this->getMyActionPath();
-        }
-        return null;
-    }
-
-    protected function actionExists($action_name, array $action_params = null)
-    {
-        /*
-         * We need to make this call with both is_callable, method_exists
-        *  as the inherited classes may contain a __call()
-        *  magic method which will be raised also lcObj as the last parent
-        *  in this tree - throws an exception!
-        */
-        $method_name = $this->classMethodForAction($action_name, $action_params);
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
-
-        return $callable_check;
-    }
-
-    protected function classMethodForAction($action_name, array $action_params = null)
-    {
-        $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $method_name = $action_type . ucfirst(lcInflector::camelize($action_name));
-        return $method_name;
-    }
-
-    protected function execute($action_name, array $action_params)
-    {
-        $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $action_params['request'] = isset($action_params['request']) ? (array)$action_params['request'] : array();
-        $action_params['type'] = isset($action_params['type']) ? (string)$action_params['type'] : $action_type;
-
-        $this->action_name = $action_name;
-        $this->action_params = $action_params;
-        $this->action_type = $action_type;
-
-        $action = $this->classMethodForAction($action_name, $action_params);
-        $controller_name = $this->controller_name;
-
-        if (DO_DEBUG) {
-            $this->debug(sprintf('%-40s %s', 'Execute ' . ($this->parent_plugin ? 'p-' . $this->parent_plugin->getPluginName() . ' :: ' : null) . $controller_name . '/' . $action_name .
-                '(' . $this->action_type . ')', '{' . lcArrays::arrayToString($action_params) . '}'));
-        }
-
-        if (!$this->actionExists($action_name, $action_params)) {
-            throw new lcActionNotFoundException('Controller action: \'' . $this->controller_name . ' / ' . $action_name . '\' is not valid');
-        }
-
-        // configure the default view
-        $this->configureControllerView();
-
-        // run before execute
-        call_user_func_array(array($this, 'beforeExecute'), $action_params);
-
-        // call the action
-        // unfortunately the way we are handling variables at the moment
-        // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
-        // so we fall back to the default way
-        //$call_result = $this->__call($action, $params);
-        $this->action_result = call_user_func_array(array($this, $action), $action_params);
-
-        // run after execute
-        call_user_func_array(array($this, 'afterExecute'), $action_params);
-
-        // notify after the action has been executed
-        if ($this->event_dispatcher) {
-            $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
-                array('controller_name' => $this->controller_name,
-                    'action_name' => $this->action_name,
-                    'action_type' => $this->action_type,
-                    'controller' => $this,
-                    'action_params' => $this->action_params,
-                    'action_result' => $this->action_result,
-                )
-            ));
-        }
-
-        return $this->action_result;
-    }
-
-    /*
-     * @deprecated LC 1.4 Compatibility method for setting a template of the current view
-    */
-    public function setCustomTemplate($filename)
-    {
-        $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
-        $this->view->setTemplateFilename($full_filename);
-    }
-
-    public function getDefaultViewInstance()
-    {
-        $instance = new lcHTMLTemplateView();
-        return $instance;
-    }
-
-    public function unsetDecorator()
-    {
-        $this->unsetDecoratorView();
-    }
-
     public function setDecorator($decorator_template_name = null, $extension = 'htm')
     {
         if (!$decorator_template_name) {
@@ -228,6 +97,72 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $view->setTemplateFilename($full_template_name);
 
         $this->setDecoratorView($view);
+    }
+
+    public function getDefaultLayoutViewInstance()
+    {
+        $view = new lcHTMLTemplateLayoutView();
+
+        $view->setEventDispatcher($this->event_dispatcher);
+        $view->setConfiguration($this->configuration);
+        $view->setController($this);
+        $view->setReplacementString(self::LAYOUT_CONTENT_REPLACEMENT);
+        $view->initialize();
+
+        return $view;
+    }
+
+    public function setDefaultDecorator($default_decorator, $decorator_filename_ext = self::DEFAULT_LAYOUT_EXT)
+    {
+        $this->default_decorator = $default_decorator;
+        $this->default_decorator_extension = $decorator_filename_ext;
+    }
+
+    public function getAllKeys()
+    {
+        return array(
+            'my_webpath',
+        );
+    }
+
+    public function getValueForKey($key)
+    {
+        if ($key == 'my_webpath' || $key == 'my_path') {
+            return $this->web_path;
+        } elseif ($key == 'my_action_path') {
+            return $this->getMyActionPath();
+        }
+        return null;
+    }
+
+    public function getMyActionPath()
+    {
+        return $this->getWebPath() . $this->action_name;
+    }
+
+    public function getWebPath()
+    {
+        return $this->web_path;
+    }
+
+    /*
+     * @deprecated LC 1.4 Compatibility method for setting a template of the current view
+    */
+
+    public function setWebPath($web_path)
+    {
+        $this->web_path = $web_path;
+    }
+
+    public function setCustomTemplate($filename)
+    {
+        $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
+        $this->view->setTemplateFilename($full_filename);
+    }
+
+    public function unsetDecorator()
+    {
+        $this->unsetDecoratorView();
     }
 
     public function decorateViewContent(lcView $view, $content)
@@ -426,12 +361,88 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $content;
     }
 
+    public function getMyPath()
+    {
+        return $this->getWebPath();
+    }
+
     /*
      * @deprecated The method is used by LC 1.4 projects
     */
-    protected function processViewResponse(lcWebController $controller)
+
+    protected function execute($action_name, array $action_params)
     {
-        $this->outputViewContents($controller, $this->view->render(), $this->view->getContentType());
+        $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
+        $action_params['request'] = isset($action_params['request']) ? (array)$action_params['request'] : array();
+        $action_params['type'] = isset($action_params['type']) ? (string)$action_params['type'] : $action_type;
+
+        $this->action_name = $action_name;
+        $this->action_params = $action_params;
+        $this->action_type = $action_type;
+
+        $action = $this->classMethodForAction($action_name, $action_params);
+        $controller_name = $this->controller_name;
+
+        if (DO_DEBUG) {
+            $this->debug(sprintf('%-40s %s', 'Execute ' . ($this->parent_plugin ? 'p-' . $this->parent_plugin->getPluginName() . ' :: ' : null) . $controller_name . '/' . $action_name .
+                '(' . $this->action_type . ')', '{' . lcArrays::arrayToString($action_params) . '}'));
+        }
+
+        if (!$this->actionExists($action_name, $action_params)) {
+            throw new lcActionNotFoundException('Controller action: \'' . $this->controller_name . ' / ' . $action_name . '\' is not valid');
+        }
+
+        // configure the default view
+        $this->configureControllerView();
+
+        // run before execute
+        call_user_func_array(array($this, 'beforeExecute'), $action_params);
+
+        // call the action
+        // unfortunately the way we are handling variables at the moment
+        // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
+        // so we fall back to the default way
+        //$call_result = $this->__call($action, $params);
+        $this->action_result = call_user_func_array(array($this, $action), $action_params);
+
+        // run after execute
+        call_user_func_array(array($this, 'afterExecute'), $action_params);
+
+        // notify after the action has been executed
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
+                array('controller_name' => $this->controller_name,
+                    'action_name' => $this->action_name,
+                    'action_type' => $this->action_type,
+                    'controller' => $this,
+                    'action_params' => $this->action_params,
+                    'action_result' => $this->action_result,
+                )
+            ));
+        }
+
+        return $this->action_result;
+    }
+
+    protected function classMethodForAction($action_name, array $action_params = null)
+    {
+        $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
+        $method_name = $action_type . ucfirst(lcInflector::camelize($action_name));
+        return $method_name;
+    }
+
+    protected function actionExists($action_name, array $action_params = null)
+    {
+        /*
+         * We need to make this call with both is_callable, method_exists
+        *  as the inherited classes may contain a __call()
+        *  magic method which will be raised also lcObj as the last parent
+        *  in this tree - throws an exception!
+        */
+        $method_name = $this->classMethodForAction($action_name, $action_params);
+        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+
+        return $callable_check;
     }
 
     protected function configureControllerView()
@@ -460,6 +471,26 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         // set to controller
         $this->setView($view);
+    }
+
+    public function getDefaultViewInstance()
+    {
+        $instance = new lcHTMLTemplateView();
+        return $instance;
+    }
+
+    public function getAssetsPath()
+    {
+        return $this->getControllerDirectory() . DS . self::ASSETS_DIR;
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    protected function processViewResponse(lcWebController $controller)
+    {
+        $this->outputViewContents($controller, $this->view->render(), $this->view->getContentType());
     }
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)
@@ -514,32 +545,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $response->sendResponse();
     }
 
-    public function setWebPath($web_path)
+    public function getTitle()
     {
-        $this->web_path = $web_path;
-    }
-
-    public function getWebPath()
-    {
-        return $this->web_path;
-    }
-
-    public function getAssetsPath()
-    {
-        return $this->getControllerDirectory() . DS . self::ASSETS_DIR;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getMyPath()
-    {
-        return $this->getWebPath();
-    }
-
-    public function getMyActionPath()
-    {
-        return $this->getWebPath() . $this->action_name;
+        return $this->title;
     }
 
     protected function setTitle($title)
@@ -547,9 +555,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $this->title = $title;
     }
 
-    public function getTitle()
+    public function getDescription()
     {
-        return $this->title;
+        return $this->description;
     }
 
     protected function setDescription($description)
@@ -557,18 +565,13 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $this->description = $description;
     }
 
-    public function getDescription()
+    public function getKeywords()
     {
-        return $this->description;
+        return $this->keywords;
     }
 
     protected function setKeywords($keywords)
     {
         $this->keywords = $keywords;
-    }
-
-    public function getKeywords()
-    {
-        return $this->keywords;
     }
 }

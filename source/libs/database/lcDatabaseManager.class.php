@@ -35,17 +35,289 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     /** @var lcDatabaseMigrationsManager */
     protected $migrations_manager;
-
+    /** @var lcLogger */
+    protected $propel_logger;
+    protected $propel_config;
     /** @var array lcDatabase[] */
     private $dbs = array();
-
     private $default_database = self::DEFAULT_DB;
+    private $propel_initialized;
 
     public function initialize()
     {
         parent::initialize();
 
         $this->loadDatabaseConfiguration();
+    }
+
+    private function loadDatabaseConfiguration()
+    {
+        // use_database
+        $use_database = $this->configuration['db.use_database'];
+
+        if (!$use_database) {
+            return;
+        }
+
+        $databases = $this->configuration['db.databases'];
+
+        // default database
+        if (isset($this->configuration['db.default_database'])) {
+            $this->default_database = (string)$this->configuration['db.default_database'];
+            $this->default_database = $this->default_database ? $this->default_database : self::DEFAULT_DB;
+        }
+
+        // propel usage
+        $use_propel = $this->configuration['db.use_propel'];
+
+        if ($use_propel) {
+            $this->initializePropel();
+        }
+
+        if (isset($databases) && is_array($databases)) {
+            foreach ($databases as $name => $db) {
+                try {
+                    if (isset($db['enabled']) && !$db['enabled']) {
+                        continue;
+                    }
+
+                    if (!class_exists($db['classname'])) {
+                        throw new lcDatabaseException('Class does not exist: ' . $db['classname']);
+                    }
+
+                    $db['name'] = $name;
+                    $db['is_default'] = ($name == $this->default_database);
+
+                    $db_object = new $db['classname']($db);
+
+                    if (!($db_object instanceof lcDatabase)) {
+                        throw new lcSystemException('Database object not valid - does not inherit from lcDatabase');
+                    }
+
+                    $db_object->setDatabaseManager($this);
+                    $db_object->setEventDispatcher($this->event_dispatcher);
+                    $db_object->setConfiguration($this->configuration);
+                    $db_object->setClassAutoloader($this->class_autoloader);
+                    $db_object->setOptions($db);
+                    $db_object->initialize();
+
+                    $this->dbs[$name] = $db_object;
+
+                    if (DO_DEBUG) {
+                        $this->debug('Database connection object (' . $name . '/' . get_class($db_object) . ') initialization');
+                    }
+
+                    // try to connect if option set
+                    if (isset($db['autoconnect']) && (bool)$db['autoconnect']) {
+                        $db_object->connect();
+                    }
+
+                    // send an event ONCE - for the default db only!
+                    if ($db['is_default']) {
+                        $res = array(
+                            'is_default' => $db['is_default'],
+                            'name' => $db['name'],
+                            'connection' => $db_object->getConnection()
+                        );
+
+                        $connection = $this->dbs[$name];
+
+                        // send a startup event
+                        $this->event_dispatcher->notify(new lcEvent('db.connect', $connection, $res));
+
+                        // attach to provide a late bound notification
+                        $this->event_dispatcher->attachConnectListener('db.connect', $this, function () use ($res, $connection) {
+                            return new lcEvent('db.connect', $connection, $res);
+                        });
+
+                        if (DO_DEBUG) {
+                            $this->debug('Database connected (' . $name . ')');
+                        }
+                    }
+
+                    unset($db, $db_object);
+                } catch (Exception $e) {
+                    throw new lcSystemException('Could not initialize database adapter (' . $name . '): ' . $e->getMessage(), $e->getCode(), $e);
+                }
+            }
+        }
+
+        unset($databases);
+    }
+
+    protected function initializePropel()
+    {
+        if ($this->propel_initialized) {
+            return;
+        }
+
+        // required by Propel
+        // @codingStandardsIgnoreStart
+        $magic_quotes_gpc = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_gpc');
+        // magic quotes are deprecated from 5.3.x up
+        $magic_quotes_sybase = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_sybase');
+        // magic quotes are deprecated from 5.3.x up
+        $ze1_compatibility_mode = (bool)ini_get('ze1_compatibility_mode');
+
+        if ($magic_quotes_gpc || $magic_quotes_sybase || $ze1_compatibility_mode) {
+            throw new lcSystemException("Propel requires the following PHP settings:\n
+					- ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ")
+					- magic_quotes_sybase = Off (Currently: " . ($magic_quotes_sybase ? 'On' : 'Off') . ")
+					- magic_quotes_gpc = Off (Currently: " . ($magic_quotes_gpc ? 'On' : 'Off') . ")");
+        }
+        // @codingStandardsIgnoreEnd
+
+        $this->makePropelConfig();
+
+        // instance pooling - we disable it by default from LC 1.5
+        $enable_instance_pooling = isset($this->propel_config['instance_pooling']) ? (bool)$this->propel_config['instance_pooling'] : false;
+
+        if ($enable_instance_pooling) {
+            Propel::enableInstancePooling();
+        } else {
+            Propel::disableInstancePooling();
+        }
+
+        // this is how we give propel access to our app! by making event
+        // dispatcher static!
+        // and not allowing it in lcApp as a static to everyone.
+        lcPropel::setEventDispatcher($this->event_dispatcher);
+        lcPropel::setConfiguration($this->propel_config);
+        lcPropel::setI18n($this->i18n);
+
+        $cache = $this->configuration->getCache();
+
+        if ($cache) {
+            $cache_key = $this->configuration->getUniqueId() . '_lcPropel';
+            lcPropel::setCache($this->configuration->getCache(), $cache_key);
+        }
+
+        if ($this->propel_logger) {
+            lcPropel::setLogger($this->propel_logger);
+        }
+
+        assert(!lcPropel::isInit());
+
+        lcPropel::initialize();
+
+        $this->propel_initialized = true;
+    }
+
+    private function makePropelConfig()
+    {
+        $propel_config = array();
+
+        $default_datasource = null;
+        $dbs = $this->configuration['db.databases'];
+
+        if ($dbs && is_array($dbs)) {
+
+            $c = 0;
+
+            foreach ($dbs as $db) {
+
+                if (isset($db['enabled']) && !$db['enabled']) {
+                    $c++;
+                    continue;
+                }
+
+                if ($db['classname'] != 'lcPropelDatabase') {
+                    $c++;
+                    continue;
+                }
+
+                $cfg = $this->getPropelConfigForDatabase($db);
+
+                if (!$cfg) {
+                    assert(false);
+                    continue;
+                }
+
+                $propel_config['propel']['datasources'][$cfg['datasource']] = $cfg['config'];
+
+                if (!$default_datasource && ($c == 0 || (isset($db['default']) && $db['default']))) {
+                    $default_datasource = $db['datasource'];
+                }
+
+                unset($db);
+
+                $c++;
+            }
+        }
+
+        $propel_config['propel']['datasources']['default'] = $default_datasource;
+
+        $this->propel_config = $propel_config;
+    }
+
+    private function getPropelConfigForDatabase(array $db_config)
+    {
+        if (!isset($db_config['url']) || !isset($db_config['datasource'])) {
+            assert(false);
+            return null;
+        }
+
+        $params = array();
+
+        $params_tmp = explode(':', $db_config['url']);
+
+        $params['phptype'] = $params_tmp[0];
+
+        $params_tmp = explode(';', $params_tmp[1]);
+
+        foreach ($params_tmp as $val) {
+            $val = explode('=', $val);
+            $params[$val[0]] = $val[1];
+            unset($val);
+        }
+
+        unset($params_tmp);
+
+        $options = array();
+        $attributes = array();
+
+        $persistent_connections = isset($db_config['persistent_connections']) ? (bool)$db_config['persistent_connections'] : true;
+        $emulated_prepare_statements = isset($db_config['emulate_prepares']) ? (bool)$db_config['emulate_prepares'] : false;
+
+        // persistent connections are now enabled by default from LC 1.5
+        if ($persistent_connections) {
+            $options['ATTR_PERSISTENT'] = array('value' => true);
+        }
+
+        // emulated prepared statements - as of 1.5 it's disabled by default
+        // http://stackoverflow.com/questions/10113562/pdo-mysql-use-pdoattr-emulate-prepares-or-not
+
+        if ($emulated_prepare_statements) {
+            $attributes = array('ATTR_EMULATE_PREPARES' => array('value' => true,),);
+        }
+
+        $username = isset($db_config['user']) ? (string)$db_config['user'] : null;
+        $password = isset($db_config['password']) ? $db_config['password'] : null;
+
+        $params['username'] = $username;
+        $params['password'] = $password;
+
+        //$propel_class = DO_DEBUG ? $this->propel_class_debug :
+        // $this->propel_class_release;
+        $propel_class = lcPropelDatabase::PROPEL_CONNECTION_CLASS;
+
+        $ret = array(
+            'datasource' => $db_config['datasource'],
+            'config' => array(
+                'adapter' => $params['phptype'],
+                'connection' => array(
+                    'dsn' => $db_config['url'],
+                    'user' => $params['username'],
+                    'password' => $params['password'],
+                    'classname' => $propel_class,
+                    'options' => $options,
+                    'attributes' => $attributes,
+                    'settings' => array('charset' => array('value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET))
+                )
+            )
+        );
+
+        return $ret;
     }
 
     public function shutdown()
@@ -101,6 +373,8 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
         return $debug;
     }
+
+    #pragma mark - Propel
 
     public function getShortDebugInfo()
     {
@@ -243,112 +517,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         return $cl;
     }
 
-    private function loadDatabaseConfiguration()
-    {
-        // use_database
-        $use_database = $this->configuration['db.use_database'];
-
-        if (!$use_database) {
-            return;
-        }
-
-        $databases = $this->configuration['db.databases'];
-
-        // default database
-        if (isset($this->configuration['db.default_database'])) {
-            $this->default_database = (string)$this->configuration['db.default_database'];
-            $this->default_database = $this->default_database ? $this->default_database : self::DEFAULT_DB;
-        }
-
-        // propel usage
-        $use_propel = $this->configuration['db.use_propel'];
-
-        if ($use_propel) {
-            $this->initializePropel();
-        }
-
-        if (isset($databases) && is_array($databases)) {
-            foreach ($databases as $name => $db) {
-                try {
-                    if (isset($db['enabled']) && !$db['enabled']) {
-                        continue;
-                    }
-
-                    if (!class_exists($db['classname'])) {
-                        throw new lcDatabaseException('Class does not exist: ' . $db['classname']);
-                    }
-
-                    $db['name'] = $name;
-                    $db['is_default'] = ($name == $this->default_database);
-
-                    $db_object = new $db['classname']($db);
-
-                    if (!($db_object instanceof lcDatabase)) {
-                        throw new lcSystemException('Database object not valid - does not inherit from lcDatabase');
-                    }
-
-                    $db_object->setDatabaseManager($this);
-                    $db_object->setEventDispatcher($this->event_dispatcher);
-                    $db_object->setConfiguration($this->configuration);
-                    $db_object->setClassAutoloader($this->class_autoloader);
-                    $db_object->setOptions($db);
-                    $db_object->initialize();
-
-                    $this->dbs[$name] = $db_object;
-
-                    if (DO_DEBUG) {
-                        $this->debug('Database connection object (' . $name . '/' . get_class($db_object) . ') initialization');
-                    }
-
-                    // try to connect if option set
-                    if (isset($db['autoconnect']) && (bool)$db['autoconnect']) {
-                        $db_object->connect();
-                    }
-
-                    // send an event ONCE - for the default db only!
-                    if ($db['is_default']) {
-                        $res = array(
-                            'is_default' => $db['is_default'],
-                            'name' => $db['name'],
-                            'connection' => $db_object->getConnection()
-                        );
-
-                        $connection = $this->dbs[$name];
-
-                        // send a startup event
-                        $this->event_dispatcher->notify(new lcEvent('db.connect', $connection, $res));
-
-                        // attach to provide a late bound notification
-                        $this->event_dispatcher->attachConnectListener('db.connect', $this, function () use ($res, $connection) {
-                            return new lcEvent('db.connect', $connection, $res);
-                        });
-
-                        if (DO_DEBUG) {
-                            $this->debug('Database connected (' . $name . ')');
-                        }
-                    }
-
-                    unset($db, $db_object);
-                } catch (Exception $e) {
-                    throw new lcSystemException('Could not initialize database adapter (' . $name . '): ' . $e->getMessage(), $e->getCode(), $e);
-                }
-            }
-        }
-
-        unset($databases);
-    }
-
-    public function getConnection($name = null)
-    {
-        $db = $this->getDatabase($name);
-
-        if (!isset($db)) {
-            return null;
-        }
-
-        return $db->getConnection();
-    }
-
     /**
      * @param null $name
      * @return lcDatabase
@@ -362,17 +530,21 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         return isset($this->dbs[$name]) ? $this->dbs[$name] : null;
     }
 
+    public function getConnection($name = null)
+    {
+        $db = $this->getDatabase($name);
+
+        if (!isset($db)) {
+            return null;
+        }
+
+        return $db->getConnection();
+    }
+
     public function getNames()
     {
         return array_keys($this->dbs);
     }
-
-    #pragma mark - Propel
-
-    /** @var lcLogger */
-    protected $propel_logger;
-    protected $propel_config;
-    private $propel_initialized;
 
     public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
     {
@@ -434,180 +606,5 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                 unset($db);
             }
         }
-    }
-
-    protected function initializePropel()
-    {
-        if ($this->propel_initialized) {
-            return;
-        }
-
-        // required by Propel
-        // @codingStandardsIgnoreStart
-        $magic_quotes_gpc = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_gpc');
-        // magic quotes are deprecated from 5.3.x up
-        $magic_quotes_sybase = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_sybase');
-        // magic quotes are deprecated from 5.3.x up
-        $ze1_compatibility_mode = (bool)ini_get('ze1_compatibility_mode');
-
-        if ($magic_quotes_gpc || $magic_quotes_sybase || $ze1_compatibility_mode) {
-            throw new lcSystemException("Propel requires the following PHP settings:\n
-					- ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ")
-					- magic_quotes_sybase = Off (Currently: " . ($magic_quotes_sybase ? 'On' : 'Off') . ")
-					- magic_quotes_gpc = Off (Currently: " . ($magic_quotes_gpc ? 'On' : 'Off') . ")");
-        }
-        // @codingStandardsIgnoreEnd
-
-        $this->makePropelConfig();
-
-        // instance pooling - we disable it by default from LC 1.5
-        $enable_instance_pooling = isset($this->propel_config['instance_pooling']) ? (bool)$this->propel_config['instance_pooling'] : false;
-
-        if ($enable_instance_pooling) {
-            Propel::enableInstancePooling();
-        } else {
-            Propel::disableInstancePooling();
-        }
-
-        // this is how we give propel access to our app! by making event
-        // dispatcher static!
-        // and not allowing it in lcApp as a static to everyone.
-        lcPropel::setEventDispatcher($this->event_dispatcher);
-        lcPropel::setConfiguration($this->propel_config);
-        lcPropel::setI18n($this->i18n);
-
-        $cache = $this->configuration->getCache();
-
-        if ($cache) {
-            $cache_key = $this->configuration->getUniqueId() . '_lcPropel';
-            lcPropel::setCache($this->configuration->getCache(), $cache_key);
-        }
-
-        if ($this->propel_logger) {
-            lcPropel::setLogger($this->propel_logger);
-        }
-
-        assert(!lcPropel::isInit());
-
-        lcPropel::initialize();
-
-        $this->propel_initialized = true;
-    }
-
-    private function getPropelConfigForDatabase(array $db_config)
-    {
-        if (!isset($db_config['url']) || !isset($db_config['datasource'])) {
-            assert(false);
-            return null;
-        }
-
-        $params = array();
-
-        $params_tmp = explode(':', $db_config['url']);
-
-        $params['phptype'] = $params_tmp[0];
-
-        $params_tmp = explode(';', $params_tmp[1]);
-
-        foreach ($params_tmp as $val) {
-            $val = explode('=', $val);
-            $params[$val[0]] = $val[1];
-            unset($val);
-        }
-
-        unset($params_tmp);
-
-        $options = array();
-        $attributes = array();
-
-        $persistent_connections = isset($db_config['persistent_connections']) ? (bool)$db_config['persistent_connections'] : true;
-        $emulated_prepare_statements = isset($db_config['emulate_prepares']) ? (bool)$db_config['emulate_prepares'] : false;
-
-        // persistent connections are now enabled by default from LC 1.5
-        if ($persistent_connections) {
-            $options['ATTR_PERSISTENT'] = array('value' => true);
-        }
-
-        // emulated prepared statements - as of 1.5 it's disabled by default
-        // http://stackoverflow.com/questions/10113562/pdo-mysql-use-pdoattr-emulate-prepares-or-not
-
-        if ($emulated_prepare_statements) {
-            $attributes = array('ATTR_EMULATE_PREPARES' => array('value' => true,),);
-        }
-
-        $username = isset($db_config['user']) ? (string)$db_config['user'] : null;
-        $password = isset($db_config['password']) ? $db_config['password'] : null;
-
-        $params['username'] = $username;
-        $params['password'] = $password;
-
-        //$propel_class = DO_DEBUG ? $this->propel_class_debug :
-        // $this->propel_class_release;
-        $propel_class = lcPropelDatabase::PROPEL_CONNECTION_CLASS;
-
-        $ret = array(
-            'datasource' => $db_config['datasource'],
-            'config' => array(
-                'adapter' => $params['phptype'],
-                'connection' => array(
-                    'dsn' => $db_config['url'],
-                    'user' => $params['username'],
-                    'password' => $params['password'],
-                    'classname' => $propel_class,
-                    'options' => $options,
-                    'attributes' => $attributes,
-                    'settings' => array('charset' => array('value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET))
-                )
-            )
-        );
-
-        return $ret;
-    }
-
-    private function makePropelConfig()
-    {
-        $propel_config = array();
-
-        $default_datasource = null;
-        $dbs = $this->configuration['db.databases'];
-
-        if ($dbs && is_array($dbs)) {
-
-            $c = 0;
-
-            foreach ($dbs as $db) {
-
-                if (isset($db['enabled']) && !$db['enabled']) {
-                    $c++;
-                    continue;
-                }
-
-                if ($db['classname'] != 'lcPropelDatabase') {
-                    $c++;
-                    continue;
-                }
-
-                $cfg = $this->getPropelConfigForDatabase($db);
-
-                if (!$cfg) {
-                    assert(false);
-                    continue;
-                }
-
-                $propel_config['propel']['datasources'][$cfg['datasource']] = $cfg['config'];
-
-                if (!$default_datasource && ($c == 0 || (isset($db['default']) && $db['default']))) {
-                    $default_datasource = $db['datasource'];
-                }
-
-                unset($db);
-
-                $c++;
-            }
-        }
-
-        $propel_config['propel']['datasources']['default'] = $default_datasource;
-
-        $this->propel_config = $propel_config;
     }
 }

@@ -41,6 +41,18 @@ class lcTagDel extends lcHtmlTag
         $this->setDateTime($datetime);
     }
 
+    public function setCite($cite = null)
+    {
+        $this->setAttribute('cite', $cite);
+        return $this;
+    }
+
+    public function setDateTime($value = null)
+    {
+        $this->setAttribute('datetime', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -51,21 +63,9 @@ class lcTagDel extends lcHtmlTag
         return array('cite');
     }
 
-    public function setCite($cite = null)
-    {
-        $this->setAttribute('cite', $cite);
-        return $this;
-    }
-
     public function getCite()
     {
         return $this->getAttribute('cite');
-    }
-
-    public function setDateTime($value = null)
-    {
-        $this->setAttribute('datetime', $value);
-        return $this;
     }
 
     public function getDateTime()

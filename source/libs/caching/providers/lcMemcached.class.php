@@ -33,16 +33,6 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
     /** @var Memcached */
     protected $memcache_backend;
 
-    protected function initBackend()
-    {
-        // check for memcache
-        if (!class_exists('Memcached', false)) {
-            throw new Exception('Memcached is not available');
-        }
-
-        $this->memcache_backend = new Memcached();
-    }
-
     public function getMulti($key)
     {
         return $this->memcache_backend->getMulti($key);
@@ -53,5 +43,15 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
         $ret = $this->memcache_backend->set($key, $value, $lifetime);
 
         return $ret;
+    }
+
+    protected function initBackend()
+    {
+        // check for memcache
+        if (!class_exists('Memcached', false)) {
+            throw new Exception('Memcached is not available');
+        }
+
+        $this->memcache_backend = new Memcached();
     }
 }

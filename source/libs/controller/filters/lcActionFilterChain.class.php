@@ -43,6 +43,16 @@ class lcActionFilterChain extends lcSysObj
         parent::shutdown();
     }
 
+    public function removeAllFilters()
+    {
+        if ($this->first_filter) {
+            $this->first_filter->shutdown();
+            $this->first_filter = null;
+        }
+
+        $this->last_filter = null;
+    }
+
     public function execute(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
     {
         if (!$this->first_filter) {
@@ -62,16 +72,6 @@ class lcActionFilterChain extends lcSysObj
             $this->last_filter->setNext($filter);
             $this->last_filter = $filter;
         }
-    }
-
-    public function removeAllFilters()
-    {
-        if ($this->first_filter) {
-            $this->first_filter->shutdown();
-            $this->first_filter = null;
-        }
-
-        $this->last_filter = null;
     }
 
     public function getFirstFilter()

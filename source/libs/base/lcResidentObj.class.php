@@ -31,24 +31,6 @@
 abstract class lcResidentObj extends lcSysObj implements iEventsListener
 {
 
-    /**
-     *  returns array|null
-     */
-    public function getListenerEvents()
-    {
-        return null;
-    }
-
-    protected function beforeAttachRegisteredEvents()
-    {
-        //
-    }
-
-    protected function afterAttachRegisteredEvents()
-    {
-        //
-    }
-
     public function attachRegisteredEvents()
     {
         $this->beforeAttachRegisteredEvents();
@@ -62,5 +44,23 @@ abstract class lcResidentObj extends lcSysObj implements iEventsListener
         }
 
         $this->afterAttachRegisteredEvents();
+    }
+
+    protected function beforeAttachRegisteredEvents()
+    {
+        //
+    }
+
+    /**
+     *  returns array|null
+     */
+    public function getListenerEvents()
+    {
+        return null;
+    }
+
+    protected function afterAttachRegisteredEvents()
+    {
+        //
     }
 }

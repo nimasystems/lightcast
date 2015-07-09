@@ -56,7 +56,7 @@
             <xsl:attribute name="name">
                 <xsl:value-of select="/DBMODEL/SETTINGS/GLOBALSETTINGS/@ModelName"/>
             </xsl:attribute>
-            <xsl:apply-templates />
+            <xsl:apply-templates/>
         </database>
     </xsl:template>
 
@@ -68,10 +68,10 @@
             </xsl:attribute>
             <xsl:if test="@Comments != ''">
                 <xsl:attribute name="description">
-                    <xsl:value-of select="@Comments" />
+                    <xsl:value-of select="@Comments"/>
                 </xsl:attribute>
             </xsl:if>
-            <xsl:apply-templates />
+            <xsl:apply-templates/>
         </table>
     </xsl:template>
 
@@ -105,7 +105,7 @@
             <xsl:attribute name="type">
                 <xsl:choose>
                     <xsl:when test="$datatype = 'ENUM'">
-                        <xsl:value-of select="'CHAR'" />
+                        <xsl:value-of select="'CHAR'"/>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:value-of select="$datatype"/>
@@ -252,13 +252,14 @@
 
                 <xsl:variable name="actionId">
                     <xsl:call-template name="str_replace">
-                        <xsl:with-param name="stringIn" select="substring-before(substring-after($relation/@RefDef,'\n'), '\n')"/>
+                        <xsl:with-param name="stringIn"
+                                        select="substring-before(substring-after($relation/@RefDef,'\n'), '\n')"/>
                         <xsl:with-param name="charsIn" select="'OnDelete='"/>
                         <xsl:with-param name="charsOut" select="''"/>
                     </xsl:call-template>
                 </xsl:variable>
                 <xsl:call-template name="get_actiontype">
-                    <xsl:with-param name="id" select="$actionId" />
+                    <xsl:with-param name="id" select="$actionId"/>
                 </xsl:call-template>
 
             </xsl:attribute>
@@ -284,10 +285,10 @@
             <xsl:value-of select="/DBMODEL/SETTINGS/DATATYPES/DATATYPE[@ID=$id]/@TypeName"/>
         </xsl:variable>
         <xsl:choose>
-            <xsl:when test="$type = 'DATETIME'" >TIMESTAMP</xsl:when>
-            <xsl:when test="$type = 'TEXT'" >LONGVARCHAR</xsl:when>
-            <xsl:when test="$type = 'BOOL'" >BOOLEAN</xsl:when>
-            <xsl:when test="$type = 'GEOMETRY'" >BLOB</xsl:when>
+            <xsl:when test="$type = 'DATETIME'">TIMESTAMP</xsl:when>
+            <xsl:when test="$type = 'TEXT'">LONGVARCHAR</xsl:when>
+            <xsl:when test="$type = 'BOOL'">BOOLEAN</xsl:when>
+            <xsl:when test="$type = 'GEOMETRY'">BLOB</xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$type"/>
             </xsl:otherwise>
@@ -300,11 +301,11 @@
         <xsl:param name="dtpc"/>
         <xsl:param name="dtype"/>
         <xsl:choose>
-            <xsl:when test="contains('FLOAT,DOUBLE,DECIMAL',$dtype)" >
+            <xsl:when test="contains('FLOAT,DOUBLE,DECIMAL',$dtype)">
                 <xsl:value-of select="substring-before($dtpc,',')"/>
             </xsl:when>
             <xsl:when test="$dtype = 'ENUM'">
-                <xsl:value-of select="''" />
+                <xsl:value-of select="''"/>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of select="$dtpc"/>

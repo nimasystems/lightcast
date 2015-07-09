@@ -30,10 +30,9 @@
  */
 class lcMemcache extends lcSysObj implements iCacheStorage
 {
+    const DEFAULT_PORT = 11211;
     /** @var Memcache */
     protected $memcache_backend;
-
-    const DEFAULT_PORT = 11211;
 
     public function __construct()
     {
@@ -91,18 +90,18 @@ class lcMemcache extends lcSysObj implements iCacheStorage
         return $ret;
     }
 
-    public function get($key)
-    {
-        $ret = $this->memcache_backend->get($key);
-
-        return $ret;
-    }
-
     public function has($key)
     {
         $has = (bool)$this->get($key) ? true : false;
 
         return $has;
+    }
+
+    public function get($key)
+    {
+        $ret = $this->memcache_backend->get($key);
+
+        return $ret;
     }
 
     public function clear()

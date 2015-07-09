@@ -31,6 +31,10 @@
 class lcPropelConnection extends PropelPDO
 {
     // override propel's default logging methods
+const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
+    const QUERY_CACHE_TIMEOUT_MINUTE = 60;    // in seconds
+    const QUERY_CACHE_TIMEOUT_DAY = 86400;
+    const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
     protected static $defaultLogMethods = array(
         'PropelPDO::exec',
         'PropelPDO::query',
@@ -43,13 +47,6 @@ class lcPropelConnection extends PropelPDO
         'lcPropelConnection::query',
         'lcPropelConnection::prepare',
     );
-
-    const QUERY_CACHE_TIMEOUT_DEFAULT = 600;    // in seconds
-    const QUERY_CACHE_TIMEOUT_MINUTE = 60;
-    const QUERY_CACHE_TIMEOUT_DAY = 86400;
-
-    const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
-
     /** @var lcEventDispatcher */
     private $event_dispatcher;
 
@@ -85,14 +82,14 @@ class lcPropelConnection extends PropelPDO
         $this->lc_configuration = $configuration;
     }
 
-    public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
-    {
-        $this->event_dispatcher = $event_dispatcher;
-    }
-
     public function getEventDispatcher()
     {
         return $this->event_dispatcher;
+    }
+
+    public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
+    {
+        $this->event_dispatcher = $event_dispatcher;
     }
 
     #pragma mark - Overriden methods
@@ -121,15 +118,24 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
-    public function prepare($sql, $driver_options = array())
+    public function lockTablesInTransaction(array $tables)
     {
-        if (!$sql) {
+        if (!$tables) {
             throw new lcInvalidArgumentException('Invalid params');
         }
 
-        $this->query_count++;
+        // http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
 
-        return parent::prepare($sql, $driver_options);
+        $this->beginTransaction();
+        $this->disableAutocommit();
+        $this->lockTables($tables);
+
+        return true;
+    }
+
+    public function disableAutocommit()
+    {
+        return $this->exec('SET autocommit = 0');
     }
 
     public function exec($sql)
@@ -164,37 +170,82 @@ class lcPropelConnection extends PropelPDO
         return false;
     }
 
-    public function query()
+    #pragma mark - Caching
+
+    public function enableAutocommit()
     {
-        $this->query_count++;
-
-        $args = func_get_args();
-
-        // php 5.3 or lower handles this differently
-        if ($this->is_php53_or_lower) {
-            $return = call_user_func_array(array($this, 'parent::query'), $args);
-        } else {
-            $return = call_user_func_array(array('parent', 'query'), $args);
-        }
-
-        return $return;
+        return $this->exec('SET autocommit = 1');
     }
 
-    #pragma mark - Caching
+    public function lockTables(array $tables)
+    {
+        if (!$tables) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
+
+        $l = array();
+
+        foreach ($tables as $table => $write_lock) {
+            $write_lock = (bool)$write_lock;
+            $table = (string)$table;
+
+            $l[] = $table . ($write_lock ? ' WRITE' : ' READ');
+
+            unset($table, $write_lock);
+        }
+
+        $sql = 'LOCK TABLES ' . implode(', ', $l);
+
+        return $this->exec($sql);
+    }
+
+    public function commitAndUnlockTables()
+    {
+        $this->unlockTables();
+        $this->commit();
+        $this->enableAutocommit();
+
+        return true;
+    }
+
+    public function unlockTables()
+    {
+        return $this->exec('UNLOCK TABLES');
+    }
+
+    public function rollbackAndUnlockTables()
+    {
+        $this->unlockTables();
+        $this->rollBack();
+        $this->enableAutocommit();
+
+        return true;
+    }
+
+    public function prepare($sql, $driver_options = array())
+    {
+        if (!$sql) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
+
+        $this->query_count++;
+
+        return parent::prepare($sql, $driver_options);
+    }
 
     public function setQueryCacheBacked(iDatabaseCacheProvider $query_cache_backend = null)
     {
         $this->query_cache_backend = $query_cache_backend;
     }
 
-    public function setQueryCacheEnabled($enabled = true)
-    {
-        $this->query_cache_enabled = $enabled;
-    }
-
     public function getQueryCacheEnabled()
     {
         return $this->query_cache_enabled;
+    }
+
+    public function setQueryCacheEnabled($enabled = true)
+    {
+        $this->query_cache_enabled = $enabled;
     }
 
     public function getQueryCacheBackend()
@@ -219,6 +270,71 @@ class lcPropelConnection extends PropelPDO
         }
     }
 
+    private function cacheRemoveForNamespace($namespace)
+    {
+        assert(isset($namespace));
+
+        $this->query_cache_backend->removeDbCacheForNamespace($namespace);
+
+        $this->log('Cache namespace removal: \'' . $namespace, null, 'PropelPDO::query');
+    }
+
+    #pragma mark - Utils
+
+    /**
+     * Logs the method call or SQL using the Propel::log() method or a registered logger class.
+     *
+     * @uses      self::getLogPrefix()
+     * @see       self::setLogger()
+     *
+     * @param string $msg Message to log.
+     * @param integer $level Log level to use; will use self::setLogLevel() specified level by default.
+     * @param string $methodName Name of the method whose execution is being logged.
+     * @param array $debugSnapshot Previous return value from self::getDebugSnapshot().
+     */
+    public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
+    {
+        // If logging has been specifically disabled, this method won't do anything
+        if (!$this->getLoggingConfig('enabled', true)) {
+            return;
+        }
+
+        // If the method being logged isn't one of the ones to be logged, bail
+        if (!in_array($methodName, $this->getLoggingConfig('methods', self::$defaultLogMethods))) {
+            return;
+        }
+
+        // If a logging level wasn't provided, use the default one
+        if ($level === null) {
+            $level = Propel::LOG_DEBUG;
+        }
+
+        // Determine if this query is slow enough to warrant logging
+        if ($this->getLoggingConfig("onlyslow", self::DEFAULT_ONLYSLOW_ENABLED)) {
+            $now = $this->getDebugSnapshot();
+            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig("details.slow.threshold", self::DEFAULT_SLOW_THRESHOLD)) {
+                return;
+            }
+        }
+
+        // If the necessary additional parameters were given, get the debug log prefix for the log line
+        if ($methodName && $debugSnapshot) {
+            $msg = $this->getLogPrefix($methodName, $debugSnapshot) . $msg;
+        }
+
+        // We won't log empty messages
+        if (!$msg) {
+            return;
+        }
+
+        // Delegate the actual logging forward
+        if ($this->logger) {
+            $this->logger->log($msg, $level);
+        } else {
+            Propel::log($msg, $level);
+        }
+    }
+
     public function invalidateCachedRows($cache_label, $namespace = null)
     {
         if (!$cache_label) {
@@ -235,6 +351,51 @@ class lcPropelConnection extends PropelPDO
             }
         }
     }
+
+    /*
+     * A somewhat Oracle-like isolation level with respect to consistent (nonlocking) reads: Each consistent read, even within the same transaction, sets and reads its own fresh snapshot. See Section 14.2.7.2, “Consistent Nonlocking Reads”.
+
+    For locking reads (SELECT with FOR UPDATE or LOCK IN SHARE MODE), InnoDB locks only index records, not the gaps before them, and thus permits the free insertion of new records next to locked records. For UPDATE and DELETE statements, locking depends on whether the statement uses a unique index with a unique search condition (such as WHERE id = 100), or a range-type search condition (such as WHERE id > 100). For a unique index with a unique search condition, InnoDB locks only the index record found, not the gap before it. For range-type searches, InnoDB locks the index range scanned, using gap locks or next-key (gap plus index-record) locks to block insertions by other sessions into the gaps covered by the range. This is necessary because “phantom rows” must be blocked for MySQL replication and recovery to work.
+    */
+
+    private function computeCacheKey($cache_label)
+    {
+        assert(isset($cache_label));
+
+        if (!$this->lc_configuration) {
+            return null;
+        }
+
+        $cache_key = null;
+
+        if (!$cache_label) {
+            assert(false);
+            return $cache_key;
+        }
+
+        $cache_key = $this->cache_prefix . $cache_label;
+
+        return $cache_key;
+    }
+
+    /*
+     * This is the default isolation level for InnoDB. For consistent reads, there is an important difference from the READ COMMITTED isolation level: All consistent reads within the same transaction read the snapshot established by the first read. This convention means that if you issue several plain (nonlocking) SELECT statements within the same transaction, these SELECT statements are consistent also with respect to each other. See Section 14.2.7.2, “Consistent Nonlocking Reads”.
+
+    For locking reads (SELECT with FOR UPDATE or LOCK IN SHARE MODE), UPDATE, and DELETE statements, locking depends on whether the statement uses a unique index with a unique search condition, or a range-type search condition. For a unique index with a unique search condition, InnoDB locks only the index record found, not the gap before it. For other search conditions, InnoDB locks the index range scanned, using gap locks or next-key (gap plus index-record) locks to block insertions by other sessions into the gaps covered by the range.
+    */
+
+    private function cacheRemove($namespace, $cache_key)
+    {
+        assert(isset($cache_key));
+
+        $this->query_cache_backend->removeDbCache($namespace, $cache_key);
+
+        $this->log('Cache removal: \'' . $namespace . ':' . $cache_key, null, 'PropelPDO::query');
+    }
+
+    /*
+     * SELECT statements are performed in a nonlocking fashion, but a possible earlier version of a row might be used. Thus, using this isolation level, such reads are not consistent. This is also called a “dirty read.” Otherwise, this isolation level works like READ COMMITTED.
+    */
 
     public function cachedQueryRows($query, $cache_label, $namespace = null, $timeout = self::QUERY_CACHE_TIMEOUT_DEFAULT, $enable_cache = true, &$is_cached = false)
     {
@@ -300,42 +461,30 @@ class lcPropelConnection extends PropelPDO
         return $rows;
     }
 
-    private function computeCacheKey($cache_label)
+    /*
+     * This level is like REPEATABLE READ, but InnoDB implicitly converts all plain SELECT statements to SELECT ... LOCK IN SHARE MODE if autocommit is disabled. If autocommit is enabled, the SELECT is its own transaction. It therefore is known to be read only and can be serialized if performed as a consistent (nonlocking) read and need not block for other transactions. (To force a plain SELECT to block if other transactions have modified the selected rows, disable autocommit.)
+    */
+
+    private function cacheLookup($namespace, $cache_key)
     {
-        assert(isset($cache_label));
-
-        if (!$this->lc_configuration) {
-            return null;
-        }
-
-        $cache_key = null;
-
-        if (!$cache_label) {
-            assert(false);
-            return $cache_key;
-        }
-
-        $cache_key = $this->cache_prefix . $cache_label;
-
-        return $cache_key;
+        $cached_data = $this->query_cache_backend->getDbCache($namespace, $cache_key);
+        return $cached_data;
     }
 
-    private function cacheRemoveForNamespace($namespace)
+    public function query()
     {
-        assert(isset($namespace));
+        $this->query_count++;
 
-        $this->query_cache_backend->removeDbCacheForNamespace($namespace);
+        $args = func_get_args();
 
-        $this->log('Cache namespace removal: \'' . $namespace, null, 'PropelPDO::query');
-    }
+        // php 5.3 or lower handles this differently
+        if ($this->is_php53_or_lower) {
+            $return = call_user_func_array(array($this, 'parent::query'), $args);
+        } else {
+            $return = call_user_func_array(array('parent', 'query'), $args);
+        }
 
-    private function cacheRemove($namespace, $cache_key)
-    {
-        assert(isset($cache_key));
-
-        $this->query_cache_backend->removeDbCache($namespace, $cache_key);
-
-        $this->log('Cache removal: \'' . $namespace . ':' . $cache_key, null, 'PropelPDO::query');
+        return $return;
     }
 
     private function cacheStore($namespace, $cache_key, array $rows, $timeout)
@@ -350,17 +499,16 @@ class lcPropelConnection extends PropelPDO
         $this->log('Cache store: \'' . $namespace . ':' . $cache_key . ', timeout: ' . $timeout, null, 'PropelPDO::query');
     }
 
-    private function cacheLookup($namespace, $cache_key)
-    {
-        $cached_data = $this->query_cache_backend->getDbCache($namespace, $cache_key);
-        return $cached_data;
-    }
-
-    #pragma mark - Utils
-
     public function getQueryCount()
     {
         return $this->query_count;
+    }
+
+    public function transactionReadCommited()
+    {
+        $this->commitTransactionIfRunning();
+
+        return $this->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
     }
 
     public function commitTransactionIfRunning()
@@ -375,23 +523,6 @@ class lcPropelConnection extends PropelPDO
         }
     }
 
-    /*
-     * A somewhat Oracle-like isolation level with respect to consistent (nonlocking) reads: Each consistent read, even within the same transaction, sets and reads its own fresh snapshot. See Section 14.2.7.2, “Consistent Nonlocking Reads”.
-
-    For locking reads (SELECT with FOR UPDATE or LOCK IN SHARE MODE), InnoDB locks only index records, not the gaps before them, and thus permits the free insertion of new records next to locked records. For UPDATE and DELETE statements, locking depends on whether the statement uses a unique index with a unique search condition (such as WHERE id = 100), or a range-type search condition (such as WHERE id > 100). For a unique index with a unique search condition, InnoDB locks only the index record found, not the gap before it. For range-type searches, InnoDB locks the index range scanned, using gap locks or next-key (gap plus index-record) locks to block insertions by other sessions into the gaps covered by the range. This is necessary because “phantom rows” must be blocked for MySQL replication and recovery to work.
-    */
-    public function transactionReadCommited()
-    {
-        $this->commitTransactionIfRunning();
-
-        return $this->exec('SET TRANSACTION ISOLATION LEVEL READ COMMITTED');
-    }
-
-    /*
-     * This is the default isolation level for InnoDB. For consistent reads, there is an important difference from the READ COMMITTED isolation level: All consistent reads within the same transaction read the snapshot established by the first read. This convention means that if you issue several plain (nonlocking) SELECT statements within the same transaction, these SELECT statements are consistent also with respect to each other. See Section 14.2.7.2, “Consistent Nonlocking Reads”.
-
-    For locking reads (SELECT with FOR UPDATE or LOCK IN SHARE MODE), UPDATE, and DELETE statements, locking depends on whether the statement uses a unique index with a unique search condition, or a range-type search condition. For a unique index with a unique search condition, InnoDB locks only the index record found, not the gap before it. For other search conditions, InnoDB locks the index range scanned, using gap locks or next-key (gap plus index-record) locks to block insertions by other sessions into the gaps covered by the range.
-    */
     public function transactionRepeatableRead()
     {
         $this->commitTransactionIfRunning();
@@ -399,9 +530,6 @@ class lcPropelConnection extends PropelPDO
         return $this->exec('SET TRANSACTION ISOLATION LEVEL REPEATABLE READ');
     }
 
-    /*
-     * SELECT statements are performed in a nonlocking fashion, but a possible earlier version of a row might be used. Thus, using this isolation level, such reads are not consistent. This is also called a “dirty read.” Otherwise, this isolation level works like READ COMMITTED.
-    */
     public function transactionReadUncommited()
     {
         $this->commitTransactionIfRunning();
@@ -409,24 +537,11 @@ class lcPropelConnection extends PropelPDO
         return $this->exec('SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED');
     }
 
-    /*
-     * This level is like REPEATABLE READ, but InnoDB implicitly converts all plain SELECT statements to SELECT ... LOCK IN SHARE MODE if autocommit is disabled. If autocommit is enabled, the SELECT is its own transaction. It therefore is known to be read only and can be serialized if performed as a consistent (nonlocking) read and need not block for other transactions. (To force a plain SELECT to block if other transactions have modified the selected rows, disable autocommit.)
-    */
     public function transactionReadSerializable()
     {
         $this->commitTransactionIfRunning();
 
         return $this->exec('SET TRANSACTION ISOLATION LEVEL SERIALIZABLE');
-    }
-
-    public function enableAutocommit()
-    {
-        return $this->exec('SET autocommit = 1');
-    }
-
-    public function disableAutocommit()
-    {
-        return $this->exec('SET autocommit = 0');
     }
 
     public function disableForeignKeyChecks()
@@ -437,120 +552,6 @@ class lcPropelConnection extends PropelPDO
     public function enableForeignKeyChecks()
     {
         return $this->exec('SET FOREIGN_KEY_CHECKS = 1');
-    }
-
-    /**
-     * Logs the method call or SQL using the Propel::log() method or a registered logger class.
-     *
-     * @uses      self::getLogPrefix()
-     * @see       self::setLogger()
-     *
-     * @param string $msg Message to log.
-     * @param integer $level Log level to use; will use self::setLogLevel() specified level by default.
-     * @param string $methodName Name of the method whose execution is being logged.
-     * @param array $debugSnapshot Previous return value from self::getDebugSnapshot().
-     */
-    public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
-    {
-        // If logging has been specifically disabled, this method won't do anything
-        if (!$this->getLoggingConfig('enabled', true)) {
-            return;
-        }
-
-        // If the method being logged isn't one of the ones to be logged, bail
-        if (!in_array($methodName, $this->getLoggingConfig('methods', self::$defaultLogMethods))) {
-            return;
-        }
-
-        // If a logging level wasn't provided, use the default one
-        if ($level === null) {
-            $level = Propel::LOG_DEBUG;
-        }
-
-        // Determine if this query is slow enough to warrant logging
-        if ($this->getLoggingConfig("onlyslow", self::DEFAULT_ONLYSLOW_ENABLED)) {
-            $now = $this->getDebugSnapshot();
-            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig("details.slow.threshold", self::DEFAULT_SLOW_THRESHOLD)) {
-                return;
-            }
-        }
-
-        // If the necessary additional parameters were given, get the debug log prefix for the log line
-        if ($methodName && $debugSnapshot) {
-            $msg = $this->getLogPrefix($methodName, $debugSnapshot) . $msg;
-        }
-
-        // We won't log empty messages
-        if (!$msg) {
-            return;
-        }
-
-        // Delegate the actual logging forward
-        if ($this->logger) {
-            $this->logger->log($msg, $level);
-        } else {
-            Propel::log($msg, $level);
-        }
-    }
-
-    public function lockTables(array $tables)
-    {
-        if (!$tables) {
-            throw new lcInvalidArgumentException('Invalid params');
-        }
-
-        $l = array();
-
-        foreach ($tables as $table => $write_lock) {
-            $write_lock = (bool)$write_lock;
-            $table = (string)$table;
-
-            $l[] = $table . ($write_lock ? ' WRITE' : ' READ');
-
-            unset($table, $write_lock);
-        }
-
-        $sql = 'LOCK TABLES ' . implode(', ', $l);
-
-        return $this->exec($sql);
-    }
-
-    public function unlockTables()
-    {
-        return $this->exec('UNLOCK TABLES');
-    }
-
-    public function lockTablesInTransaction(array $tables)
-    {
-        if (!$tables) {
-            throw new lcInvalidArgumentException('Invalid params');
-        }
-
-        // http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
-
-        $this->beginTransaction();
-        $this->disableAutocommit();
-        $this->lockTables($tables);
-
-        return true;
-    }
-
-    public function rollbackAndUnlockTables()
-    {
-        $this->unlockTables();
-        $this->rollBack();
-        $this->enableAutocommit();
-
-        return true;
-    }
-
-    public function commitAndUnlockTables()
-    {
-        $this->unlockTables();
-        $this->commit();
-        $this->enableAutocommit();
-
-        return true;
     }
 
     public function quoteTableName($string)

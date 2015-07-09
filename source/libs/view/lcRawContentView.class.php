@@ -48,12 +48,6 @@ class lcRawContentView extends lcView implements iDebuggable
         return null;
     }
 
-    protected function getViewContent()
-    {
-        assert(($this->content && (is_null($this->content) || is_string($this->content))) || !$this->content);
-        return $this->content;
-    }
-
     public function getDebugInfo()
     {
         $debug_parent = (array)parent::getDebugInfo();
@@ -76,5 +70,11 @@ class lcRawContentView extends lcView implements iDebuggable
     public function setContent($content)
     {
         $this->content = $content;
+    }
+
+    protected function getViewContent()
+    {
+        assert(($this->content && (is_null($this->content) || is_string($this->content))) || !$this->content);
+        return $this->content;
     }
 }

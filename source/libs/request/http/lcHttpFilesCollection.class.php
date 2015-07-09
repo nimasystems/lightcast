@@ -42,14 +42,14 @@ class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
         $this->set($value, $offset);
     }
 
-    public function offsetUnset($index)
-    {
-        parent::offsetUnset($index);
-    }
-
     public function set(lcHttpFile $value, $offset = null)
     {
         parent::offsetSetColl($offset, $value);
+    }
+
+    public function offsetUnset($index)
+    {
+        parent::offsetUnset($index);
     }
 
     public function delete($offset = null)

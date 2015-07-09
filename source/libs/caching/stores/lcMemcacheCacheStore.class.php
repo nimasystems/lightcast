@@ -143,162 +143,55 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return false;
     }
 
-    protected function makeSafeKey($key)
+    public function clear()
     {
-        return md5($key);
-    }
+        $this->memcache->clear();
 
-    protected function keyWithNamespace($key)
-    {
-        $k = $this->namespace_prefix . $key;
-        return $k;
-    }
-
-    public function has($key)
-    {
-        return $this->memcache->has($key);
-    }
-
-    /**
-     * @param string $key
-     * @return array|null
-     * @throws Exception
-     * @throws lcInvalidArgumentException
-     */
-    public function get($key)
-    {
+        // internal storage
         $use_internal_storage = $this->should_use_internal_storage;
 
-        $keys = array();
-        $unnamespaced_keys = array();
-        $results = array();
-
-        // allow fetching multiply values with keys
-        if (is_array($key)) {
-            if (!$key) {
-                throw new lcInvalidArgumentException('Invalid params');
-            }
-
-            // append namespace prefixes
-            foreach ($key as $key1) {
-                $namespaced_key = $this->keyWithNamespace($key1);
-                $keys[] = $namespaced_key;
-                $unnamespaced_keys[$namespaced_key] = $key1;
-                unset($key1, $namespaced_key);
-            }
-        } else {
-            $key1 = $this->keyWithNamespace($key);
-
-            if (!$key1) {
-                throw new lcInvalidArgumentException('Invalid params');
-            }
-
-            $keys = array($key1);
-            $unnamespaced_keys[$key1] = $key;
-            unset($key1);
-        }
-
-        // fetch the data from internal cache first
         if ($use_internal_storage) {
-            foreach ($keys as $key1) {
-                $value = null;
+            $this->internal_storage = array();
+        }
+    }
 
-                // internal storage read
-                if (isset($this->internal_storage[$key1])) {
-                    $value = $this->internal_storage[$key1];
-                }
+    public function hasValues()
+    {
+        throw new lcSystemException('Unimplemented');
+    }
 
-                $results[$unnamespaced_keys[$key1]] = $value;
+    public function getStats()
+    {
+        return $this->count();
+    }
 
-                unset($key1, $value);
-            }
+    public function count()
+    {
+        if (!$stats = $this->memcache->getStats()) {
+            return false;
         }
 
-        // try to fetch from memcache then
-        // if we have more than one requests to fetch
-        // use getMulti
-        try {
-            if (count($keys) > 1) {
-                if ($this->memcache instanceof iCacheMultiStorage) {
-                    // clear out the keys which we already have
-                    foreach ($keys as $key1) {
-                        if (isset($results[$unnamespaced_keys[$key1]])) {
-                            unset($keys[$key1]);
-                        }
-
-                        unset($key1);
-                    }
-
-                    // fetch from memcached
-                    $cas = null;
-                    $values = $this->memcache->getMulti($keys, $cas);
-
-                    // parse the results
-                    if ($values) {
-                        foreach ($values as $kk => $vv) {
-                            // internal storage writeback
-                            if ($use_internal_storage) {
-                                $this->internal_storage[$kk] = $vv;
-                            }
-
-                            $results[$unnamespaced_keys[$kk]] = $vv;
-
-                            unset($kk, $vv);
-                        }
-                    }
-
-                    unset($values);
-                } else {
-                    foreach ($keys as $key1) {
-
-                        $value = $this->memcache->get($key1);
-
-                        // internal storage writeback
-                        if ($use_internal_storage) {
-                            $this->internal_storage[$key1] = $value;
-                        }
-
-                        $results[$unnamespaced_keys[$key1]] = $value;
-
-                        unset($value);
-                        unset($key1);
-                    }
-                }
-
-            } elseif (!isset($results[$unnamespaced_keys[$keys[0]]])) {
-                $key1 = $keys[0];
-
-                $value = $this->memcache->get($key1);
-
-                // internal storage writeback
-                if ($use_internal_storage) {
-                    $this->internal_storage[$key1] = $value;
-                }
-
-                $results[$unnamespaced_keys[$key1]] = $value;
-
-                unset($value);
-                unset($key1);
-            }
-        } catch (Exception $e) {
-            if (DO_DEBUG) {
-                throw $e;
-            }
+        if (!isset($stats['total_items'])) {
+            return false;
         }
 
-        $ret = null;
-
-        if (is_array($key)) {
-            $ret = $results;
-        } else {
-            $ret = isset($results[$key]) ? $results[$key] : null;
-        }
-
-        return $ret;
+        return (int)$stats['total_items'];
     }
 
     // lifetime passed in seconds!
     // max object size: 1 MB!
+
+    public function getCachingSystem()
+    {
+        return $this->memcache->getBackend();
+    }
+
+    public function setDbCache($namespace, $key, $value = null, $lifetime = null)
+    {
+        $key = $namespace . ':' . $key;
+        return $this->set($key, $value, $lifetime);
+    }
+
     public function set($key, $value = null, $lifetime = null, $flags = null)
     {
         $all_kv = array();
@@ -381,6 +274,18 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $res;
     }
 
+    protected function keyWithNamespace($key)
+    {
+        $k = $this->namespace_prefix . $key;
+        return $k;
+    }
+
+    public function removeDbCache($namespace, $key)
+    {
+        $key = $namespace . ':' . $key;
+        $this->remove($key);
+    }
+
     public function remove($key)
     {
         $namespaced_key = $this->keyWithNamespace($key);
@@ -395,65 +300,13 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         }
     }
 
-    public function clear()
-    {
-        $this->memcache->clear();
-
-        // internal storage
-        $use_internal_storage = $this->should_use_internal_storage;
-
-        if ($use_internal_storage) {
-            $this->internal_storage = array();
-        }
-    }
-
-    public function hasValues()
-    {
-        throw new lcSystemException('Unimplemented');
-    }
-
-    public function count()
-    {
-        if (!$stats = $this->memcache->getStats()) {
-            return false;
-        }
-
-        if (!isset($stats['total_items'])) {
-            return false;
-        }
-
-        return (int)$stats['total_items'];
-    }
-
-    public function getStats()
-    {
-        return $this->count();
-    }
-
-    public function getCachingSystem()
-    {
-        return $this->memcache->getBackend();
-    }
-
-    #pragma mark - Database Caching
-
-    public function setDbCache($namespace, $key, $value = null, $lifetime = null)
-    {
-        $key = $namespace . ':' . $key;
-        return $this->set($key, $value, $lifetime);
-    }
-
-    public function removeDbCache($namespace, $key)
-    {
-        $key = $namespace . ':' . $key;
-        $this->remove($key);
-    }
-
     public function removeDbCacheForNamespace($namespace)
     {
         // cannot be implemented - no namespace support
         return false;
     }
+
+    #pragma mark - Database Caching
 
     public function getDbCache($namespace, $key)
     {
@@ -461,9 +314,157 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $this->get($key);
     }
 
+    /**
+     * @param string $key
+     * @return array|null
+     * @throws Exception
+     * @throws lcInvalidArgumentException
+     */
+    public function get($key)
+    {
+        $use_internal_storage = $this->should_use_internal_storage;
+
+        $keys = array();
+        $unnamespaced_keys = array();
+        $results = array();
+
+        // allow fetching multiply values with keys
+        if (is_array($key)) {
+            if (!$key) {
+                throw new lcInvalidArgumentException('Invalid params');
+            }
+
+            // append namespace prefixes
+            foreach ($key as $key1) {
+                $namespaced_key = $this->keyWithNamespace($key1);
+                $keys[] = $namespaced_key;
+                $unnamespaced_keys[$namespaced_key] = $key1;
+                unset($key1, $namespaced_key);
+            }
+        } else {
+            $key1 = $this->keyWithNamespace($key);
+
+            if (!$key1) {
+                throw new lcInvalidArgumentException('Invalid params');
+            }
+
+            $keys = array($key1);
+            $unnamespaced_keys[$key1] = $key;
+            unset($key1);
+        }
+
+        // fetch the data from internal cache first
+        if ($use_internal_storage) {
+            foreach ($keys as $key1) {
+                $value = null;
+
+                // internal storage read
+                if (isset($this->internal_storage[$key1])) {
+                    $value = $this->internal_storage[$key1];
+                }
+
+                $results[$unnamespaced_keys[$key1]] = $value;
+
+                unset($key1, $value);
+            }
+        }
+
+        // try to fetch from memcache then
+        // if we have more than one requests to fetch
+        // use getMulti
+        try {
+            if (count($keys) > 1) {
+                if ($this->memcache instanceof iCacheMultiStorage) {
+                    // clear out the keys which we already have
+                    foreach ($keys as $key1) {
+                        if (isset($results[$unnamespaced_keys[$key1]])) {
+                            unset($keys[$key1]);
+                        }
+
+                        unset($key1);
+                    }
+
+                    // fetch from memcached
+                    $cas = null;
+                    $values = $this->memcache->getMulti($keys);
+
+                    // parse the results
+                    if ($values) {
+                        foreach ($values as $kk => $vv) {
+                            // internal storage writeback
+                            if ($use_internal_storage) {
+                                $this->internal_storage[$kk] = $vv;
+                            }
+
+                            $results[$unnamespaced_keys[$kk]] = $vv;
+
+                            unset($kk, $vv);
+                        }
+                    }
+
+                    unset($values);
+                } else {
+                    foreach ($keys as $key1) {
+
+                        $value = $this->memcache->get($key1);
+
+                        // internal storage writeback
+                        if ($use_internal_storage) {
+                            $this->internal_storage[$key1] = $value;
+                        }
+
+                        $results[$unnamespaced_keys[$key1]] = $value;
+
+                        unset($value);
+                        unset($key1);
+                    }
+                }
+
+            } elseif (!isset($results[$unnamespaced_keys[$keys[0]]])) {
+                $key1 = $keys[0];
+
+                $value = $this->memcache->get($key1);
+
+                // internal storage writeback
+                if ($use_internal_storage) {
+                    $this->internal_storage[$key1] = $value;
+                }
+
+                $results[$unnamespaced_keys[$key1]] = $value;
+
+                unset($value);
+                unset($key1);
+            }
+        } catch (Exception $e) {
+            if (DO_DEBUG) {
+                throw $e;
+            }
+        }
+
+        $ret = null;
+
+        if (is_array($key)) {
+            $ret = $results;
+        } else {
+            $ret = isset($results[$key]) ? $results[$key] : null;
+        }
+
+        return $ret;
+    }
+
     public function hasDbCache($namespace, $key)
     {
         $key = $namespace . ':' . $key;
         return $this->has($key);
+    }
+
+    public function has($key)
+    {
+        return $this->memcache->has($key);
+    }
+
+    protected function makeSafeKey($key)
+    {
+        return md5($key);
     }
 }

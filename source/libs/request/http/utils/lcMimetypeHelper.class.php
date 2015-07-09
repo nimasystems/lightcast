@@ -45,38 +45,6 @@ class lcMimetypeHelper
         return true;
     }
 
-    public static function findMimeByExt($ext)
-    {
-        if (!$ext) {
-            return null;
-        }
-
-        $ext = lcFiles::fixFileExt($ext);
-
-        $list = self::getList();
-
-        foreach ($list as $key => $exts) {
-            if (@!in_array($ext, $exts)) {
-                continue;
-            }
-
-            return $key;
-        }
-
-        return null;
-    }
-
-    public static function findExtsByMime($mimetype)
-    {
-        if (!$mimetype) {
-            return false;
-        }
-
-        $list = self::getList();
-
-        return $list[$mimetype];
-    }
-
     public static function getList()
     {
 
@@ -2205,5 +2173,37 @@ class lcMimetypeHelper
         );
 
         return $mimetypes;
+    }
+
+    public static function findMimeByExt($ext)
+    {
+        if (!$ext) {
+            return null;
+        }
+
+        $ext = lcFiles::fixFileExt($ext);
+
+        $list = self::getList();
+
+        foreach ($list as $key => $exts) {
+            if (@!in_array($ext, $exts)) {
+                continue;
+            }
+
+            return $key;
+        }
+
+        return null;
+    }
+
+    public static function findExtsByMime($mimetype)
+    {
+        if (!$mimetype) {
+            return false;
+        }
+
+        $list = self::getList();
+
+        return $list[$mimetype];
     }
 }

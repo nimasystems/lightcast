@@ -112,19 +112,20 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     *
     * @returns object lcRouting
     */
-    public function getRouting()
-    {
-        return $this->routing;
-    }
-
-    public function setRouting(lcRouting $routing = null)
-    {
-        $this->routing = $routing;
-    }
 
     public function setRouter(lcRouting $routing = null)
     {
         $this->setRouting($routing);
+    }
+
+    public function getRouter()
+    {
+        return $this->getRouting();
+    }
+
+    public function getRouting()
+    {
+        return $this->routing;
     }
 
     /*
@@ -132,9 +133,10 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     *
     * @returns object lcRouting
     */
-    public function getRouter()
+
+    public function setRouting(lcRouting $routing = null)
     {
-        return $this->getRouting();
+        $this->routing = $routing;
     }
 
     /*
@@ -142,6 +144,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     *
     * @returns object lcMailer
     */
+
     public function getMailer()
     {
         return $this->mailer;

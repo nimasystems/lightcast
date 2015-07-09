@@ -47,21 +47,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     protected $is_silent;
 
-    protected function beforeAttachRegisteredEvents()
-    {
-        parent::beforeAttachRegisteredEvents();
-
-        // init default vars
-        $this->sapi = lcSys::get_sapi();
-        $this->is_running_cli = lcSys::isRunningCLI();
-
-        // TODO: Deprecated - workaround this!
-        //$this->cli_path = lcSys::getPhpCli();
-
-        // initialize default environment
-        $this->initializeEnvironment();
-    }
-
     public function shutdown()
     {
         parent::shutdown();
@@ -101,8 +86,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     abstract public function getRequestContext();
 
-    #pragma mark - iKeyValueProvider
-
     public function getAllKeys()
     {
         $keys = null;
@@ -126,6 +109,18 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return $keys;
     }
 
+    #pragma mark - iKeyValueProvider
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    public function setParams(lcArrayCollection $params)
+    {
+        $this->params = $params;
+    }
+
     public function getValueForKey($key)
     {
         if (!$key) {
@@ -135,6 +130,11 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         $ret = $this->getParam($key);
 
         return $ret;
+    }
+
+    public function getParam($name)
+    {
+        return $this->params->get($name);
     }
 
     public function getIsSilent()
@@ -182,48 +182,169 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return $this->env($name);
     }
 
+    /*
+     * Gets the Request parameters
+    */
+
     public function offsetSet($name, $value)
     {
         throw new lcUnsupportedException('Changing env variables is not supported');
     }
+
+    /*
+     * Gets a single Request parameter by name
+    */
 
     public function offsetUnset($name)
     {
         throw new lcUnsupportedException('Changing env variables is not supported');
     }
 
-    /*
-     * Gets the Request parameters
-    */
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    /*
-     * Gets a single Request parameter by name
-    */
-    public function getParam($name)
-    {
-        return $this->params->get($name);
-    }
-
-    public function setParams(lcArrayCollection $params)
-    {
-        $this->params = $params;
-    }
-
-    /*
-     * Checks if Request has a parameter by its name
-    */
     public function hasParam($name)
     {
         return $this->params->get($name) ? true : false;
     }
 
     /*
+     * Checks if Request has a parameter by its name
+    */
+
+    public function getEnv()
+    {
+        return $this->env;
+    }
+
+    /*
      * sets the default request vars - before clearing globals
     */
+
+    public function getSapi()
+    {
+        return $this->sapi;
+    }
+
+    /*
+     * Get the whole environment
+    */
+
+    public function isInCli()
+    {
+        return $this->is_running_cli;
+    }
+
+    /*
+     * PHP Value: SAPI
+    */
+
+    public function isRunningCli()
+    {
+        return $this->is_running_cli;
+    }
+
+    public function getCliPath()
+    {
+        return $this->cli_path;
+    }
+
+    /*
+     * Just an alias to isInCli()
+    */
+
+    public function getPort()
+    {
+        return $this->getServerPort();
+    }
+
+    /*
+     * PHP Value: PHP CLI Path
+    */
+
+    public function getPHPPath()
+    {
+        return $this->getPath();
+    }
+
+    public function getSystemRoot()
+    {
+        return $this->env('SystemRoot');
+    }
+
+    public function getPathExt()
+    {
+        return $this->env('PATHEXT');
+    }
+
+    /*
+     * PHP Header: SystemRoot
+    * Platform-Specific (Windows)
+    */
+
+    public function getHostname()
+    {
+        //return $this->env('SERVER_NAME');
+        return $this->env('HTTP_HOST');
+    }
+
+    /*
+     * PHP Header: PATHEXT
+    * Platform-Specific (Windows)
+    */
+
+    public function getWinDir()
+    {
+        return $this->env('WINDIR');
+    }
+
+    public function getPHPSelf()
+    {
+        return $this->getPhpSelf();
+    }
+
+    /*
+     * PHP Header: WINDIR
+    * Platform-Specific (Windows)
+    */
+
+    public function serialize()
+    {
+        return serialize(array($this->env));
+    }
+
+    /*
+     * PHP Header: PHP_SELF
+    */
+
+    public function unserialize($serialized)
+    {
+        list($this->env) = unserialize($serialized);
+    }
+
+    /*
+     * Provides access to Request
+    * Environment.
+    */
+
+    protected function beforeAttachRegisteredEvents()
+    {
+        parent::beforeAttachRegisteredEvents();
+
+        // init default vars
+        $this->sapi = lcSys::get_sapi();
+        $this->is_running_cli = lcSys::isRunningCLI();
+
+        // TODO: Deprecated - workaround this!
+        //$this->cli_path = lcSys::getPhpCli();
+
+        // initialize default environment
+        $this->initializeEnvironment();
+    }
+
+    /*
+     * Emulation for various vars -
+    * before running the clear of global vars
+    *
+    */
+
     private function initializeEnvironment()
     {
         $this->env = array();
@@ -251,110 +372,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         }
     }
 
-    /*
-     * Get the whole environment
-    */
-    public function getEnv()
-    {
-        return $this->env;
-    }
-
-    /*
-     * PHP Value: SAPI
-    */
-    public function getSapi()
-    {
-        return $this->sapi;
-    }
-
-    public function isInCli()
-    {
-        return $this->is_running_cli;
-    }
-
-    /*
-     * Just an alias to isInCli()
-    */
-    public function isRunningCli()
-    {
-        return $this->is_running_cli;
-    }
-
-    /*
-     * PHP Value: PHP CLI Path
-    */
-    public function getCliPath()
-    {
-        return $this->cli_path;
-    }
-
-    public function getPort()
-    {
-        return $this->getServerPort();
-    }
-
-    public function getPHPPath()
-    {
-        return $this->getPath();
-    }
-
-    /*
-     * PHP Header: SystemRoot
-    * Platform-Specific (Windows)
-    */
-    public function getSystemRoot()
-    {
-        return $this->env('SystemRoot');
-    }
-
-    /*
-     * PHP Header: PATHEXT
-    * Platform-Specific (Windows)
-    */
-    public function getPathExt()
-    {
-        return $this->env('PATHEXT');
-    }
-
-    public function getHostname()
-    {
-        //return $this->env('SERVER_NAME');
-        return $this->env('HTTP_HOST');
-    }
-
-    /*
-     * PHP Header: WINDIR
-    * Platform-Specific (Windows)
-    */
-    public function getWinDir()
-    {
-        return $this->env('WINDIR');
-    }
-
-    /*
-     * PHP Header: PHP_SELF
-    */
-    public function getPHPSelf()
-    {
-        return $this->getPhpSelf();
-    }
-
-    /*
-     * Provides access to Request
-    * Environment.
-    */
-    public function env($name = false)
-    {
-        $res = isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
-
-        return $res;
-    }
-
-    /*
-     * Emulation for various vars -
-    * before running the clear of global vars
-    *
-    */
     private function _env($key)
     {
         $val = null;
@@ -453,13 +470,10 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return null;
     }
 
-    public function serialize()
+    public function env($name = false)
     {
-        return serialize(array($this->env));
-    }
+        $res = isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
 
-    public function unserialize($serialized)
-    {
-        list($this->env) = unserialize($serialized);
+        return $res;
     }
 }

@@ -40,16 +40,6 @@ class lcTagLegend extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('accesskey');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -60,6 +50,16 @@ class lcTagLegend extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('accesskey');
     }
 
     public function getAccessKey()

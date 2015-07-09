@@ -47,17 +47,17 @@ abstract class lcHtmlBaseTag implements iAsHTML
         $this->attributes = new lcHtmlAttributeCollection();
     }
 
-    public function __destruct()
-    {
-        //
-    }
-
     public static function getRequiredAttributes()
     {
         //
     }
 
     public static function getOptionalAttributes()
+    {
+        //
+    }
+
+    public function __destruct()
     {
         //
     }
@@ -125,6 +125,11 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this->attributes->get($name);
     }
 
+    public function getContent()
+    {
+        return $this->content;
+    }
+
     public function setContent($content)
     {
         if (!$this->is_closed) {
@@ -135,20 +140,20 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this;
     }
 
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    protected function setIsClosed($is_closed = true)
-    {
-        $this->is_closed = $is_closed;
-        return $this;
-    }
-
     public function isClosed()
     {
         return $this->is_closed;
+    }
+
+    public function __toString()
+    {
+        $ret = null;
+        try {
+            $ret = $this->asHtml();
+        } catch (Exception $e) {
+            $ret = 'error: ' . $e->getMessage();
+        }
+        return $ret;
     }
 
     public function asHtml()
@@ -162,14 +167,9 @@ abstract class lcHtmlBaseTag implements iAsHTML
         ($this->is_closed ? '>' . $this->content . '</' . $this->tagname . '>' : ' />');
     }
 
-    public function __toString()
+    protected function setIsClosed($is_closed = true)
     {
-        $ret = null;
-        try {
-            $ret = $this->asHtml();
-        } catch (Exception $e) {
-            $ret = 'error: ' . $e->getMessage();
-        }
-        return $ret;
+        $this->is_closed = $is_closed;
+        return $this;
     }
 }

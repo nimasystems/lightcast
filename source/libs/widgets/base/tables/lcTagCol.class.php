@@ -44,25 +44,10 @@ class lcTagCol extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('span', 'align', 'valign', 'char', 'charoff');
-    }
-
     public function setSpan($value = null)
     {
         $this->setAttribute('span', $value);
         return $this;
-    }
-
-    public function getSpan()
-    {
-        return $this->getAttribute('span');
     }
 
     public function setAlign($value = null)
@@ -78,11 +63,6 @@ class lcTagCol extends lcHtmlTag
         return $this;
     }
 
-    public function getAlign()
-    {
-        return $this->getAttribute('align');
-    }
-
     public function setValign($value = null)
     {
         if (isset($value) &&
@@ -95,26 +75,46 @@ class lcTagCol extends lcHtmlTag
         return $this;
     }
 
-    public function getValign()
-    {
-        return $this->getAttribute('valign');
-    }
-
     public function setChar($value = null)
     {
         $this->setAttribute('char', $value);
         return $this;
     }
 
-    public function getChar()
-    {
-        return $this->getAttribute('char');
-    }
-
     public function setCharoff($value = null)
     {
         $this->setAttribute('charoff', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('span', 'align', 'valign', 'char', 'charoff');
+    }
+
+    public function getSpan()
+    {
+        return $this->getAttribute('span');
+    }
+
+    public function getAlign()
+    {
+        return $this->getAttribute('align');
+    }
+
+    public function getValign()
+    {
+        return $this->getAttribute('valign');
+    }
+
+    public function getChar()
+    {
+        return $this->getAttribute('char');
     }
 
     public function getCharoff()

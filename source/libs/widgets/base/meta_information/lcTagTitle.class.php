@@ -42,6 +42,24 @@ class lcTagTitle extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public function setDir($value = null)
+    {
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
+    public function setLang($value = null)
+    {
+        $this->setAttribute('lang', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -57,31 +75,13 @@ class lcTagTitle extends lcHtmlBaseTag implements iI18nAttributes
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = null)
-    {
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
     }
 
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
-    }
-
     public function getLang()
     {
         return $this->attributes->get('lang');
-    }
-
-    public function setLang($value = null)
-    {
-        $this->setAttribute('lang', $value);
-        return $this;
     }
 }

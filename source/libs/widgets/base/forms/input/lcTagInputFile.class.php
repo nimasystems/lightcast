@@ -39,6 +39,12 @@ class lcTagInputFile extends lcTagInput
         $this->setAccept($accept);
     }
 
+    public function setAccept($value = null)
+    {
+        $this->setAttribute('accept', $value);
+        return $this;
+    }
+
     public static function getOptionalAttributes()
     {
         return implode(array('accept'), parent::getOptionalAttributes());
@@ -47,11 +53,5 @@ class lcTagInputFile extends lcTagInput
     public function getAccept()
     {
         return $this->getAttribute('accept');
-    }
-
-    public function setAccept($value = null)
-    {
-        $this->setAttribute('accept', $value);
-        return $this;
     }
 }

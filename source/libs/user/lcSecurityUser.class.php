@@ -30,28 +30,20 @@
  */
 abstract class lcSecurityUser extends lcUser implements iDebuggable
 {
+    const NS_KEY = 'user_security';
+    const DEFAULT_TIMEOUT = 30;
     /** @var array */
     protected $authentication_data;
-
     /** @var lcStorage */
     protected $storage;
-
     protected $user_id;
     protected $is_authenticated;
-
     protected $timeout;
     protected $last_request;
-
-    private $diff_to_expire;
-
     protected $has_expired;
 
-    const NS_KEY = 'user_security';
-
     // in mins
-    const DEFAULT_TIMEOUT = 30;
-
-    abstract public function getCredentials();
+    private $diff_to_expire;
 
     abstract public function hasCredential($creditenal_name);
 
@@ -77,45 +69,33 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         }
     }
 
-    public function shutdown()
+    protected function readFromStorage()
     {
-        // write attributes to cache
-        $attributes = $this->is_authenticated ? $this->attributes : null;
+        $this->is_authenticated = (bool)$this->storage->get('is_authenticated', self::NS_KEY);
+        $this->authentication_data = (array)$this->storage->get('authentication_data', self::NS_KEY);
+        $this->user_id = (string)$this->storage->get('user_id', self::NS_KEY);
+        $this->last_request = (int)$this->storage->get('last_request', self::NS_KEY);
+        $this->timeout = (int)$this->storage->get('timeout', self::NS_KEY);
 
-        if ($this->storage) {
-            $this->storage->set('attributes', $attributes, self::NS_KEY);
+        $this->attributes = $this->storage->get('attributes', self::NS_KEY);
+
+        $timeout = (int)$this->configuration['user.timeout'] ? (int)$this->configuration['user.timeout'] : self::DEFAULT_TIMEOUT;
+
+        $this->setTimeout($timeout);
+
+        if (DO_DEBUG) {
+            // basic checks
+            if ($this->is_authenticated) {
+                assert(isset($this->authentication_data));
+                assert(isset($this->user_id));
+            }
+
+            $this->debug('user security data read');
         }
 
-        //$this->info('Wrote security credentials on shutdown(): ' . print_r($attributes, true));
-
-        parent::shutdown();
-    }
-
-    public function getDebugInfo()
-    {
-        $debug_parent = parent::getDebugInfo();
-
-        $debug = array(
-            'authentication_data' => $this->authentication_data,
-            'user_id' => $this->user_id,
-            'is_authenticated' => $this->is_authenticated,
-            'timeout' => $this->timeout,
-            'last_request' => $this->last_request,
-        );
-
-        $debug = array_merge($debug_parent, $debug);
-
-        return $debug;
-    }
-
-    public function getShortDebugInfo()
-    {
-        return false;
-    }
-
-    protected function getStorage()
-    {
-        return $this->storage;
+        if ($this->is_authenticated) {
+            $this->info('user authenticated by session: ' . $this->user_id);
+        }
     }
 
     protected function checkAndExpireIfNecessary()
@@ -178,103 +158,44 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return false;
     }
 
-    public function getUserId()
-    {
-        return $this->user_id;
-    }
-
-    public function setTimeout($session_timeout)
-    {
-        $session_timeout = (int)$session_timeout;
-
-        if (!$session_timeout) {
-            throw new lcInvalidArgumentException('Invalid session timeout specified: ' . $session_timeout);
-        }
-
-        // make a check if the underlying storage's timeout is
-        // equal or larger than the user's timeout
-        $storage_timeout = (int)$this->configuration['storage.timeout'];
-
-        if ($storage_timeout && $storage_timeout < $session_timeout) {
-            throw new lcConfigException('Storage timeout (' . $storage_timeout . ') is less than the requested user\'s timeout (' . $session_timeout . ') - user session would expire prematurely!');
-        }
-
-        $this->timeout = (int)$session_timeout;
-
-        // set gc_maxlifetime according to our timeout
-        if (ini_get('session.gc_maxlifetime') < $this->timeout * 60) {
-            ini_set('session.gc_maxlifetime', $this->timeout * 60);
-        }
-
-        $this->storage->set('timeout', $this->timeout, self::NS_KEY);
-
-        if (DO_DEBUG) {
-            $this->debug('user session timeout set: ' . $this->timeout . ' minutes.');
-        }
-    }
-
-    public function getTimeout()
-    {
-        return $this->timeout;
-    }
-
-    public function getLastRequest()
-    {
-        return $this->last_request;
-    }
-
-    public function hasExpired()
-    {
-        return $this->has_expired;
-    }
-
-    public function forceExpire()
-    {
-        $this->setAuthenticated(false);
-        $this->has_expired = true;
-    }
-
-    protected function readFromStorage()
-    {
-        $this->is_authenticated = (bool)$this->storage->get('is_authenticated', self::NS_KEY);
-        $this->authentication_data = (array)$this->storage->get('authentication_data', self::NS_KEY);
-        $this->user_id = (string)$this->storage->get('user_id', self::NS_KEY);
-        $this->last_request = (int)$this->storage->get('last_request', self::NS_KEY);
-        $this->timeout = (int)$this->storage->get('timeout', self::NS_KEY);
-
-        $this->attributes = $this->storage->get('attributes', self::NS_KEY);
-
-        $timeout = (int)$this->configuration['user.timeout'] ? (int)$this->configuration['user.timeout'] : self::DEFAULT_TIMEOUT;
-
-        $this->setTimeout($timeout);
-
-        if (DO_DEBUG) {
-            // basic checks
-            if ($this->is_authenticated) {
-                assert(isset($this->authentication_data));
-                assert(isset($this->user_id));
-            }
-
-            $this->debug('user security data read');
-        }
-
-        if ($this->is_authenticated) {
-            $this->info('user authenticated by session: ' . $this->user_id);
-        }
-    }
-
-    protected function setAuthenticationData($user_id, array $authentication_data = null)
-    {
-        $this->user_id = $user_id;
-        $this->authentication_data = $authentication_data;
-
-        $this->storage->set('user_id', $this->user_id, self::NS_KEY);
-        $this->storage->set('authentication_data', $this->authentication_data, self::NS_KEY);
-    }
+    abstract public function getCredentials();
 
     protected function setAuthenticated($authenticated, $forced_by_user = false, $no_events = false)
     {
         return $authenticated ? $this->setAuthentication($forced_by_user, $no_events) : $this->clearAuthentication($forced_by_user, $no_events);
+    }
+
+    protected function setAuthentication($forced_by_user = false, $no_events = false)
+    {
+        if ($this->is_authenticated) {
+            return $this->refreshUserSession($forced_by_user, $no_events);
+        }
+
+        // check if should be authenticated or not
+        if (!$this->shouldUserAuthenticate($forced_by_user, $no_events)) {
+            return false;
+        }
+
+        $this->last_request = time();
+        $this->is_authenticated = true;
+
+        $this->storage->set('last_request', $this->last_request, self::NS_KEY);
+        $this->storage->set('is_authenticated', $this->is_authenticated, self::NS_KEY);
+
+        $this->info('User ' . $this->user_id . ' authenticated');
+
+        // event telling everyone user is now authenticated
+        $this->refreshUserSession($forced_by_user, $no_events);
+
+        if (!$no_events) {
+            $this->event_dispatcher->notify(new lcEvent('user.session_refresh', $this,
+                array(
+                    'is_authenticated' => $this->is_authenticated,
+                    'forced_by_user' => $forced_by_user
+                )));
+        }
+
+        return true;
     }
 
     protected function refreshUserSession($forced_by_user = false, $no_events = false)
@@ -309,39 +230,6 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         $should_authenticate = $event->isProcessed() ? $event->getReturnValue() : true;
 
         return $should_authenticate;
-    }
-
-    protected function setAuthentication($forced_by_user = false, $no_events = false)
-    {
-        if ($this->is_authenticated) {
-            return $this->refreshUserSession($forced_by_user, $no_events);
-        }
-
-        // check if should be authenticated or not
-        if (!$this->shouldUserAuthenticate($forced_by_user, $no_events)) {
-            return false;
-        }
-
-        $this->last_request = time();
-        $this->is_authenticated = true;
-
-        $this->storage->set('last_request', $this->last_request, self::NS_KEY);
-        $this->storage->set('is_authenticated', $this->is_authenticated, self::NS_KEY);
-
-        $this->info('User ' . $this->user_id . ' authenticated');
-
-        // event telling everyone user is now authenticated
-        $this->refreshUserSession($forced_by_user, $no_events);
-
-        if (!$no_events) {
-            $this->event_dispatcher->notify(new lcEvent('user.session_refresh', $this,
-                array(
-                    'is_authenticated' => $this->is_authenticated,
-                    'forced_by_user' => $forced_by_user
-                )));
-        }
-
-        return true;
     }
 
     protected function clearAuthentication($forced_by_user = false, $no_events = false)
@@ -386,11 +274,6 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return true;
     }
 
-    public function isAuthenticated()
-    {
-        return $this->is_authenticated;
-    }
-
     protected function calculateTimeoutInSeconds()
     {
         if (!$this->is_authenticated) {
@@ -412,6 +295,103 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return $diff;
     }
 
+    public function shutdown()
+    {
+        // write attributes to cache
+        $attributes = $this->is_authenticated ? $this->attributes : null;
+
+        if ($this->storage) {
+            $this->storage->set('attributes', $attributes, self::NS_KEY);
+        }
+
+        //$this->info('Wrote security credentials on shutdown(): ' . print_r($attributes, true));
+
+        parent::shutdown();
+    }
+
+    public function getDebugInfo()
+    {
+        $debug_parent = parent::getDebugInfo();
+
+        $debug = array(
+            'authentication_data' => $this->authentication_data,
+            'user_id' => $this->user_id,
+            'is_authenticated' => $this->is_authenticated,
+            'timeout' => $this->timeout,
+            'last_request' => $this->last_request,
+        );
+
+        $debug = array_merge($debug_parent, $debug);
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
+
+    public function getUserId()
+    {
+        return $this->user_id;
+    }
+
+    public function getTimeout()
+    {
+        return $this->timeout;
+    }
+
+    public function setTimeout($session_timeout)
+    {
+        $session_timeout = (int)$session_timeout;
+
+        if (!$session_timeout) {
+            throw new lcInvalidArgumentException('Invalid session timeout specified: ' . $session_timeout);
+        }
+
+        // make a check if the underlying storage's timeout is
+        // equal or larger than the user's timeout
+        $storage_timeout = (int)$this->configuration['storage.timeout'];
+
+        if ($storage_timeout && $storage_timeout < $session_timeout) {
+            throw new lcConfigException('Storage timeout (' . $storage_timeout . ') is less than the requested user\'s timeout (' . $session_timeout . ') - user session would expire prematurely!');
+        }
+
+        $this->timeout = (int)$session_timeout;
+
+        // set gc_maxlifetime according to our timeout
+        if (ini_get('session.gc_maxlifetime') < $this->timeout * 60) {
+            ini_set('session.gc_maxlifetime', $this->timeout * 60);
+        }
+
+        $this->storage->set('timeout', $this->timeout, self::NS_KEY);
+
+        if (DO_DEBUG) {
+            $this->debug('user session timeout set: ' . $this->timeout . ' minutes.');
+        }
+    }
+
+    public function getLastRequest()
+    {
+        return $this->last_request;
+    }
+
+    public function hasExpired()
+    {
+        return $this->has_expired;
+    }
+
+    public function forceExpire()
+    {
+        $this->setAuthenticated(false);
+        $this->has_expired = true;
+    }
+
+    public function isAuthenticated()
+    {
+        return $this->is_authenticated;
+    }
+
     public function __toString()
     {
         $str = 'lcSecurityUser: ' .
@@ -424,5 +404,19 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             parent::__toString();
 
         return $str;
+    }
+
+    protected function getStorage()
+    {
+        return $this->storage;
+    }
+
+    protected function setAuthenticationData($user_id, array $authentication_data = null)
+    {
+        $this->user_id = $user_id;
+        $this->authentication_data = $authentication_data;
+
+        $this->storage->set('user_id', $this->user_id, self::NS_KEY);
+        $this->storage->set('authentication_data', $this->authentication_data, self::NS_KEY);
     }
 }

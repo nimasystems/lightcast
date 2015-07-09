@@ -51,59 +51,10 @@ class lcTagTh extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function getRequiredAttributes()
+    public function setColspan($value = null)
     {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
-            'align', 'valign', 'char', 'charoff');
-    }
-
-    public function setScope($value = null)
-    {
-        $this->setAttribute('scope', $value);
+        $this->setAttribute('colspan', $value);
         return $this;
-    }
-
-    public function getScope()
-    {
-        return $this->getAttribute('scope');
-    }
-
-    public function setHeaders($value = null)
-    {
-        $this->setAttribute('headers', $value);
-        return $this;
-    }
-
-    public function getHeaders()
-    {
-        return $this->getAttribute('axis');
-    }
-
-    public function setAxis($value = null)
-    {
-        $this->setAttribute('axis', $value);
-        return $this;
-    }
-
-    public function getAxis()
-    {
-        return $this->getAttribute('axis');
-    }
-
-    public function setAbbr($value = null)
-    {
-        $this->setAttribute('abbr', $value);
-        return $this;
-    }
-
-    public function getAbbr()
-    {
-        return $this->getAttribute('abbr');
     }
 
     public function setRowspan($value = null)
@@ -112,20 +63,28 @@ class lcTagTh extends lcHtmlTag
         return $this;
     }
 
-    public function getRowspan()
+    public function setAbbr($value = null)
     {
-        return $this->getAttribute('rowspan');
-    }
-
-    public function setColspan($value = null)
-    {
-        $this->setAttribute('colspan', $value);
+        $this->setAttribute('abbr', $value);
         return $this;
     }
 
-    public function getColspan()
+    public function setAxis($value = null)
     {
-        return $this->getAttribute('colspan');
+        $this->setAttribute('axis', $value);
+        return $this;
+    }
+
+    public function setHeaders($value = null)
+    {
+        $this->setAttribute('headers', $value);
+        return $this;
+    }
+
+    public function setScope($value = null)
+    {
+        $this->setAttribute('scope', $value);
+        return $this;
     }
 
     public function setAlign($value = null)
@@ -141,11 +100,6 @@ class lcTagTh extends lcHtmlTag
         return $this;
     }
 
-    public function getAlign()
-    {
-        return $this->getAttribute('align');
-    }
-
     public function setValign($value = null)
     {
         if (isset($value) &&
@@ -158,26 +112,72 @@ class lcTagTh extends lcHtmlTag
         return $this;
     }
 
-    public function getValign()
-    {
-        return $this->getAttribute('valign');
-    }
-
     public function setChar($value = null)
     {
         $this->setAttribute('char', $value);
         return $this;
     }
 
-    public function getChar()
-    {
-        return $this->getAttribute('char');
-    }
-
     public function setCharoff($value = null)
     {
         $this->setAttribute('charoff', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
+            'align', 'valign', 'char', 'charoff');
+    }
+
+    public function getScope()
+    {
+        return $this->getAttribute('scope');
+    }
+
+    public function getHeaders()
+    {
+        return $this->getAttribute('axis');
+    }
+
+    public function getAxis()
+    {
+        return $this->getAttribute('axis');
+    }
+
+    public function getAbbr()
+    {
+        return $this->getAttribute('abbr');
+    }
+
+    public function getRowspan()
+    {
+        return $this->getAttribute('rowspan');
+    }
+
+    public function getColspan()
+    {
+        return $this->getAttribute('colspan');
+    }
+
+    public function getAlign()
+    {
+        return $this->getAttribute('align');
+    }
+
+    public function getValign()
+    {
+        return $this->getAttribute('valign');
+    }
+
+    public function getChar()
+    {
+        return $this->getAttribute('char');
     }
 
     public function getCharoff()

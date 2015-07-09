@@ -41,6 +41,18 @@ class lcTagBody extends lcHtmlTag
         $this->setOnUnload($onunload);
     }
 
+    public function setOnLoad($value = null)
+    {
+        $this->setAttribute('onload', $value);
+        return $this;
+    }
+
+    public function setOnUnload($value = null)
+    {
+        $this->setAttribute('onunload', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -56,20 +68,8 @@ class lcTagBody extends lcHtmlTag
         return $this->attributes->get('onload');
     }
 
-    public function setOnLoad($value = null)
-    {
-        $this->setAttribute('onload', $value);
-        return $this;
-    }
-
     public function getOnUnload()
     {
         return $this->attributes->get('onunload');
-    }
-
-    public function setOnUnload($value = null)
-    {
-        $this->setAttribute('onunload', $value);
-        return $this;
     }
 }

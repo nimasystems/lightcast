@@ -45,6 +45,30 @@ class lcTagScript extends lcHtmlBaseTag
         $this->setCharset($charset);
     }
 
+    public function setType($type = self::DEFAULT_TYPE)
+    {
+        $this->setAttribute('type', $type);
+        return $this;
+    }
+
+    public function setSrc($value = null)
+    {
+        $this->setAttribute('src', $value);
+        return $this;
+    }
+
+    public function setDefer($value = false)
+    {
+        $this->setAttribute('defer', $value ? 'defer' : null);
+        return $this;
+    }
+
+    public function setCharset($value = null)
+    {
+        $this->setAttribute('charset', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('type');
@@ -55,21 +79,9 @@ class lcTagScript extends lcHtmlBaseTag
         return array('src', 'charset', 'defer');
     }
 
-    public function setType($type = self::DEFAULT_TYPE)
-    {
-        $this->setAttribute('type', $type);
-        return $this;
-    }
-
     public function getType()
     {
         return $this->getAttribute('type');
-    }
-
-    public function setSrc($value = null)
-    {
-        $this->setAttribute('src', $value);
-        return $this;
     }
 
     public function getSrc()
@@ -77,21 +89,9 @@ class lcTagScript extends lcHtmlBaseTag
         return $this->getAttribute('src');
     }
 
-    public function setCharset($value = null)
-    {
-        $this->setAttribute('charset', $value);
-        return $this;
-    }
-
     public function getCharset()
     {
         return $this->getAttribute('charset');
-    }
-
-    public function setDefer($value = false)
-    {
-        $this->setAttribute('defer', $value ? 'defer' : null);
-        return $this;
     }
 
     public function getDefer()

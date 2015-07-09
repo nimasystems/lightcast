@@ -94,6 +94,29 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
         parent::addBuildRelations($script);
     }
 
+    protected function buildCustomRelations()
+    {
+        $relations = array();
+
+        foreach ($this->getTable()->getForeignKeys() as $fkey) {
+            $relations[] = addslashes($fkey->getTableName());
+            unset($fkey);
+        }
+
+        foreach ($this->getTable()->getReferrers() as $fkey) {
+            $relations[] = addslashes($fkey->getTableName());
+            unset($fkey);
+        }
+
+        foreach ($this->getTable()->getCrossFks() as $fkList) {
+            list($refFK, $crossFK) = $fkList;
+            $relations[] = addslashes($crossFK->getTableName());
+            unset($refFK, $crossFK, $fkList);
+        }
+
+        return array_unique($relations);
+    }
+
     protected function addClassBody(&$script)
     {
         parent::addClassBody($script);
@@ -270,28 +293,5 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
     } // initialize()
 ";
 
-    }
-
-    protected function buildCustomRelations()
-    {
-        $relations = array();
-
-        foreach ($this->getTable()->getForeignKeys() as $fkey) {
-            $relations[] = addslashes($fkey->getTableName());
-            unset($fkey);
-        }
-
-        foreach ($this->getTable()->getReferrers() as $fkey) {
-            $relations[] = addslashes($fkey->getTableName());
-            unset($fkey);
-        }
-
-        foreach ($this->getTable()->getCrossFks() as $fkList) {
-            list($refFK, $crossFK) = $fkList;
-            $relations[] = addslashes($crossFK->getTableName());
-            unset($refFK, $crossFK, $fkList);
-        }
-
-        return array_unique($relations);
     }
 }

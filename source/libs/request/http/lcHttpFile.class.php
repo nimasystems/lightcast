@@ -35,84 +35,84 @@ class lcHttpFile extends lcObj
     /*
      * The original name of the file on the client machine.
     */
-    private $name;
+    const UPLOAD_ERR_OK = 0;
 
 
     /*
      * The name in html file input field.
     */
-    private $form_filename;
+    const UPLOAD_ERR_INI_SIZE = 1;
 
     /*
      * The mime type of the file, if the browser provided this information. An example would be "image/gif".
     * This mime type is however not checked on the PHP side and therefore don't take its value for granted.
     */
-    private $mimetype;
+    const UPLOAD_ERR_FORM_SIZE = 2;
 
     /*
      * The temporary filename of the file in which the uploaded file was stored on the server.
     */
-    private $tmpname;
+    const UPLOAD_ERR_PARTIAL = 3;
 
     /*
      * the file after we moved into the temporary directory
     */
-    private $local_name;
+    const UPLOAD_ERR_NO_FILE = 4;
 
     /*
      * if has been moved locally
     */
-    private $is_moved;
+    const UPLOAD_ERR_NO_TMP_DIR = 5;
 
     /*
      * The error code associated with this file upload. This element was added in PHP 4.2.0
     */
-    private $error;
+    const UPLOAD_ERR_CANT_WRITE = 6;
 
     /*
      * The size, in bytes, of the uploaded file
     */
-    private $size = 0;
+    const UPLOAD_ERR_EXTENSION = 7;
 
     /*
      * Value: 0; There is no error, the file uploaded with success.
     */
-    const UPLOAD_ERR_OK = 0;
+    private $name;
 
     /*
      * Value: 1; The uploaded file exceeds the upload_max_filesize directive in php.ini.
     */
-    const UPLOAD_ERR_INI_SIZE = 1;
+    private $form_filename;
 
     /*
      * Value: 2; The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form
     */
-    const UPLOAD_ERR_FORM_SIZE = 2;
+    private $mimetype;
 
     /*
      * Value: 3; The uploaded file was only partially uploaded
     */
-    const UPLOAD_ERR_PARTIAL = 3;
+    private $tmpname;
 
     /*
      * Value: 4; No file was uploaded
     */
-    const UPLOAD_ERR_NO_FILE = 4;
+    private $local_name;
 
     /*
      * Value: 6; Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3
     */
-    const UPLOAD_ERR_NO_TMP_DIR = 5;
+    private $is_moved;
 
     /*
      * Value: 7; Failed to write file to disk. Introduced in PHP 5.1.0
     */
-    const UPLOAD_ERR_CANT_WRITE = 6;
+    private $error;
 
     /*
      * Value: 8; File upload stopped by extension. Introduced in PHP 5.2.0
     */
-    const UPLOAD_ERR_EXTENSION = 7;
+    private $size = 0;
 
     public function __construct($form_filename, $name, $tmpname, $error = self::UPLOAD_ERR_OK, $size = 0, $mimetype = null)
     {

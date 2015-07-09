@@ -42,6 +42,30 @@ class lcTagLink extends lcHtmlTag
         $this->setMedia($media);
     }
 
+    public function setHref($href)
+    {
+        $this->setAttribute('href', $href);
+        return $this;
+    }
+
+    public function setRel($rel = null)
+    {
+        $this->setAttribute('rel', $rel);
+        return $this;
+    }
+
+    public function setType($type = null)
+    {
+        $this->setAttribute('type', $type);
+        return $this;
+    }
+
+    public function setMedia($media = null)
+    {
+        $this->setAttribute('media', $media);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('href');
@@ -57,21 +81,9 @@ class lcTagLink extends lcHtmlTag
         return $this->getAttribute('href');
     }
 
-    public function setHref($href)
-    {
-        $this->setAttribute('href', $href);
-        return $this;
-    }
-
     public function getRel()
     {
         return $this->getAttribute('rel');
-    }
-
-    public function setRel($rel = null)
-    {
-        $this->setAttribute('rel', $rel);
-        return $this;
     }
 
     public function getType()
@@ -79,20 +91,8 @@ class lcTagLink extends lcHtmlTag
         return $this->getAttribute('type');
     }
 
-    public function setType($type = null)
-    {
-        $this->setAttribute('type', $type);
-        return $this;
-    }
-
     public function getMedia()
     {
         return $this->getAttribute('media');
-    }
-
-    public function setMedia($media = null)
-    {
-        $this->setAttribute('media', $media);
-        return $this;
     }
 }

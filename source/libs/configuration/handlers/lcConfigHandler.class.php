@@ -38,31 +38,6 @@ abstract class lcConfigHandler extends lcObj
 
     protected $environments;
 
-    public function getDefaultValues()
-    {
-        return null;
-    }
-
-    protected function preReadConfigData($environment, array $data)
-    {
-        return $data;
-    }
-
-    protected function postReadConfigData($environment, array $data)
-    {
-        return $data;
-    }
-
-    public function setDataProvider(iConfigDataProvider $data_provider)
-    {
-        $this->data_provider = $data_provider;
-    }
-
-    public function getDataProvider()
-    {
-        return $this->data_provider;
-    }
-
     /**
      * @param $handler_type
      * @return lcConfigHandler
@@ -90,14 +65,24 @@ abstract class lcConfigHandler extends lcObj
         return $handler;
     }
 
-    public function setOptions(array $options)
+    public function getDataProvider()
     {
-        $this->options = $options;
+        return $this->data_provider;
+    }
+
+    public function setDataProvider(iConfigDataProvider $data_provider)
+    {
+        $this->data_provider = $data_provider;
     }
 
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 
     public function setEnvironments(array $environments = null)
@@ -170,6 +155,21 @@ abstract class lcConfigHandler extends lcObj
         $data = lcArrays::arrayFilterDeep($data, true);
         $data = $data ? $data : null;
 
+        return $data;
+    }
+
+    public function getDefaultValues()
+    {
+        return null;
+    }
+
+    protected function preReadConfigData($environment, array $data)
+    {
+        return $data;
+    }
+
+    protected function postReadConfigData($environment, array $data)
+    {
         return $data;
     }
 }

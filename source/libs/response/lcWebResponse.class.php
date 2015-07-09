@@ -55,72 +55,57 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     protected $content;
     protected $output_content;
-
-    /**
-     * @var lcCookiesCollection
-     */
-    private $cookies;
-
     /**
      * @var array
      */
     protected $javascripts;
-
     protected $js_at_end_forced;
     protected $css_at_end_forced;
-
     protected $javascripts_async;
-
     /**
      * @var array
      */
     protected $javascripts_end;
-
     /**
      * @var array
      */
     protected $stylesheets;
-
     /**
      * @var array
      */
     protected $metatags;
-
     /**
      * @var array
      */
     protected $rssfeeds;
-
     protected $icon;
     protected $html_base;
     protected $title;
     protected $title_suffix;
     protected $lang_dir;
-
     /**
      * @var array
      */
     protected $body_tags;
-
     /**
      * @var array
      */
     protected $html_head_custom;
-
     /**
      * @var array
      */
     protected $html_body_custom;
-
     protected $allow_javascripts;
     protected $allow_rss_feeds;
     protected $allow_stylesheets;
     protected $allow_metatags;
-
     protected $content_lang;
     protected $htmlver;
     protected $canonical_url;
-
+    /**
+     * @var lcCookiesCollection
+     */
+    private $cookies;
     private $content_should_be_processed;
 
     /*
@@ -175,6 +160,32 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         parent::shutdown();
     }
 
+    public function clear()
+    {
+        if ($this->response_sent) {
+            return;
+        }
+
+        $this->javascripts = null;
+        $this->javascripts_end = null;
+        $this->stylesheets = null;
+        $this->metatags = null;
+        $this->rssfeeds = null;
+        $this->icon = null;
+        $this->html_base = null;
+        $this->title = null;
+        $this->body_tags = null;
+        $this->html_head_custom = null;
+        $this->html_body_custom = null;
+        $this->content = null;
+        $this->content_type = 'text/html';
+        $this->server_charset = 'utf-8';
+
+        if ($this->custom_headers) {
+            $this->custom_headers->clear();
+        }
+    }
+
     public function getDebugInfo()
     {
         // compile cookies
@@ -209,12 +220,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $debug;
     }
 
+    #pragma mark - iKeyValueProvider
+
     public function getShortDebugInfo()
     {
         return false;
     }
-
-    #pragma mark - iKeyValueProvider
 
     public function getAllKeys()
     {
@@ -239,6 +250,20 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $ret;
     }
 
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+
+        if (DO_DEBUG) {
+            $this->debug('set title: ' . $title);
+        }
+    }
+
     public function fileStream($data, $filename, $mimetype = 'application/binary')
     {
         $content_type = (($mimetype !== null) ? $mimetype : 'application/binary');
@@ -254,392 +279,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->sendResponse();
     }
 
-    public function getStylesheets()
+    public function setContentDisposition($content_disposition)
     {
-        return $this->stylesheets;
+        $this->custom_headers->set('Content-Disposition', $content_disposition);
     }
 
-    public function getJavascripts()
-    {
-        return $this->javascripts;
-    }
-
-    public function getJavascriptsEnd()
-    {
-        return $this->javascripts_end;
-    }
-
-    public function clear()
-    {
-        if ($this->response_sent) {
-            return;
-        }
-
-        $this->javascripts = null;
-        $this->javascripts_end = null;
-        $this->stylesheets = null;
-        $this->metatags = null;
-        $this->rssfeeds = null;
-        $this->icon = null;
-        $this->html_base = null;
-        $this->title = null;
-        $this->body_tags = null;
-        $this->html_head_custom = null;
-        $this->html_body_custom = null;
-        $this->content = null;
-        $this->content_type = 'text/html';
-        $this->server_charset = 'utf-8';
-
-        if ($this->custom_headers) {
-            $this->custom_headers->clear();
-        }
-    }
-
-    public function setNoContentProcessing($process = true)
-    {
-        $this->content_should_be_processed = !(bool)$process;
-    }
-
-    public function getNoContentProcessing()
-    {
-        return $this->content_should_be_processed;
-    }
-
-    public function setAllowJavascripts($allow = true)
-    {
-        $this->allow_javascripts = $allow;
-    }
-
-    public function setAllowStylesheets($allow = true)
-    {
-        $this->allow_stylesheets = $allow;
-    }
-
-    public function setAllowRssFeeds($allow = true)
-    {
-        $this->allow_rss_feeds = $allow;
-    }
-
-    public function setAllowMetatags($allow = true)
-    {
-        $this->allow_metatags = $allow;
-    }
-
-    /**
-     * Removes all included js files
-     */
-    public function clearJavascripts()
-    {
-        $this->javascripts = null;
-        $this->javascripts_end = null;
-    }
-
-    /**
-     * Removes all included css files
-     */
-    public function clearStylesheets()
-    {
-        $this->stylesheets = null;
-    }
-
-    public function removeJavascript($js_src)
-    {
-        if (isset($this->javascripts[$js_src])) {
-            unset($this->javascripts[$js_src]);
-        }
-
-        if (isset($this->javascripts_end[$js_src])) {
-            unset($this->javascripts_end[$js_src]);
-        }
-    }
-
-    public function removeStylesheet($css_src)
-    {
-        if (isset($this->stylesheets[$css_src])) {
-            unset($this->stylesheets[$css_src]);
-        }
-    }
-
-    public function javascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
-    {
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
-
-        $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
-    }
-
-    /*
-     * Set a javascript include
-    * <script type="text/javascript" src=""></script>
-    */
-    public function setJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
-    {
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
-
-        if (is_array($src)) {
-            foreach ($src as $s) {
-                $this->setJavascript($s, $type, $language, $at_end, $other_attribs);
-                unset($s);
-            }
-        } else {
-            if ($at_end) {
-                $this->javascripts_end[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
-            } else {
-                $this->javascripts[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
-            }
-
-            if (DO_DEBUG) {
-                $this->debug('set javascript: ' . $src);
-            }
-        }
-    }
-
-    /*
-     * Prepends a javascript - before all other javascripts
-    */
-    public function prependJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
-    {
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
-
-        $new = array();
-        $new[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
-
-        if ($at_end) {
-            $this->javascripts_end = array_merge($new, (array)$this->javascripts_end);
-        } else {
-            $this->javascripts = array_merge($new, (array)$this->javascripts);
-        }
-
-        if (DO_DEBUG) {
-            $this->debug('prepend javascript: ' . $src);
-        }
-    }
-
-    public function css($href, $media = 'all', $type = 'text/css')
-    {
-        $this->setStylesheet($href, $media, $type);
-    }
-
-    /*
-     * Set a css include
-    * <link rel="stylesheet" type="text/css" href="" media="screen" />
-    */
-    public function setStylesheet($href, $media = 'all', $type = 'text/css')
-    {
-        if (is_array($href)) {
-            foreach ($href as $h) {
-                $this->setStylesheet($h, $media, $type);
-                unset($h);
-            }
-        } else {
-            $this->stylesheets[$href] = array('href' => $href, 'type' => $type, 'media' => $media);
-
-            if (DO_DEBUG) {
-                $this->debug('set stylesheet: ' . $href . ' : ' . $media);
-            }
-        }
-    }
-
-    public function clearMetatags()
-    {
-        $this->metatags = array();
-    }
-
-    /*
-     * Set a metatag
-    * <meta name="robots" content="" />
-    */
-    public function setMetatag($name, $value)
-    {
-        $this->metatags[$name] = $value;
-
-        if (DO_DEBUG) {
-            $this->debug('set metatag: ' . $name . '/' . $value);
-        }
-    }
-
-    /*
-     * Set a RSS feed
-    * <link media="all" rel="alternate" type="application/rss+xml" title=""  href=""  />
-    */
-    public function setRSSFeed($href, $title = '', $media = 'all')
-    {
-        $this->rssfeeds[$href] = array('href' => $href, 'title' => $title, 'media' => $media);
-
-        if (DO_DEBUG) {
-            $this->debug('set rss feed: ' . $href);
-        }
-    }
-
-    public function getHtmlVer()
-    {
-        return $this->htmlver;
-    }
-
-    /*
-     * Set a Favorite Icon
-    * <link rel="icon" href="" type="image/png" />
-    */
-    public function setIcon($href, $type = 'image/png')
-    {
-        $this->icon = array('href' => $href, 'type' => $type);
-
-        if (DO_DEBUG) {
-            $this->debug('set icon: ' . $href);
-        }
-    }
-
-    /*
-     * Set Base
-    * <base href="" />
-    */
-    public function setBase($href = null)
-    {
-        $this->html_base = $href;
-
-        if (DO_DEBUG) {
-            $this->debug('set base: ' . $href);
-        }
-    }
-
-    /*
-     * Set Title Suffix
-    */
-    public function setTitleSuffix($title)
-    {
-        $this->title_suffix = $title;
-    }
-
-    /*
-     * Get Title Suffix
-    */
-    public function getTitleSuffix()
-    {
-        return $this->title_suffix;
-    }
-
-    /*
-     * Set Title
-    */
-    public function setTitle($title)
-    {
-        $this->title = $title;
-
-        if (DO_DEBUG) {
-            $this->debug('set title: ' . $title);
-        }
-    }
-
-    /*
-     * Get Title
-    */
-    public function getTitle()
-    {
-        return $this->title;
-    }
-
-    /*
-     * Set body tags
-    */
-    public function setBodyTag($name, $value)
-    {
-        $this->body_tags[$name] = $value;
-    }
-
-    /*
-     * Set <head> custom
-    */
-    public function customHeadHtml($start = null, $end = null)
-    {
-        $this->html_head_custom[] = array('start' => $start, 'end' => $end);
-    }
-
-    /*
-     * Set <body> custom
-    */
-    public function customBodyHtml($start = null, $end = null)
-    {
-        $this->html_body_custom[] = array('start' => $start, 'end' => $end);
-    }
-
-    /*
-     * Insert/Append a Response Cookie
-    */
-    public function setCookie(lcCookie $cookie)
-    {
-        $this->cookies->append($cookie);
-
-        if (DO_DEBUG) {
-            $this->debug('set cookie: ' . $cookie->getName() . ' : ' . $cookie->getValue());
-        }
-    }
-
-    public function setCanonicalUrl($canonical_url)
-    {
-        // notify listeners
-        $event = $this->event_dispatcher->filter(
-            new lcEvent('response.set_canonical_url', $this, array()), $canonical_url);
-
-        if ($event->isProcessed()) {
-            $canonical_url = $event->getReturnValue();
-        }
-
-        $this->canonical_url = $canonical_url;
-    }
-
-    public function getOutputContent()
-    {
-        return $this->output_content;
-    }
-
-    /*
-     * Get the current Response content
-    */
-    public function getContent()
-    {
-        return $this->content;
-    }
-
-    /*
-     * Check if the response headers haven't been already
-    * sent out
-    */
-    public function headersSent()
-    {
-        return headers_sent();
-    }
-
-    public function sendHttpError($message = null)
-    {
-        $this->setStatusCode(lcHttpStatusCode::INTERNAL_ERROR);
-
-        // allow listeners to update the errorous page content
-        $this->content = $message ? $message : lcHttpStatusCode::getMessage($this->status_code);
-
-        $this->send();
-    }
-
-    public function sendHttpNotFound()
-    {
-        $this->setStatusCode(lcHttpStatusCode::NOT_FOUND);
-
-        // allow listeners to update the errorous page content
-        if (!$this->content) {
-            $this->content = lcHttpStatusCode::getMessage($this->status_code);
-        }
-
-        $this->send();
-    }
-
-    public function send()
-    {
-        $this->sendResponse();
-    }
-
-    /*
-     * Send the Response
-    * If the response headers have already been sent out
-    * the script will silently stop
-    */
     public function sendResponse()
     {
         if ($this->headersSent()) {
@@ -681,111 +325,92 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    public function setShouldExitUponSend($do_exit = true)
+    public function headersSent()
     {
-        $this->exit_upon_send = (bool)$do_exit;
+        return headers_sent();
     }
 
-    private function processViewConfiguration()
+    protected function _internalSend()
     {
-        // metatags
-        $config_metatags = (array)$this->configuration['view.metatags'];
+        $content = $this->content;
+        $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
 
-        foreach ($config_metatags as $name => $value) {
-            if (isset($this->metatags[$name])) {
-                continue;
-            }
+        $this->content = null;
 
-            $this->metatags[$name] = (string)$value;
-
-            unset($name, $value);
+        // if exit code is error - do not process content
+        if ($this->exit_code != 0 || !is_string($content)) {
+            $this->content_should_be_processed = false;
         }
 
-        unset($config_metatags);
+        // notify listeners if this is an errorous response
+        if (!$this->no_http_errors_processing && $this->status_code != lcHttpStatusCode::OK) {
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.send_http_error', $this, array(
+                    'status_code' => $this->status_code,
+                )), $content);
 
-
-        // stylesheets
-        $stylesheet_path = $this->configuration->getStylesheetPath();
-
-        $stylesheets = (array)$this->configuration['view.stylesheets'];
-
-        if ($stylesheets) {
-            $config_stylesheets = (array)$this->configuration['view.stylesheets'];
-
-            foreach ($config_stylesheets as $type => $stylesheets) {
-                if (!$stylesheets || !is_array($stylesheets)) {
-                    continue;
-                }
-
-                foreach ($stylesheets as $sheet) {
-                    // relative or absolute path
-                    $p = ($sheet && $sheet{0} == '/') ? $sheet : $stylesheet_path . $sheet;
-
-                    $this->stylesheets[$stylesheet_path . $sheet] = array(
-                        'href' => $p,
-                        'type' => 'text/css',
-                        'media' => $type
-                    );
-
-                    unset($sheet, $p);
-                }
-
-                unset($name, $type);
+            if ($event->isProcessed()) {
+                $content = $event->getReturnValue();
             }
-
-            unset($config_stylesheets);
         }
 
-        unset($stylesheet_path);
+        // notify listeners
+        if ($this->content_should_be_processed) {
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.send_response', $this, array()), $content);
 
-        // javascripts
-        $js_path = $this->configuration->getJavascriptPath();
-
-        // start javascripts
-        $javascripts = (array)$this->configuration['view.javascripts'];
-
-        if ($javascripts) {
-            foreach ($javascripts as $js) {
-                // relative or absolute path
-                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
-
-                $this->javascripts[$js_path . $js] = array(
-                    'src' => $p,
-                    'type' => 'text/javascript',
-                    'language' => 'javascript'
-                );
-
-                unset($js, $p);
+            if ($event->isProcessed()) {
+                $content = $event->getReturnValue();
             }
 
-            unset($config_js);
+            unset($event);
         }
 
-        // end javascripts
-        $javascripts = (array)$this->configuration['view.javascripts_end'];
+        // notify with an event
+        $this->event_dispatcher->notify(
+            new lcEvent('response.will_send_response', $this, array()));
 
-        if ($javascripts) {
-            foreach ($javascripts as $js) {
-                // relative or absolute path
-                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
+        if ($this->content_should_be_processed) {
+            // set html customizations
+            if ($this->content_type == 'text/html') {
+                $content = $this->processHtmlContent($content);
+            }
+        }
 
-                $this->javascripts_end[$js_path . $js] = array(
-                    'src' => $p,
-                    'type' => 'text/javascript',
-                    'language' => 'javascript'
-                );
+        // notify listeners
+        if ($this->content_should_be_processed) {
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.output_content', $this, array()), $content);
 
-                unset($js, $p);
+            if ($event->isProcessed()) {
+                $content = $event->getReturnValue();
             }
 
-            unset($config_js);
+            unset($event);
         }
+
+        // disable all scripts
+        if ($this->content_type == 'text/html') {
+            $no_scripts = (bool)$this->configuration['view.no_scripts'];
+
+            if ($no_scripts) {
+                $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+            }
+        }
+
+        $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
+
+        $this->output_content = $content;
+
+        // IMPORTANT: COOKIES / HEADERS MUST BE SENT LAST!
+
+        // send the cookies
+        $this->sendCookies();
+
+        // send the headers
+        $this->sendHeaders();
     }
 
-    /*
-     * Parses the output content before sending
-    * and sets XHTML specific tags
-    */
     private function processHtmlContent($content)
     {
         if (!$content) {
@@ -1063,93 +688,100 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $content;
     }
 
-    public function setDontProcessHttpErrors($dont = true)
+    private function processViewConfiguration()
     {
-        $this->no_http_errors_processing = $dont;
-    }
+        // metatags
+        $config_metatags = (array)$this->configuration['view.metatags'];
 
-    /*
-     * Internal response send
-    */
-    protected function _internalSend()
-    {
-        $content = $this->content;
-        $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
-
-        $this->content = null;
-
-        // if exit code is error - do not process content
-        if ($this->exit_code != 0 || !is_string($content)) {
-            $this->content_should_be_processed = false;
-        }
-
-        // notify listeners if this is an errorous response
-        if (!$this->no_http_errors_processing && $this->status_code != lcHttpStatusCode::OK) {
-            $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_http_error', $this, array(
-                    'status_code' => $this->status_code,
-                )), $content);
-
-            if ($event->isProcessed()) {
-                $content = $event->getReturnValue();
-            }
-        }
-
-        // notify listeners
-        if ($this->content_should_be_processed) {
-            $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_response', $this, array()), $content);
-
-            if ($event->isProcessed()) {
-                $content = $event->getReturnValue();
+        foreach ($config_metatags as $name => $value) {
+            if (isset($this->metatags[$name])) {
+                continue;
             }
 
-            unset($event);
+            $this->metatags[$name] = (string)$value;
+
+            unset($name, $value);
         }
 
-        // notify with an event
-        $this->event_dispatcher->notify(
-            new lcEvent('response.will_send_response', $this, array()));
+        unset($config_metatags);
 
-        if ($this->content_should_be_processed) {
-            // set html customizations
-            if ($this->content_type == 'text/html') {
-                $content = $this->processHtmlContent($content);
+
+        // stylesheets
+        $stylesheet_path = $this->configuration->getStylesheetPath();
+
+        $stylesheets = (array)$this->configuration['view.stylesheets'];
+
+        if ($stylesheets) {
+            $config_stylesheets = (array)$this->configuration['view.stylesheets'];
+
+            foreach ($config_stylesheets as $type => $stylesheets) {
+                if (!$stylesheets || !is_array($stylesheets)) {
+                    continue;
+                }
+
+                foreach ($stylesheets as $sheet) {
+                    // relative or absolute path
+                    $p = ($sheet && $sheet{0} == '/') ? $sheet : $stylesheet_path . $sheet;
+
+                    $this->stylesheets[$stylesheet_path . $sheet] = array(
+                        'href' => $p,
+                        'type' => 'text/css',
+                        'media' => $type
+                    );
+
+                    unset($sheet, $p);
+                }
+
+                unset($name, $type);
             }
+
+            unset($config_stylesheets);
         }
 
-        // notify listeners
-        if ($this->content_should_be_processed) {
-            $event = $this->event_dispatcher->filter(
-                new lcEvent('response.output_content', $this, array()), $content);
+        unset($stylesheet_path);
 
-            if ($event->isProcessed()) {
-                $content = $event->getReturnValue();
+        // javascripts
+        $js_path = $this->configuration->getJavascriptPath();
+
+        // start javascripts
+        $javascripts = (array)$this->configuration['view.javascripts'];
+
+        if ($javascripts) {
+            foreach ($javascripts as $js) {
+                // relative or absolute path
+                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
+
+                $this->javascripts[$js_path . $js] = array(
+                    'src' => $p,
+                    'type' => 'text/javascript',
+                    'language' => 'javascript'
+                );
+
+                unset($js, $p);
             }
 
-            unset($event);
+            unset($config_js);
         }
 
-        // disable all scripts
-        if ($this->content_type == 'text/html') {
-            $no_scripts = (bool)$this->configuration['view.no_scripts'];
+        // end javascripts
+        $javascripts = (array)$this->configuration['view.javascripts_end'];
 
-            if ($no_scripts) {
-                $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+        if ($javascripts) {
+            foreach ($javascripts as $js) {
+                // relative or absolute path
+                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
+
+                $this->javascripts_end[$js_path . $js] = array(
+                    'src' => $p,
+                    'type' => 'text/javascript',
+                    'language' => 'javascript'
+                );
+
+                unset($js, $p);
             }
+
+            unset($config_js);
         }
-
-        $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
-
-        $this->output_content = $content;
-
-        // IMPORTANT: COOKIES / HEADERS MUST BE SENT LAST!
-
-        // send the cookies
-        $this->sendCookies();
-
-        // send the headers
-        $this->sendHeaders();
     }
 
     protected function sendCookies()
@@ -1289,6 +921,24 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    protected function _outputContent()
+    {
+        $this->clear();
+
+        $content = $this->output_content;
+
+        if ($this->configuration['view.minify_html']) {
+            $content = $this->minifyHtml($content);
+        }
+
+        if ($content && is_resource($content)) {
+            fpassthru($content);
+            fclose($content);
+        } else {
+            echo $content;
+        }
+    }
+
     protected function minifyHtml($body)
     {
         $replace = array(
@@ -1328,27 +978,397 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $body;
     }
 
-    protected function _outputContent()
+    public function getStylesheets()
     {
-        $this->clear();
+        return $this->stylesheets;
+    }
 
-        $content = $this->output_content;
+    public function getJavascripts()
+    {
+        return $this->javascripts;
+    }
 
-        if ($this->configuration['view.minify_html']) {
-            $content = $this->minifyHtml($content);
+    /*
+     * Set a javascript include
+    * <script type="text/javascript" src=""></script>
+    */
+
+    public function getJavascriptsEnd()
+    {
+        return $this->javascripts_end;
+    }
+
+    /*
+     * Prepends a javascript - before all other javascripts
+    */
+
+    public function setNoContentProcessing($process = true)
+    {
+        $this->content_should_be_processed = !(bool)$process;
+    }
+
+    public function getNoContentProcessing()
+    {
+        return $this->content_should_be_processed;
+    }
+
+    /*
+     * Set a css include
+    * <link rel="stylesheet" type="text/css" href="" media="screen" />
+    */
+
+    public function setAllowJavascripts($allow = true)
+    {
+        $this->allow_javascripts = $allow;
+    }
+
+    public function setAllowStylesheets($allow = true)
+    {
+        $this->allow_stylesheets = $allow;
+    }
+
+    /*
+     * Set a metatag
+    * <meta name="robots" content="" />
+    */
+
+    public function setAllowRssFeeds($allow = true)
+    {
+        $this->allow_rss_feeds = $allow;
+    }
+
+    /*
+     * Set a RSS feed
+    * <link media="all" rel="alternate" type="application/rss+xml" title=""  href=""  />
+    */
+
+    public function setAllowMetatags($allow = true)
+    {
+        $this->allow_metatags = $allow;
+    }
+
+    /**
+     * Removes all included js files
+     */
+    public function clearJavascripts()
+    {
+        $this->javascripts = null;
+        $this->javascripts_end = null;
+    }
+
+    /*
+     * Set a Favorite Icon
+    * <link rel="icon" href="" type="image/png" />
+    */
+
+    /**
+     * Removes all included css files
+     */
+    public function clearStylesheets()
+    {
+        $this->stylesheets = null;
+    }
+
+    /*
+     * Set Base
+    * <base href="" />
+    */
+
+    public function removeJavascript($js_src)
+    {
+        if (isset($this->javascripts[$js_src])) {
+            unset($this->javascripts[$js_src]);
         }
 
-        if ($content && is_resource($content)) {
-            fpassthru($content);
-            fclose($content);
+        if (isset($this->javascripts_end[$js_src])) {
+            unset($this->javascripts_end[$js_src]);
+        }
+    }
+
+    /*
+     * Set Title Suffix
+    */
+
+    public function removeStylesheet($css_src)
+    {
+        if (isset($this->stylesheets[$css_src])) {
+            unset($this->stylesheets[$css_src]);
+        }
+    }
+
+    /*
+     * Get Title Suffix
+    */
+
+    public function javascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
+        $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
+    }
+
+    /*
+     * Set Title
+    */
+
+    public function setJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
+        if (is_array($src)) {
+            foreach ($src as $s) {
+                $this->setJavascript($s, $type, $language, $at_end, $other_attribs);
+                unset($s);
+            }
         } else {
-            echo $content;
+            if ($at_end) {
+                $this->javascripts_end[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+            } else {
+                $this->javascripts[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+            }
+
+            if (DO_DEBUG) {
+                $this->debug('set javascript: ' . $src);
+            }
         }
+    }
+
+    /*
+     * Get Title
+    */
+
+    public function prependJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    {
+        $at_end = ($this->js_at_end_forced ? true : $at_end);
+
+        $new = array();
+        $new[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+
+        if ($at_end) {
+            $this->javascripts_end = array_merge($new, (array)$this->javascripts_end);
+        } else {
+            $this->javascripts = array_merge($new, (array)$this->javascripts);
+        }
+
+        if (DO_DEBUG) {
+            $this->debug('prepend javascript: ' . $src);
+        }
+    }
+
+    /*
+     * Set body tags
+    */
+
+    public function css($href, $media = 'all', $type = 'text/css')
+    {
+        $this->setStylesheet($href, $media, $type);
+    }
+
+    /*
+     * Set <head> custom
+    */
+
+    public function setStylesheet($href, $media = 'all', $type = 'text/css')
+    {
+        if (is_array($href)) {
+            foreach ($href as $h) {
+                $this->setStylesheet($h, $media, $type);
+                unset($h);
+            }
+        } else {
+            $this->stylesheets[$href] = array('href' => $href, 'type' => $type, 'media' => $media);
+
+            if (DO_DEBUG) {
+                $this->debug('set stylesheet: ' . $href . ' : ' . $media);
+            }
+        }
+    }
+
+    /*
+     * Set <body> custom
+    */
+
+    public function clearMetatags()
+    {
+        $this->metatags = array();
+    }
+
+    /*
+     * Insert/Append a Response Cookie
+    */
+
+    public function setMetatag($name, $value)
+    {
+        $this->metatags[$name] = $value;
+
+        if (DO_DEBUG) {
+            $this->debug('set metatag: ' . $name . '/' . $value);
+        }
+    }
+
+    public function setRSSFeed($href, $title = '', $media = 'all')
+    {
+        $this->rssfeeds[$href] = array('href' => $href, 'title' => $title, 'media' => $media);
+
+        if (DO_DEBUG) {
+            $this->debug('set rss feed: ' . $href);
+        }
+    }
+
+    public function getHtmlVer()
+    {
+        return $this->htmlver;
+    }
+
+    /*
+     * Get the current Response content
+    */
+
+    public function setIcon($href, $type = 'image/png')
+    {
+        $this->icon = array('href' => $href, 'type' => $type);
+
+        if (DO_DEBUG) {
+            $this->debug('set icon: ' . $href);
+        }
+    }
+
+    /*
+     * Check if the response headers haven't been already
+    * sent out
+    */
+
+    public function setBase($href = null)
+    {
+        $this->html_base = $href;
+
+        if (DO_DEBUG) {
+            $this->debug('set base: ' . $href);
+        }
+    }
+
+    public function getTitleSuffix()
+    {
+        return $this->title_suffix;
+    }
+
+    public function setTitleSuffix($title)
+    {
+        $this->title_suffix = $title;
+    }
+
+    public function setBodyTag($name, $value)
+    {
+        $this->body_tags[$name] = $value;
+    }
+
+    /*
+     * Send the Response
+    * If the response headers have already been sent out
+    * the script will silently stop
+    */
+
+    public function customHeadHtml($start = null, $end = null)
+    {
+        $this->html_head_custom[] = array('start' => $start, 'end' => $end);
+    }
+
+    public function customBodyHtml($start = null, $end = null)
+    {
+        $this->html_body_custom[] = array('start' => $start, 'end' => $end);
+    }
+
+    public function setCookie(lcCookie $cookie)
+    {
+        $this->cookies->append($cookie);
+
+        if (DO_DEBUG) {
+            $this->debug('set cookie: ' . $cookie->getName() . ' : ' . $cookie->getValue());
+        }
+    }
+
+    /*
+     * Parses the output content before sending
+    * and sets XHTML specific tags
+    */
+
+    public function setCanonicalUrl($canonical_url)
+    {
+        // notify listeners
+        $event = $this->event_dispatcher->filter(
+            new lcEvent('response.set_canonical_url', $this, array()), $canonical_url);
+
+        if ($event->isProcessed()) {
+            $canonical_url = $event->getReturnValue();
+        }
+
+        $this->canonical_url = $canonical_url;
+    }
+
+    public function getOutputContent()
+    {
+        return $this->output_content;
+    }
+
+    /*
+     * Internal response send
+    */
+
+    public function getContent()
+    {
+        return $this->content;
+    }
+
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
+    public function sendHttpError($message = null)
+    {
+        $this->setStatusCode(lcHttpStatusCode::INTERNAL_ERROR);
+
+        // allow listeners to update the errorous page content
+        $this->content = $message ? $message : lcHttpStatusCode::getMessage($this->status_code);
+
+        $this->send();
+    }
+
+    public function send()
+    {
+        $this->sendResponse();
+    }
+
+    public function sendHttpNotFound()
+    {
+        $this->setStatusCode(lcHttpStatusCode::NOT_FOUND);
+
+        // allow listeners to update the errorous page content
+        if (!$this->content) {
+            $this->content = lcHttpStatusCode::getMessage($this->status_code);
+        }
+
+        $this->send();
     }
 
     /*
      * Set a custom Response Header
     */
+
+    public function setShouldExitUponSend($do_exit = true)
+    {
+        $this->exit_upon_send = (bool)$do_exit;
+    }
+
+    public function setDontProcessHttpErrors($dont = true)
+    {
+        $this->no_http_errors_processing = $dont;
+    }
+
+    /*
+     * Send a HTTP Redirect and stop script
+    */
+
     public function header($name, $value)
     {
         $this->custom_headers->set($name, $value);
@@ -1368,8 +1388,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     }
 
     /*
-     * Send a HTTP Redirect and stop script
+     * Disable response caching by outputing
+    * Cache-Control and Expires headers
     */
+
     public function redirect($url, $http_code = 302)
     {
         $this->info('Will send HTTP Redirect (' . $http_code . '): ' . $url);
@@ -1385,15 +1407,28 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->sendResponse();
     }
 
+    /*
+     * Get the output charset encoding
+    */
+
+    public function setLocation($location)
+    {
+        $this->custom_headers->set('Location', $location);
+    }
+
+    /*
+     * Sets the Response content type
+    */
+
     public function disableCaching()
     {
         $this->setNoCaching();
     }
 
     /*
-     * Disable response caching by outputing
-    * Cache-Control and Expires headers
+     * Sets the actual Response content
     */
+
     public function setNoCaching()
     {
         $this->setExpires('Sat, 26 Jul 1997 05:00:00 GMT');
@@ -1407,43 +1442,21 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     }
 
     /*
-     * Get the output charset encoding
-    */
-    public function getServerCharset()
-    {
-        return $this->server_charset;
-    }
-
-    /*
-     * Sets the Response content type
-    */
-    public function setContentType($content_type = 'text/html')
-    {
-        $this->content_type = $content_type;
-    }
-
-    /*
-     * Sets the actual Response content
-    */
-    public function setContent($content)
-    {
-        $this->content = $content;
-    }
-
-    /*
      * Get the current response cookies
     */
-    public function getCookies()
+
+    public function setExpires($expires)
     {
-        return $this->cookies;
+        $this->custom_headers->set('Expires', $expires);
     }
 
     /*
      * Gets the current content type
     */
-    public function getContentType()
+
+    public function setLastModified($last_modified)
     {
-        return $this->content_type;
+        $this->custom_headers->set('Last-Modified', $last_modified);
     }
 
     /*
@@ -1464,6 +1477,74 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     /*
      * Set a custom HTTP Response Code/Reason
     */
+
+    public function setCacheControl($cache_control)
+    {
+        $this->custom_headers->set('Cache-Control', $cache_control);
+    }
+
+    /*
+     * Get the current status code
+    */
+
+    public function setPragma($pragma)
+    {
+        $this->custom_headers->set('Pragma', $pragma);
+    }
+
+    /*
+     * Get the current response reason string
+    */
+
+    public function getServerCharset()
+    {
+        return $this->server_charset;
+    }
+
+    /*
+     * Sets the output content charset
+    */
+
+    public function getCookies()
+    {
+        return $this->cookies;
+    }
+
+    /*
+     * HTTP Header:
+    * Date
+    */
+
+    public function getContentType()
+    {
+        return $this->content_type;
+    }
+
+    /*
+     * HTTP Header:
+    * Via
+    */
+
+    public function setContentType($content_type = 'text/html')
+    {
+        $this->content_type = $content_type;
+    }
+
+    /*
+     * HTTP Header:
+    * Location
+    */
+
+    public function getStatusCode()
+    {
+        return $this->status_code;
+    }
+
+    /*
+     * HTTP Header:
+    * Version
+    */
+
     public function setStatusCode($status_code, $reason_string = null)
     {
         if (!$this->status_code = lcHttpStatusCode::getType($status_code)) {
@@ -1480,24 +1561,20 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     }
 
     /*
-     * Get the current status code
+     * HTTP Header:
+    * Content-Disposition
     */
-    public function getStatusCode()
-    {
-        return $this->status_code;
-    }
 
-    /*
-     * Get the current response reason string
-    */
     public function getReasonString()
     {
         return $this->reason_string;
     }
 
     /*
-     * Sets the output content charset
+     * HTTP Header:
+    * Content-Encoding
     */
+
     public function setCharset($charset)
     {
         $this->server_charset = $charset;
@@ -1505,8 +1582,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Date
+    * Content-Language
     */
+
     public function setDate($date)
     {
         return $this->custom_headers->set('Date', $date);
@@ -1514,8 +1592,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Via
+    * Accept-Ranges
     */
+
     public function setVia($via)
     {
         $this->custom_headers->set('Via', $via);
@@ -1523,17 +1602,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Location
+    * Age
     */
-    public function setLocation($location)
-    {
-        $this->custom_headers->set('Location', $location);
-    }
 
-    /*
-     * HTTP Header:
-    * Version
-    */
     public function setContentVersion($version)
     {
         $this->custom_headers->set('Version', $version);
@@ -1541,17 +1612,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Content-Disposition
+    * ETag
     */
-    public function setContentDisposition($content_disposition)
-    {
-        $this->custom_headers->set('Content-Disposition', $content_disposition);
-    }
 
-    /*
-     * HTTP Header:
-    * Content-Encoding
-    */
     public function setContentEncoding($content_encoding)
     {
         $this->custom_headers->set('Content-Encoding', $content_encoding);
@@ -1559,8 +1622,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Content-Language
+    * Proxy-Authenticate
     */
+
     public function setContentLanguage($content_language)
     {
         $this->content_lang = $content_language;
@@ -1569,8 +1633,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Accept-Ranges
+    * Retry-After
     */
+
     public function setAcceptRanges($accept_ranges)
     {
         $this->custom_headers->set('Accept-Ranges', $accept_ranges);
@@ -1578,8 +1643,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Age
+    * Server
     */
+
     public function setAge($age)
     {
         $this->custom_headers->set('Age', $age);
@@ -1587,8 +1653,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * ETag
+    * Vary
     */
+
     public function setETag($etag)
     {
         $this->custom_headers->set('ETag', $etag);
@@ -1596,8 +1663,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Proxy-Authenticate
+    * WWW-Authenticate
     */
+
     public function setProxyAuthenticate($proxy_authenticate)
     {
         $this->custom_headers->set('Proxy-Authenticate', $proxy_authenticate);
@@ -1605,8 +1673,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Retry-After
+    * Connection
     */
+
     public function setRetryAfter($retry_after)
     {
         $this->custom_headers->set('Retry-After', $retry_after);
@@ -1614,8 +1683,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Server
+    * Pragma
     */
+
     public function setServer($server)
     {
         $this->custom_headers->set('Server', $server);
@@ -1623,8 +1693,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Vary
+    * Expires
     */
+
     public function setVary($vary)
     {
         $this->custom_headers->set('Vary', $vary);
@@ -1632,8 +1703,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * WWW-Authenticate
+    * Last-Modified
     */
+
     public function setWWWAuthenticate($www_authenticate)
     {
         $this->custom_headers->set('WWW-Authenticate', $www_authenticate);
@@ -1641,8 +1713,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Connection
+    * Cache-Control
     */
+
     public function setConnection($connection)
     {
         $this->custom_headers->set('Connection', $connection);
@@ -1650,44 +1723,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     /*
      * HTTP Header:
-    * Pragma
-    */
-    public function setPragma($pragma)
-    {
-        $this->custom_headers->set('Pragma', $pragma);
-    }
-
-    /*
-     * HTTP Header:
-    * Expires
-    */
-    public function setExpires($expires)
-    {
-        $this->custom_headers->set('Expires', $expires);
-    }
-
-    /*
-     * HTTP Header:
-    * Last-Modified
-    */
-    public function setLastModified($last_modified)
-    {
-        $this->custom_headers->set('Last-Modified', $last_modified);
-    }
-
-    /*
-     * HTTP Header:
-    * Cache-Control
-    */
-    public function setCacheControl($cache_control)
-    {
-        $this->custom_headers->set('Cache-Control', $cache_control);
-    }
-
-    /*
-     * HTTP Header:
     * Message-Id
     */
+
     public function setMessageId($message_id)
     {
         $this->custom_headers->set('Message-Id', $message_id);

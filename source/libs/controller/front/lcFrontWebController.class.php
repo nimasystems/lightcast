@@ -33,6 +33,43 @@ class lcFrontWebController extends lcFrontController
     /** @var lcWebRequest */
     protected $request;
 
+    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->system_component_factory) {
+            throw new lcNotAvailableException('System Component Factory not available');
+        }
+
+        $controller_instance = $this->system_component_factory->getControllerModuleInstance($controller_name, $context_type, $context_name);
+
+        if (!$controller_instance) {
+            return null;
+        }
+
+        // assign system objects
+        $this->prepareControllerInstance($controller_instance);
+
+        if ($this->default_decorator) {
+            $controller_instance->setDefaultDecorator($this->default_decorator);
+        }
+
+        // assign request-based web path
+        $web_path = $this->request->getUrlPrefix() . '/' . $controller_instance->getControllerName() . '/';
+        $controller_instance->setWebPath($web_path);
+
+        // resolve dependancies
+        try {
+            $controller_instance->loadDependancies();
+        } catch (Exception $e) {
+            throw new lcRequirementException('Web controller dependancies could not be loaded (' . $controller_name . '): ' .
+                $e->getMessage(),
+                $e->getCode(),
+                $e);
+        }
+
+        // do not initialize the object yet! leave it to the caller
+        return $controller_instance;
+    }
+
     protected function beforeDispatch()
     {
         // custom code before dispatching
@@ -118,42 +155,5 @@ class lcFrontWebController extends lcFrontController
     protected function handleControllerNotReachableAfter()
     {
         // don't throw here - but in handleControllerNotReachable
-    }
-
-    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        if (!$this->system_component_factory) {
-            throw new lcNotAvailableException('System Component Factory not available');
-        }
-
-        $controller_instance = $this->system_component_factory->getControllerModuleInstance($controller_name, $context_type, $context_name);
-
-        if (!$controller_instance) {
-            return null;
-        }
-
-        // assign system objects
-        $this->prepareControllerInstance($controller_instance);
-
-        if ($this->default_decorator) {
-            $controller_instance->setDefaultDecorator($this->default_decorator);
-        }
-
-        // assign request-based web path
-        $web_path = $this->request->getUrlPrefix() . '/' . $controller_instance->getControllerName() . '/';
-        $controller_instance->setWebPath($web_path);
-
-        // resolve dependancies
-        try {
-            $controller_instance->loadDependancies();
-        } catch (Exception $e) {
-            throw new lcRequirementException('Web controller dependancies could not be loaded (' . $controller_name . '): ' .
-                $e->getMessage(),
-                $e->getCode(),
-                $e);
-        }
-
-        // do not initialize the object yet! leave it to the caller
-        return $controller_instance;
     }
 }

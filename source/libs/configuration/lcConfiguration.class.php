@@ -40,19 +40,13 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     /*
      * Default configuration environments
      */
+    protected $configuration = array();
+    protected $base_config_dir;
     private $environments = array(
         lcEnvConfigHandler::ENVIRONMENT_DEBUG,
         lcEnvConfigHandler::ENVIRONMENT_RELEASE,
         lcEnvConfigHandler::ENVIRONMENT_TESTING
     );
-
-    protected $configuration = array();
-
-    protected $base_config_dir;
-
-    abstract public function getConfigDir();
-
-    abstract public function getProjectConfigDir();
 
     public function initialize()
     {
@@ -83,86 +77,10 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         }
     }
 
-    public function shutdown()
-    {
-        $this->configuration = null;
-
-        parent::shutdown();
-    }
-
-    public function getDebugInfo()
-    {
-        $debug = array('configuration' => $this->configuration,);
-
-        return $debug;
-    }
-
-    public function getShortDebugInfo()
-    {
-        $debug = array('environment' => $this->environment,);
-        return $debug;
-    }
-
-    public function setBaseConfigDir($config_dir)
-    {
-        $this->base_config_dir = $config_dir;
-    }
-
-    public function getBaseConfigDir()
-    {
-        return $this->base_config_dir;
-    }
-
     protected function loadConfigurationData()
     {
         $config_data = $this->loadConfigurationFromHandleMap($this->getConfigHandleMap());
         return $config_data;
-    }
-
-    public function getConfigHandleMap()
-    {
-        return null;
-    }
-
-    public function setEnvironment($environment)
-    {
-        $this->environment = $environment;
-    }
-
-    public function getEnvironment()
-    {
-        return $this->environment;
-    }
-
-    public function setEnvironments(array $environments = null)
-    {
-        $this->environments = $environments;
-    }
-
-    public function getEnvironments()
-    {
-        return $this->environments;
-    }
-
-    public function getData()
-    {
-        return $this->configuration;
-    }
-
-    public function getConfiguration()
-    {
-        return $this->configuration;
-    }
-
-    public function getConfigurationData()
-    {
-        return $this->getConfiguration();
-    }
-
-    protected function getConfigDataProviderInstance()
-    {
-        // subclassers may return a different data provider here
-        return new lcYamlConfigDataProvider();
     }
 
     protected function loadConfigurationFromHandleMap(array $config_handle_map)
@@ -229,25 +147,94 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         return $configuration;
     }
 
+    public function getBaseConfigDir()
+    {
+        return $this->base_config_dir;
+    }
+
+    public function setBaseConfigDir($config_dir)
+    {
+        $this->base_config_dir = $config_dir;
+    }
+
+    abstract public function getProjectConfigDir();
+
+    abstract public function getConfigDir();
+
+    protected function getConfigDataProviderInstance()
+    {
+        // subclassers may return a different data provider here
+        return new lcYamlConfigDataProvider();
+    }
+
+    public function getConfigHandleMap()
+    {
+        return null;
+    }
+
+    public function shutdown()
+    {
+        $this->configuration = null;
+
+        parent::shutdown();
+    }
+
+    public function getDebugInfo()
+    {
+        $debug = array('configuration' => $this->configuration,);
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        $debug = array('environment' => $this->environment,);
+        return $debug;
+    }
+
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    public function setEnvironment($environment)
+    {
+        $this->environment = $environment;
+    }
+
+    public function getEnvironments()
+    {
+        return $this->environments;
+    }
+
+    public function setEnvironments(array $environments = null)
+    {
+        $this->environments = $environments;
+    }
+
+    public function getData()
+    {
+        return $this->configuration;
+    }
+
+    public function getConfigurationData()
+    {
+        return $this->getConfiguration();
+    }
+
+    public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
     public function getAll()
     {
         return $this->configuration;
     }
 
-    public function get($name)
+    public function offsetExists($name)
     {
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $configuration = $this->configuration;
-
-        $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
-        $arr_str = '(isset(' . $arr_str . ') ? ' . $arr_str . ' : null)';
-
-        $tmp = null;
-        $eval_str = '$tmp = ' . $arr_str . ';';
-
-        eval($eval_str);
-
-        return $tmp;
+        return $this->has($name);
     }
 
     public function has($name)
@@ -267,6 +254,35 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     }
 
     // @codingStandardsIgnoreStart
+
+    public function offsetGet($name)
+    {
+        return $this->get($name);
+    }
+
+    // @codingStandardsIgnoreEnd
+
+    public function get($name)
+    {
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $configuration = $this->configuration;
+
+        $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
+        $arr_str = '(isset(' . $arr_str . ') ? ' . $arr_str . ' : null)';
+
+        $tmp = null;
+        $eval_str = '$tmp = ' . $arr_str . ';';
+
+        eval($eval_str);
+
+        return $tmp;
+    }
+
+    public function offsetSet($name, $value)
+    {
+        return $this->set($name, $value);
+    }
+
     public function set($name, /** @noinspection PhpUnusedParameterInspection */
                         $value = null)
     {
@@ -276,33 +292,16 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         return eval($eval_str);
     }
 
-    // @codingStandardsIgnoreEnd
+    public function offsetUnset($name)
+    {
+        return $this->remove($name);
+    }
 
     public function remove($name)
     {
         $arr_str = '$this->configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
         $eval_str = 'unset(' . $arr_str . ');';
         return eval($eval_str);
-    }
-
-    public function offsetExists($name)
-    {
-        return $this->has($name);
-    }
-
-    public function offsetGet($name)
-    {
-        return $this->get($name);
-    }
-
-    public function offsetSet($name, $value)
-    {
-        return $this->set($name, $value);
-    }
-
-    public function offsetUnset($name)
-    {
-        return $this->remove($name);
     }
 
     public function __toString()

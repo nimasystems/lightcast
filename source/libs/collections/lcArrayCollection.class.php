@@ -51,34 +51,6 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         }
     }
 
-    public function set($key, $value = null)
-    {
-        $this->append($key, $value);
-    }
-
-    public function has($key)
-    {
-        return $this->setPositionByKey($key);
-    }
-
-    public function get($key)
-    {
-        if (!$this->setPositionByKey($key)) {
-            return null;
-        }
-
-        return $this->current()->getValue();
-    }
-
-    public function delete($key = null)
-    {
-        if (!$this->setPositionByKey($key)) {
-            return;
-        }
-
-        parent::delete($this->key());
-    }
-
     private function setPositionByKey($key)
     {
         $this->first();
@@ -98,6 +70,11 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         return false;
     }
 
+    public function has($key)
+    {
+        return $this->setPositionByKey($key);
+    }
+
     public function clear()
     {
         parent::clear();
@@ -112,9 +89,23 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         }
     }
 
+    public function set($key, $value = null)
+    {
+        $this->append($key, $value);
+    }
+
     public function offsetExists($name)
     {
         return $this->get($name) ? true : false;
+    }
+
+    public function get($key)
+    {
+        if (!$this->setPositionByKey($key)) {
+            return null;
+        }
+
+        return $this->current()->getValue();
     }
 
     public function offsetGet($name)
@@ -130,6 +121,15 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     public function offsetUnset($name)
     {
         $this->delete($name);
+    }
+
+    public function delete($key = null)
+    {
+        if (!$this->setPositionByKey($key)) {
+            return;
+        }
+
+        parent::delete($this->key());
     }
 
     public function toArray()

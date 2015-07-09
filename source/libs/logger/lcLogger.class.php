@@ -22,51 +22,82 @@
  */
 abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCapabilities
 {
-    protected $severity;
+    const LOG_EMERG = 1;
 
     /*
      * A constant defining 'System is unusuable' logging level
     */
-    const LOG_EMERG = 1;
+    const LOG_ALERT = 2;
 
     /*
      * A constant defining 'Immediate action required' logging level
     */
-    const LOG_ALERT = 2;
+    const LOG_CRIT = 3;
 
     /*
      * A constant defining 'Critical conditions' logging level
     */
-    const LOG_CRIT = 3;
+    const LOG_ERR = 4;
 
     /*
      * A constant defining 'Error conditions' logging level
     */
-    const LOG_ERR = 4;
+    const LOG_WARNING = 5;
 
     /*
      * A constant defining 'Warning conditions' logging level
     */
-    const LOG_WARNING = 5;
+    const LOG_NOTICE = 6;
 
     /*
      * A constant defining 'Normal but significant' logging level
     */
-    const LOG_NOTICE = 6;
+    const LOG_INFO = 7;
 
     /*
      * A constant defining 'Informational' logging level
     */
-    const LOG_INFO = 7;
+    const LOG_DEBUG = 8;
 
     /*
      * A constant defining 'Debug-level messages' logging level
     */
-    const LOG_DEBUG = 8;
-
     const DEFAULT_SEVERITY = 7;
-
     const DEFAULT_CHANNEL = 'generic';
+    protected $severity;
+
+    public static function errTypeToStr($error_type)
+    {
+        switch ($error_type) {
+            case self::LOG_EMERG: {
+                return 'emerg';
+            }
+            case self::LOG_ALERT: {
+                return 'alert';
+            }
+            case self::LOG_CRIT: {
+                return 'crit';
+            }
+            case self::LOG_ERR: {
+                return 'err';
+            }
+            case self::LOG_WARNING: {
+                return 'warning';
+            }
+            case self::LOG_NOTICE: {
+                return 'notice';
+            }
+            case self::LOG_INFO: {
+                return 'info';
+            }
+            case self::LOG_DEBUG: {
+                return 'debug';
+            }
+            default: {
+                return 'info';
+            }
+        }
+    }
 
     public function initialize()
     {
@@ -82,6 +113,42 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
         $this->event_dispatcher->connect('logger.log', $this, 'listenerLog');
 
         $this->severity = self::strToErrType($this->configuration['logger.severity']);
+    }
+
+    public static function strToErrType($error_type_str)
+    {
+        switch ($error_type_str) {
+            case 'emerg': {
+                return self::LOG_EMERG;
+            }
+            case 'alert': {
+                return self::LOG_ALERT;
+            }
+            case 'crit': {
+                return self::LOG_CRIT;
+            }
+            case 'err': {
+                return self::LOG_ERR;
+            }
+            case 'error': {
+                return self::LOG_ERR;
+            }
+            case 'warning': {
+                return self::LOG_WARNING;
+            }
+            case 'notice': {
+                return self::LOG_NOTICE;
+            }
+            case 'info': {
+                return self::LOG_INFO;
+            }
+            case 'debug': {
+                return self::LOG_DEBUG;
+            }
+            default: {
+                return self::LOG_INFO;
+            }
+        }
     }
 
     public function shutdown()
@@ -122,78 +189,14 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
         }
     }
 
+    public function crit($message, $channel = null)
+    {
+        $this->log($message, self::LOG_CRIT, $channel);
+    }
+
     public function getSeverity()
     {
         return $this->severity;
-    }
-
-    public static function errTypeToStr($error_type)
-    {
-        switch ($error_type) {
-            case self::LOG_EMERG: {
-                return 'emerg';
-            }
-            case self::LOG_ALERT: {
-                return 'alert';
-            }
-            case self::LOG_CRIT: {
-                return 'crit';
-            }
-            case self::LOG_ERR: {
-                return 'err';
-            }
-            case self::LOG_WARNING: {
-                return 'warning';
-            }
-            case self::LOG_NOTICE: {
-                return 'notice';
-            }
-            case self::LOG_INFO: {
-                return 'info';
-            }
-            case self::LOG_DEBUG: {
-                return 'debug';
-            }
-            default: {
-                return 'info';
-            }
-        }
-    }
-
-    public static function strToErrType($error_type_str)
-    {
-        switch ($error_type_str) {
-            case 'emerg': {
-                return self::LOG_EMERG;
-            }
-            case 'alert': {
-                return self::LOG_ALERT;
-            }
-            case 'crit': {
-                return self::LOG_CRIT;
-            }
-            case 'err': {
-                return self::LOG_ERR;
-            }
-            case 'error': {
-                return self::LOG_ERR;
-            }
-            case 'warning': {
-                return self::LOG_WARNING;
-            }
-            case 'notice': {
-                return self::LOG_NOTICE;
-            }
-            case 'info': {
-                return self::LOG_INFO;
-            }
-            case 'debug': {
-                return self::LOG_DEBUG;
-            }
-            default: {
-                return self::LOG_INFO;
-            }
-        }
     }
 
     public function emerg($message, $channel = null)
@@ -204,11 +207,6 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     public function alert($message, $channel = null)
     {
         $this->log($message, self::LOG_ALERT, $channel);
-    }
-
-    public function crit($message, $channel = null)
-    {
-        $this->log($message, self::LOG_CRIT, $channel);
     }
 
     public function err($message, $channel = null)

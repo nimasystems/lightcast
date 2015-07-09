@@ -46,16 +46,6 @@ class lcTagButton extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('type', 'name', 'value', 'disabled', 'tabindex', 'accesskey');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -72,20 +62,10 @@ class lcTagButton extends lcHtmlTag
         return $this;
     }
 
-    public function getType()
-    {
-        return $this->getAttribute('type');
-    }
-
     public function setName($value = null)
     {
         $this->setAttribute('name', $value);
         return $this;
-    }
-
-    public function getName()
-    {
-        return $this->getAttribute('name');
     }
 
     public function setValue($value = null)
@@ -94,20 +74,10 @@ class lcTagButton extends lcHtmlTag
         return $this;
     }
 
-    public function getValue()
-    {
-        return $this->getAttribute('value');
-    }
-
     public function setIsDisabled($value = false)
     {
         $this->setAttribute('disabled', $value ? 'disabled' : null);
         return $this;
-    }
-
-    public function getIsDisabled()
-    {
-        return $this->getAttribute('disabled') ? true : false;
     }
 
     public function setTabIndex($value = null)
@@ -116,15 +86,45 @@ class lcTagButton extends lcHtmlTag
         return $this;
     }
 
-    public function getTabIndex()
-    {
-        return $this->getAttribute('tabindex');
-    }
-
     public function setAccessKey($accesskey = null)
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('type', 'name', 'value', 'disabled', 'tabindex', 'accesskey');
+    }
+
+    public function getType()
+    {
+        return $this->getAttribute('type');
+    }
+
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
+
+    public function getValue()
+    {
+        return $this->getAttribute('value');
+    }
+
+    public function getIsDisabled()
+    {
+        return $this->getAttribute('disabled') ? true : false;
+    }
+
+    public function getTabIndex()
+    {
+        return $this->getAttribute('tabindex');
     }
 
     public function getAccessKey()

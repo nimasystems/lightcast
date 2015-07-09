@@ -42,6 +42,15 @@ class lcPropelLogger extends lcSysObj
         parent::shutdown();
     }
 
+    public function log($message, $level = null, $channel = null)
+    {
+        $level = $level ? $level : Propel::LOG_DEBUG;
+
+        $logger_severity = $this->getInternalLoggerSeverity($level);
+
+        parent::log($message, $logger_severity, 'database');
+    }
+
     private function getInternalLoggerSeverity($propel_severity)
     {
         $propel_severity = (int)$propel_severity;
@@ -66,14 +75,5 @@ class lcPropelLogger extends lcSysObj
             default:
                 return lcLogger::LOG_DEBUG;
         }
-    }
-
-    public function log($message, $level = null, $channel = null)
-    {
-        $level = $level ? $level : Propel::LOG_DEBUG;
-
-        $logger_severity = $this->getInternalLoggerSeverity($level);
-
-        parent::log($message, $logger_severity, 'database');
     }
 }

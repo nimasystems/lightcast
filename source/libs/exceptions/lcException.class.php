@@ -62,24 +62,24 @@ class lcException extends Exception implements iDomainException
         }
     }
 
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
-    }
-
     public function getDomain()
     {
         return $this->domain;
     }
 
-    public function setExtraData($data)
+    public function setDomain($domain)
     {
-        $this->extra_data = $data;
+        $this->domain = $domain;
     }
 
     public function getExtraData()
     {
         return $this->extra_data;
+    }
+
+    public function setExtraData($data)
+    {
+        $this->extra_data = $data;
     }
 
     /**

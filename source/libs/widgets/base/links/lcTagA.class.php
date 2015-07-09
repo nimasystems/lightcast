@@ -46,6 +46,42 @@ class lcTagA extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    public function setHref($href = null)
+    {
+        $this->setAttribute('href', $href);
+        return $this;
+    }
+
+    public function setTarget($tabindex = null)
+    {
+        $this->setAttribute('target', $tabindex);
+        return $this;
+    }
+
+    public function setRel($rel = null)
+    {
+        $this->setAttribute('rel', $rel);
+        return $this;
+    }
+
+    public function setRev($rev = null)
+    {
+        $this->setAttribute('rev', $rev);
+        return $this;
+    }
+
+    public function setAccessKey($accesskey = null)
+    {
+        $this->setAttribute('accesskey', $accesskey);
+        return $this;
+    }
+
+    public function setTabIndex($tabindex = null)
+    {
+        $this->setAttribute('tabindex', $tabindex);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -59,12 +95,6 @@ class lcTagA extends lcHtmlTag
     public function getHref()
     {
         return $this->getAttribute('href');
-    }
-
-    public function setHref($href = null)
-    {
-        $this->setAttribute('href', $href);
-        return $this;
     }
 
     public function getCharset()
@@ -105,21 +135,9 @@ class lcTagA extends lcHtmlTag
         return $this->getAttribute('rel');
     }
 
-    public function setRel($rel = null)
-    {
-        $this->setAttribute('rel', $rel);
-        return $this;
-    }
-
     public function getRev()
     {
         return $this->getAttribute('rev');
-    }
-
-    public function setRev($rev = null)
-    {
-        $this->setAttribute('rev', $rev);
-        return $this;
     }
 
     public function getAccessKey()
@@ -127,31 +145,13 @@ class lcTagA extends lcHtmlTag
         return $this->getAttribute('accesskey');
     }
 
-    public function setAccessKey($accesskey = null)
-    {
-        $this->setAttribute('accesskey', $accesskey);
-        return $this;
-    }
-
     public function getTabIndex()
     {
         return $this->getAttribute('tabindex');
     }
 
-    public function setTabIndex($tabindex = null)
-    {
-        $this->setAttribute('tabindex', $tabindex);
-        return $this;
-    }
-
     public function getTarget()
     {
         return $this->getAttribute('target');
-    }
-
-    public function setTarget($tabindex = null)
-    {
-        $this->setAttribute('target', $tabindex);
-        return $this;
     }
 }

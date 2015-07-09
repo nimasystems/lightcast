@@ -43,14 +43,14 @@ class lcValidatorFailure implements Serializable, JsonSerializable
         $this->extra_data = $extra_data;
     }
 
-    public function setExtraData(array $data = null)
-    {
-        $this->extra_data = $data;
-    }
-
     public function getExtraData()
     {
         return $this->extra_data;
+    }
+
+    public function setExtraData(array $data = null)
+    {
+        $this->extra_data = $data;
     }
 
     public function getValidator()

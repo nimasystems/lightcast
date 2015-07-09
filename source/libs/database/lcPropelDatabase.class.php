@@ -35,7 +35,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     /** @var lcPropelConnection */
     protected $conn;
-    
+
     protected $db_cache;
     protected $propel_logger;
 
@@ -57,6 +57,21 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         parent::shutdown();
     }
 
+    public function disconnect()
+    {
+        if (!$this->conn) {
+            return true;
+        }
+
+        $this->conn = null;
+
+        if (DO_DEBUG) {
+            $this->debug('Database disconnected');
+        }
+
+        return true;
+    }
+
     public function getDebugInfo()
     {
         $debug = array(
@@ -69,59 +84,11 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         return $debug;
     }
 
-    public function getShortDebugInfo()
-    {
-        $debug = array(
-            'sql_count' => $this->getSQLCount(),
-            'cached_sql_count' => $this->getCachedSQLCount(),
-            'cache_enabled' => $this->getIsCacheEnabled()
-        );
-
-        return $debug;
-    }
-
-    public function getDatabaseCache()
-    {
-        return $this->db_cache;
-    }
-
-    public function setDatabaseCache(iDatabaseCacheProvider $cache_storage = null)
-    {
-        $this->db_cache = $cache_storage;
-
-        if ($this->conn) {
-            $this->conn->setQueryCacheBacked($this->db_cache);
-        }
-    }
-
-    public function setPropelLogger(lcPropelLogger $logger = null)
-    {
-        $this->propel_logger = $logger;
-
-        if ($this->conn) {
-            $this->conn->setLogger($this->propel_logger);
-        }
-    }
-
     public function getSQLCount()
     {
         $this->connect();
 
         return $this->conn->getQueryCount();
-    }
-
-    public function getConnection()
-    {
-        if (!$this->conn) {
-            $this->connect();
-        }
-
-        return $this->conn;
-    }
-
-    public function isConnected()
-    {
-        return $this->conn ? true : false;
     }
 
     public function connect()
@@ -168,6 +135,71 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         }
     }
 
+    public function getCachedSQLCount()
+    {
+        return $this->conn->getCachedQueryCount();
+    }
+
+    public function getIsCacheEnabled()
+    {
+        return $this->conn->getQueryCacheEnabled();
+    }
+
+    public function getCacheTimeout()
+    {
+        return $this->conn->getCacheTimeout();
+    }
+
+    public function getShortDebugInfo()
+    {
+        $debug = array(
+            'sql_count' => $this->getSQLCount(),
+            'cached_sql_count' => $this->getCachedSQLCount(),
+            'cache_enabled' => $this->getIsCacheEnabled()
+        );
+
+        return $debug;
+    }
+
+    public function getDatabaseCache()
+    {
+        return $this->db_cache;
+    }
+
+    public function setDatabaseCache(iDatabaseCacheProvider $cache_storage = null)
+    {
+        $this->db_cache = $cache_storage;
+
+        if ($this->conn) {
+            $this->conn->setQueryCacheBacked($this->db_cache);
+        }
+    }
+
+    public function setPropelLogger(lcPropelLogger $logger = null)
+    {
+        $this->propel_logger = $logger;
+
+        if ($this->conn) {
+            $this->conn->setLogger($this->propel_logger);
+        }
+    }
+
+    #pragma mark - iDatabaseWithCache methods
+
+    public function getConnection()
+    {
+        if (!$this->conn) {
+            $this->connect();
+        }
+
+        return $this->conn;
+    }
+
+    public function isConnected()
+    {
+        return $this->conn ? true : false;
+    }
+
     public function reconnect()
     {
         $this->disconnect();
@@ -179,38 +211,6 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         }
 
         return $res;
-    }
-
-    public function disconnect()
-    {
-        if (!$this->conn) {
-            return true;
-        }
-
-        $this->conn = null;
-
-        if (DO_DEBUG) {
-            $this->debug('Database disconnected');
-        }
-
-        return true;
-    }
-
-    #pragma mark - iDatabaseWithCache methods
-
-    public function getCachedSQLCount()
-    {
-        return $this->conn->getCachedQueryCount();
-    }
-
-    public function getCacheTimeout()
-    {
-        return $this->conn->getCacheTimeout();
-    }
-
-    public function getIsCacheEnabled()
-    {
-        return $this->conn->getQueryCacheEnabled();
     }
 
 }

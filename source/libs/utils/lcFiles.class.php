@@ -89,30 +89,6 @@ class lcFiles
         return true;
     }
 
-    public static function splitFileName($filename)
-    {
-        $filename = basename($filename);
-
-        # if no extension at all - add one
-        if (strpos($filename, '.') === false) {
-            $filename .= '.';
-        }
-
-        $lastd = strrpos($filename, '.');
-        $ext = substr($filename, $lastd, strlen($filename));
-        $fname = substr($filename, 0, $lastd);
-
-        $ext = ($ext != '.') ? $ext : null;
-
-        $ret =
-            array(
-                'name' => $fname,
-                'ext' => $ext
-            );
-
-        return $ret;
-    }
-
     public static function rm($filename)
     {
         if (!file_exists($filename)) {
@@ -139,7 +115,6 @@ class lcFiles
         }
     }
 
-    // returns the dot with the extension (e.g: .jpg)!
     public static function getFileExt($filename)
     {
         if (!$tmp = self::splitFileName($filename)) {
@@ -147,6 +122,32 @@ class lcFiles
         }
 
         return $tmp['ext'];
+    }
+
+    // returns the dot with the extension (e.g: .jpg)!
+
+    public static function splitFileName($filename)
+    {
+        $filename = basename($filename);
+
+        # if no extension at all - add one
+        if (strpos($filename, '.') === false) {
+            $filename .= '.';
+        }
+
+        $lastd = strrpos($filename, '.');
+        $ext = substr($filename, $lastd, strlen($filename));
+        $fname = substr($filename, 0, $lastd);
+
+        $ext = ($ext != '.') ? $ext : null;
+
+        $ret =
+            array(
+                'name' => $fname,
+                'ext' => $ext
+            );
+
+        return $ret;
     }
 
     public static function getMimetype($filename)

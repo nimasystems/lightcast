@@ -35,14 +35,14 @@ class lcAutoloadCacheTool extends lcObj
         $this->ignore_hidden_files = true;
     }
 
-    public function setWriteBasePath($write_base_path = true)
-    {
-        $this->write_base_path = $write_base_path;
-    }
-
     public function getWriteBasePath()
     {
         return $this->write_base_path;
+    }
+
+    public function setWriteBasePath($write_base_path = true)
+    {
+        $this->write_base_path = $write_base_path;
     }
 
     public function getClassDirs()
@@ -60,14 +60,14 @@ class lcAutoloadCacheTool extends lcObj
         $this->class_file_endings = $class_file_endings;
     }
 
-    public function getCacheVarName()
-    {
-        return $this->cache_var_name;
-    }
-
     public function getCacheVersionVarName()
     {
         return $this->getCacheVarName();
+    }
+
+    public function getCacheVarName()
+    {
+        return $this->cache_var_name;
     }
 
     public function getFollowSymlinks()
@@ -100,14 +100,14 @@ class lcAutoloadCacheTool extends lcObj
         $this->cache_filename = $cache_filename;
     }
 
-    public function setCacheVersion($version)
-    {
-        $this->cache_version = $version;
-    }
-
     public function getCacheVersion()
     {
         return $this->cache_version;
+    }
+
+    public function setCacheVersion($version)
+    {
+        $this->cache_version = $version;
     }
 
     public function getFoundClasses()

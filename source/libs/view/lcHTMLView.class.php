@@ -30,14 +30,14 @@
  */
 abstract class lcHTMLView extends lcView
 {
-    public function getContentType()
-    {
-        return 'text/html';
-    }
-
     public function getSupportedContentTypes()
     {
         // only text/html supported
         return array($this->getContentType());
+    }
+
+    public function getContentType()
+    {
+        return 'text/html';
     }
 }

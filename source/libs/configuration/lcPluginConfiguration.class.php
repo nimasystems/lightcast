@@ -49,27 +49,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         parent::initialize();
     }
 
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
     public function getPluginDir()
-    {
-        return $this->root_dir;
-    }
-
-    public function setRootDir($root_dir)
-    {
-        $this->root_dir = $root_dir;
-    }
-
-    public function getRootDir()
     {
         return $this->root_dir;
     }
@@ -108,27 +88,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         // dispatcher notifications
         // which - when observed in the system - will automatically boot the
         // plugin prior the event!
-        return null;
-    }
-
-    public function getDefaultConfiguration()
-    {
-        // subclassers may override this method to return a default configuration
-        // which
-        // should be applied upon initialization
-    }
-
-    public function getDefaultRoutingConfiguration()
-    {
-        // subclassers may override this method to return a different routing
-        // configuration
-        return null;
-    }
-
-    public function getDefaultViewConfiguration()
-    {
-        // subclassers may override this method to return a different view
-        // configuration
         return null;
     }
 
@@ -241,6 +200,16 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return $this->getRootDir() . DS . 'config';
     }
 
+    public function getRootDir()
+    {
+        return $this->root_dir;
+    }
+
+    public function setRootDir($root_dir)
+    {
+        $this->root_dir = $root_dir;
+    }
+
     public function getProjectConfigDir()
     {
         $plugin_name = $this->getName();
@@ -250,6 +219,16 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         }
 
         return 'plugins' . DS . $plugin_name;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getConfigHandleMap()
@@ -274,5 +253,26 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         );
 
         return $config_map;
+    }
+
+    public function getDefaultConfiguration()
+    {
+        // subclassers may override this method to return a default configuration
+        // which
+        // should be applied upon initialization
+    }
+
+    public function getDefaultRoutingConfiguration()
+    {
+        // subclassers may override this method to return a different routing
+        // configuration
+        return null;
+    }
+
+    public function getDefaultViewConfiguration()
+    {
+        // subclassers may override this method to return a different view
+        // configuration
+        return null;
     }
 }

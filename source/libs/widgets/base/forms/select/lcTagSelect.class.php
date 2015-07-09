@@ -48,14 +48,50 @@ class lcTagSelect extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    public static function getRequiredAttributes()
+    public function setName($value = null)
     {
-        return array();
+        $this->setAttribute('name', $value);
+        return $this;
     }
 
     /*
      * Can be option or option group
     */
+
+    public function setSize($value = null)
+    {
+        $this->setAttribute('size', $value);
+        return $this;
+    }
+
+    public function setIsMultiple($value = false)
+    {
+        $this->setAttribute('multiple', $value ? 'multiple' : null);
+        return $this;
+    }
+
+    public function setIsDisabled($value = false)
+    {
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        return $this;
+    }
+
+    public function setTabIndex($value = null)
+    {
+        $this->setAttribute('tabindex', $value);
+        return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('name', 'size', 'multiply', 'disabled', 'tabindex');
+    }
+
     public function addOption($option)
     {
         if ((!$option instanceof lcTagOption) && (!$option instanceof lcOptGroup)) {
@@ -94,26 +130,9 @@ class lcTagSelect extends lcHtmlTag
         return $this;
     }
 
-    public static function getOptionalAttributes()
-    {
-        return array('name', 'size', 'multiply', 'disabled', 'tabindex');
-    }
-
-    public function setName($value = null)
-    {
-        $this->setAttribute('name', $value);
-        return $this;
-    }
-
     public function getName()
     {
         return $this->getAttribute('name');
-    }
-
-    public function setSize($value = null)
-    {
-        $this->setAttribute('size', $value);
-        return $this;
     }
 
     public function getSize()
@@ -121,32 +140,14 @@ class lcTagSelect extends lcHtmlTag
         return $this->getAttribute('size');
     }
 
-    public function setIsMultiple($value = false)
-    {
-        $this->setAttribute('multiple', $value ? 'multiple' : null);
-        return $this;
-    }
-
     public function getIsMultiple()
     {
         return $this->getAttribute('multiple') ? true : false;
     }
 
-    public function setIsDisabled($value = false)
-    {
-        $this->setAttribute('disabled', $value ? 'disabled' : null);
-        return $this;
-    }
-
     public function getIsDisabled()
     {
         return $this->getAttribute('disabled') ? true : false;
-    }
-
-    public function setTabIndex($value = null)
-    {
-        $this->setAttribute('tabindex', $value);
-        return $this;
     }
 
     public function getTabIndex()

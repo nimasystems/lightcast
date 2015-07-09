@@ -30,17 +30,17 @@
  */
 abstract class lcBaseCollection extends lcObj
 {
+    const SPL_OBJECT_NAME = 'ArrayIterator';
     /**
      * @var ArrayIterator
      */
     protected $list;
 
-    const SPL_OBJECT_NAME = 'ArrayIterator';
-
     /*
      * Construct a new array iterator from anything that has a hash table.
     * That is any Array or Object.
     */
+
     public function __construct(array $data = null)
     {
         parent::__construct();
@@ -60,45 +60,9 @@ abstract class lcBaseCollection extends lcObj
         parent::__destruct();
     }
 
-    protected function appendColl($value)
-    {
-        $this->list->append($value);
-    }
-
-    public function offsetExists($index)
-    {
-        return $this->list->offsetExists($index);
-    }
-
     public function offsetGet($index)
     {
         return $this->list->offsetGet($index);
-    }
-
-    protected function offsetSetColl($index, $value)
-    {
-        $this->list->offsetSet($index, $value);
-    }
-
-    protected function offsetUnset($index)
-    {
-        $this->list->offsetUnset($index);
-    }
-
-    protected function setColl($value, $offset = null)
-    {
-        $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
-    }
-
-    protected function delete($offset = null)
-    {
-        $this->list->offsetUnset($offset ? $offset : $this->key());
-    }
-
-    protected function clear()
-    {
-        $spl = self::SPL_OBJECT_NAME;
-        $this->list = new $spl;
     }
 
     public function getArrayCopy()
@@ -106,40 +70,19 @@ abstract class lcBaseCollection extends lcObj
         return $this->list->getArrayCopy();
     }
 
-    /*
-     * Get vars
-    */
-    public function count()
-    {
-        return $this->list->count();
-    }
-
-    public function key()
-    {
-        return $this->list->key();
-    }
-
-    public function pos()
-    {
-        return $this->key();
-    }
-
     public function isValid()
     {
         return $this->list->valid();
     }
 
-    /*
-     * Manage Position of List
-    */
-    public function current()
-    {
-        return $this->list->current();
-    }
-
     public function selected()
     {
         return $this->current();
+    }
+
+    public function current()
+    {
+        return $this->list->current();
     }
 
     public function previous()
@@ -149,6 +92,11 @@ abstract class lcBaseCollection extends lcObj
         }
 
         $this->list->seek($this->list->key() - 1);
+    }
+
+    public function offsetExists($index)
+    {
+        return $this->list->offsetExists($index);
     }
 
     public function next()
@@ -161,14 +109,18 @@ abstract class lcBaseCollection extends lcObj
         $this->list->seek($position);
     }
 
-    public function rewind()
-    {
-        $this->list->rewind();
-    }
+    /*
+     * Get vars
+    */
 
     public function first()
     {
         $this->rewind();
+    }
+
+    public function rewind()
+    {
+        $this->list->rewind();
     }
 
     public function last()
@@ -180,50 +132,23 @@ abstract class lcBaseCollection extends lcObj
         $this->list->seek($this->count() - 1);
     }
 
+    public function pos()
+    {
+        return $this->key();
+    }
+
+    /*
+     * Manage Position of List
+    */
+
+    public function count()
+    {
+        return $this->list->count();
+    }
+
     public function getAll()
     {
         return $this->list;
-    }
-
-    /*
-     * Sorting functions
-    */
-    protected function asort()
-    {
-        $this->list->asort();
-    }
-
-    protected function ksort()
-    {
-        $this->list->ksort();
-    }
-
-    protected function natcasesort()
-    {
-        $this->list->natcasesort();
-    }
-
-    protected function natsort()
-    {
-        $this->list->natsort();
-    }
-
-    protected function uasort($cpm_function)
-    {
-        $this->list->uasort($cpm_function);
-    }
-
-    protected function uksort($cpm_function)
-    {
-        $this->list->uksort($cpm_function);
-    }
-
-    /*
-     * Other
-    */
-    protected function setSPLFlags($flags)
-    {
-        $this->list->setFlags($flags);
     }
 
     public function getSPLFlags()
@@ -252,5 +177,84 @@ abstract class lcBaseCollection extends lcObj
         }
 
         return $out;
+    }
+
+    protected function appendColl($value)
+    {
+        $this->list->append($value);
+    }
+
+    protected function offsetSetColl($index, $value)
+    {
+        $this->list->offsetSet($index, $value);
+    }
+
+    protected function offsetUnset($index)
+    {
+        $this->list->offsetUnset($index);
+    }
+
+    protected function setColl($value, $offset = null)
+    {
+        $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
+    }
+
+    protected function delete($offset = null)
+    {
+        $this->list->offsetUnset($offset ? $offset : $this->key());
+    }
+
+    /*
+     * Sorting functions
+    */
+
+    public function key()
+    {
+        return $this->list->key();
+    }
+
+    protected function clear()
+    {
+        $spl = self::SPL_OBJECT_NAME;
+        $this->list = new $spl;
+    }
+
+    protected function asort()
+    {
+        $this->list->asort();
+    }
+
+    protected function ksort()
+    {
+        $this->list->ksort();
+    }
+
+    protected function natcasesort()
+    {
+        $this->list->natcasesort();
+    }
+
+    protected function natsort()
+    {
+        $this->list->natsort();
+    }
+
+    /*
+     * Other
+    */
+
+    protected function uasort($cpm_function)
+    {
+        $this->list->uasort($cpm_function);
+    }
+
+    protected function uksort($cpm_function)
+    {
+        $this->list->uksort($cpm_function);
+    }
+
+    protected function setSPLFlags($flags)
+    {
+        $this->list->setFlags($flags);
     }
 }

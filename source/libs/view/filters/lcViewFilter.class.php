@@ -36,10 +36,6 @@ abstract class lcViewFilter extends lcSysObj
     /** @var lcViewFilter */
     protected $next;
 
-    abstract protected function getShouldApplyFilter();
-
-    abstract protected function applyFilter($content, $content_type = null);
-
     public function shutdown()
     {
         if ($this->next) {
@@ -81,4 +77,8 @@ abstract class lcViewFilter extends lcSysObj
 
         return $content;
     }
+
+    abstract protected function getShouldApplyFilter();
+
+    abstract protected function applyFilter($content, $content_type = null);
 }

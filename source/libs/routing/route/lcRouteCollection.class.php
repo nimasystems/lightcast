@@ -37,11 +37,6 @@ class lcRouteCollection extends lcBaseCollection
         parent::appendColl(new lcNamedRoute($name, $route, $params, $requirements));
     }
 
-    public function append(lcNamedRoute $route)
-    {
-        parent::appendColl($route);
-    }
-
     public function prepend($name, $route, array $params = null, array $requirements = null)
     {
         $all = $this->list;
@@ -56,6 +51,11 @@ class lcRouteCollection extends lcBaseCollection
         }
 
         unset($all);
+    }
+
+    public function append(lcNamedRoute $route)
+    {
+        parent::appendColl($route);
     }
 
     public function get($name)

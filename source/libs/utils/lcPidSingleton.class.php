@@ -3,9 +3,8 @@
 class PidSingleton
 {
 
-    protected $filename;
-
     public $already_running;
+    protected $filename;
 
     public function __construct($directory)
     {

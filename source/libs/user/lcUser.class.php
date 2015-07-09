@@ -93,26 +93,9 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         return $debug;
     }
 
-    public function getShortDebugInfo()
-    {
-        return false;
-    }
-
     public function getAttributes()
     {
         return $this->attributes;
-    }
-
-    public function getAttribute($name)
-    {
-        $value = isset($this->attributes[$name]) ?
-            $this->attributes[$name] : null;
-        return $value;
-    }
-
-    public function setAttribute($name, $value)
-    {
-        $this->attributes[$name] = $value;
     }
 
     public function setAttributes(array $attributes = null)
@@ -120,11 +103,9 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         $this->attributes = isset($attributes) ? $attributes : array();
     }
 
-    public function unsetAttribute($name)
+    public function getShortDebugInfo()
     {
-        if (isset($this->attributes[$name])) {
-            unset($this->attributes[$name]);
-        }
+        return false;
     }
 
     public function unsetAttributes()
@@ -147,9 +128,21 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         return $this->getAttribute($offset);
     }
 
+    public function getAttribute($name)
+    {
+        $value = isset($this->attributes[$name]) ?
+            $this->attributes[$name] : null;
+        return $value;
+    }
+
     public function offsetSet($offset, $value)
     {
         $this->setAttribute($offset, $value);
+    }
+
+    public function setAttribute($name, $value)
+    {
+        $this->attributes[$name] = $value;
     }
 
     public function offsetUnset($offset)
@@ -157,15 +150,11 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         $this->unsetAttribute($offset);
     }
 
-    public function getAttributeNames()
+    public function unsetAttribute($name)
     {
-        if (!$this->attributes) {
-            return false;
+        if (isset($this->attributes[$name])) {
+            unset($this->attributes[$name]);
         }
-
-        $ret = array_keys($this->attributes);
-
-        return $ret;
     }
 
     public function __toString()
@@ -176,11 +165,22 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         return $str;
     }
 
-    #pragma mark - iKeyValueProvider
-
     public function getAllKeys()
     {
         $ret = $this->getAttributeNames();
+        return $ret;
+    }
+
+    #pragma mark - iKeyValueProvider
+
+    public function getAttributeNames()
+    {
+        if (!$this->attributes) {
+            return false;
+        }
+
+        $ret = array_keys($this->attributes);
+
         return $ret;
     }
 

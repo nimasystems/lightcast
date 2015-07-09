@@ -35,16 +35,16 @@ class lcMailRecipient extends lcObj
     private $email;
     private $name;
 
-    public static function create($email, $name = null)
-    {
-        $obj = new lcMailRecipient($email, $name);
-        return $obj;
-    }
-
     public function __construct($email, $name = '')
     {
         $this->name = isset($name) ? (string)$name : null;
         $this->email = (string)$email;
+    }
+
+    public static function create($email, $name = null)
+    {
+        $obj = new lcMailRecipient($email, $name);
+        return $obj;
     }
 
     public function getEmail()

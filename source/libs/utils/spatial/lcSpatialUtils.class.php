@@ -127,6 +127,16 @@ class lcSpatialUtils
         return $ret;
     }
 
+    public static function generateRandomPointKm($centre, $radius)
+    {
+        // 1km = 0.621371192 miles
+        $radius_miles = $radius * self::MILE_KM;
+
+        $ret = self::generateRandomPoint($centre, $radius_miles);
+
+        return $ret;
+    }
+
     /**
      * Given a $centre (latitude, longitude) co-ordinates and a
      * distance $radius (miles), returns a random point (latitude,longtitude)
@@ -182,15 +192,5 @@ class lcSpatialUtils
         $lat_rads = asin($z3);
 
         return array_map('rad2deg', array($lat_rads, $lng_rads));
-    }
-
-    public static function generateRandomPointKm($centre, $radius)
-    {
-        // 1km = 0.621371192 miles
-        $radius_miles = $radius * self::MILE_KM;
-
-        $ret = self::generateRandomPoint($centre, $radius_miles);
-
-        return $ret;
     }
 }

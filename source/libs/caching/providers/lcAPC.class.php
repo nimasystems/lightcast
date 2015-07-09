@@ -45,6 +45,8 @@ class lcAPC extends lcSysObj implements iCacheStorage
      */
     public function __construct()
     {
+        parent::__construct();
+        
         // check for apc
         if (!function_exists('apc_fetch')) {
             throw new lcSystemException('APC is not available');

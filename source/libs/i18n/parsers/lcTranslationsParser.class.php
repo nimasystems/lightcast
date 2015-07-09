@@ -32,14 +32,10 @@ abstract class lcTranslationsParser extends lcObj
 {
     const DEFAULT_CATEGORY_NAME = 'default';
     const ALL_SUBDIRS = '*';
-
+    const TR_MULTILINE_DETECT_REP = '-----tn----';
     protected $event_dispatcher;
     protected $configuration;
-
     protected $base_dir;
-
-    const TR_MULTILINE_DETECT_REP = '-----tn----';
-
     protected $conditions = array(
         'template' => array(
             array("/\{t\}(.*?)\{\/t\}/i" => '1'),
@@ -61,21 +57,15 @@ abstract class lcTranslationsParser extends lcObj
         $this->base_dir = $base_dir;
     }
 
-    abstract public function getDirsToParse();
+    public function setConditions($file_type, array $conditions)
+    {
+        $this->conditions[$file_type] = $conditions;
+    }
 
     /*
      * If translations should be separated and categorized by dirs
     * Should return an array of 'dir' => 'category name'
     */
-    public function getCategorizationMap()
-    {
-        return false;
-    }
-
-    public function setConditions($file_type, array $conditions)
-    {
-        $this->conditions[$file_type] = $conditions;
-    }
 
     public function internalParseFile($filename, $category_name = self::DEFAULT_CATEGORY_NAME)
     {
@@ -99,39 +89,13 @@ abstract class lcTranslationsParser extends lcObj
         return true;
     }
 
-    public function parse()
+    private function getConditionScopeByFilename($filename)
     {
-        $this->results = array();
-
-        $base_dir = $this->base_dir;
-
-        // walk and parse
-        $dirs = $this->getDirsToParse();
-
-        // get the categorization map
-        $categorization_map = $this->getCategorizationMap();
-
-        if ($dirs) {
-            if ($dirs == self::ALL_SUBDIRS) {
-                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'));
-            } elseif (is_array($dirs)) {
-                // parse the base dir first
-                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'), array(self::DEFAULT_CATEGORY_NAME), false);
-
-                foreach ($dirs as $dir) {
-                    $category = isset($categorization_map[$dir]) ? $categorization_map[$dir] : self::DEFAULT_CATEGORY_NAME;
-                    $fullpath = $base_dir . DS . $dir;
-
-                    lcDirs::recursiveFilesCallback($fullpath, array($this, 'internalParseFile'), array($category));
-
-                    unset($dir, $fullpath, $category);
-                }
-            }
-
-            unset($dirs);
+        if (substr(basename($filename), -3) == 'php') {
+            return 'php';
+        } else {
+            return 'template';
         }
-
-        return $this->results;
     }
 
     public function parseFile($filename, $filetype)
@@ -210,12 +174,45 @@ abstract class lcTranslationsParser extends lcObj
         return $matched;
     }
 
-    private function getConditionScopeByFilename($filename)
+    public function parse()
     {
-        if (substr(basename($filename), -3) == 'php') {
-            return 'php';
-        } else {
-            return 'template';
+        $this->results = array();
+
+        $base_dir = $this->base_dir;
+
+        // walk and parse
+        $dirs = $this->getDirsToParse();
+
+        // get the categorization map
+        $categorization_map = $this->getCategorizationMap();
+
+        if ($dirs) {
+            if ($dirs == self::ALL_SUBDIRS) {
+                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'));
+            } elseif (is_array($dirs)) {
+                // parse the base dir first
+                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'), array(self::DEFAULT_CATEGORY_NAME), false);
+
+                foreach ($dirs as $dir) {
+                    $category = isset($categorization_map[$dir]) ? $categorization_map[$dir] : self::DEFAULT_CATEGORY_NAME;
+                    $fullpath = $base_dir . DS . $dir;
+
+                    lcDirs::recursiveFilesCallback($fullpath, array($this, 'internalParseFile'), array($category));
+
+                    unset($dir, $fullpath, $category);
+                }
+            }
+
+            unset($dirs);
         }
+
+        return $this->results;
+    }
+
+    abstract public function getDirsToParse();
+
+    public function getCategorizationMap()
+    {
+        return false;
     }
 }

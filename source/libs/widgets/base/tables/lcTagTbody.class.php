@@ -43,16 +43,6 @@ class lcTagTbody extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('align', 'valign', 'char', 'charoff');
-    }
-
     public function setAlign($value = null)
     {
         if (isset($value) &&
@@ -64,11 +54,6 @@ class lcTagTbody extends lcHtmlTag
 
         $this->setAttribute('align', $value);
         return $this;
-    }
-
-    public function getAlign()
-    {
-        return $this->getAttribute('align');
     }
 
     public function setValign($value = null)
@@ -83,26 +68,41 @@ class lcTagTbody extends lcHtmlTag
         return $this;
     }
 
-    public function getValign()
-    {
-        return $this->getAttribute('valign');
-    }
-
     public function setChar($value = null)
     {
         $this->setAttribute('char', $value);
         return $this;
     }
 
-    public function getChar()
-    {
-        return $this->getAttribute('char');
-    }
-
     public function setCharoff($value = null)
     {
         $this->setAttribute('charoff', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('align', 'valign', 'char', 'charoff');
+    }
+
+    public function getAlign()
+    {
+        return $this->getAttribute('align');
+    }
+
+    public function getValign()
+    {
+        return $this->getAttribute('valign');
+    }
+
+    public function getChar()
+    {
+        return $this->getAttribute('char');
     }
 
     public function getCharoff()

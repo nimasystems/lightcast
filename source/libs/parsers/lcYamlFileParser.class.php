@@ -37,39 +37,6 @@ class lcYamlFileParser extends lcFileParser
     const INDENT_VALUE = 2;
     const WORD_WRAP_VALUE = 0;
 
-    protected function trimYamlValue($val)
-    {
-        if (is_array($val)) {
-            return $val;
-        }
-
-        $val = trim($val);
-
-        return $val;
-    }
-
-    private function fixSpycContent($yaml_content)
-    {
-        // iterate thru string
-        $final = '';
-        $lines = explode("\n", $yaml_content);
-
-        foreach ($lines as $line) {
-            // check for dash...
-            $trim = ltrim($line);
-            if (substr($trim, 0, 1) === '-') {
-                // bump space
-                $line = '  ' . $line;
-            }
-
-            // add back to string
-            $final .= $line . "\n";
-        }
-
-        // return
-        return $final;
-    }
-
     public function parse()
     {
         $filename = $this->filename;
@@ -113,6 +80,28 @@ class lcYamlFileParser extends lcFileParser
         }
     }
 
+    private function fixSpycContent($yaml_content)
+    {
+        // iterate thru string
+        $final = '';
+        $lines = explode("\n", $yaml_content);
+
+        foreach ($lines as $line) {
+            // check for dash...
+            $trim = ltrim($line);
+            if (substr($trim, 0, 1) === '-') {
+                // bump space
+                $line = '  ' . $line;
+            }
+
+            // add back to string
+            $final .= $line . "\n";
+        }
+
+        // return
+        return $final;
+    }
+
     public function writeData($data, array $options = null)
     {
         $filename = $this->filename;
@@ -153,5 +142,16 @@ class lcYamlFileParser extends lcFileParser
         } catch (Exception $e) {
             throw new lcSystemException('Error while trying to save data to config file (' . $filename . '): ' . $e->getMessage(), $e->getCode(), $e);
         }
+    }
+
+    protected function trimYamlValue($val)
+    {
+        if (is_array($val)) {
+            return $val;
+        }
+
+        $val = trim($val);
+
+        return $val;
     }
 }

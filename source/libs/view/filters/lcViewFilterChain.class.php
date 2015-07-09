@@ -43,6 +43,16 @@ class lcViewFilterChain extends lcSysObj
         parent::shutdown();
     }
 
+    public function removeAllFilters()
+    {
+        if ($this->first_view_filter) {
+            $this->first_view_filter->shutdown();
+            $this->first_view_filter = null;
+        }
+
+        $this->last_view_filter = null;
+    }
+
     public function execute(lcView $view, $content, $content_type = null)
     {
         if (!$this->first_view_filter) {
@@ -62,16 +72,6 @@ class lcViewFilterChain extends lcSysObj
             $this->last_view_filter->setNext($view_filter);
             $this->last_view_filter = $view_filter;
         }
-    }
-
-    public function removeAllFilters()
-    {
-        if ($this->first_view_filter) {
-            $this->first_view_filter->shutdown();
-            $this->first_view_filter = null;
-        }
-
-        $this->last_view_filter = null;
     }
 
     public function getFirstViewFilter()

@@ -51,11 +51,6 @@ class lcInternalTranslationSource extends lcSerializedFileTranslationSource
             ) = unserialize($serialized);
     }
 
-    public function translationExists($original_string)
-    {
-        return isset($this->translations[$original_string]);
-    }
-
     public function getTranslation($original_string)
     {
         if (!$this->translationExists($original_string)) {
@@ -65,14 +60,14 @@ class lcInternalTranslationSource extends lcSerializedFileTranslationSource
         return $this->translations[$original_string];
     }
 
+    public function translationExists($original_string)
+    {
+        return isset($this->translations[$original_string]);
+    }
+
     public function getTranslations()
     {
         return $this->translations;
-    }
-
-    public function setTranslation($original_string, $translated_string)
-    {
-        $this->translations[$original_string] = $translated_string;
     }
 
     public function setTranslations(array $translations)
@@ -81,5 +76,10 @@ class lcInternalTranslationSource extends lcSerializedFileTranslationSource
             (array)$this->translations,
             $translations
         );
+    }
+
+    public function setTranslation($original_string, $translated_string)
+    {
+        $this->translations[$original_string] = $translated_string;
     }
 }

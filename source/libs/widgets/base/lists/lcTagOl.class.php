@@ -39,6 +39,12 @@ class lcTagOl extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public function setContent($content = null)
+    {
+        parent::setContent($content);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -47,11 +53,5 @@ class lcTagOl extends lcHtmlTag
     public static function getOptionalAttributes()
     {
         return array();
-    }
-
-    public function setContent($content = null)
-    {
-        parent::setContent($content);
-        return $this;
     }
 }

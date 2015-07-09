@@ -118,6 +118,97 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         return true;
     }
 
+    private function prepareWithTarget(lcBaseMigrationsTarget $target)
+    {
+        // validate it
+        $this->validateMigrationsTarget($target);
+
+        // create migration table if missing
+        $this->createMigrationTable($target->getDatabase());
+
+        // fetch and cache info for target
+        $this->initInternal($target);
+    }
+
+    private function validateMigrationsTarget(lcBaseMigrationsTarget $target)
+    {
+        $valid = $target && $target->getDatabase() && $target->getSchemaIdentifier() && $target->getMigrationsVersion() && is_numeric($target->getMigrationsVersion());
+
+        if (!$valid) {
+            throw new lcSystemException('Schema migration target ' . ($target ? get_class($target) : null) . ' is invalid: ' . $target);
+        }
+    }
+
+    private function createMigrationTable(lcDatabase $database)
+    {
+        if (!$database) {
+            throw new lcInvalidArgumentException('Invalid database');
+        }
+
+        $conn = $database->getConnection();
+
+        $mtable = $this->migration_table_name;
+
+        assert(!is_null($mtable));
+
+        // check if it exists first
+        $query = 'SHOW TABLES LIKE ' . $conn->quote($mtable);
+        $ret = $conn->query($query)->fetch(PDO::FETCH_ASSOC);
+
+        if (!$ret) {
+            $this->info('Creating schema migrations table (' . $mtable . ')');
+
+            // not existing - create it
+            $sql = 'CREATE TABLE ' . $conn->quoteTableName($mtable) . ' (`schema_identifier` varchar(50) NOT NULL DEFAULT \'\',`schema_version` int(11) NOT NULL DEFAULT \'1\',`last_updated` DATETIME NOT NULL,PRIMARY KEY (`schema_identifier`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
+            $conn->exec($sql);
+        }
+    }
+
+    private function initInternal(lcBaseMigrationsTarget $target)
+    {
+        $this->current_target = $target;
+        $this->conn = $target->getDatabase()->getConnection();
+
+        // fetch current schema migrations version
+        $query = 'SELECT schema_version FROM ' . $this->conn->quoteTableName($this->migration_table_name) . ' WHERE schema_identifier = ' . $this->conn->quote($target->getSchemaIdentifier()) . ' LIMIT 1';
+        $res = $this->conn->query($query);
+
+        $current_schema_version = 0;
+
+        if ($res->rowCount()) {
+            $row = $res->fetch(PDO::FETCH_ASSOC);
+            $current_schema_version = (int)$row['schema_version'];
+        }
+
+        $this->current_migrations_version = $current_schema_version;
+
+        $this->info('Obtained current schema version: ' . $current_schema_version);
+
+        // check if for some reason the installed version is higher than the
+        // target's one
+        // that should never happen!
+        if ($this->current_migrations_version > $target->getMigrationsVersion()) {
+            throw new lcDatabaseSchemaException('The schema object\'s version identifier is invalid - it is lower than the currently active installed schema version!' . ' (currently installed: ' . $this->current_migrations_version . ', Schema target version: ' . $target->getMigrationsVersion() . ')');
+        }
+    }
+
+    private function updateSchemaVersionToMigrationTable(lcBaseMigrationsTarget $target, $version)
+    {
+        $version = (int)$version;
+
+        assert($version);
+        assert(isset($target));
+
+        $conn = $target->getDatabase()->getConnection();
+
+        $sql = 'REPLACE INTO ' . $conn->quoteTableName($this->migration_table_name) . ' (schema_identifier, schema_version, last_updated) VALUES(' . $conn->quote($target->getSchemaIdentifier()) . ', ' . $version . ', CURRENT_TIMESTAMP)';
+        $conn->exec($sql);
+
+        if (DO_DEBUG) {
+            $this->debug('Schema table updated (Changed version: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ' -> ' . $version . ')');
+        }
+    }
+
     public function removeSchema(lcBaseMigrationsTarget $target)
     {
         // validate it
@@ -147,6 +238,20 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $this->info('Schema (' . $target . ') removed');
 
         return true;
+    }
+
+    private function removeSchemaFromMigrationTable(lcBaseMigrationsTarget $target)
+    {
+        assert(isset($target));
+
+        $conn = $target->getDatabase()->getConnection();
+
+        $sql = 'DELETE FROM ' . $conn->quoteTableName($this->migration_table_name) . ' WHERE schema_identifier = ' . $conn->quote($target->getSchemaIdentifier());
+        $conn->exec($sql);
+
+        if (DO_DEBUG) {
+            $this->debug('Schema table updated (Removed schema: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ')');
+        }
     }
 
     public function installData(lcBaseMigrationsTarget $target)
@@ -323,111 +428,6 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
         $this->info('Schema downgrade complete');
 
         return true;
-    }
-
-    private function prepareWithTarget(lcBaseMigrationsTarget $target)
-    {
-        // validate it
-        $this->validateMigrationsTarget($target);
-
-        // create migration table if missing
-        $this->createMigrationTable($target->getDatabase());
-
-        // fetch and cache info for target
-        $this->initInternal($target);
-    }
-
-    private function validateMigrationsTarget(lcBaseMigrationsTarget $target)
-    {
-        $valid = $target && $target->getDatabase() && $target->getSchemaIdentifier() && $target->getMigrationsVersion() && is_numeric($target->getMigrationsVersion());
-
-        if (!$valid) {
-            throw new lcSystemException('Schema migration target ' . ($target ? get_class($target) : null) . ' is invalid: ' . $target);
-        }
-    }
-
-    private function updateSchemaVersionToMigrationTable(lcBaseMigrationsTarget $target, $version)
-    {
-        $version = (int)$version;
-
-        assert($version);
-        assert(isset($target));
-
-        $conn = $target->getDatabase()->getConnection();
-
-        $sql = 'REPLACE INTO ' . $conn->quoteTableName($this->migration_table_name) . ' (schema_identifier, schema_version, last_updated) VALUES(' . $conn->quote($target->getSchemaIdentifier()) . ', ' . $version . ', CURRENT_TIMESTAMP)';
-        $conn->exec($sql);
-
-        if (DO_DEBUG) {
-            $this->debug('Schema table updated (Changed version: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ' -> ' . $version . ')');
-        }
-    }
-
-    private function removeSchemaFromMigrationTable(lcBaseMigrationsTarget $target)
-    {
-        assert(isset($target));
-
-        $conn = $target->getDatabase()->getConnection();
-
-        $sql = 'DELETE FROM ' . $conn->quoteTableName($this->migration_table_name) . ' WHERE schema_identifier = ' . $conn->quote($target->getSchemaIdentifier());
-        $conn->exec($sql);
-
-        if (DO_DEBUG) {
-            $this->debug('Schema table updated (Removed schema: ' . $this->migration_table_name . ': ' . $target->getSchemaIdentifier() . ')');
-        }
-    }
-
-    private function initInternal(lcBaseMigrationsTarget $target)
-    {
-        $this->current_target = $target;
-        $this->conn = $target->getDatabase()->getConnection();
-
-        // fetch current schema migrations version
-        $query = 'SELECT schema_version FROM ' . $this->conn->quoteTableName($this->migration_table_name) . ' WHERE schema_identifier = ' . $this->conn->quote($target->getSchemaIdentifier()) . ' LIMIT 1';
-        $res = $this->conn->query($query);
-
-        $current_schema_version = 0;
-
-        if ($res->rowCount()) {
-            $row = $res->fetch(PDO::FETCH_ASSOC);
-            $current_schema_version = (int)$row['schema_version'];
-        }
-
-        $this->current_migrations_version = $current_schema_version;
-
-        $this->info('Obtained current schema version: ' . $current_schema_version);
-
-        // check if for some reason the installed version is higher than the
-        // target's one
-        // that should never happen!
-        if ($this->current_migrations_version > $target->getMigrationsVersion()) {
-            throw new lcDatabaseSchemaException('The schema object\'s version identifier is invalid - it is lower than the currently active installed schema version!' . ' (currently installed: ' . $this->current_migrations_version . ', Schema target version: ' . $target->getMigrationsVersion() . ')');
-        }
-    }
-
-    private function createMigrationTable(lcDatabase $database)
-    {
-        if (!$database) {
-            throw new lcInvalidArgumentException('Invalid database');
-        }
-
-        $conn = $database->getConnection();
-
-        $mtable = $this->migration_table_name;
-
-        assert(!is_null($mtable));
-
-        // check if it exists first
-        $query = 'SHOW TABLES LIKE ' . $conn->quote($mtable);
-        $ret = $conn->query($query)->fetch(PDO::FETCH_ASSOC);
-
-        if (!$ret) {
-            $this->info('Creating schema migrations table (' . $mtable . ')');
-
-            // not existing - create it
-            $sql = 'CREATE TABLE ' . $conn->quoteTableName($mtable) . ' (`schema_identifier` varchar(50) NOT NULL DEFAULT \'\',`schema_version` int(11) NOT NULL DEFAULT \'1\',`last_updated` DATETIME NOT NULL,PRIMARY KEY (`schema_identifier`)) ENGINE=InnoDB DEFAULT CHARSET=utf8;';
-            $conn->exec($sql);
-        }
     }
 
 }

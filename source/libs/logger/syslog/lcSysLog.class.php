@@ -30,10 +30,9 @@
  */
 class lcSysLog extends lcObj
 {
-    private $is_os_win;
-
     const DEFAULT_FACILITY = LOG_LOCAL7;
     const DEFAULT_PRIORITY = LOG_INFO;
+    private $is_os_win;
 
     /*  syslog() code types:
      *  LOG_EMERG system is unusable

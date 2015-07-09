@@ -70,6 +70,28 @@ class lcPoFile extends lcObj
         }
     }
 
+    public function setDefaultHeaders()
+    {
+        $this->headers = array(
+            'Project-Id-Version' => '1.0.0.0',
+            'Report-Msgid-Bugs-To' => 'i18n@nimasystems.com',
+            'POT-Creation-Date' => date(self::DATE_FORMAT),
+            'PO-Revision-Date' => date(self::DATE_FORMAT),
+            'Last-Translator' => 'Nimasystems Ltd',
+            'Language' => '',
+            'Language-Team' => 'Nimasystems Ltd Translation Team',
+            'MIME-Version' => '1.0',
+            'Content-Type' => 'text/plain; charset=UTF-8',
+            'Content-Transfer-Encoding' => '8bit'
+        );
+
+        $this->description =
+            '# TRANSLATION FILE' . "\n" .
+            '# Copyright (C) ' . date('Y') . ' NIMASYSTEMS LTD' . "\n" .
+            '# NIMASYSTEMS LTD <i18n@nimasystems.com> - ' . date('Y') . "\n" .
+            '#';
+    }
+
     public function open($filename)
     {
         if ($this->data_loaded && $filename == $this->filename) {
@@ -106,43 +128,35 @@ class lcPoFile extends lcObj
         }
     }
 
-    public function mergeTemplate(array $template_messages)
-    {
-        $this->messages = (array)$this->messages;
-
-        if (!count($this->messages)) {
-            $this->messages = $template_messages;
-            return true;
-        } else {
-            // add missing
-            $this->messages = array_merge(
-                $template_messages,
-                $this->messages
-            );
-
-            $template_messages = array_keys($template_messages);
-
-            // remove stale
-            foreach ($this->messages as $msgid => $msgstr) {
-                if (array_search($msgid, $template_messages) === false) {
-                    unset($this->messages[$msgid]);
-                }
-
-                unset($msgid, $msgstr);
-            }
-        }
-
-        return $this->messages;
-    }
-
-    public function getHeaders()
-    {
-        return (array)$this->headers;
-    }
-
     public function clearHeaders()
     {
         $this->headers = array();
+    }
+
+    private function parseHeader(&$data)
+    {
+        // parse description
+        if (preg_match("/(.*?)msgid\s\"\"\nmsgstr\s\"\"/is", $data, $matches)) {
+            if ($matches && is_array($matches)) {
+                $this->description = trim($matches[1]);
+            }
+
+            unset($matches);
+        }
+
+        // parse headers
+        if (preg_match_all("/\"(.*?):(.*?).n\"/i", $data, $matches)) {
+            if ($matches && is_array($matches)) {
+                $c = 0;
+                foreach ($matches[1] as $header) {
+                    $this->setHeader($header, $matches[2][$c]);
+                    $c++;
+                    unset($header);
+                }
+                unset($c);
+            }
+            unset($matches);
+        }
     }
 
     /*private function addslashMultilineMsgId($string)
@@ -190,57 +204,6 @@ class lcPoFile extends lcObj
         return $string;
     }*/
 
-    private function stripslashMultilineMsgId($string)
-    {
-        $string = str_replace('\"', '~*~', $string);
-        $string = str_replace('"', '', $string);
-        $string = str_replace("\n", '', $string);
-        $string = str_replace('~*~', '"', $string);
-        return $string;
-    }
-
-    private function stripslashMultilineMsgStr($string)
-    {
-        $string = str_replace("\n", '', $string);
-        $string = str_replace('\n', "\n", $string);
-        $string = str_replace('\"', '~*~', $string);
-        $string = str_replace('"', '', $string);
-        $string = str_replace('~*~', '"', $string);
-        return $string;
-    }
-
-    public function setDefaultHeaders()
-    {
-        $this->headers = array(
-            'Project-Id-Version' => '1.0.0.0',
-            'Report-Msgid-Bugs-To' => 'i18n@nimasystems.com',
-            'POT-Creation-Date' => date(self::DATE_FORMAT),
-            'PO-Revision-Date' => date(self::DATE_FORMAT),
-            'Last-Translator' => 'Nimasystems Ltd',
-            'Language' => '',
-            'Language-Team' => 'Nimasystems Ltd Translation Team',
-            'MIME-Version' => '1.0',
-            'Content-Type' => 'text/plain; charset=UTF-8',
-            'Content-Transfer-Encoding' => '8bit'
-        );
-
-        $this->description =
-            '# TRANSLATION FILE' . "\n" .
-            '# Copyright (C) ' . date('Y') . ' NIMASYSTEMS LTD' . "\n" .
-            '# NIMASYSTEMS LTD <i18n@nimasystems.com> - ' . date('Y') . "\n" .
-            '#';
-    }
-
-    public function setDescription($description)
-    {
-        $this->description = $description;
-    }
-
-    public function getDescription()
-    {
-        return $this->description;
-    }
-
     public function setHeader($name, $value = null)
     {
         $name = trim($name);
@@ -253,32 +216,6 @@ class lcPoFile extends lcObj
             }
         } else {
             $this->headers[$name] = $value;
-        }
-    }
-
-    private function parseHeader(&$data)
-    {
-        // parse description
-        if (preg_match("/(.*?)msgid\s\"\"\nmsgstr\s\"\"/is", $data, $matches)) {
-            if ($matches && is_array($matches)) {
-                $this->description = trim($matches[1]);
-            }
-
-            unset($matches);
-        }
-
-        // parse headers
-        if (preg_match_all("/\"(.*?):(.*?).n\"/i", $data, $matches)) {
-            if ($matches && is_array($matches)) {
-                $c = 0;
-                foreach ($matches[1] as $header) {
-                    $this->setHeader($header, $matches[2][$c]);
-                    $c++;
-                    unset($header);
-                }
-                unset($c);
-            }
-            unset($matches);
         }
     }
 
@@ -450,6 +387,81 @@ class lcPoFile extends lcObj
         $this->messages = $messages_;
     }
 
+    private function unescapeMessage($message)
+    {
+        $message = str_replace('\"', '"', $message);
+
+        return $message;
+    }
+
+    private function stripslashMultilineMsgId($string)
+    {
+        $string = str_replace('\"', '~*~', $string);
+        $string = str_replace('"', '', $string);
+        $string = str_replace("\n", '', $string);
+        $string = str_replace('~*~', '"', $string);
+        return $string;
+    }
+
+    private function stripslashMultilineMsgStr($string)
+    {
+        $string = str_replace("\n", '', $string);
+        $string = str_replace('\n', "\n", $string);
+        $string = str_replace('\"', '~*~', $string);
+        $string = str_replace('"', '', $string);
+        $string = str_replace('~*~', '"', $string);
+        return $string;
+    }
+
+    public function mergeTemplate(array $template_messages)
+    {
+        $this->messages = (array)$this->messages;
+
+        if (!count($this->messages)) {
+            $this->messages = $template_messages;
+            return true;
+        } else {
+            // add missing
+            $this->messages = array_merge(
+                $template_messages,
+                $this->messages
+            );
+
+            $template_messages = array_keys($template_messages);
+
+            // remove stale
+            foreach ($this->messages as $msgid => $msgstr) {
+                if (array_search($msgid, $template_messages) === false) {
+                    unset($this->messages[$msgid]);
+                }
+
+                unset($msgid, $msgstr);
+            }
+        }
+
+        return $this->messages;
+    }
+
+    public function getHeaders()
+    {
+        return (array)$this->headers;
+    }
+
+    public function setHeaders(array $headers)
+    {
+        $this->headers = $headers;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
     public function setFilename($filename)
     {
         $this->filename = $filename;
@@ -468,26 +480,6 @@ class lcPoFile extends lcObj
         } catch (Exception $e) {
             throw new lcIOException('Cannot save PO file: ' . $e->getMessage(), null, $e);
         }
-    }
-
-    public function toMo($filename = null)
-    {
-        if (!isset($filename) && (!$this->filename)) {
-            throw new lcSystemException('Cannot convert PO to MO - no filename set');
-        }
-
-        $filename = isset($filename) ? $filename : $this->filename;
-
-        $fmt = new lcMsgFmt();
-
-        $res = $fmt->process($filename);
-
-        return $res;
-    }
-
-    public function __toString()
-    {
-        return $this->compile();
     }
 
     public function compile()
@@ -604,6 +596,26 @@ class lcPoFile extends lcObj
         return $value;
     }
 
+    public function toMo($filename = null)
+    {
+        if (!isset($filename) && (!$this->filename)) {
+            throw new lcSystemException('Cannot convert PO to MO - no filename set');
+        }
+
+        $filename = isset($filename) ? $filename : $this->filename;
+
+        $fmt = new lcMsgFmt();
+
+        $res = $fmt->process($filename);
+
+        return $res;
+    }
+
+    public function __toString()
+    {
+        return $this->compile();
+    }
+
     public function setMessage($msgid, $msgstr)
     {
         $this->messages[$msgid] = $msgstr;
@@ -682,6 +694,13 @@ class lcPoFile extends lcObj
         return isset($this->messages[$msgid]);
     }
 
+    /*private function escapeMessage($message)
+    {
+        $message = str_replace('"', '\"', $message);
+
+        return $message;
+    }*/
+
     public function hasMessages()
     {
         return (bool)empty($this->messages);
@@ -694,20 +713,6 @@ class lcPoFile extends lcObj
             null;
     }
 
-    /*private function escapeMessage($message)
-    {
-        $message = str_replace('"', '\"', $message);
-
-        return $message;
-    }*/
-
-    private function unescapeMessage($message)
-    {
-        $message = str_replace('\"', '"', $message);
-
-        return $message;
-    }
-
     public function removeMessage($msgid)
     {
         if (!isset($this->messages[$msgid])) {
@@ -717,19 +722,14 @@ class lcPoFile extends lcObj
         unset($this->messages[$msgid]);
     }
 
-    public function setMessages(array $messages)
-    {
-        $this->messages = $messages;
-    }
-
-    public function setHeaders(array $headers)
-    {
-        $this->headers = $headers;
-    }
-
     public function getMessages()
     {
         return (array)$this->messages;
+    }
+
+    public function setMessages(array $messages)
+    {
+        $this->messages = $messages;
     }
 
     public function clearMessages()

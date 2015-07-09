@@ -39,16 +39,6 @@ abstract class lcSerializedFileTranslationSource extends lcTranslationMessageSou
     private $ext;
     private $locale;
 
-    public function getLocale()
-    {
-        return $this->locale;
-    }
-
-    public function setLocale($locale)
-    {
-        throw new lcInvalidArgumentException('Cannot set locale ' . $locale . ' - try reading a file');
-    }
-
     public function getFileExtension()
     {
         return $this->ext;
@@ -57,11 +47,6 @@ abstract class lcSerializedFileTranslationSource extends lcTranslationMessageSou
     public function getPath()
     {
         return $this->file_path;
-    }
-
-    public function getFullFilename()
-    {
-        return $this->file_path . DS . $this->locale . $this->ext;
     }
 
     public function readFile($path, $locale, $ext = self::DEFAULT_EXT)
@@ -98,6 +83,16 @@ abstract class lcSerializedFileTranslationSource extends lcTranslationMessageSou
         }
     }
 
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    public function setLocale($locale)
+    {
+        throw new lcInvalidArgumentException('Cannot set locale ' . $locale . ' - try reading a file');
+    }
+
     public function saveFile()
     {
         try {
@@ -108,5 +103,10 @@ abstract class lcSerializedFileTranslationSource extends lcTranslationMessageSou
         } catch (Exception $e) {
             throw new lcI18NException('Error while writing to translation file: ' . $e->getMessage(), null, $e);
         }
+    }
+
+    public function getFullFilename()
+    {
+        return $this->file_path . DS . $this->locale . $this->ext;
     }
 }

@@ -62,14 +62,14 @@ class lcTableMap extends TableMap
         return $this->lc_context_name;
     }
 
-    public function setLcTitle($title)
-    {
-        return $this->lc_title = $title;
-    }
-
     public function getLcTitle()
     {
         return $this->lc_title;
+    }
+
+    public function setLcTitle($title)
+    {
+        return $this->lc_title = $title;
     }
 
     public function getLcTitlePlural()

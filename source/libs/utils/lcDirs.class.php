@@ -120,15 +120,6 @@ class lcDirs
         return (true);
     }
 
-    public static function fixDirDelimiter($dirname)
-    {
-        if ($dirname{strlen($dirname) - 1} != DS) {
-            $dirname .= DS;
-        }
-
-        return $dirname;
-    }
-
     public static function removeDirDelimiter($dirname)
     {
         /** @noinspection PhpExpressionResultUnusedInspection */
@@ -182,28 +173,6 @@ class lcDirs
         return true;
     }
 
-    public static function mkdirRecursive($path, $mode = 0777)
-    {
-        if (is_dir($path)) {
-            return true;
-        }
-
-        $old = umask(0);
-
-        if (!@mkdir($path, $mode, true)) {
-            umask($old);
-            throw new lcIOException('Cannot create folder recursively: ' . $path);
-        }
-
-        umask($old);
-
-        if ($old != umask()) {
-            throw new lcIOException('Error setting umask');
-        }
-
-        return true;
-    }
-
     public static function isDirEmpty($dir)
     {
         $iterator = new \FilesystemIterator($dir);
@@ -230,6 +199,28 @@ class lcDirs
                 self::mkdirRecursive($dirname);
             }
         }
+        return true;
+    }
+
+    public static function mkdirRecursive($path, $mode = 0777)
+    {
+        if (is_dir($path)) {
+            return true;
+        }
+
+        $old = umask(0);
+
+        if (!@mkdir($path, $mode, true)) {
+            umask($old);
+            throw new lcIOException('Cannot create folder recursively: ' . $path);
+        }
+
+        umask($old);
+
+        if ($old != umask()) {
+            throw new lcIOException('Error setting umask');
+        }
+
         return true;
     }
 
@@ -308,43 +299,13 @@ class lcDirs
         unset($subdirs);
     }
 
-    public static function getFileCountInDir($dir)
+    public static function fixDirDelimiter($dirname)
     {
-        return count(glob($dir . "*"));
-    }
-
-    public static function getRandomFileDirName()
-    {
-        return
-            md5(
-                md5(time()) .
-                md5(microtime()) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000))
-            );
-    }
-
-    public static function getSubDirsOfDir($dir, $skip = null)
-    {
-        if (!$d = @dir($dir)) {
-            return false;
+        if ($dirname{strlen($dirname) - 1} != DS) {
+            $dirname .= DS;
         }
 
-        $dirs = array();
-
-        while (false !== ($entry = $d->read())) {
-            if (($entry == '.') || ($entry == '..') || !is_dir($dir . DS . $entry) || substr($entry, 0, 1) == '.' || ((isset($skip)) && ($entry == $skip))) {
-                continue;
-            }
-
-            $dirs[] = $entry;
-            unset($entry);
-        }
-        $d->close();
-
-        return $dirs;
+        return $dirname;
     }
 
     public static function searchDir($dir, $onlyfiles = true, $skip_system_dirs = false, array $filetypes_ = null)
@@ -392,6 +353,45 @@ class lcDirs
         closedir($dh);
 
         return $files;
+    }
+
+    public static function getSubDirsOfDir($dir, $skip = null)
+    {
+        if (!$d = @dir($dir)) {
+            return false;
+        }
+
+        $dirs = array();
+
+        while (false !== ($entry = $d->read())) {
+            if (($entry == '.') || ($entry == '..') || !is_dir($dir . DS . $entry) || substr($entry, 0, 1) == '.' || ((isset($skip)) && ($entry == $skip))) {
+                continue;
+            }
+
+            $dirs[] = $entry;
+            unset($entry);
+        }
+        $d->close();
+
+        return $dirs;
+    }
+
+    public static function getFileCountInDir($dir)
+    {
+        return count(glob($dir . "*"));
+    }
+
+    public static function getRandomFileDirName()
+    {
+        return
+            md5(
+                md5(time()) .
+                md5(microtime()) .
+                md5(rand(1, 10000000)) .
+                md5(rand(1, 10000000)) .
+                md5(rand(1, 10000000)) .
+                md5(rand(1, 10000000))
+            );
     }
 
     public static function exists($dirname)

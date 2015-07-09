@@ -56,102 +56,6 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
     }
 
-    protected function beforeDispatch()
-    {
-        // root view controller initialization point
-
-        // set the API level
-        $this->response->header(self::XLC_APILEVEL_HEADER_NAME, $this->configuration->getApiLevel());
-    }
-
-    protected function prepareDispatchParams(lcRequest $request)
-    {
-        $params = array();
-
-        // TODO: Change this in 1.5 - remove it
-        // as it harcodes the usage of lcPHPRouting only!
-        if ($this->getRouter() instanceof lcPHPRouting) {
-            $params = (array)$this->extractRequestParams($request);
-        } else {
-            /** @var lcNameValuePair[] $params_tmp */
-            $params_tmp = $request->getParams()->getArrayCopy();
-
-            if ($params_tmp) {
-                foreach ($params_tmp as $param) {
-                    $params[$param->getName()] = $param->getValue();
-
-                    unset($param);
-                }
-            }
-
-            unset($params_tmp);
-        }
-
-        $parent_params = parent::prepareDispatchParams($request);
-
-        $params = array_merge((array)$params, (array)$parent_params);
-
-        return $params;
-    }
-
-    private function extractRequestParams(lcRequest $request)
-    {
-        /** @var lcWebRequest $request */
-
-        /** @var lcNameValuePair[] $params */
-        $params = $request->isPost() ? $request->getPostParams()->getArrayCopy() :
-            $request->getGetParams()->getArrayCopy();
-
-        $extraction = array();
-        $arr2 = array();
-
-        if (!empty($params)) {
-            foreach ($params as $param) {
-                if (substr($param->getName(), 0, 5) == 'param') {
-                    $extraction[substr($param->getName(), 5)] = $param->getValue();
-                }
-
-                $arr2[$param->getName()] = $param->getValue();
-            }
-        }
-
-        ksort($extraction);
-
-        $res = $this->use_actual_get_params ? $arr2 : array_values($extraction);
-
-        return $res;
-    }
-
-    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        if (!$this->system_component_factory) {
-            throw new lcNotAvailableException('System Component Factory not available');
-        }
-
-        $controller_instance = $this->system_component_factory->getControllerWebServiceInstance($controller_name, $context_type, $context_name);
-
-        if (!$controller_instance) {
-            return null;
-        }
-
-        // assign system objects
-        $this->prepareControllerInstance($controller_instance);
-
-        // resolve dependancies
-        try {
-            $controller_instance->loadDependancies();
-        } catch (Exception $e) {
-            throw new lcRequirementException('Web Service controller dependancies could not be loaded (' . $controller_name . '): ' .
-                $e->getMessage(),
-                $e->getCode(),
-                $e);
-        }
-
-        // do not initialize the object yet! leave it to the caller
-
-        return $controller_instance;
-    }
-
     public function sendErrorResponseFromException(Exception $e, $custom_domain = null, $custom_error_code = null, $custom_message = null)
     {
         $custom_domain = isset($custom_domain) ? (string)$custom_domain : null;
@@ -260,5 +164,101 @@ class lcFrontWebServiceController extends lcFrontWebController
         $response->sendResponse();
 
         exit(0);
+    }
+
+    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->system_component_factory) {
+            throw new lcNotAvailableException('System Component Factory not available');
+        }
+
+        $controller_instance = $this->system_component_factory->getControllerWebServiceInstance($controller_name, $context_type, $context_name);
+
+        if (!$controller_instance) {
+            return null;
+        }
+
+        // assign system objects
+        $this->prepareControllerInstance($controller_instance);
+
+        // resolve dependancies
+        try {
+            $controller_instance->loadDependancies();
+        } catch (Exception $e) {
+            throw new lcRequirementException('Web Service controller dependancies could not be loaded (' . $controller_name . '): ' .
+                $e->getMessage(),
+                $e->getCode(),
+                $e);
+        }
+
+        // do not initialize the object yet! leave it to the caller
+
+        return $controller_instance;
+    }
+
+    protected function beforeDispatch()
+    {
+        // root view controller initialization point
+
+        // set the API level
+        $this->response->header(self::XLC_APILEVEL_HEADER_NAME, $this->configuration->getApiLevel());
+    }
+
+    protected function prepareDispatchParams(lcRequest $request)
+    {
+        $params = array();
+
+        // TODO: Change this in 1.5 - remove it
+        // as it harcodes the usage of lcPHPRouting only!
+        if ($this->getRouter() instanceof lcPHPRouting) {
+            $params = (array)$this->extractRequestParams($request);
+        } else {
+            /** @var lcNameValuePair[] $params_tmp */
+            $params_tmp = $request->getParams()->getArrayCopy();
+
+            if ($params_tmp) {
+                foreach ($params_tmp as $param) {
+                    $params[$param->getName()] = $param->getValue();
+
+                    unset($param);
+                }
+            }
+
+            unset($params_tmp);
+        }
+
+        $parent_params = parent::prepareDispatchParams($request);
+
+        $params = array_merge((array)$params, (array)$parent_params);
+
+        return $params;
+    }
+
+    private function extractRequestParams(lcRequest $request)
+    {
+        /** @var lcWebRequest $request */
+
+        /** @var lcNameValuePair[] $params */
+        $params = $request->isPost() ? $request->getPostParams()->getArrayCopy() :
+            $request->getGetParams()->getArrayCopy();
+
+        $extraction = array();
+        $arr2 = array();
+
+        if (!empty($params)) {
+            foreach ($params as $param) {
+                if (substr($param->getName(), 0, 5) == 'param') {
+                    $extraction[substr($param->getName(), 5)] = $param->getValue();
+                }
+
+                $arr2[$param->getName()] = $param->getValue();
+            }
+        }
+
+        ksort($extraction);
+
+        $res = $this->use_actual_get_params ? $arr2 : array_values($extraction);
+
+        return $res;
     }
 }

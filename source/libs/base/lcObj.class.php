@@ -43,22 +43,17 @@ abstract class lcObj
         $this->_reflection = null;
     }
 
-    public function __toString()
-    {
-        return e($this, true);
-    }
-
     public function __call($method, array $params = null)
     {
         throw new Exception('Class Method \'' . get_class($this) . '::' . $method . '\' does not exist');
     }
 
-    public function __set($property, $value = null)
+    public function __get($property)
     {
         throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
     }
 
-    public function __get($property)
+    public function __set($property, $value = null)
     {
         throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
     }
@@ -88,6 +83,11 @@ abstract class lcObj
         return is_subclass_of($this, $classname);
     }
 
+    public function getClassInfo()
+    {
+        return $this->getReflection();
+    }
+
     public function getReflection()
     {
         $reflection = $this->_reflection ? $this->_reflection : new ReflectionClass($this);
@@ -97,11 +97,6 @@ abstract class lcObj
         }
 
         return $reflection;
-    }
-
-    public function getClassInfo()
-    {
-        return $this->getReflection();
     }
 
     public function isFinal()
@@ -168,13 +163,18 @@ abstract class lcObj
         return $this->__toString();
     }
 
-    public function setTag($tag)
+    public function __toString()
     {
-        $this->tag = $tag;
+        return e($this, true);
     }
 
     public function getTag()
     {
         return $this->tag;
+    }
+
+    public function setTag($tag)
+    {
+        $this->tag = $tag;
     }
 }

@@ -67,31 +67,35 @@ class lcXCacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvide
         return false;
     }
 
-    protected function keyWithNamespace($key)
+    public function clear()
     {
-        $k = $this->namespace_prefix . $key;
-        return $k;
+        $this->xcache->clear();
     }
 
-    public function has($key)
+    public function hasValues()
     {
-        return $this->xcache->has($key);
+        throw new lcSystemException('Unimplemented');
     }
 
-    public function get($key)
+    public function count()
     {
-        if (is_array($key)) {
-            throw new lcInvalidArgumentException('Multiply key fetching is not supported');
-        }
-
-        $key1 = $this->keyWithNamespace($key);
-        $ret = $this->xcache->get($key1);
-
-        return $ret;
+        throw new lcSystemException('Unimplemented');
     }
 
     // lifetime passed in seconds!
     // max object size: 1 MB!
+
+    public function getCachingSystem()
+    {
+        return $this->xcache->getBackend();
+    }
+
+    public function setDbCache($namespace, $key, $value = null, $lifetime = null)
+    {
+        $key = $namespace . ':' . $key;
+        return $this->set($key, $value, $lifetime);
+    }
+
     public function set($key, $value = null, $lifetime = null)
     {
         $key = (string)$key;
@@ -112,39 +116,10 @@ class lcXCacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvide
         return true;
     }
 
-    public function remove($key)
+    protected function keyWithNamespace($key)
     {
-        $namespaced_key = $this->keyWithNamespace($key);
-
-        $this->xcache->remove($namespaced_key);
-    }
-
-    public function clear()
-    {
-        $this->xcache->clear();
-    }
-
-    public function hasValues()
-    {
-        throw new lcSystemException('Unimplemented');
-    }
-
-    public function count()
-    {
-        throw new lcSystemException('Unimplemented');
-    }
-
-    public function getCachingSystem()
-    {
-        return $this->xcache->getBackend();
-    }
-
-    #pragma mark - Database Caching
-
-    public function setDbCache($namespace, $key, $value = null, $lifetime = null)
-    {
-        $key = $namespace . ':' . $key;
-        return $this->set($key, $value, $lifetime);
+        $k = $this->namespace_prefix . $key;
+        return $k;
     }
 
     public function removeDbCache($namespace, $key)
@@ -152,6 +127,15 @@ class lcXCacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvide
         $key = $namespace . ':' . $key;
         $this->remove($key);
     }
+
+    public function remove($key)
+    {
+        $namespaced_key = $this->keyWithNamespace($key);
+
+        $this->xcache->remove($namespaced_key);
+    }
+
+    #pragma mark - Database Caching
 
     public function removeDbCacheForNamespace($namespace)
     {
@@ -165,9 +149,26 @@ class lcXCacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvide
         return $this->get($key);
     }
 
+    public function get($key)
+    {
+        if (is_array($key)) {
+            throw new lcInvalidArgumentException('Multiply key fetching is not supported');
+        }
+
+        $key1 = $this->keyWithNamespace($key);
+        $ret = $this->xcache->get($key1);
+
+        return $ret;
+    }
+
     public function hasDbCache($namespace, $key)
     {
         $key = $namespace . ':' . $key;
         return $this->has($key);
+    }
+
+    public function has($key)
+    {
+        return $this->xcache->has($key);
     }
 }

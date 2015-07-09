@@ -47,25 +47,10 @@ class lcTagArea extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array('alt');
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex');
-    }
-
     public function setAlt($value)
     {
         $this->setAttribute('alt', $value);
         return $this;
-    }
-
-    public function getAlt()
-    {
-        return $this->getAttribute('alt');
     }
 
     public function setShape($value = null)
@@ -82,20 +67,10 @@ class lcTagArea extends lcHtmlTag
         return $this;
     }
 
-    public function getShape()
-    {
-        return $this->getAttribute('shape');
-    }
-
     public function setCoords($value = null)
     {
         $this->setAttribute('coords', $value);
         return $this;
-    }
-
-    public function getCoords()
-    {
-        return $this->getAttribute('coords');
     }
 
     public function setHref($value = null)
@@ -104,20 +79,10 @@ class lcTagArea extends lcHtmlTag
         return $this;
     }
 
-    public function getHref()
-    {
-        return $this->getAttribute('href');
-    }
-
     public function setNoHref($value = false)
     {
         $this->setAttribute('nohref', $value);
         return $this;
-    }
-
-    public function getNoHref()
-    {
-        return $this->getAttribute('nohref') ? true : false;
     }
 
     public function setAccessKey($value = null)
@@ -126,15 +91,50 @@ class lcTagArea extends lcHtmlTag
         return $this;
     }
 
-    public function getAccessKey()
-    {
-        return $this->getAttribute('accesskey');
-    }
-
     public function setTabIndex($value = null)
     {
         $this->setAttribute('tabindex', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array('alt');
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex');
+    }
+
+    public function getAlt()
+    {
+        return $this->getAttribute('alt');
+    }
+
+    public function getShape()
+    {
+        return $this->getAttribute('shape');
+    }
+
+    public function getCoords()
+    {
+        return $this->getAttribute('coords');
+    }
+
+    public function getHref()
+    {
+        return $this->getAttribute('href');
+    }
+
+    public function getNoHref()
+    {
+        return $this->getAttribute('nohref') ? true : false;
+    }
+
+    public function getAccessKey()
+    {
+        return $this->getAttribute('accesskey');
     }
 
     public function getTabIndex()

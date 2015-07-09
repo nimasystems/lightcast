@@ -33,21 +33,16 @@ class lcPHPMailer extends lcMailer
     const DEFAULT_LANGUAGE = 'en';
     const DEFAULT_SMTP_HOST = '127.0.0.1';
     const DEFAULT_SMTP_PORT = 25;
-
-    private $last_error;
-    private $enable_debugging;
-
     /** @var lcMailRecipient[] */
     protected $cc_recipients;
-
     /** @var lcMailRecipient[] */
     protected $bcc_recipients;
-
     /** @var lcMailRecipient */
     protected $reply_to_address;
-
     /** @var string */
     protected $alt_body;
+    private $last_error;
+    private $enable_debugging;
 
     public function initialize()
     {
@@ -58,11 +53,6 @@ class lcPHPMailer extends lcMailer
         }
 
         $this->enable_debugging = (bool)$this->configuration['mailer.debug'];
-    }
-
-    private function getMailerType()
-    {
-        return $this->configuration['mailer.use'] ? $this->configuration['mailer.use'] : 'mail';
     }
 
     public function setEnableDebugging($enabled = true)
@@ -262,5 +252,10 @@ class lcPHPMailer extends lcMailer
         unset($mailer);
 
         return $ret;
+    }
+
+    private function getMailerType()
+    {
+        return $this->configuration['mailer.use'] ? $this->configuration['mailer.use'] : 'mail';
     }
 }

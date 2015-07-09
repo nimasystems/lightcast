@@ -49,32 +49,6 @@ class i18nHelper
         return @$l[1][$lang_code];
     }
 
-    public static function LangCountryLocalesToThreeLetterCode($locale)
-    {
-        if (!$spl = array_filter(explode('_', $locale))) {
-            return false;
-        }
-
-        $all = self::getAll();
-
-        if (!isset($spl[1])) {
-            $spl[1] = isset($all[1][$spl[0]]) ? $all[1][$spl[0]] : null;
-        }
-
-        if (!isset($all[0][$spl[0]])) {
-            return false;
-        }
-
-        if (!isset($all[0][$spl[0]][$spl[1]])) {
-            return false;
-        }
-
-        return array(
-            $all[0][$spl[0]][$spl[1]]['langcode'],
-            $all[0][$spl[0]][$spl[1]]['title_en']
-        );
-    }
-
     public static function getAll()
     {
         $defaultCountry = array();
@@ -2688,5 +2662,31 @@ class i18nHelper
         $defaultCountry['yo'] = 'NG';
 
         return array($supportedLanguages, $defaultCountry);
+    }
+
+    public static function LangCountryLocalesToThreeLetterCode($locale)
+    {
+        if (!$spl = array_filter(explode('_', $locale))) {
+            return false;
+        }
+
+        $all = self::getAll();
+
+        if (!isset($spl[1])) {
+            $spl[1] = isset($all[1][$spl[0]]) ? $all[1][$spl[0]] : null;
+        }
+
+        if (!isset($all[0][$spl[0]])) {
+            return false;
+        }
+
+        if (!isset($all[0][$spl[0]][$spl[1]])) {
+            return false;
+        }
+
+        return array(
+            $all[0][$spl[0]][$spl[1]]['langcode'],
+            $all[0][$spl[0]][$spl[1]]['title_en']
+        );
     }
 }

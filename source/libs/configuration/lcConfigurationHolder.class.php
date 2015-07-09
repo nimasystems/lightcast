@@ -107,15 +107,6 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         return isset($this->config_namespaces[$namespace]) ? $this->config_namespaces[$namespace] : null;
     }
 
-    public function offsetExists($short_config_name)
-    {
-        if (!isset($this->idx[$short_config_name])) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function offsetGet($short_config_name)
     {
         if (!$this->offsetExists($short_config_name)) {
@@ -123,6 +114,15 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         }
 
         return $this->config_namespaces[$this->idx[$short_config_name][0]][$this->idx[$short_config_name][1]];
+    }
+
+    public function offsetExists($short_config_name)
+    {
+        if (!isset($this->idx[$short_config_name])) {
+            return false;
+        }
+
+        return true;
     }
 
     public function offsetSet($short_config_name, $value)

@@ -109,11 +109,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->replacement_policy = self::REPLACE_DEEP;
     }
 
-    public function setReplacementPolicy($policy)
-    {
-        $this->replacement_policy = $policy;
-    }
-
     public function setReplacementPolicyStr($policy_str)
     {
         switch ($policy_str) {
@@ -137,11 +132,9 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return $this->replacement_policy;
     }
 
-    public function insertNode($name, lcIterateParamHolder $node)
+    public function setReplacementPolicy($policy)
     {
-        $this->subnodes[$name] = $node;
-
-        return $node;
+        $this->replacement_policy = $policy;
     }
 
     public function copyNode($name, lcIterateParamHolder $node)
@@ -151,6 +144,13 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->insertNode($name, $copy);
 
         return $copy;
+    }
+
+    public function insertNode($name, lcIterateParamHolder $node)
+    {
+        $this->subnodes[$name] = $node;
+
+        return $node;
     }
 
     public function & getNode($name, $params = null)
@@ -264,30 +264,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->params = $params;
     }
 
-    public function setParam($name, $value)
-    {
-        $this->params[$name] = $value;
-    }
-
-    public function set($name, $value)
-    {
-        $this->setParam($name, $value);
-    }
-
-    public function getParam($name)
-    {
-        if (!isset($this->params[$name])) {
-            return null;
-        }
-
-        return $this->params[$name];
-    }
-
-    public function get($name)
-    {
-        return $this->getParam($name);
-    }
-
     public function clearParams()
     {
         $this->params = null;
@@ -304,14 +280,38 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return true;
     }
 
+    public function __get($name)
+    {
+        return $this->get($name);
+    }
+
     public function __set($name, $value = null)
     {
         $this->set($name, $value);
     }
 
-    public function __get($name)
+    public function set($name, $value)
     {
-        return $this->get($name);
+        $this->setParam($name, $value);
+    }
+
+    public function setParam($name, $value)
+    {
+        $this->params[$name] = $value;
+    }
+
+    public function get($name)
+    {
+        return $this->getParam($name);
+    }
+
+    public function getParam($name)
+    {
+        if (!isset($this->params[$name])) {
+            return null;
+        }
+
+        return $this->params[$name];
     }
 
     public function offsetExists($name)

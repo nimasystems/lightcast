@@ -47,16 +47,6 @@ class lcTagTextarea extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array('rows', 'cols');
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('name', 'disabled', 'readonly', 'accesskey', 'tabindex');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -69,20 +59,10 @@ class lcTagTextarea extends lcHtmlTag
         return $this;
     }
 
-    public function getRows()
-    {
-        return $this->getAttribute('rows');
-    }
-
     public function setCols($value)
     {
         $this->setAttribute('cols', $value);
         return $this;
-    }
-
-    public function getCols()
-    {
-        return $this->getAttribute('cols');
     }
 
     public function setName($value = null)
@@ -91,20 +71,10 @@ class lcTagTextarea extends lcHtmlTag
         return $this;
     }
 
-    public function getName()
+    public function setIsDisabled($value = false)
     {
-        return $this->getAttribute('name');
-    }
-
-    public function setTabIndex($value = null)
-    {
-        $this->setAttribute('tabindex', $value);
+        $this->setAttribute('disabled', $value ? 'disabled' : null);
         return $this;
-    }
-
-    public function getTabIndex()
-    {
-        return $this->getAttribute('tabindex');
     }
 
     public function setIsReadonly($value = false)
@@ -113,26 +83,56 @@ class lcTagTextarea extends lcHtmlTag
         return $this;
     }
 
-    public function getIsReadonly()
+    public function setTabIndex($value = null)
     {
-        return $this->getAttribute('readonly') ? true : false;
-    }
-
-    public function setIsDisabled($value = false)
-    {
-        $this->setAttribute('disabled', $value ? 'disabled' : null);
+        $this->setAttribute('tabindex', $value);
         return $this;
-    }
-
-    public function getIsDisabled()
-    {
-        return $this->getAttribute('disabled') ? true : false;
     }
 
     public function setAccessKey($accesskey = null)
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array('rows', 'cols');
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('name', 'disabled', 'readonly', 'accesskey', 'tabindex');
+    }
+
+    public function getRows()
+    {
+        return $this->getAttribute('rows');
+    }
+
+    public function getCols()
+    {
+        return $this->getAttribute('cols');
+    }
+
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
+
+    public function getTabIndex()
+    {
+        return $this->getAttribute('tabindex');
+    }
+
+    public function getIsReadonly()
+    {
+        return $this->getAttribute('readonly') ? true : false;
+    }
+
+    public function getIsDisabled()
+    {
+        return $this->getAttribute('disabled') ? true : false;
     }
 
     public function getAccessKey()

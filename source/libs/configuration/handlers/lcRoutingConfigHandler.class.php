@@ -31,6 +31,15 @@
  */
 class lcRoutingConfigHandler extends lcEnvConfigHandler
 {
+    public function getDefaultValues()
+    {
+        return array('routing' => array(
+            'send_http_errors' => true,
+            'default_module' => 'home',
+            'default_action' => 'index',
+        ));
+    }
+
     protected function postReadConfigData($environment, array $data)
     {
         // there is a problem with defaults merging here (order is broken)
@@ -66,14 +75,5 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
         );
 
         return $routes;
-    }
-
-    public function getDefaultValues()
-    {
-        return array('routing' => array(
-            'send_http_errors' => true,
-            'default_module' => 'home',
-            'default_action' => 'index',
-        ));
     }
 }

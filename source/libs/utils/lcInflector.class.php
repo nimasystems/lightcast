@@ -33,6 +33,15 @@
 class lcInflector
 {
     # returns a string from format: underscored, spaced to: ThisIsTheString
+    public static function subcamelize($underscored_subject, $sanitize = true)
+    {
+        $underscored_subject = self::camelize($underscored_subject, $sanitize);
+        $underscored_subject{0} = strtolower($underscored_subject{0});
+        return $underscored_subject;
+    }
+
+    # returns a string from format: underscored, spaced to: thisIsTheString
+
     public static function camelize($underscored_subject, $sanitize = true)
     {
         // allow passing a sanitize parameter to speed up this where
@@ -42,15 +51,8 @@ class lcInflector
         return $r;
     }
 
-    # returns a string from format: underscored, spaced to: thisIsTheString
-    public static function subcamelize($underscored_subject, $sanitize = true)
-    {
-        $underscored_subject = self::camelize($underscored_subject, $sanitize);
-        $underscored_subject{0} = strtolower($underscored_subject{0});
-        return $underscored_subject;
-    }
-
     # returns a well formated string to a controller class name - TheController => cTheController
+
     public static function controllerize($camelized_controller_name)
     {
         return 'c' . $camelized_controller_name;

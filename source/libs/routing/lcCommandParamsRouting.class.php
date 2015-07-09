@@ -65,44 +65,6 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         $this->detectParameters();
     }
 
-    public function shutdown()
-    {
-        $this->request = null;
-
-        parent::shutdown();
-    }
-
-    public function getDebugInfo()
-    {
-        $debug_parent = (array)parent::getDebugInfo();
-
-        $debug = array(
-            'detected_params' => $this->detected_params
-        );
-
-        $debug = array_merge($debug_parent, $debug);
-
-        return $debug;
-    }
-
-    public function getShortDebugInfo()
-    {
-        return false;
-    }
-
-    public function onFilterParameters(lcEvent $event, $params)
-    {
-        $this->context = $event->getParams();
-
-        if (false === $params_ret = $this->parse($event['argv'])) {
-            return $params;
-        }
-
-        $pars = array_merge((array)$params, (array)$params_ret);
-
-        return $pars;
-    }
-
     private function detectParameters()
     {
         $context = $this->context;
@@ -190,7 +152,46 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         )));
     }
 
+    public function shutdown()
+    {
+        $this->request = null;
+
+        parent::shutdown();
+    }
+
+    public function getDebugInfo()
+    {
+        $debug_parent = (array)parent::getDebugInfo();
+
+        $debug = array(
+            'detected_params' => $this->detected_params
+        );
+
+        $debug = array_merge($debug_parent, $debug);
+
+        return $debug;
+    }
+
+    public function getShortDebugInfo()
+    {
+        return false;
+    }
+
+    public function onFilterParameters(lcEvent $event, $params)
+    {
+        $this->context = $event->getParams();
+
+        if (false === $params_ret = $this->parse($event['argv'])) {
+            return $params;
+        }
+
+        $pars = array_merge((array)$params, (array)$params_ret);
+
+        return $pars;
+    }
+
     // TODO: Finish this implementation
+
     public function getParams()
     {
         return $this->detected_params;

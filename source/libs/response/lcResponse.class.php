@@ -59,14 +59,14 @@ abstract class lcResponse extends lcResidentObj implements iProvidesCapabilities
         return $this->response_sent;
     }
 
+    public function getExitCode()
+    {
+        return $this->exit_code;
+    }
+
     public function setExitCode($exit_code = 0)
     {
         assert($exit_code >= 0 && $exit_code <= 255);
         $this->exit_code = (int)$exit_code;
-    }
-
-    public function getExitCode()
-    {
-        return $this->exit_code;
     }
 }

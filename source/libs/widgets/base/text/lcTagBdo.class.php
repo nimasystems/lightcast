@@ -43,6 +43,22 @@ class lcTagBdo extends lcHtmlTag
         $this->setXmlLang($xml_lang);
     }
 
+    public function setDir($value = self::DEFAULT_DIR)
+    {
+        if ($value != 'ltr' && $value != 'rtl') {
+            throw new lcInvalidArgumentException('Bdo tag has an invalid dir attribute: ' . $value);
+        }
+
+        $this->setAttribute('dir', $value);
+        return $this;
+    }
+
+    public function setXmlLang($value = null)
+    {
+        $this->setAttribute('xml:lang', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('dir');
@@ -58,24 +74,8 @@ class lcTagBdo extends lcHtmlTag
         return $this->attributes->get('dir');
     }
 
-    public function setDir($value = self::DEFAULT_DIR)
-    {
-        if ($value != 'ltr' && $value != 'rtl') {
-            throw new lcInvalidArgumentException('Bdo tag has an invalid dir attribute: ' . $value);
-        }
-
-        $this->setAttribute('dir', $value);
-        return $this;
-    }
-
     public function getXmlLang()
     {
         return $this->attributes->get('xml:lang');
-    }
-
-    public function setXmlLang($value = null)
-    {
-        $this->setAttribute('xml:lang', $value);
-        return $this;
     }
 }

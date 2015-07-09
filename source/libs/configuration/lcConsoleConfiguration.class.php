@@ -85,11 +85,6 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         return self::DEFAULT_APP_NAME;
     }
 
-    public function getConfigDir()
-    {
-        return $this->getProjectDir() . DS . 'config';
-    }
-
     public function getProjectConfigDir()
     {
         return null;
@@ -114,6 +109,11 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         unset($parent_map, $config_map);
 
         return $app_map;
+    }
+
+    public function getConfigDir()
+    {
+        return $this->getProjectDir() . DS . 'config';
     }
 
     protected function loadConfigurationData()

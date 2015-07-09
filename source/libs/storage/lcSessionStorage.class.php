@@ -30,16 +30,13 @@
  */
 class lcSessionStorage extends lcStorage implements iDebuggable
 {
+    const DEFAULT_NAMESPACE = 'global';
+const DEFAULT_TIMEOUT = 30;
     protected $storage;
-
     protected $session_id;
     protected $timeout;
-
     private $last_request;
-    private $diff_to_expire;
-
-    const DEFAULT_NAMESPACE = 'global';
-    const DEFAULT_TIMEOUT = 30; // in minutes
+        private $diff_to_expire; // in minutes
 
     public function initialize()
     {
@@ -154,110 +151,6 @@ class lcSessionStorage extends lcStorage implements iDebuggable
     public function getShortDebugInfo()
     {
         return false;
-    }
-
-    protected function trackTime()
-    {
-        // update the last request time at shutdown so it can be overriden
-        $this->storage['_internal'] = array('last_request' => time());
-    }
-
-    protected function readFromStorage()
-    {
-        parent::readFromStorage();
-
-        try {
-            session_start();
-        } catch (Exception $e) {
-            throw new lcStorageException('Cannot start session: ' . $e->getMessage());
-        }
-
-        $this->session_id = session_id();
-
-        // move all variables from global var to local var
-        // in shutdown() we will do exactly the opposite so session is not lost
-        $this->storage = (isset($_SESSION) && is_array($_SESSION)) ? $_SESSION : array();
-        $_SESSION = array();
-
-        /*
-         * Because the integrated PHP methods are not 100% reliable:
-        * (http://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes)
-        * we implement our own checking in addition to the integrated ones
-        */
-
-        // load time of last request
-        $this->last_request = isset($this->storage['_internal']['last_request']) ? (int)$this->storage['_internal']['last_request'] : 0;
-
-        // check for expiration
-        $this->checkAndExpireIfNecessary();
-
-        // mark the last request
-        $this->diff_to_expire = $this->calculateTimeoutInSeconds();
-    }
-
-    protected function writeToStorage()
-    {
-        parent::writeToStorage();
-
-        $_SESSION = $this->storage;
-
-        session_write_close();
-
-        $this->storage = null;
-    }
-
-    private function checkAndExpireIfNecessary()
-    {
-        $this->diff_to_expire = 0;
-
-        $last_request = (int)$this->last_request;
-
-        if (!$last_request) {
-            return;
-        }
-
-        $new_time = time() - ($this->timeout * 60);
-        $old_time = (int)$this->last_request;
-
-        if ($new_time > $old_time) {
-            $this->info('storage session has expired. Last action: ' . date('d.m.Y H:i:s', $this->last_request));
-
-            $_SESSION = array();
-            session_destroy();
-
-            // restart
-            session_start();
-
-            $this->session_id = session_id();
-            $this->storage = array();
-
-            // send an event
-            $this->event_dispatcher->notify(new lcEvent('storage.gc', $this,
-                array('max_lifetime' => $last_request, 'session_id' => $this->session_id)
-            ));
-
-            $gctime = date('Y-m-d H:i:s', $last_request);
-
-            $this->info('garbage collector invalidated sessions older than ' .
-                $gctime . ' (' . lcVm::date_default_timezone_get() . ')', 'severity');
-        }
-    }
-
-    private function calculateTimeoutInSeconds()
-    {
-        $timeout = (int)$this->timeout;
-        $last_request = (int)$this->last_request;
-
-        if (!$timeout || !$this->last_request) {
-            return false;
-        }
-
-        $new_time = time() - ($timeout * 60);
-        $old_time = $last_request;
-
-        $diff = $old_time - $new_time;
-
-        return $diff;
     }
 
     public function getSessionId()
@@ -420,5 +313,109 @@ class lcSessionStorage extends lcStorage implements iDebuggable
             $p;
 
         return $res;
+    }
+
+    protected function trackTime()
+    {
+        // update the last request time at shutdown so it can be overriden
+        $this->storage['_internal'] = array('last_request' => time());
+    }
+
+    protected function readFromStorage()
+    {
+        parent::readFromStorage();
+
+        try {
+            session_start();
+        } catch (Exception $e) {
+            throw new lcStorageException('Cannot start session: ' . $e->getMessage());
+        }
+
+        $this->session_id = session_id();
+
+        // move all variables from global var to local var
+        // in shutdown() we will do exactly the opposite so session is not lost
+        $this->storage = (isset($_SESSION) && is_array($_SESSION)) ? $_SESSION : array();
+        $_SESSION = array();
+
+        /*
+         * Because the integrated PHP methods are not 100% reliable:
+        * (http://stackoverflow.com/questions/520237/how-do-i-expire-a-php-session-after-30-minutes)
+        * we implement our own checking in addition to the integrated ones
+        */
+
+        // load time of last request
+        $this->last_request = isset($this->storage['_internal']['last_request']) ? (int)$this->storage['_internal']['last_request'] : 0;
+
+        // check for expiration
+        $this->checkAndExpireIfNecessary();
+
+        // mark the last request
+        $this->diff_to_expire = $this->calculateTimeoutInSeconds();
+    }
+
+    private function checkAndExpireIfNecessary()
+    {
+        $this->diff_to_expire = 0;
+
+        $last_request = (int)$this->last_request;
+
+        if (!$last_request) {
+            return;
+        }
+
+        $new_time = time() - ($this->timeout * 60);
+        $old_time = (int)$this->last_request;
+
+        if ($new_time > $old_time) {
+            $this->info('storage session has expired. Last action: ' . date('d.m.Y H:i:s', $this->last_request));
+
+            $_SESSION = array();
+            session_destroy();
+
+            // restart
+            session_start();
+
+            $this->session_id = session_id();
+            $this->storage = array();
+
+            // send an event
+            $this->event_dispatcher->notify(new lcEvent('storage.gc', $this,
+                array('max_lifetime' => $last_request, 'session_id' => $this->session_id)
+            ));
+
+            $gctime = date('Y-m-d H:i:s', $last_request);
+
+            $this->info('garbage collector invalidated sessions older than ' .
+                $gctime . ' (' . lcVm::date_default_timezone_get() . ')', 'severity');
+        }
+    }
+
+    private function calculateTimeoutInSeconds()
+    {
+        $timeout = (int)$this->timeout;
+        $last_request = (int)$this->last_request;
+
+        if (!$timeout || !$this->last_request) {
+            return false;
+        }
+
+        $new_time = time() - ($timeout * 60);
+        $old_time = $last_request;
+
+        $diff = $old_time - $new_time;
+
+        return $diff;
+    }
+
+    protected function writeToStorage()
+    {
+        parent::writeToStorage();
+
+        $_SESSION = $this->storage;
+
+        session_write_close();
+
+        $this->storage = null;
     }
 }

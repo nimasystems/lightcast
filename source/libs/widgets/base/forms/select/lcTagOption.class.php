@@ -42,16 +42,6 @@ class lcTagOption extends lcHtmlTag
         $this->setClass($class);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array();
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('selected', 'value');
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -64,15 +54,25 @@ class lcTagOption extends lcHtmlTag
         return $this;
     }
 
-    public function getSelected()
-    {
-        return $this->getAttribute('selected') ? true : false;
-    }
-
     public function setValue($value = null)
     {
         $this->setAttribute('value', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array();
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('selected', 'value');
+    }
+
+    public function getSelected()
+    {
+        return $this->getAttribute('selected') ? true : false;
     }
 
     public function getValue()

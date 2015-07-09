@@ -40,6 +40,17 @@ class lcTagInputImage extends lcTagInput
         $this->setAlt($alt);
     }
 
+    public function setSrc($value = null)
+    {
+        $this->setAttribute('src', $value);
+        return $this;
+    }
+
+    public function setAlt($value = null)
+    {
+        $this->setAttribute('alt', $value);
+    }
+
     public static function getRequiredAttributes()
     {
         return implode(array('src'), parent::getRequiredAttributes());
@@ -50,20 +61,9 @@ class lcTagInputImage extends lcTagInput
         return implode(array('alt'), parent::getOptionalAttributes());
     }
 
-    public function setSrc($value = null)
-    {
-        $this->setAttribute('src', $value);
-        return $this;
-    }
-
     public function getSrc()
     {
         return $this->getAttribute('src');
-    }
-
-    public function setAlt($value = null)
-    {
-        $this->setAttribute('alt', $value);
     }
 
     public function getAlt()

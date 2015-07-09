@@ -40,6 +40,12 @@ class lcTagBlockQuote extends lcHtmlTag
         $this->setCite($cite);
     }
 
+    public function setCite($cite = null)
+    {
+        $this->setAttribute('cite', $cite);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array();
@@ -48,12 +54,6 @@ class lcTagBlockQuote extends lcHtmlTag
     public static function getOptionalAttributes()
     {
         return array('cite');
-    }
-
-    public function setCite($cite = null)
-    {
-        $this->setAttribute('cite', $cite);
-        return $this;
     }
 
     public function getCite()

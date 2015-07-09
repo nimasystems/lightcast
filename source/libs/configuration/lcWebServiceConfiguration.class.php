@@ -48,11 +48,6 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
         return 1;
     }
 
-    public function getConfigDir()
-    {
-        return $this->getProjectDir() . DS . 'config';
-    }
-
     public function getProjectConfigDir()
     {
         return null;
@@ -87,5 +82,10 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
         unset($parent_map, $config_map);
 
         return $app_map;
+    }
+
+    public function getConfigDir()
+    {
+        return $this->getProjectDir() . DS . 'config';
     }
 }

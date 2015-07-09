@@ -45,13 +45,13 @@ class lcControllerStackItem extends lcSysObj
         parent::shutdown();
     }
 
-    public function setControllerInstance(lcController $controller_instance)
-    {
-        $this->controller_instance = $controller_instance;
-    }
-
     public function getControllerInstance()
     {
         return $this->controller_instance;
+    }
+
+    public function setControllerInstance(lcController $controller_instance)
+    {
+        $this->controller_instance = $controller_instance;
     }
 }

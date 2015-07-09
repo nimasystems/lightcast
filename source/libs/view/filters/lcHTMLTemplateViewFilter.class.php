@@ -34,6 +34,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
     /** @var lcHTMLTemplateView */
     protected $view;
+    private $tmp_node_params;
 
     protected function getShouldApplyFilter()
     {
@@ -62,80 +63,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $content;
     }
 
-    public function parsedParamValue($name, $category, $default_value = null)
-    {
-        $ret = $default_value;
-
-        // custom categories - which are handled by this class
-        if ($category == 'keylink') {
-            if ($ret) {
-                $ret = lcStrings::keyLink($ret);
-                return $ret;
-            }
-        } elseif ($category == 'seopath') {
-            if ($ret) {
-                $ret = preg_replace('/\s{2,}/', '', $ret);
-                $ret = preg_replace('/\s{1,}/', '-', $ret);
-                $ret = str_replace('/', '_', $ret);
-                return $ret;
-            }
-        } elseif ($category == 'sp') {
-            if ($ret) {
-                $ret = htmlspecialchars($ret);
-                return $ret;
-            }
-        } elseif ($category == '*') {
-            return '*';
-        } elseif ($category == 'urlencode' || $category == 'encode') {
-            return urlencode($name);
-        } elseif ($category == 'urldecode' || $category == 'decode') {
-            return urldecode($name);
-        } elseif ($category == 'env') {
-            /** @var lcWebRequest $request */
-            $request = $this->view->getController()->getRequest();
-            $env = $request->getEnv();
-            $value = strtoupper($name);
-            $ret = isset($env[$value]) ? (string)$env[$value] : null;
-            return $ret;
-        } elseif ($category == 'config') {
-            $config = $this->configuration;
-            $r = $config[$name];
-            return $r;
-        } elseif ($category == 'controller') {
-            $ctrl = $this->view->getController();
-
-            if ($ctrl && ($ctrl instanceof iKeyValueProvider)) {
-                $ret = $ctrl->getValueForKey($name);
-                return $ret;
-            }
-        } else {
-            // try to fetch from loaders - through the view's controller
-            /** @var lcWebController $controller */
-            $controller = $this->view->getController();
-
-            $loaders = array(
-                'request' => $controller->getRequest(),
-                'response' => $controller->getResponse(),
-                'routing' => $controller->getRouting(),
-                'database_manager' => $controller->getDatabaseManager(),
-                'storage' => $controller->getStorage(),
-                'data_storage' => $controller->getDataStorage(),
-                'cache' => $controller->getCache(),
-                'mailer' => $controller->getMailer()
-            );
-
-            $loader = isset($loaders[$category]) ? $loaders[$category] : null;
-
-            if ($loader && ($loader instanceof iKeyValueProvider)) {
-                $ret = $loader->getValueForKey($name);
-            }
-
-            return $ret;
-        }
-
-        return null;
-    }
-
     protected function parseNodeTemplate(lcIterateParamHolder $params, $data)
     {
         return $this->parseNodeComplete($data, $params);
@@ -162,36 +89,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         // clear template
         $template = $this->clearHtmlNode($template);
-
-        return $template;
-    }
-
-    protected function parseSubnodesCycle(lcIterateParamHolder $holder, $template)
-    {
-        // parse subnodes
-        $subnodes = $holder->getNodes();
-
-        if ($subnodes) {
-            foreach ($subnodes as $subnode) {
-                $node_name = $subnode->getNodeName();
-                $tmp_tem = $this->getHtmlNode($node_name, $template);
-
-                if (!$tmp_tem) {
-                    continue;
-                }
-
-                $tmp_tem = $this->parseNodeComplete($tmp_tem, $subnode);
-
-                $subnode->clear();
-
-                $template = $this->insertHtmlNode($node_name, $template, $tmp_tem);
-
-                unset($tmp_tem, $subnode, $node_name);
-            }
-        }
-
-        // cleanup
-        unset($subnodes);
 
         return $template;
     }
@@ -291,8 +188,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $ret;
     }
 
-    private $tmp_node_params;
-
     protected function parseTemplate($template, lcIterateParamHolder $node)
     {
         $this->tmp_node_params = $node->getParams();
@@ -313,9 +208,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $template;
     }
 
-    /*
-     * Keep public for PHP 5.3 compatibility
-     */
     public function parseParam($param, array $all_params = null)
     {
         assert(isset($param));
@@ -356,6 +248,114 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         $param_default = $this->debug ? '{' . $param_default . '}' : $param_default;
 
         return $param_default;
+    }
+
+    public function parsedParamValue($name, $category, $default_value = null)
+    {
+        $ret = $default_value;
+
+        // custom categories - which are handled by this class
+        if ($category == 'keylink') {
+            if ($ret) {
+                $ret = lcStrings::keyLink($ret);
+                return $ret;
+            }
+        } elseif ($category == 'seopath') {
+            if ($ret) {
+                $ret = preg_replace('/\s{2,}/', '', $ret);
+                $ret = preg_replace('/\s{1,}/', '-', $ret);
+                $ret = str_replace('/', '_', $ret);
+                return $ret;
+            }
+        } elseif ($category == 'sp') {
+            if ($ret) {
+                $ret = htmlspecialchars($ret);
+                return $ret;
+            }
+        } elseif ($category == '*') {
+            return '*';
+        } elseif ($category == 'urlencode' || $category == 'encode') {
+            return urlencode($name);
+        } elseif ($category == 'urldecode' || $category == 'decode') {
+            return urldecode($name);
+        } elseif ($category == 'env') {
+            /** @var lcWebRequest $request */
+            $request = $this->view->getController()->getRequest();
+            $env = $request->getEnv();
+            $value = strtoupper($name);
+            $ret = isset($env[$value]) ? (string)$env[$value] : null;
+            return $ret;
+        } elseif ($category == 'config') {
+            $config = $this->configuration;
+            $r = $config[$name];
+            return $r;
+        } elseif ($category == 'controller') {
+            $ctrl = $this->view->getController();
+
+            if ($ctrl && ($ctrl instanceof iKeyValueProvider)) {
+                $ret = $ctrl->getValueForKey($name);
+                return $ret;
+            }
+        } else {
+            // try to fetch from loaders - through the view's controller
+            /** @var lcWebController $controller */
+            $controller = $this->view->getController();
+
+            $loaders = array(
+                'request' => $controller->getRequest(),
+                'response' => $controller->getResponse(),
+                'routing' => $controller->getRouting(),
+                'database_manager' => $controller->getDatabaseManager(),
+                'storage' => $controller->getStorage(),
+                'data_storage' => $controller->getDataStorage(),
+                'cache' => $controller->getCache(),
+                'mailer' => $controller->getMailer()
+            );
+
+            $loader = isset($loaders[$category]) ? $loaders[$category] : null;
+
+            if ($loader && ($loader instanceof iKeyValueProvider)) {
+                $ret = $loader->getValueForKey($name);
+            }
+
+            return $ret;
+        }
+
+        return null;
+    }
+
+    /*
+     * Keep public for PHP 5.3 compatibility
+     */
+
+    protected function parseSubnodesCycle(lcIterateParamHolder $holder, $template)
+    {
+        // parse subnodes
+        $subnodes = $holder->getNodes();
+
+        if ($subnodes) {
+            foreach ($subnodes as $subnode) {
+                $node_name = $subnode->getNodeName();
+                $tmp_tem = $this->getHtmlNode($node_name, $template);
+
+                if (!$tmp_tem) {
+                    continue;
+                }
+
+                $tmp_tem = $this->parseNodeComplete($tmp_tem, $subnode);
+
+                $subnode->clear();
+
+                $template = $this->insertHtmlNode($node_name, $template, $tmp_tem);
+
+                unset($tmp_tem, $subnode, $node_name);
+            }
+        }
+
+        // cleanup
+        unset($subnodes);
+
+        return $template;
     }
 
     protected function clearHtmlNode($text)

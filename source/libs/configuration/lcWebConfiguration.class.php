@@ -71,6 +71,11 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $this->getAppConfigDir();
     }
 
+    public function getAppConfigDir()
+    {
+        return $this->app_dir . DS . 'config';
+    }
+
     public function getProjectConfigDir()
     {
         return 'applications' . DS . $this->getApplicationName();
@@ -115,26 +120,6 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
-    protected function loadConfigurationData()
-    {
-        // read the configuration
-        $config_data = parent::loadConfigurationData();
-
-        // reset loaders to their defaults in case the property is set
-        if ($this->should_use_default_loaders) {
-            $lhandler = new lcLoadersConfigHandler();
-            $ldata = $lhandler->getDefaultValues();
-
-            if ($ldata && is_array($ldata) && isset($config_data['loaders'])) {
-                $config_data['loaders'] = $ldata;
-            }
-
-            unset($lhandler, $ldata);
-        }
-
-        return $config_data;
-    }
-
     public function getPathInfoPrefix()
     {
         return null;
@@ -161,13 +146,28 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $this->app_dir;
     }
 
-    public function getAppConfigDir()
-    {
-        return $this->app_dir . DS . 'config';
-    }
-
     public function getLayoutsDir()
     {
         return $this->app_dir . DS . 'layouts';
+    }
+
+    protected function loadConfigurationData()
+    {
+        // read the configuration
+        $config_data = parent::loadConfigurationData();
+
+        // reset loaders to their defaults in case the property is set
+        if ($this->should_use_default_loaders) {
+            $lhandler = new lcLoadersConfigHandler();
+            $ldata = $lhandler->getDefaultValues();
+
+            if ($ldata && is_array($ldata) && isset($config_data['loaders'])) {
+                $config_data['loaders'] = $ldata;
+            }
+
+            unset($lhandler, $ldata);
+        }
+
+        return $config_data;
     }
 }

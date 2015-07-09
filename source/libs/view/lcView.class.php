@@ -47,8 +47,6 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
     protected $label;
     protected $options;
 
-    abstract protected function getViewContent();
-
     public function shutdown()
     {
         $this->view_filter_chain =
@@ -58,30 +56,6 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         $this->controller = null;
 
         parent::shutdown();
-    }
-
-    protected function willApplyFilters($content)
-    {
-        // subclassers may override this method to detect the state
-        return $content;
-    }
-
-    protected function didApplyFilters($content)
-    {
-        // subclassers may override this method to detect the state
-        return $content;
-    }
-
-    protected function willDecorateView($content)
-    {
-        // subclassers may override this method to detect the state
-        return $content;
-    }
-
-    protected function didDecorateView($content)
-    {
-        // subclassers may override this method to detect the state
-        return $content;
     }
 
     public function render()
@@ -130,6 +104,42 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $view_content;
     }
 
+    abstract protected function getViewContent();
+
+    protected function willApplyFilters($content)
+    {
+        // subclassers may override this method to detect the state
+        return $content;
+    }
+
+    public function getContentType()
+    {
+        return $this->content_type;
+    }
+
+    public function setContentType($content_type)
+    {
+        $this->content_type = $content_type;
+    }
+
+    protected function didApplyFilters($content)
+    {
+        // subclassers may override this method to detect the state
+        return $content;
+    }
+
+    protected function willDecorateView($content)
+    {
+        // subclassers may override this method to detect the state
+        return $content;
+    }
+
+    protected function didDecorateView($content)
+    {
+        // subclassers may override this method to detect the state
+        return $content;
+    }
+
     public function getDebugInfo()
     {
         $debug = array(
@@ -144,19 +154,14 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return false;
     }
 
-    public function setViewDecorator(iViewDecorator $view_decorator)
-    {
-        $this->view_decorator = $view_decorator;
-    }
-
     public function getViewDecorator()
     {
         return $this->view_decorator;
     }
 
-    public function setViewFilterChain(lcViewFilterChain $view_filter_chain)
+    public function setViewDecorator(iViewDecorator $view_decorator)
     {
-        $this->view_filter_chain = $view_filter_chain;
+        $this->view_decorator = $view_decorator;
     }
 
     public function getViewFilterChain()
@@ -164,19 +169,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->view_filter_chain;
     }
 
-    public function getContentType()
+    public function setViewFilterChain(lcViewFilterChain $view_filter_chain)
     {
-        return $this->content_type;
-    }
-
-    public function setContentType($content_type)
-    {
-        $this->content_type = $content_type;
-    }
-
-    public function setActionResult($action_result)
-    {
-        $this->action_result = $action_result;
+        $this->view_filter_chain = $view_filter_chain;
     }
 
     public function getActionResult()
@@ -184,9 +179,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->action_result;
     }
 
-    public function setViewDebuggingEnabled($debugging_enabled = true)
+    public function setActionResult($action_result)
     {
-        $this->view_debugging_enabled = $debugging_enabled;
+        $this->action_result = $action_result;
     }
 
     public function getViewDebuggingEnabled()
@@ -194,9 +189,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->view_debugging_enabled;
     }
 
-    public function setController(lcBaseController $controller)
+    public function setViewDebuggingEnabled($debugging_enabled = true)
     {
-        $this->controller = $controller;
+        $this->view_debugging_enabled = $debugging_enabled;
     }
 
     public function getController()
@@ -204,9 +199,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->controller;
     }
 
-    public function setLabel($label)
+    public function setController(lcBaseController $controller)
     {
-        $this->label = $label;
+        $this->controller = $controller;
     }
 
     public function getLabel()
@@ -214,13 +209,18 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
         return $this->label;
     }
 
-    public function setOptions(array $options)
+    public function setLabel($label)
     {
-        $this->options = $options;
+        $this->label = $label;
     }
 
     public function getOptions()
     {
         return $this->options;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 }

@@ -64,56 +64,6 @@ class lcFrontConsoleController extends lcFrontController
         return $tmp;
     }
 
-    public function getConsoleIntro()
-    {
-        $ver = LIGHTCAST_VER;
-        $lyear = date('Y');
-
-        $lcintro = <<<EOD
-----------------------------------------------
-Lightcast $ver Console Control
-----------------------------------------------
-Nimasystems Ltd - All Rights Reserved, 2007 - $lyear
-	
-You must be licensed to use this software and
-it comes with ABSOLUTELY NO WARRANTY.
-Please read the README and LICENSE files.
-----------------------------------------------
-	
-EOD;
-
-        $intro = lcConsolePainter::formatColoredConsoleText($lcintro, 'cyan');
-
-        $intro .= <<<EOD
-	
-The Lightcast command line tool (console) can be
-used to launch existing project tasks.
-	
-Usage: console [task_name] [action_name] [OPTIONS]
-Usage (debugging): console_debug [task_name] [action_name='default'] [OPTIONS]
-	
-- If action_name is not specified the default HELP context of the task will be shown
-- OPTIONS can be specified as string parameters or --key=value parameters
-	
-General Options:
-	
-{fgcolor:green}--help{/fgcolor} - Displays help information about this tool or a task if specified
-{fgcolor:green}--silent{/fgcolor} - Run a task action without providing any feedback to the terminal
-	
-Plugin Options:
-	
-{fgcolor:green}--debug{/fgcolor} - Enable debugging mode
-	
-{fgcolor:green}--disable-plugins{/fgcolor} - Do not initialize plugins. Useful when generating Propel models for the first time
-					and there are model dependancies upon plugin initialization
-	
-{fgcolor:green}--disable-loaders{/fgcolor} - Do not load the loaders specified in configuration. Fallback to default loaders
-	
-EOD;
-
-        return $intro;
-    }
-
     protected function shouldDispatch($controller_name, $action_name, array $params = null)
     {
         // handler called just before dispatching by front controller
@@ -127,6 +77,17 @@ EOD;
         }
 
         return true;
+    }
+
+    protected function displayControllerHelp($controller_name)
+    {
+        $help_info = $this->getControllerHelpInformation($controller_name);
+
+        $output = $help_info ?
+            "\n\n" . $help_info . "\n\n" :
+            'Module does not provide help information';
+
+        $this->response->consoleDisplay($output, false);
     }
 
     protected function getControllerHelpInformation($controller_name)
@@ -145,17 +106,6 @@ EOD;
         $controller->shutdown();
 
         return $help;
-    }
-
-    protected function displayControllerHelp($controller_name)
-    {
-        $help_info = $this->getControllerHelpInformation($controller_name);
-
-        $output = $help_info ?
-            "\n\n" . $help_info . "\n\n" :
-            'Module does not provide help information';
-
-        $this->response->consoleDisplay($output, false);
     }
 
     public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
@@ -186,5 +136,55 @@ EOD;
         // do not initialize the object yet! leave it to the caller
 
         return $controller_instance;
+    }
+
+    public function getConsoleIntro()
+    {
+        $ver = LIGHTCAST_VER;
+        $lyear = date('Y');
+
+        $lcintro = <<<EOD
+----------------------------------------------
+Lightcast $ver Console Control
+----------------------------------------------
+Nimasystems Ltd - All Rights Reserved, 2007 - $lyear
+
+You must be licensed to use this software and
+it comes with ABSOLUTELY NO WARRANTY.
+Please read the README and LICENSE files.
+----------------------------------------------
+
+EOD;
+
+        $intro = lcConsolePainter::formatColoredConsoleText($lcintro, 'cyan');
+
+        $intro .= <<<EOD
+
+The Lightcast command line tool (console) can be
+used to launch existing project tasks.
+
+Usage: console [task_name] [action_name] [OPTIONS]
+Usage (debugging): console_debug [task_name] [action_name='default'] [OPTIONS]
+
+- If action_name is not specified the default HELP context of the task will be shown
+- OPTIONS can be specified as string parameters or --key=value parameters
+
+General Options:
+
+{fgcolor:green}--help{/fgcolor} - Displays help information about this tool or a task if specified
+{fgcolor:green}--silent{/fgcolor} - Run a task action without providing any feedback to the terminal
+
+Plugin Options:
+
+{fgcolor:green}--debug{/fgcolor} - Enable debugging mode
+
+{fgcolor:green}--disable-plugins{/fgcolor} - Do not initialize plugins. Useful when generating Propel models for the first time
+					and there are model dependancies upon plugin initialization
+
+{fgcolor:green}--disable-loaders{/fgcolor} - Do not load the loaders specified in configuration. Fallback to default loaders
+
+EOD;
+
+        return $intro;
     }
 }

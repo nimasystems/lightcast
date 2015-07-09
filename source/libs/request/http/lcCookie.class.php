@@ -66,9 +66,19 @@ class lcCookie extends lcObj
         return $this->name;
     }
 
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function setValue($value)
+    {
+        $this->value = $value;
     }
 
     public function getPath()
@@ -76,9 +86,19 @@ class lcCookie extends lcObj
         return $this->path;
     }
 
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
     public function getDomain()
     {
         return $this->domain;
+    }
+
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
     }
 
     public function getExpiration()
@@ -91,34 +111,14 @@ class lcCookie extends lcObj
         return $this->secure;
     }
 
-    public function setName($name)
+    public function setSecure($secure)
     {
-        $this->name = $name;
-    }
-
-    public function setValue($value)
-    {
-        $this->value = $value;
-    }
-
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
-    public function setDomain($domain)
-    {
-        $this->domain = $domain;
+        $this->secure = $secure;
     }
 
     public function setExpiration($expires)
     {
         $this->expires = (int)$expires;
-    }
-
-    public function setSecure($secure)
-    {
-        $this->secure = $secure;
     }
 
     public function __toString()

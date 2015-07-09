@@ -56,11 +56,6 @@ class lcFinder
         return $finder->set_type($type);
     }
 
-    public function setSortOrder($sort_order)
-    {
-        $this->sort_order = $sort_order;
-    }
-
     protected function set_type($type)
     {
         $type = strtolower($type);
@@ -74,6 +69,11 @@ class lcFinder
         }
 
         return $this;
+    }
+
+    public function setSortOrder($sort_order)
+    {
+        $this->sort_order = $sort_order;
     }
 
     public function set_ignore($ignore_rule)
@@ -107,13 +107,6 @@ class lcFinder
         $files = $this->search_in($start_directory, 0);
 
         return array_unique($files);
-    }
-
-    public function depth($depth_lvl)
-    {
-        $this->maxdepth = (int)$depth_lvl;
-
-        return $this;
     }
 
     public function search_in($dir, $depth)
@@ -185,5 +178,12 @@ class lcFinder
         }
 
         return false;
+    }
+
+    public function depth($depth_lvl)
+    {
+        $this->maxdepth = (int)$depth_lvl;
+
+        return $this;
     }
 }

@@ -57,95 +57,6 @@ class lcHttpAcceptParser extends lcObj
         }
     }
 
-    private function _check_mimetype($mimetype)
-    {
-        if (!lcMimetypeHelper::isMimetype($mimetype)) {
-            return false;
-        }
-
-        if (in_array('*/*', $this->accepts)) {
-            return true;
-        }
-
-        $m = explode('/', $mimetype);
-
-        foreach ($this->accepts as $key => $accept) {
-            if (strcasecmp($mimetype, $accept) == 0) {
-                return true;
-            }
-
-            $a = explode('/', $accept);
-
-            // check for subtype=ANY
-            if (($m[0] == $a[0]) && ($a[1] == '*')) {
-                return true;
-            }
-
-            // check for type=ANY
-            if (($m[1] = $a[1]) && ($a[0] == '*')) {
-                return true;
-            }
-
-            unset($key, $accept);
-        }
-
-        return false;
-    }
-
-    private function _check_general($accept_test)
-    {
-        if (in_array('*', $this->accepts)) {
-            return true;
-        }
-
-        foreach ($this->accepts as $key => $accept) {
-            if (strcasecmp($accept_test, $accept) == 0) {
-                return true;
-            }
-
-            unset($key, $accept);
-        }
-
-        return false;
-    }
-
-    private function _check_language($locale)
-    {
-        if (in_array('*', $this->accepts)) {
-            return true;
-        }
-
-        foreach ($this->accepts as $key => $accept) {
-            if (strcasecmp($locale, $accept) == 0) {
-                return true;
-            }
-
-            $e = @explode('-', $locale);
-            $a = @explode('-', $accept);
-
-            // TODO - not too sure if this is really valid!
-            if ($e[0] == $a[0]) {
-                return true;
-            }
-
-            unset($key, $accept);
-        }
-
-        return false;
-    }
-
-    public function getAsString()
-    {
-        return $this->acceptstring;
-    }
-
-    public function getPreferred()
-    {
-        $this->_parseInternal();
-
-        return $this->accepts;
-    }
-
     private function _parseInternal()
     {
         if ($this->hasparsed) {
@@ -223,5 +134,94 @@ class lcHttpAcceptParser extends lcObj
         }
 
         $this->hasparsed = true;
+    }
+
+    private function _check_mimetype($mimetype)
+    {
+        if (!lcMimetypeHelper::isMimetype($mimetype)) {
+            return false;
+        }
+
+        if (in_array('*/*', $this->accepts)) {
+            return true;
+        }
+
+        $m = explode('/', $mimetype);
+
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($mimetype, $accept) == 0) {
+                return true;
+            }
+
+            $a = explode('/', $accept);
+
+            // check for subtype=ANY
+            if (($m[0] == $a[0]) && ($a[1] == '*')) {
+                return true;
+            }
+
+            // check for type=ANY
+            if (($m[1] = $a[1]) && ($a[0] == '*')) {
+                return true;
+            }
+
+            unset($key, $accept);
+        }
+
+        return false;
+    }
+
+    private function _check_language($locale)
+    {
+        if (in_array('*', $this->accepts)) {
+            return true;
+        }
+
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($locale, $accept) == 0) {
+                return true;
+            }
+
+            $e = @explode('-', $locale);
+            $a = @explode('-', $accept);
+
+            // TODO - not too sure if this is really valid!
+            if ($e[0] == $a[0]) {
+                return true;
+            }
+
+            unset($key, $accept);
+        }
+
+        return false;
+    }
+
+    private function _check_general($accept_test)
+    {
+        if (in_array('*', $this->accepts)) {
+            return true;
+        }
+
+        foreach ($this->accepts as $key => $accept) {
+            if (strcasecmp($accept_test, $accept) == 0) {
+                return true;
+            }
+
+            unset($key, $accept);
+        }
+
+        return false;
+    }
+
+    public function getAsString()
+    {
+        return $this->acceptstring;
+    }
+
+    public function getPreferred()
+    {
+        $this->_parseInternal();
+
+        return $this->accepts;
     }
 }

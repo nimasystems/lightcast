@@ -43,6 +43,36 @@ class lcTagImg extends lcHtmlTag
         $this->setLongDesc($longdesc);
     }
 
+    public function setSrc($value)
+    {
+        $this->setAttribute('src', $value);
+        return $this;
+    }
+
+    public function setAlt($value)
+    {
+        $this->setAttribute('alt', $value);
+        return $this;
+    }
+
+    public function setHeight($value = null)
+    {
+        $this->setAttribute('height', isset($value) ? (int)$value : null);
+        return $this;
+    }
+
+    public function setWidth($value = null)
+    {
+        $this->setAttribute('width', isset($value) ? (int)$value : null);
+        return $this;
+    }
+
+    public function setLongDesc($value = null)
+    {
+        $this->setAttribute('longdesc', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('src', 'alt');
@@ -53,21 +83,9 @@ class lcTagImg extends lcHtmlTag
         return array('longdesc', 'height', 'width');
     }
 
-    public function setSrc($value)
-    {
-        $this->setAttribute('src', $value);
-        return $this;
-    }
-
     public function getSrc()
     {
         return $this->getAttribute('src');
-    }
-
-    public function setAlt($value)
-    {
-        $this->setAttribute('alt', $value);
-        return $this;
     }
 
     public function getAlt()
@@ -75,32 +93,14 @@ class lcTagImg extends lcHtmlTag
         return $this->getAttribute('alt');
     }
 
-    public function setHeight($value = null)
-    {
-        $this->setAttribute('height', isset($value) ? (int)$value : null);
-        return $this;
-    }
-
     public function getHeight()
     {
         return $this->getAttribute('height');
     }
 
-    public function setWidth($value = null)
-    {
-        $this->setAttribute('width', isset($value) ? (int)$value : null);
-        return $this;
-    }
-
     public function getWidth()
     {
         return $this->getAttribute('width');
-    }
-
-    public function setLongDesc($value = null)
-    {
-        $this->setAttribute('longdesc', $value);
-        return $this;
     }
 
     public function getLongDesc()

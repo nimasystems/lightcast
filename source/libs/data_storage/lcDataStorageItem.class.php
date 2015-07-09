@@ -32,26 +32,17 @@
  */
 class lcDataStorageItem extends lcObj
 {
+    const DEFAULT_CHUNK_SIZE = 8192;
     protected $attributes = array();
     protected $data_location_attribute_name;
-
     /** @var iDataStorageItemListener */
     protected $delegate;
-
     private $is_receiving;
     private $total_bytes_read = 0;
     private $errors = array();
     private $fpointer;
 
-    const DEFAULT_CHUNK_SIZE = 8192;
-
     // factory
-    public static function itemWithAttributes($attributes = array(), $data_location_attribute_name = null)
-    {
-        $tmp = new lcDataStorageItem($attributes, $data_location_attribute_name);
-
-        return $tmp;
-    }
 
     public function __construct($attributes = array(), $data_location_attribute_name = null)
     {
@@ -59,6 +50,13 @@ class lcDataStorageItem extends lcObj
 
         $this->data_location_attribute_name = $data_location_attribute_name;
         $this->attributes = is_array($attributes) ? $attributes : array();
+    }
+
+    public static function itemWithAttributes($attributes = array(), $data_location_attribute_name = null)
+    {
+        $tmp = new lcDataStorageItem($attributes, $data_location_attribute_name);
+
+        return $tmp;
     }
 
     public function __destruct()
@@ -92,18 +90,6 @@ class lcDataStorageItem extends lcObj
         return print_r($this->attributes, true);
     }
 
-    public function getDataLocation()
-    {
-        if (!$this->data_location_attribute_name) {
-            return null;
-        }
-
-        $location = isset($this->attributes[$this->data_location_attribute_name]) ?
-            $this->attributes[$this->data_location_attribute_name] : null;
-
-        return $location;
-    }
-
     public function passThroughData()
     {
         if (!$this->getDataPointer()) {
@@ -130,6 +116,26 @@ class lcDataStorageItem extends lcObj
         return $this->fpointer;
     }
 
+    public function getDataLocation()
+    {
+        if (!$this->data_location_attribute_name) {
+            return null;
+        }
+
+        $location = isset($this->attributes[$this->data_location_attribute_name]) ?
+            $this->attributes[$this->data_location_attribute_name] : null;
+
+        return $location;
+    }
+
+    private function cleanup()
+    {
+        $this->is_receiving = false;
+        @fclose($this->fpointer);
+        $this->fpointer = null;
+        $this->total_bytes_read = 0;
+    }
+
     public function getFullData()
     {
         if (!$location = $this->getDataLocation()) {
@@ -139,14 +145,14 @@ class lcDataStorageItem extends lcObj
         return @file_get_contents($location);
     }
 
-    public function setDelegate(iDataStorageItemListener $delegate)
-    {
-        $this->delegate = $delegate;
-    }
-
     public function getDelegate()
     {
         return $this->delegate;
+    }
+
+    public function setDelegate(iDataStorageItemListener $delegate)
+    {
+        $this->delegate = $delegate;
     }
 
     public function isReceivingData()
@@ -202,19 +208,6 @@ class lcDataStorageItem extends lcObj
         $this->stopReceivingData();
     }
 
-    public function getLastErrors()
-    {
-        return $this->errors;
-    }
-
-    private function cleanup()
-    {
-        $this->is_receiving = false;
-        @fclose($this->fpointer);
-        $this->fpointer = null;
-        $this->total_bytes_read = 0;
-    }
-
     public function stopReceivingData()
     {
         if (!$this->is_receiving) {
@@ -226,5 +219,10 @@ class lcDataStorageItem extends lcObj
         $this->cleanup();
 
         return true;
+    }
+
+    public function getLastErrors()
+    {
+        return $this->errors;
     }
 }

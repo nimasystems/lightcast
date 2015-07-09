@@ -75,6 +75,11 @@ abstract class lcDatabase extends lcSysObj
     }
 
     /**
+     * @return PDO
+     */
+    abstract public function getConnection();
+
+    /**
      * @return void
      */
     abstract public function disconnect();
@@ -83,11 +88,6 @@ abstract class lcDatabase extends lcSysObj
      * @return bool
      */
     abstract public function isConnected();
-
-    /**
-     * @return PDO
-     */
-    abstract public function getConnection();
 
     /**
      * @return int

@@ -64,26 +64,20 @@ class lcHTMLTemplateLayoutView extends lcHTMLTemplateView implements iSupportsLa
         $this->replacement_string = $replacement_string;
     }
 
+    public function getDecorateContent()
+    {
+        return $this->decorate_content;
+    }
+
     public function setDecorateContent($content, $content_type = null)
     {
         $this->decorate_content = $content;
         $this->decorate_content_type = $content_type;
     }
 
-    public function getDecorateContent()
-    {
-        return $this->decorate_content;
-    }
-
     public function getDecorateContentType()
     {
         return $this->decorate_content_type;
-    }
-
-    protected function getViewContent()
-    {
-        $c = parent::getViewContent();
-        return $c;
     }
 
     public function render()
@@ -102,5 +96,11 @@ class lcHTMLTemplateLayoutView extends lcHTMLTemplateView implements iSupportsLa
         $decorator_content = str_replace($this->replacement_string, $this->decorate_content, $decorator_content);
 
         return $decorator_content;
+    }
+
+    protected function getViewContent()
+    {
+        $c = parent::getViewContent();
+        return $c;
     }
 }

@@ -39,6 +39,11 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         $this->readFromStorage();
     }
 
+    protected function readFromStorage()
+    {
+        // to be overriden by subclassers
+    }
+
     public function shutdown()
     {
         if (!$this->ignore_time_tracking) {
@@ -48,6 +53,16 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         $this->writeToStorage();
 
         parent::shutdown();
+    }
+
+    protected function trackTime()
+    {
+        // to be overriden by subclassers
+    }
+
+    protected function writeToStorage()
+    {
+        // to be overriden by subclassers
     }
 
     public function getCapabilities()
@@ -101,6 +116,10 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         return $debug;
     }
 
+    abstract public function getNamespaces();
+
+    abstract public function getAll($namespace = null);
+
     public function getShortDebugInfo()
     {
         return false;
@@ -111,28 +130,7 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         $this->ignore_time_tracking = $ignore_time_tracking;
     }
 
-    protected function trackTime()
-    {
-        // to be overriden by subclassers
-    }
-
-    protected function writeToStorage()
-    {
-        // to be overriden by subclassers
-    }
-
-    protected function readFromStorage()
-    {
-        // to be overriden by subclassers
-    }
-
     abstract public function has($key, $namespace = null);
-
-    abstract public function get($key, $namespace = null);
-
-    abstract public function set($key, $value, $namespace = null);
-
-    abstract public function remove($key, $namespace = null);
 
     abstract public function clear($namespace = null);
 
@@ -142,16 +140,12 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
 
     abstract public function count($namespace = null);
 
-    abstract public function getNamespaces();
-
-    abstract public function getAll($namespace = null);
-
-    abstract public function getBackendData();
-
     public function offsetExists($name)
     {
         return $this->get($name) ? true : false;
     }
+
+    abstract public function get($key, $namespace = null);
 
     public function offsetGet($name)
     {
@@ -163,10 +157,14 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         return $this->set($name, $value);
     }
 
+    abstract public function set($key, $value, $namespace = null);
+
     public function offsetUnset($name)
     {
         return $this->remove($name);
     }
+
+    abstract public function remove($key, $namespace = null);
 
     public function __toString()
     {
@@ -174,4 +172,6 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
 
         return (string)e($all, true);
     }
+
+    abstract public function getBackendData();
 }

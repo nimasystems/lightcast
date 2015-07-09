@@ -85,40 +85,19 @@ class lcPDODatabase extends lcDatabase
         return $this->options;
     }
 
-    public function setDriver($driver_name)
-    {
-        $this->driver = $driver_name;
-    }
-
-    public function setCharset($charset)
-    {
-        $this->charset = $charset;
-    }
-
     public function setPersistentConnections($persistent_connections = false)
     {
         $this->persistentc = $persistent_connections;
     }
 
-    public function setConnectionUrl($url)
-    {
-        $this->connection_url = $url;
-    }
-
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    // getters
     public function getDriver()
     {
         return $this->driver;
+    }
+
+    public function setDriver($driver_name)
+    {
+        $this->driver = $driver_name;
     }
 
     public function getCharset()
@@ -126,14 +105,26 @@ class lcPDODatabase extends lcDatabase
         return $this->charset;
     }
 
+    public function setCharset($charset)
+    {
+        $this->charset = $charset;
+    }
+
     public function getPersistentConnectionsUsage()
     {
         return $this->persistentc;
     }
 
+    // getters
+
     public function getConnectionUrl()
     {
         return $this->connection_url;
+    }
+
+    public function setConnectionUrl($url)
+    {
+        $this->connection_url = $url;
     }
 
     public function getUsername()
@@ -141,19 +132,24 @@ class lcPDODatabase extends lcDatabase
         return $this->username;
     }
 
+    public function setUsername($username)
+    {
+        $this->username = $username;
+    }
+
     public function getPassword()
     {
         return $this->password;
     }
 
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
     public function getConnection()
     {
         return $this->connect();
-    }
-
-    public function isConnected()
-    {
-        return $this->conn ? true : false;
     }
 
     public function connect()
@@ -177,6 +173,11 @@ class lcPDODatabase extends lcDatabase
         parent::connect();
 
         return $this->conn;
+    }
+
+    public function isConnected()
+    {
+        return $this->conn ? true : false;
     }
 
     public function reconnect()

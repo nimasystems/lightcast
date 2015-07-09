@@ -108,122 +108,9 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         $this->template_filename = $filename;
     }
 
-    protected function getViewContent()
-    {
-        return $this->getTemplateData();
-    }
-
-    protected function didApplyFilters($content)
-    {
-        // parse the content to obtain partials / fragments
-        $content = $this->parseParticles($content);
-        return $content;
-    }
-
-    protected function parseParticles($data)
-    {
-        // parse and find info of found partials
-        $self = $this;
-        $data = preg_replace_callback("/<!--\s*PARTIAL\s*(.*?)\s*-->/i", function ($m) use ($self) {
-            return $self->parsePartialDetails(@$m[1]);
-        }, $data);
-
-        // parse all find info of found fragments
-        $data = preg_replace_callback("/<!--\s*FRAGMENT\s*(.*?)\s*-->/i", function ($m) use ($self) {
-            return $self->parseFragmentDetails(@$m[1]);
-        }, $data);
-
-        return $data;
-    }
-
-    /*
-     * Keep public for PHP 5.3 compatibility
-     */
-    public function parsePartialDetails($url)
-    {
-        if (!$url) {
-            return null;
-        }
-
-        $url = stripslashes($url);
-
-        $rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions) + 1) . '#' . $url . '#';
-
-        $this->found_controller_actions[] = array(
-            'tag_name' => $rep_tag,
-            'route' => $url,
-            'action_type' => 'partial'
-        );
-
-        // return the tag as the replacement of the preg - this is
-        // how we'll match it later on to replace with actual content
-        return $rep_tag;
-    }
-
-    /*
-     * Keep public for PHP 5.3 compatibility
-     */
-    public function parseFragmentDetails($url)
-    {
-        if (!$url) {
-            return null;
-        }
-
-        $res = null;
-        $type = 'file';
-
-        // a web page
-        if ((substr($url, 0, 7) == 'http://') ||
-            (substr($url, 0, 8) == 'https://') ||
-            (substr($url, 0, 4) == 'www.')
-        ) {
-            $type = 'url';
-            $res = $url;
-        } else {
-            // if relative - search for the file within the assets folder of the module
-            // otherwise try to include it directly
-            $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
-
-            $do_include =
-                lcFiles::getFileExt($res) == '.php' ?
-                    true : false;
-
-            if ($do_include) {
-                $type = 'php';
-            }
-        }
-
-        $rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments) + 1);
-        $this->found_fragments[] = array(
-            'tag_name' => $rep_tag,
-            'url' => $res,
-            'type' => $type
-        );
-
-        return $rep_tag;
-    }
-
-    protected function getTemplateData()
-    {
-        $template_filename = $this->template_filename;
-
-        if (!isset($template_filename)) {
-            throw new lcInvalidArgumentException('No template filename has been set to view');
-        }
-
-        $data = @file_get_contents($template_filename);
-
-        return $data;
-    }
-
     public function getParams()
     {
         return $this->params;
-    }
-
-    public function __set($name, $value = null)
-    {
-        return $this->params->__set($name, $value);
     }
 
     public function __get($name)
@@ -231,10 +118,23 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $this->params->__get($name);
     }
 
+    public function __set($name, $value = null)
+    {
+        return $this->params->__set($name, $value);
+    }
+
+    /*
+     * Keep public for PHP 5.3 compatibility
+     */
+
     public function & getNode($name, $params = null)
     {
         return $this->params->getNode($name, $params);
     }
+
+    /*
+     * Keep public for PHP 5.3 compatibility
+     */
 
     public function & repeat($name, $params = null)
     {
@@ -284,5 +184,107 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     public function offsetUnset($name)
     {
         return $this->params->offsetUnset($name);
+    }
+
+    protected function getViewContent()
+    {
+        return $this->getTemplateData();
+    }
+
+    protected function getTemplateData()
+    {
+        $template_filename = $this->template_filename;
+
+        if (!isset($template_filename)) {
+            throw new lcInvalidArgumentException('No template filename has been set to view');
+        }
+
+        $data = @file_get_contents($template_filename);
+
+        return $data;
+    }
+
+    protected function didApplyFilters($content)
+    {
+        // parse the content to obtain partials / fragments
+        $content = $this->parseParticles($content);
+        return $content;
+    }
+
+    protected function parseParticles($data)
+    {
+        // parse and find info of found partials
+        $self = $this;
+        $data = preg_replace_callback("/<!--\s*PARTIAL\s*(.*?)\s*-->/i", function ($m) use ($self) {
+            return $self->parsePartialDetails(@$m[1]);
+        }, $data);
+
+        // parse all find info of found fragments
+        $data = preg_replace_callback("/<!--\s*FRAGMENT\s*(.*?)\s*-->/i", function ($m) use ($self) {
+            return $self->parseFragmentDetails(@$m[1]);
+        }, $data);
+
+        return $data;
+    }
+
+    public function parsePartialDetails($url)
+    {
+        if (!$url) {
+            return null;
+        }
+
+        $url = stripslashes($url);
+
+        $rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions) + 1) . '#' . $url . '#';
+
+        $this->found_controller_actions[] = array(
+            'tag_name' => $rep_tag,
+            'route' => $url,
+            'action_type' => 'partial'
+        );
+
+        // return the tag as the replacement of the preg - this is
+        // how we'll match it later on to replace with actual content
+        return $rep_tag;
+    }
+
+    public function parseFragmentDetails($url)
+    {
+        if (!$url) {
+            return null;
+        }
+
+        $res = null;
+        $type = 'file';
+
+        // a web page
+        if ((substr($url, 0, 7) == 'http://') ||
+            (substr($url, 0, 8) == 'https://') ||
+            (substr($url, 0, 4) == 'www.')
+        ) {
+            $type = 'url';
+            $res = $url;
+        } else {
+            // if relative - search for the file within the assets folder of the module
+            // otherwise try to include it directly
+            $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
+
+            $do_include =
+                lcFiles::getFileExt($res) == '.php' ?
+                    true : false;
+
+            if ($do_include) {
+                $type = 'php';
+            }
+        }
+
+        $rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments) + 1);
+        $this->found_fragments[] = array(
+            'tag_name' => $rep_tag,
+            'url' => $res,
+            'type' => $type
+        );
+
+        return $rep_tag;
     }
 }

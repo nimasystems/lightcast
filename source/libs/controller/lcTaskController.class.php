@@ -66,6 +66,11 @@ abstract class lcTaskController extends lcController implements iDebuggable
         return false;
     }
 
+    public function consoleDisplay($data, $prefixed = true, $return = false)
+    {
+        $this->response->consoleDisplay($data, $prefixed, $return);
+    }
+
     /**
      * @return lcView
      */
@@ -81,6 +86,23 @@ abstract class lcTaskController extends lcController implements iDebuggable
     {
         // console tasks don't have layouts
         return null;
+    }
+
+    public function display($data, $prefixed = true, $return = false)
+    {
+        $this->consoleDisplay($data, $prefixed, $return);
+    }
+
+    public function displayWarning($data, $prefixed = true, $return = false)
+    {
+        $data = lcConsolePainter::formatColoredConsoleText($data, 'yellow');
+        $this->consoleDisplay($data, $prefixed, $return);
+    }
+
+    public function getHelpInformation()
+    {
+        $this->consoleDisplay('No help information provided by: \'' . $this->getControllerName() . '\'');
+        return false;
     }
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)
@@ -100,28 +122,10 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $response->sendResponse();
     }
 
-    protected function actionExists($action_name, array $action_params = null)
+    public function displayError($data, $prefixed = true, $return = false)
     {
-        /*
-         * We need to make this call with both is_callable, method_exists
-        *  as the inherited classes may contain a __call()
-        *  magic method which will be raised also lcObj as the last parent
-        *  in this tree - throws an exception!
-        */
-        $method_name = $this->classMethodForAction($action_name, $action_params);
-
-        if (!$method_name) {
-            return false;
-        }
-
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
-
-        return $callable_check;
-    }
-
-    protected function classMethodForAction($action_name, array $action_params = null)
-    {
-        return 'executeTask';
+        $data = lcConsolePainter::formatColoredConsoleText($data, 'red');
+        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     protected function execute($action_name, array $action_params)
@@ -158,26 +162,28 @@ abstract class lcTaskController extends lcController implements iDebuggable
         return $this->action_result;
     }
 
-    public function display($data, $prefixed = true, $return = false)
+    protected function actionExists($action_name, array $action_params = null)
     {
-        $this->consoleDisplay($data, $prefixed, $return);
+        /*
+         * We need to make this call with both is_callable, method_exists
+        *  as the inherited classes may contain a __call()
+        *  magic method which will be raised also lcObj as the last parent
+        *  in this tree - throws an exception!
+        */
+        $method_name = $this->classMethodForAction($action_name, $action_params);
+
+        if (!$method_name) {
+            return false;
+        }
+
+        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+
+        return $callable_check;
     }
 
-    public function displayError($data, $prefixed = true, $return = false)
+    protected function classMethodForAction($action_name, array $action_params = null)
     {
-        $data = lcConsolePainter::formatColoredConsoleText($data, 'red');
-        $this->consoleDisplay($data, $prefixed, $return);
-    }
-
-    public function displayWarning($data, $prefixed = true, $return = false)
-    {
-        $data = lcConsolePainter::formatColoredConsoleText($data, 'yellow');
-        $this->consoleDisplay($data, $prefixed, $return);
-    }
-
-    public function consoleDisplay($data, $prefixed = true, $return = false)
-    {
-        $this->response->consoleDisplay($data, $prefixed, $return);
+        return 'executeTask';
     }
 
     protected function confirm($message, $accept_string = 'y')
@@ -193,12 +199,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
             return $input;
         }
 
-        return false;
-    }
-
-    public function getHelpInformation()
-    {
-        $this->consoleDisplay('No help information provided by: \'' . $this->getControllerName() . '\'');
         return false;
     }
 }

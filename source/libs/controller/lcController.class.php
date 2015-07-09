@@ -92,24 +92,165 @@ abstract class lcController extends lcBaseController implements iDebuggable
      */
     abstract public function getDefaultLayoutViewInstance();
 
-    abstract protected function classMethodForAction($action_name, array $action_params = null);
-
-    abstract protected function actionExists($action_name, array $action_params = null);
-
-    abstract protected function execute($action_name, array $action_params);
-
-    abstract protected function outputViewContents(lcController $controller, $content = null, $content_type = null);
-
-    public function initialize()
+    public function getProfilingData()
     {
-        parent::initialize();
+        // TODO: Complete this
+        return null;
+    }
 
-        // partial view provider
+    public function getControllerStack()
+    {
+        return $this->controller_stack;
+    }
 
-        /*
-         * @deprecated Left for LC 1.4 compatibility
-        */
-        $this->event_dispatcher->registerProvider('controller.partial_view', $this, 'getPartialViewByEvent');
+    public function setControllerStack(lcControllerStack $stack)
+    {
+        $this->controller_stack = $stack;
+    }
+
+    public function getActionFilterChain()
+    {
+        return $this->action_filter_chain;
+    }
+
+    public function setActionFilterChain(lcActionFilterChain $action_filter_chain)
+    {
+        $this->action_filter_chain = $action_filter_chain;
+    }
+
+    public function getActionFilters()
+    {
+        return $this->action_filters;
+    }
+
+    public function & getDispatchParams()
+    {
+        return $this->dispatch_params;
+    }
+
+    public function setDispatchParams(array $dispatch_params = null)
+    {
+        $this->dispatch_params = &$dispatch_params;
+    }
+
+    public function getActionResult()
+    {
+        return $this->action_result;
+    }
+
+    public function getPartialViewByEvent(lcEvent $event)
+    {
+        $params = $event->getParams();
+
+        $partial_url = isset($params['partial_url']) ? $params['partial_url'] : null;
+
+        if (!$partial_url) {
+            assert(false);
+            return null;
+        }
+
+        $partial_view = $this->getPartialViewBasedOnParams($partial_url);
+
+        return $partial_view;
+    }
+
+    public function getPartialViewBasedOnParams($params /* dynamic - string or array */)
+    {
+        if (!$params) {
+            return null;
+        }
+
+        // two formats
+        // - url
+        // - array(module, action, params)
+        if (is_string($params)) {
+            // need to find the route first
+            $router = $this->routing;
+
+            assert(isset($router));
+
+            $options = array('url' => $params);
+            $params = $router->getParamsByCriteria($options);
+
+            if (!$params) {
+                return null;
+            }
+
+            unset($router, $options);
+        } elseif (!is_array($params)) {
+            return null;
+        }
+
+        assert(isset($params['action']) && isset($params['module']));
+
+        $action_name = $params['action'];
+        $module_name = $params['module'];
+
+        $action_params_detected = (isset($params['params']) && is_array($params['params'])) ? $params['params'] : $params;
+
+        return $this->getPartialView($action_name, $module_name, $action_params_detected);
+    }
+
+    public function getPartialView($action_name, $module, array $params = null)
+    {
+        return $this->getPartial($action_name, $module, $params);
+    }
+
+    public function getPartial($action_name, $module, array $params = null)
+    {
+        $params = array(
+            'request' => array_merge(
+                array(
+                    'module' => $module,
+                    'action' => $action_name,
+                    'type' => lcController::TYPE_PARTIAL,
+                ),
+                (array)$params
+            ),
+            'type' => lcController::TYPE_PARTIAL
+        );
+
+        $content = null;
+
+        try {
+            // get an instance of the controller first
+            $controller_instance = $this->getControllerInstance($module);
+
+            if (!$controller_instance) {
+                throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
+            }
+
+            $rendered_contents = null;
+
+            $controller_instance->initialize();
+
+            $this->prepareControllerInstance($controller_instance);
+
+            try {
+                $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
+            } catch (Exception $e) {
+                // shutdown the controller after usage
+                $controller_instance->shutdown();
+
+                throw $e;
+            }
+
+            if (!$rendered_contents) {
+                return null;
+            }
+
+            $content = $rendered_contents['content'];
+        } catch (Exception $e) {
+            if (DO_DEBUG) {
+                $content =
+                    '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
+                    $e->getMessage() . "<br />\n<br />\n" . nl2br(htmlspecialchars($e->getTraceAsString())) . '</div>';
+            }
+
+            // silence if not debugging
+        }
+
+        return $content;
     }
 
     public function shutdown()
@@ -130,6 +271,73 @@ abstract class lcController extends lcBaseController implements iDebuggable
         parent::shutdown();
     }
 
+    public function getRenderTime()
+    {
+        return $this->render_time;
+    }
+
+    public function getActionParams()
+    {
+        return $this->action_params;
+    }
+
+    public function setActionParams(array $params = null)
+    {
+        $this->action_params = $params;
+    }
+
+    public function getActionType()
+    {
+        return $this->action_type;
+    }
+
+    public function setActionType($action_type = null)
+    {
+        $this->action_type = $action_type;
+    }
+
+    public function getParentController()
+    {
+        return $this->parent_controller;
+    }
+
+    public function setParentController(lcController & $parent_controller = null)
+    {
+        $this->parent_controller = $parent_controller;
+    }
+
+    public function isFrontController()
+    {
+        return $this->isRootController();
+    }
+
+    public function isRootController()
+    {
+        return ($this->root_controller === null);
+    }
+
+    public function isTopController()
+    {
+        $res = ($this->getTopController() === $this) ? false : true;
+        return $res;
+    }
+
+    public function getTopController()
+    {
+        if (!$this->controller_stack) {
+            return null;
+        }
+
+        // get the top controller on the stack
+        $controller_instance = $this->controller_stack->first();
+        $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
+        return $controller;
+    }
+
+    abstract protected function classMethodForAction($action_name, array $action_params = null);
+
+    abstract protected function actionExists($action_name, array $action_params = null);
+
     protected function beforeExecute()
     {
         // subclassers may override this method to execute code before the initialization of the controller
@@ -138,47 +346,6 @@ abstract class lcController extends lcBaseController implements iDebuggable
     protected function afterExecute()
     {
         // subclassers may override this method to execute code after the initialization of the controller
-    }
-
-    public function getProfilingData()
-    {
-        // TODO: Complete this
-        return null;
-    }
-
-    public function setControllerStack(lcControllerStack $stack)
-    {
-        $this->controller_stack = $stack;
-    }
-
-    public function getControllerStack()
-    {
-        return $this->controller_stack;
-    }
-
-    public function setActionFilterChain(lcActionFilterChain $action_filter_chain)
-    {
-        $this->action_filter_chain = $action_filter_chain;
-    }
-
-    public function getActionFilterChain()
-    {
-        return $this->action_filter_chain;
-    }
-
-    public function getActionFilters()
-    {
-        return $this->action_filters;
-    }
-
-    public function setDispatchParams(array $dispatch_params = null)
-    {
-        $this->dispatch_params = &$dispatch_params;
-    }
-
-    public function & getDispatchParams()
-    {
-        return $this->dispatch_params;
     }
 
     protected function validateRequestAndThrow()
@@ -197,96 +364,10 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
     }
 
-    public function setDecoratorView(iSupportsLayoutDecoration $view = null)
-    {
-        // LC 1.4 compatibility fixes:
-        $params = array(
-            'view' => $view
-        );
-
-        $full_template_name = null;
-
-        if ($view && $view instanceof lcHTMLTemplateView) {
-            $full_template_name = $view->getTemplateFilename();
-
-            if ($full_template_name) {
-                $params['template_filename'] = $full_template_name;
-                $params['template_name'] = basename($full_template_name);
-            }
-
-            // send a filtering event to allow / disallow changing the decorator
-            $event = $this->event_dispatcher->filter(new lcEvent('view.set_decorator', $this, $params), $full_template_name);
-
-            if ($event->isProcessed()) {
-                $return_value = $event->getReturnValue();
-
-                if (!$return_value) {
-                    $this->info('setDecoratorView was disabled by an event handler');
-                    return;
-                }
-            }
-        }
-
-        // unset the previous one first
-        $this->unsetDecoratorView();
-
-        // set the new one
-        $this->layout_view = $view;
-
-        if (DO_DEBUG) {
-            $log_str = $this->controller_name . '/' . $this->action_name . ' set decorator to: ' . (string)$view;
-            $this->notice($log_str);
-        }
-    }
-
-    public function unsetDecoratorView()
-    {
-        if ($this->layout_view) {
-            $this->layout_view->shutdown();
-            $this->layout_view = null;
-        }
-    }
-
-    public function getDecoratorView()
-    {
-        return $this->layout_view;
-    }
-
-    public function getActionResult()
-    {
-        return $this->action_result;
-    }
-
     protected function forwardIf($condition, $action_name, $controller_name = null)
     {
         if ($condition) {
             $this->forward($action_name, $controller_name);
-        }
-    }
-
-    protected function forwardUnless($condition, $action_name, $controller_name = null)
-    {
-        if (!$condition) {
-            $this->forward($action_name, $controller_name);
-        }
-    }
-
-    protected function forwardError($message = null)
-    {
-        throw new lcNotAvailableException($message);
-    }
-
-    protected function forwardErrorIf($condition, $message = null)
-    {
-        if ($condition) {
-            $this->forwardError($message);
-        }
-    }
-
-    protected function forwardErrorUnless($condition, $message = null)
-    {
-        if (!$condition) {
-            $this->forwardError($message);
         }
     }
 
@@ -324,6 +405,29 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $this,
             $action_name, $action_params);
     }
+
+    public function getRootController()
+    {
+        return $this->root_controller;
+    }
+
+    public function setRootController(iFrontController & $controller = null)
+    {
+        $this->root_controller = $controller;
+    }
+
+    protected function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->root_controller) {
+            throw new lcNotAvailableException('Root controller not available');
+        }
+
+        return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
 
     public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller = null, $action_name, array $action_params = null)
     {
@@ -400,35 +504,88 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $this->outputViewContents($controller_instance, $content, $content_type);
     }
 
-    protected function executeControllerFilterChain($controller_name, $controller_filename, $controller_context_type, $controller_context_name, $controller_parent_plugin_name,
-                                                    $action_name, array $action_params = null)
-    {
-        $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, array(
-            'controller_context_name' => $controller_context_name,
-            'controller_context_type' => $controller_context_type,
-            'controller_filename' => $controller_filename,
-            'controller_parent_plugin' => $controller_parent_plugin_name
-        ));
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
 
-        return $filter_results;
+    public function getActionName()
+    {
+        return $this->action_name;
     }
 
-    public function shouldApplyActionFilters($action_name, $action_type)
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function setActionName($action_name)
     {
-        $action_filters = $this->action_filters;
+        $this->action_name = $action_name;
+    }
 
-        if (!$action_filters || !isset($action_filters[$action_name])) {
-            return true;
+    public function setDecoratorView(iSupportsLayoutDecoration $view = null)
+    {
+        // LC 1.4 compatibility fixes:
+        $params = array(
+            'view' => $view
+        );
+
+        $full_template_name = null;
+
+        if ($view && $view instanceof lcHTMLTemplateView) {
+            $full_template_name = $view->getTemplateFilename();
+
+            if ($full_template_name) {
+                $params['template_filename'] = $full_template_name;
+                $params['template_name'] = basename($full_template_name);
+            }
+
+            // send a filtering event to allow / disallow changing the decorator
+            $event = $this->event_dispatcher->filter(new lcEvent('view.set_decorator', $this, $params), $full_template_name);
+
+            if ($event->isProcessed()) {
+                $return_value = $event->getReturnValue();
+
+                if (!$return_value) {
+                    $this->info('setDecoratorView was disabled by an event handler');
+                    return;
+                }
+            }
         }
 
-        $ac = $action_filters[$action_name];
+        // unset the previous one first
+        $this->unsetDecoratorView();
 
-        if (!isset($ac['type']) || $ac['type'] == $action_type) {
-            $should_apply_filters = (!isset($ac['skip_filters']) || !$ac['skip_filters']);
-            return $should_apply_filters;
+        // set the new one
+        $this->layout_view = $view;
+
+        if (DO_DEBUG) {
+            $log_str = $this->controller_name . '/' . $this->action_name . ' set decorator to: ' . (string)$view;
+            $this->notice($log_str);
         }
+    }
 
-        return true;
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function unsetDecoratorView()
+    {
+        if ($this->layout_view) {
+            $this->layout_view->shutdown();
+            $this->layout_view = null;
+        }
+    }
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        // partial view provider
+
+        /*
+         * @deprecated Left for LC 1.4 compatibility
+        */
+        $this->event_dispatcher->registerProvider('controller.partial_view', $this, 'getPartialViewByEvent');
     }
 
     protected function applyActionFilters(lcController $controller_instance, $controller_name, $action_name, array $action_params = null)
@@ -515,6 +672,37 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
     }
 
+    public function shouldApplyActionFilters($action_name, $action_type)
+    {
+        $action_filters = $this->action_filters;
+
+        if (!$action_filters || !isset($action_filters[$action_name])) {
+            return true;
+        }
+
+        $ac = $action_filters[$action_name];
+
+        if (!isset($ac['type']) || $ac['type'] == $action_type) {
+            $should_apply_filters = (!isset($ac['skip_filters']) || !$ac['skip_filters']);
+            return $should_apply_filters;
+        }
+
+        return true;
+    }
+
+    protected function executeControllerFilterChain($controller_name, $controller_filename, $controller_context_type, $controller_context_name, $controller_parent_plugin_name,
+                                                    $action_name, array $action_params = null)
+    {
+        $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, array(
+            'controller_context_name' => $controller_context_name,
+            'controller_context_type' => $controller_context_type,
+            'controller_filename' => $controller_filename,
+            'controller_parent_plugin' => $controller_parent_plugin_name
+        ));
+
+        return $filter_results;
+    }
+
     public function renderControllerAction(lcController $controller, $action_name, array $action_params = null)
     {
         if (!$controller || !$action_name) {
@@ -572,6 +760,81 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
 
         return $rendered_view_contents;
+    }
+
+    abstract protected function execute($action_name, array $action_params);
+
+    protected function renderLayoutView($layout_content, $layout_content_type = null)
+    {
+        /** @var iSupportsLayoutDecoration $layout_view */
+        $layout_view = $this->getDecoratorView();
+
+        if (!$layout_view) {
+            return $layout_content;
+        }
+
+        // notify / filter
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this), array(
+            'use_layout' => true,
+            'content' => $layout_content,
+            'content_type' => $layout_content_type
+        ));
+
+        if ($event->isProcessed()) {
+            $r = $event->getReturnValue();
+
+            $use_layout = isset($r['use_layout']) ? (bool)$r['use_layout'] : true;
+            $layout_content = isset($r['content']) ? $r['content'] : null;
+            $layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
+
+            if (!$use_layout) {
+                // layout decoration not allowed
+                return $layout_content;
+            }
+        }
+
+        $layout_view->setDecorateContent($layout_content, $layout_content_type);
+        $render_result = $this->renderControllerView($this, $layout_view);
+
+        // unset / shutdown the view after we are done with it to preserve memory
+        if ($layout_view instanceof lcSysObj) {
+            /** @var lcSysObj $layout_view */
+            $layout_view->shutdown();
+        }
+
+        $this->layout_view = null;
+
+        if (!$render_result) {
+            return null;
+        }
+
+        // notify / filter
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), array(
+            'content' => $render_result['content'],
+            'content_type' => $layout_content_type
+        ));
+
+        if ($event->isProcessed()) {
+            $r = $event->getReturnValue();
+
+            $layout_content = isset($r['content']) ? $r['content'] : null;
+            //$layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
+
+            if (!$layout_content) {
+                return $layout_content;
+            }
+
+            $render_result['content'] = $layout_content;
+        }
+
+        $content = $render_result['content'];
+
+        return $content;
+    }
+
+    public function getDecoratorView()
+    {
+        return $this->layout_view;
     }
 
     protected function renderControllerView(lcBaseController $controller, lcView $view)
@@ -643,72 +906,32 @@ abstract class lcController extends lcBaseController implements iDebuggable
         return $ret;
     }
 
-    protected function renderLayoutView($layout_content, $layout_content_type = null)
+    abstract protected function outputViewContents(lcController $controller, $content = null, $content_type = null);
+
+    protected function forwardUnless($condition, $action_name, $controller_name = null)
     {
-        /** @var iSupportsLayoutDecoration $layout_view */
-        $layout_view = $this->getDecoratorView();
-
-        if (!$layout_view) {
-            return $layout_content;
+        if (!$condition) {
+            $this->forward($action_name, $controller_name);
         }
+    }
 
-        // notify / filter
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this), array(
-            'use_layout' => true,
-            'content' => $layout_content,
-            'content_type' => $layout_content_type
-        ));
-
-        if ($event->isProcessed()) {
-            $r = $event->getReturnValue();
-
-            $use_layout = isset($r['use_layout']) ? (bool)$r['use_layout'] : true;
-            $layout_content = isset($r['content']) ? $r['content'] : null;
-            $layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
-
-            if (!$use_layout) {
-                // layout decoration not allowed
-                return $layout_content;
-            }
+    protected function forwardErrorIf($condition, $message = null)
+    {
+        if ($condition) {
+            $this->forwardError($message);
         }
+    }
 
-        $layout_view->setDecorateContent($layout_content, $layout_content_type);
-        $render_result = $this->renderControllerView($this, $layout_view);
+    protected function forwardError($message = null)
+    {
+        throw new lcNotAvailableException($message);
+    }
 
-        // unset / shutdown the view after we are done with it to preserve memory
-        if ($layout_view instanceof lcSysObj) {
-            /** @var lcSysObj $layout_view */
-            $layout_view->shutdown();
+    protected function forwardErrorUnless($condition, $message = null)
+    {
+        if (!$condition) {
+            $this->forwardError($message);
         }
-
-        $this->layout_view = null;
-
-        if (!$render_result) {
-            return null;
-        }
-
-        // notify / filter
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), array(
-            'content' => $render_result['content'],
-            'content_type' => $layout_content_type
-        ));
-
-        if ($event->isProcessed()) {
-            $r = $event->getReturnValue();
-
-            $layout_content = isset($r['content']) ? $r['content'] : null;
-            //$layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
-
-            if (!$layout_content) {
-                return $layout_content;
-            }
-
-            $render_result['content'] = $layout_content;
-        }
-
-        $content = $render_result['content'];
-
-        return $content;
     }
 
     protected function renderFragment($type, $url)
@@ -742,224 +965,5 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
 
         return $fragment_content;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getPartialViewByEvent(lcEvent $event)
-    {
-        $params = $event->getParams();
-
-        $partial_url = isset($params['partial_url']) ? $params['partial_url'] : null;
-
-        if (!$partial_url) {
-            assert(false);
-            return null;
-        }
-
-        $partial_view = $this->getPartialViewBasedOnParams($partial_url);
-
-        return $partial_view;
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getPartialViewBasedOnParams($params /* dynamic - string or array */)
-    {
-        if (!$params) {
-            return null;
-        }
-
-        // two formats
-        // - url
-        // - array(module, action, params)
-        if (is_string($params)) {
-            // need to find the route first
-            $router = $this->routing;
-
-            assert(isset($router));
-
-            $options = array('url' => $params);
-            $params = $router->getParamsByCriteria($options);
-
-            if (!$params) {
-                return null;
-            }
-
-            unset($router, $options);
-        } elseif (!is_array($params)) {
-            return null;
-        }
-
-        assert(isset($params['action']) && isset($params['module']));
-
-        $action_name = $params['action'];
-        $module_name = $params['module'];
-
-        $action_params_detected = (isset($params['params']) && is_array($params['params'])) ? $params['params'] : $params;
-
-        return $this->getPartialView($action_name, $module_name, $action_params_detected);
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getPartialView($action_name, $module, array $params = null)
-    {
-        return $this->getPartial($action_name, $module, $params);
-    }
-
-    protected function getControllerInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        if (!$this->root_controller) {
-            throw new lcNotAvailableException('Root controller not available');
-        }
-
-        return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
-    }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-    public function getPartial($action_name, $module, array $params = null)
-    {
-        $params = array(
-            'request' => array_merge(
-                array(
-                    'module' => $module,
-                    'action' => $action_name,
-                    'type' => lcController::TYPE_PARTIAL,
-                ),
-                (array)$params
-            ),
-            'type' => lcController::TYPE_PARTIAL
-        );
-
-        $content = null;
-
-        try {
-            // get an instance of the controller first
-            $controller_instance = $this->getControllerInstance($module);
-
-            if (!$controller_instance) {
-                throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
-            }
-
-            $rendered_contents = null;
-
-            $controller_instance->initialize();
-
-            $this->prepareControllerInstance($controller_instance);
-
-            try {
-                $rendered_contents = $this->renderControllerAction($controller_instance, $action_name, $params);
-            } catch (Exception $e) {
-                // shutdown the controller after usage
-                $controller_instance->shutdown();
-
-                throw $e;
-            }
-
-            if (!$rendered_contents) {
-                return null;
-            }
-
-            $content = $rendered_contents['content'];
-        } catch (Exception $e) {
-            if (DO_DEBUG) {
-                $content =
-                    '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
-                    $e->getMessage() . "<br />\n<br />\n" . nl2br(htmlspecialchars($e->getTraceAsString())) . '</div>';
-            }
-
-            // silence if not debugging
-        }
-
-        return $content;
-    }
-
-    public function getRenderTime()
-    {
-        return $this->render_time;
-    }
-
-    public function setActionName($action_name)
-    {
-        $this->action_name = $action_name;
-    }
-
-    public function getActionName()
-    {
-        return $this->action_name;
-    }
-
-    public function setActionParams(array $params = null)
-    {
-        $this->action_params = $params;
-    }
-
-    public function getActionParams()
-    {
-        return $this->action_params;
-    }
-
-    public function setActionType($action_type = null)
-    {
-        $this->action_type = $action_type;
-    }
-
-    public function getActionType()
-    {
-        return $this->action_type;
-    }
-
-    public function setParentController(lcController & $parent_controller = null)
-    {
-        $this->parent_controller = $parent_controller;
-    }
-
-    public function getParentController()
-    {
-        return $this->parent_controller;
-    }
-
-    public function isFrontController()
-    {
-        return $this->isRootController();
-    }
-
-    public function isRootController()
-    {
-        return ($this->root_controller === null);
-    }
-
-    public function isTopController()
-    {
-        $res = ($this->getTopController() === $this) ? false : true;
-        return $res;
-    }
-
-    public function setRootController(iFrontController & $controller = null)
-    {
-        $this->root_controller = $controller;
-    }
-
-    public function getRootController()
-    {
-        return $this->root_controller;
-    }
-
-    public function getTopController()
-    {
-        if (!$this->controller_stack) {
-            return null;
-        }
-
-        // get the top controller on the stack
-        $controller_instance = $this->controller_stack->first();
-        $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
-        return $controller;
     }
 }

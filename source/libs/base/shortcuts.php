@@ -52,7 +52,7 @@ function e($param, $return = false)
 {
     if (!$return) {
         var_dump($param);
-        return;
+        return null;
     }
 
     if (!is_string($param)) {
@@ -67,6 +67,7 @@ function e($param, $return = false)
     }
 
     echo $param;
+    return null;
 }
 
 function ee($param, $return = false)
@@ -81,6 +82,7 @@ function ee($param, $return = false)
     }
 
     echo $param;
+    return null;
 }
 
 function vd($val)

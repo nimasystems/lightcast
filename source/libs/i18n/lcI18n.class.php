@@ -58,6 +58,8 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
         return $debug;
     }
 
+    abstract public function getLocale();
+
     public function getShortDebugInfo()
     {
         $debug = array(
@@ -68,8 +70,6 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
     }
 
     abstract public function setLocale($locale);
-
-    abstract public function getLocale();
 
     public function splitLocale($locale, $set_default_country = true)
     {

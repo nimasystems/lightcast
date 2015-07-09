@@ -43,25 +43,10 @@ class lcTagParam extends lcHtmlBaseTag
         $this->setValueType($valuetype);
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array('name');
-    }
-
-    public static function getOptionalAttributes()
-    {
-        return array('value', 'id', 'type', 'valuetype');
-    }
-
     public function setName($value)
     {
         $this->setAttribute('name', $value);
         return $this;
-    }
-
-    public function getName()
-    {
-        return $this->getAttribute('name');
     }
 
     public function setValue($value = null)
@@ -70,31 +55,16 @@ class lcTagParam extends lcHtmlBaseTag
         return $this;
     }
 
-    public function getValue()
-    {
-        return $this->getAttribute('value');
-    }
-
     public function setId($value = null)
     {
         $this->setAttribute('id', $value);
         return $this;
     }
 
-    public function getId()
-    {
-        return $this->getAttribute('id');
-    }
-
     public function setType($value = null)
     {
         $this->setAttribute('type', $value);
         return $this;
-    }
-
-    public function getType()
-    {
-        return $this->getAttribute('type');
     }
 
     public function setValueType($value = null)
@@ -105,6 +75,36 @@ class lcTagParam extends lcHtmlBaseTag
 
         $this->setAttribute('valuetype', $value);
         return $this;
+    }
+
+    public static function getRequiredAttributes()
+    {
+        return array('name');
+    }
+
+    public static function getOptionalAttributes()
+    {
+        return array('value', 'id', 'type', 'valuetype');
+    }
+
+    public function getName()
+    {
+        return $this->getAttribute('name');
+    }
+
+    public function getValue()
+    {
+        return $this->getAttribute('value');
+    }
+
+    public function getId()
+    {
+        return $this->getAttribute('id');
+    }
+
+    public function getType()
+    {
+        return $this->getAttribute('type');
     }
 
     public function getValueType()

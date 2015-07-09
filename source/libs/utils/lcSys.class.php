@@ -31,14 +31,6 @@
  */
 class lcSys
 {
-    public static function execCmd($cmd, &$result = null, $dont_implode = false)
-    {
-        $output = null;
-        exec($cmd, $output, $result);
-
-        return ($dont_implode ? $output : implode("\n", $output));
-    }
-
     public static function correctShellParam($param)
     {
         $param = str_replace(' ', '\ ', $param);
@@ -79,12 +71,6 @@ class lcSys
         return php_sapi_name();
     }
 
-    public static function getOSType($basic = false)
-    {
-        $ostype = $basic ? PHP_OS : php_uname();
-        return $ostype;
-    }
-
     public static function isOSWin()
     {
         if (strtolower(substr(self::getOSType(), 0, 3)) == strtolower('WIN')) {
@@ -92,6 +78,12 @@ class lcSys
         }
 
         return false;
+    }
+
+    public static function getOSType($basic = false)
+    {
+        $ostype = $basic ? PHP_OS : php_uname();
+        return $ostype;
     }
 
     public static function isOSLinux()
@@ -129,13 +121,6 @@ class lcSys
         return 0 == strncasecmp(PHP_SAPI, 'cli', 3);
     }
 
-    /*public static function getPhpCli()
-     {
-    if (self::isOSLinux()) return '/usr/bin/php'; else
-        if (self::isOSWin()) return 'C:\\php\\php.exe'; else
-        return false;
-    }*/
-
     /**
      * Get path to php cli.
      * @return string If no php cli found
@@ -163,6 +148,13 @@ class lcSys
 
         throw new lcSystemException('Unable to find PHP executable.');
     }
+
+    /*public static function getPhpCli()
+     {
+    if (self::isOSLinux()) return '/usr/bin/php'; else
+        if (self::isOSWin()) return 'C:\\php\\php.exe'; else
+        return false;
+    }*/
 
     /**
      * From PEAR System.php
@@ -220,8 +212,20 @@ class lcSys
         $mem = memory_get_usage();
 
         return $humanize ?
-            self::formatObjectSize($mem, $precision, $size_in) :
+            self::formatObjectSize($mem, $precision) :
             $mem;
+    }
+
+    public static function formatObjectSize($bytes, $precision = 2)
+    {
+        $suffix = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $total = count($suffix);
+
+        for ($i = 0; $bytes > 1024 && $i < $total; $i++) {
+            $bytes /= 1024;
+        }
+
+        return number_format($bytes, $precision) . ' ' . $suffix[$i];
     }
 
     public static function getMemoryPeakUsage($emalloc = false, $humanize = false, $precision = 2, $size_in = null)
@@ -229,7 +233,7 @@ class lcSys
         $mem = lcVm::memory_get_peak_usage($emalloc);
 
         return $humanize ?
-            self::formatObjectSize($mem, $precision, $size_in) :
+            self::formatObjectSize($mem, $precision) :
             $mem;
     }
 
@@ -260,18 +264,6 @@ class lcSys
         }
 
         return $ret;
-    }
-
-    public static function formatObjectSize($bytes, $precision = 2)
-    {
-        $suffix = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-        $total = count($suffix);
-
-        for ($i = 0; $bytes > 1024 && $i < $total; $i++) {
-            $bytes /= 1024;
-        }
-
-        return number_format($bytes, $precision) . ' ' . $suffix[$i];
     }
 
     public static function formatFileSize($object_size, $precision = 2, $size_in = null)
@@ -383,5 +375,13 @@ class lcSys
         $ret = ($result == '0');
 
         return $ret;
+    }
+
+    public static function execCmd($cmd, &$result = null, $dont_implode = false)
+    {
+        $output = null;
+        exec($cmd, $output, $result);
+
+        return ($dont_implode ? $output : implode("\n", $output));
     }
 }

@@ -2,7 +2,7 @@
 
 <!DOCTYPE xsl:stylesheet [<!ENTITY nbsp "&#160;">]>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <!--
     XSL Stylesheet to normalize a database schema
     -->
@@ -10,7 +10,7 @@
     <!--
     Output indented UTF 8 XML
     -->
-    <xsl:output method="xml" indent="yes" encoding="UTF-8" />
+    <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
 
     <!--
     Matches root database node, the only allowed root node

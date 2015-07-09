@@ -42,6 +42,18 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
         $this->setTitle($title);
     }
 
+    public function setClass($value = null)
+    {
+        $this->setAttribute('class', $value);
+        return $this;
+    }
+
+    public function setTitle($value = null)
+    {
+        $this->setAttribute('title', $value);
+        return $this;
+    }
+
     public static function getRequiredAttributes()
     {
         return array('id');
@@ -90,21 +102,9 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
         return $this->attributes->get('class');
     }
 
-    public function setClass($value = null)
-    {
-        $this->setAttribute('class', $value);
-        return $this;
-    }
-
     public function getTitle()
     {
         return $this->attributes->get('title');
-    }
-
-    public function setTitle($value = null)
-    {
-        $this->setAttribute('title', $value);
-        return $this;
     }
 
     public function getOnClick()

@@ -58,13 +58,6 @@ class lcConsoleResponse extends lcResponse
         $this->compileOutputModifiers();
     }
 
-    public function shutdown()
-    {
-        $this->request = null;
-
-        parent::shutdown();
-    }
-
     private function compileOutputModifiers()
     {
         if (!$this->output_formatters) {
@@ -86,6 +79,13 @@ class lcConsoleResponse extends lcResponse
 
         $this->compiled_output_modifiers = $modifiers;
         $this->compiled_output_modifier_methods = $methods;
+    }
+
+    public function shutdown()
+    {
+        $this->request = null;
+
+        parent::shutdown();
     }
 
     public function consoleDisplay($data, $prefixed = true, $return = false)
@@ -164,6 +164,11 @@ class lcConsoleResponse extends lcResponse
         return $this->content;
     }
 
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
+
     public function getOutputContent()
     {
         return $this->content;
@@ -175,12 +180,8 @@ class lcConsoleResponse extends lcResponse
         $this->exit_code = 0;
     }
 
-    public function setContent($content)
-    {
-        $this->content = $content;
-    }
-
     // for compatibility
+
     public function setContentType($content_type)
     {
         //
