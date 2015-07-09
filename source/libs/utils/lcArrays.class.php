@@ -173,7 +173,8 @@ class lcArrays
         return $base;
     }
 
-    public static function arrayToString(array $arr = null)
+    public static function arrayToString(/** @noinspection PhpUnusedParameterInspection */
+        array $arr = null)
     {
         // TODO - Bug - memory exhaust
         return '';

@@ -252,7 +252,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
                     unset($data, $class_name, $object, $cached_data, $key);
                 } catch (Exception $e) {
                     if (DO_DEBUG) {
-                        throw lcSystemException('Could not write class cache to storage (' . $key . '): ' .
+                        throw new lcSystemException('Could not write class cache to storage (' . $key . '): ' .
                             $e->getMessage(),
                             $e->getCode(),
                             $e);

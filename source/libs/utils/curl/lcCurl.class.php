@@ -150,7 +150,7 @@ class lcCurl extends lcObj
 
     public function getAuthPassword()
     {
-        return $this->auth_password;
+        return $this->auth_pass;
     }
 
     public function setReferer($referer)

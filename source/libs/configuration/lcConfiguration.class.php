@@ -267,7 +267,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     }
 
     // @codingStandardsIgnoreStart
-    public function set($name, $value = null)
+    public function set($name, /** @noinspection PhpUnusedParameterInspection */
+                        $value = null)
     {
         $arr_str = '$this->configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
         $eval_str = $arr_str . ' = $value;';

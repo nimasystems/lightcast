@@ -44,6 +44,7 @@ class lcColumnMap extends ColumnMap
 
     public function getLcTitle()
     {
-        return $this->getTable()->translate($this->lc_title);
+        $table = $this->getTable();
+        return ($table instanceof lcTableMap ? $table->translate($this->lc_title) : null);
     }
 }

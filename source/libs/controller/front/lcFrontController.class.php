@@ -148,7 +148,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // but an access denied instead.
 
         // forward the request
-        return $this->forward($controller, $action, array('request' => $request_params));
+        $this->forward($controller, $action, array('request' => $request_params));
     }
 
     public function forward($controller_name, $action_name, array $action_params = null)
@@ -270,18 +270,13 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             }
 
             unset($nf, $nf_module, $nf_action);
-
-            // if not handled yet - send the response with a 404 in case of a web app
-            $response = $this->response;
-
-            if ((bool)$this->configuration['routing.send_http_errors']) {
-                $this->info('Sending a HTTP 404 because no suitable module/action were found for the request');
-
-                $response->clear();
-                $response->sendHttpNotFound();
-            }
         }
 
+        $this->handleControllerNotReachableAfter();
+    }
+
+    protected function handleControllerNotReachableAfter()
+    {
         // final stop
         throw new lcControllerForwardException('Could not forward to controller action');
     }
@@ -442,5 +437,3 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->default_decorator = $decorator;
     }
 }
-
-?>

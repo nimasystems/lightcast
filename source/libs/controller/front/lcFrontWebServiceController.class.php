@@ -34,6 +34,9 @@ class lcFrontWebServiceController extends lcFrontWebController
 
     protected $use_actual_get_params;
 
+    /** @var lcWebResponse */
+    protected $response;
+
     public function initialize()
     {
         parent::initialize();
@@ -70,6 +73,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         if ($this->getRouter() instanceof lcPHPRouting) {
             $params = (array)$this->extractRequestParams($request);
         } else {
+            /** @var lcNameValuePair[] $params_tmp */
             $params_tmp = $request->getParams()->getArrayCopy();
 
             if ($params_tmp) {
@@ -92,6 +96,9 @@ class lcFrontWebServiceController extends lcFrontWebController
 
     private function extractRequestParams(lcRequest $request)
     {
+        /** @var lcWebRequest $request */
+
+        /** @var lcNameValuePair[] $params */
         $params = $request->isPost() ? $request->getPostParams()->getArrayCopy() :
             $request->getGetParams()->getArrayCopy();
 
@@ -151,7 +158,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         $custom_error_code = isset($custom_error_code) ? (string)$custom_error_code : null;
         $custom_message = isset($custom_message) ? (string)$custom_message : null;
 
-        $response = $this->getResponse();
+        $response = $this->response;
 
         $response->clear();
 
@@ -173,6 +180,7 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         $exception_domain = ($e instanceof iDomainException) ? $e->getDomain() : lcException::DEFAULT_DOMAIN;
         $extra_data = ($e instanceof lcException) ? $e->getExtraData() : null;
+
         $validation_failures = ($e instanceof lcValidationException) ? $e->getValidationFailures() : null;
 
         // TODO: Hide system related messages
@@ -254,5 +262,3 @@ class lcFrontWebServiceController extends lcFrontWebController
         exit(0);
     }
 }
-
-?>

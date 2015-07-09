@@ -126,11 +126,6 @@ class lcHttpFile extends lcObj
         $this->size = (int)$size;
     }
 
-    public function getTempDir()
-    {
-        return $this->temp_dir;
-    }
-
     public function getName()
     {
         return $this->name;

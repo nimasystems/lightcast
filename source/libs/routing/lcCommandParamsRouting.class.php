@@ -39,8 +39,12 @@
 
 class lcCommandParamsRouting extends lcRouting implements iDebuggable
 {
+    /** @var lcConsoleRequest */
     protected $request;
+
     protected $detected_params;
+
+    protected $context;
 
     public function initialize()
     {

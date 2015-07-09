@@ -188,7 +188,7 @@ class lcPDODatabase extends lcDatabase
 
     public function disconnect()
     {
-        if (!$this->connected) {
+        if (!$this->conn) {
             return true;
         }
 

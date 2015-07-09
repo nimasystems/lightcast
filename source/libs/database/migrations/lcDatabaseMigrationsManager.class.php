@@ -40,7 +40,7 @@ class lcDatabaseMigrationsManager extends lcSysObj implements iDatabaseMigration
     const ERR_SCHEMA_UPGRADE = 12;
 
     protected $migration_table_name = self::DEFAULT_MIGRATION_TABLE_NAME;
-    private $migrations_target_class_name;
+    //private $migrations_target_class_name;
 
     private $current_target;
     private $conn;

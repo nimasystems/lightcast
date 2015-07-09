@@ -30,16 +30,16 @@
  */
 class lcSystemComponentFactory extends lcSysObj implements iCacheable
 {
-    /** @var lcController[] */
+    /** @var array */
     protected $controllers;
 
-    /** @var lcWebServiceController */
+    /** @var array */
     protected $web_services;
 
-    /** @var lcTaskController */
+    /** @var array */
     protected $tasks;
 
-    /** @var lcComponent */
+    /** @var array */
     protected $components;
 
     // store the ones from configuration separately and merge them later
@@ -665,6 +665,15 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         return $instance;
     }
 
+    /**
+     * @param $controller_name
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcWebController
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcSystemException
+     */
     public function getControllerModuleInstance($controller_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
@@ -699,6 +708,15 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         return $instance;
     }
 
+    /**
+     * @param $controller_name
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcWebServiceController
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcSystemException
+     */
     public function getControllerWebServiceInstance($controller_name, $context_type = null, $context_name = null)
     {
         // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
@@ -900,5 +918,3 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->config_system_plugins = isset($cached_data['config_system_plugins']) ? $cached_data['config_system_plugins'] : null;
     }
 }
-
-?>

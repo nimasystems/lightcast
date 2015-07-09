@@ -77,11 +77,6 @@ class lcEvent extends lcObj
         return $this->params;
     }
 
-    public function getFilterValue()
-    {
-        return $this->filter_value;
-    }
-
     public function setProcessed($processed = true)
     {
         $this->processed = $processed;

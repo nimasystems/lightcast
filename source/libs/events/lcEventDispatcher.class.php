@@ -140,7 +140,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
     public function connect($event_name, lcObj & $listener, $callback_func, $once = true)
     {
-        $notify_event = $this->notifyOnConnectForEvent($event_name, $listener, $callback_func);
+        $notify_event = $this->notifyOnConnectForEvent($event_name);
 
         if ($notify_event) {
 
@@ -572,11 +572,10 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
      * @param $event_name
      * @param lcObj $listener
      * @param $callback_func
-     * @param bool $once
      * @return lcEvent|null
      * @throws Exception
      */
-    public function notifyOnConnectForEvent($event_name, lcObj & $listener, $callback_func, $once = true)
+    public function notifyOnConnectForEvent($event_name)
     {
         $listeners = $this->connect_listeners;
 
