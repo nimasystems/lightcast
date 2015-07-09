@@ -234,7 +234,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         $this->has_expired = true;
     }
 
-    private function readFromStorage()
+    protected function readFromStorage()
     {
         $this->is_authenticated = (bool)$this->storage->get('is_authenticated', self::NS_KEY);
         $this->authentication_data = (array)$this->storage->get('authentication_data', self::NS_KEY);
@@ -263,7 +263,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         }
     }
 
-    public function setAuthenticationData($user_id, array $authentication_data)
+    protected function setAuthenticationData($user_id, array $authentication_data = null)
     {
         $this->user_id = $user_id;
         $this->authentication_data = $authentication_data;
@@ -313,7 +313,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return $should_authenticate;
     }
 
-    private function setAuthentication($forced_by_user = false, $no_events = false)
+    protected function setAuthentication($forced_by_user = false, $no_events = false)
     {
         if ($this->is_authenticated) {
             return $this->refreshUserSession($forced_by_user, $no_events);
@@ -393,7 +393,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
         return $this->is_authenticated;
     }
 
-    private function calculateTimeoutInSeconds()
+    protected function calculateTimeoutInSeconds()
     {
         if (!$this->is_authenticated) {
             return 0;

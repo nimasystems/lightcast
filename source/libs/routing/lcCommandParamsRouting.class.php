@@ -52,6 +52,10 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
 
         $this->request = $this->event_dispatcher->provide('loader.request', $this)->getReturnValue();
 
+        $this->context = $this->request->getRequestContext();
+        $this->context['default_module'] = $this->default_module;
+        $this->context['default_action'] = $this->default_action;
+
         // allow others to be notified when base routes have been loaded
         $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
             'context' => $this->context
