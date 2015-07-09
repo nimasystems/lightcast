@@ -28,7 +28,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1565 $
  */
-class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHandler
+class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iErrorHandler
 {
     const AJAX_REQUEST_CONTENT_TYPE = 'application/json';
 
@@ -52,21 +52,23 @@ class lcErrorHandler extends lcSysObj implements iProvidesCapabilities, iErrorHa
 
     private $is_debugging;
 
-    public function initialize()
+    protected function beforeAttachRegisteredEvents()
     {
-        parent::initialize();
+        parent::beforeAttachRegisteredEvents();
 
         $this->is_debugging = $this->configuration->isDebugging();
+    }
 
-        // attach events
-        $this->event_dispatcher->connect('app.startup', $this, 'onAppStartup');
-        $this->event_dispatcher->connect('request.startup', $this, 'onRequestStartup');
-        $this->event_dispatcher->connect('response.startup', $this, 'onResponseStartup');
-        $this->event_dispatcher->connect('mailer.startup', $this, 'onMailerStartup');
-        $this->event_dispatcher->connect('controller.startup', $this, 'onControllerStartup');
-
-        // listen for 'error_handler.exception' event
-        $this->event_dispatcher->connect('error_handler.exception_notify', $this, 'onExceptionNotificationReported');
+    public function getListenerEvents()
+    {
+        return array(
+            'app.startup' => 'onAppStartup',
+            'request.startup' => 'onRequestStartup',
+            'response.startup' => 'onResponseStartup',
+            'mailer.startup' => 'onMailerStartup',
+            'controller.startup' => 'onControllerStartup',
+            'error_handler.exception_notify' => 'onExceptionNotificationReported',
+        );
     }
 
     public function shutdown()

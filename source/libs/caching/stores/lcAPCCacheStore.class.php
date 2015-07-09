@@ -32,7 +32,7 @@ class lcAPCCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, 
 {
     /** @var lcAPC */
     protected $apc;
-    
+
     private $namespace_prefix;
 
     public function initialize()

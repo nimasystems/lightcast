@@ -57,29 +57,40 @@ abstract class lcDatabase extends lcSysObj
     public function setDatabaseManager(lcDatabaseManager $database_manager)
     {
         $this->database_manager = $database_manager;
+        return $this;
     }
 
     public function setOptions(array $options)
     {
         $this->options = $options;
+        return $this;
     }
 
+    /**
+     * @return PDO
+     */
     public function connect()
     {
-        $connection = $this->getConnection();
-
-        if (!$connection) {
-            return false;
-        }
-
-        return $connection;
+        return $this->getConnection();
     }
 
+    /**
+     * @return void
+     */
     abstract public function disconnect();
 
+    /**
+     * @return bool
+     */
     abstract public function isConnected();
 
+    /**
+     * @return PDO
+     */
     abstract public function getConnection();
 
+    /**
+     * @return int
+     */
     abstract public function getSQLCount();
 }

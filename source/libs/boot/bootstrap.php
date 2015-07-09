@@ -140,6 +140,8 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDb
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
 
 // load base classes
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iEventsListener.class.php');
+
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcObj.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcSysObj.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcResidentObj.class.php');

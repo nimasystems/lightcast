@@ -50,8 +50,10 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         parent::initialize();
     }
 
-    protected function beforeRegisterEvents()
+    protected function beforeAttachRegisteredEvents()
     {
+        parent::beforeAttachRegisteredEvents();
+
         $this->argv = $this->env('argv');
         $this->argc = $this->env('argc');
         $this->params = new lcArrayCollection($this->argv);

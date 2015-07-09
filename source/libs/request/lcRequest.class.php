@@ -47,9 +47,9 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     protected $is_silent;
 
-    public function initialize()
+    protected function beforeAttachRegisteredEvents()
     {
-        parent::initialize();
+        parent::beforeAttachRegisteredEvents();
 
         // init default vars
         $this->sapi = lcSys::get_sapi();

@@ -77,8 +77,10 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         parent::initialize();
     }
 
-    protected function beforeRegisterEvents()
+    protected function beforeAttachRegisteredEvents()
     {
+        parent::beforeAttachRegisteredEvents();
+
         $this->resetPHPRequestGlobals();
 
         // fix REQUEST_URI - it is not url escaped

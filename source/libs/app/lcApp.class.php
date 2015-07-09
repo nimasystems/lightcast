@@ -415,7 +415,7 @@ class lcApp extends lcObj
                 }
 
                 try {
-                    $this->configureResidentObject($object, $object_name, get_class($object), true);
+                    $this->configureSystemObject($object, $object_name, get_class($object), true);
                 } catch (Exception $e) {
                     throw new lcSystemException('Could not initialize system object (' . $object_name . '): ' .
                         $e->getMessage(),
@@ -605,7 +605,7 @@ class lcApp extends lcObj
                     continue;
                 }
 
-                $this->configureResidentObject($obj, $loader, $class_name);
+                $this->configureSystemObject($obj, $loader, $class_name);
 
                 // if it comes from a plugin - assign proper context type / name
                 if (isset($component_loaders[$class_name])) {
@@ -688,7 +688,7 @@ class lcApp extends lcObj
         }
     }
 
-    protected function configureResidentObject(lcResidentObj $obj, $object_type, $class_name, $add_local_cache = false)
+    protected function configureSystemObject(lcSysObj $obj, $object_type, $class_name, $add_local_cache = false)
     {
         assert(!is_null($obj) && !is_null($class_name) && !is_null($object_type));
 
@@ -728,7 +728,10 @@ class lcApp extends lcObj
         // send event - initialize
         //$this->event_dispatcher->notify(new lcEvent($object_type . '.initialize', $obj));
 
-        $obj->attachRegisteredEvents();
+        // TODO: Change this
+        if ($obj instanceof lcResidentObj) {
+            $obj->attachRegisteredEvents();
+        }
     }
 
     protected function addAutoloadClassesFromObject(iSupportsAutoload $obj)

@@ -35,16 +35,6 @@ abstract class lcResponse extends lcResidentObj implements iProvidesCapabilities
     protected $exit_code = 0;
     protected $response_sent;
 
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
-    public function shutdown()
-    {
-        parent::shutdown();
-    }
-
     public function getCapabilities()
     {
         return array(
