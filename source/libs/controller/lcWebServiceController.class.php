@@ -35,6 +35,9 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     protected $send_direct_response;
     protected $send_server_timezone;
 
+    /** @var lcApiWebRequest */
+    protected $request;
+
     public function initialize()
     {
         parent::initialize();
