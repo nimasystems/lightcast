@@ -60,6 +60,10 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     abstract public function getLocale();
 
+    abstract public function getLanguageCode();
+
+    abstract public function getCountryCode();
+
     public function getShortDebugInfo()
     {
         $debug = array(

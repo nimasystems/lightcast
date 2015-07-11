@@ -65,6 +65,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
      */
     protected $data_storage;
 
+    /** @var iCacheStorage */
     protected $cache;
 
     /**

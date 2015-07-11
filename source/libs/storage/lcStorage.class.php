@@ -32,6 +32,11 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
 {
     protected $ignore_time_tracking;
 
+    /**
+     * @return string
+     */
+    abstract public function getSessionId();
+
     public function initialize()
     {
         parent::initialize();
