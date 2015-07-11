@@ -202,7 +202,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        $ret = @include_once($filename);
+        if (DO_DEBUG) {
+            $ret = include_once($filename);
+        } else {
+            $ret = @include_once($filename);
+        }
 
         if (!$ret) {
             return false;
@@ -347,7 +351,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         if ($plugins) {
             foreach ($plugins as $name => $plugin) {
-                $implementations = $plugin->getPluginConfiguration()->getImplementations();
+                $implementations = $plugin->getImplementations();
 
                 if ($plugin instanceof iDebuggable || in_array('iDebuggable', (array)$implementations)) {
                     $dbg[$name] = $plugin->getDebugInfo();
@@ -506,9 +510,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $plugin_name = $plugin_object->getPluginName();
         $plugin_config = $plugin_object->getPluginConfiguration();
 
-        $implementations = $plugin_config->getImplementations();
-
-        if (!($plugin_config instanceof iPluginRequirements && !in_array('iPluginRequirements', (array)$implementations))) {
+        if (!($plugin_config instanceof iPluginRequirements)) {
             return;
         }
 
@@ -570,9 +572,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         $plugin_configuration = $plugin->getPluginConfiguration();
 
-        $implementations = $plugin_configuration->getImplementations();
-
-        if ($plugin_configuration instanceof iRequiresCapabilities || in_array('iRequiresCapabilities', (array)$implementations)) {
+        if ($plugin_configuration instanceof iRequiresCapabilities) {
             $required_capabilities = $plugin_configuration->getRequiredCapabilities();
 
             if ($required_capabilities && is_array($required_capabilities)) {

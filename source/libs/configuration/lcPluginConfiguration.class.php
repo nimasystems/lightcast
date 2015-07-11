@@ -189,12 +189,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 0;
     }
 
-    public function getImplementations()
-    {
-        // subclassers may override this
-        return null;
-    }
-
     public function getConfigDir()
     {
         return $this->getRootDir() . DS . 'config';
