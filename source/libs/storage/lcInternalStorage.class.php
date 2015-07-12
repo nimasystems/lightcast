@@ -58,6 +58,11 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         return false;
     }
 
+    public function getSessionId()
+    {
+        return null;
+    }
+
     public function has($key, $namespace = null)
     {
         return $this->get($key, $namespace) ? true : false;

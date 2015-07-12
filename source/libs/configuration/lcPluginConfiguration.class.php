@@ -49,11 +49,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         parent::initialize();
     }
 
+    /**
+     * @return string
+     */
     public function getPluginDir()
     {
         return $this->root_dir;
     }
 
+    /**
+     * @return string
+     */
     public function getWebPath()
     {
         return $this->web_path;
@@ -64,11 +70,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         $this->web_path = $web_path;
     }
 
+    /**
+     * @return array|null
+     */
     public function getRoutes()
     {
         return $this['routes'];
     }
 
+    /**
+     * @return string
+     */
     public function getStartupType()
     {
         // subclassers may override this method and ask to start the plugin
@@ -82,6 +94,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return self::STARTUP_TYPE_MANUAL;
     }
 
+    /**
+     * @return array|null
+     */
     public function getAutomaticStartupEvents()
     {
         // subclassers may override this method and return an array of event
@@ -91,6 +106,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return null;
     }
 
+    /**
+     * @return array|null
+     */
     public function getPluginAuthor()
     {
         // subclassers may override this method to return informationa bout the
@@ -142,6 +160,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         );
     }
 
+    /**
+     * @return string
+     */
     public function getPluginCategory()
     {
         // subclassers may override this method to return the plugin's logical
@@ -149,6 +170,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return null;
     }
 
+    /**
+     * @return string
+     */
     public function getPluginIdentifier()
     {
         // subclassers may override this method to return the GUID identifier of
@@ -156,11 +180,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return null;
     }
 
+    /**
+     * @return string
+     */
     public function getVersion()
     {
         return $this->getMajorVersion() . '.' . $this->getMinorVersion() . '.' . $this->getBuildVersion() . '.' . $this->getRevisionVersion();
     }
 
+    /**
+     * @return int
+     */
     public function getMajorVersion()
     {
         // subclassers may override this method to return the major version of
@@ -168,6 +198,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 1;
     }
 
+    /**
+     * @return int
+     */
     public function getMinorVersion()
     {
         // subclassers may override this method to return the minor version of
@@ -175,6 +208,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 0;
     }
 
+    /**
+     * @return int
+     */
     public function getBuildVersion()
     {
         // subclassers may override this method to return the build version of
@@ -182,6 +218,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return iSupportsVersions::BUILD_PRODUCTION;
     }
 
+    /**
+     * @return int
+     */
     public function getRevisionVersion()
     {
         // subclassers may override this method to return the revision version of
@@ -189,11 +228,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 0;
     }
 
+    /**
+     * @return string
+     */
     public function getConfigDir()
     {
         return $this->getRootDir() . DS . 'config';
     }
 
+    /**
+     * @return string
+     */
     public function getRootDir()
     {
         return $this->root_dir;
@@ -202,8 +247,12 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function setRootDir($root_dir)
     {
         $this->root_dir = $root_dir;
+        return $this;
     }
 
+    /**
+     * @return string
+     */
     public function getProjectConfigDir()
     {
         $plugin_name = $this->getName();
@@ -215,6 +264,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return 'plugins' . DS . $plugin_name;
     }
 
+    /**
+     * @return string
+     */
     public function getName()
     {
         return $this->name;
@@ -223,6 +275,15 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function setName($name)
     {
         $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return lcWebsiteConfigurationKey[]|null
+     */
+    public function getWebsiteConfigurationKeys()
+    {
+        return null;
     }
 
     public function getConfigHandleMap()
@@ -249,13 +310,20 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return $config_map;
     }
 
+    /**
+     * @return array|null
+     */
     public function getDefaultConfiguration()
     {
         // subclassers may override this method to return a default configuration
         // which
         // should be applied upon initialization
+        return null;
     }
 
+    /**
+     * @return array|null
+     */
     public function getDefaultRoutingConfiguration()
     {
         // subclassers may override this method to return a different routing
@@ -263,6 +331,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return null;
     }
 
+    /**
+     * @return array|null
+     */
     public function getDefaultViewConfiguration()
     {
         // subclassers may override this method to return a different view
