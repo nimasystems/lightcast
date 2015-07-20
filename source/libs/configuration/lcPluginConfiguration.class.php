@@ -50,6 +50,14 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
+     * @return string|null
+     */
+    public function getPackageName()
+    {
+        return null;
+    }
+
+    /**
      * @return string
      */
     public function getPluginDir()
