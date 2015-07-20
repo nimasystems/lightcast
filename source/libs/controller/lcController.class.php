@@ -329,7 +329,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
 
         // get the top controller on the stack
-        $controller_instance = $this->controller_stack->first();
+        $controller_instance = $this->controller_stack->last();
         $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
         return $controller;
     }

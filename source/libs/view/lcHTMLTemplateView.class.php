@@ -127,6 +127,11 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
      * Keep public for PHP 5.3 compatibility
      */
 
+    /**
+     * @param $name
+     * @param null $params
+     * @return lcHtmlTemplateView
+     */
     public function & getNode($name, $params = null)
     {
         return $this->params->getNode($name, $params);
@@ -136,16 +141,28 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
      * Keep public for PHP 5.3 compatibility
      */
 
+    /**
+     * @param $name
+     * @param null $params
+     * @return lcHtmlTemplateView
+     */
     public function & repeat($name, $params = null)
     {
         return $this->params->repeat($name, $params);
     }
 
+    /**
+     * @param $node_deep_name
+     * @return lcHtmlTemplateView
+     */
     public function getDeepNode($node_deep_name)
     {
         return $this->params->getDeepNode($node_deep_name);
     }
 
+    /**
+     * @return lcHtmlTemplateView[]
+     */
     public function getNodes()
     {
         return $this->params->getNodes();
