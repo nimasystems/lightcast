@@ -801,7 +801,7 @@ EOD;
                 // if a plugin - set package, otherwise 'models'
                 $options['package'] = ($type_name == 'plugin') ? 'addons.plugins.' . htmlspecialchars($name) . '.models' : 'models';
 
-                $this->fixSchema($target_filename, $options, $schema_details['models']);
+                $this->fixSchema($target_filename, $options, (array)$schema_details['models']);
 
                 unset($name, $schema_details, $path, $source_filename, $target_filename, $rf, $options);
             }
@@ -870,7 +870,7 @@ EOD;
         return $ret;
     }
 
-    private function fixSchema($filename, array $options, array $supported_models = null)
+    private function fixSchema($filename, array $options, array $supported_models)
     {
         $fdata = @file_get_contents($filename);
 
@@ -909,7 +909,7 @@ EOD;
                 $table_name = $table->getAttribute('name');
 
                 // remove if not in supported models
-                if ($supported_models && !in_array($table_name, $supported_models)) {
+                if (!in_array($table_name, $supported_models)) {
                     $table->parentNode->removeChild($table);
                 }
 
@@ -926,35 +926,33 @@ EOD;
         }
 
         // add the missing ones
-        if ($supported_models) {
-            foreach ($supported_models as $model_name) {
+        foreach ($supported_models as $model_name) {
 
-                $found = false;
+            $found = false;
 
-                if ($tables_dom->length) {
-                    foreach ($tables_dom as $table) {
+            if ($tables_dom->length) {
+                foreach ($tables_dom as $table) {
 
-                        $table_name = $table->getAttribute('name');
+                    $table_name = $table->getAttribute('name');
 
-                        if ($table_name == $model_name) {
-                            $found = true;
-                            break;
-                        }
-
-                        unset($table);
+                    if ($table_name == $model_name) {
+                        $found = true;
+                        break;
                     }
-                }
 
-                if (!$found) {
-                    $tmp = $pXml->createElement("table");
-                    $tmp->setAttribute('name', $model_name);
-                    $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
-                    $tmp->setAttribute('idMethod', 'native');
-                    $db_q->item(0)->appendChild($tmp);
+                    unset($table);
                 }
-
-                unset($model_name);
             }
+
+            if (!$found) {
+                $tmp = $pXml->createElement("table");
+                $tmp->setAttribute('name', $model_name);
+                $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
+                $tmp->setAttribute('idMethod', 'native');
+                $db_q->item(0)->appendChild($tmp);
+            }
+
+            unset($model_name);
         }
 
         unset($tables_dom, $tables_xpath_search);
