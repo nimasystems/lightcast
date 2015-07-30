@@ -723,7 +723,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     // relative or absolute path
                     $p = ($sheet && $sheet{0} == '/') ? $sheet : $stylesheet_path . $sheet;
 
-                    $this->stylesheets[$stylesheet_path . $sheet] = array(
+                    $this->stylesheets[$sheet] = array(
                         'href' => $p,
                         'type' => 'text/css',
                         'media' => $type
