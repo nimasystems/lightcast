@@ -829,7 +829,7 @@ class BasePeer
 
         // build from-clause
         $from = '';
-        if (!empty($joinClause) && count($fromClause) > 1) {
+        if (!empty($joinClause) && count($fromClause) > 1) {ee($fromClause);die;
             $from .= implode(" CROSS JOIN ", $fromClause);
         } else {
             $from .= implode(", ", $fromClause);

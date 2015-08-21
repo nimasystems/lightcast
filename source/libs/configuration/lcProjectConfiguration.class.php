@@ -766,6 +766,11 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->getProjectDir() . DS . 'data';
     }
 
+    public function getMediaDir()
+    {
+        return $this->getDataDir() . DS . 'media';
+    }
+
     public function getGenDir()
     {
         return $this->getProjectDir() . DS . 'gen';
