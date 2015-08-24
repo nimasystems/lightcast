@@ -419,16 +419,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $head = array();
 
-        // html_base
-        if ($this->html_base) {
-            $head[] = '<base href="' . $this->html_base . '" />';
-        }
-
-        // title
-        if ($this->title) {
-            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
-        }
-
         // flush based on allowances
         if (!$this->allow_metatags) {
             $this->metatags = array();
@@ -453,18 +443,28 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // meta equiv
         // meta equiv
         if ($this->htmlver == 5) {
+            // html5 compat
+            //$head[] = '<!-- From HTML 5 Boilerplate: Use .htaccess instead. See: h5bp.com/i/378 -->';
+            $head[] = '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
+
             $head[] = '<meta charset="' . $this->server_charset . '" />';
         } else {
             $head[] = '<meta http-equiv="Content-Type" content="' . $this->content_type . ' charset=' . $this->server_charset . '" />';
         }
 
+        // html_base
+        if ($this->html_base) {
+            $head[] = '<base href="' . $this->html_base . '" />';
+        }
+
+        // title
+        if ($this->title) {
+            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
+        }
+
         if ($this->canonical_url) {
             $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->canonical_url) . '" />';
         }
-
-        // html5 compat
-        //$head[] = '<!-- From HTML 5 Boilerplate: Use .htaccess instead. See: h5bp.com/i/378 -->';
-        $head[] = '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />';
 
         // metatags
         $metatags = $this->metatags;
