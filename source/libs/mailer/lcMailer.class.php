@@ -53,9 +53,14 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
     protected $body;
     protected $subject;
 
+    /** @var lcMailRecipient|null */
+    protected $default_sender;
+
     public function initialize()
     {
         parent::initialize();
+
+        $this->parseDefaultSender();
 
         $this->recipients = array();
         $this->attachments = array();
@@ -185,16 +190,39 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->recipients[$email] = $recipient;
     }
 
+    public function parseDefaultSender()
+    {
+        $sender = $this->configuration->get('mailer.default_sender');
+        $email = null;
+        $name = null;
+
+        if ($sender) {
+            $sender = lcStrings::splitEmail($sender);
+
+            if ($sender) {
+                $email = (isset($sender['email']) ? $sender['email'] : null);
+                $name = (isset($sender['name']) ? $sender['name'] : null);
+            }
+        }
+
+        $email = $email ? $email : $this->configuration->getDefaultEmailSender();
+
+        if (!$email) {
+            return null;
+        }
+
+        $this->default_sender = new lcMailRecipient($email, $name);
+    }
+
+    public function getDefaultSender()
+    {
+        return $this->default_sender;
+    }
+
     public function send()
     {
         if (!$this->sender) {
-            if (isset($this->configuration['mailer']['default_sender']) && $this->configuration['mailer']['default_sender']) {
-                $this->setSender(new lcMailRecipient($this->configuration['mailer']['default_sender']));
-            } elseif (ini_get('sendmail_from')) {
-                $this->setSender(new lcMailRecipient(ini_get('sendmail_from')));
-            } else {
-                $this->setSender(new lcMailRecipient('Webmaster <root@localhost>'));
-            }
+            $this->sender = $this->getDefaultSender();
         }
 
         $error_message = null;

@@ -265,6 +265,15 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $email = $this->get('admin_email');
         $email = !$email ? $this->get('settings.admin_email') : $email;
         $email = !$email ? ini_get('sendmail_from') : $email;
+        $email = !$email ? get_current_user() . '@' . php_uname('n') : $email;
+        $email = !$email ? 'root@localhost' : $email;
+        return $email;
+    }
+
+    public function getDefaultEmailSender()
+    {
+        $email = ini_get('sendmail_from');
+        $email = !$email ? get_current_user() . '@' . php_uname('n') : $email;
         $email = !$email ? 'root@localhost' : $email;
         return $email;
     }

@@ -58,6 +58,16 @@ class lcStrings
         return strstr($haystack, $needle);
     }
 
+    public static function splitEmail($str)
+    {
+        $str .= " ";
+        $sPattern = '/([\w\s\'\"]+[\s]+)?(<)?(([\w-\.]+)@((?:[\w]+\.)+)([a-zA-Z]{2,4}))?(>)?/';
+        preg_match($sPattern, $str, $aMatch);
+        $name = (isset($aMatch[1])) ? $aMatch[1] : '';
+        $email = (isset($aMatch[3])) ? $aMatch[3] : '';
+        return array('name' => trim($name), 'email' => trim($email));
+    }
+
     public static function permaLink(array $key_cols, array $keywords, $prefix = null)
     {
         if (isset($prefix)) {
