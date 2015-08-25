@@ -766,6 +766,11 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->getProjectDir() . DS . 'data';
     }
 
+    public function getMediaDir()
+    {
+        return $this->getDataDir() . DS . 'media';
+    }
+
     public function getGenDir()
     {
         return $this->getProjectDir() . DS . 'gen';
@@ -779,7 +784,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getCacheDir($environment = null)
     {
         $environment = $environment ? $environment : $this->getConfigEnvironment();
-        return $this->tmp_dir . DS . $environment . DS . 'cache';
+        return $this->tmp_dir . DS . 'cache' . DS . $environment;
     }
 
     public function getConfigEnvironment()
@@ -795,7 +800,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getSpoolDir($environment = null)
     {
         $environment = $environment ? $environment : $this->getConfigEnvironment();
-        return $this->tmp_dir . DS . $environment . DS . 'spool';
+        return $this->tmp_dir . DS . 'spool' . DS . $environment;
     }
 
     public function getShellDir()

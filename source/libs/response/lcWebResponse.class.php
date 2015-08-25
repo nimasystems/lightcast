@@ -419,16 +419,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $head = array();
 
-        // html_base
-        if ($this->html_base) {
-            $head[] = '<base href="' . $this->html_base . '" />';
-        }
-
-        // title
-        if ($this->title) {
-            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
-        }
-
         // flush based on allowances
         if (!$this->allow_metatags) {
             $this->metatags = array();
@@ -453,18 +443,28 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // meta equiv
         // meta equiv
         if ($this->htmlver == 5) {
+            // html5 compat
+            //$head[] = '<!-- From HTML 5 Boilerplate: Use .htaccess instead. See: h5bp.com/i/378 -->';
+            $head[] = '<meta http-equiv="X-UA-Compatible" content="IE=edge" />';
+
             $head[] = '<meta charset="' . $this->server_charset . '" />';
         } else {
             $head[] = '<meta http-equiv="Content-Type" content="' . $this->content_type . ' charset=' . $this->server_charset . '" />';
         }
 
+        // html_base
+        if ($this->html_base) {
+            $head[] = '<base href="' . $this->html_base . '" />';
+        }
+
+        // title
+        if ($this->title) {
+            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
+        }
+
         if ($this->canonical_url) {
             $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->canonical_url) . '" />';
         }
-
-        // html5 compat
-        //$head[] = '<!-- From HTML 5 Boilerplate: Use .htaccess instead. See: h5bp.com/i/378 -->';
-        $head[] = '<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />';
 
         // metatags
         $metatags = $this->metatags;
@@ -927,55 +927,20 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $content = $this->output_content;
 
-        if ($this->configuration['view.minify_html']) {
-            $content = $this->minifyHtml($content);
-        }
-
         if ($content && is_resource($content)) {
             fpassthru($content);
             fclose($content);
         } else {
+            // notify with an event
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.optimize_content', $this, array()), $content);
+
+            if ($event->isProcessed()) {
+                $content = $event->getReturnValue();
+            }
+
             echo $content;
         }
-    }
-
-    protected function minifyHtml($body)
-    {
-        $replace = array(
-            //remove tabs before and after HTML tags
-            '/\>[^\S ]+/s' => '>',
-            '/[^\S ]+\</s' => '<',
-            //shorten multiple whitespace sequences; keep new-line characters because they matter in JS!!!
-            '/([\t ])+/s' => ' ',
-            //remove leading and trailing spaces
-            '/^([\t ])+/m' => '',
-            '/([\t ])+$/m' => '',
-            // remove JS line comments (simple only); do NOT remove lines containing URL (e.g. 'src="http://server.com/"')!!!
-            '~//[a-zA-Z0-9 ]+$~m' => '',
-            //remove empty lines (sequence of line-end and white-space characters)
-            '/[\r\n]+([\t ]?[\r\n]+)+/s' => "\n",
-            //remove empty lines (between HTML tags); cannot remove just any line-end characters because in inline JS they can matter!
-            '/\>[\r\n\t ]+\</s' => '><',
-            //remove "empty" lines containing only JS's block end character; join with next line (e.g. "}\n}\n</script>" --> "}}</script>"
-            '/}[\r\n\t ]+/s' => '}',
-            '/}[\r\n\t ]+,[\r\n\t ]+/s' => '},',
-            //remove new-line after JS's function or condition start; join with next line
-            '/\)[\r\n\t ]?{[\r\n\t ]+/s' => '){',
-            '/,[\r\n\t ]?{[\r\n\t ]+/s' => ',{',
-            //remove new-line after JS's line end (only most obvious and safe cases)
-            '/\),[\r\n\t ]+/s' => '),',
-            //remove quotes from HTML attributes that does not contain spaces; keep quotes around URLs!
-            '~([\r\n\t ])?([a-zA-Z0-9]+)="([a-zA-Z0-9_/\\-]+)"([\r\n\t ])?~s' => '$1$2=$3$4', //$1 and $4 insert first white-space character found before/after attribute
-        );
-        $body = preg_replace(array_keys($replace), array_values($replace), $body);
-
-        //remove optional ending tags (see http://www.w3.org/TR/html5/syntax.html#syntax-tag-omission )
-        $remove = array(
-            '</option>', '</li>', '</dt>', '</dd>', '</tr>', '</th>', '</td>'
-        );
-        $body = str_ireplace($remove, '', $body);
-
-        return $body;
     }
 
     public function getStylesheets()

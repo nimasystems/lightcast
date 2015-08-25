@@ -279,6 +279,30 @@ class lcFiles
         return true;
     }
 
+    /**
+     * Sanitizes a filename replacing whitespace with dashes
+     * @author WordPress
+     *
+     * Removes special characters that are illegal in filenames on certain
+     * operating systems and special characters requiring special escaping
+     * to manipulate at the command line. Replaces spaces and consecutive
+     * dashes with a single dash. Trim period, dash and underscore from beginning
+     * and end of filename.
+     *
+     * @since 2.1.0
+     *
+     * @param string $filename The filename to be sanitized
+     * @return string The sanitized filename
+     */
+    public static function sanitizeFilename($filename)
+    {
+        $special_chars = array("?", "[", "]", "/", "\\", "=", "<", ">", ":", ";", ",", "'", "\"", "&", "$", "#", "*", "(", ")", "|", "~", "`", "!", "{", "}");
+        $filename = str_replace($special_chars, '', $filename);
+        $filename = preg_replace('/[\s-]+/', '-', $filename);
+        $filename = trim($filename, '.-_');
+        return $filename;
+    }
+
     public static function globRecursive($dir, $glob_pattern, $glob_options = GLOB_BRACE)
     {
         $ret = (array)glob($dir . DS . $glob_pattern, $glob_options);

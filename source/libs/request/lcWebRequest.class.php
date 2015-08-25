@@ -513,9 +513,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
      * HTTP Header: HTTP_CONTENT_LANGUAGE
     */
 
-    public function getProtocol()
+    public function getProtocol($string = false)
     {
-        return $this->protocol;
+        return ($string ? ($this->protocol == self::HTTP_PROTO_HTTPS ? 'https' : 'http') : $this->protocol);
     }
 
     /*
