@@ -155,7 +155,13 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
             $this->setSubject($subject);
         }
 
-        $this->setSender(new lcMailRecipient($from ? $from : $this->configuration['settings.admin_email']));
+        if ($from) {
+            $sender = new lcMailRecipient($from);
+        } else {
+            $sender = $this->default_sender;
+        }
+
+        $this->setSender($sender);
 
         $res = $this->send();
 
