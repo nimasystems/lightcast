@@ -721,7 +721,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
                 foreach ($stylesheets as $sheet) {
                     // relative or absolute path
-                    $p = ($sheet && $sheet{0} == '/') ? $sheet : $stylesheet_path . $sheet;
+                    $p = ($sheet && ($sheet{0} == '/' || lcStrings::startsWith($sheet, 'http'))) ? $sheet : $stylesheet_path . $sheet;
 
                     $this->stylesheets[$sheet] = array(
                         'href' => $p,
@@ -749,7 +749,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if ($javascripts) {
             foreach ($javascripts as $js) {
                 // relative or absolute path
-                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
+                $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
                 $this->javascripts[$js_path . $js] = array(
                     'src' => $p,
@@ -769,7 +769,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if ($javascripts) {
             foreach ($javascripts as $js) {
                 // relative or absolute path
-                $p = ($js && $js{0} == '/') ? $js : $js_path . $js;
+                $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
                 $this->javascripts_end[$js_path . $js] = array(
                     'src' => $p,
