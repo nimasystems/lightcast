@@ -393,7 +393,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
 
         // configure the default view
-        $this->configureControllerView();
+        if (!$this->getView()) {
+            $this->configureControllerView();
+        }
 
         // run before execute
         call_user_func_array(array($this, 'beforeExecute'), $action_params);
