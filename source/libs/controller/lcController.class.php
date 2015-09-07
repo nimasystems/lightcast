@@ -855,7 +855,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $view->setViewFilterChain($this->view_filter_chain);
 
             // set the decorator
-            if ($controller instanceof iViewDecorator && $view instanceof iDecoratingView) {
+            if ($controller instanceof iViewDecorator && $view instanceof iDecoratingView && $controller->getDecoratorView()) {
                 /** @var lcView $view */
                 $view->setViewDecorator($controller);
             }
