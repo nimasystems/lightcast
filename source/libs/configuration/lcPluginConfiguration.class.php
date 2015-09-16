@@ -348,4 +348,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         // configuration
         return null;
     }
+
+    public function getSupportedLocales()
+    {
+        return null;
+    }
 }

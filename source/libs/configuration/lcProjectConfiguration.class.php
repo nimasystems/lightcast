@@ -888,6 +888,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->getSourceDir() . DS . '3rdparty';
     }
 
+    public function getSupportedLocales() {
+        return null;
+    }
+
     public function setEnvironment($environment)
     {
         parent::setEnvironment($environment);

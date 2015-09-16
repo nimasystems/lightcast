@@ -34,7 +34,6 @@ class lcProjectTranslationsParser extends lcTranslationsParser
     {
         return array(
             'models' => 'database_models',
-            'gen' => 'database_models',
         );
     }
 
@@ -43,7 +42,6 @@ class lcProjectTranslationsParser extends lcTranslationsParser
         return array(
             'extensions',
             'models',
-            'gen',
             'tasks',
             'ws'
         );

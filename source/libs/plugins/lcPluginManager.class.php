@@ -91,6 +91,25 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.startup', $this));
     }
 
+    public function getPluginConfiguration($plugin_name)
+    {
+        if (!isset($this->plugin_configurations[$plugin_name])) {
+            $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
+
+            foreach ($available_plugins as $plugin_name => $plugin_details) {
+                $is_plugin_enabled = in_array($plugin_name, $this->enabled_plugins);
+                $path = $plugin_details['path'];
+                $web_path = isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null;
+
+                // initialize and store plugin configuration
+                $this->plugin_configurations[$plugin_name] =
+                    isset($this->plugin_configurations[$plugin_name]) ? $this->plugin_configurations[$plugin_name] :
+                        $this->getInstanceOfPluginConfiguration($path, $plugin_name, $web_path);
+            }
+        }
+        return $this->plugin_configurations[$plugin_name];
+    }
+
     protected function initializeEnabledPlugins()
     {
         // init enabled plugins

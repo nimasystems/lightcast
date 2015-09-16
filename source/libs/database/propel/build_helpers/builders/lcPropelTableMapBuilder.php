@@ -162,20 +162,20 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
         \$this->setPackage('" . parent::getPackage() . "');";
 
         // if title is not set - fake it
-        $lc_title = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_ATTR);
-        $lc_title = $lc_title ? $lc_title : lcInflector::humanize($this->getTable()->getAttribute('phpName'));
+        //$lc_title = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_ATTR);
+        //$lc_title = $lc_title ? $lc_title : lcInflector::humanize($this->getTable()->getAttribute('phpName'));
 
-        $php_name_title_pl = lcInflector::humanize($this->getTable()->getAttribute('phpName'));
-        $last_char = substr($php_name_title_pl, strlen($php_name_title_pl) - 1, strlen($php_name_title_pl));
-        $php_name_title_pl = ($last_char == 's' || $last_char == 'z') ? $php_name_title_pl . 'es' : $php_name_title_pl . 's';
+        //$php_name_title_pl = lcInflector::humanize($this->getTable()->getAttribute('phpName'));
+        //$last_char = substr($php_name_title_pl, strlen($php_name_title_pl) - 1, strlen($php_name_title_pl));
+        //$php_name_title_pl = ($last_char == 's' || $last_char == 'z') ? $php_name_title_pl . 'es' : $php_name_title_pl . 's';
 
-        $lc_title_plural = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_PLURAL_ATTR);
-        $lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
+        //$lc_title_plural = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_PLURAL_ATTR);
+        //$lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
 
-        $script .= "
+        /*$script .= "
         \$this->setLcTitle(\$this->translate('" . $lc_title . "'));";
         $script .= "
-        \$this->setLcTitlePlural(\$this->translate('" . $lc_title_plural . "'));";
+        \$this->setLcTitlePlural(\$this->translate('" . $lc_title_plural . "'));";*/
 
         if ($table->getIdMethod() == "native") {
             $script .= "
@@ -268,7 +268,7 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
             $lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
 
             $script .= "
-       \$this->getColumn('$cup', false)->setLcTitle(\$this->translate('" . $lc_title . "'));";
+       \$this->getColumn('$cup', false)->setLcTitle('" . $lc_title . "');";
 
         }// foreach
 
@@ -289,8 +289,27 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
             } // foreach rule
         }// foreach validator
 
+        // if title is not set - fake it
+        $lc_title = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_ATTR);
+        $lc_title = $lc_title ? $lc_title : lcInflector::humanize($this->getTable()->getAttribute('phpName'));
+
+        $php_name_title_pl = lcInflector::humanize($this->getTable()->getAttribute('phpName'));
+        $last_char = substr($php_name_title_pl, strlen($php_name_title_pl) - 1, strlen($php_name_title_pl));
+        $php_name_title_pl = ($last_char == 's' || $last_char == 'z') ? $php_name_title_pl . 'es' : $php_name_title_pl . 's';
+
+        $lc_title_plural = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_PLURAL_ATTR);
+        $lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
+
         $script .= "
     } // initialize()
+
+    public function getLcTitle() {
+        return \$this->translate('" . $lc_title . "');
+    } // getLcTitle
+
+     public function getLcTitlePlural() {
+        return \$this->translate('" . $lc_title_plural . "');
+    } // getLcTitle
 ";
 
     }

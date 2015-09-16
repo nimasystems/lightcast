@@ -110,6 +110,7 @@ class lcPropel extends Propel
 
         $translated_string = self::$i18n->translateInContext($context_type, $context_name, $string, self::TRANSLATION_DOMAIN);
 
+        //ee(self::$i18n->getLocale() . ' > ' . $context_name . ': ' . $string . ' ::::: ' . $translated_string);
         //e($context_type . ' :: ' . $context_name . ' ---- ' . $string . ' - ' . $translated_string);
 
         return $translated_string;
