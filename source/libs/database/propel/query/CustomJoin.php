@@ -68,7 +68,7 @@ class CustomJoin extends Join
         if (null === $this->joinCondition) {
             $conditions = array();
             for ($i = 0; $i < $this->count; $i++) {
-                if (in_array($i, $this->value_conditions)) {
+                if ($this->value_conditions && in_array($i, $this->value_conditions)) {
                     $conditions [] = $this->getRightTableAliasOrName($i) . '.' . $this->left[$i] . $this->getOperator($i) . $this->right[$i];
                 } else {
                     $conditions [] = $this->getLeftColumn($i) . $this->getOperator($i) . $this->getRightColumn($i);

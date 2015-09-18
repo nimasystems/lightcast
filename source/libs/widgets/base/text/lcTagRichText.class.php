@@ -33,11 +33,11 @@ class lcTagRichText extends lcTagInput
     /** @var componentFckEdit */
     protected $fck_component;
 
-    private $width = 700;
+    private $width = '100%';
 
-    public function __construct($name, $width)
+    public function __construct($name, $width = null)
     {
-        $this->width = $width;
+        $this->width = ($width ? $width : $this->width);
 
         parent::__construct('', $name);
     }

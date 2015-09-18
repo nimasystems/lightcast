@@ -351,6 +351,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     public function getSupportedLocales()
     {
-        return null;
+        return array('en_US');
     }
 }

@@ -209,7 +209,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
      * Because of incompatibilities in several utilities (form_helper) from LC 1.4
     * we need to keep this public for the moment.
     */
-
     public function getPluginManager()
     {
         return $this->plugin_manager;
@@ -511,7 +510,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
      * @throws lcRequirementException
      * @throws lcSystemException
      */
-    protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
+    public function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
     {
         if (!$this->system_component_factory) {
             throw new lcNotAvailableException('System Component Factory not available');
