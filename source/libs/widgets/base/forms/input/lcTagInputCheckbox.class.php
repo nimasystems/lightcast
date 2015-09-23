@@ -32,7 +32,7 @@
  */
 class lcTagInputCheckbox extends lcTagInput
 {
-    public function __construct($name = null, $id = null, $value, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    public function __construct($name = null, $id = null, $value = null, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
     {
         parent::__construct('checkbox', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
