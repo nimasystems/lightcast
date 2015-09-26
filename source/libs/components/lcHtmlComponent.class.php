@@ -20,7 +20,7 @@
  * @version $Revision: 1535 $
  *
  */
-abstract class lcHtmlComponent extends lcComponent
+abstract class lcHtmlComponent extends lcWebComponent
 {
 
     public function initialize()

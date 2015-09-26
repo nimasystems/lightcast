@@ -85,6 +85,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     abstract public function getProfilingData();
 
+    /**
+     * @return lcView
+     */
     abstract public function getDefaultViewInstance();
 
     public function shutdown()
@@ -305,6 +308,11 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         return $ret;
     }
 
+    public function getflash()
+    {
+        return $this->user->getFlash();
+    }
+
     public function setFlash($flash)
     {
         return $this->user->setFlash($flash);
@@ -434,6 +442,11 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected function initComponent($component_name)
     {
         return $this->getComponent($component_name);
+    }
+
+    public function getLoadedComponents()
+    {
+        return $this->loaded_components;
     }
 
     public function getComponent($component_name)

@@ -333,7 +333,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected function _internalSend()
     {
         $content = $this->content;
-        $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
+
+        if (!is_resource($content)) {
+            $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
+        }
 
         $this->content = null;
 
@@ -389,16 +392,18 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             unset($event);
         }
 
-        // disable all scripts
-        if ($this->content_type == 'text/html') {
-            $no_scripts = (bool)$this->configuration['view.no_scripts'];
+        if (!is_resource($content)) {
+            // disable all scripts
+            if ($this->content_type == 'text/html') {
+                $no_scripts = (bool)$this->configuration['view.no_scripts'];
 
-            if ($no_scripts) {
-                $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+                if ($no_scripts) {
+                    $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+                }
             }
-        }
 
-        $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
+            $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
+        }
 
         $this->output_content = $content;
 

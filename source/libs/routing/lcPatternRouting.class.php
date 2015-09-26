@@ -74,6 +74,11 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $this->detectParameters();
     }
 
+    public function getContext()
+    {
+        return $this->context;
+    }
+
     protected function setConfigRoutes()
     {
         assert(!$this->routes_are_cached);

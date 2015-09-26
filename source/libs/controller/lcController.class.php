@@ -460,6 +460,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $controller_instance->setActionFilterChain($this->action_filter_chain);
         $controller_instance->setParentController($parent_controller);
         $controller_instance->setDecoratorView($this->layout_view);
+        $controller_instance->setActionName($action_name);
 
         // initialize the controller now
         $controller_instance->initialize();
@@ -479,15 +480,39 @@ abstract class lcController extends lcBaseController implements iDebuggable
             'params' => $action_params,
         );
         $this->event_dispatcher->filter(new lcEvent('controller.change_action', $this, $notification_params), $notification_params);
+
+        $should_execute = true;
+
+        $ctrl_view = $controller_instance->getView();
+        $ctrl_view = $ctrl_view ? $ctrl_view : $controller_instance->getDefaultViewInstance();
+
+        $content_type = $ctrl_view ? $ctrl_view->getContentType() : null;
+        $content = null;
+
+        $notification_params['content_type'] = $content_type;
+
+        // this is the new filter which we use
+        $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), array(
+            'should_execute' => true
+        ));
         unset($notification_params);
 
-        // render the action
-        $rendered_view_contents = $this->renderControllerAction($controller_instance, $action_name, $action_params);
+        if ($execute_action_event->isProcessed()) {
+            $event_params = $execute_action_event->getReturnValue();
+            $should_execute = (isset($event_params['should_execute']) && $event_params['should_execute']) || !isset($event_params['should_execute']);
+        }
+
+        if ($should_execute) {
+            // render the action
+            $rendered_view_contents = $this->renderControllerAction($controller_instance, $action_name, $action_params);
+
+            $content_type = $rendered_view_contents['content_type'];
+            $content = isset($rendered_view_contents['content']) ? $rendered_view_contents['content'] : null;
+
+            unset($rendered_view_contents);
+        }
 
         // decorate content with layout view
-        $content_type = $rendered_view_contents['content_type'];
-        $content = isset($rendered_view_contents['content']) ? $rendered_view_contents['content'] : null;
-
         try {
             $content = $controller_instance->renderLayoutView($content, $content_type);
         } catch (Exception $e) {
@@ -774,7 +799,10 @@ abstract class lcController extends lcBaseController implements iDebuggable
         }
 
         // notify / filter
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this), array(
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this, array(
+            'controller_name' => $this->getControllerName(),
+            'action_name' => $this->getActionName(),
+        )), array(
             'use_layout' => true,
             'content' => $layout_content,
             'content_type' => $layout_content_type

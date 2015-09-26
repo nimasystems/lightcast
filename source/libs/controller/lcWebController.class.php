@@ -41,6 +41,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
      */
     protected $view;
 
+    protected $required_js_includes;
+    protected $required_css_includes;
+
+    protected $required_javascript_code;
+
     protected $web_path;
 
     protected $title;
@@ -75,6 +80,78 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         if ($has_layout && !$this->request->isAjax()) {
             $this->setDecorator($this->default_decorator, $this->default_decorator_extension);
         }
+    }
+
+    private function getRandomIdentifier()
+    {
+        return 'anon_' . $this->getControllerName() . '/' . $this->getActionName() . '_' . lcStrings::randomString(15);
+    }
+
+    protected function addJavascriptInclude($location, $identifier = null)
+    {
+        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
+        $this->required_js_includes[$identifier] = $location;
+    }
+
+    protected function addCssInclude($location, $identifier = null)
+    {
+        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
+        $this->required_css_includes[$identifier] = $location;
+    }
+
+    protected function addJavascriptCode($code, $identifier = null)
+    {
+        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
+        $this->required_javascript_code[$identifier] = $code;
+    }
+
+    public function getRequiredJavascriptIncludes()
+    {
+        return $this->required_js_includes;
+    }
+
+    public function getRequiredCssIncludes()
+    {
+        return $this->required_css_includes;
+    }
+
+    public function getRequiredJavascriptCode()
+    {
+        return $this->required_javascript_code;
+    }
+
+    public function renderJavascriptCode($with_children = true, $with_script_tag = true)
+    {
+        $code = (array)$this->required_javascript_code;
+
+        if ($with_children) {
+            $components = $this->getLoadedComponents();
+
+            if ($components) {
+                foreach ($components as $component_data) {
+                    /** @var lcWebComponent $component */
+                    $component = $component_data['instance'];
+                    $js_codes = $component->getRequiredJavascriptCode();
+
+                    if ($js_codes) {
+                        foreach ($js_codes as $identifier => $code2) {
+                            // append the component name before the identifier - to prevent overlapping of identifiers
+                            $identifier = $component->getControllerName() . '-' . $identifier;
+                            $code[$identifier] = $code2;
+                            unset($identifier, $code2);
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($code) {
+            return ($with_script_tag ? '<script>' : null) .
+            implode("\n", array_values($code)) .
+            ($with_script_tag ? '</script>' : null);
+        }
+
+        return null;
     }
 
     public function setDecorator($decorator_template_name = null, $extension = 'htm')
