@@ -177,6 +177,9 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
         $script .= "
         \$this->setLcTitlePlural(\$this->translate('" . $lc_title_plural . "'));";*/
 
+        // lightcast fake translate method - so the parser can catch the translations
+        $lc_trans_fnc = 'private function _fakeTransMethod() {' . "\n";
+
         if ($table->getIdMethod() == "native") {
             $script .= "
         \$this->setUseIdGenerator(true);";
@@ -270,6 +273,8 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
             $script .= "
        \$this->getColumn('$cup', false)->setLcTitle('" . $lc_title . "');";
 
+            $lc_trans_fnc .= ' $_temp = $this->t(\'' . $lc_title . '\');' . "\n";
+
         }// foreach
 
         // validators
@@ -300,8 +305,13 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
         $lc_title_plural = $this->getTable()->getAttribute(lcPropelBasePeerBuilder::LC_TITLE_PLURAL_ATTR);
         $lc_title_plural = $lc_title_plural ? $lc_title_plural : $php_name_title_pl;
 
+        // completion of the fake trans method
+        $lc_trans_fnc .= "\n" . '}';
+
         $script .= "
     } // initialize()
+
+    " . $lc_trans_fnc . "
 
     public function getLcTitle() {
         return \$this->translate('" . $lc_title . "');
