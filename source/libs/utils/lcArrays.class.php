@@ -30,7 +30,7 @@
  */
 class lcArrays
 {
-    public static function filterNum(array $array)
+    public static function filterNum(array $array = null)
     {
         if (!$array) {
             return $array;
