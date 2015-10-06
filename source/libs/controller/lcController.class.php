@@ -196,7 +196,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
         return $this->getPartial($action_name, $module, $params);
     }
 
-    public function getPartial($action_name, $module, array $params = null)
+    public function getPartial($action_name, $module, array $params = null, $return_params = false)
     {
         $params = array(
             'request' => array_merge(
@@ -211,6 +211,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
         );
 
         $content = null;
+        $controller_instance = null;
 
         try {
             // get an instance of the controller first
@@ -239,12 +240,24 @@ abstract class lcController extends lcBaseController implements iDebuggable
                 return null;
             }
 
-            $content = $rendered_contents['content'];
+            if ($return_params) {
+                $content = array(
+                    'content' => $rendered_contents['content'],
+                    'content_type' => $rendered_contents['content_type'],
+                    'controller' => $controller_instance
+                );
+            } else {
+                $content = $rendered_contents['content'];
+            }
+
         } catch (Exception $e) {
             if (DO_DEBUG) {
                 $content =
                     '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
                     $e->getMessage() . "<br />\n<br />\n" . nl2br(htmlspecialchars($e->getTraceAsString())) . '</div>';
+                if ($return_params) {
+                    $content = array('content' => $content, 'controller' => $controller_instance);
+                }
             }
 
             // silence if not debugging
