@@ -151,6 +151,50 @@ class lcComponentLocator
         return $ret;
     }
 
+    public static function getActionFormsInPath($path, array $options = null)
+    {
+        if (!$path) {
+            throw new lcInvalidArgumentException('Invalid path');
+        }
+
+        // scan the location for modules
+        $subdirs = lcDirs::searchDir($path, false, true);
+
+        $forms = array();
+
+        if ($subdirs) {
+            foreach ($subdirs as $info) {
+                if ($info['type'] != 'dir') {
+                    continue;
+                }
+
+                $form_name = $info['name'];
+                $fullpath = $path . DS . $form_name;
+
+                // do not look for the file as the operation is way too expensive
+                // even if the module is invalid - if it is invoked the operation will fail later on
+                $found = self::getActionFormContextInfo($form_name, $fullpath);
+
+                $forms[$form_name] = $options ? array_merge($options, $found) : $found;
+
+                unset($info, $form_name, $fullpath);
+            }
+        }
+
+        return $forms;
+    }
+
+    public static function getActionFormContextInfo($form_name, $path)
+    {
+        $ret = array(
+            'name' => $form_name,
+            'path' => $path,
+            'filename' => $form_name . '.php',
+            'class' => lcInflector::camelize($form_name, false) . 'Form'
+        );
+        return $ret;
+    }
+
     public static function getControllerModulesInPath($path, array $options = null)
     {
         if (!$path) {

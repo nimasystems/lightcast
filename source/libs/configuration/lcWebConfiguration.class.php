@@ -125,6 +125,22 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return null;
     }
 
+    public function getActionFormLocations()
+    {
+        $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : array();
+
+        // app modules
+        $controller_locations = array(array(
+            'context_type' => lcSysObj::CONTEXT_APP,
+            'context_name' => $this->getApplicationName(),
+            'path' => $this->app_dir . DS . 'forms'
+        ),);
+
+        $locations = array_merge((array)$parent_locations, $controller_locations);
+
+        return $locations;
+    }
+
     public function getControllerModuleLocations()
     {
         $parent_locations = $this->project_configuration ? $this->project_configuration->getControllerModuleLocations() : array();

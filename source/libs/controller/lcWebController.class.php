@@ -438,6 +438,43 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $content;
     }
 
+    protected function getActionFormInstance($form_name)
+    {
+        if (!$this->system_component_factory) {
+            throw new lcNotAvailableException('System Component Factory not available');
+        }
+
+        $plugin = $this->getMyPlugin();
+
+        if (!$plugin) {
+            return null;
+        }
+
+        $form_instance = $this->system_component_factory->getActionFormInstance($form_name);
+
+        if (!$form_instance) {
+            return null;
+        }
+
+        // assign system objects
+        $form_instance->setEventDispatcher($this->event_dispatcher);
+        $form_instance->setConfiguration($this->configuration);
+
+        $form_instance->setI18n($this->i18n);
+
+        // translation context
+        $form_instance->setTranslationContext($this->getContextType(), $this->getContextName());
+
+        $form_instance->setClassAutoloader($this->class_autoloader);
+        $form_instance->setPluginManager($this->plugin_manager);
+
+        $form_instance->setController($this);
+
+        $form_instance->initialize();
+
+        return $form_instance;
+    }
+
     public function getMyPath()
     {
         return $this->getWebPath();

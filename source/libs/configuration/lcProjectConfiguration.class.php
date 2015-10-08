@@ -634,6 +634,19 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $locations_new;
     }
 
+    public function getActionFormLocations()
+    {
+        $locations = array(
+            array(
+                'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'path' => $this->getAssetsDir() . DS . 'forms'
+            ),
+            /* app modules to be overriden in the inherited app config class */
+        );
+
+        return $locations;
+    }
+
     public function getControllerModuleLocations()
     {
         $locations = array(
@@ -888,7 +901,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->getSourceDir() . DS . '3rdparty';
     }
 
-    public function getSupportedLocales() {
+    public function getSupportedLocales()
+    {
         return null;
     }
 

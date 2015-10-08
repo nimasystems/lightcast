@@ -34,6 +34,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     const CONFIG_PATH = 'config';
     const MODELS_PATH = 'models';
     const MODULES_PATH = 'modules';
+    const ACTION_FORMS_PATH = 'forms';
     const COMPONENTS_PATH = 'components';
     const WEB_SERVICES_PATH = 'ws';
     const TASKS_PATH = 'tasks';
