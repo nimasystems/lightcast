@@ -38,6 +38,11 @@ class lcApp extends lcObj
     const SYSTEM_OBJECTS_CACHE_PREFIX = 'sys_';
     const LOADERS_OBJECT_CACHE_PREFIX = 'loader_';
 
+    /**
+     * @var lcApp
+     */
+    private static $app;
+
     /** @var iAppDelegate */
     protected $delegate;
 
@@ -95,9 +100,24 @@ class lcApp extends lcObj
 
     public static function bootstrap(lcApplicationConfiguration $configuration)
     {
-        $app = new lcApp();
+        $app = lcApp::getInstance();
         $app->initialize($configuration);
         return $app;
+    }
+
+    private static function getInstance()
+    {
+        if (!self::$app) {
+            self::$app = new lcApp();
+        }
+        return self::$app;
+    }
+
+    public static function translateInContext($string, $context_type, $context_name, $translation_domain = null)
+    {
+        /** @var lcI18n $i18n */
+        $i18n = lcApp::getInstance()->getI18n();
+        return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
     }
 
     public function initialize(lcApplicationConfiguration $configuration)

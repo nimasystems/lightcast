@@ -38,14 +38,17 @@ define('L_TIME_WEEK', 604800);
 define('L_TIME_MONTH', 2678400);
 define('L_TIME_YEAR', 32140800);
 
-/*
- * This is a 'do nothing' method used to mark the place
- * where a translation is set - in cases where the translation parsers
- * cannot detect the translation
+/**
+ * Helper method to translate a string within a specific context
+ *
+ * @param $string
+ * @param $context_type
+ * @param $context_name
+ * @return bool|string
  */
-function __($param)
+function __($string, $context_type = null, $context_name = null)
 {
-    return $param;
+    return lcApp::translateInContext($string, $context_type, $context_name);
 }
 
 function e($param, $return = false)

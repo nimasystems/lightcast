@@ -45,6 +45,7 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
             'lib',
             'components',
             'tasks',
+            'forms',
             'modules',
             'models',
             'ws'
