@@ -115,6 +115,10 @@ class lcApp extends lcObj
 
     public static function translateInContext($string, $context_type, $context_name, $translation_domain = null)
     {
+        if (!$context_type || !$context_name || !$string) {
+            return $string;
+        }
+
         /** @var lcI18n $i18n */
         $i18n = lcApp::getInstance()->getI18n();
         return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
