@@ -103,6 +103,11 @@ abstract class lcWebBaseController extends lcController
         $this->redirect($request_uri);
     }
 
+    protected function permanentRedirect($url)
+    {
+        $this->redirect($url, 301);
+    }
+
     protected function redirect($url, $http_code = 302)
     {
         if (!$url) {

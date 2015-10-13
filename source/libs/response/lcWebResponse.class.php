@@ -462,20 +462,28 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $head[] = '<base href="' . $this->html_base . '" />';
         }
 
+        // metatags
+        $metatags = $this->metatags;
+
         // title
-        if ($this->title) {
-            $head[] = '<title>' . htmlspecialchars($this->title . $this->title_suffix) . '</title>';
+        $title = $this->title ? $this->title : (isset($metatags['title']) ? $metatags['title'] : null);
+
+        if ($title) {
+            $head[] = '<title>' . htmlspecialchars($title . $this->title_suffix) . '</title>';
         }
 
         if ($this->canonical_url) {
             $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->canonical_url) . '" />';
         }
 
-        // metatags
-        $metatags = $this->metatags;
-
         if ($metatags) {
             foreach ($metatags as $name => $value) {
+
+                // this is deprecated now
+                if ($name == 'title') {
+                    continue;
+                }
+
                 if (!$value) {
                     continue;
                 }
