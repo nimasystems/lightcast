@@ -56,6 +56,8 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     protected $priority;
 
+    protected $label_shown_after;
+
     abstract public function render();
 
     abstract public function getLabelClass();
@@ -77,6 +79,16 @@ abstract class lcBaseActionFormWidget extends lcObj
         $class_name = isset($this->options['class']) ? (string)$this->options['class'] : null;
         $classes = implode(' ', array_filter(array_merge(array($this->getFieldClass(), $class_name), (array)$additional_classes)));
         return $classes;
+    }
+
+    public function setLabelShownAfter($after)
+    {
+        $this->label_shown_after = $after;
+    }
+
+    public function getLabelShownAfter()
+    {
+        return $this->label_shown_after;
     }
 
     public function getIdPrefix()
