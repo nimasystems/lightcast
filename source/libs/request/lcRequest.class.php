@@ -418,7 +418,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             unset($forwarded_for, $addr);
         }
 
-        if ($val !== null) {
+        if ($val) {
             return $val;
         }
 
@@ -467,7 +467,8 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
                 return isset($_SERVER['SCRIPT_URL']) ? $_SERVER['SCRIPT_URL'] : $this->_env('REQUEST_URI');
                 break;
         }
-        return null;
+        
+        return $val;
     }
 
     public function env($name = false)
