@@ -66,6 +66,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      * @var array
      */
     protected $javascripts_end;
+    protected $javascript_code;
     /**
      * @var array
      */
@@ -576,6 +577,13 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         unset($javascripts);
 
+        // javascript code
+        $jscode = $this->javascript_code;
+
+        if ($jscode) {
+            $this->html_body_custom['end'][] = '<script>' . $this->javascript_code . '</script>';
+        }
+
         // rss feeds
         $rssfeeds = $this->rssfeeds;
 
@@ -1061,6 +1069,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (isset($this->javascripts_end[$js_src])) {
             unset($this->javascripts_end[$js_src]);
         }
+    }
+
+    public function setJavascriptCode($code)
+    {
+        $this->javascript_code = $code;
+    }
+
+    public function getJavascriptCode()
+    {
+        return $this->javascript_code;
     }
 
     /*

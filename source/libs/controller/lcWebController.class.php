@@ -655,6 +655,12 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             if ($keywords) {
                 $response->setMetatag('keywords', $keywords);
             }
+
+            $javascript_code = $this->renderJavascriptCode(true, false);
+
+            if ($javascript_code) {
+                $response->setJavascriptCode($javascript_code);
+            }
         }
 
         $response->setContent($content);
