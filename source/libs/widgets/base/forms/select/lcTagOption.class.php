@@ -42,6 +42,11 @@ class lcTagOption extends lcHtmlTag
         $this->setClass($class);
     }
 
+    public static function create()
+    {
+        return new lcTagOption();
+    }
+
     public function setContent($content)
     {
         parent::setContent($content);

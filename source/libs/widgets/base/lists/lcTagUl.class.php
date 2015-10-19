@@ -39,6 +39,11 @@ class lcTagUl extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagUl();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

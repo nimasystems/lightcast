@@ -32,7 +32,7 @@
  */
 class lcTagLink extends lcHtmlTag
 {
-    public function __construct($href, $rel = null, $type = null, $media = null)
+    public function __construct($href = null, $rel = null, $type = null, $media = null)
     {
         parent::__construct('link', false);
 
@@ -40,6 +40,11 @@ class lcTagLink extends lcHtmlTag
         $this->setRel($rel);
         $this->setType($type);
         $this->setMedia($media);
+    }
+
+    public static function create()
+    {
+        return new lcTagLink();
     }
 
     public function setHref($href)

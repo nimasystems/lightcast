@@ -172,4 +172,9 @@ abstract class lcHtmlBaseTag implements iAsHTML
         $this->is_closed = $is_closed;
         return $this;
     }
+
+    public function toString()
+    {
+        return $this->asHtml();
+    }
 }

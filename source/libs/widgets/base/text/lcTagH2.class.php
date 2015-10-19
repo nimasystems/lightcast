@@ -39,6 +39,11 @@ class lcTagH2 extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagH2();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

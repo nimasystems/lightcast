@@ -39,6 +39,11 @@ class lcTagPre extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagPre();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

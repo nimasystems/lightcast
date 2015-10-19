@@ -60,6 +60,11 @@ class lcTagForm extends lcHtmlTag
         }
     }
 
+    public static function create()
+    {
+        return new lcTagForm();
+    }
+
     public function setContent($content)
     {
         parent::setContent($content);

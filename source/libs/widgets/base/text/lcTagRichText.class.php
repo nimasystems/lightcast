@@ -35,11 +35,16 @@ class lcTagRichText extends lcTagInput
 
     private $width = '100%';
 
-    public function __construct($name, $width = null)
+    public function __construct($name = null, $width = null)
     {
         $this->width = ($width ? $width : $this->width);
 
         parent::__construct('', $name);
+    }
+
+    public static function create()
+    {
+        return new lcTagRichText();
     }
 
     public function setFckComponent(componentFckEdit $editor)

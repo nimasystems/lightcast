@@ -36,4 +36,9 @@ class lcTagInputPassword extends lcTagInput
     {
         parent::__construct('password', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
     }
+
+    public static function create()
+    {
+        return new lcTagInputPassword();
+    }
 }

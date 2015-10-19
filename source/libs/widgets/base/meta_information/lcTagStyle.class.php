@@ -48,6 +48,11 @@ class lcTagStyle extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public static function create()
+    {
+        return new lcTagStyle();
+    }
+
     public function setType($value = self::DEFAULT_TYPE)
     {
         $this->setAttribute('type', $value);

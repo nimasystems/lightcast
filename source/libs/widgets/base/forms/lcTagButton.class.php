@@ -46,6 +46,11 @@ class lcTagButton extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
+    public static function create()
+    {
+        return new lcTagButton();
+    }
+
     public function setContent($content)
     {
         parent::setContent($content);

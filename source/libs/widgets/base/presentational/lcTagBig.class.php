@@ -39,6 +39,11 @@ class lcTagBig extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagBig();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

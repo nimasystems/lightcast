@@ -39,6 +39,11 @@ class lcTagNoScript extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagNoScript();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

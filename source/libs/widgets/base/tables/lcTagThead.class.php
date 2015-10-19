@@ -43,6 +43,11 @@ class lcTagThead extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
+    public static function create()
+    {
+        return new lcTagThead();
+    }
+
     public function setAlign($value = null)
     {
         if (isset($value) &&

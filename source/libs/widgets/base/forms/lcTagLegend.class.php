@@ -32,12 +32,17 @@
  */
 class lcTagLegend extends lcHtmlTag
 {
-    public function __construct($content, $accesskey = null)
+    public function __construct($content = null, $accesskey = null)
     {
         parent::__construct('legend', true);
 
         $this->setContent($content);
         $this->setAccessKey($accesskey);
+    }
+
+    public static function create()
+    {
+        return new lcTagLegend();
     }
 
     public function setContent($content)

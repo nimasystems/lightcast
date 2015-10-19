@@ -39,6 +39,11 @@ class lcTagVar extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagVar();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

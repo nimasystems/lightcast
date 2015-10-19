@@ -47,6 +47,11 @@ class lcTagTable extends lcHtmlTag
         $this->setWidth($width);
     }
 
+    public static function create()
+    {
+        return new lcTagTable();
+    }
+
     public function setBorder($value = null)
     {
         $this->setAttribute('border', $value);

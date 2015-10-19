@@ -44,6 +44,11 @@ class lcTagColGroup extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
+    public static function create()
+    {
+        return new lcTagColGroup();
+    }
+
     public function setSpan($value = null)
     {
         $this->setAttribute('span', $value);

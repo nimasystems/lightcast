@@ -32,11 +32,16 @@
  */
 class lcTagBase extends lcHtmlTag
 {
-    public function __construct($href)
+    public function __construct($href = null)
     {
         parent::__construct('base', false);
 
         $this->setHref($href);
+    }
+
+    public static function create()
+    {
+        return new lcTagBase();
     }
 
     public function setHref($href)

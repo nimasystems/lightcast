@@ -51,6 +51,11 @@ class lcTagTd extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
+    public static function create()
+    {
+        return new lcTagTd();
+    }
+
     public function setColspan($value = null)
     {
         $this->setAttribute('colspan', $value);

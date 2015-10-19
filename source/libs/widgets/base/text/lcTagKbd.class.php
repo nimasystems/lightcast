@@ -39,6 +39,11 @@ class lcTagKbd extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagKbd();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

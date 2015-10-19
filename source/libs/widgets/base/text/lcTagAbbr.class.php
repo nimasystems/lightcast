@@ -39,6 +39,11 @@ class lcTagAbbr extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagAbbr();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

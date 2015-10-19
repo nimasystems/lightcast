@@ -39,6 +39,11 @@ class lcTagH3 extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagH3();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

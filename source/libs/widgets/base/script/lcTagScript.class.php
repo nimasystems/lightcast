@@ -45,6 +45,11 @@ class lcTagScript extends lcHtmlBaseTag
         $this->setCharset($charset);
     }
 
+    public static function create()
+    {
+        return new lcTagScript();
+    }
+
     public function setType($type = self::DEFAULT_TYPE)
     {
         $this->setAttribute('type', $type);

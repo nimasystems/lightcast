@@ -36,4 +36,9 @@ class lcTagInputReset extends lcTagInput
     {
         parent::__construct('reset', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
     }
+
+    public static function create()
+    {
+        return new lcTagInputReset();
+    }
 }

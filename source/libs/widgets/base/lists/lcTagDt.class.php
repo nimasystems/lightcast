@@ -39,6 +39,11 @@ class lcTagDt extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagDt();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

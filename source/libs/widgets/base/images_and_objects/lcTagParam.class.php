@@ -32,7 +32,7 @@
  */
 class lcTagParam extends lcHtmlBaseTag
 {
-    public function __construct($name, $value = null, $id = null, $type = null, $valuetype = null)
+    public function __construct($name = null, $value = null, $id = null, $type = null, $valuetype = null)
     {
         parent::__construct('param', false);
 
@@ -41,6 +41,11 @@ class lcTagParam extends lcHtmlBaseTag
         $this->setId($id);
         $this->setType($type);
         $this->setValueType($valuetype);
+    }
+
+    public static function create()
+    {
+        return new lcTagParam();
     }
 
     public function setName($value)

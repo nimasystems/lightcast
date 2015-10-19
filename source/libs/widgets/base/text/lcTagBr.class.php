@@ -37,6 +37,11 @@ class lcTagBr extends lcHtmlTag
         parent::__construct('br', false);
     }
 
+    public static function create()
+    {
+        return new lcTagBr();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

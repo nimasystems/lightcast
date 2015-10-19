@@ -32,12 +32,17 @@
  */
 class lcTagInputImage extends lcTagInput
 {
-    public function __construct($src, $name = null, $id = null, $value = null, $alt = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    public function __construct($src = null, $name = null, $id = null, $value = null, $alt = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
     {
         parent::__construct('image', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
         $this->setSrc($src);
         $this->setAlt($alt);
+    }
+
+    public static function create()
+    {
+        return new lcTagInputImage();
     }
 
     public function setSrc($value = null)

@@ -48,6 +48,11 @@ class lcTagSelect extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    public static function create()
+    {
+        return new lcTagSelect();
+    }
+
     public function setName($value = null)
     {
         $this->setAttribute('name', $value);

@@ -32,7 +32,7 @@
  */
 class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
 {
-    public function __construct($content, $name = null, $http_equiv = null, $scheme = null, $xml_lang = null, $lang = null, $dir = null)
+    public function __construct($content = null, $name = null, $http_equiv = null, $scheme = null, $xml_lang = null, $lang = null, $dir = null)
     {
         parent::__construct('meta', false);
 
@@ -43,6 +43,11 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
         $this->setDir($dir);
         $this->setXmlLang($xml_lang);
         $this->setLang($lang);
+    }
+
+    public static function create()
+    {
+        return new lcTagMeta();
     }
 
     public function setContent($value)

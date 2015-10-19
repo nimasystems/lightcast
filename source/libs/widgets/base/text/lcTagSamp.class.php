@@ -39,6 +39,11 @@ class lcTagSamp extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagSamp();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

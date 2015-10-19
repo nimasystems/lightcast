@@ -39,6 +39,11 @@ class lcTagB extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagB();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

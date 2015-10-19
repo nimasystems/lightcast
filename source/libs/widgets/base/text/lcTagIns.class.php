@@ -41,6 +41,11 @@ class lcTagIns extends lcHtmlTag
         $this->setDateTime($datetime);
     }
 
+    public static function create()
+    {
+        return new lcTagIns();
+    }
+
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);

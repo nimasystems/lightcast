@@ -32,7 +32,7 @@
  */
 class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttributes
 {
-    public function __construct($id, $content = null, $class = null, $title = null)
+    public function __construct($id = null, $content = null, $class = null, $title = null)
     {
         parent::__construct('map', true);
 
@@ -40,6 +40,11 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
         $this->setAttribute('id', $id);
         $this->setClass($class);
         $this->setTitle($title);
+    }
+
+    public static function create()
+    {
+        return new lcTagMap();
     }
 
     public function setClass($value = null)

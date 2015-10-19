@@ -146,9 +146,15 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
 
         if ($code) {
-            return ($with_script_tag ? '<script>' : null) .
-            implode("\n", array_values($code)) .
-            ($with_script_tag ? '</script>' : null);
+            $out = implode("\n", array_values($code));
+
+            if ($with_script_tag) {
+                return lcTagScript::create()
+                    ->setContent($out)
+                    ->toString();
+            } else {
+                return $out;
+            }
         }
 
         return null;
@@ -656,7 +662,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 $response->setMetatag('keywords', $keywords);
             }
 
-            $javascript_code = $this->renderJavascriptCode(true, false);
+            $javascript_code = $controller->renderJavascriptCode(true, false);
 
             if ($javascript_code) {
                 $response->setJavascriptCode($javascript_code);

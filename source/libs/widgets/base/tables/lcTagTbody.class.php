@@ -43,6 +43,11 @@ class lcTagTbody extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
+    public static function create()
+    {
+        return new lcTagTbody();
+    }
+
     public function setAlign($value = null)
     {
         if (isset($value) &&

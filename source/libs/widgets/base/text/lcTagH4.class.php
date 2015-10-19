@@ -39,6 +39,11 @@ class lcTagH4 extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagH4();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

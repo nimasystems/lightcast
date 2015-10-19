@@ -41,6 +41,11 @@ class lcTagBody extends lcHtmlTag
         $this->setOnUnload($onunload);
     }
 
+    public static function create()
+    {
+        return new lcTagBody();
+    }
+
     public function setOnLoad($value = null)
     {
         $this->setAttribute('onload', $value);

@@ -46,6 +46,11 @@ class lcTagA extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    public static function create()
+    {
+        return new lcTagA();
+    }
+
     public function setHref($href = null)
     {
         $this->setAttribute('href', $href);

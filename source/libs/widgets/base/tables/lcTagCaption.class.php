@@ -39,6 +39,11 @@ class lcTagCaption extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagCaption();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

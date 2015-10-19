@@ -32,7 +32,7 @@
  */
 class lcTagArea extends lcHtmlTag
 {
-    public function __construct($alt, $content = null, $shape = null, $coords = null,
+    public function __construct($alt = null, $content = null, $shape = null, $coords = null,
                                 $href = null, $nohref = null, $accesskey = null, $tabindex = null)
     {
         parent::__construct('area', true);
@@ -45,6 +45,11 @@ class lcTagArea extends lcHtmlTag
         $this->setNoHref($nohref);
         $this->setAccessKey($accesskey);
         $this->setTabIndex($tabindex);
+    }
+
+    public static function create()
+    {
+        return new lcTagArea();
     }
 
     public function setAlt($value)

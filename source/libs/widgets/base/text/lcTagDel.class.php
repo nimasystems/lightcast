@@ -41,6 +41,11 @@ class lcTagDel extends lcHtmlTag
         $this->setDateTime($datetime);
     }
 
+    public static function create()
+    {
+        return new lcTagDel();
+    }
+
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);

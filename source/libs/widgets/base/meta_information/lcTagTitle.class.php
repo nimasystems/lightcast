@@ -42,6 +42,11 @@ class lcTagTitle extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
+    public static function create()
+    {
+        return new lcTagTitle();
+    }
+
     public function setDir($value = null)
     {
         $this->setAttribute('dir', $value);

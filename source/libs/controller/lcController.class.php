@@ -540,6 +540,9 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         // let the inherited class handle the rest
         $this->outputViewContents($controller_instance, $content, $content_type);
+
+        // halt everything - prevent forwarding loops and over-rendering
+        exit(0);
     }
 
     /*

@@ -32,7 +32,7 @@
  */
 class lcTagImg extends lcHtmlTag
 {
-    public function __construct($src, $alt, $height = null, $width = null, $longdesc = null)
+    public function __construct($src = null, $alt = null, $height = null, $width = null, $longdesc = null)
     {
         parent::__construct('img', false);
 
@@ -41,6 +41,11 @@ class lcTagImg extends lcHtmlTag
         $this->setHeight($height);
         $this->setWidth($width);
         $this->setLongDesc($longdesc);
+    }
+
+    public static function create()
+    {
+        return new lcTagImg();
     }
 
     public function setSrc($value)

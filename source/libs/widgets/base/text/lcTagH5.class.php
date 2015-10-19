@@ -39,6 +39,11 @@ class lcTagH5 extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagH5();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

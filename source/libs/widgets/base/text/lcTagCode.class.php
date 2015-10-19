@@ -39,6 +39,11 @@ class lcTagCode extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagCode();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

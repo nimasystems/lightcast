@@ -32,11 +32,16 @@
  */
 class lcTagInputRadio extends lcTagInput
 {
-    public function __construct($value, $name = null, $id = null, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
+    public function __construct($value = null, $name = null, $id = null, $checked = false, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)
     {
         parent::__construct('radio', $name, $id, $value, $size, $maxsize, $disabled, $readonly, $accesskey);
 
         $this->setIsChecked($checked);
+    }
+
+    public static function create()
+    {
+        return new lcTagInputRadio();
     }
 
     public function setIsChecked($value = false)

@@ -43,6 +43,11 @@ class lcTagTr extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
+    public static function create()
+    {
+        return new lcTagTr();
+    }
+
     public function setAlign($value = null)
     {
         if (isset($value) &&

@@ -39,6 +39,11 @@ class lcTagSmall extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagSmall();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

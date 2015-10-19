@@ -39,6 +39,11 @@ class lcTagSpan extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagSpan();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

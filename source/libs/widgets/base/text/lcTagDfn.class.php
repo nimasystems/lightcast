@@ -39,6 +39,11 @@ class lcTagDfn extends lcHtmlTag
         $this->setContent($content);
     }
 
+    public static function create()
+    {
+        return new lcTagDfn();
+    }
+
     public static function getRequiredAttributes()
     {
         return array();

@@ -54,6 +54,11 @@ class lcTagObject extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    public static function create()
+    {
+        return new lcTagObject();
+    }
+
     public function setClassId($value = null)
     {
         $this->setAttribute('classid', $value);
