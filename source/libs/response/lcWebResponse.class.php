@@ -480,7 +480,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $request_uri = $this->request->getFullHostname() . $this->request->getRequestUri();
         $has_canonical = false;
 
-        if ($this->content_url && $request_uri != $this->content_url) {
+        if ($this->content_url && urldecode($request_uri) != urldecode($this->content_url)) {
             $has_canonical = true;
             $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->content_url) . '" />';
         }
@@ -1429,7 +1429,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (!$url) {
             return;
         }
-        
+
         $this->info('Will send HTTP Redirect (' . $http_code . '): ' . $url);
 
         $this->clear();
