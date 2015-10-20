@@ -143,6 +143,11 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
                 // try with each loader
                 // store the first detected error
                 foreach ($autoloaders as $autoloader) {
+
+                    if (!is_array($autoloader) || $autoloader instanceof Closure) {
+                        continue;
+                    }
+
                     $obj = $autoloader[0];
                     $func = $autoloader[1];
 
