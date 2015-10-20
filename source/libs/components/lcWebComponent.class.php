@@ -66,7 +66,9 @@ abstract class lcWebComponent extends lcComponent
         $code = $this->required_javascript_code;
 
         if ($code) {
-            return '<script>' . implode("\n", array_values($code)) . '</script>';
+            return lcTagScript::create()
+                ->setContent(implode("\n", array_values($code)))
+                ->toString();
         }
 
         return null;

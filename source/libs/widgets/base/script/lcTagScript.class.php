@@ -34,12 +34,16 @@ class lcTagScript extends lcHtmlBaseTag
 {
     const DEFAULT_TYPE = 'text/javascript';
 
-    public function __construct($src = null, $content = null, $type = self::DEFAULT_TYPE, $defer = false, $charset = null)
+    public function __construct($src = null, $content = null, $type = null, $defer = false, $charset = null)
     {
         parent::__construct('script', true);
 
         $this->setContent($content);
-        $this->setType($type);
+
+        if ($type) {
+            $this->setType($type);
+        }
+
         $this->setSrc($src);
         $this->setDefer($defer);
         $this->setCharset($charset);
@@ -74,14 +78,9 @@ class lcTagScript extends lcHtmlBaseTag
         return $this;
     }
 
-    public static function getRequiredAttributes()
-    {
-        return array('type');
-    }
-
     public static function getOptionalAttributes()
     {
-        return array('src', 'charset', 'defer');
+        return array('type', 'src', 'charset', 'defer');
     }
 
     public function getType()
@@ -106,8 +105,10 @@ class lcTagScript extends lcHtmlBaseTag
 
     public function asHtml()
     {
+        $attrs = $this->getAttributes()->asHtml();
+
         return
-            '<script ' . $this->getAttributes()->asHtml() . '>' . "\n" .
+            '<script' . ($attrs ? ' ' . $attrs : null) . '>' . "\n" .
             '/* <![CDATA[ */' . "\n" .
             $this->getContent() . "\n" .
             '/* ]]> */' . "\n" .

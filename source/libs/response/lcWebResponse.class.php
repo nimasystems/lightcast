@@ -102,7 +102,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $allow_metatags;
     protected $content_lang;
     protected $htmlver;
-    protected $canonical_url;
+
+    protected $content_url;
+    protected $content_hreflangs;
+
     /**
      * @var lcCookiesCollection
      */
@@ -473,10 +476,34 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $head[] = '<title>' . htmlspecialchars($title . $this->title_suffix) . '</title>';
         }
 
-        if ($this->canonical_url) {
-            $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->canonical_url) . '" />';
+        // auto add canonical if there is a difference between the current uri and the content url
+        $request_uri = $this->request->getFullHostname() . $this->request->getRequestUri();
+        $has_canonical = false;
+
+        if ($this->content_url && $request_uri != $this->content_url) {
+            $has_canonical = true;
+            $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->content_url) . '" />';
         }
 
+        // hreflang(s) - do not show if there is a canonical present
+        if (!$has_canonical) {
+            $content_hreflangs = $this->content_hreflangs;
+
+            if ($content_hreflangs) {
+                foreach ($content_hreflangs as $data) {
+
+                    $head[] = lcTagLink::create()
+                        ->setRel('alternate')
+                        ->setHref($data['url'])
+                        ->setAttribute('hreflang', (isset($data['default']) && $data['default'] ? 'x-default' : $data['locale']))
+                        ->toString();
+
+                    unset($data);
+                }
+            }
+        }
+
+        // metatags
         if ($metatags) {
             foreach ($metatags as $name => $value) {
 
@@ -581,7 +608,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $jscode = $this->javascript_code;
 
         if ($jscode) {
-            $this->html_body_custom['end'][] = '<script>' . $this->javascript_code . '</script>';
+            $this->html_body_custom['end'][] = lcTagScript::create()
+                ->setContent($this->javascript_code)
+                ->toString();
         }
 
         // rss feeds
@@ -604,17 +633,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $google_analytics = (string)$this->configuration['view.google_analytics'];
 
         if ($google_analytics) {
-            $this->html_body_custom['end'][] =
-                '<script type="text/javascript">/* <![CDATA[ */
-					var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            $this->html_body_custom['end'][] = lcTagScript::create()
+                ->setContent('var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 					document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));
-					/* ]]> */</script>
-					<script type="text/javascript">
-					/* <![CDATA[ */
 					try {
 					var pageTracker = _gat._getTracker("' . $google_analytics . '");
 							pageTracker._trackPageview();
-		} catch(err) {}/* ]]> */</script>';
+		            } catch(err) {}')
+                ->toString();
         }
 
         // custom body end
@@ -707,6 +733,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         unset($body_tags1);
 
         return $content;
+    }
+
+    public function getContentHreflangs()
+    {
+        return $this->content_hreflangs;
+    }
+
+    public function setContentHreflangs(array $content_hreflangs = null)
+    {
+        $this->content_hreflangs = $content_hreflangs;
     }
 
     private function processViewConfiguration()
@@ -1283,22 +1319,22 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /*
-     * Parses the output content before sending
-    * and sets XHTML specific tags
-    */
+    public function getContentUrl()
+    {
+        return $this->content_url;
+    }
 
-    public function setCanonicalUrl($canonical_url)
+    public function setContentUrl($content_url)
     {
         // notify listeners
         $event = $this->event_dispatcher->filter(
-            new lcEvent('response.set_canonical_url', $this, array()), $canonical_url);
+            new lcEvent('response.set_content_url', $this, array()), $content_url);
 
         if ($event->isProcessed()) {
-            $canonical_url = $event->getReturnValue();
+            $content_url = $event->getReturnValue();
         }
 
-        $this->canonical_url = $canonical_url;
+        $this->content_url = $content_url;
     }
 
     public function getOutputContent()

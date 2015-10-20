@@ -1,35 +1,85 @@
 <?php
-/*
- * Lightcast - A PHP MVC Framework
-* Copyright (C) 2005 Nimasystems Ltd
-*
-* This program is NOT free software; you cannot redistribute and/or modify
-* it's sources under any circumstances without the explicit knowledge and
-* agreement of the rightful owner of the software - Nimasystems Ltd.
-*
-* This program is distributed WITHOUT ANY WARRANTY; without even the
-* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-* PURPOSE.  See the LICENSE.txt file for more information.
-*
-* You should have received a copy of LICENSE.txt file along with this
-* program; if not, write to:
-* NIMASYSTEMS LTD
-* Plovdiv, Bulgaria
-* ZIP Code: 4000
-* Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
 
-
-*/
-
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcBasePropelObject.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcBasePropelObject extends BaseObject
 {
+    /**
+     * @var lcEventDispatcher
+     */
+    protected $event_dispatcher;
+
+    /**
+     * @var lcApplicationConfiguration
+     */
+    protected $application_configuration;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->application_configuration = $GLOBALS['configuration'];
+        $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
+    }
+
+    public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
+    {
+        $this->event_dispatcher = $event_dispatcher;
+    }
+
+    public function setApplicationConfiguration(lcApplicationConfiguration $configuration)
+    {
+        $this->application_configuration = $configuration;
+    }
+
+    public function preInsert(PropelPDO $con = null)
+    {
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.before_create', $this));
+        }
+
+        return parent::preInsert($con);
+    }
+
+    public function postInsert(PropelPDO $con = null)
+    {
+        parent::postInsert($con);
+
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.after_create', $this));
+        }
+    }
+
+    public function preUpdate(PropelPDO $con = null)
+    {
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.before_update', $this));
+        }
+
+        return parent::preUpdate($con);
+    }
+
+    public function postUpdate(PropelPDO $con = null)
+    {
+        parent::postUpdate($con);
+
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.after_update', $this));
+        }
+    }
+
+    public function preDelete(PropelPDO $con = null)
+    {
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.before_delete', $this));
+        }
+
+        return parent::preDelete($con);
+    }
+
+    public function postDelete(PropelPDO $con = null)
+    {
+        parent::postDelete($con);
+
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.after_delete', $this));
+        }
+    }
 }

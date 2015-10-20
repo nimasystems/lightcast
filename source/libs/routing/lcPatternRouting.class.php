@@ -214,6 +214,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             return null;
         }
 
+        /** @var lcNamedRoute $route */
         foreach ($all as $route) {
             if (false === $params = $route->matchesUrl($url, $context)) {
                 continue;

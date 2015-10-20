@@ -36,7 +36,7 @@
 * for performance reasons!!!
 */
 
-class lcEvent extends lcObj
+class lcEvent extends lcObj implements ArrayAccess
 {
     // we make these public as lcEvent
     // is highly used everywhere
@@ -105,5 +105,25 @@ class lcEvent extends lcObj
             'Event: ' . $this->event_name . ", \n" .
             'Subject: ' . (isset($this->subject) ? get_class($this->subject) : null) . ", \n" .
             'Is Processed: ' . $this->processed . ", \n";
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->params[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->params[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->params[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->params[$offset]);
     }
 }

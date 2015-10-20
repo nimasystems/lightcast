@@ -113,6 +113,16 @@ class lcApp extends lcObj
         return self::$app;
     }
 
+    public static function getEventDispatcher()
+    {
+        return lcApp::getInstance()->getEventDispatcher();
+    }
+
+    public static function getApplicationConfiguration()
+    {
+        return lcApp::getInstance()->getConfiguration();
+    }
+
     public static function translateInContext($string, $context_type, $context_name, $translation_domain = null)
     {
         if (!$context_type || !$context_name || !$string) {
