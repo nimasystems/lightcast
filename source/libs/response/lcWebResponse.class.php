@@ -1426,6 +1426,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function redirect($url, $http_code = 302)
     {
+        if (!$url) {
+            return;
+        }
+        
         $this->info('Will send HTTP Redirect (' . $http_code . '): ' . $url);
 
         $this->clear();
