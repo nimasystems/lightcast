@@ -299,7 +299,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         }
 
         // strip out query string
-        $path = array_filter(explode('?', $path));
+        $path = (explode('?', $path));
 
         if (!$path || !is_array($path)) {
             return false;
