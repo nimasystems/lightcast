@@ -359,6 +359,27 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         }
     }
 
+    public function throwIfNoCredentials($credentials)
+    {
+        $ret = true;
+
+        if (!is_array($credentials)) {
+            $ret = $this->hasCredential($credentials);
+        } else {
+            foreach ($credentials as $c) {
+                if (!$this->hasCredential($c)) {
+                    $ret = false;
+                    break;
+                }
+                unset($c);
+            }
+        }
+
+        if (!$ret) {
+            throw new lcAccessDeniedException($this->t('Access not allowed'));
+        }
+    }
+
     public function hasCredential($credential_name)
     {
         return ($this->user ? $this->user->hasCredential($credential_name) : false);

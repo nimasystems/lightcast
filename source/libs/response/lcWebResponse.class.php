@@ -268,6 +268,39 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    public function sendChunkedStream($uri, $mimetype = 'application/binary', array $options = null)
+    {
+        $cnt = 0;
+        $handle = fopen($uri, 'r', null, (isset($options['stream_context']) ? $options['stream_context'] : null));
+
+        if ($handle === false) {
+            return false;
+        }
+
+        $chunk_size = isset($options['chunk_size']) && (int)$options['chunk_size'] ? $options['chunk_size'] : 128;
+
+        if ($mimetype) {
+            header('Content-Type: ' . $mimetype);
+        }
+
+        if (isset($options['attachment']) && isset($options['attachment']['filename'])) {
+            header('Content-Disposition: attachment; filename=' . $options['attachment']['filename']);
+        }
+
+        while (!feof($handle)) {
+            $buffer = fread($handle, $chunk_size);
+            echo $buffer;
+            ob_flush();
+
+            $cnt += strlen($buffer);
+        }
+
+        $this->response_sent = true;
+
+        fclose($handle);
+        exit(0);
+    }
+
     public function fileStream($data, $filename, $mimetype = 'application/binary')
     {
         $content_type = (($mimetype !== null) ? $mimetype : 'application/binary');
