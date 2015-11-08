@@ -234,7 +234,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function getAllKeys()
     {
         $ret = array(
-            'page_title'
+            'page_title',
+            'page_description'
         );
         return $ret;
     }
@@ -371,9 +372,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         $content = $this->content;
 
-        if (!is_resource($content)) {
+        /*if (!is_resource($content)) {
             $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
-        }
+        }*/
 
         $this->content = null;
 
@@ -413,7 +414,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if ($this->content_should_be_processed) {
             // set html customizations
             if ($this->content_type == 'text/html') {
+                $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
                 $content = $this->processHtmlContent($content);
+                $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
             }
         }
 
@@ -439,7 +442,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 }
             }
 
-            $content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
+            //$content = str_replace(self::TR_MULTILINE_DETECT_REP, "\n", $content);
         }
 
         $this->output_content = $content;
@@ -600,7 +603,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     }
                 }
 
-                if ($this->javascripts_async) {
+                if ($this->javascripts_async || (isset($data['async']) && $data['async'])) {
                     $oattr[] = 'async';
                 }
 
@@ -624,7 +627,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     }
                 }
 
-                if ($this->javascripts_async) {
+                if ($this->javascripts_async || (isset($data['async']) && $data['async'])) {
                     $oattr[] = 'async';
                 }
 
@@ -837,15 +840,25 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $javascripts = (array)$this->configuration['view.javascripts'];
 
         if ($javascripts) {
-            foreach ($javascripts as $js) {
+            foreach ($javascripts as $jsidx => $js) {
+                 $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
+
+                if (!$js) {
+                    continue;
+                }
+
+                $async = is_array($jss) && isset($jss['async']) && $jss['async'];
+
                 // relative or absolute path
                 $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
-                $this->javascripts[$js_path . $js] = array(
+                $jd = array(
                     'src' => $p,
                     'type' => 'text/javascript',
-                    'language' => 'javascript'
+                    'async' => $async
                 );
+
+                $this->javascripts[$js_path . $js] = $jd;
 
                 unset($js, $p);
             }
@@ -857,17 +870,27 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $javascripts = (array)$this->configuration['view.javascripts_end'];
 
         if ($javascripts) {
-            foreach ($javascripts as $js) {
+            foreach ($javascripts as $jsidx => $jss) {
+                $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
+
+                if (!$js) {
+                    continue;
+                }
+
+                $async = is_array($jss) && isset($jss['async']) && $jss['async'];
+
                 // relative or absolute path
                 $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
-                $this->javascripts_end[$js_path . $js] = array(
+                $jd = array(
                     'src' => $p,
                     'type' => 'text/javascript',
-                    'language' => 'javascript'
+                    'async' => $async
                 );
 
-                unset($js, $p);
+                $this->javascripts_end[$js_path . $js] = $jd;
+
+                unset($jsidx, $js, $p);
             }
 
             unset($config_js);
@@ -1261,6 +1284,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     /*
      * Insert/Append a Response Cookie
     */
+
+    public function getMetatag($name)
+    {
+        return isset($this->metatags[$name]) ? $this->metatags[$name] : null;
+    }
 
     public function setMetatag($name, $value)
     {

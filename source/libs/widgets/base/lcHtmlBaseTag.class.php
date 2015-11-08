@@ -36,6 +36,10 @@ abstract class lcHtmlBaseTag implements iAsHTML
 
     protected $tagname;
     protected $content;
+
+    /** @var lcHtmlBaseTag[]|null */
+    protected $children;
+
     protected $attributes;
     protected $is_closed;
 
@@ -73,6 +77,11 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this->parent_widget;
     }
 
+    public function getIsClosed()
+    {
+        return $this->is_closed;
+    }
+
     public function attr($name, $value = null)
     {
         return $this->setAttribute($name, $value);
@@ -86,6 +95,49 @@ abstract class lcHtmlBaseTag implements iAsHTML
             $this->attributes->set($name, $value);
         }
         return $this;
+    }
+
+    public function addChild(lcHtmlBaseTag $child, $tag = null)
+    {
+        $tag = $tag ? $tag : 'gen_' . lcStrings::randomString(10, true);
+        $this->children[$tag] = $child;
+        return $this;
+    }
+
+    public function removeChild($tag)
+    {
+        unset($this->children[$tag]);
+        return $this;
+    }
+
+    public function removeChildren()
+    {
+        $this->children = null;
+        return $this;
+    }
+
+    public function getChildren($compiled = false)
+    {
+        if (!$compiled) {
+            return $this->children;
+        } else {
+            $children = $this->children;
+            $out = null;
+
+            if ($children) {
+                foreach ($children as $child) {
+                    $out .= $child->toString();
+                    unset($child);
+                }
+            }
+
+            return $out;
+        }
+    }
+
+    public function getChild($tag)
+    {
+        return (isset($this->children[$tag]) ? $this->children[$tag] : null);
     }
 
     public function removeAttribute($name)
@@ -127,7 +179,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
 
     public function getContent()
     {
-        return $this->content;
+        return ($this->content ? $this->content : $this->getChildren(true));
     }
 
     public function setContent($content)
@@ -164,7 +216,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
                     $this->attributes->asHtml()
                 ))
         ) .
-        ($this->is_closed ? '>' . $this->content . '</' . $this->tagname . '>' : ' />');
+        ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
     }
 
     protected function setIsClosed($is_closed = true)

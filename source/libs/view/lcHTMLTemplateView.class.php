@@ -34,6 +34,8 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     const PARTIAL_PREFIX = 'p#';
 
     protected $view_contents;
+
+    /** @var lcIterateParamHolder */
     protected $params;
 
     protected $found_controller_actions = array();
@@ -75,7 +77,6 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
 
         $debug = array(
             'template_filename' => $this->template_filename,
-            'total_params' => ($this->params ? count($this->params) : null)
         );
 
         $debug = array_merge($debug_parent, $debug);
@@ -132,7 +133,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
      * @param null $params
      * @return lcHtmlTemplateView
      */
-    public function & getNode($name, $params = null)
+    public function getNode($name, $params = null)
     {
         return $this->params->getNode($name, $params);
     }
@@ -146,7 +147,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
      * @param null $params
      * @return lcHtmlTemplateView
      */
-    public function & repeat($name, $params = null)
+    public function repeat($name, $params = null)
     {
         return $this->params->repeat($name, $params);
     }
@@ -195,12 +196,12 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
 
     public function offsetSet($name, $value)
     {
-        return $this->params->offsetSet($name, $value);
+        $this->params->offsetSet($name, $value);
     }
 
     public function offsetUnset($name)
     {
-        return $this->params->offsetUnset($name);
+        $this->params->offsetUnset($name);
     }
 
     protected function getViewContent()

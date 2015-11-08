@@ -36,6 +36,8 @@ class lcTagOption extends lcHtmlTag
     {
         parent::__construct('option', true);
 
+        $this->attributes->setAlwaysAddedAttribs(array('value'));
+
         $this->setContent($content);
         $this->setSelected($selected);
         $this->setValue($value);

@@ -153,7 +153,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return $node;
     }
 
-    public function & getNode($name, $params = null)
+    public function getNode($name, $params = null)
     {
         assert(isset($name));
 
@@ -168,7 +168,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return $this->subnodes[$name];
     }
 
-    public function & repeat($name, $params = null)
+    public function repeat($name, $params = null)
     {
         $rep = count($this->node_repeats);
 

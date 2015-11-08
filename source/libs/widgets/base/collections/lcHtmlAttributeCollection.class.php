@@ -32,6 +32,7 @@
  */
 class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
 {
+    protected $always_added_attribs;
     protected $attributes;
 
     public function __construct(array $attributes = null)
@@ -52,6 +53,11 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
         return isset($this->attributes[$name]) ?
             $this->attributes[$name] :
             null;
+    }
+
+    public function setAlwaysAddedAttribs(array $attribs)
+    {
+        $this->always_added_attribs = $attribs;
     }
 
     public function getAll()
@@ -113,8 +119,10 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
         $out = array();
 
         foreach ($this->attributes as $name => $value) {
-            if (!is_int($value) && !$value) {
-                continue;
+            if (!in_array($name, (array)$this->always_added_attribs)) {
+                if (!is_int($value) && !$value) {
+                    continue;
+                }
             }
 
             $out[] = htmlspecialchars($name) . '="' . htmlspecialchars($value) . '"';

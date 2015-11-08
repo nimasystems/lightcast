@@ -311,6 +311,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
                             try {
                                 // obtain an instance of the controller
+                                /** @var lcWebController $decorating_controller */
                                 $decorating_controller = $this->getControllerInstance($module);
 
                                 if (!$decorating_controller) {
@@ -328,6 +329,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                                         $decorating_controller,
                                         $action,
                                         $params);
+                                    $render_response['javascript'] = $decorating_controller->renderJavascriptCode(true, false);
                                 } catch (Exception $e) {
                                     $decorating_controller->shutdown();
                                     throw $e;
@@ -339,6 +341,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
                                     if ($controller_content_type && $controller_content_type != 'text/html') {
                                         throw new lcUnsupportedException('Content unsupported - ' . $controller_content_type);
+                                    }
+
+                                    if (isset($render_response['javascript'])) {
+                                        $this->addJavascriptCode($render_response['javascript']);
                                     }
 
                                     unset($controller_content_type);
