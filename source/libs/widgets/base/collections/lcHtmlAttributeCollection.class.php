@@ -125,6 +125,14 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
                 }
             }
 
+            if (is_array($value)) {
+                if (DO_DEBUG) {
+                    throw new Exception('Array based value detected in HTML attribute collection');
+                } else {
+                    continue;
+                }
+            }
+
             $out[] = htmlspecialchars($name) . '="' . htmlspecialchars($value) . '"';
             unset($name, $value);
         }

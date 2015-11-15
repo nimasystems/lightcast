@@ -25,16 +25,27 @@
 
 abstract class lcBaseActionForm extends lcSysObj
 {
-    /** @var lcBaseController */
+    /** @var lcWebController */
     protected $controller;
 
-    abstract public function saveFormData();
-
     abstract public function getName();
+
+    abstract public function getFormId();
+
+    abstract public function getFormAction();
+
+    abstract public function getFormClass();
+
+    abstract public function getFormTabIndex();
 
     abstract public function validate();
 
     abstract public function render();
+
+    /**
+     * @return iActionFormExecuteSubmitResponse
+     */
+    abstract public function execute();
 
     abstract public function bindData(array $data);
 
@@ -50,12 +61,22 @@ abstract class lcBaseActionForm extends lcSysObj
      */
     abstract public function getValidationFailures();
 
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->controller->getEventDispatcher()->notify(new lcEvent('action_form.iniitialize', $this));
+    }
+
     public function setController(lcBaseController $controller)
     {
         $this->controller = $controller;
         return $this;
     }
 
+    /**
+     * @return lcWebController
+     */
     public function getController()
     {
         return $this->controller;
@@ -63,6 +84,8 @@ abstract class lcBaseActionForm extends lcSysObj
 
     public function initializeFormWidgets()
     {
+        $this->controller->getEventDispatcher()->notify(new lcEvent('action_form.iniitialize_form_widgets', $this));
+
         return $this;
     }
 

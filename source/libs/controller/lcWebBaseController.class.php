@@ -75,12 +75,12 @@ abstract class lcWebBaseController extends lcController
         $this->view = $view;
     }
 
-    protected function render404($message = 'Page not found')
+    public function render404($message = 'Page not found')
     {
         $this->renderHttpError(404, $message);
     }
 
-    protected function renderHttpError($error_code = 500, $reason_string = null)
+    public function renderHttpError($error_code = 500, $reason_string = null)
     {
         $response = $this->response;
         $response->setStatusCode($error_code, $reason_string);
@@ -88,7 +88,7 @@ abstract class lcWebBaseController extends lcController
         $response->send();
     }
 
-    protected function reloadPage()
+    public function reloadPage()
     {
         if (!$this->request) {
             throw new lcNotAvailableException('Request not available');
@@ -103,12 +103,12 @@ abstract class lcWebBaseController extends lcController
         $this->redirect($request_uri);
     }
 
-    protected function permanentRedirect($url)
+    public function permanentRedirect($url)
     {
         $this->redirect($url, 301);
     }
 
-    protected function redirect($url, $http_code = 302)
+    public function redirect($url, $http_code = 302)
     {
         if (!$url) {
             throw new lcInvalidArgumentException('Invalid URL');
@@ -147,14 +147,14 @@ abstract class lcWebBaseController extends lcController
         $this->response->redirect($url, $http_code);
     }
 
-    protected function redirectIfNot($url, $condition, $http_code = 302)
+    public function redirectIfNot($url, $condition, $http_code = 302)
     {
         if (!$condition) {
             $this->redirect($url, $http_code);
         }
     }
 
-    protected function redirectIf($url, $condition, $http_code = 302)
+    public function redirectIf($url, $condition, $http_code = 302)
     {
         if ($condition) {
             $this->redirect($url, $http_code);

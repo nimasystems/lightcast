@@ -386,6 +386,8 @@ EOD;
 
         if ($fix_plugin_schemas) {
             $fix_plugin_schemas = strlen($fix_plugin_schemas) > 1 ? array_filter(explode(',', $fix_plugin_schemas)) : true;
+        } else {
+            $fix_plugin_schemas = true;
         }
 
         $this->propelFlush();

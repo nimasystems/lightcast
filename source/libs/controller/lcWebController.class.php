@@ -57,6 +57,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     private $default_decorator;
     private $default_decorator_extension;
 
+    /** @var lcBaseActionForm[] */
+    protected $action_forms;
+
     public function initialize()
     {
         parent::initialize();
@@ -80,6 +83,19 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         if ($has_layout && !$this->request->isAjax()) {
             $this->setDecorator($this->default_decorator, $this->default_decorator_extension);
         }
+    }
+
+    public function shutdown()
+    {
+        if ($this->action_forms) {
+            foreach ($this->action_forms as $form) {
+                $form->shutdown();
+                unset($form);
+            }
+            $this->action_forms = null;
+        }
+
+        parent::shutdown();
     }
 
     private function getRandomIdentifier()
@@ -450,16 +466,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $content;
     }
 
-    protected function getActionFormInstance($form_name)
+    public function getActionFormInstance($form_name)
     {
         if (!$this->system_component_factory) {
             throw new lcNotAvailableException('System Component Factory not available');
-        }
-
-        $plugin = $this->getMyPlugin();
-
-        if (!$plugin) {
-            return null;
         }
 
         $form_instance = $this->system_component_factory->getActionFormInstance($form_name);
@@ -483,6 +493,8 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $form_instance->setController($this);
 
         $form_instance->initialize();
+
+        $this->action_forms[] = $form_instance;
 
         return $form_instance;
     }

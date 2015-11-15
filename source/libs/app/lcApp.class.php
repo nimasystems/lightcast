@@ -28,6 +28,8 @@
  * @changed $Id: lcApp.class.php 1491 2013-12-14 10:25:23Z mkovachev $
  * @author $Author: mkovachev $
  * @version $Revision: 1491 $
+ * @method lcPluginManager getPluginManager
+ * @method lcController getController
  */
 class lcApp extends lcObj
 {

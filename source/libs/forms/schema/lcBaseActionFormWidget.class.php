@@ -41,12 +41,18 @@ abstract class lcBaseActionFormWidget extends lcObj
     /** @var array */
     protected $options;
 
+    /** @var array */
+    protected $additional_tag_attributes;
+
     protected $data;
+    protected $data_alias;
 
     protected $init_javascript;
 
     /** @var lcBaseActionFormValidator[] */
     protected $validators;
+
+    protected $validation_rules;
 
     /** @var lcBaseActionFormValidationFailure[] */
     protected $validation_failures;
@@ -58,13 +64,33 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     protected $label_shown_after;
 
+    protected $default_class;
+
+    protected $title;
+
+    protected $ui_description;
+    protected $ui_requirements;
+
+    protected $placeholder;
+
+    protected $default_value;
+
+    /** @var array|null */
+    protected $constraints;
+
+    protected $is_disabled;
+    protected $is_hidden;
+    protected $is_required;
+
+    protected $id_prefix;
+    protected $name_suffix;
+    protected $name_prefix;
+
+    protected $container_name;
+    protected $field_tag_id;
+    protected $field_tag_id_prefix;
+
     abstract public function render();
-
-    abstract public function getLabelClass();
-
-    abstract public function getFieldClass();
-
-    abstract public function getIsUserControl();
 
     public function __construct()
     {
@@ -74,16 +100,48 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->validators = array();
     }
 
-    public function getDefaultClass(array $additional_classes = null)
+    public function getIsUserControl()
     {
-        $class_name = isset($this->options['class']) ? (string)$this->options['class'] : null;
-        $classes = implode(' ', array_filter(array_merge(array($this->getFieldClass(), $class_name), (array)$additional_classes)));
+        return true;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLabelClass()
+    {
+        //
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFieldClass()
+    {
+        //
+    }
+
+    public function getFieldClassesMerged(array $additional_classes = null)
+    {
+        $classes = implode(' ', array_filter(array_merge(array($this->getFieldClass(), $this->default_class), (array)$additional_classes)));
         return $classes;
+    }
+
+    public function setDataAlias($alias)
+    {
+        $this->data_alias = $alias;
+        return $this;
+    }
+
+    public function getDataAlias()
+    {
+        return $this->data_alias;
     }
 
     public function setLabelShownAfter($after)
     {
         $this->label_shown_after = $after;
+        return $this;
     }
 
     public function getLabelShownAfter()
@@ -93,32 +151,100 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function getIdPrefix()
     {
-        return (isset($this->options['id_prefix']) ? $this->options['id_prefix'] : null);
+        return $this->id_prefix;
+    }
+
+    public function setIdPrefix($prefix)
+    {
+        $this->id_prefix = $prefix;
+        return $this;
+    }
+
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    public function setValidationRules($rules)
+    {
+        $this->validation_rules = $rules;
+    }
+
+    public function getValidationRules()
+    {
+        return $this->validation_rules;
     }
 
     public function getNamePrefix()
     {
-        return (isset($this->options['name_prefix']) ? $this->options['name_prefix'] : null);
+        return $this->name_prefix;
     }
 
-    public function getUIDescription()
+    public function setNamePrefix($prefix)
     {
-        return (isset($this->options['help']['description']) ? $this->options['help']['description'] : null);
+        $this->name_prefix = $prefix;
+        return $this;
     }
 
-    public function getUIRequirements()
+    public function setDefaultClass($class)
     {
-        return (isset($this->options['help']['requirements']) ? $this->options['help']['requirements'] : null);
+        $this->default_class = $class;
+        return $this;
+    }
+
+    public function getDefaultClass()
+    {
+        return $this->default_class;
     }
 
     public function getPlaceholder()
     {
-        return (isset($this->options['placeholder']) ? $this->options['placeholder'] : null);
+        return $this->placeholder;
+    }
+
+    public function setPlaceholder($placeholder)
+    {
+        $this->placeholder = $placeholder;
+        return $this;
     }
 
     public function getDefaultValue()
     {
-        return (isset($this->options['default_value']) ? $this->options['default_value'] : null);
+        return $this->default_value;
+    }
+
+    public function setDefaultValue($default_value)
+    {
+        $this->default_value = $default_value;
+        return $this;
+    }
+
+    public function setUIDescription($description)
+    {
+        $this->ui_description = $description;
+        return $this;
+    }
+
+    public function setUIRequirements($requirements)
+    {
+        $this->ui_requirements = $requirements;
+        return $this;
+    }
+
+    public function getUIDescription()
+    {
+        return $this->ui_description;
+    }
+
+    public function getUIRequirements()
+    {
+        return $this->ui_requirements;
     }
 
     public function getOnInitJavascript()
@@ -129,16 +255,13 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function setOnInitJavascript($javascript)
     {
         $this->init_javascript = $javascript;
-    }
-
-    public function getContainer()
-    {
-        return (isset($this->options['container']) ? $this->options['container'] : null);
+        return $this;
     }
 
     public function setActionForm(lcActionForm $form)
     {
         $this->action_form = $form;
+        return $this;
     }
 
     public function getActionForm()
@@ -153,17 +276,30 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function getConstraints()
     {
-        return (isset($this->options['constraints']) ? (array)$this->options['constraints'] : null);
+        return $this->constraints;
     }
 
-    public function getAdditionalAttributes()
+    public function setConstraints(array $constraints)
     {
-        return (isset($this->options['attributes']) ? $this->options['attributes'] : null);
+        $this->constraints = $constraints;
+        return $this;
+    }
+
+    public function addConstraint($constraint)
+    {
+        $this->constraints[] = $constraint;
+        return $this;
     }
 
     public function getNameSuffix()
     {
-        return (isset($this->options['name_suffix']) ? $this->options['name_suffix'] : null);
+        return $this->name_suffix;
+    }
+
+    public function setNameSuffix($name_suffix)
+    {
+        $this->name_suffix = $name_suffix;
+        return $this;
     }
 
     public function getPrefixedFieldName()
@@ -182,9 +318,25 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $full_name;
     }
 
+    public function setAttributes(array $attributes)
+    {
+        $this->additional_tag_attributes = $attributes;
+    }
+
+    public function setAttribute($key, $value)
+    {
+        $this->additional_tag_attributes[$key] = $value;
+    }
+
+    public function getAttributes()
+    {
+        return array_merge((array)$this->additional_tag_attributes,
+            (isset($this->options['attributes']) ? (array)$this->options['attributes'] : array()));
+    }
+
     protected function addAdditionalAttributesToTag(lcHtmlTag $tag)
     {
-        $attrs = $this->getAdditionalAttributes();
+        $attrs = $this->getAttributes();
 
         if (!$attrs) {
             return false;
@@ -195,21 +347,64 @@ abstract class lcBaseActionFormWidget extends lcObj
             unset($name, $value);
         }
 
-        return true;
+        return $this;
+    }
+
+    public function setContainerName($container_name)
+    {
+        $this->container_name = $container_name;
+        return $this;
+    }
+
+    public function setFieldTagId($field_id)
+    {
+        $this->field_tag_id = $field_id;
+        return $this;
+    }
+
+    public function setFieldTagIdPrefix($id_prefix)
+    {
+        $this->field_tag_id_prefix = $id_prefix;
+        return $this;
+    }
+
+    public function getContainer()
+    {
+        return $this->container_name;
+    }
+
+    protected function getContainerNameForForm()
+    {
+        return strtolower($this->getContainer());
+    }
+
+    public function getFieldTagId()
+    {
+        return $this->field_tag_id;
+    }
+
+    public function getFieldTagIdPrefix()
+    {
+        return $this->field_tag_id_prefix;
     }
 
     public function getFieldId()
     {
-        $options = $this->options;
-        $container_prefix = isset($options['container']) ? /*&& isset($options['append_container_to_field_ids']) && $options['append_container_to_field_ids'] ?*/
-            strtolower($options['container']) . '_' : null;
-        $id = isset($options['id']) ? (string)$options['id'] : (isset($options['id_prefix']) ? $options['id_prefix'] : null) . $container_prefix . $this->getFieldName();
+        $container_prefix = $this->container_name ? strtolower($this->container_name) . '_' : null;
+        $id = ($this->field_tag_id ? (string)$this->field_tag_id : ($this->field_tag_id_prefix ? $this->field_tag_id_prefix : null)) .
+            $container_prefix . $this->getFieldName();
         return $id;
+    }
+
+    public function setIsDisabled($is_disabled)
+    {
+        $this->is_disabled = $is_disabled;
+        return $this;
     }
 
     public function getIsDisabled()
     {
-        return (isset($this->options['disabled']) && $this->options['disabled']);
+        return $this->is_disabled;
     }
 
     public function getIsEnabled()
@@ -217,33 +412,43 @@ abstract class lcBaseActionFormWidget extends lcObj
         return !$this->getIsDisabled();
     }
 
+    public function setIsHidden($is_hidden)
+    {
+        $this->is_hidden = $is_hidden;
+        return $this;
+    }
+
     public function getIsHidden()
     {
-        return (isset($this->options['hidden']) && $this->options['hidden']);
+        return $this->is_hidden;
+    }
+
+    public function setIsRequired($is_required)
+    {
+        $this->is_required = $is_required;
+        return $this;
     }
 
     public function getIsRequired()
     {
-        return (isset($this->options['required']) && $this->options['required']);
+        return $this->is_required;
     }
 
     public function setPriority($priority)
     {
         $this->priority = $priority;
+        return $this;
     }
 
     public function getPriority()
     {
-        if ($this->priority) {
-            return $this->priority;
-        }
-
-        return (isset($this->options['priority']) ? (int)$this->options['priority'] : null);
+        return $this->priority;
     }
 
     public function setFieldName($field_name)
     {
         $this->field_name = $field_name;
+        return $this;
     }
 
     public function getFieldName()
@@ -254,6 +459,90 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function setOptions(array $options = null)
     {
         $this->options = $options;
+
+        if ($options) {
+            $this->parseOptions($options);
+        }
+
+        return $this;
+    }
+
+    protected function parseOptions(array $options)
+    {
+        // parse the default options
+        if (isset($options['name_suffix'])) {
+            $this->name_suffix = $options['name_suffix'];
+        }
+
+        if (isset($options['class'])) {
+            $this->default_class = $options['class'];
+        }
+
+        if (isset($options['id_prefix'])) {
+            $this->id_prefix = $options['id_prefix'];
+        }
+
+        if (isset($options['name_prefix'])) {
+            $this->name_prefix = $options['name_prefix'];
+        }
+
+        if (isset($options['help']['description'])) {
+            $this->ui_description = $options['help']['description'];
+        }
+
+        if (isset($options['help']['requirements'])) {
+            $this->ui_requirements = $options['help']['requirements'];
+        }
+
+        if (isset($options['placeholder'])) {
+            $this->placeholder = $options['placeholder'];
+        }
+
+        if (isset($options['default_value'])) {
+            $this->default_value = $options['default_value'];
+        }
+
+        if (isset($options['container'])) {
+            $this->container_name = $options['container'];
+        }
+
+        if (isset($options['constraints'])) {
+            $this->constraints = $options['constraints'];
+        }
+
+        if (isset($options['disabled'])) {
+            $this->is_disabled = $options['disabled'];
+        }
+
+        if (isset($options['hidden'])) {
+            $this->is_hidden = $options['hidden'];
+        }
+
+        if (isset($options['required'])) {
+            $this->is_required = $options['required'];
+        }
+
+        if (isset($options['priority'])) {
+            $this->priority = $options['priority'];
+        }
+
+        if (isset($options['id'])) {
+            $this->field_tag_id = $options['id'];
+        }
+
+        if (isset($options['validation'])) {
+            $this->validation_rules = $options['validation'];
+        }
+
+        if (isset($options['data_alias'])) {
+            $this->data_alias = $options['data_alias'];
+        }
+
+        if (isset($options['title'])) {
+            $this->title = $options['title'];
+        }
+
+        return $this;
     }
 
     public function getOptions()
@@ -264,6 +553,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function setData($data = null)
     {
         $this->data = $data;
+        return $this;
     }
 
     public function getData()
@@ -329,6 +619,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     {
         $this->is_valid = false;
         $this->validation_failures[] = new lcBaseActionFormValidationFailure($this->field_name, $message);
+        return $this;
     }
 
     public function getValidators()
@@ -339,12 +630,14 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function addValidator(lcBaseActionFormValidator $validator)
     {
         $this->validators[] = $validator;
+        return $this;
     }
 
     public function removeValidators()
     {
         $this->validators = array();
         $this->clearValidationFailures();
+        return $this;
     }
 
     public function clearValidationFailures()
@@ -352,6 +645,7 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->validation_failures = array();
         $this->is_valid = false;
         $this->is_validated = false;
+        return $this;
     }
 
     protected function t($string)

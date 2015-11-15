@@ -37,13 +37,31 @@ class lcTagButton extends lcHtmlTag
     {
         parent::__construct('button', true);
 
-        $this->setContent($content);
-        $this->setType($type);
-        $this->setName($name);
-        $this->setValue($value);
+        if ($content) {
+            $this->setContent($content);
+        }
+
+        if ($type) {
+            $this->setType($type);
+        }
+
+        if ($name) {
+            $this->setName($name);
+        }
+
+        if ($value) {
+            $this->setValue($value);
+        }
+
         $this->setIsDisabled($disabled);
-        $this->setTabIndex($tabindex);
-        $this->setAccessKey($accesskey);
+
+        if ($tabindex) {
+            $this->setTabIndex($tabindex);
+        }
+
+        if ($accesskey) {
+            $this->setAccessKey($accesskey);
+        }
     }
 
     public static function create()
