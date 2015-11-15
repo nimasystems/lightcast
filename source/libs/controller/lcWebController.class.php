@@ -147,14 +147,17 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 foreach ($components as $component_data) {
                     /** @var lcWebComponent $component */
                     $component = $component_data['instance'];
-                    $js_codes = $component->getRequiredJavascriptCode();
 
-                    if ($js_codes) {
-                        foreach ($js_codes as $identifier => $code2) {
-                            // append the component name before the identifier - to prevent overlapping of identifiers
-                            $identifier = $component->getControllerName() . '-' . $identifier;
-                            $code[$identifier] = $code2;
-                            unset($identifier, $code2);
+                    if ($component instanceof lcWebComponent) {
+                        $js_codes = $component->getRequiredJavascriptCode();
+
+                        if ($js_codes) {
+                            foreach ($js_codes as $identifier => $code2) {
+                                // append the component name before the identifier - to prevent overlapping of identifiers
+                                $identifier = $component->getControllerName() . '-' . $identifier;
+                                $code[$identifier] = $code2;
+                                unset($identifier, $code2);
+                            }
                         }
                     }
                 }

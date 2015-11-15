@@ -840,8 +840,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $javascripts = (array)$this->configuration['view.javascripts'];
 
         if ($javascripts) {
-            foreach ($javascripts as $jsidx => $js) {
-                 $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
+            foreach ($javascripts as $jsidx => $jss) {
+                $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
 
                 if (!$js) {
                     continue;
