@@ -139,6 +139,7 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDb
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbViews.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'view' . DS . 'filters' . DS . 'iViewFilterProvider.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'components' . DS . 'iSupportsComponentOperations.class.php');
 
 // load base classes
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iEventsListener.class.php');
