@@ -221,11 +221,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        if (DO_DEBUG) {
-            $ret = include_once($filename);
-        } else {
-            $ret = @include_once($filename);
-        }
+        $ret = include_once($filename);
 
         if (!$ret) {
             return false;
