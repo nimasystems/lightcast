@@ -41,7 +41,7 @@ class lcStrings
 
     public static function startsWith($haystack, $needle)
     {
-        return ($haystack{0} == $needle{0}) ? strncmp($haystack, $needle, strlen($needle)) === 0 : false;
+        return ($haystack && $needle && $haystack{0} == $needle{0}) ? strncmp($haystack, $needle, strlen($needle)) === 0 : false;
     }
 
     public static function endsWith($haystack, $needle, $case = true)
