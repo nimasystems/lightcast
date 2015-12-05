@@ -62,6 +62,11 @@ class lcEvent extends lcObj implements ArrayAccess
         $this->params = isset($params) ? $params : array();
     }
 
+    public function __get($property)
+    {
+        return (isset($this->params[$property]) ? $this->params[$property] : null);
+    }
+
     public function getSubject()
     {
         return $this->subject;
