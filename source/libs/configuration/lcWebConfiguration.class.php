@@ -120,11 +120,6 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
-    public function getPathInfoPrefix()
-    {
-        return null;
-    }
-
     public function getActionFormLocations()
     {
         $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : array();

@@ -41,16 +41,16 @@ class lcStrings
 
     public static function startsWith($haystack, $needle)
     {
-        return ($haystack && $needle && $haystack{0} == $needle{0}) ? strncmp($haystack, $needle, strlen($needle)) === 0 : false;
+        return ($haystack && $needle && $haystack{0} == $needle{0}) ? strncmp($haystack, $needle, lcUnicode::strlen($needle)) === 0 : false;
     }
 
     public static function endsWith($haystack, $needle, $case = true)
     {
         if ($case) {
-            return (strcmp(substr($haystack, strlen($haystack) - strlen($needle)), $needle) === 0);
+            return (strcmp(lcUnicode::substr($haystack, lcUnicode::strlen($haystack) - lcUnicode::strlen($needle)), $needle) === 0);
         }
 
-        return (strcasecmp(substr($haystack, strlen($haystack) - strlen($needle)), $needle) === 0);
+        return (strcasecmp(lcUnicode::substr($haystack, lcUnicode::strlen($haystack) - lcUnicode::strlen($needle)), $needle) === 0);
     }
 
     public static function contains($haystack, $needle)
