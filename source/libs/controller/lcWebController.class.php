@@ -247,10 +247,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->web_path;
     }
 
-    /*
-     * @deprecated LC 1.4 Compatibility method for setting a template of the current view
-    */
-
     public function setWebPath($web_path)
     {
         $this->web_path = $web_path;
