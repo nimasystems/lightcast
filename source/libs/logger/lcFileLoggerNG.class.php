@@ -84,7 +84,7 @@ class lcFileLoggerNG extends lcLogger
 
         $this->dont_log_request_header = (bool)$this->configuration['logger.no_request_header'];
 
-        $this->event_dispatcher->connect('request.load_parameters', $this, 'onRequestLoadParameters');
+        $this->event_dispatcher->connect('request.startup', $this, 'onRequestStart');
     }
 
     private function setupLogFiles(array $log_files)
@@ -223,7 +223,7 @@ class lcFileLoggerNG extends lcLogger
         try {
             $this->flushLogs();
         } catch (Exception $e) {
-            //
+            error_log('Could not flush logs on app exception: ' . $e);
         }
 
         parent::onAppException($event);
@@ -243,17 +243,10 @@ class lcFileLoggerNG extends lcLogger
 
                 while ($sub = substr($str, $last_pos, $max_len)) {
                     error_log($sub, 3, $filename);
-                    $last_pos += $max_len;
+                    $last_pos += strlen($sub);
                     unset($sub);
                 }
 
-                //error_log(implode('', $logs), 3, $filename);
-                /*foreach($logs as $log)
-                {
-                    error_log($log, 3, $filename);
-                    //error_log(implode("\n", $logs), 3, $filename);
-                    unset($log);
-                }*/
                 unset($filename, $logs1, $str);
             }
         }
@@ -271,7 +264,7 @@ class lcFileLoggerNG extends lcLogger
         try {
             $this->flushLogs();
         } catch (Exception $e) {
-            //
+            error_log('Could not flush logs on shutdown: ' . $e);
         }
 
         parent::shutdown();
@@ -287,103 +280,93 @@ class lcFileLoggerNG extends lcLogger
         }
     }
 
-    public function onRequestLoadParameters(lcEvent $event)
+    public function onRequestStart(lcEvent $event)
     {
         // if logged or not from config
         if ($this->dont_log_request_header) {
             return;
         }
 
-        try {
-            $this->request = $event->getSubject();
+        $this->request = $event->getSubject();
 
-            assert(isset($this->request));
+        assert(isset($this->request));
 
-            // TODO: think about this
-            if ($this->request instanceof lcWebRequest) {
-                /** @var lcWebRequest $request */
-                $request = $this->request;
+        if ($this->request instanceof lcWebRequest) {
+            /** @var lcWebRequest $request */
+            $request = $this->request;
 
-                // initialize new log buffer
-                $buffer = array();
-                $buffer[] = '';
-                $buffer[] = '******************** REQUEST START [' . $this->getTimeTick() . ']';
-                $buffer[] = '';
+            // initialize new log buffer
+            $buffer = array();
+            $buffer[] = '';
+            $buffer[] = '******************** REQUEST START [' . $this->getTimeTick() . ']';
+            $buffer[] = '';
 
-                // intro line
-                $buffer[] =
-                    $this->request->getRealRemoteAddr() . ' ' .
-                    ($request->getXForwardedFor() ? '*-> ' . $request->getXForwardedFor() . '* ' : null) .
-                    '[' . date('r', $request->getRequestTime()) . '] ' .
-                    '[' . $this->configuration->getApplicationName() . '] ' .
-                    ($this->request->isXmlHttpRequest() ? '[XML-HTTP] ' : null) .
-                    '"' . $request->getRequestMethod() . ' ' . $request->getRequestUri() . '" ' .
-                    '"' . ($request->getHttpReferer() ? $request->getHttpReferer() : '-') . '" ' .
-                    '"' . ($request->getHttpUserAgent() ? $request->getHttpUserAgent() : '-') . '"';
+            // intro line
+            $buffer[] =
+                $this->request->getRealRemoteAddr() . ' ' .
+                ($request->getXForwardedFor() ? '*-> ' . $request->getXForwardedFor() . '* ' : null) .
+                '[' . date('r', $request->getRequestTime()) . '] ' .
+                '[' . $this->configuration->getApplicationName() . '] ' .
+                ($this->request->isXmlHttpRequest() ? '[XML-HTTP] ' : null) .
+                '"' . $request->getRequestMethod() . ' ' . $request->getRequestUri() . '" ' .
+                '"' . ($request->getHttpReferer() ? $request->getHttpReferer() : '-') . '" ' .
+                '"' . ($request->getHttpUserAgent() ? $request->getHttpUserAgent() : '-') . '"';
 
-                // params
+            // params
 
-                // GET
-                $tmpstr = (string)$this->request->getGetParams();
+            // GET
+            $tmpstr = (string)$this->request->getGetParams();
 
-                if ($tmpstr) {
-                    $buffer[] = 'Get: {' . $tmpstr . '}';
-                }
-
-                // POST
-                $tmpstr = (string)$this->request->getPostParams();
-
-                if ($tmpstr) {
-                    $buffer[] = 'Post: {' . $tmpstr . '}';
-                }
-
-                // COOKIES
-                $tmpstr = (string)$this->request->getCookies();
-
-                if ($tmpstr) {
-                    $buffer[] = 'Cookies: {' . $tmpstr . '}';
-                }
-
-                // FILES
-                $tmpstr = (string)$this->request->getFiles();
-
-                if ($tmpstr) {
-                    $buffer[] = 'Files: {' . $tmpstr . '}';
-                }
-
-                // ROUTING
-                $tmpstr = (string)$this->request->getParams();
-
-                if ($tmpstr) {
-                    $buffer[] = 'Route: {' . $tmpstr . '}';
-                }
-
-                // headers
-                $headers = $this->request->getApacheHeaders();
-
-                if ($headers) {
-                    $buffer[] = '';
-
-                    foreach ($headers as $key => $val) {
-                        $buffer[] = $key . ': ' . $val;
-
-                        unset($key, $val);
-                    }
-                }
-
-                $interm = implode("\r\n", $buffer) . "\r\n\r\n";
-
-                unset($buffer);
-
-                $this->saved_request_header = $interm;
+            if ($tmpstr) {
+                $buffer[] = 'Get: {' . $tmpstr . '}';
             }
 
-            //$this->internalLog($interm, self::LOG_INFO, null, true);
-        } catch (Exception $e) {
-            // nothing here
-            if (DO_DEBUG) {
-                throw $e;
+            // POST
+            $tmpstr = (string)$this->request->getPostParams();
+
+            if ($tmpstr) {
+                $buffer[] = 'Post: {' . $tmpstr . '}';
             }
+
+            // COOKIES
+            $tmpstr = (string)$this->request->getCookies();
+
+            if ($tmpstr) {
+                $buffer[] = 'Cookies: {' . $tmpstr . '}';
+            }
+
+            // FILES
+            $tmpstr = (string)$this->request->getFiles();
+
+            if ($tmpstr) {
+                $buffer[] = 'Files: {' . $tmpstr . '}';
+            }
+
+            // ROUTING
+            $tmpstr = (string)$this->request->getParams();
+
+            if ($tmpstr) {
+                $buffer[] = 'Route: {' . $tmpstr . '}';
+            }
+
+            // headers
+            $headers = $this->request->getApacheHeaders();
+
+            if ($headers) {
+                $buffer[] = '';
+
+                foreach ($headers as $key => $val) {
+                    $buffer[] = $key . ': ' . $val;
+
+                    unset($key, $val);
+                }
+            }
+
+            $interm = implode("\r\n", $buffer) . "\r\n\r\n";
+
+            unset($buffer);
+
+            $this->saved_request_header = $interm;
         }
     }
 
@@ -426,7 +409,7 @@ class lcFileLoggerNG extends lcLogger
             $this->internalLog($message, $severity, $filename, $cleartext, $channel);
         } catch (Exception $e) {
             if (DO_DEBUG) {
-                die('Logger error: ' . $e);
+                error_log('Logger error: ' . $e);
             }
         }
     }
