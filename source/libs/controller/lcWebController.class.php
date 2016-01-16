@@ -242,9 +242,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->getWebPath() . $this->action_name;
     }
 
-    public function getWebPath()
+    public function getWebPath($suffixed = true)
     {
-        return $this->web_path;
+        return $this->web_path . ($suffixed ? '/' : null);
     }
 
     public function setWebPath($web_path)
@@ -498,9 +498,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $form_instance;
     }
 
-    public function getMyPath()
+    public function getMyPath($suffixed = true)
     {
-        return $this->getWebPath();
+        return $this->getWebPath($suffixed);
     }
 
     /*
