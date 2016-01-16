@@ -230,7 +230,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function getValueForKey($key)
     {
         if ($key == 'my_webpath' || $key == 'my_path') {
-            return $this->web_path;
+            return $this->getWebPath();
         } elseif ($key == 'my_action_path') {
             return $this->getMyActionPath();
         }
