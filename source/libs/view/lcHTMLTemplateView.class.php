@@ -245,6 +245,11 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $data;
     }
 
+    /**
+     * @param $url
+     * @warning Leave as public for PHP 5.3x compatibility (some methods are calling from lambdas below)
+     * @return null|string
+     */
     public function parsePartialDetails($url)
     {
         if (!$url) {
