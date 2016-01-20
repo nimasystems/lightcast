@@ -30,7 +30,7 @@
  * @author $Author: mkovachev $
  * @version $Revision: 1455 $
  */
-class lcNotImplemented extends lcException
+class lcNotImplemented extends lcException implements iHTTPException
 {
     public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
     {
@@ -39,5 +39,10 @@ class lcNotImplemented extends lcException
         }
 
         parent::__construct($message, $code, $cause, $extra_data, $domain);
+    }
+
+    public function getStatusCode()
+    {
+        return '501';
     }
 }

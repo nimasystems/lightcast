@@ -297,6 +297,9 @@ class lcApp extends lcObj
         if (!defined('CACHE_PATH')) {
             define('CACHE_PATH', $configuration->getCacheDir());
         }
+
+        // lib dir path
+        set_include_path(get_include_path() . PATH_SEPARATOR . $configuration->getProjectDir() . DS . 'lib');
     }
 
     private function initErrorHandler()

@@ -45,7 +45,8 @@ class lcFileLoggerNG extends lcLogger
     protected $files;
     protected $channels;
     protected $dont_log_request_header;
-    private $request;
+
+    protected $request;
 
     // flush log buffers at each 200 logs
     private $is_logging;

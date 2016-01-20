@@ -656,61 +656,58 @@ abstract class lcController extends lcBaseController implements iDebuggable
             }
         }
 
-        try {
-            $filter_results = $this->executeControllerFilterChain(
-                $controller_name,
-                $controller_instance->getControllerFilename(),
-                $controller_instance->getContextType(),
-                $controller_instance->getContextName(),
-                ($controller_instance->getParentPlugin() ? $controller_instance->getParentPlugin()->getPluginName() : null),
-                $action_name,
-                $action_params);
+        $filter_results = $this->executeControllerFilterChain(
+            $controller_name,
+            $controller_instance->getControllerFilename(),
+            $controller_instance->getContextType(),
+            $controller_instance->getContextName(),
+            ($controller_instance->getParentPlugin() ? $controller_instance->getParentPlugin()->getPluginName() : null),
+            $action_name,
+            $action_params);
 
-            if ($filter_results) {
-                assert(isset($filter_results['filter']));
-                assert(isset($filter_results['result']));
+        if ($filter_results) {
+            assert(isset($filter_results['filter']));
+            assert(isset($filter_results['result']));
 
-                $filter = $filter_results['filter'];
-                $result = $filter_results['result'];
+            $filter = $filter_results['filter'];
+            $result = $filter_results['result'];
 
-                $allow_forward = isset($result['allow_forward']) ? (bool)$result['allow_forward'] : true;
+            $allow_forward = isset($result['allow_forward']) ? (bool)$result['allow_forward'] : true;
 
-                if (!$allow_forward) {
-                    $deny_reason = isset($result['filter_reason']) ? $result['filter_reason'] : null;
+            if (!$allow_forward) {
+                $deny_reason = isset($result['filter_reason']) ? $result['filter_reason'] : null;
 
-                    $credentials_module = isset($result['controller_name']) && $result['controller_name'] ? $result['controller_name'] :
-                        $this->configuration['security.credentials_module'];
+                $credentials_module = isset($result['controller_name']) && $result['controller_name'] ? $result['controller_name'] :
+                    $this->configuration['security.credentials_module'];
 
-                    $credentials_action = isset($result['action_name']) && $result['action_name'] ? $result['action_name'] :
-                        $this->configuration['security.credentials_action'];
+                $credentials_action = isset($result['action_name']) && $result['action_name'] ? $result['action_name'] :
+                    $this->configuration['security.credentials_action'];
 
-                    $this->info('Controller action denied by filter (Filtering object: ' . $filter . '): Previous: ' .
-                        $controller_name . '/' . $action_name . ' => New: ' .
-                        ($credentials_module . '/' . $credentials_action) .
-                        ' (Type: ' . (isset($action_params['type']) ? $action_params['type'] : null) . '), Reason: ' . ($deny_reason ? $deny_reason : ' - none given - '));
+                $this->info('Controller action denied by filter: Previous: ' .
+                    $controller_name . '/' . $action_name . ' => New: ' .
+                    ($credentials_module . '/' . $credentials_action) .
+                    ' (Type: ' . (isset($action_params['type']) ? $action_params['type'] : null) . '), Reason: ' . ($deny_reason ? $deny_reason : ' - none given - '));
 
 
-                    if ($credentials_module && $credentials_action) {
-                        $this->forward(
-                            $credentials_action,
-                            $credentials_module,
-                            $action_params
-                        );
+                if ($credentials_module && $credentials_action) {
+                    $this->forward(
+                        $credentials_action,
+                        $credentials_module,
+                        $action_params
+                    );
+                } else {
+                    $exception = isset($result['exception']) && $result['exception'] ? $result['exception'] : null;
+
+                    if ($exception) {
+                        throw $exception;
                     } else {
-                        throw new lcAuthException('Access Denied (' . $controller_name . '/' . $action_name . ')');
+                        throw new lcAuthException(($deny_reason ? $deny_reason : 'Access Denied (' . $controller_name . '/' . $action_name . ')'));
                     }
                 }
             }
-
-            unset($filter_results);
-
-            return false;
-        } catch (Exception $ee) {
-            throw new lcFilterException('Could not apply view filters: ' .
-                $ee->getMessage(),
-                $ee->getCode(),
-                $ee);
         }
+
+        return false;
     }
 
     public function shouldApplyActionFilters($action_name, $action_type)

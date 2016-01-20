@@ -31,6 +31,7 @@
 class lcFrontWebServiceController extends lcFrontWebController
 {
     const XLC_APILEVEL_HEADER_NAME = 'X-LC-Api-Level';
+    const DEFAULT_HTTP_ERROR_CODE = '500';
 
     protected $use_actual_get_params;
 
@@ -56,7 +57,8 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
     }
 
-    public function sendErrorResponseFromException(Exception $e, $custom_domain = null, $custom_error_code = null, $custom_message = null)
+    public function sendErrorResponseFromException(Exception $e, $custom_domain = null, $custom_error_code = null,
+                                                   $custom_message = null, $custom_http_error_code = null)
     {
         $custom_domain = isset($custom_domain) ? (string)$custom_domain : null;
         $custom_error_code = isset($custom_error_code) ? (string)$custom_error_code : null;
@@ -80,6 +82,21 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         if ($send_server_timezone) {
             $response->header(lcWebServiceController::TIMEZONE_RESPONSE_HEADER, date_default_timezone_get());
+        }
+
+        // http errors
+        $send_http_error_code = (bool)$this->configuration['settings.send_http_error_code'];
+
+        if ($send_http_error_code) {
+            $http_error_code = $custom_http_error_code ? $custom_http_error_code : self::DEFAULT_HTTP_ERROR_CODE;
+
+            if ($e instanceof iHTTPException) {
+                $http_error_code = $e->getStatusCode();
+            }
+
+            if ($http_error_code) {
+                $response->setStatusCode($http_error_code);
+            }
         }
 
         $exception_domain = ($e instanceof iDomainException) ? $e->getDomain() : lcException::DEFAULT_DOMAIN;

@@ -103,7 +103,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
                     throw new lcNotAvailableException('Controller filter \'' . $filter_class . '\' not available');
                 }
 
+                /** @var lcActionFilter $obj */
                 $obj = new $filter_class();
+                $obj->setConfiguration($this->configuration);
+                $obj->setEventDispatcher($this->event_dispatcher);
                 $obj->initialize();
 
                 $this->action_filter_chain->addFilter($obj);
@@ -133,12 +136,16 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
                     throw new lcNotAvailableException('View filter \'' . $filter_class . '\' not available');
                 }
 
+                /** @var lcActionFilter $obj */
                 $obj = new $filter_class();
                 $obj->setConfiguration($this->configuration);
                 $obj->setEventDispatcher($this->event_dispatcher);
                 $obj->initialize();
 
-                $this->view_filter_chain->addViewFilter($obj);
+                if ($obj instanceof lcViewFilter) {
+                    /** @var lcViewFilter $obj */
+                    $this->view_filter_chain->addViewFilter($obj);
+                }
 
                 unset($filter_class, $obj);
             }
