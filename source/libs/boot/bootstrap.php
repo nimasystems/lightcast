@@ -111,6 +111,9 @@ set_include_path(get_include_path() . PATH_SEPARATOR . ROOT . DS . 'source' . DS
 // load shortcut funcs
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'shortcuts.php');
 
+// compatibility functions
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'compat.php');
+
 // debugging
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'debug' . DS . 'iDebuggable.class.php');
 

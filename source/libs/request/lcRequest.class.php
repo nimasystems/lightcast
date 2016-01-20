@@ -246,10 +246,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return $this->cli_path;
     }
 
-    /*
-     * Just an alias to isInCli()
-    */
-
     public function getPort()
     {
         return $this->getServerPort();

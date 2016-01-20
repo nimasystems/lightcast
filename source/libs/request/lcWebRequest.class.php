@@ -376,17 +376,20 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->env('HTTP_REFERER');
     }
 
-    // TODO: Deprecated - remove in 1.5
-
+    /**
+     * @return mixed
+     * @deprecated Use core config base_url
+     */
     public function getRequestPrefix()
     {
         return $this->getUrlPrefix();
     }
 
-    /*
+    /**
      * Gets the url protocol plus the hostname together
-    */
-
+     * @return mixed
+     * @deprecated Use core config base_url
+     */
     public function getUrlPrefix()
     {
         return $this->prefix;
@@ -757,6 +760,29 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->uri_as_path;
     }
 
+    protected function setUrlPrefix()
+    {
+        // set / fix prefix
+        $prefix = $this->configuration->getPathInfoPrefix();
+
+        if (!$prefix) {
+            // try to autodetect the prefix - find diff between REQUEST_URI / PATH_INFO
+            $prefix = @parse_url(str_replace($this->env['PATH_INFO'], '', $this->env['REQUEST_URI']), PHP_URL_PATH);
+        }
+
+        $len = strlen($prefix);
+        $prefix = substr($prefix, $len - 1, $len) == '/' ? substr($prefix, 0, $len - 1) : $prefix;
+
+        // send a filter event to allow others to change the context
+        $evn = $this->event_dispatcher->filter(new lcEvent('request.set_url_prefix', $this), $prefix);
+
+        if ($evn->isProcessed()) {
+            $prefix = $evn->getReturnValue();
+        }
+
+        $this->prefix = $prefix;
+    }
+
     /*
      * Gets a single cookie object
     */
@@ -789,16 +815,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         $this->_set_request_uri();
 
-        // set / fix prefix
-        $prefix = $this->configuration->getPathInfoPrefix();
-
-        if (!$prefix) {
-            // try to autodetect the prefix - find diff between REQUEST_URI / PATH_INFO
-            $prefix = @parse_url(str_replace($this->env['PATH_INFO'], '', $this->env['REQUEST_URI']), PHP_URL_PATH);
-        }
-
-        $len = strlen($prefix);
-        $this->prefix = substr($prefix, $len - 1, $len) == '/' ? substr($prefix, 0, $len - 1) : $prefix;
+        $this->setUrlPrefix();
 
         // init http method type
         $this->initHttpMethod();

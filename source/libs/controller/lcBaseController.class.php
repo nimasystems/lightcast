@@ -749,6 +749,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         if (!$meets_requirements) {
             throw new lcRequirementException($this->t('Cannot instantiate controller - requirements not met:') . ' ' . get_class($this));
         }
+
+        $this->event_dispatcher->notify(new lcEvent('controller.initialize', $this));
     }
 
     protected function getMeetsRequirements()

@@ -758,6 +758,11 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $action_result = null;
         $action_params = $action_params ? $action_params : array();
 
+        $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, array(
+            'action_params' => $action_params,
+            'action_name' => $action_name
+        )));
+
         $action_result = $controller->execute($action_name, $action_params);
 
         // set back to controller

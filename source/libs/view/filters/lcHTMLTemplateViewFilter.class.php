@@ -208,6 +208,12 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $template;
     }
 
+    /**
+     * @param $param
+     * @param array|null $all_params
+     * @warning Leave as public for PHP 5.3x compatibility (some methods are calling from lambdas below)
+     * @return bool|mixed|null|string
+     */
     public function parseParam($param, array $all_params = null)
     {
         assert(isset($param));

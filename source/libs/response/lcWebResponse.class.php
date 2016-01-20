@@ -272,7 +272,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function sendChunkedStream($uri, $mimetype = 'application/binary', array $options = null)
     {
         $cnt = 0;
-        $handle = fopen($uri, 'r', null, (isset($options['stream_context']) ? $options['stream_context'] : null));
+        $resource = (isset($options['stream_context']) ? $options['stream_context'] : null);
+        $handle = $resource ? fopen($uri, 'r', null, $resource) : fopen($uri, 'r');
 
         if ($handle === false) {
             return false;

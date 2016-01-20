@@ -53,7 +53,7 @@ class lcFrontWebController extends lcFrontController
         }
 
         // assign request-based web path
-        $web_path = $this->request->getUrlPrefix() . '/' . $controller_instance->getControllerName() . '/';
+        $web_path = $this->request->getUrlPrefix() . '/' . $controller_instance->getControllerName();
         $controller_instance->setWebPath($web_path);
 
         // resolve dependancies

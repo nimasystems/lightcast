@@ -95,7 +95,7 @@ class lcHttpAcceptParser extends lcObj
             arsort($narr2, SORT_NUMERIC);
             $narr2 = array_flip($narr2);
 
-            $this->accepts = array_merge($narr, $narr2);
+            $this->accepts = array_values(array_merge($narr, $narr2));
 
             unset($key, $val);
         }

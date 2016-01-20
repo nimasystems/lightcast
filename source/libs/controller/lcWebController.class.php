@@ -230,7 +230,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function getValueForKey($key)
     {
         if ($key == 'my_webpath' || $key == 'my_path') {
-            return $this->web_path;
+            return $this->getWebPath();
         } elseif ($key == 'my_action_path') {
             return $this->getMyActionPath();
         }
@@ -242,14 +242,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->getWebPath() . $this->action_name;
     }
 
-    public function getWebPath()
+    public function getWebPath($suffixed = true)
     {
-        return $this->web_path;
+        return $this->web_path . ($suffixed ? '/' : null);
     }
-
-    /*
-     * @deprecated LC 1.4 Compatibility method for setting a template of the current view
-    */
 
     public function setWebPath($web_path)
     {
@@ -502,9 +498,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $form_instance;
     }
 
-    public function getMyPath()
+    public function getMyPath($suffixed = true)
     {
-        return $this->getWebPath();
+        return $this->getWebPath($suffixed);
     }
 
     /*
