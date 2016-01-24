@@ -31,7 +31,7 @@
 class lcPropelConnection extends PropelPDO
 {
     // override propel's default logging methods
-const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
+    const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
     const QUERY_CACHE_TIMEOUT_MINUTE = 60;    // in seconds
     const QUERY_CACHE_TIMEOUT_DAY = 86400;
     const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
@@ -118,6 +118,39 @@ const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
         return true;
     }
 
+    public function beginTransaction($emulated = true)
+    {
+        if ($emulated) {
+            return parent::beginTransaction();
+        } else {
+            return $this->disableAutocommit();
+        }
+    }
+
+    public function commit($emulated = true)
+    {
+        if ($emulated) {
+            return parent::commit();
+        } else {
+            if (!$this->exec('COMMIT')) {
+                return false;
+            }
+            return $this->enableAutocommit();
+        }
+    }
+
+    public function rollback($emulated = true)
+    {
+        if ($emulated) {
+            return parent::rollback();
+        } else {
+            if (!$this->exec('ROLLBACK')) {
+                return false;
+            }
+            return $this->enableAutocommit();
+        }
+    }
+
     public function lockTablesInTransaction(array $tables)
     {
         if (!$tables) {
@@ -202,7 +235,7 @@ const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
     public function commitAndUnlockTables()
     {
         $this->unlockTables();
-        $this->commit();
+        parent::commit();
         $this->enableAutocommit();
 
         return true;
@@ -216,7 +249,7 @@ const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
     public function rollbackAndUnlockTables()
     {
         $this->unlockTables();
-        $this->rollBack();
+        parent::rollBack();
         $this->enableAutocommit();
 
         return true;
