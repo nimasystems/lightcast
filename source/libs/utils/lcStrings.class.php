@@ -28,6 +28,41 @@ class lcStrings
         return strstr($haystack, $needle);
     }
 
+    public static function splitLocaleCode($locale)
+    {
+        $locale_code = null;
+        $country_code = null;
+
+        $separators = array('_', '-');
+        $sel_sep = null;
+
+        foreach ($separators as $sep) {
+
+            if (strstr($locale, $sep)) {
+                $sel_sep = $sep;
+                break;
+            }
+
+            unset($sep);
+        }
+
+        if ($sel_sep) {
+            $tmp = explode($sel_sep, $locale);
+            $locale_code = $tmp[0];
+
+            if (isset($tmp[1])) {
+                $country_code = $tmp[1];
+            }
+        } else {
+            $locale_code = $locale;
+        }
+
+        return array(
+            'country' => $country_code,
+            'locale' => $locale_code
+        );
+    }
+
     public static function splitEmail($str)
     {
         $str .= " ";
