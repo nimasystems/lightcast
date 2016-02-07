@@ -180,12 +180,18 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     /**
      * @return string
+     * @deprecated use getIdentifier()
      */
     public function getPluginIdentifier()
     {
         // subclassers may override this method to return the GUID identifier of
         // the plugin
         return null;
+    }
+
+    public function getIdentifier()
+    {
+        throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));
     }
 
     /**
