@@ -29,14 +29,6 @@
 http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHttpStatusCode.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcHttpStatusCode
 {
     /*

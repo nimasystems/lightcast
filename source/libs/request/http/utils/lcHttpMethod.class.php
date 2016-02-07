@@ -28,14 +28,6 @@
  As proposed from http://www.w3.org/Protocols/HTTP/Methods.html
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHttpMethod.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcHttpMethod
 {
     const METHOD_ANY = 0;

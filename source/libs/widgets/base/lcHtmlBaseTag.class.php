@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHtmlBaseTag.class.php 1529 2014-06-01 09:20:40Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1529 $
- */
 abstract class lcHtmlBaseTag implements iAsHTML
 {
     protected $parent_widget;

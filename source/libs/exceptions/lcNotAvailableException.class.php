@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcNotAvailableException.class.php 1517 2014-05-15 12:25:06Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1517 $
- */
 class lcNotAvailableException extends lcException
 {
 }

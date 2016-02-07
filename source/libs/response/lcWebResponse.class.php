@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcWebResponse.class.php 1536 2014-06-09 11:56:08Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1536 $
- */
 class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 {
     const TR_MULTILINE_DETECT_REP = '-----rtn----';

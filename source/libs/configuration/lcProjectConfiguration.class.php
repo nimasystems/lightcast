@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcProjectConfiguration.class.php 1489 2013-12-12 14:27:36Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1489 $
- */
 class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels, iSupportsDbModelOperations,
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {

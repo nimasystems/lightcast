@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,17 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- *
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcApp.class.php 1491 2013-12-14 10:25:23Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1491 $
- * @method lcPluginManager getPluginManager
- * @method lcController getController
- */
 class lcApp extends lcObj
 {
     const FRAMEWORK_CACHE_FILENAME = 'source/assets/misc/autoload/autoload.php';

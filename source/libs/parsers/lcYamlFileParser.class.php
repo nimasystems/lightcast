@@ -20,15 +20,6 @@
  * E-Mail: info@nimasystems.com
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcYamlFileParser.class.php 1470 2013-11-16 13:11:43Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1470 $
- */
-
 require_once('parsers' . DS . 'lcFileParser.class.php');
 
 class lcYamlFileParser extends lcFileParser

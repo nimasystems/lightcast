@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
  * E-Mail: info@nimasystems.com
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcConfigHandler.class.php 1473 2013-11-17 10:38:32Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1473 $
- */
 abstract class lcConfigHandler extends lcObj
 {
     /** @var iConfigDataProvider */

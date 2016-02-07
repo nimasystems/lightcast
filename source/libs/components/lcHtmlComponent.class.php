@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework Copyright (C) 2005 Nimasystems Ltd This program is NOT free
  * software; you cannot redistribute and/or modify it's sources under any circumstances without the
@@ -10,16 +11,6 @@
  * info@nimasystems.com
  */
 
-/**
- * File Description
- *
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHtmlComponent.class.php 1535 2014-06-05 17:11:56Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1535 $
- *
- */
 abstract class lcHtmlComponent extends lcWebComponent
 {
 

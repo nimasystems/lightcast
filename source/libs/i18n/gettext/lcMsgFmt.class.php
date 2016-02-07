@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcMsgFmt.class.php 1475 2013-11-26 16:51:48Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1475 $
- */
 class lcMsgFmt extends lcObj
 {
     const SHELL_CMD = 'msgfmt -c %s -o %s';

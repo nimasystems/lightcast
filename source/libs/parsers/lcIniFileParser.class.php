@@ -22,15 +22,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcIniFileParser.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
-
 require_once('parsers' . DS . 'lcFileParser.class.php');
 
 class lcIniFileParser extends lcFileParser

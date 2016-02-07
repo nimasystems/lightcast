@@ -21,15 +21,6 @@
 */
 
 /**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFinder.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
-
-/**
  * lcFinder
  *
  * $files = lcFinder::search('file')->set_filter('*.yml')->do_search_in('/folder/');

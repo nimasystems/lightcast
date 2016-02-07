@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcAPC.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcAPC extends lcSysObj implements iCacheStorage
 {
     /**
@@ -46,7 +39,7 @@ class lcAPC extends lcSysObj implements iCacheStorage
     public function __construct()
     {
         parent::__construct();
-        
+
         // check for apc
         if (!function_exists('apc_fetch')) {
             throw new lcSystemException('APC is not available');

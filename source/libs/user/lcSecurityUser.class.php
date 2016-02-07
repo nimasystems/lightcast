@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcSecurityUser.class.php 1544 2014-06-21 06:14:47Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1544 $
- */
 abstract class lcSecurityUser extends lcUser implements iDebuggable
 {
     const NS_KEY = 'user_security';

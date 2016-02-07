@@ -20,15 +20,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: system.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
-
 require_once('parsers' . DS . 'lcYamlFileParser.class.php');
 
 class tSystem extends lcTaskController

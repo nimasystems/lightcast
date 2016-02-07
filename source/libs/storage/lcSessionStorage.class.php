@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,23 +21,15 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcSessionStorage.class.php 1460 2013-10-27 06:12:26Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1460 $
- */
 class lcSessionStorage extends lcStorage implements iDebuggable
 {
     const DEFAULT_NAMESPACE = 'global';
-const DEFAULT_TIMEOUT = 30;
+    const DEFAULT_TIMEOUT = 30;
     protected $storage;
     protected $session_id;
     protected $timeout;
     private $last_request;
-        private $diff_to_expire; // in minutes
+    private $diff_to_expire; // in minutes
 
     public function initialize()
     {

@@ -20,15 +20,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package FileCategory
- * @subpackage FileSubcategory
- * @changed $Id: bootstrap.php 1592 2015-05-22 13:28:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1592 $
- */
-
 // setup proper initial error reporting before booting
 if (defined('DO_DEBUG')) {
     // Enable showing all errors until app boots

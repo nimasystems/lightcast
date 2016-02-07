@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcDateTime.class.php 1550 2014-07-13 10:54:12Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1550 $
- */
 class lcDateTime
 {
     public static function strftime($format, $timestamp = 0)

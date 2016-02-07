@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcApiWebRequest.class.php 1590 2015-05-22 11:29:35Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1590 $
- */
 class lcApiWebRequest extends lcWebRequest
 {
     const CLIENT_API_LEVEL_HEADER = 'X-LC-Client-Api-Level';

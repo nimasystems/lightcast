@@ -22,14 +22,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcSpatialUtils.class.php 1587 2015-05-07 15:18:38Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1587 $
- */
 /*SELECT
  SQL_NO_CACHE
 prop.prop_id, title, loc_lat, loc_lon,

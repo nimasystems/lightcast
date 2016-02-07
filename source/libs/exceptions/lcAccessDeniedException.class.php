@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcAccessDeniedException.class.php 1513 2014-05-13 20:16:21Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1513 $
- */
 class lcAccessDeniedException extends lcException implements iHTTPException
 {
     public function getStatusCode()

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -21,15 +22,6 @@
 
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcViewConfigHandler.class.php 1459 2013-10-27 05:56:17Z
- * mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1532 $
- */
 class lcViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()

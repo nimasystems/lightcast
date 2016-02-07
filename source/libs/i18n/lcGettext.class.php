@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcGettext.class.php 1479 2013-11-27 13:51:57Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1479 $
- */
 abstract class lcGettext extends lcI18n implements iDebuggable
 {
     const DEFAULT_LOCALE_UNIX = 'en_US';

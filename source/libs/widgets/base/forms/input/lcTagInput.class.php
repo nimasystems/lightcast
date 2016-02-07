@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcTagInput.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcTagInput extends lcHtmlTag
 {
     public function __construct($type = null, $name = null, $id = null, $value = null, $size = null, $maxsize = null, $disabled = null, $readonly = null, $accesskey = null)

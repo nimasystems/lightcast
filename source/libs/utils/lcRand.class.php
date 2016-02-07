@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcRand.class.php 1527 2014-05-28 08:18:38Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1527 $
- */
 class lcRand
 {
     public static function randomFloat($max)

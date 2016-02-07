@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcMailRecipient.class.php 1594 2015-06-20 18:47:08Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1594 $
- */
 class lcMailRecipient extends lcObj
 {
     private $email;

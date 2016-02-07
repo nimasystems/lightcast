@@ -22,15 +22,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFiles.class.php 1552 2014-08-01 07:13:50Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1552 $
- */
-
 if (!function_exists('mime_content_type')) {
     function mime_content_type($filename)
     {
