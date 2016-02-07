@@ -47,6 +47,8 @@ abstract class lcBaseActionForm extends lcSysObj
      */
     abstract public function execute();
 
+    abstract public function bindDefaultData(array $data);
+
     abstract public function bindData(array $data);
 
     /**

@@ -545,6 +545,11 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    public function getRawData()
+    {
+        return $this->getData();
+    }
+
     public function getOptions()
     {
         return $this->options;
