@@ -343,7 +343,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                                     throw $e;
                                 }
 
-                                if ($render_response) {
+                                if ($render_response && isset($render_response['content'])) {
                                     $controller_content = $render_response['content'];
                                     $controller_content_type = isset($render_response['content_type']) ? $render_response['content_type'] : null;
 
