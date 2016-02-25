@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,15 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- *
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcBaseController.class.php 1595 2015-06-22 11:21:45Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1595 $
- */
 abstract class lcBaseController extends lcAppObj implements iProvidesCapabilities, iDebuggable, iCacheable, iPluginContained,
     iSupportsDbModelOperations, iSupportsPluginOperations, iSupportsComponentOperations
 {

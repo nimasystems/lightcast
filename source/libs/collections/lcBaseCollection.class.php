@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcBaseCollection.class.php 1593 2015-05-28 10:02:17Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1593 $
- */
 abstract class lcBaseCollection extends lcObj
 {
     const SPL_OBJECT_NAME = 'ArrayIterator';

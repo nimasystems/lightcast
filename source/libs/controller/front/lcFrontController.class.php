@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFrontController.class.php 1543 2014-06-21 06:09:06Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1543 $
- */
 abstract class lcFrontController extends lcAppObj implements iFrontController
 {
     const DEFAULT_MAX_FORWARDS = 10;

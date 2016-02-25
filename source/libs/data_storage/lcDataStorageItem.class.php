@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcDataStorageItem.class.php 1487 2013-12-12 06:57:32Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1487 $
- */
 class lcDataStorageItem extends lcObj
 {
     const DEFAULT_CHUNK_SIZE = 8192;

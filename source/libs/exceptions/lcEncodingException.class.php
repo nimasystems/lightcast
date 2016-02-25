@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcEncodingException.class.php 1497 2014-01-08 18:25:32Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1497 $
- */
 class lcEncodingException extends lcException
 {
 }

@@ -20,15 +20,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHtmlUtils.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
-
 // handy script from tycoonmaster at gmail dot com
 // http://fi2.php.net/manual/en/function.http-build-url.php#96335
 // I didn't make this but I think it is useful so I store / share it here

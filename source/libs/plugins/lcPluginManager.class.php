@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPluginManager.class.php 1589 2015-05-17 16:50:29Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1589 $
- */
 class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEventObserver
 {
     const DEFAULT_PLUGIN_CONFIG_CLASS_NAME = 'lcPluginConfiguration';

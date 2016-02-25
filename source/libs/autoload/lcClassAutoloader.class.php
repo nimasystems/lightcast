@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcClassAutoloader.class.php 1488 2013-12-12 09:32:04Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1488 $
- */
 class lcClassAutoloader extends lcSysObj implements iCacheable
 {
     /**

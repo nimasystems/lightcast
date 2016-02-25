@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -21,15 +22,6 @@
 
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPluginConfiguration.class.php 1455 2013-10-25 20:29:31Z
- * mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1589 $
- */
 class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
@@ -180,12 +172,18 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     /**
      * @return string
+     * @deprecated use getIdentifier()
      */
     public function getPluginIdentifier()
     {
         // subclassers may override this method to return the GUID identifier of
         // the plugin
         return null;
+    }
+
+    public function getIdentifier()
+    {
+        throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));
     }
 
     /**

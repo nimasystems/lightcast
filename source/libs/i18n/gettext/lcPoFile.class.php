@@ -22,14 +22,6 @@
 
 // Format of PO file: http://www.gnu.org/software/gettext/manual/html_node/PO-Files.html
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPoFile.class.php 1517 2014-05-15 12:25:06Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1517 $
- */
 class lcPoFile extends lcObj
 {
     const DATE_FORMAT = 'Y-m-d H:iO';

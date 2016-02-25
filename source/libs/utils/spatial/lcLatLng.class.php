@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcLatLng.class.php 1527 2014-05-28 08:18:38Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1527 $
- */
 class lcLatLng
 {
     private $latitude;

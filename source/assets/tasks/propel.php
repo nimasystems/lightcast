@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: propel.php 1500 2014-01-10 16:33:26Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1500 $
- */
 class tPropel extends lcTaskController
 {
     const SCHEMA_FILE = 'schema.xml';
@@ -106,7 +99,7 @@ EOD;
         $this->precheck();
 
         $ret = false;
-        
+
         switch ($this->getRequest()->getParam('action')) {
             case 'models' : {
                 $ret = $this->propelOm();

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
  * E-Mail: info@nimasystems.com
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPropelDatabase.class.php 1498 2014-01-09 04:57:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1498 $
- */
 class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithCache
 {
     const PROPEL_CONNECTION_CLASS = 'lcPropelConnection';
