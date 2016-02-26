@@ -412,7 +412,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
     }
 
-    public function initializePlugin($plugin_name, $load_dependancies = true)
+    public function initializePlugin($plugin_name, $load_dependancies = true, $throw_if_missing = true)
     {
         if (!$plugin_name) {
             throw new lcInvalidArgumentException('Invalid plugin');
@@ -428,11 +428,19 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 null;
 
             if (!$plugin_configuration) {
+                if (!$throw_if_missing) {
+                    return false;
+                }
+
                 throw new lcNotAvailableException('Plugin not available');
             }
 
             // check if enabled
             if (!in_array($plugin_name, $this->enabled_plugins)) {
+                if (!$throw_if_missing) {
+                    return false;
+                }
+                
                 throw new lcNotAvailableException('Plugin is not enabled');
             }
 
@@ -820,15 +828,16 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     /**
      * @param $plugin_name
      * @param bool $try_initialize
+     * @param bool $throw_if_missing
      * @return lcPlugin|null
      * @throws lcInvalidArgumentException
      * @throws lcPluginException
      */
-    public function getPlugin($plugin_name, $try_initialize = true)
+    public function getPlugin($plugin_name, $try_initialize = true, $throw_if_missing = true)
     {
         if (!isset($this->plugins[$plugin_name]) && $try_initialize) {
             // try to initialize it
-            $this->initializePlugin($plugin_name);
+            $this->initializePlugin($plugin_name, true, $throw_if_missing);
         }
 
         $plugin_instance = isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
