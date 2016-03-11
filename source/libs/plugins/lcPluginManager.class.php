@@ -62,6 +62,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     private $included_plugin_classes;
     private $plugin_autostart_events;
 
+    private $plugin_webpath;
+
     public function initialize()
     {
         parent::initialize();
@@ -70,6 +72,15 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             array();
 
         $this->plugin_configurations = array();
+
+        $this->plugin_webpath = $this->configuration['plugins.webpath'];
+
+        if ($this->plugin_webpath) {
+            // fix it
+            if (substr($this->plugin_webpath, strlen($this->plugin_webpath) - 1, strlen($this->plugin_webpath)) != '/') {
+                $this->plugin_webpath .= '/';
+            }
+        }
 
         if ($this->should_load_plugins) {
             $this->initializeEnabledPlugins();
@@ -90,9 +101,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
 
             foreach ($available_plugins as $plugin_name => $plugin_details) {
-                $is_plugin_enabled = in_array($plugin_name, $this->enabled_plugins);
                 $path = $plugin_details['path'];
-                $web_path = isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null;
+                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
+                    (isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null);
 
                 // initialize and store plugin configuration
                 $this->plugin_configurations[$plugin_name] =
@@ -144,7 +155,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
                 $is_plugin_enabled = in_array($plugin_name, $this->enabled_plugins);
                 $path = $plugin_details['path'];
-                $web_path = isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null;
+                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
+                    (isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null);
 
                 // initialize and store plugin configuration
                 $plugin_config =
@@ -232,7 +244,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $ret;
     }
 
-    public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path)
+    public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null)
     {
         $class_name = null;
 
