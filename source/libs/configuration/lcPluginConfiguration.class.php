@@ -186,6 +186,34 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));
     }
 
+    private $is_lc15_targeting;
+    private $_is_lc15_targeting_checked;
+
+    public function isTargetingLC15()
+    {
+        if (!$this->_is_lc15_targeting_checked) {
+            $target_version = $this->getTargetFrameworkVersion();
+
+            if ($target_version) {
+                $this->is_lc15_targeting = version_compare($target_version, '1.5', '>=');
+            }
+
+            $this->_is_lc15_targeting_checked = true;
+        }
+
+        return $this->is_lc15_targeting;
+    }
+
+    public function getTargetFrameworkVersion()
+    {
+        return null;
+    }
+
+    public function getMinimumFrameworkVersion()
+    {
+        return null;
+    }
+
     /**
      * @return string
      */

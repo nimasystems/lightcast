@@ -47,6 +47,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      */
     protected $plugin_configurations;
 
+    /**
+     * @var iSupportsAutoload[]
+     */
+    protected $plugin_autoload_configurations;
+
     protected $runtime_plugins;
     protected $enabled_plugins;
 
@@ -58,9 +63,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      * @var lcApp
      */
     protected $app_context;
-    private $plugin_configurations_cached;
+
     private $included_plugin_classes;
     private $plugin_autostart_events;
+
+    private $autoload_class_map_file_exists_map;
 
     private $plugin_webpath;
 
@@ -125,6 +132,19 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
 
+        if ($this->configuration->isTargetingLC15()) {
+            // new autoload files
+            foreach ($available_plugins as $plugin_name => $plugin_details) {
+                $path = $plugin_details['path'];
+
+                // include and store the autoload configuration
+                $this->tryIncludePluginAutoloadClassMapFile($path, $plugin_name,
+                    $this->configuration->isDebugging());
+
+                unset($plugin_name, $path, $plugin_details);
+            }
+        }
+
         // walk all available plugins and include their configurations
         // they will reside live throughout the entire live of the application
         // we need to do this in two passes as the first one only adds the configuration file
@@ -136,11 +156,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $this->tryIncludePluginConfigurationFile($path, $plugin_name);
 
             unset($plugin_name, $path, $plugin_details);
-        }
-
-        // expand the cache if available
-        if ($this->plugin_configurations_cached) {
-            $this->plugin_configurations = @unserialize($this->plugin_configurations_cached);
         }
 
         // then boot the plugins
@@ -218,9 +233,55 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugins_initialized', $this));
     }
 
+    protected function tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name, $verify = false)
+    {
+        if (isset($this->plugin_autoload_configurations[$plugin_name])) {
+            return $this->plugin_autoload_configurations[$plugin_name];
+        }
+
+        $filename = $root_dir . DS . 'config' . DS . 'autoload.php';
+
+        $autoload_file_exists_cached = isset($this->autoload_class_map_file_exists_map[$plugin_name]) &&
+            $this->autoload_class_map_file_exists_map[$plugin_name];
+
+        if ($verify && !$autoload_file_exists_cached && !file_exists($filename)) {
+            return false;
+        }
+
+        if (!$autoload_file_exists_cached) {
+            $this->autoload_class_map_file_exists_map[$plugin_name] = true;
+        }
+
+        $ret = include_once($filename);
+
+        if (!$ret) {
+            return null;
+        }
+
+        $camelized_class_name = $plugin_name . '_autoload_plugin_configuration';
+        $class_name = lcInflector::camelize($camelized_class_name, false);
+
+        if (class_exists($class_name, false)) {
+            $obj = new $class_name();
+
+            if ($obj instanceof iSupportsAutoload) {
+                $this->plugin_autoload_configurations[$plugin_name] = $obj;
+
+                $this->getSystemComponentFactory()->getClassAutoloader()->addFromObject($obj, $root_dir);
+
+                return $obj;
+            }
+        }
+
+        return null;
+    }
+
     protected function tryIncludePluginConfigurationFile($root_dir, $plugin_name, $verify = false)
     {
-        $filename = $root_dir . DS . 'config' . DS . $plugin_name . '_config.php';
+        $is_15 = $this->configuration->isTargetingLC15();
+
+        $filename = $root_dir . DS . 'config' . DS . ($is_15 ?
+                'config.php' : $plugin_name . '_config.php');
 
         if ($verify && !file_exists($filename)) {
             return false;
@@ -232,13 +293,14 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        $class_name = lcInflector::camelize($plugin_name . '_config_configuration', false);
+        $camelized_class_name = $is_15 ? $plugin_name . '_plugin_configuration' : $plugin_name . '_config_configuration';
+        $class_name = lcInflector::camelize($camelized_class_name, false);
 
         // this is now deprecated
-        $class_name_deprecated = lcInflector::subcamelize($plugin_name . '_config', false);
+        $class_name_deprecated = $is_15 ? null : lcInflector::subcamelize($plugin_name . '_config', false);
 
         // cache this so we don't need to call subcamelize several times
-        $ret = array($class_name, $class_name_deprecated);
+        $ret = $is_15 ? $class_name : array($class_name, $class_name_deprecated);
         $this->included_plugin_classes[$plugin_name] = $ret;
 
         return $ret;
@@ -246,6 +308,13 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null)
     {
+        // new autoload files
+        if ($this->configuration->isTargetingLC15()) {
+            // include and store the autoload configuration
+            $this->tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name,
+                $this->configuration->isDebugging());
+        }
+
         $class_name = null;
 
         if (!isset($this->included_plugin_classes[$plugin_name])) {
@@ -352,7 +421,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->runtime_plugins =
         $this->enabled_plugins =
         $this->plugin_autostart_events =
-        $this->plugin_configurations_cached =
         $this->included_plugin_classes =
         $this->system_component_factory =
         $this->database_model_manager =
@@ -424,6 +492,27 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
     }
 
+    public function validatePluginConfigMeetsPlatformConstraints(lcPluginConfiguration $plugin_configuration)
+    {
+        // verify if the target / minimum versions are met
+        $target_version = $plugin_configuration->getTargetFrameworkVersion();
+        $minimum_version = $plugin_configuration->getMinimumFrameworkVersion();
+
+        if ($target_version) {
+            if (version_compare($target_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        if ($minimum_version) {
+            if (version_compare($minimum_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        return true;
+    }
+
     public function initializePlugin($plugin_name, $load_dependancies = true, $throw_if_missing = true)
     {
         if (!$plugin_name) {
@@ -452,9 +541,12 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 if (!$throw_if_missing) {
                     return false;
                 }
-                
+
                 throw new lcNotAvailableException('Plugin is not enabled');
             }
+
+            // check if plugin meets the framework constraints
+            $this->validatePluginConfigMeetsPlatformConstraints($plugin_configuration);
 
             $system_component_factory = $this->system_component_factory;
 
@@ -885,8 +977,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // we need to store them serialized and read them later on - when all classes are made available
         // otherwise when expanding them into objects - they won't be found!
         $cached_data = array(
-            'plugin_configurations_serialized' => ($this->plugin_configurations_cached ? $this->plugin_configurations_cached :
-                ($this->plugin_configurations ? serialize($this->plugin_configurations) : null))
+            'plugin_configurations' => ($this->plugin_configurations ? serialize($this->plugin_configurations) : null),
+            'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null),
+            'autoload_class_map_file_exists_map' => $this->autoload_class_map_file_exists_map,
         );
 
         return $cached_data;
@@ -894,6 +987,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function readClassCache(array $cached_data)
     {
-        $this->plugin_configurations_cached = isset($cached_data['plugin_configurations_serialized']) ? $cached_data['plugin_configurations_serialized'] : null;
+        $this->plugin_configurations = isset($cached_data['plugin_configurations']) ? @unserialize($cached_data['plugin_configurations']) : null;
+        $this->plugin_autoload_configurations = isset($cached_data['plugin_autoload_configurations']) ? @unserialize($cached_data['plugin_autoload_configurations']) : null;
+        $this->autoload_class_map_file_exists_map = isset($cached_data['autoload_class_map_file_exists_map']) ? $cached_data['autoload_class_map_file_exists_map'] : null;
     }
 }

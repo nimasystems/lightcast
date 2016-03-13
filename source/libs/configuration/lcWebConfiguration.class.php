@@ -112,6 +112,11 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
+    public function getClientsideJavascript()
+    {
+        return (bool)$this['view.clientside_js'];
+    }
+
     public function getActionFormLocations()
     {
         $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : array();

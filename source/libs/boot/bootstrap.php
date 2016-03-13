@@ -45,12 +45,6 @@ define('LC_VER_BUILD', 1);
 define('LC_VER_REVISION', 1469);
 define('LC_VER', LIGHTCAST_VER);
 
-// verify if an older app is trying to boot into the framework
-if (defined('APP_VER') && version_compare(APP_VER, LIGHTCAST_VER, '<=')) {
-    echo 'The application is too old to run on Lightcast ' . LC_VER . '. It must be upgraded first.';
-    exit(2);
-}
-
 // check min allowed framework version
 if (defined('MIN_LC_VER')) {
     $v = version_compare(LC_VER, MIN_LC_VER);

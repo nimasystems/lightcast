@@ -95,6 +95,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $allow_metatags;
     protected $content_lang;
     protected $htmlver;
+    protected $clientside_js;
 
     protected $content_url;
     protected $content_hreflangs;
@@ -141,6 +142,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->allow_stylesheets = (bool)$this->configuration['view.allow_stylesheets'];
         $this->allow_rss_feeds = (bool)$this->configuration['view.allow_rss_feeds'];
         $this->allow_metatags = (bool)$this->configuration['view.allow_metatags'];
+
+        $this->clientside_js = (bool)$this->configuration['view.clientside_js'];
 
         unset($js_path);
     }
@@ -1355,14 +1358,27 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     * the script will silently stop
     */
 
-    public function customHeadHtml($start = null, $end = null)
+    public function customHeadHtml($start = null, $end = null, $tag = null, $is_javascript = false)
     {
-        $this->html_head_custom[] = array('start' => $start, 'end' => $end);
+        if ($is_javascript && $this->clientside_js) {
+            return false;
+        }
+
+        $this->html_head_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
     }
 
-    public function customBodyHtml($start = null, $end = null)
+    public function customBodyHtml($start = null, $end = null, $tag = null, $is_javascript = false)
     {
-        $this->html_body_custom[] = array('start' => $start, 'end' => $end);
+        if ($is_javascript && $this->clientside_js) {
+            return false;
+        }
+
+        $this->html_body_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
+    }
+
+    public function addBodyJavascript($code, $tag = null)
+    {
+        $this->customBodyHtml(null, $code, $tag, true);
     }
 
     public function setCookie(lcCookie $cookie)

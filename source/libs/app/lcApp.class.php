@@ -528,6 +528,22 @@ class lcApp extends lcObj
         /** @var lcProjectConfiguration $project_configuration */
         $project_configuration = $configuration->getProjectConfiguration();
 
+        // verify if the target / minimum versions are met
+        $target_version = $project_configuration->getTargetFrameworkVersion();
+        $minimum_version = $project_configuration->getMinimumFrameworkVersion();
+
+        if ($target_version) {
+            if (version_compare($target_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        if ($minimum_version) {
+            if (version_compare($minimum_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
         // assign the configuration to be the delegate of the app
         // if it implements iAppDelegate and the current delegate is null
         if (!$this->delegate && ($project_configuration instanceof iAppDelegate)) {

@@ -65,6 +65,7 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
      * @var lcConfiguration
      */
 
+    /** @var lcProjectConfiguration|lcApplicationConfiguration */
     protected $configuration;
 
     private $has_initialized = false;

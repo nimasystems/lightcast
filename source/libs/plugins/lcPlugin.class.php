@@ -94,6 +94,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
 
     /**
      * @return bool|null
+     * @deprecated This will no longer be used in a future version (autoload config separation)
      */
     public function getImplementations()
     {
