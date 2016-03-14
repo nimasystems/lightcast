@@ -485,7 +485,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
             if ($t) {
                 foreach ($t as $obj) {
-                    $r = str_replace(' . php', '', $obj['name']);
+                    $r = str_replace('.php', '', $obj['name']);
 
                     if (lcStrings::endsWith($r, 'Peer') || lcStrings::endsWith($r, 'Query')) {
                         continue;
@@ -646,7 +646,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $path,
-                'web_path' => ' / addons / plugins / '
+                'web_path' => '/addons/plugins/'
             );
 
             unset($path);
@@ -859,27 +859,27 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getWebPath()
     {
-        return ' / ';
+        return '/';
     }
 
     public function getAssetsPath()
     {
-        return ' / ';
+        return '/';
     }
 
     public function getStylesheetPath()
     {
-        return ' / css / ';
+        return '/css/';
     }
 
     public function getJavascriptPath()
     {
-        return ' / js / ';
+        return '/js/';
     }
 
     public function getImgPath()
     {
-        return ' / img / ';
+        return '/img/';
     }
 
     public function getStylesheetDir()

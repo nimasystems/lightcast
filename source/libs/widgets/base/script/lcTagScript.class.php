@@ -59,7 +59,13 @@ class lcTagScript extends lcHtmlBaseTag
         return $this;
     }
 
-    public function setDefer($value = false)
+    public function setAsync($value = true)
+    {
+        $this->setAttribute('async', $value ? 'async' : null);
+        return $this;
+    }
+
+    public function setDefer($value = true)
     {
         $this->setAttribute('defer', $value ? 'defer' : null);
         return $this;
@@ -73,7 +79,7 @@ class lcTagScript extends lcHtmlBaseTag
 
     public static function getOptionalAttributes()
     {
-        return array('type', 'src', 'charset', 'defer');
+        return array('type', 'src', 'charset', 'defer', 'async');
     }
 
     public function getType()
@@ -100,11 +106,13 @@ class lcTagScript extends lcHtmlBaseTag
     {
         $attrs = $this->getAttributes()->asHtml();
 
+        $content = $this->getContent();
+
         return
-            '<script' . ($attrs ? ' ' . $attrs : null) . '>' . "\n" .
-            '/* <![CDATA[ */' . "\n" .
-            $this->getContent() . "\n" .
-            '/* ]]> */' . "\n" .
+            '<script' . ($attrs ? ' ' . $attrs : null) . '>' . ($content ? "\n" .
+                '/* <![CDATA[ */' . "\n" .
+                $this->getContent() . "\n" .
+                '/* ]]> */' . "\n" : null) .
             '</script>';
     }
 }

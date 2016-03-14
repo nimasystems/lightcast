@@ -180,6 +180,20 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->loaded_components = $loaded_components;
     }
 
+    protected function preparePluginSystemObject(lcSysObj $object)
+    {
+        $object->setPluginManager($this->getPluginManager());
+        $object->setEventDispatcher($this->getEventDispatcher());
+        $object->setConfiguration($this->getConfiguration());
+        $object->setClassAutoloader($this->getClassAutoloader());
+        $object->setContextName($this->getContextName());
+        $object->setContextType($this->getContextType());
+        $object->setLogger($this->getLogger());
+        $object->setI18n($this->getI18n());
+        $object->setParentPlugin($this);
+        $object->setTranslationContext(lcSysObj::CONTEXT_PLUGIN, $this->getPluginName());
+    }
+
     protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
     {
         if (!$this->app_context || !$this->app_context->getIsInitialized()) {
