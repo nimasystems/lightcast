@@ -138,8 +138,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 $path = $plugin_details['path'];
 
                 // include and store the autoload configuration
-                $this->tryIncludePluginAutoloadClassMapFile($path, $plugin_name,
-                    $this->configuration->isDebugging());
+                $this->tryIncludePluginAutoloadClassMapFile($path, $plugin_name);
 
                 unset($plugin_name, $path, $plugin_details);
             }
@@ -233,7 +232,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugins_initialized', $this));
     }
 
-    protected function tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name, $verify = false)
+    protected function tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name)
     {
         if (isset($this->plugin_autoload_configurations[$plugin_name])) {
             return $this->plugin_autoload_configurations[$plugin_name];
@@ -244,7 +243,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $autoload_file_exists_cached = isset($this->autoload_class_map_file_exists_map[$plugin_name]) &&
             $this->autoload_class_map_file_exists_map[$plugin_name];
 
-        if ($verify && !$autoload_file_exists_cached && !file_exists($filename)) {
+        if (!$autoload_file_exists_cached && !file_exists($filename)) {
             return false;
         }
 
@@ -311,8 +310,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // new autoload files
         if ($this->configuration->isTargetingLC15()) {
             // include and store the autoload configuration
-            $this->tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name,
-                $this->configuration->isDebugging());
+            $this->tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name);
         }
 
         $class_name = null;
