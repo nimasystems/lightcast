@@ -437,9 +437,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         if ($plugins) {
             foreach ($plugins as $name => $plugin) {
-                $implementations = $plugin->getImplementations();
-
-                if ($plugin instanceof iDebuggable || in_array('iDebuggable', (array)$implementations)) {
+                if ($plugin instanceof iDebuggable) {
                     $dbg[$name] = $plugin->getDebugInfo();
                 }
 

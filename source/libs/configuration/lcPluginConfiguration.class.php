@@ -263,6 +263,39 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
+     * @return bool|null
+     */
+    public function getImplements()
+    {
+        // subclassers may override this method to return custom class names which the plugin implements
+    }
+
+    /**
+     * @param array|string $interface_name
+     * @return bool
+     */
+    public function testIfImplements($interface_name)
+    {
+        if (!is_array($interface_name)) {
+            return ($this instanceof $interface_name || in_array($interface_name, (array)$this->getImplements()));
+        } else {
+            $implements_all = true;
+
+            foreach ($interface_name as $class_name) {
+                $implements_all = ($this instanceof $class_name || in_array($class_name, (array)$this->getImplements()));
+
+                if (!$implements_all) {
+                    break;
+                }
+
+                unset($class_name);
+            }
+
+            return $implements_all;
+        }
+    }
+
+    /**
      * @return string
      */
     public function getConfigDir()
