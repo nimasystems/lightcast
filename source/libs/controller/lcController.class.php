@@ -228,18 +228,14 @@ abstract class lcController extends lcBaseController implements iDebuggable
                 throw $e;
             }
 
-            if (!$rendered_contents) {
-                return null;
-            }
-
             if ($return_params) {
                 $content = array(
-                    'content' => $rendered_contents['content'],
-                    'content_type' => $rendered_contents['content_type'],
+                    'content' => (isset($rendered_contents['content']) ? $rendered_contents['content'] : null),
+                    'content_type' => (isset($rendered_contents['content_type']) ? $rendered_contents['content_type'] : null),
                     'controller' => $controller_instance
                 );
             } else {
-                $content = $rendered_contents['content'];
+                $content = (isset($rendered_contents['content']) ? $rendered_contents['content'] : null);
             }
 
         } catch (Exception $e) {
