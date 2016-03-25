@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -20,15 +21,6 @@
  * E-Mail: info@nimasystems.com
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcDatabaseManager.class.php 1472 2013-11-16 14:30:20Z mkovachev
- * $
- * @author $Author: mkovachev $
- * @version $Revision: 1498 $
- */
 class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, iDatabaseManager, iDebuggable
 {
     const DEFAULT_DB = 'primary';

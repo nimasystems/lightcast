@@ -23,14 +23,6 @@
 // TODO: 1.5 - Remove recipients, sender, attachments, body, subject from here and move them to an atomic lcMailMessage object which gets passed
 // to the send method here
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcMailer.class.php 1547 2014-06-24 14:51:46Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1547 $
- */
 abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 {
     const LOG_CHANNEL = 'mail';

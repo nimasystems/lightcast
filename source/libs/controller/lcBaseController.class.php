@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,15 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- *
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcBaseController.class.php 1595 2015-06-22 11:21:45Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1595 $
- */
 abstract class lcBaseController extends lcAppObj implements iProvidesCapabilities, iDebuggable, iCacheable, iPluginContained,
     iSupportsDbModelOperations, iSupportsPluginOperations, iSupportsComponentOperations
 {
@@ -642,18 +634,17 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $used_plugins = $this->getUsedPlugins();
 
             if ($used_plugins && is_array($used_plugins)) {
-                foreach ($used_plugins as $plugin_name) {
+                foreach ($used_plugins as $plugin_name => $additional_detail) {
+                    $plugin_name = is_numeric($plugin_name) ? $additional_detail : $plugin_name;
+                    $is_optional = is_array($additional_detail) && isset($additional_detail['optional']) && $additional_detail['optional'];
+
                     // skip the context plugin name so we do not double call this
                     if ($context_plugin_name && $context_plugin_name == $plugin_name) {
                         continue;
                     }
 
                     try {
-                        $plugin = $this->plugin_manager->getPlugin($plugin_name);
-
-                        if (!$plugin) {
-                            throw new lcNotAvailableException('Plugin not available');
-                        }
+                        $plugin = $this->internalLoadPlugin($plugin_name, !$is_optional);
                     } catch (Exception $e) {
                         throw new lcRequirementException('Plugin dependancy not available (' . $plugin_name . '): ' .
                             $e->getMessage(),
@@ -661,9 +652,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                             $e);
                     }
 
-                    $plugins[$plugin_name] = &$plugin;
+                    $plugins[$plugin_name] = $plugin;
 
-                    unset($plugin_name, $plugin);
+                    unset($plugin_name, $plugin, $additional_detail);
                 }
             }
 
@@ -729,6 +720,23 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->dependancies_loaded = true;
     }
 
+    private function internalLoadPlugin($plugin_name, $throw_if_missing = true)
+    {
+        if (isset($this->plugins[$plugin_name])) {
+            return $this->plugins[$plugin_name];
+        }
+
+        $plugin = $this->plugin_manager->getPlugin($plugin_name, true, $throw_if_missing);
+
+        if (!$plugin) {
+            return false;
+        }
+
+        $this->plugins[$plugin_name] = &$plugin;
+
+        return $plugin;
+    }
+
     public function getUsedPlugins()
     {
         return $this->use_plugins;
@@ -783,13 +791,14 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
      * @return lcPlugin The plugin's instance
      * @throws lcNotAvailableException
      */
-    protected function getPlugin($plugin_name)
+    protected function getPlugin($plugin_name, $optional = false)
     {
         $plugin = isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
 
         if (!$plugin) {
+            $plugin = $this->internalLoadPlugin($plugin_name, !$optional);
             /** @noinspection PhpToStringImplementationInspection */
-            throw new lcNotAvailableException('Plugin \'' . $plugin_name . '\' has not been required');
+            //throw new lcNotAvailableException('Plugin \'' . $plugin_name . '\' has not been required');
         }
 
         return $plugin;

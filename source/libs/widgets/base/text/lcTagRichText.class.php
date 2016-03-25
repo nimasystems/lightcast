@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcTagRichText.class.php 1464 2013-10-29 02:38:39Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1464 $
- */
 class lcTagRichText extends lcTagInput
 {
     /** @var componentFckEdit */

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,20 +21,6 @@
 * E-Mail: info@nimasystems.com
 
 
-*/
-
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcEvent.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
-/*
- * This object MUST NOT IMPLEMENT ANY VIRTUAL methods
-* and it must be AS PLAIN AS POSSIBLE
-* for performance reasons!!!
 */
 
 class lcEvent extends lcObj implements ArrayAccess

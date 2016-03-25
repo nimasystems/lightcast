@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcTagScript.class.php 1455 2013-10-25 20:29:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1455 $
- */
 class lcTagScript extends lcHtmlBaseTag
 {
     const DEFAULT_TYPE = 'text/javascript';
@@ -66,7 +59,13 @@ class lcTagScript extends lcHtmlBaseTag
         return $this;
     }
 
-    public function setDefer($value = false)
+    public function setAsync($value = true)
+    {
+        $this->setAttribute('async', $value ? 'async' : null);
+        return $this;
+    }
+
+    public function setDefer($value = true)
     {
         $this->setAttribute('defer', $value ? 'defer' : null);
         return $this;
@@ -80,7 +79,7 @@ class lcTagScript extends lcHtmlBaseTag
 
     public static function getOptionalAttributes()
     {
-        return array('type', 'src', 'charset', 'defer');
+        return array('type', 'src', 'charset', 'defer', 'async');
     }
 
     public function getType()
@@ -107,11 +106,13 @@ class lcTagScript extends lcHtmlBaseTag
     {
         $attrs = $this->getAttributes()->asHtml();
 
+        $content = $this->getContent();
+
         return
-            '<script' . ($attrs ? ' ' . $attrs : null) . '>' . "\n" .
-            '/* <![CDATA[ */' . "\n" .
-            $this->getContent() . "\n" .
-            '/* ]]> */' . "\n" .
+            '<script' . ($attrs ? ' ' . $attrs : null) . '>' . ($content ? "\n" .
+                '/* <![CDATA[ */' . "\n" .
+                $this->getContent() . "\n" .
+                '/* ]]> */' . "\n" : null) .
             '</script>';
     }
 }

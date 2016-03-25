@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: iSupportsDbViews.class.php 1596 2015-06-28 12:37:20Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1596 $
- */
 interface iSupportsDbViews
 {
     public function getDbViews();

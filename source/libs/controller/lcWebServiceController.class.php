@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcWebServiceController.class.php 1559 2014-10-27 23:47:30Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1559 $
- */
 abstract class lcWebServiceController extends lcWebBaseController implements iPluginContained, iDebuggable
 {
     const TIMEZONE_RESPONSE_HEADER = 'X-TZ';

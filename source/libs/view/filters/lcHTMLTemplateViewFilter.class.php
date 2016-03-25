@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcHTMLTemplateViewFilter.class.php 1569 2015-01-28 21:49:54Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1569 $
- */
 class lcHTMLTemplateViewFilter extends lcViewFilter
 {
     protected $debug;

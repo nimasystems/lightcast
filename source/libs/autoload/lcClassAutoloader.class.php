@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcClassAutoloader.class.php 1488 2013-12-12 09:32:04Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1488 $
- */
 class lcClassAutoloader extends lcSysObj implements iCacheable
 {
     /**
@@ -99,6 +92,19 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
         $current_classes = (array)$this->registered_classes;
         $new_classes = array_merge($current_classes, $classes);
         $this->registered_classes = $new_classes;
+    }
+
+    public function addFromObject(iSupportsAutoload $obj, $base_dir = null)
+    {
+        $autoload_classes = $obj->getAutoloadClasses();
+
+        if ($autoload_classes && is_array($autoload_classes)) {
+            foreach ($autoload_classes as $class_name => $filename) {
+                $filename = ($filename{0} == '/') ? $filename : ($base_dir ? $base_dir . DS . $filename : $filename);
+                $this->addClass($class_name, $filename);
+                unset($class_name, $filename);
+            }
+        }
     }
 
     public function hasClass($class_name)

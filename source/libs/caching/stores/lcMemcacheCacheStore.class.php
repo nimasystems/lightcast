@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcMemcacheCacheStore.class.php 1552 2014-08-01 07:13:50Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1552 $
- */
 class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, ArrayAccess, iDebuggable
 {
     const DEFAULT_MEMCACHE_STORE = 'memcache';

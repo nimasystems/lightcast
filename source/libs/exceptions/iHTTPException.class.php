@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: iHTTPException.class.php 1513 2014-05-13 20:16:21Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1513 $
- */
 interface iHTTPException
 {
     public function getStatusCode();

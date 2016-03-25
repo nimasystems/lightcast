@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPlugin.class.php 1594 2015-06-20 18:47:08Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1594 $
- */
 abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbModelOperations, iSupportsComponentOperations
 {
     const ASSETS_PATH = 'web';
@@ -99,39 +92,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         // subclassers may override this method to initialize their web-service-based components
     }
 
-    /**
-     * @return bool|null
-     */
-    public function getImplementations()
-    {
-        // subclassers may override this method to return custom class names which the plugin implements
-    }
-
-    /**
-     * @param array|string $interface_name
-     * @return bool
-     */
-    public function testIfImplements($interface_name)
-    {
-        if (!is_array($interface_name)) {
-            return ($this instanceof $interface_name || in_array($interface_name, (array)$this->getImplementations()));
-        } else {
-            $implements_all = true;
-
-            foreach ($interface_name as $class_name) {
-                $implements_all = ($this instanceof $class_name || in_array($class_name, (array)$this->getImplementations()));
-
-                if (!$implements_all) {
-                    break;
-                }
-
-                unset($class_name);
-            }
-
-            return $implements_all;
-        }
-    }
-
     public function initializeApp(lcApp $context)
     {
         // subclassers may override this method when it's necessary to know
@@ -184,6 +144,20 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         }
 
         $this->loaded_components = $loaded_components;
+    }
+
+    protected function preparePluginSystemObject(lcSysObj $object)
+    {
+        $object->setPluginManager($this->getPluginManager());
+        $object->setEventDispatcher($this->getEventDispatcher());
+        $object->setConfiguration($this->getConfiguration());
+        $object->setClassAutoloader($this->getClassAutoloader());
+        $object->setContextName($this->getContextName());
+        $object->setContextType($this->getContextType());
+        $object->setLogger($this->getLogger());
+        $object->setI18n($this->getI18n());
+        $object->setParentPlugin($this);
+        $object->setTranslationContext(lcSysObj::CONTEXT_PLUGIN, $this->getPluginName());
     }
 
     protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)

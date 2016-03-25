@@ -22,14 +22,6 @@
 * Tel./Fax: +359 32 395 282
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFrameworkConfiguration.class.php 1592 2015-05-22 13:28:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1592 $
- */
 class lcFrameworkConfiguration extends lcProjectConfiguration
 {
     public function getProjectName()

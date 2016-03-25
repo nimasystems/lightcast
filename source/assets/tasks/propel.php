@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: propel.php 1500 2014-01-10 16:33:26Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1500 $
- */
 class tPropel extends lcTaskController
 {
     const SCHEMA_FILE = 'schema.xml';
@@ -105,6 +98,8 @@ EOD;
         // check necessary requirements
         $this->precheck();
 
+        $ret = false;
+
         switch ($this->getRequest()->getParam('action')) {
             case 'models' : {
                 $ret = $this->propelOm();
@@ -139,7 +134,7 @@ EOD;
                 break;
             }
             case 'migrate' : {
-                $ret = $this->propelMigrate();
+                $this->propelMigrate();
                 break;
             }
             default : {
@@ -262,8 +257,10 @@ EOD;
     {
         $this->display('Flushing runtime data...');
 
-        $dir = $this->configuration->getAppRootDir();
-        $gen_dir = $this->configuration->getGenDir();
+        /** @var lcProjectConfiguration $cfg */
+        $cfg = $this->configuration;
+        $dir = $cfg->getAppRootDir();
+        $gen_dir = $cfg->getGenDir();
 
         // remove generated model om/map files
         lcDirs::rmdirRecursive($gen_dir . DS . 'propel', true);
@@ -330,6 +327,8 @@ EOD;
             $data = $data[$ak[0]];
         }
 
+
+        /** @noinspection PhpUndefinedMethodInspection */
         $cfg = $this->configuration->getProjectConfiguration();
         $schema_views = ($cfg instanceof iSupportsDbViews) ? $cfg->getDbViews() : null;
         $schema_views = is_array($schema_views) && $schema_views ? $schema_views : array();
@@ -823,13 +822,9 @@ EOD;
         return '<?xml version="1.0" encoding="utf-8"?><database package="models" defaultIdMethod="native" baseClass="lcBasePropelObject" defaultTranslateMethod="$this-&gt;translate"></database>';
     }
 
-    private function getProjectViews()
-    {
-        return ($this->configuration instanceof iSupportsDbViews ? $this->configuration->getDbViews() : null);
-    }
-
     private function getProjectModels()
     {
+        /** @noinspection PhpUndefinedMethodInspection */
         return ($this->configuration->getProjectConfiguration() instanceof iSupportsDbModels ? $this->configuration->getProjectConfiguration()->getDbModels() : null);
     }
 
@@ -1022,6 +1017,8 @@ EOD;
         }
 
         $pXmlDatabaseNode = $pXml->getElementsByTagName('database')->item(0);
+        /** @noinspection PhpUndefinedMethodInspection */
+        $pXmlDatabaseNode->removeAttribute('name');
 
         // add plugin tables from main reversed schema
         if ($plugin_tables) {
@@ -1124,6 +1121,7 @@ EOD;
         $dir = $this->getRequest()->getParam('store-in') ? $this->getRequest()->getParam('store-in') : self::DEFAULT_REVERSE_TARGET_FOLDER;
         $filename = self::DEFAULT_REVERSE_TARGET_NAME . '-' . date('Y_m_d_H_i_s');
 
+        /** @noinspection PhpUndefinedMethodInspection */
         $dir = ($dir{0} == '/') ? $dir : $this->configuration->getAppRootDir() . DS . $dir;
 
         if (isset($output_filename)) {
@@ -1152,6 +1150,7 @@ EOD;
             return true;
         }
 
+        /** @noinspection PhpUndefinedMethodInspection */
         $this->work_dir = $this->configuration->getGenDir() . DS . 'propel';
 
         lcDirs::mkdirRecursive($this->work_dir);
@@ -1188,26 +1187,11 @@ EOD;
         return $config;
     }
 
-    /*
-     * This method is used to generate an autoload classmap when a new phing
-    * version is added to the framework
-    */
-    private function generatePhingAutoloadClassMap()
-    {
-        $phing_base = $this->configuration->getThirdPartyDir() . DS . 'phing';
-
-        $class_dirs = array($phing_base . DS . 'classes');
-        $cache_filename = $phing_base . DS . 'autoload.php';
-        $class_cache_var_name = 'phing_classmap';
-        $class_cache_version_var_name = 'phing_class_ver';
-        $t = new lcAutoloadCacheTool($class_dirs, $cache_filename, $class_cache_var_name, $class_cache_version_var_name);
-        $t->setWriteBasePath(false);
-        $t->createCache();
-    }
-
     public function phingAutoloadClass($class_name)
     {
         if (!$this->phing_autoload_cache) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            /** @noinspection PhpIncludeInspection */
             require_once($this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'autoload.php');
             $phing_classmap = isset($phing_classmap) ? $phing_classmap : null;
             $this->phing_autoload_cache = $phing_classmap;
@@ -1222,12 +1206,14 @@ EOD;
         $path = isset($phing_classmap[$class_name]) ? $phing_classmap[$class_name] : null;
 
         if ($path) {
+            /** @noinspection PhpIncludeInspection */
             include_once($path);
         }
     }
 
     private function initPropelGenerator()
     {
+        /** @noinspection PhpUndefinedMethodInspection */
         set_include_path(get_include_path() . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'lib' . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'classes');
 
         // register phing autoload file
@@ -1243,16 +1229,27 @@ EOD;
         require_once 'phing/system/util/Properties.php';
         require_once('phing/listener/AnsiColorLogger.php');*/
 
+        /** @noinspection PhpIncludeInspection */
         require_once 'task/PropelOMTask.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5PeerBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5ExtensionPeerBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5ExtensionObjectBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5TableMapBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5ObjectBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/QueryBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'platform/MysqlPlatform.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'reverse/mysql/MysqlSchemaParser.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/sql/DataSQLBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/sql/mysql/MysqlDataSQLBuilder.php';
 
         //require_once($propel_dir . DS .
@@ -1263,10 +1260,12 @@ EOD;
     {
         $request = $this->getRequest();
 
+        /** @noinspection PhpUndefinedMethodInspection */
         $projectPath = $this->configuration->getRootDir() . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'propel';
 
         $wd = $work_dir ? $work_dir : (realpath($this->work_dir) . DS);
 
+        /** @noinspection PhpUndefinedMethodInspection */
         $properties = array(
             'propel.output.dir' => $this->configuration->getAppRootDir(),
             'propel.schema.xsd.file' => $projectPath . DS . 'resources/xsd/database.xsd',
@@ -1324,6 +1323,7 @@ EOD;
             }
         }
 
+        /** @noinspection PhpUndefinedMethodInspection */
         if ($this->configuration->isDebugging()) {
             $args[] = '-debug';
             //$args[] = '-verbose';
@@ -1337,10 +1337,12 @@ EOD;
 
         if ($request->getIsSilent()) {
             $args[] = '-logfile';
+            /** @noinspection PhpUndefinedMethodInspection */
             $args[] = $this->configuration->getLogDir() . DS . 'propel-phing.log';
         }
 
         $args[] = '-f';
+        /** @noinspection PhpUndefinedMethodInspection */
         $args[] = $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'build.xml';
 
         $args[] = $cmd;
@@ -1349,10 +1351,6 @@ EOD;
         if (!$db_conf['propel.project']) {
             throw new lcSystemException('You must set the datasource name in databases.yml (propel.project)');
         }
-
-        $captured_errors = array();
-        $exit_code = 1;
-        $success = false;
 
         try {
             $php_output = $request->getIsSilent() ? fopen('/dev/null', 'w') : fopen('php://output', 'w');
@@ -1381,12 +1379,8 @@ EOD;
             $success = true;
             $exit_code = 0;
         } catch (Exception $e) {
-            $success = false;
-            $exit_code = 1;
 
             $this->phing_has_error = true;
-
-            $captured_errors = Phing::getCapturedPhpErrors();
 
             throw new lcSystemException('Phing command failed: ' . $e->getMessage() . ' (' . implode(' ', $args) . ')', $e->getCode(), $e);
         }

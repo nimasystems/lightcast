@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: iProvidesCapabilities.class.php 1592 2015-05-22 13:28:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1592 $
- */
 interface iProvidesCapabilities
 {
     /**

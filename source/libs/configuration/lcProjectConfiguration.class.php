@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcProjectConfiguration.class.php 1489 2013-12-12 14:27:36Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1489 $
- */
 class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels, iSupportsDbModelOperations,
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
@@ -393,11 +386,39 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         assert($this->config_version);
     }
 
+    private $is_lc15_targeting;
+    private $_is_lc15_targeting_checked;
+
+    public function isTargetingLC15()
+    {
+        if (!$this->_is_lc15_targeting_checked) {
+            $target_version = $this->getTargetFrameworkVersion();
+
+            if ($target_version) {
+                $this->is_lc15_targeting = version_compare($target_version, '1.5', '>=');
+            }
+
+            $this->_is_lc15_targeting_checked = true;
+        }
+
+        return $this->is_lc15_targeting;
+    }
+
+    public function getTargetFrameworkVersion()
+    {
+        return null;
+    }
+
+    public function getMinimumFrameworkVersion()
+    {
+        return null;
+    }
+
     public function getVersion()
     {
-        return $this->getMajorVersion() . '.' .
-        $this->getMinorVersion() . '.' .
-        $this->getBuildVersion() . '.' .
+        return $this->getMajorVersion() . ' . ' .
+        $this->getMinorVersion() . ' . ' .
+        $this->getBuildVersion() . ' . ' .
         $this->getRevisionVersion();
     }
 

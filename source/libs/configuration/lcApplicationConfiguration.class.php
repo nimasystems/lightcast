@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,15 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcApplicationConfiguration.class.php 1472 2013-11-16 14:30:20Z
- * mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1552 $
- */
 abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
 {
     protected $project_configuration;
@@ -286,7 +278,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // default unique id is composed of project_name, application_name,
         // is_debugging setting
         // it is used as the unique cache key
-        $ret = $this->getProjectName() . ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) . $this->getEnvironment() . $this->getConfigEnvironment() . ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) . ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+        $ret = $this->getProjectName() .
+            ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
+            $this->getEnvironment() .
+            $this->getConfigEnvironment() .
+            ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
+            $this->project_configuration->getProjectDir() .
+            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
         $ret = md5($ret);
 
@@ -298,7 +296,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // default unique id is composed of project_name, application_name,
         // is_debugging setting
         // it is used as the unique cache key
-        $ret = $this->getProjectAppName($this->getApplicationName()) . ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) . $this->getEnvironment() . $this->getConfigEnvironment() . ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) . ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+        $ret = $this->getProjectAppName($this->getApplicationName()) .
+            ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
+            $this->getEnvironment() .
+            $this->getConfigEnvironment() .
+            ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
+            $this->project_configuration->getProjectDir() .
+            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
         $ret = md5($ret);
 

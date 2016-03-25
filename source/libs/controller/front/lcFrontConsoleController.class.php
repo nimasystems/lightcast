@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFrontConsoleController.class.php 1493 2013-12-17 11:27:04Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1493 $
- */
 class lcFrontConsoleController extends lcFrontController
 {
     /** @var lcConsoleResponse */

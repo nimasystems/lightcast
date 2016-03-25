@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,17 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- *
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcApp.class.php 1491 2013-12-14 10:25:23Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1491 $
- * @method lcPluginManager getPluginManager
- * @method lcController getController
- */
 class lcApp extends lcObj
 {
     const FRAMEWORK_CACHE_FILENAME = 'source/assets/misc/autoload/autoload.php';
@@ -537,6 +527,22 @@ class lcApp extends lcObj
 
         /** @var lcProjectConfiguration $project_configuration */
         $project_configuration = $configuration->getProjectConfiguration();
+
+        // verify if the target / minimum versions are met
+        $target_version = $project_configuration->getTargetFrameworkVersion();
+        $minimum_version = $project_configuration->getMinimumFrameworkVersion();
+
+        if ($target_version) {
+            if (version_compare($target_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        if ($minimum_version) {
+            if (version_compare($minimum_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
 
         // assign the configuration to be the delegate of the app
         // if it implements iAppDelegate and the current delegate is null

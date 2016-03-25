@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcDataView.class.php 1506 2014-03-24 08:20:58Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1506 $
- */
 class lcDataView extends lcRawContentView
 {
     public function getViewContent()

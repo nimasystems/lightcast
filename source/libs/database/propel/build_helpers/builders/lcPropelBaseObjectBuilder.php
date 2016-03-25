@@ -43,4 +43,40 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         return null;
     }
 
+    /**
+     * Adds setter method for "normal" columns.
+     *
+     * This is a fix for converting decimals to string while on a locale different than C (floating point value gets lost)
+     * @param string &$script The script will be modified in this method.
+     * @param Column $col The current column.
+     *
+     * @see        parent::addColumnMutators()
+     */
+    protected function addDefaultMutator(&$script, Column $col)
+    {
+        $clo = strtolower($col->getName());
+
+        $this->addMutatorOpen($script, $col);
+
+        // Perform type-casting to ensure that we can use type-sensitive
+        // checking in mutators.
+        if ($col->isPhpPrimitiveType()) {
+            $script .= "
+        if (\$v !== null && is_numeric(\$v)) {
+            \$prev_locale = setlocale(LC_NUMERIC, 0);
+            setlocale(LC_NUMERIC, 'C');
+            \$v = (" . $col->getPhpType() . ") \$v;
+            setlocale(LC_NUMERIC, \$prev_locale);
+        }
+";
+        }
+
+        $script .= "
+        if (\$this->$clo !== \$v) {
+            \$this->$clo = \$v;
+            \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ";
+        }
+";
+        $this->addMutatorClose($script, $col);
+    }
 }

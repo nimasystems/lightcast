@@ -20,15 +20,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package FileCategory
- * @subpackage FileSubcategory
- * @changed $Id: bootstrap.php 1592 2015-05-22 13:28:31Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1592 $
- */
-
 // setup proper initial error reporting before booting
 if (defined('DO_DEBUG')) {
     // Enable showing all errors until app boots
@@ -53,12 +44,6 @@ define('LC_VER_MINOR', 5);
 define('LC_VER_BUILD', 1);
 define('LC_VER_REVISION', 1469);
 define('LC_VER', LIGHTCAST_VER);
-
-// verify if an older app is trying to boot into the framework
-if (defined('APP_VER') && version_compare(APP_VER, LIGHTCAST_VER, '<=')) {
-    echo 'The application is too old to run on Lightcast ' . LC_VER . '. It must be upgraded first.';
-    exit(2);
-}
 
 // check min allowed framework version
 if (defined('MIN_LC_VER')) {

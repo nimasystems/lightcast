@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcErrorHandler.class.php 1565 2015-01-28 21:26:30Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1565 $
- */
 class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iErrorHandler
 {
     const AJAX_REQUEST_CONTENT_TYPE = 'application/json';

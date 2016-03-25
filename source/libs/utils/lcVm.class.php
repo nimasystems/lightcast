@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -22,14 +23,6 @@
 
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcVm.class.php 1570 2015-02-06 09:56:05Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1570 $
- */
 class lcVm
 {
     // file_put_contents emulation

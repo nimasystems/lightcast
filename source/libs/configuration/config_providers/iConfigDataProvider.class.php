@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -21,15 +22,6 @@
 
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: iConfigDataProvider.class.php 1455 2013-10-25 20:29:31Z
- * mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1473 $
- */
 interface iConfigDataProvider
 {
     public function readConfigData($config_key, array $options = null);

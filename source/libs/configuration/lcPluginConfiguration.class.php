@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -21,15 +22,6 @@
 
  */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcPluginConfiguration.class.php 1455 2013-10-25 20:29:31Z
- * mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1589 $
- */
 class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
@@ -180,11 +172,45 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     /**
      * @return string
+     * @deprecated use getIdentifier()
      */
     public function getPluginIdentifier()
     {
         // subclassers may override this method to return the GUID identifier of
         // the plugin
+        return null;
+    }
+
+    public function getIdentifier()
+    {
+        throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));
+    }
+
+    private $is_lc15_targeting;
+    private $_is_lc15_targeting_checked;
+
+    public function isTargetingLC15()
+    {
+        if (!$this->_is_lc15_targeting_checked) {
+            $target_version = $this->getTargetFrameworkVersion();
+
+            if ($target_version) {
+                $this->is_lc15_targeting = version_compare($target_version, '1.5', '>=');
+            }
+
+            $this->_is_lc15_targeting_checked = true;
+        }
+
+        return $this->is_lc15_targeting;
+    }
+
+    public function getTargetFrameworkVersion()
+    {
+        return null;
+    }
+
+    public function getMinimumFrameworkVersion()
+    {
         return null;
     }
 
@@ -234,6 +260,39 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         // subclassers may override this method to return the revision version of
         // the plugin
         return 0;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getImplements()
+    {
+        // subclassers may override this method to return custom class names which the plugin implements
+    }
+
+    /**
+     * @param array|string $interface_name
+     * @return bool
+     */
+    public function testIfImplements($interface_name)
+    {
+        if (!is_array($interface_name)) {
+            return ($this instanceof $interface_name || in_array($interface_name, (array)$this->getImplements()));
+        } else {
+            $implements_all = true;
+
+            foreach ($interface_name as $class_name) {
+                $implements_all = ($this instanceof $class_name || in_array($class_name, (array)$this->getImplements()));
+
+                if (!$implements_all) {
+                    break;
+                }
+
+                unset($class_name);
+            }
+
+            return $implements_all;
+        }
     }
 
     /**

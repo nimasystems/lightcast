@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcFrontWebServiceController.class.php 1562 2014-11-12 12:19:20Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1562 $
- */
 class lcFrontWebServiceController extends lcFrontWebController
 {
     const XLC_APILEVEL_HEADER_NAME = 'X-LC-Api-Level';

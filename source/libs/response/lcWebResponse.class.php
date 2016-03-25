@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -20,14 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-/**
- * File Description
- * @package File Category
- * @subpackage File Subcategory
- * @changed $Id: lcWebResponse.class.php 1536 2014-06-09 11:56:08Z mkovachev $
- * @author $Author: mkovachev $
- * @version $Revision: 1536 $
- */
 class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 {
     const TR_MULTILINE_DETECT_REP = '-----rtn----';
@@ -62,6 +55,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $js_at_end_forced;
     protected $css_at_end_forced;
     protected $javascripts_async;
+    protected $no_scripts;
     /**
      * @var array
      */
@@ -102,6 +96,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $allow_metatags;
     protected $content_lang;
     protected $htmlver;
+    protected $clientside_js;
 
     protected $content_url;
     protected $content_hreflangs;
@@ -139,6 +134,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->js_at_end_forced = (bool)$this->configuration['view.javascripts_at_end'];
         $this->css_at_end_forced = (bool)$this->configuration['view.stylesheets_at_end'];
         $this->javascripts_async = (bool)$this->configuration['view.javascripts_async'];
+        $this->no_scripts = (bool)$this->configuration['view.no_scripts'];
 
         // dir
         $this->lang_dir = (string)$this->configuration['view.dir'];
@@ -148,6 +144,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->allow_stylesheets = (bool)$this->configuration['view.allow_stylesheets'];
         $this->allow_rss_feeds = (bool)$this->configuration['view.allow_rss_feeds'];
         $this->allow_metatags = (bool)$this->configuration['view.allow_metatags'];
+
+        $this->clientside_js = (bool)$this->configuration['view.clientside_js'];
 
         unset($js_path);
     }
@@ -436,10 +434,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (!is_resource($content)) {
             // disable all scripts
             if ($this->content_type == 'text/html') {
-                $no_scripts = (bool)$this->configuration['view.no_scripts'];
-
-                if ($no_scripts) {
-                    $content = preg_replace("/\<script(.*?)\<\/script\>/i", '', $content);
+                if ($this->no_scripts) {
+                    $content = preg_replace("#<script(.*?)>(.*?)</script>#is", '', $content);
                 }
             }
 
@@ -641,14 +637,26 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         unset($javascripts);
 
-        // javascript code
-        $jscode = $this->javascript_code;
+        if (!$this->no_scripts) {
+            // javascript code
+            $jscode = $this->javascript_code;
 
-        if ($jscode) {
-            $this->html_body_custom['end'][] = lcTagScript::create()
-                ->setContent($this->javascript_code)
-                ->toString();
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.send_response_javascript_code', $this, array()), $jscode);
+
+            if ($event->isProcessed()) {
+                $jscode = $event->getReturnValue();
+            }
+
+            unset($event);
+
+            if ($jscode) {
+                $this->html_body_custom['end'][] = lcTagScript::create()
+                    ->setContent($jscode)
+                    ->toString();
+            }
         }
+
 
         // rss feeds
         $rssfeeds = $this->rssfeeds;
@@ -666,18 +674,20 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         unset($rssfeeds);
 
-        // google analytics
-        $google_analytics = (string)$this->configuration['view.google_analytics'];
+        if (!$this->no_scripts) {
+            // google analytics
+            $google_analytics = (string)$this->configuration['view.google_analytics'];
 
-        if ($google_analytics) {
-            $this->html_body_custom['end'][] = lcTagScript::create()
-                ->setContent('var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            if ($google_analytics) {
+                $this->html_body_custom['end'][] = lcTagScript::create()
+                    ->setContent('var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
 					document.write(unescape("%3Cscript src=\'" + gaJsHost + "google-analytics.com/ga.js\' type=\'text/javascript\'%3E%3C/script%3E"));
 					try {
 					var pageTracker = _gat._getTracker("' . $google_analytics . '");
 							pageTracker._trackPageview();
 		            } catch(err) {}')
-                ->toString();
+                    ->toString();
+            }
         }
 
         // custom body end
@@ -1362,14 +1372,31 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     * the script will silently stop
     */
 
-    public function customHeadHtml($start = null, $end = null)
+    public function customHeadHtml($start = null, $end = null, $tag = null, $is_javascript = false)
     {
-        $this->html_head_custom[] = array('start' => $start, 'end' => $end);
+        if ($is_javascript && $this->clientside_js) {
+            return false;
+        }
+
+        $this->html_head_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
+
+        return null;
     }
 
-    public function customBodyHtml($start = null, $end = null)
+    public function customBodyHtml($start = null, $end = null, $tag = null, $is_javascript = false)
     {
-        $this->html_body_custom[] = array('start' => $start, 'end' => $end);
+        if ($is_javascript && $this->clientside_js) {
+            return false;
+        }
+
+        $this->html_body_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
+
+        return null;
+    }
+
+    public function addBodyJavascript($code, $tag = null)
+    {
+        $this->customBodyHtml(null, $code, $tag, true);
     }
 
     public function setCookie(lcCookie $cookie)
@@ -1685,7 +1712,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function setDate($date)
     {
-        return $this->custom_headers->set('Date', $date);
+        $this->custom_headers->set('Date', $date);
     }
 
     /*
