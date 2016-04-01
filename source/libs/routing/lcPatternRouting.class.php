@@ -485,6 +485,19 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $prefix = isset($this->context['prefix']) ? $this->context['prefix'] : null;
         $ret = $prefix . $ret;
 
+        $evn = $this->event_dispatcher->filter(new lcEvent('router.generate_url', $this, array(
+            'url' => $ret,
+            'params' => $params,
+            'absolute' => $absolute,
+            'route_name' => $name,
+            'prefix' => $prefix,
+            'context' => $this->context
+        ), false), $ret);
+
+        if ($evn->isProcessed()) {
+            $ret = $evn->getReturnValue();
+        }
+
         return $ret;
     }
 

@@ -81,6 +81,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     protected $is_disabled;
     protected $is_hidden;
     protected $is_required;
+    protected $is_read_only;
 
     protected $id_prefix;
     protected $name_suffix;
@@ -407,6 +408,17 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->is_disabled;
     }
 
+    public function setIsReadOnly($read_only)
+    {
+        $this->is_read_only = $read_only;
+        return $this;
+    }
+
+    public function getIsReadOnly()
+    {
+        return $this->is_read_only;
+    }
+
     public function getIsEnabled()
     {
         return !$this->getIsDisabled();
@@ -512,6 +524,10 @@ abstract class lcBaseActionFormWidget extends lcObj
 
         if (isset($options['disabled'])) {
             $this->is_disabled = $options['disabled'];
+        }
+
+        if (isset($options['readonly'])) {
+            $this->is_read_only = $options['readonly'];
         }
 
         if (isset($options['hidden'])) {
