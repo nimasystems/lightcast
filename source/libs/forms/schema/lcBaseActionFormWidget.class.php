@@ -73,7 +73,7 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     protected $placeholder;
 
-    protected $default_value;
+    protected $default_data;
 
     /** @var array|null */
     protected $constraints;
@@ -215,14 +215,33 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    /**
+     * @return mixed
+     * @deprecated use getDefaultData
+     */
     public function getDefaultValue()
     {
-        return $this->default_value;
+        return $this->getDefaultData();
     }
 
-    public function setDefaultValue($default_value)
+    /**
+     * @param null $default_data
+     * @return lcBaseActionFormWidget
+     * @deprecated use setDefaultData
+     */
+    public function setDefaultValue($default_data = null)
     {
-        $this->default_value = $default_value;
+        return $this->setDefaultData($default_data);
+    }
+
+    public function getDefaultData()
+    {
+        return $this->default_data;
+    }
+
+    public function setDefaultData($default_data = null)
+    {
+        $this->default_data = $default_data;
         return $this;
     }
 
