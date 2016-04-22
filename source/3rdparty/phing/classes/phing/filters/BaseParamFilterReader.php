@@ -1,9 +1,6 @@
 <?php
-
-/*
- *  $Id: BaseParamFilterReader.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+/**
+ * TTHIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
  * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
@@ -27,43 +24,50 @@ include_once 'phing/types/Parameter.php';
 /**
  * Base class for core filter readers.
  *
- * @author    <a href="mailto:yl@seasonfive.com">Yannick Lecaillez</a>
+ * @author    Yannick Lecaillez <yl@seasonfive.com>
  * @copyright 2003 seasonfive. All rights reserved
- * @version   $Id: BaseParamFilterReader.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ *
  * @see       FilterReader
  * @package   phing.filters
  */
-class BaseParamFilterReader extends BaseFilterReader implements Parameterizable {
-    
-    /** The passed in parameter array. */
+class BaseParamFilterReader extends BaseFilterReader implements Parameterizable
+{
+    /**
+     * The passed in parameter array.
+     *
+     * @var array $_parameters
+     */
     protected $_parameters = array();
-    
-    /*
+
+    /**
      * Sets the parameters used by this filter, and sets
      * the filter to an uninitialized status.
-     * 
-     * @param array Array of parameters to be used by this filter.
+     *
+     * @param array $parameters Array of parameters to be used by this filter.
      *              Should not be <code>null</code>.
-    */
-    function setParameters($parameters) {
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    public function setParameters($parameters)
+    {
         // type check, error must never occur, bad code of it does
-        if ( !is_array($parameters) ) {
-            throw new Exception("Expected parameters array got something else");            
+        if (!is_array($parameters)) {
+            throw new Exception("Expected parameters array got something else");
         }
 
         $this->_parameters = $parameters;
         $this->setInitialized(false);
     }
 
-    /*
+    /**
      * Returns the parameters to be used by this filter.
-     * 
-     * @return the parameters to be used by this filter
-    */
-    function &getParameters() {
+     *
+     * @return array the parameters to be used by this filter
+     */
+    public function &getParameters()
+    {
         return $this->_parameters;
     }
 }
-
-

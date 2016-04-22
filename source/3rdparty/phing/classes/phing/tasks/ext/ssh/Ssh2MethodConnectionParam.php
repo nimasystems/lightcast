@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Ssh2MethodConnectionParam.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 121e04668c7aa65d641eb261fb93d3a9ece1e730 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,6 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
-
 
 /**
  * Class that holds parameters for an ssh2_connect $methods parameter
@@ -107,7 +106,11 @@ class Ssh2MethodConnectionParam
             array($this, '_filterParam')
         );
     }
-    
+
+    /**
+     * @param $var
+     * @return bool
+     */
     protected function _filterParam($var)
     {
         return !is_null($var);

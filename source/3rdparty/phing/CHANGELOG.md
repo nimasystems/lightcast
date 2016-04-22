@@ -2,6 +2,316 @@ P     H     I     N     G
 =========================
 
 
+Mar. 10, 2016 - Phing 2.14
+--------------------------
+
+This release contains the following new or improved functionality:
+
+ * Phing can now emit a specific status code on exit after failing
+ * Added IsPropertyTrue/IsPropertyFalse conditions
+ * Added IsWritable / IsReadable selectors
+ * Added GitDescribe task
+ * Added CutDirs mapper
+ * Line breaks in property files on Windows machines fixed
+ * FileSync task now supports excluding multiple files/directories
+ * Various typo and bug fixes, documentation updates
+
+The following tickets were closed in this release:
+
+ * [1245] ExecTask documentation has incorrect escape attribute default value
+ * [1244] phpunit task -- problem when listener depends on bootstrap
+ * [1242] symfonyConsoleTask does not quote path to console
+ * [1241] SymfonyConsoleTask's checkreturn / propertyname are not documented
+ * [1239] ResolvePath just concatenates if "dir" attribute is present
+ * [1237] HttpGetTask should catch HTTP_Request2_Exception, throw BuildException
+ * [1236] version-compare condition typo in documentation
+ * [1235] misworded sentence in documentation
+ * [1234] IsFailure condition always evaluates to TRUE
+ * [1231] JsHintTask fails when filename contains double quotes
+ * [1198] PropertyTask resolving UTF-8 special chars in file attribute
+ * [1194] Update relax-ng schema
+ * [1132] Provide SHA512 sum of all generated archives for a release
+ * [1131] Verification of changelog file fails when your file is in a directory added in your classpathref
+ * [1046] ReplaceTokensWithFile doesn't support begintoken/endtokens with / in them
+
+Dec. 4, 2015 - Phing 2.13
+-------------------------
+
+This release contains the following new or improved functionality:
+
+ * '-listener' command line argument
+ * SSL connections in FtpDeploy task
+ * IsFailure condition
+ * Crap4J PHPUnit formatter
+ * FirstMatch mapper
+ * PhpArrayMapLines filter
+ * NotifySend, Attrib tasks
+ * Json and Xml command line loggers
+ * Property parser now supports YAML files
+ * PHPUnit 5.x supported
+ * PHP 7 fixes
+ * Updated Apigen support
+ * PhpCodeSniffer task can now populate a property with used sniffs
+ * PHPMD and PhpCodeSniffer task can now cache results to speed up
+   subsequent runs
+ * Various typo and bug fixes, documentation updates
+
+The following tickets were closed in this release:
+
+ * [1224] JSHint and space in the path of the workspace (Windows 7)
+ * [1221] Case insensitive switch doesn't work
+ * [1217] Add ability to ignore symlinks in zip task
+ * [1212] Add support for formatters for PhpLoc task
+ * [1187] Disable compression of phing.phar to make it work on hhvm
+
+Aug. 24, 2015 - Phing 2.12
+--------------------------
+
+This release contains the following new or improved functionality:
+
+ * Retry, Tempfile, Inifile tasks
+ * 'keepgoing' command line mode
+ * Fileset support in the Import task
+ * EscapeUnicode, Concat filters
+ * Profile logger
+ * Composite mapper
+ * Various typo and bug fixes
+
+The following tickets were closed in this release:
+
+ * [1208] When UntarTask fails to extract an archive it should tell why
+ * [1207] PackageAsPath Task exists in 2.11, but not in documentation
+ * [1206] WaitFor task has maxwaitunit attribute, not WaitUnit
+ * [1205] Triple "B.37.1 Supported Nested Tags" header
+ * [1204] Wrong type of record task loglevel attribute
+ * [1203] Duplicated doc for Apply task, spawn attribute
+ * [1199] PHPUnitReport task: package name detection no longer works
+ * [1196] Target 'phing.listener.AnsiColorLogger' does not exist in this project.
+ * [1193] There is no native method for manipulating .ini files.
+ * [1191] phing parallel task should handle workers dying unexpectedly
+ * [1190] RegexTask processes backslashes incorrectly
+ * [1189] Coverage Report broken for Jenkins PHP Clover
+ * [1178] Parameter getValue is null when parameter is equal to 0
+ * [1148] phpdoc2 via phar
+
+May 20, 2015 - Phing 2.11
+-------------------------
+
+This release contains the following new or improved functionality:
+
+ * PharData and EchoProperties tasks
+ * 'silent' and 'emacs' command line modes
+ * Improvements to FileHash and FtpDeploy tasks
+ * SuffixLines and Sort filters
+
+The following tickets were closed in this release:
+
+ * [1186] Implement pharLocation attribute for PHP_Depend task
+ * [1185] Implement pharLocation attribute for PHPMD task
+ * [1183] Fatal error in PHPMDTask
+ * [1176] Showwarnings doesn't work
+ * [1170] Allow more than one code standard review for PHP_CodeSniffer.
+ * [1169] Allow for fuzzy parameter for phpcpdPHPCPD
+ * [1162] add depth param to GitCloneTask
+ * [1161] Update phpcpd & phploc tasks to work with phar versions
+ * [1134] Phar version did not provide colorized output
+ * [462] Incremental uploads in ftp deploy task
+
+Feb. 19, 2015 - Phing 2.10.1
+----------------------------
+
+This release fixes the following tickets:
+
+ * [1174] Phing can't work PHPUnit(PHAR)
+ * [1173] [PHP Error] include_once(PHP/PPMD/Renderer/XMLRenderer.php): failed to open stream: No such file or directory
+ * [1171] Socket condition does not work
+
+Feb. 9, 2015 - Phing 2.10.0
+--------------------------
+
+This release contains the following new or improved functionality:
+
+ * 'user.home' property on Windows fixed
+ * Various documentation updates
+ * Added support for listeners configured via phpunit.xml config
+ * Basename task
+ * Dirname task
+ * Diagnostics task
+ * FilesMatch condition
+ * HasFreeSpace condition
+ * PathToFileSet task
+ * PhingVersion task/condition
+ * PropertyRegex task
+ * Recorder task
+ * Socket condition
+ * Xor condition
+
+The following tickets were closed in this release:
+
+ * [1168] PhpCodeSnifferTask incompatible with PHP_CS 2.2.0
+ * [1167] include task can't really have mode
+ * [1163] Phing and PHPMD via composer both
+ * [1160] Documentation lists covereage-report styledir as required.
+ * [1159] phpunit task ignores excludeGroups, groups attributes
+ * [1152] Add socket condition
+ * [1127] Removing .phar from the phar file makes it crash
+ * [1120] Phing 2.8.1 does not support PDepend 2.0
+ * [856]  ZPK Packaging for zend server
+ * [250]  recorder task
+
+Dec. 3, 2014 - Phing 2.9.1
+--------------------------
+
+This releases fixes a Windows regression and adds the following new functionality:
+
+ * Http condition
+ * Switch task
+ * Throw task
+
+The following tickets were closed in this release:
+
+ * [1158] Phing fails to call itself with Exec task
+ * [1157] ZIP task ignores ${phing.dir}
+ * [1156] phing+windows copy file path
+ * [1155] Add http condition
+ * [1154] Can't read version information file
+ * [1147] Resetting Phing::$msgOutputLevel
+
+Nov. 25, 2014 - Phing 2.9.0
+---------------------------
+
+This release contains the following new or improved functionality:
+
+ * Phing now supports HHVM
+ * Stopwatch task added
+ * Unit test coverage increased
+ * Source code formatted to PSR-2
+ * Various bugs and documentation errors fixed
+
+Additionally, the following Trac tickets (see www.phing.info) were fixed in this release:
+
+ * [1151] PHPMD Task does not support the format tag
+ * [1149] Exclude extra files from composer package
+ * [1144] Reduce PhingCall/Foreach log messages
+ * [1140] DefaultLogger is not default logger
+ * [1138] ParallelTask - error in subtask should fail build
+ * [1135] obfuscation-key option for IoncubeEncoderTask does not work
+ * [1133] copytask haltonerror = "false" function failure when source dir not exists
+ * [1130] Add documentation for Manifest task
+ * [1129] ManifestTask md5 hash vs FileHashTask md5 hash not the same
+ * [1128] Imported target won't run until there is one with the same name in main build.xml
+ * [1123] ApplyTask outputProperty doesn't append
+ * [1122] Untar task does not preserve file permissions
+ * [1121] Please fix the syntax error in PHP Lint
+ * [1104] ArchiveComment Parameter for ZipTask
+ * [1095] ReferenceExistsCondition returns true for all UnknownElements
+ * [1089] phing -l is listing imported targets twice
+ * [1086] Support for running on HHVM
+ * [1084] pdepend task does not find dependencies when installed by composer
+ * [1069] PHPUnitTask formatter does not create directory if specified "todir" does not exist
+ * [1068] Phingcall and Import issues
+ * [1040] Composer task has no documentation
+ * [1012] SymlinkTaks overwrite fails if target doesn't exist
+ * [965] includePathTask: Allow appending and replacing
+ * [945] several phpunit task problems
+ * [930] Attribute logoutput to property task
+ * [796] Can't delete all subdirectories without directory itself
+ * [441] Reformat Phing source code to PSR-2
+
+Jul. 18, 2014 - Phing 2.8.2
+---------------------------
+
+This patch release fixes two regressions.
+
+ * [1119] #1111 breaks PHPLint task
+ * [1118] Property "X" was circularly defined.
+
+Jul. 1, 2014 - Phing 2.8.1
+--------------------------
+
+This patch release fixes a regression preventing Phing from
+being used on machines where PEAR is not installed, as well
+as another (unrelated) issue.
+
+ * [1114] PHP Fatal Error using Phing on machines without PEAR
+ * [1111] setting PhpLintTask interpreter
+
+Jun. 30, 2014 - Phing 2.8.0
+---------------------------
+
+New or improved functionality:
+
+ * The rsync task can now handle remote connections without specifying a username
+ * The rsync task now creates remote directories as needed by default
+ * Support for PHP MD 2.*
+ * Various tasks now support dependencies loaded through composer
+ * AutoloaderTask added
+ * Various bugs and documentation errors fixed
+
+Additionally, the following Trac tickets (see www.phing.info) were fixed in this release:
+
+ * [1108] pdosqlexec doesn't throw exception for the non-first SQL instruction
+ * [1106] Add .git and associated files to defaultexcludes attribute
+ * [1105] PHPUnitTask: attributes 'groups' and 'excludeGroups' not documented
+ * [1102] Phing is not compatible with PHPMD 2.0.0 beta
+ * [1101] Add (optional) external deps to suggest section in composer.json
+ * [1100] Add composer / PHAR installation instructions to README & web pages
+ * [1099] Allow loading of externals through composer [meta ticket]
+ * [1091] Phing is not compatible with PHPUnit 4.x
+ * [1090] PearPackageFileSet copies files with baseinstalldir incorrectly
+ * [1085] Conditions section (5.8) does not correctly link to mentioned tasks
+ * [1084] pdepend task does not find dependencies when installed by composer
+ * [980] Support for .dist files
+ * [975] Included JSmin has non-free license
+ * [964] includePathTask: talk about appending/prepending
+
+Feb. 13, 2014 - Phing 2.7.0
+---------------------------
+
+New or improved functionality:
+
+ * Support for PHP CodeSniffer 1.5, PHP Copy&Paste Detector 2.0 and PHPLOC 2.0
+ * Composer support for PHPCPD and PhpDocumentor tasks
+ * Fixed / improved error handling in various places
+ * More unit / regression tests added
+ * Various bugs and documentation errors fixed
+
+Additionally, the following Trac tickets (see www.phing.info) were fixed in this release:
+
+ * [1083] PhpDocumentor2Task: add support for default package name
+ * [1082] Tasks in root target are executed twice
+ * [1081] Documentation of AvailableTask does not link to conditions page
+ * [1078] IoncubeEncoderTask does not support PHP 5.4
+ * [1073] Phing silently died, when cant read build.xml
+ * [1070] PHPCS 1.5.0 breaks PHPCodeSniffer Task
+ * [1064] Formatter 'brief' not implemented when using Unittest task
+ * [1063] PHPCPD 2.0 breaks PHPCPD Task
+ * [1062] AvailableTask throws exception when filepath contains duplicates
+ * [1059] phing exits with return code 0 when there is unknown argument
+ * [1057] pdo exception thrown from pdosqlexec not properly handled
+ * [1056] filesyncTask: problem (error?) with verbose (-v) option
+ * [1054] Missing or erroneous definition in phing-grammar.rng
+ * [1053] Add composer support for phpdoc2 task
+ * [1051] phing 2.6.1 - impossible upgrade
+ * [1045] PHPLocTask broken with recent phploc updates
+ * [1044] Using fileset in echo does not list subdirectories
+ * [1042] Fix UnknownElement wrapping and configuring
+ * [1035] phpcpd tasks does not find dependencies when installed by composer
+ * [1034] Improving debuggability of errors in custom code
+ * [1032] FileSync Port
+ * [1030] JsMin task creates directories with 0700 permissions
+ * [1028] Change visibility of FailTask variables
+ * [1021] MailTask backend configuration
+ * [1010] Invalid error about refid attribute when specifying multiple targets
+ * [1009] certain liquibase tasks (rollback, tag and update) do not check return value
+ * [994] Clarify pdoexec autocommit/transactions
+ * [991] GitCommit: add fileset support
+ * [984] Improve documentation about including custom tasks
+ * [983] Selenium with PHPUnit: browser configurations are not processed
+ * [978] svn switches: recursive
+ * [976] phpunitreport: broken html for test suite names containing "/"
+ * [650] Namespace support for extensions (PSR0 support)
+
 Aug. 27, 2013 - Phing 2.6.1
 ---------------------------
 
@@ -230,7 +540,7 @@ Nov. 2, 2011 - Phing 2.4.8
   * [799] DbDeploy does not support pdo-dblib
   * [798] ReplaceTokensWithFile - postfix attribute ignored
   * [797] PhpLintTask performance improvement
-  * [794] Fix rSTTask to avoid the need of PEAR everytime
+  * [794] Fix rSTTask to avoid the need of PEAR every time
   * [793] Corrected spelling of name
   * [792] EchoTask: Fileset support
   * [789] rSTTask unittests fix
@@ -335,7 +645,7 @@ and adds several new tasks (SVN log/list, DocBlox and LoadFile).
   * [668] Empty Default Value Behaves Like the Value is not set
   * [667] Document how symbolic links and hidden files are treated in copy task
   * [663] __toString for register slots
-  * [662] Hiding the command that is excecuted with "ExecTask"
+  * [662] Hiding the command that is executed with "ExecTask"
   * [659] optionally skip version check in codesniffer task
   * [654] fileset not selecting folders
   * [652] PDOSQLExec task doesn't close the DB connection before throw an exception or at the end of the task.
@@ -611,12 +921,12 @@ Sep. 14, 2009 - Phing 2.4.0 RC1
   * [246] Phing test brocken but no failure entry if test case class has no test method
   * [245] TAR task
   * [243] Delete task won't delete all files
-  * [240] phing test succesful while phpunit test is broken
+  * [240] phing test successful while phpunit test is broken
   * [233] Separate docs from phing package
   * [231] File::exists() returns false on *existing* but broken symlinks
   * [229] CopyTask shoul accept filelist subelement
   * [226] <move> task doesn't support filters
-  * [222] Terminal output dissapears and/or changes color
+  * [222] Terminal output disappears and/or changes color
   * [221] Support for copying symlinks as is
   * [212] Make file perms configurable in copy task
   * [209] Cache the results of PHPLintTask so as to not check unmodified files

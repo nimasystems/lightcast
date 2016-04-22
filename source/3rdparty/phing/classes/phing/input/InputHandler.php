@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: InputHandler.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 5f69c44b818429e2fc92b8cb00e8971fcd6dce67 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,10 +24,11 @@
  * Plugin to Phing to handle requests for user input.
  *
  * @author Stefan Bodewig <stefan.bodewig@epost.de>
- * @version $Id: InputHandler.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 5f69c44b818429e2fc92b8cb00e8971fcd6dce67 $
  * @package phing.input
  */
-interface InputHandler {
+interface InputHandler
+{
 
     /**
      * Handle the request encapsulated in the argument.
@@ -37,9 +38,9 @@ interface InputHandler {
      *
      * <p>Postcondition: request.getInput will return a non-null
      * value, request.isInputValid will return true.</p>
+     * @param InputRequest $request
      * @return void
-     * @throws BuildException
      */
     public function handleInput(InputRequest $request);
-    
+
 }

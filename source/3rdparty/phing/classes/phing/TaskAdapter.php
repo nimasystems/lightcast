@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: TaskAdapter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 66a06bb5f7df99f501c5fe7d427c39d7ea661051 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,22 +27,26 @@ require_once 'phing/Task.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: TaskAdapter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 66a06bb5f7df99f501c5fe7d427c39d7ea661051 $
  * @package   phing
  */
-class TaskAdapter extends Task {
-    
+class TaskAdapter extends Task
+{
+
     /** target object */
     private $proxy;
-    
+
     /**
      * Main entry point.
+     * @throws BuildException
+     * @throws Exception
      * @return void
      */
-    function main() {
-    
+    public function main()
+    {
+
         if (method_exists($this->proxy, "setProject")) {
-            try {  // try to set project
+            try { // try to set project
                 $this->proxy->setProject($this->project);
             } catch (Exception $ex) {
                 $this->log("Error setting project in " . get_class($this->proxy) . Project::MSG_ERR);
@@ -51,26 +55,30 @@ class TaskAdapter extends Task {
         } else {
             throw new Exception("Error setting project in class " . get_class($this->proxy));
         }
-               
+
         if (method_exists($this->proxy, "main")) {
             try { //try to call main
                 $this->proxy->main($this->project);
+            } catch (BuildException $be) {
+                throw $be;
             } catch (Exception $ex) {
                 $this->log("Error in " . get_class($this->proxy), Project::MSG_ERR);
-                $this->log($ex->getTraceAsString(), Project::MSG_DEBUG);
-                throw new BuildException($ex->getMessage());
+                throw new BuildException("Error in " . get_class($this->proxy), $ex);
             }
         } else {
-            throw new BuildException("Your task-like class '" . get_class($this->proxy) ."' does not have a main() method");
+            throw new BuildException("Your task-like class '" . get_class(
+                    $this->proxy
+                ) . "' does not have a main() method");
         }
     }
 
     /**
      * Set the target object.
-     * @param object $o
+     * @param  object $o
      * @return void
      */
-    function setProxy($o) {
+    public function setProxy($o)
+    {
         $this->proxy = $o;
     }
 
@@ -78,7 +86,8 @@ class TaskAdapter extends Task {
      * Gets the target object.
      * @return object
      */
-    function getProxy() {
+    public function getProxy()
+    {
         return $this->proxy;
     }
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: EchoTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: c6629f7d06eb05a6f89fe92917286e370512e787 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 include_once 'phing/Task.php';
 
 /**
@@ -26,29 +26,40 @@ include_once 'phing/Task.php';
  *
  * @author   Michiel Rook <mrook@php.net>
  * @author   Andreas Aderhold, andi@binarycloud.com
- * @version  $Id: EchoTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: c6629f7d06eb05a6f89fe92917286e370512e787 $
  * @package  phing.tasks.system
  */
-class EchoTask extends Task {
-    
+class EchoTask extends Task
+{
+
     protected $msg = "";
-    
+
     protected $file = "";
-    
+
     protected $append = false;
-    
+
     protected $level = "info";
 
     protected $filesets = array();
 
-    function main() {       
-        switch ($this->level)
-        {
-            case "error": $loglevel = Project::MSG_ERR; break;
-            case "warning": $loglevel = Project::MSG_WARN; break;
-            case "info": $loglevel = Project::MSG_INFO; break;
-            case "verbose": $loglevel = Project::MSG_VERBOSE; break;
-            case "debug": $loglevel = Project::MSG_DEBUG; break;
+    public function main()
+    {
+        switch ($this->level) {
+            case "error":
+                $loglevel = Project::MSG_ERR;
+                break;
+            case "warning":
+                $loglevel = Project::MSG_WARN;
+                break;
+            case "info":
+                $loglevel = Project::MSG_INFO;
+                break;
+            case "verbose":
+                $loglevel = Project::MSG_VERBOSE;
+                break;
+            case "debug":
+                $loglevel = Project::MSG_DEBUG;
+                break;
         }
 
         if (count($this->filesets)) {
@@ -57,24 +68,18 @@ class EchoTask extends Task {
             }
             $this->msg .= $this->getFilesetsMsg();
         }
-        
-        if (empty($this->file))
-        {
+
+        if (empty($this->file)) {
             $this->log($this->msg, $loglevel);
-        }
-        else
-        {
-            if ($this->append)
-            {
+        } else {
+            if ($this->append) {
                 $handle = fopen($this->file, "a");
-            }
-            else
-            {
+            } else {
                 $handle = fopen($this->file, "w");
             }
-            
+
             fwrite($handle, $this->msg);
-            
+
             fclose($handle);
         }
     }
@@ -90,10 +95,15 @@ class EchoTask extends Task {
         $msg = '';
         foreach ($this->filesets as $fs) {
             $ds = $fs->getDirectoryScanner($project);
-            $fromDir  = $fs->getDir($project);
+            $fromDir = $fs->getDir($project);
+            $srcDirs = $ds->getIncludedDirectories();
             $srcFiles = $ds->getIncludedFiles();
             $msg .= 'Directory: ' . $fromDir . ' => '
                 . realpath($fromDir) . "\n";
+            foreach ($srcDirs as $dir) {
+                $relPath = $fromDir . DIRECTORY_SEPARATOR . $dir;
+                $msg .= $relPath . "\n";
+            }
             foreach ($srcFiles as $file) {
                 $relPath = $fromDir . DIRECTORY_SEPARATOR . $file;
                 $msg .= $relPath . "\n";
@@ -102,37 +112,51 @@ class EchoTask extends Task {
 
         return $msg;
     }
-    
-    /** setter for file */
-    function setFile($file)
+
+    /** setter for file
+     * @param $file
+     */
+    public function setFile($file)
     {
         $this->file = (string) $file;
     }
 
-    /** setter for level */
-    function setLevel($level)
+    /** setter for level
+     * @param $level
+     */
+    public function setLevel($level)
     {
         $this->level = (string) $level;
     }
 
-    /** setter for append */
-    function setAppend($append)
+    /** setter for append
+     * @param $append
+     */
+    public function setAppend($append)
     {
         $this->append = $append;
     }
 
-    /** setter for message */
-    function setMsg($msg) {
+    /** setter for message
+     * @param $msg
+     */
+    public function setMsg($msg)
+    {
         $this->setMessage($msg);
     }
 
-    /** alias setter */
-    function setMessage($msg) {
+    /** alias setter
+     * @param $msg
+     */
+    public function setMessage($msg)
+    {
         $this->msg = (string) $msg;
     }
-    
-    /** Supporting the <echo>Message</echo> syntax. */
-    function addText($msg)
+
+    /** Supporting the <echo>Message</echo> syntax.
+     * @param $msg
+     */
+    public function addText($msg)
     {
         $this->msg = (string) $msg;
     }

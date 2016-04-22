@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPMDFormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: fa23de508582a5bc1d36fab6153d64df333099c6 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/system/io/PhingFile.php';
  *
  * @package phing.tasks.ext.phpmd
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: PHPMDFormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: fa23de508582a5bc1d36fab6153d64df333099c6 $
  * @since   2.4.1
  */
 class PHPMDFormatterElement
@@ -42,6 +42,11 @@ class PHPMDFormatterElement
      * @var string
      */
     protected $type = "";
+
+    /**
+     * @var string
+     */
+    protected $className = "";
 
     /**
      * Whether to use file (or write output to phing log).
@@ -62,27 +67,26 @@ class PHPMDFormatterElement
      *
      * @param string $type Type of the formatter
      *
-     * @return void
+     * @throws BuildException
      */
     public function setType($type)
     {
         $this->type = $type;
-
         switch ($this->type) {
-        case 'xml':
-            include_once 'PHP/PMD/Renderer/XMLRenderer.php';
-            break;
+            case 'xml':
+                $this->className = 'XMLRenderer';
+                break;
 
-        case 'html':
-            include_once 'PHP/PMD/Renderer/HTMLRenderer.php';
-            break;
+            case 'html':
+                $this->className = 'HTMLRenderer';
+                break;
 
-        case 'text':
-            include_once 'PHP/PMD/Renderer/TextRenderer.php';
-            break;
+            case 'text':
+                $this->className = 'TextRenderer';
+                break;
 
-        default:
-            throw new BuildException("Formatter '" . $this->type . "' not implemented");
+            default:
+                throw new BuildException('Formatter "' . $this->type . '" not implemented');
         }
     }
 
@@ -100,12 +104,10 @@ class PHPMDFormatterElement
      * Set whether to write formatter results to file or not.
      *
      * @param boolean $useFile True or false.
-     *
-     * @return void
      */
     public function setUseFile($useFile)
     {
-        $this->useFile = (boolean) $useFile;
+        $this->useFile = StringHelper::booleanValue($useFile);
     }
 
     /**
@@ -122,8 +124,6 @@ class PHPMDFormatterElement
      * Sets the output file for the formatter results.
      *
      * @param PhingFile $outfile The output file
-     *
-     * @return void
      */
     public function setOutfile(PhingFile $outfile)
     {
@@ -144,26 +144,21 @@ class PHPMDFormatterElement
      * Creates a report renderer instance based on the formatter type.
      *
      * @return PHP_PMD_AbstractRenderer
-     * @throws BuildException When the specified renderer does not exist.
+     * @throws BuildException           When the specified renderer does not exist.
      */
     public function getRenderer()
     {
-        switch ($this->type) {
-        case 'xml':
-            $renderer = new PHP_PMD_Renderer_XMLRenderer();
-            break;
-
-        case 'html':
-            $renderer = new PHP_PMD_Renderer_HTMLRenderer();
-            break;
-
-        case 'text':
-            $renderer = new PHP_PMD_Renderer_TextRenderer();
-            break;
-
-        default:
-            throw new BuildException("PHP_MD renderer '" . $this->type . "' not implemented");
+        if (!class_exists('\\PHPMD\\Writer\\StreamWriter')) {
+            $renderClass = 'PHP_PMD_RENDERER_' . $this->className;
+            $writerClass = 'PHP_PMD_Writer_Stream';
+            include_once 'PHP/PMD/Renderer/' . $this->className . '.php';
+            include_once 'PHP/PMD/Writer/Stream.php';
+        } else {
+            $renderClass = 'PHPMD\Renderer\\' . $this->className;
+            $writerClass = '\PHPMD\Writer\StreamWriter';
         }
+
+        $renderer = new $renderClass();
 
         // Create a report stream
         if ($this->getUseFile() === false || $this->getOutfile() === null) {
@@ -172,9 +167,7 @@ class PHPMDFormatterElement
             $stream = fopen($this->getOutfile()->getAbsoluteFile(), 'wb');
         }
 
-        require_once 'PHP/PMD/Writer/Stream.php';
-        
-        $renderer->setWriter(new PHP_PMD_Writer_Stream($stream));
+        $renderer->setWriter(new $writerClass($stream));
 
         return $renderer;
     }

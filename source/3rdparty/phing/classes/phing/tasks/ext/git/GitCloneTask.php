@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitCloneTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: ab02e5fd181d7c037a76cc58b9f6a022892e1281 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,20 +18,26 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 /**
  * Wrapper around git-clone
  *
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitCloneTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: ab02e5fd181d7c037a76cc58b9f6a022892e1281 $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.3
  */
 class GitCloneTask extends GitBaseTask
 {
+    /**
+     * Whether --depth key should be set for git-clone
+     * @var int
+     */
+    private $depth = 0;
+
     /**
      * Whether --bare key should be set for git-init
      * @var string
@@ -62,26 +68,91 @@ class GitCloneTask extends GitBaseTask
             throw new BuildException(
                 sprintf(
                     '"%s" target directory is not empty',
-                    $this->getTargetPath())
+                    $this->getTargetPath()
+                )
             );
         }
 
         $client = $this->getGitClient(false, getcwd());
 
         try {
-            $client->createClone(
-                $this->getRepository(), 
-                $this->isBare(), 
-                $this->getTargetPath());
+            if ($this->hasDepth()) {
+                $this->doShallowClone($client);
+            } else {
+                $client->createClone(
+                    $this->getRepository(),
+                    $this->isBare(),
+                    $this->getTargetPath()
+                );
+            }
         } catch (Exception $e) {
             throw new BuildException('The remote end hung up unexpectedly', $e);
         }
 
-        $msg = 'git-clone: cloning ' 
+        $msg = 'git-clone: cloning '
             . ($this->isBare() ? '(bare) ' : '')
-            . '"' . $this->getRepository() .'" repository'
-            . ' to "' . $this->getTargetPath() .'" directory'; 
-        $this->log($msg, Project::MSG_INFO); 
+            . ($this->hasDepth() ? ' (depth="' . $this->getDepth() . '") ' : '')
+            . '"' . $this->getRepository() . '" repository'
+            . ' to "' . $this->getTargetPath() . '" directory';
+        $this->log($msg, Project::MSG_INFO);
+    }
+
+    /**
+     * Create a shallow clone with a history truncated to the specified number of revisions.
+     *
+     * @param VersionControl_Git $client
+     *
+     * @throws VersionControl_Git_Exception
+     */
+    protected function doShallowClone(VersionControl_Git $client)
+    {
+        $command = $client->getCommand('clone')
+            ->setOption('depth', $this->getDepth())
+            ->setOption('q')
+            ->addArgument($this->getRepository())
+            ->addArgument($this->getTargetPath());
+
+        if (is_dir($this->getTargetPath()) && version_compare('1.6.1.4', $client->getGitVersion(), '>=')) {
+            $isEmptyDir = true;
+            $entries = scandir($this->getTargetPath());
+            foreach ($entries as $entry) {
+                if ('.' !== $entry && '..' !== $entry) {
+                    $isEmptyDir = false;
+
+                    break;
+                }
+            }
+
+            if ($isEmptyDir) {
+                @rmdir($this->getTargetPath());
+            }
+        }
+
+        $command->execute();
+    }
+
+    /**
+     * @return int
+     */
+    public function getDepth()
+    {
+        return $this->depth;
+    }
+
+    /**
+     * @param int $depth
+     */
+    public function setDepth($depth)
+    {
+        $this->depth = $depth;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDepth()
+    {
+        return (bool) $this->depth;
     }
 
     /**
@@ -97,7 +168,7 @@ class GitCloneTask extends GitBaseTask
     /**
      * Set path to source repo
      *
-     * @param string $targetPath Path to repository used as source
+     * @param  string $targetPath Path to repository used as source
      * @return void
      */
     public function setTargetPath($targetPath)
@@ -115,14 +186,20 @@ class GitCloneTask extends GitBaseTask
         return $this->getBare();
     }
 
+    /**
+     * @return string
+     */
     public function getBare()
     {
         return $this->isBare;
     }
 
+    /**
+     * @param $flag
+     */
     public function setBare($flag)
     {
-        $this->isBare = (bool)$flag;
+        $this->isBare = (bool) $flag;
     }
 
 }

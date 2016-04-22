@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: VersionTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 3e7c572ae9bdb739905b54e831e3985194d65071 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,7 +30,7 @@ require_once 'phing/Task.php';
  * Resulting version number is also published under supplied property.
  *
  * @author      Mike Wittje <mw@mike.wittje.de>
- * @version     $Id: VersionTask.php 1441 2013-10-08 16:28:22Z mkovachev $ $Rev $Id: VersionTask.php 1441 2013-10-08 16:28:22Z mkovachev $ $Author: mkovachev $
+ * @version     $Id: 3e7c572ae9bdb739905b54e831e3985194d65071 $ $Rev $Id: 3e7c572ae9bdb739905b54e831e3985194d65071 $ $Author$
  * @package     phing.tasks.ext
  */
 class VersionTask extends Task
@@ -60,7 +60,7 @@ class VersionTask extends Task
 
     /**
      * Set Property for Releasetype (Minor, Major, Bugfix)
-     * @param string  $releasetype
+     * @param string $releasetype
      */
     public function setReleasetype($releasetype)
     {
@@ -89,8 +89,8 @@ class VersionTask extends Task
     /**
      * Main-Method for the Task
      *
-     * @return  void
-     * @throws  BuildException
+     * @return void
+     * @throws BuildException
      */
     public function main()
     {
@@ -116,7 +116,7 @@ class VersionTask extends Task
     /**
      * Returns new version number corresponding to Release type
      *
-     * @param string $filecontent
+     * @param  string $filecontent
      * @return string
      */
     private function getVersion($filecontent)
@@ -130,27 +130,35 @@ class VersionTask extends Task
         // Return new version number
         switch ($this->releasetype) {
             case self::RELEASETYPE_MAJOR:
-                $newVersion = sprintf("%d.%d.%d", ++$major,
-                                                  0,
-                                                  0);
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    ++$major,
+                    0,
+                    0
+                );
                 break;
 
             case self::RELEASETYPE_MINOR:
-                $newVersion = sprintf("%d.%d.%d", $major,
-                                                  ++$minor,
-                                                  0);
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    $major,
+                    ++$minor,
+                    0
+                );
                 break;
 
             case self::RELEASETYPE_BUGFIX:
-                $newVersion = sprintf("%d.%d.%d", $major,
-                                                  $minor,
-                                                  ++$bugfix);
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    $major,
+                    $minor,
+                    ++$bugfix
+                );
                 break;
         }
 
         return $newVersion;
     }
-
 
     /**
      * checks releasetype attribute
@@ -171,8 +179,10 @@ class VersionTask extends Task
         );
 
         if (!in_array($this->releasetype, $releaseTypes)) {
-            throw new BuildException(sprintf('Unknown Releasetype %s..Must be one of Major, Minor or Bugfix',
-                                        $this->releasetype), $this->location);
+            throw new BuildException(sprintf(
+                'Unknown Releasetype %s..Must be one of Major, Minor or Bugfix',
+                $this->releasetype
+            ), $this->location);
         }
     }
 
@@ -185,7 +195,8 @@ class VersionTask extends Task
     {
         // check File
         if ($this->file === null ||
-        strlen($this->file) == 0) {
+            strlen($this->file) == 0
+        ) {
             throw new BuildException('You must specify a file containing the version number', $this->location);
         }
 
@@ -210,7 +221,8 @@ class VersionTask extends Task
     private function checkProperty()
     {
         if (is_null($this->property) ||
-            strlen($this->property) === 0) {
+            strlen($this->property) === 0
+        ) {
             throw new BuildException('Property for publishing version number is not set', $this->location);
         }
     }

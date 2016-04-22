@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Arg.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 0e03453bfaa39363850a37e44da2cf435cdf66e6 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once "phing/types/DataType.php";
  *
  * @author nuno costa <nuno@francodacosta.com>
  * @license GPL
- * @version $Id: Arg.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 0e03453bfaa39363850a37e44da2cf435cdf66e6 $
  * @package phing.tasks.ext.symfony
  */
 class Arg extends DataType
@@ -37,7 +37,7 @@ class Arg extends DataType
     private $quotes = false;
 
     /**
-     * Gets the argment name
+     * Gets the argument name
      * @return String
      */
     public function getName()
@@ -85,7 +85,7 @@ class Arg extends DataType
      * Should the argument value be enclosed in double quotes
      * @param boolean $quotes
      */
-    public function setQuotes( $quotes)
+    public function setQuotes($quotes)
     {
         $this->quotes = $quotes;
     }
@@ -102,7 +102,7 @@ class Arg extends DataType
         $quote = $this->getQuotes() ? '"' : '';
 
         if (!is_null($this->getValue())) {
-            $value = $quote . $this->getValue() . $quote ;
+            $value = $quote . $this->getValue() . $quote;
         }
 
         if (!is_null($this->getName())) {
@@ -112,6 +112,7 @@ class Arg extends DataType
         if (strlen($name) > 0 && strlen($value) > 0) {
             $value = '=' . $value;
         }
+
         return $name . $value;
     }
 

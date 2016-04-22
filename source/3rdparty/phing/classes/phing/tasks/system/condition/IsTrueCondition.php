@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: IsTrueCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 31e829a7d42bf922181a32e06d50057ab32afbbf $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,31 +29,34 @@ require_once 'phing/tasks/system/condition/Condition.php';
  * @author Steve Loughran (Ant)
  * @package phing.tasks.system.condition
  */
-class IsTrueCondition extends ProjectComponent implements Condition {
+class IsTrueCondition extends ProjectComponent implements Condition
+{
 
-    /**  
+    /**
      * what we eval
-     */ 
+     */
     private $value;
 
     /**
      * Set the value to be tested.
      * @param boolean $value
-     */ 
-    public function setValue($value) {
+     */
+    public function setValue($value)
+    {
         $this->value = $value;
     }
 
     /**
      * return the inverted value;
      * @throws BuildException if someone forgot to spec a value
-     */ 
-    public function evaluate() {
+     */
+    public function evaluate()
+    {
         if ($this->value === null) {
             throw new BuildException("Nothing to test for falsehood");
         }
+
         return $this->value;
     }
 
 }
-

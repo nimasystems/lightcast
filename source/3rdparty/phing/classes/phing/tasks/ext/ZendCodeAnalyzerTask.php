@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ZendCodeAnalyzerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: d1bcb58746c4f9bb6e63c43e61c9074f511ad456 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,7 +23,7 @@ require_once 'phing/Task.php';
 
 /**
  * ZendCodeAnalyzerTask analyze PHP source code using the ZendCodeAnalyzer included in Zend Studio 5.1
- * 
+ *
  * Available warnings:
  * <b>zend-error</b> - %s(line %d): %s
  * <b>oneline-comment</b> - One-line comment ends with  tag.
@@ -59,26 +59,27 @@ require_once 'phing/Task.php';
  * <b>expr-unused</b> - Expression result is never used
  *
  * @author   Knut Urdalen <knut.urdalen@gmail.com>
- * @version  $Id: ZendCodeAnalyzerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: d1bcb58746c4f9bb6e63c43e61c9074f511ad456 $
  * @package  phing.tasks.ext
  */
 class ZendCodeAnalyzerTask extends Task
 {
     protected $analyzerPath = ""; // Path to ZendCodeAnalyzer binary
-    protected $file = "";  // the source file (from xml attribute)
+    protected $file = ""; // the source file (from xml attribute)
     protected $filesets = array(); // all fileset objects assigned to this task
     protected $counter = 0;
     protected $disable = array();
     protected $enable = array();
 
-    private $haltonwarning = false; 
+    private $haltonwarning = false;
 
     /**
      * File to be analyzed
-     * 
+     *
      * @param PhingFile $file
      */
-    public function setFile(PhingFile $file) {
+    public function setFile(PhingFile $file)
+    {
         $this->file = $file;
     }
 
@@ -87,25 +88,28 @@ class ZendCodeAnalyzerTask extends Task
      *
      * @param string $analyzerPath
      */
-    public function setAnalyzerPath($analyzerPath) {
+    public function setAnalyzerPath($analyzerPath)
+    {
         $this->analyzerPath = $analyzerPath;
     }
 
     /**
-    * Disable warning levels. Seperate warning levels with ','
-    *
-    * @param string $disable
-    */
-    public function setDisable($disable) {
+     * Disable warning levels. Separate warning levels with ','
+     *
+     * @param string $disable
+     */
+    public function setDisable($disable)
+    {
         $this->disable = explode(",", $disable);
     }
 
     /**
-     * Enable warning levels. Seperate warning levels with ','
+     * Enable warning levels. Separate warning levels with ','
      *
      * @param string $enable
      */
-    public function setEnable($enable) {
+    public function setEnable($enable)
+    {
         $this->enable = explode(",", $enable);
     }
 
@@ -117,91 +121,93 @@ class ZendCodeAnalyzerTask extends Task
     {
         $this->haltonwarning = $value;
     }
-    
+
     /**
-     * Nested creator, creates a FileSet for this task
+     * Nested adder, adds a set of files (nested fileset attribute).
      *
-     * @return FileSet The created fileset object
+     * @param FileSet $fs
+     * @return void
      */
-    public function createFileSet() {
-        $num = array_push($this->filesets, new FileSet());
-        return $this->filesets[$num-1];
+    public function addFileSet(FileSet $fs)
+    {
+        $this->filesets[] = $fs;
     }
 
     /**
      * Analyze against PhingFile or a FileSet
      */
-    public function main() {
-        if(!isset($this->analyzerPath)) {
+    public function main()
+    {
+        if (!isset($this->analyzerPath)) {
             throw new BuildException("Missing attribute 'analyzerPath'");
         }
-        
-        if(!isset($this->file) and count($this->filesets) == 0) {
+
+        if (!isset($this->file) and count($this->filesets) == 0) {
             throw new BuildException("Missing either a nested fileset or attribute 'file' set");
         }
 
-        if($this->file instanceof PhingFile) {
+        if ($this->file instanceof PhingFile) {
             $this->analyze($this->file->getPath());
         } else { // process filesets
             $project = $this->getProject();
-        
-            foreach($this->filesets as $fs) {
+
+            foreach ($this->filesets as $fs) {
                 $ds = $fs->getDirectoryScanner($project);
                 $files = $ds->getIncludedFiles();
                 $dir = $fs->getDir($this->project)->getPath();
-                
-                foreach($files as $file) {
-                    $this->analyze($dir.DIRECTORY_SEPARATOR.$file);
+
+                foreach ($files as $file) {
+                    $this->analyze($dir . DIRECTORY_SEPARATOR . $file);
                 }
             }
         }
-        
-        $this->log("Number of findings: ".$this->counter, Project::MSG_INFO);
+
+        $this->log("Number of findings: " . $this->counter, Project::MSG_INFO);
     }
 
     /**
      * Analyze file
      *
-     * @param string $file
+     * @param  string $file
+     * @throws BuildException
      * @return void
      */
-    protected function analyze($file) {
-        if(file_exists($file)) {
-            if(is_readable($file)) {
+    protected function analyze($file)
+    {
+        if (file_exists($file)) {
+            if (is_readable($file)) {
                 // Construct shell command
-                $cmd = $this->analyzerPath." ";
-                
-                foreach($this->enable as $enable) { // Enable warning levels
+                $cmd = $this->analyzerPath . " ";
+
+                foreach ($this->enable as $enable) { // Enable warning levels
                     $cmd .= " --enable $enable ";
                 }
-                
-                foreach($this->disable as $disable) { // Disable warning levels
+
+                foreach ($this->disable as $disable) { // Disable warning levels
                     $cmd .= " --disable $disable ";
                 }
-                
+
                 $cmd .= "$file 2>&1";
 
                 // Execute command
                 $result = shell_exec($cmd);
                 $result = explode("\n", $result);
-                
-                for($i=2, $size=count($result); $i<($size-1); $i++) {
+
+                for ($i = 2, $size = count($result); $i < ($size - 1); $i++) {
                     $this->counter++;
                     $this->log($result[$i], Project::MSG_WARN);
                 }
-                
+
                 $total = count($result) - 3;
-                
+
                 if ($total > 0 && $this->haltonwarning) {
                     throw new BuildException('zendcodeanalyzer detected ' . $total . ' warning' . ($total > 1 ? 's' : '') . ' in ' . $file);
                 }
-            } 
-            else
-            {
-                throw new BuildException('Permission denied: '.$file);
+            } else {
+                throw new BuildException('Permission denied: ' . $file);
             }
         } else {
-            throw new BuildException('File not found: '.$file);
+            throw new BuildException('File not found: ' . $file);
         }
     }
 }

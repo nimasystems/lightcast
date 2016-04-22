@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: IoncubeLicenseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 46bbb0c463665f3960cef69b836652c4f3f4c32c $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,14 +26,14 @@ require_once 'phing/tasks/ext/ioncube/IoncubeComment.php';
  * Invokes the ionCube "make_license" program
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: IoncubeLicenseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 46bbb0c463665f3960cef69b836652c4f3f4c32c $
  * @package phing.tasks.ext.ioncube
  * @since 2.2.0
  */
 class IoncubeLicenseTask extends Task
 {
     private $ioncubePath = "/usr/local/ioncube";
-    
+
     private $licensePath = "";
     private $passPhrase = "";
     private $allowedServer = "";
@@ -43,8 +43,9 @@ class IoncubeLicenseTask extends Task
 
     /**
      * Sets the path to the ionCube encoder
+     * @param $ioncubePath
      */
-    function setIoncubePath($ioncubePath)
+    public function setIoncubePath($ioncubePath)
     {
         $this->ioncubePath = $ioncubePath;
     }
@@ -52,15 +53,16 @@ class IoncubeLicenseTask extends Task
     /**
      * Returns the path to the ionCube encoder
      */
-    function getIoncubePath()
+    public function getIoncubePath()
     {
         return $this->ioncubePath;
     }
 
     /**
      * Sets the path to the license file to use
+     * @param $licensePath
      */
-    function setLicensePath($licensePath)
+    public function setLicensePath($licensePath)
     {
         $this->licensePath = $licensePath;
     }
@@ -68,15 +70,16 @@ class IoncubeLicenseTask extends Task
     /**
      * Returns the path to the license file to use
      */
-    function getLicensePath()
+    public function getLicensePath()
     {
         return $this->licensePath;
     }
 
     /**
      * Sets the passphrase to use when encoding files
+     * @param $passPhrase
      */
-    function setPassPhrase($passPhrase)
+    public function setPassPhrase($passPhrase)
     {
         $this->passPhrase = $passPhrase;
     }
@@ -84,39 +87,42 @@ class IoncubeLicenseTask extends Task
     /**
      * Returns the passphrase to use when encoding files
      */
-    function getPassPhrase()
+    public function getPassPhrase()
     {
         return $this->passPhrase;
     }
 
     /**
      * Adds a comment to be used in encoded files
+     * @param IoncubeComment $comment
      */
-    function addComment(IoncubeComment $comment)
+    public function addComment(IoncubeComment $comment)
     {
         $this->comments[] = $comment;
     }
 
     /**
      * Sets the --allowed-server option to use when generating the license
-     */ 
-    function setAllowedServer($allowedServer)
+     * @param $allowedServer
+     */
+    public function setAllowedServer($allowedServer)
     {
-	$this->allowedServer = $allowedServer;
+        $this->allowedServer = $allowedServer;
     }
 
     /**
      * Returns the --allowed-server option
      */
-    function getAllowedServer()
+    public function getAllowedServer()
     {
-	return $this->allowedServer;
+        return $this->allowedServer;
     }
 
     /**
      * Sets the --expire-on option to use when generating the license
+     * @param $expireOn
      */
-    function setExpireOn($expireOn)
+    public function setExpireOn($expireOn)
     {
         $this->expireOn = $expireOn;
     }
@@ -124,15 +130,16 @@ class IoncubeLicenseTask extends Task
     /**
      * Returns the --expire-on option
      */
-    function getExpireOn()
+    public function getExpireOn()
     {
         return $this->expireOn;
     }
 
     /**
      * Sets the --expire-in option to use when generating the license
+     * @param $expireIn
      */
-    function setExpireIn($expireIn)
+    public function setExpireIn($expireIn)
     {
         $this->expireIn = $expireIn;
     }
@@ -140,7 +147,7 @@ class IoncubeLicenseTask extends Task
     /**
      * Returns the --expire-in option
      */
-    function getExpireIn()
+    public function getExpireIn()
     {
         return $this->expireIn;
     }
@@ -150,20 +157,19 @@ class IoncubeLicenseTask extends Task
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $arguments = $this->constructArguments();
-        
+
         $makelicense = new PhingFile($this->ioncubePath, 'make_license');
-        
+
         $this->log("Running ionCube make_license...");
 
         exec($makelicense->__toString() . " " . $arguments . " 2>&1", $output, $return);
-        
-        if ($return != 0)
-        {
+
+        if ($return != 0) {
             throw new BuildException("Could not execute ionCube make_license: " . implode(' ', $output));
-        }       
+        }
     }
 
     /**
@@ -172,35 +178,29 @@ class IoncubeLicenseTask extends Task
     private function constructArguments()
     {
         $arguments = "";
-        
-        if (!empty($this->passPhrase))
-        {
-            $arguments.= "--passphrase '" . $this->passPhrase . "' ";
-        }
-        
-        foreach ($this->comments as $comment)
-        {
-            $arguments.= "--header-line '" . $comment->getValue() . "' ";
-        }
-        
-        if (!empty($this->licensePath))
-        {
-            $arguments.= "--o '" . $this->licensePath . "' ";
+
+        if (!empty($this->passPhrase)) {
+            $arguments .= "--passphrase '" . $this->passPhrase . "' ";
         }
 
-	if (!empty($this->allowedServer))
-	{
-	    $arguments.= "--allowed-server {" . $this->allowedServer . "} ";
-	}
-
-	if (!empty($this->expireOn))
-        {
-            $arguments.= "--expire-on " . $this->expireOn . " ";
+        foreach ($this->comments as $comment) {
+            $arguments .= "--header-line '" . $comment->getValue() . "' ";
         }
 
-	if (!empty($this->expireIn))
-        {
-            $arguments.= "--expire-in " . $this->expireIn . " ";
+        if (!empty($this->licensePath)) {
+            $arguments .= "--o '" . $this->licensePath . "' ";
+        }
+
+        if (!empty($this->allowedServer)) {
+            $arguments .= "--allowed-server {" . $this->allowedServer . "} ";
+        }
+
+        if (!empty($this->expireOn)) {
+            $arguments .= "--expire-on " . $this->expireOn . " ";
+        }
+
+        if (!empty($this->expireIn)) {
+            $arguments .= "--expire-in " . $this->expireIn . " ";
         }
 
         return $arguments;

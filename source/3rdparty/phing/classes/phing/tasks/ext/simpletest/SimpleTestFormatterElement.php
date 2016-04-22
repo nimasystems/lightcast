@@ -1,7 +1,5 @@
 <?php
 /**
- * $Id: SimpleTestFormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,43 +24,41 @@ require_once 'phing/tasks/ext/phpunit/FormatterElement.php';
  * formatter classes for SimpleTest
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: SimpleTestFormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package phing.tasks.ext.simpletest
  * @since 2.2.0
  */
 class SimpleTestFormatterElement extends FormatterElement
 {
-    function setType($type)
+    /**
+     * @param string $type
+     * @throws BuildException
+     */
+    public function setType($type)
     {
         $this->type = $type;
 
-        if ($this->type == "xml")
-        {
+        if ($this->type == "xml") {
             require_once 'phing/tasks/ext/simpletest/SimpleTestXmlResultFormatter.php';
             $destFile = new PhingFile($this->toDir, 'testsuites.xml');
             $this->formatter = new SimpleTestXmlResultFormatter();
-        }
-        else
-        if ($this->type == "plain")
-        {
-            require_once 'phing/tasks/ext/simpletest/SimpleTestPlainResultFormatter.php';
-            $this->formatter = new SimpleTestPlainResultFormatter();
-        }
-        else
-        if ($this->type == "summary")
-        {
-            require_once 'phing/tasks/ext/simpletest/SimpleTestSummaryResultFormatter.php';
-            $this->formatter = new SimpleTestSummaryResultFormatter();
-        }
-        else
-        if ($this->type == "debug")
-        {
-            require_once 'phing/tasks/ext/simpletest/SimpleTestDebugResultFormatter.php';
-            $this->formatter = new SimpleTestDebugResultFormatter();
-        }
-        else
-        {
-            throw new BuildException("Formatter '" . $this->type . "' not implemented");
+        } else {
+            if ($this->type == "plain") {
+                require_once 'phing/tasks/ext/simpletest/SimpleTestPlainResultFormatter.php';
+                $this->formatter = new SimpleTestPlainResultFormatter();
+            } else {
+                if ($this->type == "summary") {
+                    require_once 'phing/tasks/ext/simpletest/SimpleTestSummaryResultFormatter.php';
+                    $this->formatter = new SimpleTestSummaryResultFormatter();
+                } else {
+                    if ($this->type == "debug") {
+                        require_once 'phing/tasks/ext/simpletest/SimpleTestDebugResultFormatter.php';
+                        $this->formatter = new SimpleTestDebugResultFormatter();
+                    } else {
+                        throw new BuildException("Formatter '" . $this->type . "' not implemented");
+                    }
+                }
+            }
         }
     }
 }

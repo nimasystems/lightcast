@@ -1,7 +1,5 @@
 <?php
 /**
- * $Id: SvnInfoTask.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,20 +24,22 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Parses the output of 'svn info --xml' and
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: SvnInfoTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package phing.tasks.ext.svn
+ *
  * @see VersionControl_SVN
  * @since 2.4.9
  */
 class SvnInfoTask extends SvnBaseTask
 {
     private $propertyName = "svn.info";
-    
+
     private $element = 'url';
     private $subElement = null;
 
     /**
      * Sets the name of the property to use
+     * @param $propertyName
      */
     public function setPropertyName($propertyName)
     {
@@ -53,17 +53,23 @@ class SvnInfoTask extends SvnBaseTask
     {
         return $this->propertyName;
     }
-    
+
     /**
-     * Sets the name of the xml element to use
+     * Sets the name of the xml element to use.
+     *
+     * @param string $element
+     *
+     * @return void
      */
     public function setElement($element)
     {
         $this->element = $element;
     }
-    
+
     /**
-     * Returns the name of the xml element to use
+     * Returns the name of the xml element to use.
+     *
+     * @return string
      */
     public function getElement()
     {
@@ -71,15 +77,21 @@ class SvnInfoTask extends SvnBaseTask
     }
 
     /**
-     * Sets the name of the xml sub element to use
+     * Sets the name of the xml sub element to use.
+     *
+     * @param $subElement
+     *
+     * @return void
      */
     public function setSubElement($subElement)
     {
         $this->subElement = $subElement;
     }
-    
+
     /**
-     * Returns the name of the xml sub element to use
+     * Returns the name of the xml sub element to use.
+     *
+     * @return string
      */
     public function getSubElement()
     {
@@ -87,40 +99,42 @@ class SvnInfoTask extends SvnBaseTask
     }
 
     /**
-     * The main entry point
+     * The main entry point.
+     *
+     * @return void
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('info');
-        
+
         if ($this->oldVersion) {
             $output = $this->run(array('--xml', '--incremental'));
 
             if (!($xmlObj = @simplexml_load_string($output))) {
                 throw new BuildException("Failed to parse the output of 'svn info --xml'.");
             }
-            
+
             $object = $xmlObj->{$this->element};
-            
+
             if (!empty($this->subElement)) {
                 $object = $object->{$this->subElement};
             }
         } else {
             $output = $this->run();
-            
+
             if (empty($output) || !isset($output['entry'][0])) {
                 throw new BuildException("Failed to parse the output of 'svn info'.");
             }
-            
+
             $object = $output['entry'][0][$this->element];
-            
+
             if (!empty($this->subElement)) {
                 $object = $object[$this->subElement];
             }
         }
-        
+
         $this->project->setProperty($this->getPropertyName(), (string) $object);
     }
 }

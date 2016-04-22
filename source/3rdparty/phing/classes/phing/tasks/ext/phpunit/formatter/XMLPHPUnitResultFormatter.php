@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: XMLPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 8f7dc1ae4c1d6ac3a4d531968cb58034ad9bc754 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,15 +19,13 @@
  * <http://phing.info>.
  */
 
-require_once 'PHPUnit/Util/Log/JUnit.php';
-
 require_once 'phing/tasks/ext/phpunit/formatter/PHPUnitResultFormatter.php';
 
 /**
  * Prints XML output of the test to a specified Writer
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: XMLPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 8f7dc1ae4c1d6ac3a4d531968cb58034ad9bc754 $
  * @package phing.tasks.ext.formatter
  * @since 2.1.0
  */
@@ -36,28 +34,40 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
     /**
      * @var PHPUnit_Util_Log_JUnit
      */
-    private $logger = NULL;
+    private $logger = null;
 
+    /**
+     * @param PHPUnitTask $parentTask
+     */
     public function __construct(PHPUnitTask $parentTask)
     {
         parent::__construct($parentTask);
-        
+
         $logIncompleteSkipped = $parentTask->getHaltonincomplete() || $parentTask->getHaltonskipped();
-        
+
         $this->logger = new PHPUnit_Util_Log_JUnit(null, $logIncompleteSkipped);
         $this->logger->setWriteDocument(false);
     }
 
+    /**
+     * @return string
+     */
     public function getExtension()
     {
         return ".xml";
     }
 
+    /**
+     * @return string
+     */
     public function getPreferredOutfile()
     {
         return "testsuites";
     }
 
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
     public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
         parent::startTestSuite($suite);
@@ -65,6 +75,9 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->startTestSuite($suite);
     }
 
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
     public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
         parent::endTestSuite($suite);
@@ -72,6 +85,9 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->endTestSuite($suite);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     */
     public function startTest(PHPUnit_Framework_Test $test)
     {
         parent::startTest($test);
@@ -79,6 +95,10 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->startTest($test);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param float $time
+     */
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
         parent::endTest($test, $time);
@@ -86,6 +106,11 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->endTest($test, $time);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
     public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         parent::addError($test, $e, $time);
@@ -93,6 +118,11 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->addError($test, $e, $time);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param float $time
+     */
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
     {
         parent::addFailure($test, $e, $time);
@@ -100,6 +130,11 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
         $this->logger->addFailure($test, $e, $time);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
     public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         parent::addIncompleteTest($test, $e, $time);
@@ -111,8 +146,7 @@ class XMLPHPUnitResultFormatter extends PHPUnitResultFormatter
     {
         parent::endTestRun();
 
-        if ($this->out)
-        {
+        if ($this->out) {
             $this->out->write($this->logger->getXML());
             $this->out->close();
         }

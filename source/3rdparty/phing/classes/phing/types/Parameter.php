@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Parameter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 4206aed7478704fa7ef5d066ba183159ae0ea7f9 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -30,25 +30,34 @@ include_once 'phing/types/DataType.php';
  * @author    <a href="mailto:yl@seasonfive.com">Yannick Lecaillez</a>
  * @package   phing.types
  */
-class Parameter extends DataType {
+class Parameter extends DataType
+{
 
     /** Parameter name */
     protected $name;
-    
-    /** Paramter type */
+
+    /** Parameter type */
     protected $type;
-    
+
     /** Parameter value */
     protected $value;
-    
+
     /** Nested parameters */
     protected $parameters = array();
 
-    function setName($name) {
+    /**
+     * @param $name
+     */
+    public function setName($name)
+    {
         $this->name = (string) $name;
     }
-    
-    function setType($type) {
+
+    /**
+     * @param $type
+     */
+    public function setType($type)
+    {
         $this->type = (string) $type;
     }
 
@@ -56,44 +65,56 @@ class Parameter extends DataType {
      * Sets value to dynamic register slot.
      * @param RegisterSlot $value
      */
-    public function setListeningValue(RegisterSlot $value) {
+    public function setListeningValue(RegisterSlot $value)
+    {
         $this->value = $value;
     }
-    
-    function setValue($value) {
+
+    /**
+     * @param $value
+     */
+    public function setValue($value)
+    {
         $this->value = (string) $value;
     }
 
-    function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
-    function getValue() {
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
         if ($this->value instanceof RegisterSlot) {
             return $this->value->getValue();
         } else {
             return $this->value;
         }
     }
-    
+
     /**
      * @return Parameter
      */
-    function createParam() {
+    public function createParam()
+    {
         $num = array_push($this->parameters, new Parameter());
-        return $this->parameters[$num-1];
+
+        return $this->parameters[$num - 1];
     }
 
     /**
      * @return array Nested parameters.
      */
-    function getParams() {
+    public function getParams()
+    {
         return $this->parameters;
     }
 }
-
-

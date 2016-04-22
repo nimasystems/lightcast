@@ -23,7 +23,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
 /**
  * Copies a repository from the repository url to another
  *
- * @version $Id: SvnCopyTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 0b4894341e10f5f3ba44a669707b7727b58383f5 $
  * @package phing.tasks.ext.svn
  * @since 2.3.0
  */
@@ -33,8 +33,9 @@ class SvnCopyTask extends SvnBaseTask
 
     /**
      * Sets the message
+     * @param $message
      */
-    function setMessage($message)
+    public function setMessage($message)
     {
         $this->message = $message;
     }
@@ -42,7 +43,7 @@ class SvnCopyTask extends SvnBaseTask
     /**
      * Gets the message
      */
-    function getMessage()
+    public function getMessage()
     {
         return $this->message;
     }
@@ -52,14 +53,14 @@ class SvnCopyTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('copy');
 
-        $this->log("Copying SVN repository from '" . $this->getRepositoryUrl()  .  "' to '" . $this->getToDir() . "'");
-        
+        $this->log("Copying SVN repository from '" . $this->getRepositoryUrl() . "' to '" . $this->getToDir() . "'");
+
         $options = array();
-        
+
         if (strlen($this->getMessage()) > 0) {
             $options['message'] = $this->getMessage();
         }
@@ -67,4 +68,3 @@ class SvnCopyTask extends SvnBaseTask
         $this->run(array($this->getToDir()), $options);
     }
 }
-

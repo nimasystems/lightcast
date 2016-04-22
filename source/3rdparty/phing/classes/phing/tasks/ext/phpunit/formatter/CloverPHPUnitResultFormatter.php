@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: CloverPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 07b0bdd8f6adb167b753d21663c339565e807e70 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,7 +25,7 @@ require_once 'phing/tasks/ext/phpunit/formatter/PHPUnitResultFormatter.php';
  * Prints Clover XML output of the test
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: CloverPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 07b0bdd8f6adb167b753d21663c339565e807e70 $
  * @package phing.tasks.ext.formatter
  * @since 2.4.0
  */
@@ -34,31 +34,43 @@ class CloverPHPUnitResultFormatter extends PHPUnitResultFormatter
     /**
      * @var PHPUnit_Framework_TestResult
      */
-    private $result = NULL;
-    
+    private $result = null;
+
     /**
      * PHPUnit version
      * @var string
      */
-    private $version = NULL;
+    private $version = null;
 
+    /**
+     * @param PHPUnitTask $parentTask
+     */
     public function __construct(PHPUnitTask $parentTask)
     {
         parent::__construct($parentTask);
-        
+
         $this->version = PHPUnit_Runner_Version::id();
     }
 
+    /**
+     * @return string
+     */
     public function getExtension()
     {
         return ".xml";
     }
 
+    /**
+     * @return string
+     */
     public function getPreferredOutfile()
     {
         return "clover-coverage";
     }
 
+    /**
+     * @param PHPUnit_Framework_TestResult $result
+     */
     public function processResult(PHPUnit_Framework_TestResult $result)
     {
         $this->result = $result;
@@ -66,22 +78,19 @@ class CloverPHPUnitResultFormatter extends PHPUnitResultFormatter
 
     public function endTestRun()
     {
-        require_once 'PHP/CodeCoverage/Report/Clover.php';
-        
         $coverage = $this->result->getCodeCoverage();
-        
+
         if (!empty($coverage)) {
             $clover = new PHP_CodeCoverage_Report_Clover();
-            
+
             $contents = $clover->process($coverage);
-    
-            if ($this->out)
-            {
+
+            if ($this->out) {
                 $this->out->write($contents);
                 $this->out->close();
             }
         }
-        
+
         parent::endTestRun();
     }
 }

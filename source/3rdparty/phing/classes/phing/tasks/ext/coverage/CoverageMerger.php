@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: CoverageMerger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 18a66018595b27816f2bd0ac5f2d67a42ea16416 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,12 +25,17 @@ require_once 'phing/system/util/Properties.php';
  * Saves coverage output of the test to a specified database
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: CoverageMerger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 18a66018595b27816f2bd0ac5f2d67a42ea16416 $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */
 class CoverageMerger
 {
+    /**
+     * @param $left
+     * @param $right
+     * @return array
+     */
     private static function mergeCodeCoverage($left, $right)
     {
         $coverageMerged = array();
@@ -54,7 +59,7 @@ class CoverageMerger
                 } else {
                     $coverageMerged[$linenr_right] = current($left) + current($right);
                 }
-                
+
                 next($left);
                 next($right);
             }
@@ -72,73 +77,83 @@ class CoverageMerger
 
         return $coverageMerged;
     }
-    
+
     /**
-     * @param  Project $project
+     * @param  Project        $project
      * @return Properties
      * @throws BuildException
      */
     protected static function _getDatabase($project)
     {
         $coverageDatabase = $project->getProperty('coverage.database');
-        
+
         if (!$coverageDatabase) {
             throw new BuildException("Property coverage.database is not set - please include coverage-setup in your build file");
         }
-        
+
         $database = new PhingFile($coverageDatabase);
 
         $props = new Properties();
         $props->load($database);
-        
+
         return $props;
     }
-    
+
+    /**
+     * @param $project
+     * @return array
+     * @throws BuildException
+     */
     public static function getWhiteList($project)
     {
         $whitelist = array();
         $props = self::_getDatabase($project);
-        
+
         foreach ($props->getProperties() as $property) {
             $data = unserialize($property);
             $whitelist[] = $data['fullname'];
         }
-        
+
         return $whitelist;
     }
 
+    /**
+     * @param $project
+     * @param $codeCoverageInformation
+     * @throws BuildException
+     * @throws IOException
+     */
     public static function merge($project, $codeCoverageInformation)
     {
         $props = self::_getDatabase($project);
-        
+
         $coverageTotal = $codeCoverageInformation;
-        
+
         foreach ($coverageTotal as $filename => $data) {
-            $ignoreLines = PHP_CodeCoverage_Util::getLinesToBeIgnored($filename);
-            
             $lines = array();
             $filename = strtolower($filename);
 
             if ($props->getProperty($filename) != null) {
                 foreach ($data as $_line => $_data) {
-                    if(isset($ignoreLines[$_line])) {
-                        // line is marked as ignored
-                	continue;
-                    }
-                    
                     if ($_data === null) {
                         continue;
                     }
-                    
+
                     if (is_array($_data)) {
                         $count = count($_data);
-                        if ($count == 0) $count = -1;
-                    } else if ($_data == -1) {
-                        // not executed
-                        $count = -1;
-                    } else if ($_data == -2) {
-                        // dead code
-                        $count = -2;
+                        if ($count == 0) {
+                            $count = -1;
+                        }
+                    } else {
+                        if ($_data == -1) {
+                            // not executed
+                            $count = -1;
+                        } else {
+                            if ($_data == -2) {
+                                // dead code
+                                $count = -2;
+                            }
+                        }
                     }
 
                     $lines[$_line] = $count;
@@ -153,7 +168,7 @@ class CoverageMerger
 
                 $file['coverage'] = $coverageMerged;
                 $props->setProperty($filename, serialize($file));
-            }           
+            }
         }
 
         $props->store();

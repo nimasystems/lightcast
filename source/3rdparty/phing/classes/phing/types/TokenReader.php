@@ -1,7 +1,5 @@
 <?php
-/*
- *  $Id: TokenReader.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
+/**
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -25,42 +23,50 @@ include_once 'phing/filters/ReplaceTokens.php'; // For class Token
 
 /**
  * Abstract class for TokenReaders.
- * 
+ *
  * @author    Manuel Holtgewe
- * @version   $Id: TokenReader.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package   phing.filters.util
  */
-abstract class TokenReader {
-
+abstract class TokenReader
+{
     /**
      * Reference to the Project the TokenReader is used in.
-     * @var Project 
+     *
+     * @var Project
      */
     protected $project;
 
     /**
-     * Constructor
-     * @param   object  Reference to the project the TokenReader is used in.
+     * Constructor.
+     *
+     * @param Project $project Reference to the project the TokenReader is used in.
      */
-    function __construct(Project $project) {
+    public function __construct(Project $project)
+    {
         $this->project = $project;
     }
 
     /**
-     * Utility function for logging
+     * Utility function for logging.
+     *
+     * @param $level
+     * @param $msg
+     *
+     * @return void
      */
-    function log($level, $msg) {
+    public function log($level, $msg)
+    {
         $this->project->log($level, $msg);
     }
 
     /**
-     * Reads the next token from the Reader
+     * Reads the next token from the Reader.
      *
      * @throws IOException - On error
+     *
      * @return string
      */
     abstract public function readToken();
-    
+
 }
-
-

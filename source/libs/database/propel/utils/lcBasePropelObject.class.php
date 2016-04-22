@@ -1,6 +1,6 @@
 <?php
 
-class lcBasePropelObject extends BaseObject
+abstract class lcBasePropelObject extends BaseObject
 {
     /**
      * @var lcEventDispatcher
@@ -18,6 +18,8 @@ class lcBasePropelObject extends BaseObject
         $this->application_configuration = $GLOBALS['configuration'];
         $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
     }
+
+    abstract public function getPrimaryKey();
 
     public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
     {
@@ -81,5 +83,10 @@ class lcBasePropelObject extends BaseObject
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('data_model.after_delete', $this));
         }
+    }
+
+    public function getFormattedTitle()
+    {
+        return '#' . $this->getPrimaryKey();
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: IterableFileSet.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 2fc86a029661c59a2ca1088fd26199d2c4764f73 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -38,17 +38,18 @@ class IterableFileSet
     {
         return new ArrayIterator($this->getFiles());
     }
+
     /**
      * @return array
      */
     private function getFiles()
     {
-        $directoryScanner   = $this->getDirectoryScanner($this->getProject());
-        $files              = $directoryScanner->getIncludedFiles();
+        $directoryScanner = $this->getDirectoryScanner($this->getProject());
+        $files = $directoryScanner->getIncludedFiles();
 
         $baseDirectory = $directoryScanner->getBasedir();
         foreach ($files as $index => $file) {
-            $files[$index] = realpath($baseDirectory.'/'.$file);
+            $files[$index] = realpath($baseDirectory . '/' . $file);
         }
 
         return $files;

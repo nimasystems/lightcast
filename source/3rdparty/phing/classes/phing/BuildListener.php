@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: BuildListener.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: e0f8f926fe954fa2128283a0707dda812fcf1708 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,12 +27,13 @@
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @author    Hans Lellelid <hans@xmpl.org>
- * @version   $Id: BuildListener.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: e0f8f926fe954fa2128283a0707dda812fcf1708 $
  * @see       BuildEvent
  * @see       Project::addBuildListener()
  * @package   phing
  */
-interface BuildListener {
+interface BuildListener
+{
 
     /**
      * Fired before any targets are started.

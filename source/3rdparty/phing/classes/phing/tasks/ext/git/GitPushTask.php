@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitPushTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 8406c9cfd560b995db09e9888334355641cd3975 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/git/GitBaseTask.php';
  * Wrapper aroung git-push
  *
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitPushTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 8406c9cfd560b995db09e9888334355641cd3975 $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.3
@@ -105,21 +105,25 @@ class GitPushTask extends GitBaseTask
             ->setOption('force', $this->isForce());
 
         // set operation target
-        if ($this->isAllRemotes()) {            // --all
+        if ($this->isAllRemotes()) { // --all
             $command->setOption('all', true);
-            $this->log('git-push: push to all refs', Project::MSG_INFO); 
-        } elseif ($this->isMirror()) {         // <repository> [<refspec>]
+            $this->log('git-push: push to all refs', Project::MSG_INFO);
+        } elseif ($this->isMirror()) { // <repository> [<refspec>]
             $command->setOption('mirror', true);
-            $this->log('git-push: mirror all refs', Project::MSG_INFO); 
-        } elseif ($this->getDestination()) {         // <repository> [<refspec>]
+            $this->log('git-push: mirror all refs', Project::MSG_INFO);
+        } elseif ($this->getDestination()) { // <repository> [<refspec>]
             $command->addArgument($this->getDestination());
             if ($this->getRefspec()) {
                 $command->addArgument($this->getRefspec());
             }
             $this->log(
-                sprintf('git-push: pushing to %s %s', 
-                    $this->getDestination(), $this->getRefspec()), 
-                Project::MSG_INFO); 
+                sprintf(
+                    'git-push: pushing to %s %s',
+                    $this->getDestination(),
+                    $this->getRefspec()
+                ),
+                Project::MSG_INFO
+            );
         } else {
             throw new BuildException('At least one destination must be provided');
         }
@@ -132,124 +136,187 @@ class GitPushTask extends GitBaseTask
             throw new BuildException('Task execution failed.', $e);
         }
 
-        $this->log('git-push: complete', Project::MSG_INFO); 
+        $this->log('git-push: complete', Project::MSG_INFO);
         if ($this->isDelete()) {
             $this->log('git-push: branch delete requested', Project::MSG_INFO);
         }
         $this->log('git-push output: ' . trim($output), Project::MSG_INFO);
     }
 
+    /**
+     * @param $flag
+     */
     public function setAll($flag)
     {
         $this->allRemotes = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getAll()
     {
         return $this->allRemotes;
     }
 
+    /**
+     * @return bool
+     */
     public function isAllRemotes()
     {
         return $this->getAll();
     }
 
+    /**
+     * @param $flag
+     */
     public function setMirror($flag)
     {
-        $this->mirror = (boolean)$flag;
+        $this->mirror = (boolean) $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getMirror()
     {
         return $this->mirror;
     }
 
+    /**
+     * @return bool
+     */
     public function isMirror()
     {
         return $this->getMirror();
     }
 
+    /**
+     * @param $flag
+     */
     public function setDelete($flag)
     {
-        $this->delete = (boolean)$flag;
+        $this->delete = (boolean) $flag;
     }
 
+    /**
+     * @return string
+     */
     public function getDelete()
     {
         return $this->delete;
     }
 
+    /**
+     * @return string
+     */
     public function isDelete()
     {
         return $this->getDelete();
     }
 
+    /**
+     * @param $flag
+     */
     public function setTags($flag)
     {
         $this->tags = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getTags()
     {
         return $this->tags;
     }
 
+    /**
+     * @return bool
+     */
     public function isTags()
     {
         return $this->getTags();
     }
 
+    /**
+     * @param $destination
+     */
     public function setDestination($destination)
     {
         $this->destination = $destination;
     }
 
+    /**
+     * @return string
+     */
     public function getDestination()
     {
         return $this->destination;
     }
 
+    /**
+     * @param $spec
+     */
     public function setRefspec($spec)
     {
         $this->refspec = $spec;
     }
 
+    /**
+     * @return string
+     */
     public function getRefspec()
     {
         return $this->refspec;
     }
 
+    /**
+     * @param $flag
+     */
     public function setForce($flag)
     {
         $this->force = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getForce()
     {
         return $this->force;
     }
 
+    /**
+     * @return bool
+     */
     public function isForce()
     {
         return $this->getForce();
     }
 
+    /**
+     * @param $flag
+     */
     public function setQuiet($flag)
     {
         $this->quiet = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getQuiet()
     {
         return $this->quiet;
     }
 
+    /**
+     * @return bool
+     */
     public function isQuiet()
     {
         return $this->getQuiet();
     }
-
-
-
 
 }

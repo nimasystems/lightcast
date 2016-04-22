@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DbmsSyntaxSQLite.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: f154ae7623dcdc04e60284fe70bea1da99ab1254 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,19 +18,21 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 /**
  * Utility class for generating necessary server-specific SQL commands
  *
  * @author   Luke Crouch at SourceForge (http://sourceforge.net)
- * @version  $Id: DbmsSyntaxSQLite.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: f154ae7623dcdc04e60284fe70bea1da99ab1254 $
  * @package  phing.tasks.ext.dbdeploy
  */
-class DbmsSyntaxSQLite extends DbmsSyntax 
+class DbmsSyntaxSQLite extends DbmsSyntax
 {
+    /**
+     * @return string
+     */
     public function generateTimestamp()
     {
         return "strftime('%s','now')";
     }
 }
-

@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnCheckoutTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 34178e3af0b03b5da591c716f43bbc49a25cdcb4 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Checks out a repository to a local directory
  *
  * @author Andrew Eddie <andrew.eddie@jamboworks.com>
- * @version $Id: SvnCheckoutTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 34178e3af0b03b5da591c716f43bbc49a25cdcb4 $
  * @package phing.tasks.ext.svn
  * @since 2.3.0
  */
@@ -34,9 +34,9 @@ class SvnCheckoutTask extends SvnBaseTask
 {
     /**
      * Which Revision to Export
-     * 
+     *
      * @todo check if version_control_svn supports constants
-     * 
+     *
      * @var string
      */
     private $revision = 'HEAD';
@@ -46,11 +46,14 @@ class SvnCheckoutTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('checkout');
 
-        $this->log("Checking out SVN repository to '" . $this->getToDir() . "'". ($this->revision=='HEAD'?'':" (revision: {$this->revision})"));
+        $this->log(
+            "Checking out SVN repository to '" . $this->getToDir(
+            ) . "'" . ($this->revision == 'HEAD' ? '' : " (revision: {$this->revision})")
+        );
 
         // revision
         $switches = array(
@@ -60,6 +63,9 @@ class SvnCheckoutTask extends SvnBaseTask
         $this->run(array($this->getToDir()), $switches);
     }
 
+    /**
+     * @param $revision
+     */
     public function setRevision($revision)
     {
         $this->revision = $revision;

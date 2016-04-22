@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: ZendGuardEncodeTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: aacbd9ea1b3f9e13178cea0f5ff625f921076a32 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,7 +29,7 @@ include_once 'phing/util/StringHelper.php';
  * Encodes files using Zeng Guard Encoder
  *
  * @author    Petr Rybak <petr@rynawe.net>
- * @version   $Id: ZendGuardEncodeTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: aacbd9ea1b3f9e13178cea0f5ff625f921076a32 $
  * @package   phing.tasks.ext.zendguard
  * @since     2.4.3
  */
@@ -37,7 +37,6 @@ class ZendGuardEncodeTask extends MatchingTask
 {
     protected $filesets = array();
     protected $encodeCommand;
-
 
     /**
      * TASK PROPERTIES
@@ -190,92 +189,144 @@ class ZendGuardEncodeTask extends MatchingTask
 
     /**
      * TASK PROPERTIES SETTERS
+     * @param $value
      */
     public function setZendEncoderPath($value)
     {
         $this->zendEncoderPath = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setPrivateKeyPath($value)
     {
         $this->privateKeyPath = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setShortTags($value)
     {
         $this->shortTags = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setAspTags($value)
     {
         $this->aspTags = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setDeleteSource($value)
     {
         $this->shortTags = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setUseCrypto($value)
     {
         $this->useCrypto = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setObfuscationLevel($value)
     {
         $this->obfuscationLevel = (int) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setLicenseProduct($value)
     {
         $this->licenseProduct = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setPrologFile($value)
     {
         $this->prologFile = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setSignProduct($value)
     {
         $this->signProduct = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setForceEncode($value)
     {
         $this->forceEncode = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setEncodedOnly($value)
     {
         $this->encodedOnly = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setIgnoreFileModes($value)
     {
         $this->ignoreFileModes = (bool) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setExpires($value)
     {
         $this->expires = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setProductName($value)
     {
         $this->productName = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setOptMask($value)
     {
         $this->optMask = (int) $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setRenameSourceExt($value)
     {
         $this->renameSourceExt = $value;
     }
 
+    /**
+     * @param $value
+     */
     public function setNoHeader($value)
     {
         $this->noHeader = (bool) $value;
@@ -290,6 +341,7 @@ class ZendGuardEncodeTask extends MatchingTask
     {
         $this->fileset = new ZendGuardFileSet();
         $this->filesets[] = $this->fileset;
+
         return $this->fileset;
     }
 
@@ -461,6 +513,8 @@ class ZendGuardEncodeTask extends MatchingTask
      * Encodes a file using currently defined Zend Guard settings
      *
      * @param string $filePath Path to the encoded file
+     * @throws BuildException
+     * @return bool
      */
     protected function encodeFile($filePath)
     {
@@ -492,8 +546,11 @@ class ZendGuardFileSet extends FileSet
 
     /**
      *  Get a list of files and directories specified in the fileset.
-     *  @return array a list of file and directory names, relative to
-     *    the baseDir for the project.
+     * @param Project $p
+     * @param bool $includeEmpty
+     * @throws BuildException
+     * @return array a list of file and directory names, relative to
+     *               the baseDir for the project.
      */
     public function getFiles(Project $p, $includeEmpty = true)
     {

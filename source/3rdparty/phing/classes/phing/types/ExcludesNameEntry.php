@@ -1,6 +1,6 @@
 <?php
-/*
- *  $Id: ExcludesNameEntry.php 1441 2013-10-08 16:28:22Z mkovachev $
+/**
+ *  $Id: 63ab78ae0c05fe95b19878434bce454ce8d82a97 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,7 +24,7 @@
  *
  * @package phing.types
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: ExcludesNameEntry.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 63ab78ae0c05fe95b19878434bce454ce8d82a97 $
  * @since   2.4.6
  */
 class ExcludesNameEntry
@@ -34,7 +34,7 @@ class ExcludesNameEntry
      *
      * @var string
      */
-    private $_name;
+    private $name;
 
     /**
      * An alias for the setName() method.
@@ -56,7 +56,7 @@ class ExcludesNameEntry
      */
     public function setName($name)
     {
-        $this->_name = (string) $name;
+        $this->name = (string) $name;
     }
 
     /**
@@ -66,7 +66,7 @@ class ExcludesNameEntry
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -76,6 +76,6 @@ class ExcludesNameEntry
      */
     public function toString()
     {
-        return $this->_name;
+        return $this->name;
     }
 }

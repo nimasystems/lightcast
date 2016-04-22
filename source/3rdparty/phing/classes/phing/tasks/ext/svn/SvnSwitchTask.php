@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnSwitchTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: f840cd73068d8b9cf90051b0be3101ee9f22d4fc $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Switches a repository at a given local directory to a different location
  *
  * @author Dom Udall <dom.udall@clock.co.uk>
- * @version $Id: SvnSwitchTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: f840cd73068d8b9cf90051b0be3101ee9f22d4fc $
  * @package phing.tasks.ext.svn
  * @since 2.4.3
  */
@@ -46,12 +46,14 @@ class SvnSwitchTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('switch');
 
-        $this->log("Switching SVN repository at '" . $this->getToDir() . "' to '" . $this->getRepositoryUrl() . "' "
-          . ($this->getRevision()=='HEAD'?'':" (revision: {$this->getRevision()})"));
+        $this->log(
+            "Switching SVN repository at '" . $this->getToDir() . "' to '" . $this->getRepositoryUrl() . "' "
+            . ($this->getRevision() == 'HEAD' ? '' : " (revision: {$this->getRevision()})")
+        );
 
         // revision
         $switches = array(
@@ -61,11 +63,17 @@ class SvnSwitchTask extends SvnBaseTask
         $this->run(array($this->getToDir()), $switches);
     }
 
+    /**
+     * @param $revision
+     */
     public function setRevision($revision)
     {
         $this->revision = $revision;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getRevision()
     {
         return $this->revision;

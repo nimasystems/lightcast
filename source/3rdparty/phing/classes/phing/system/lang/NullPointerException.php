@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: NullPointerException.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 8d0f260c2fee6d2107bfa59801719b70551dabd8 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,5 +22,6 @@
 /**
  * @package phing.system.lang
  */
-class NullPointerException extends Exception {}
-
+class NullPointerException extends Exception
+{
+}

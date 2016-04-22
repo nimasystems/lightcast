@@ -3,17 +3,11 @@
 
 /**
  * Shell wrapper for Phing
- * $Id: 65c6f04c4f3e8c6b47d387ad1a624d6630138bab $
+ * $Id: 3da5a2758ca689a6ee49defabcda5efa6dd70a97 $
  */
 
 // turn off html errors
 ini_set('html_errors', 'off');
-
-// default logger
-if (!in_array('-logger', $argv)) {
-    $argv[] = '-logger';
-    $argv[] = 'phing.listener.AnsiColorLogger';
-}
 
 putenv("PHING_HOME=" . realpath(dirname(__FILE__) . '/../'));
 

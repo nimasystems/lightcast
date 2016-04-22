@@ -1,7 +1,5 @@
 <?php
 /**
- * $Id: SimpleTestXmlResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -20,13 +18,13 @@
  */
 
 require_once 'phing/tasks/ext/simpletest/SimpleTestResultFormatter.php';
-require_once 'simpletest/xml.php';
+@include_once 'simpletest/xml.php';
 
 /**
  * Prints plain text output of the test to a specified Writer.
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: SimpleTestXmlResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package phing.tasks.ext.simpletest
  * @since 2.2.0
  */
@@ -35,141 +33,192 @@ class SimpleTestXmlResultFormatter extends SimpleTestResultFormatter
     /**
      * @var XmlReporter
      */
-    private $logger = NULL;
-    
+    private $logger = null;
+
     private $xmlData = "";
 
-    function __construct()
+    /**
+     *
+     */
+    public function __construct()
     {
         $this->logger = new XmlReporter();
     }
-    
-    function getExtension()
+
+    /**
+     * @return string
+     */
+    public function getExtension()
     {
         return ".xml";
     }
-    
-    function getPreferredOutfile()
+
+    /**
+     * @return string
+     */
+    public function getPreferredOutfile()
     {
         return "testsuites";
     }
-    
+
     private function captureStart()
     {
         ob_start();
     }
-    
+
     private function captureStop()
     {
         $this->xmlData .= ob_get_contents();
         ob_end_clean();
     }
 
-    function paintGroupStart($test_name, $size)
+    /**
+     * @param string $test_name
+     * @param int $size
+     */
+    public function paintGroupStart($test_name, $size)
     {
         parent::paintGroupStart($test_name, $size);
-        
+
         $this->captureStart();
         $this->logger->paintGroupStart($test_name, $size);
         $this->captureStop();
     }
-    
-    function paintGroupEnd($test_name)
+
+    /**
+     * @param string $test_name
+     */
+    public function paintGroupEnd($test_name)
     {
         parent::paintGroupEnd($test_name);
-        
+
         $this->captureStart();
         $this->logger->paintGroupEnd($test_name);
         $this->captureStop();
 
-        if (count($this->_test_stack) == 0)
-        {
-            if ($this->out)
-            {
+        if (count($this->_test_stack) == 0) {
+            if ($this->out) {
                 $this->out->write($this->xmlData);
                 $this->out->close();
             }
         }
     }
 
-    function paintCaseStart($test_name)
+    /**
+     * @param string $test_name
+     */
+    public function paintCaseStart($test_name)
     {
         $this->captureStart();
         $this->logger->paintCaseStart($test_name);
         $this->captureStop();
     }
-    
-    function paintCaseEnd($test_name)
+
+    /**
+     * @param string $test_name
+     */
+    public function paintCaseEnd($test_name)
     {
         $this->captureStart();
         $this->logger->paintCaseEnd($test_name);
         $this->captureStop();
     }
 
-    function paintMethodStart($test_name)
+    /**
+     * @param string $test_name
+     */
+    public function paintMethodStart($test_name)
     {
         $this->captureStart();
         $this->logger->paintMethodStart($test_name);
         $this->captureStop();
     }
-    
-    function paintMethodEnd($test_name)
+
+    /**
+     * @param string $test_name
+     */
+    public function paintMethodEnd($test_name)
     {
         $this->captureStart();
         $this->logger->paintMethodEnd($test_name);
         $this->captureStop();
     }
 
-    function paintPass($message)
+    /**
+     * @param string $message
+     */
+    public function paintPass($message)
     {
         $this->captureStart();
         $this->logger->paintPass($message);
         $this->captureStop();
     }
-    
-    function paintError($message)
+
+    /**
+     * @param string $message
+     */
+    public function paintError($message)
     {
         $this->captureStart();
         $this->logger->paintError($message);
         $this->captureStop();
     }
 
-    function paintFail($message)
+    /**
+     * @param string $message
+     */
+    public function paintFail($message)
     {
         $this->captureStart();
         $this->logger->paintFail($message);
         $this->captureStop();
     }
 
-    function paintException($exception)
+    /**
+     * @param Exception $exception
+     */
+    public function paintException($exception)
     {
         $this->captureStart();
         $this->logger->paintException($exception);
         $this->captureStop();
     }
 
-    function paintSkip($message)
+    /**
+     * @param string $message
+     */
+    public function paintSkip($message)
     {
         $this->captureStart();
         $this->logger->paintSkip($message);
         $this->captureStop();
     }
 
-    function paintMessage($message)
+    /**
+     * @param string $message
+     */
+    public function paintMessage($message)
     {
         $this->captureStart();
         $this->logger->paintMessage($message);
         $this->captureStop();
     }
 
-    function paintFormattedMessage($message)
+    /**
+     * @param string $message
+     */
+    public function paintFormattedMessage($message)
     {
         $this->captureStart();
         $this->logger->paintFormattedMessage($message);
         $this->captureStop();
     }
 
-    function paintSignal($type, $payload)
+    /**
+     * @param string $type
+     * @param mixed $payload
+     */
+    public function paintSignal($type, $payload)
     {
         $this->captureStart();
         $this->logger->paintSignal($type, $payload);

@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: ComposerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: be79ded318bcd97deb5b1d7bac9f216dff9bbdfe $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,15 +29,15 @@ require_once "phing/types/Commandline.php";
  *
  * @author nuno costa <nuno@francodacosta.com>
  * @license MIT
- * @version $Id: ComposerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: be79ded318bcd97deb5b1d7bac9f216dff9bbdfe $
  * @package phing.tasks.ext
  */
 class ComposerTask extends Task
 {
     /**
-     * @var string the path to php interperter
+     * @var string the path to php interpreter
      */
-    private $php = 'php';
+    private $php = '';
 
     /**
      *
@@ -49,16 +49,27 @@ class ComposerTask extends Task
      *
      * @var Commandline
      */
-    private $commandLine =null;
+    private $commandLine = null;
     /**
      *
      * @var string path to Composer application
      */
     private $composer = 'composer.phar';
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->commandLine = new Commandline();
+    }
+
+    /**
+     * Initialize the interpreter with the Phing property php.interpreter
+     */
+    public function init()
+    {
+        $this->setPhp($this->project->getProperty('php.interpreter'));
     }
 
     /**
@@ -80,6 +91,7 @@ class ComposerTask extends Task
     {
         return $this->php;
     }
+
     /**
      * sets the Composer command to execute
      * @param string $command
@@ -140,8 +152,10 @@ class ComposerTask extends Task
         $commandLine = strval($this->commandLine);
         //Creating new Commandline instance. It allows to handle subsequent calls correctly
         $this->commandLine = new Commandline();
+
         return $commandLine;
     }
+
     /**
      * executes the Composer task
      */

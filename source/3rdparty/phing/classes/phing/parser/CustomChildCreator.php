@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  $Id: CustomChildCreator.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: cf8a5bbff30a758d6428a24861a1a532435eddad $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,10 +31,10 @@ interface CustomChildCreator
 {
     /**
      * Creates the object for the child element
-     * 
-     * @param string $elementName the name of the element that has been requested
-     * @param Project $project The project the element is in
-     * @return object Returns the nested element
+     *
+     * @param  string  $elementName the name of the element that has been requested
+     * @param  Project $project     The project the element is in
+     * @return object  Returns the nested element
      */
     public function customChildCreator($elementName, Project $project);
 }

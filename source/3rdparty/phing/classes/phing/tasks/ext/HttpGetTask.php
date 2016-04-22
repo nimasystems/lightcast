@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: HttpGetTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 519893a6517940c2efd8ea989a54657275dcf902 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,32 +19,25 @@
  * <http://phing.info>.
  */
 
-require_once 'phing/Task.php';
+require_once 'phing/tasks/ext/HttpTask.php';
 
 /**
- * A HTTP request task.
- * Making an HTTP request and try to match the response against an provided
- * regular expression.
+ * A HTTP download task.
+ *
+ * Downloads a file via HTTP GET method and saves it to a specified directory
  *
  * @package phing.tasks.ext
  * @author  Ole Markus With <o.with@sportradar.com>
- * @version $Id: HttpGetTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 519893a6517940c2efd8ea989a54657275dcf902 $
  */
-class HttpGetTask extends Task
+class HttpGetTask extends HttpTask
 {
-    /**
-     * Holds the request URL
-     *
-     * @var string
-     */
-    protected $url = null;
-
     /**
      * Holds the filename to store the output in
      *
      * @var string
      */
-    protected $filename = null;    
+    protected $filename = null;
 
     /**
      * Holds the save location
@@ -59,7 +52,7 @@ class HttpGetTask extends Task
      * @var boolean
      */
     protected $sslVerifyPeer = true;
-    
+
     /**
      * Holds value for "follow_redirects" option
      *
@@ -72,72 +65,64 @@ class HttpGetTask extends Task
      *
      * @var string
      */
-    protected $_proxy = null;
+    protected $proxy = null;
 
     /**
-     * Load the necessary environment for running this task.
-     *
+     * @return HTTP_Request2
      * @throws BuildException
+     * @throws HTTP_Request2_LogicException
      */
-    public function init()
+    protected function createRequest()
     {
-        @include_once 'HTTP/Request2.php';
-
-        if (! class_exists('HTTP_Request2')) {
-            throw new BuildException(
-                'HttpRequestTask depends on HTTP_Request2 being installed '
-                . 'and on include_path.',
-                $this->getLocation()
-            );
-        }
-    }
-
-
-    /**
-     * Make the GET request
-     *
-     * @throws BuildException
-     */
-    public function main()
-    {
-        if (!isset($this->url)) {
-            throw new BuildException("Missing attribute 'url'");
-        }
-
         if (!isset($this->dir)) {
-            throw new BuildException("Missing attribute 'dir'");
-        }
-        
-        $config = array();
-        if (isset($this->_proxy) && $url = parse_url($this->_proxy)) {
-            $config['proxy_user'] = $url['user'];
-            $config['proxy_password'] = $url['pass'];
-            $config['proxy_host'] = $url['host'];
-            $config['proxy_port'] = $url['port'];
+            throw new BuildException("Required attribute 'dir' is missing");
         }
 
-        $config['ssl_verify_peer'] = $this->sslVerifyPeer;
-        
+        $config = array(
+            'ssl_verify_peer' => $this->sslVerifyPeer
+        );
+        if (isset($this->proxy)) {
+            $config['proxy'] = $this->proxy;
+        }
         if (null !== $this->followRedirects) {
             $config['follow_redirects'] = $this->followRedirects;
         }
 
+        $request = parent::createRequest();
+        $request->setConfig($config);
+
         $this->log("Fetching " . $this->url);
 
-        $request = new HTTP_Request2($this->url, '', $config);
-        $response =  $request->send();
+        return $request;
+    }
+
+    /**
+     * Saves the response body to a specified directory
+     *
+     * @param  HTTP_Request2_Response $response
+     * @return void
+     * @throws BuildException
+     */
+    protected function processResponse(HTTP_Request2_Response $response)
+    {
         if ($response->getStatus() != 200) {
-            throw new BuildException("Request unsuccessful. Response from server: " . $response->getStatus() . " " . $response->getReasonPhrase());
+            throw new BuildException(
+                "Request unsuccessful. Response from server: " . $response->getStatus()
+                . " " . $response->getReasonPhrase()
+            );
         }
-         
+
         $content = $response->getBody();
         $disposition = $response->getHeader('content-disposition');
-        
+
         if ($this->filename) {
             $filename = $this->filename;
+
         } elseif ($disposition && 0 == strpos($disposition, 'attachment')
-            && preg_match('/filename="([^"]+)"/', $disposition, $m)) {
+            && preg_match('/filename="([^"]+)"/', $disposition, $m)
+        ) {
             $filename = basename($m[1]);
+
         } else {
             $filename = basename(parse_url($this->url, PHP_URL_PATH));
         }
@@ -145,37 +130,30 @@ class HttpGetTask extends Task
         if (!is_writable($this->dir)) {
             throw new BuildException("Cannot write to directory: " . $this->dir);
         }
-         
+
         $filename = $this->dir . "/" . $filename;
         file_put_contents($filename, $content);
-         
+
         $this->log("Contents from " . $this->url . " saved to $filename");
     }
 
     /**
-     * Sets the request URL
-     * 
-     * @param string $url
-     */
-    public function setUrl($url) {
-        $this->url = $url;
-    }
-
-    /**
      * Sets the filename to store the output in
-     * 
+     *
      * @param string $filename
      */
-    public function setFilename($filename) {
+    public function setFilename($filename)
+    {
         $this->filename = $filename;
     }
 
     /**
      * Sets the save location
-     * 
+     *
      * @param string $dir
      */
-    public function setDir($dir) {
+    public function setDir($dir)
+    {
         $this->dir = $dir;
     }
 
@@ -188,7 +166,7 @@ class HttpGetTask extends Task
     {
         $this->sslVerifyPeer = $value;
     }
-    
+
     /**
      * Sets the follow_redirects option
      *
@@ -204,7 +182,8 @@ class HttpGetTask extends Task
      *
      * @param string $proxy
      */
-    public function setProxy($proxy) {
-        $this->_proxy = $proxy;
+    public function setProxy($proxy)
+    {
+        $this->proxy = $proxy;
     }
 }

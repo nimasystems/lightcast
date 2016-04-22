@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: PharMetadata.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: a2ac87525ca9022012d9961946b556eb0d3ba3f3 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -32,6 +32,7 @@ class PharMetadata
      * @var array
      */
     protected $elements = array();
+
     /**
      * @return PharMetadataElement
      */
@@ -39,6 +40,7 @@ class PharMetadata
     {
         return ($this->elements[] = new PharMetadataElement());
     }
+
     /**
      * @return array
      */

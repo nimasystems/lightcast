@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PhkPackageWebAccess.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 37ba9ef129372cad5ee8e00607f98042ec1c59fe $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -31,6 +31,7 @@ class PhkPackageWebAccess
      * @var array
      */
     private $paths = array();
+
     /**
      * @return PhkPackageWebAccessPath
      */
@@ -38,6 +39,7 @@ class PhkPackageWebAccess
     {
         return ($this->paths[] = new PhkPackageWebAccessPath());
     }
+
     /**
      * @return array
      */

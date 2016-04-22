@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PDOResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 07ef257c685f448c71fffb98303cbedd07a92245 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,7 +22,7 @@
 require_once 'phing/system/io/PhingFile.php';
 
 /**
- * Abstract 
+ * Abstract
  *
  * @author Hans Lellelid <hans@xmpl.org>
  * @package phing.tasks.ext.pdo
@@ -42,7 +42,8 @@ abstract class PDOResultFormatter
      *
      * @param Writer $out
      */
-    public function setOutput(Writer $out) {
+    public function setOutput(Writer $out)
+    {
         $this->out = $out;
     }
 
@@ -51,7 +52,8 @@ abstract class PDOResultFormatter
      *
      * @return Writer
      */
-    public function getOutput() {
+    public function getOutput()
+    {
         return $this->out;
     }
 
@@ -64,7 +66,8 @@ abstract class PDOResultFormatter
     /**
      * Perform any initialization.
      */
-    public function initialize() {
+    public function initialize()
+    {
 
     }
 
@@ -78,7 +81,8 @@ abstract class PDOResultFormatter
     /**
      * Perform any final tasks and Close the writer.
      */
-    public function close() {
+    public function close()
+    {
         $this->out->close();
     }
 }

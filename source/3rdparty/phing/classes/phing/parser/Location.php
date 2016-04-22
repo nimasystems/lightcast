@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: Location.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: feed38557f156bd1c61593a048f37c2e246faf87 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,12 +24,12 @@
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: Location.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: feed38557f156bd1c61593a048f37c2e246faf87 $
  * @package   phing.parser
  */
 
-class Location {
+class Location
+{
 
     private $fileName;
     private $lineNumber;
@@ -41,9 +41,9 @@ class Location {
      * @param  string  the filename
      * @param  integer the line number
      * @param  integer the column number
-     * @access public
      */
-    function Location($fileName = null, $lineNumber = null, $columnNumber = null) {
+    public function __construct($fileName = null, $lineNumber = null, $columnNumber = null)
+    {
         $this->fileName = $fileName;
         $this->lineNumber = $lineNumber;
         $this->columnNumber = $columnNumber;
@@ -56,21 +56,26 @@ class Location {
      * returns empty string.
      *
      * @return string the string representation of this Location object
-     * @access public
      */
-    function toString() {
+    public function toString()
+    {
         $buf = "";
         if ($this->fileName !== null) {
-            $buf.=$this->fileName;
+            $buf .= $this->fileName;
             if ($this->lineNumber !== null) {
-                $buf.= ":".$this->lineNumber;
+                $buf .= ":" . $this->lineNumber;
             }
-            $buf.=":".$this->columnNumber;
+            $buf .= ":" . $this->columnNumber;
         }
+
         return (string) $buf;
     }
 
-    function __toString () {
-      return $this->toString();
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 }

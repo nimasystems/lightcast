@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnLogTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 7e1ed209fca1c776aa105241110a78a65284f6ae $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  *
  * @author Anton Stöckl <anton@stoeckl.de>
  * @author Michiel Rook <mrook@php.net> (SvnLastRevisionTask)
- * @version $Id: SvnLogTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 7e1ed209fca1c776aa105241110a78a65284f6ae $
  * @package phing.tasks.ext.svn
  * @see VersionControl_SVN
  * @since 2.1.0
@@ -40,8 +40,9 @@ class SvnLogTask extends SvnBaseTask
 
     /**
      * Sets the name of the property to use
+     * @param $propertyName
      */
-    function setPropertyName($propertyName)
+    public function setPropertyName($propertyName)
     {
         $this->propertyName = $propertyName;
     }
@@ -49,7 +50,7 @@ class SvnLogTask extends SvnBaseTask
     /**
      * Returns the name of the property to use
      */
-    function getPropertyName()
+    public function getPropertyName()
     {
         return $this->propertyName;
     }
@@ -57,6 +58,7 @@ class SvnLogTask extends SvnBaseTask
     /**
      * Sets whether to force compatibility with older SVN versions (< 1.2)
      * @deprecated
+     * @param $force
      */
     public function setForceCompatible($force)
     {
@@ -64,8 +66,9 @@ class SvnLogTask extends SvnBaseTask
 
     /**
      * Sets the max num of log entries to get from svn
+     * @param $limit
      */
-    function setLimit($limit)
+    public function setLimit($limit)
     {
         $this->limit = (int) $limit;
     }
@@ -75,18 +78,18 @@ class SvnLogTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('log');
 
-        $switches= array();
+        $switches = array();
         if ($this->limit > 0) {
             $switches['limit'] = $this->limit;
         }
 
         $output = $this->run(array(), $switches);
         $result = null;
-        
+
         if ($this->oldVersion) {
             foreach ($output as $line) {
                 $result .= (!empty($result)) ? "\n" : '';

@@ -22,14 +22,13 @@ require_once 'phing/tasks/ext/liquibase/AbstractLiquibaseTask.php';
  * Rollbacks the database changes.
  *
  * @author Stephan Hochdoerfer <S.Hochdoerfer@bitExpert.de>
- * @version $Id: LiquibaseRollbackTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 1915fb3b50b9c646643a44df4cf4457a2c79f6f1 $
  * @since 2.4.10
  * @package phing.tasks.ext.liquibase
  */
 class LiquibaseRollbackTask extends AbstractLiquibaseTask
 {
     protected $rollbackTag;
-
 
     /**
      * Sets the name of the tag to roll back to.
@@ -41,7 +40,6 @@ class LiquibaseRollbackTask extends AbstractLiquibaseTask
         $this->rollbackTag = $rollbackTag;
     }
 
-
     /**
      * @see AbstractTask::checkParams()
      */
@@ -49,17 +47,15 @@ class LiquibaseRollbackTask extends AbstractLiquibaseTask
     {
         parent::checkParams();
 
-        if(null === $this->rollbackTag)
-        {
+        if (null === $this->rollbackTag) {
             throw new BuildException(
-            sprintf(
-					'Please specify the tag to rollback to!',
-            $this->rollbackTag
-            )
+                sprintf(
+                    'Please specify the tag to rollback to!',
+                    $this->rollbackTag
+                )
             );
         }
     }
-
 
     /**
      * @see Task::main()

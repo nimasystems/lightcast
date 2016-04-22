@@ -1,7 +1,7 @@
 <?php
 
 /**
- * $Id: ParallelTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: aec45bda16dccf81c18561f29f4923bc94fae280 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,17 +18,17 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
- * 
+ *
  * @package phing.tasks.ext
  */
 
 /**
  * Uses the DocBlox_Parallel library to run nested Phing tasks concurrently.
- * 
+ *
  * WARNING: this task is highly experimental!
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: ParallelTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: aec45bda16dccf81c18561f29f4923bc94fae280 $
  * @package phing.tasks.ext
  * @see https://github.com/phpdocumentor/Parallel
  * @since 2.4.10
@@ -40,7 +40,7 @@ class ParallelTask extends SequentialTask
      * @var int
      */
     private $threadCount = 2;
-    
+
     /**
      * Sets the maximum number of threads / processes to use
      * @param int $threadCount
@@ -49,11 +49,11 @@ class ParallelTask extends SequentialTask
     {
         $this->threadCount = $threadCount;
     }
-    
+
     public function init()
     {
     }
-    
+
     public function main()
     {
         @include_once 'phing/contrib/DocBlox/Parallel/Manager.php';
@@ -68,16 +68,25 @@ class ParallelTask extends SequentialTask
 
         $mgr = new DocBlox_Parallel_Manager();
         $mgr->setProcessLimit($this->threadCount);
-        
+
         foreach ($this->nestedTasks as $task) {
             $worker = new DocBlox_Parallel_Worker(
                 array($task, 'perform'),
                 array($task)
             );
-            
+
             $mgr->addWorker($worker);
         }
-        
+
         $mgr->execute();
+
+        /** @var DocBlox_Parallel_Worker $nestedTask */
+        foreach ($mgr as $nestedTask) {
+            if ($nestedTask->getError() === "") {
+                continue;
+            }
+
+            throw new BuildException($nestedTask->getError());
+        }
     }
 }

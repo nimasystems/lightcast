@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnLastRevisionTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 61bd055f46bd8430785610a76271250d2e30786e $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Stores the number of the last revision of a workingcopy in a property
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: SvnLastRevisionTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 61bd055f46bd8430785610a76271250d2e30786e $
  * @package phing.tasks.ext.svn
  * @see VersionControl_SVN
  * @since 2.1.0
@@ -38,32 +38,36 @@ class SvnLastRevisionTask extends SvnBaseTask
 
     /**
      * Sets the name of the property to use
+     * @param string $propertyName
      */
-    function setPropertyName($propertyName)
+    public function setPropertyName($propertyName)
     {
         $this->propertyName = $propertyName;
     }
 
     /**
      * Returns the name of the property to use
+     * @return string
      */
-    function getPropertyName()
+    public function getPropertyName()
     {
         return $this->propertyName;
     }
-    
+
     /**
      * Sets whether to force compatibility with older SVN versions (< 1.2)
      *
      * Retained for legacy reasons
      * @deprecated
+     * @param $force
      */
     public function setForceCompatible($force)
     {
     }
-    
+
     /**
      * Sets whether to retrieve the last changed revision
+     * @param $lastChanged
      */
     public function setLastChanged($lastChanged)
     {
@@ -75,17 +79,17 @@ class SvnLastRevisionTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('info');
-        
+
         if ($this->oldVersion) {
             $output = $this->run(array('--xml'));
-            
+
             if (!($xmlObj = @simplexml_load_string($output))) {
                 throw new BuildException("Failed to parse the output of 'svn info --xml'.");
             }
-            
+
             if ($this->lastChanged) {
                 $found = (int) $xmlObj->entry->commit['revision'];
             } else {
@@ -93,18 +97,18 @@ class SvnLastRevisionTask extends SvnBaseTask
             }
         } else {
             $output = $this->run();
-            
+
             if (empty($output) || !isset($output['entry'][0])) {
                 throw new BuildException("Failed to parse the output of 'svn info'.");
             }
-            
+
             if ($this->lastChanged) {
                 $found = $output['entry'][0]['commit']['revision'];
             } else {
                 $found = $output['entry'][0]['revision'];
             }
         }
-        
+
         $this->project->setProperty($this->getPropertyName(), $found);
     }
 }

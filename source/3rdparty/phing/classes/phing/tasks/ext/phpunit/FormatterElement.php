@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: FormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: d9772e92cb3f8171dcfe721066c2f23f46f20c58 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,24 +25,24 @@ require_once 'phing/system/io/PhingFile.php';
  * A wrapper for the implementations of PHPUnit2ResultFormatter.
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: FormatterElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: d9772e92cb3f8171dcfe721066c2f23f46f20c58 $
  * @package phing.tasks.ext.phpunit
  * @since 2.1.0
  */
 class FormatterElement
 {
-    protected $formatter = NULL;
-    
+    protected $formatter = null;
+
     protected $type = "";
-    
+
     protected $useFile = true;
-    
+
     protected $toDir = ".";
-    
+
     protected $outfile = "";
-    
-    protected $parent = NULL;
-    
+
+    protected $parent = null;
+
     /**
      * Sets parent task
      * @param Task $parent Calling Task
@@ -59,38 +59,11 @@ class FormatterElement
     public function setType($type)
     {
         $this->type = $type;
-        
-        if ($this->type == "summary")
-        {
-            require_once 'phing/tasks/ext/phpunit/formatter/SummaryPHPUnitResultFormatter.php';
-            $this->formatter = new SummaryPHPUnitResultFormatter($this->parent);
-        }
-        else
-        if ($this->type == "clover")
-        {
-            require_once 'phing/tasks/ext/phpunit/formatter/CloverPHPUnitResultFormatter.php';
-            $this->formatter = new CloverPHPUnitResultFormatter($this->parent);
-        }
-        else
-        if ($this->type == "xml")
-        {
-            require_once 'phing/tasks/ext/phpunit/formatter/XMLPHPUnitResultFormatter.php';
-            $this->formatter = new XMLPHPUnitResultFormatter($this->parent);
-        }
-        else
-        if ($this->type == "plain")
-        {
-            require_once 'phing/tasks/ext/phpunit/formatter/PlainPHPUnitResultFormatter.php';
-            $this->formatter = new PlainPHPUnitResultFormatter($this->parent);
-        }
-        else
-        {
-            throw new BuildException("Formatter '" . $this->type . "' not implemented");
-        }
     }
 
     /**
      * Loads a specific formatter class
+     * @param $className
      */
     public function setClassName($className)
     {
@@ -101,12 +74,13 @@ class FormatterElement
 
     /**
      * Sets whether to store formatting results in a file
+     * @param $useFile
      */
     public function setUseFile($useFile)
     {
         $this->useFile = $useFile;
     }
-    
+
     /**
      * Returns whether to store formatting results in a file
      */
@@ -114,16 +88,21 @@ class FormatterElement
     {
         return $this->useFile;
     }
-    
+
     /**
      * Sets output directory
      * @param string $toDir
      */
     public function setToDir($toDir)
     {
+        if (!is_dir($toDir)) {
+            $toDir = new PhingFile($toDir);
+            $toDir->mkdirs();
+        }
+
         $this->toDir = $toDir;
     }
-    
+
     /**
      * Returns output directory
      * @return string
@@ -141,23 +120,20 @@ class FormatterElement
     {
         $this->outfile = $outfile;
     }
-    
+
     /**
      * Returns output filename
      * @return string
      */
     public function getOutfile()
     {
-        if ($this->outfile)
-        {
+        if ($this->outfile) {
             return $this->outfile;
-        }
-        else
-        {
+        } else {
             return $this->formatter->getPreferredOutfile() . $this->getExtension();
         }
     }
-    
+
     /**
      * Returns extension
      * @return string
@@ -169,10 +145,34 @@ class FormatterElement
 
     /**
      * Returns formatter object
+     * @throws BuildException
      * @return PHPUnitResultFormatter
      */
     public function getFormatter()
     {
+        if ($this->formatter !== null) {
+            return $this->formatter;
+        }
+
+        if ($this->type == "summary") {
+            require_once 'phing/tasks/ext/phpunit/formatter/SummaryPHPUnitResultFormatter.php';
+            $this->formatter = new SummaryPHPUnitResultFormatter($this->parent);
+        } elseif ($this->type == "clover") {
+            require_once 'phing/tasks/ext/phpunit/formatter/CloverPHPUnitResultFormatter.php';
+            $this->formatter = new CloverPHPUnitResultFormatter($this->parent);
+        } elseif ($this->type == "xml") {
+            require_once 'phing/tasks/ext/phpunit/formatter/XMLPHPUnitResultFormatter.php';
+            $this->formatter = new XMLPHPUnitResultFormatter($this->parent);
+        } elseif ($this->type == "plain") {
+            require_once 'phing/tasks/ext/phpunit/formatter/PlainPHPUnitResultFormatter.php';
+            $this->formatter = new PlainPHPUnitResultFormatter($this->parent);
+        } elseif ($this->type == "crap4j") {
+            require_once 'phing/tasks/ext/phpunit/formatter/Crap4jPHPUnitResultFormatter.php';
+            $this->formatter = new Crap4jPHPUnitResultFormatter($this->parent);
+        } else {
+            throw new BuildException("Formatter '" . $this->type . "' not implemented");
+        }
+
         return $this->formatter;
     }
 }

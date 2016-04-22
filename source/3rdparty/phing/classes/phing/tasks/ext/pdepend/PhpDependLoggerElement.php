@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PhpDependLoggerElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: c5b569118db6a6d66c6568702f14e8ae37fad9a3 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/system/io/PhingFile.php';
  *
  * @package phing.tasks.ext.pdepend
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: PhpDependLoggerElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: c5b569118db6a6d66c6568702f14e8ae37fad9a3 $
  * @since   2.4.1
  */
 class PhpDependLoggerElement
@@ -36,27 +36,27 @@ class PhpDependLoggerElement
      *
      * @var string
      */
-    protected $_type = '';
+    protected $type = '';
 
     /**
      * Output file for logger.
      *
      * @var PhingFile
      */
-    protected $_outfile = null;
+    protected $outfile = null;
 
     /**
      * Sets the logger type.
      *
      * @param string $type Type of the logger
      *
-     * @return void
+     * @throws BuildException
      */
     public function setType($type)
     {
-        $this->_type = $type;
+        $this->type = $type;
 
-        switch ($this->_type) {
+        switch ($this->type) {
             case 'jdepend-chart':
             case 'jdepend-xml':
             case 'overview-pyramid':
@@ -65,9 +65,7 @@ class PhpDependLoggerElement
                 break;
 
             default:
-                throw new BuildException(
-                    "Logger '" . $this->_type . "' not implemented"
-                );
+                throw new BuildException('Logger "' . $this->type . '" not implemented');
         }
     }
 
@@ -78,19 +76,17 @@ class PhpDependLoggerElement
      */
     public function getType()
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
      * Sets the output file for the logger results.
      *
      * @param PhingFile $outfile The output file
-     *
-     * @return void
      */
     public function setOutfile(PhingFile $outfile)
     {
-        $this->_outfile = $outfile;
+        $this->outfile = $outfile;
     }
 
     /**
@@ -100,6 +96,6 @@ class PhpDependLoggerElement
      */
     public function getOutfile()
     {
-        return $this->_outfile;
+        return $this->outfile;
     }
 }

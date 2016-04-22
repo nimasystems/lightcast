@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DbmsSyntaxPgSQL.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: ee3d162c42e59a87e2cde17d64360fa16955fa85 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,19 +18,21 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 /**
  * Utility class for generating necessary server-specific SQL commands
  *
  * @author   Remy BREUILS
- * @version  $Id: DbmsSyntaxPgSQL.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: ee3d162c42e59a87e2cde17d64360fa16955fa85 $
  * @package  phing.tasks.ext.dbdeploy
  */
-class DbmsSyntaxPgSQL extends DbmsSyntax 
+class DbmsSyntaxPgSQL extends DbmsSyntax
 {
+    /**
+     * @return string
+     */
     public function generateTimestamp()
     {
         return "NOW()";
     }
 }
-

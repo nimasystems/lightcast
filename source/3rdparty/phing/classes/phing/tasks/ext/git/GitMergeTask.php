@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitMergeTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: e5d20b926ab512d72bfc19ac2f1ccc80d09f036c $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/git/GitBaseTask.php';
  * Wrapper aroung git-merge
  *
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitMergeTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e5d20b926ab512d72bfc19ac2f1ccc80d09f036c $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.3
@@ -88,7 +88,13 @@ class GitMergeTask extends GitBaseTask
      * @var array
      */
     private $validStrategies = array(
-        'octopus', 'ours', 'recursive', 'resolve', 'subtree');
+        'octopus',
+        'ours',
+        'theirs',
+        'recursive',
+        'resolve',
+        'subtree'
+    );
 
     /**
      * The main entry point for the task
@@ -126,13 +132,15 @@ class GitMergeTask extends GitBaseTask
             // check if strategy is valid
             if (false === in_array($strategy, $this->validStrategies)) {
                 throw new BuildException(
-                    "Could not find merge strategy '" . $strategy . "'\n".
+                    "Could not find merge strategy '" . $strategy . "'\n" .
                     "Available strategies are: " . implode(', ', $this->validStrategies));
             }
             $command->setOption('strategy', $strategy);
             if ($this->getStrategyOption()) {
                 $command->setOption(
-                    'strategy-option', $this->getStrategyOption());
+                    'strategy-option',
+                    $this->getStrategyOption()
+                );
             }
         }
 
@@ -150,107 +158,168 @@ class GitMergeTask extends GitBaseTask
         }
 
         $this->log(
-            sprintf('git-merge: replaying "%s" commits', $this->getRemote()), 
-            Project::MSG_INFO); 
+            sprintf('git-merge: replaying "%s" commits', $this->getRemote()),
+            Project::MSG_INFO
+        );
         $this->log('git-merge output: ' . trim($output), Project::MSG_INFO);
 
     }
 
+    /**
+     * @param $remote
+     */
     public function setRemote($remote)
     {
         $this->remote = $remote;
     }
 
+    /**
+     * @return string
+     */
     public function getRemote()
     {
         return $this->remote;
     }
 
+    /**
+     * @param $message
+     */
     public function setMessage($message)
     {
         $this->message = $message;
     }
 
+    /**
+     * @return string
+     */
     public function getMessage()
     {
         return $this->message;
     }
 
+    /**
+     * @param $strategy
+     */
     public function setStrategy($strategy)
     {
         $this->strategy = $strategy;
     }
 
+    /**
+     * @return string
+     */
     public function getStrategy()
     {
         return $this->strategy;
     }
 
+    /**
+     * @param $strategyOption
+     */
     public function setStrategyOption($strategyOption)
     {
         $this->strategyOption = $strategyOption;
     }
 
+    /**
+     * @return string
+     */
     public function getStrategyOption()
     {
         return $this->strategyOption;
     }
 
+    /**
+     * @param $flag
+     */
     public function setQuiet($flag)
     {
         $this->quiet = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getQuiet()
     {
         return $this->quiet;
     }
 
+    /**
+     * @return bool
+     */
     public function isQuiet()
     {
         return $this->getQuiet();
     }
 
+    /**
+     * @param $flag
+     */
     public function setCommit($flag)
     {
-        $this->commit = (boolean)$flag;
+        $this->commit = (boolean) $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getCommit()
     {
         return $this->commit;
     }
 
+    /**
+     * @return bool
+     */
     public function isCommit()
     {
         return $this->getCommit();
     }
 
+    /**
+     * @param $flag
+     */
     public function setNoCommit($flag)
     {
-        $this->noCommit = (boolean)$flag;
+        $this->noCommit = (boolean) $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getNoCommit()
     {
         return $this->noCommit;
     }
 
+    /**
+     * @return bool
+     */
     public function isNoCommit()
     {
         return $this->getNoCommit();
     }
 
+    /**
+     * @param $flag
+     */
     public function setFastForwardCommit($flag)
     {
         $this->fastForwardCommit = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getFastForwardCommit()
     {
         return $this->fastForwardCommit;
     }
 
+    /**
+     * @return bool
+     */
     public function isFastForwardCommit()
     {
         return $this->getFastForwardCommit();

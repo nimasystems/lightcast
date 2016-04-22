@@ -26,7 +26,7 @@ require_once 'phing/system/io/FileSystem.php';
  *
  * @author  Joakim Bodin <joakim.bodin+phing@gmail.com>
  * @author  George Miroshnikov <laggy.luke@gmail.com>
- * @version $Id: UnzipTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 5cd1dcc3efd193ed2c40aa7ca2b39cfbb5accf80 $
  * @package phing.tasks.ext
  */
 class UnzipTask extends ExtractBaseTask
@@ -38,25 +38,30 @@ class UnzipTask extends ExtractBaseTask
      */
     protected function extractArchive(PhingFile $zipfile)
     {
-        $this->log("Extracting zip: " . $zipfile->__toString() . ' to ' . $this->todir->__toString(), Project::MSG_INFO);
-        
+        $this->log(
+            "Extracting zip: " . $zipfile->__toString() . ' to ' . $this->todir->__toString(),
+            Project::MSG_INFO
+        );
+
         $zip = new ZipArchive();
-        
+
         $result = $zip->open($zipfile->getAbsolutePath());
         if (!$result) {
             $this->log("Unable to open zipfile " . $zipfile->__toString(), Project::MSG_ERR);
+
             return false;
         }
-        
+
         $result = $zip->extractTo($this->todir->getAbsolutePath());
         if (!$result) {
             $this->log("Unable to extract zipfile " . $zipfile->__toString(), Project::MSG_ERR);
+
             return false;
         }
-        
+
         return true;
     }
-    
+
     /**
      * List archive content
      * @param PhingFile Zip file to list content
@@ -66,14 +71,14 @@ class UnzipTask extends ExtractBaseTask
     {
         $zip = new ZipArchive();
         $zip->open($zipfile->getAbsolutePath());
-        
+
         $content = array();
         for ($i = 0; $i < $zip->numFiles; $i++) {
             $content[] = array(
                 'filename' => $zip->getNameIndex($i)
             );
         }
+
         return $content;
     }
 }
-

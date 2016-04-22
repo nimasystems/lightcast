@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPUnitReportTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 736c93aeebfee971ec02e321baf6e0120d58e937 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,12 +27,12 @@ require_once 'phing/util/ExtendedFileStream.php';
 /**
  * Transform a PHPUnit xml report using XSLT.
  * This transformation generates an html report in either framed or non-framed
- * style. The non-framed style is convenient to have a concise report via mail, 
- * the framed report is much more convenient if you want to browse into 
+ * style. The non-framed style is convenient to have a concise report via mail,
+ * the framed report is much more convenient if you want to browse into
  * different packages or testcases since it is a Javadoc like report.
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: PHPUnitReportTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 736c93aeebfee971ec02e321baf6e0120d58e937 $
  * @package phing.tasks.ext.phpunit
  * @since 2.1.0
  */
@@ -40,8 +40,12 @@ class PHPUnitReportTask extends Task
 {
     private $format = "noframes";
     private $styleDir = "";
-    private $toDir = "";
-    
+
+    /**
+     * @var PhingFile
+     */
+    private $toDir;
+
     /**
      * Whether to use the sorttable JavaScript library, defaults to false
      * See {@link http://www.kryogenix.org/code/browser/sorttable/)}
@@ -55,6 +59,8 @@ class PHPUnitReportTask extends Task
 
     /**
      * Set the filename of the XML results file to use.
+     * @param PhingFile $inFile
+     * @return void
      */
     public function setInFile(PhingFile $inFile)
     {
@@ -63,6 +69,8 @@ class PHPUnitReportTask extends Task
 
     /**
      * Set the format of the generated report. Must be noframes or frames.
+     * @param $format
+     * @return void
      */
     public function setFormat($format)
     {
@@ -71,6 +79,8 @@ class PHPUnitReportTask extends Task
 
     /**
      * Set the directory where the stylesheets are located.
+     * @param $styleDir
+     * @return void
      */
     public function setStyleDir($styleDir)
     {
@@ -78,104 +88,97 @@ class PHPUnitReportTask extends Task
     }
 
     /**
-     * Set the directory where the files resulting from the 
+     * Set the directory where the files resulting from the
      * transformation should be written to.
+     * @param PhingFile $toDir
+     * @return void
      */
     public function setToDir(PhingFile $toDir)
     {
         $this->toDir = $toDir;
     }
-    
+
     /**
      * Sets whether to use the sorttable JavaScript library, defaults to false
      * See {@link http://www.kryogenix.org/code/browser/sorttable/)}
      *
      * @param boolean $useSortTable
+     * @return void
      */
     public function setUseSortTable($useSortTable)
     {
         $this->useSortTable = (boolean) $useSortTable;
     }
-    
+
     /**
      * Returns the path to the XSL stylesheet
+     * @throws BuildException
      */
     protected function getStyleSheet()
     {
         $xslname = "phpunit-" . $this->format . ".xsl";
-        
-        if ($this->styleDir)
-        {
+
+        if ($this->styleDir) {
             $file = new PhingFile($this->styleDir, $xslname);
-        }
-        else
-        {
+        } else {
             $path = Phing::getResourcePath("phing/etc/$xslname");
-            
-            if ($path === NULL)
-            {
+
+            if ($path === null) {
                 $path = Phing::getResourcePath("etc/$xslname");
 
-                if ($path === NULL)
-                {
+                if ($path === null) {
                     throw new BuildException("Could not find $xslname in resource path");
                 }
             }
-            
+
             $file = new PhingFile($path);
         }
 
-        if (!$file->exists())
-        {
+        if (!$file->exists()) {
             throw new BuildException("Could not find file " . $file->getPath());
         }
 
         return $file;
     }
-    
+
     /**
      * Transforms the DOM document
+     * @param DOMDocument $document
+     * @throws BuildException
+     * @throws IOException
      */
     protected function transform(DOMDocument $document)
     {
-        if (!$this->toDir->exists())
-        {
+        if (!$this->toDir->exists()) {
             throw new BuildException("Directory '" . $this->toDir . "' does not exist");
         }
-        
+
         $xslfile = $this->getStyleSheet();
 
         $xsl = new DOMDocument();
         $xsl->load($xslfile->getAbsolutePath());
 
         $proc = new XSLTProcessor();
-        if (defined('XSL_SECPREF_WRITE_FILE'))
-        {
-            if (version_compare(PHP_VERSION,'5.4',"<"))
-            {
+        if (defined('XSL_SECPREF_WRITE_FILE')) {
+            if (version_compare(PHP_VERSION, '5.4', "<")) {
                 ini_set("xsl.security_prefs", XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
-            }
-            else
-            {
+            } else {
                 $proc->setSecurityPrefs(XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
             }
         }
-        
-        $proc->importStyleSheet($xsl);
-        $proc->setParameter('', 'output.sorttable', $this->useSortTable);
 
-        if ($this->format == "noframes")
-        {
+        $proc->importStyleSheet($xsl);
+        $proc->setParameter('', 'output.sorttable', (string) $this->useSortTable);
+
+        if ($this->format == "noframes") {
             $writer = new FileWriter(new PhingFile($this->toDir, "phpunit-noframes.html"));
             $writer->write($proc->transformToXML($document));
             $writer->close();
-        }
-        else
-        {
+        } else {
             ExtendedFileStream::registerStream();
-            
+
             $toDir = (string) $this->toDir;
-            
+
             // urlencode() the path if we're on Windows
             if (FileSystem::getFileSystem()->getSeparator() == '\\') {
                 $toDir = urlencode($toDir);
@@ -185,42 +188,63 @@ class PHPUnitReportTask extends Task
             // it's all done by extension...
             $proc->setParameter('', 'output.dir', $toDir);
             $proc->transformToXML($document);
-            
+
             ExtendedFileStream::unregisterStream();
         }
     }
-    
+
     /**
      * Fixes DOM document tree:
      *   - adds package="default" to 'testsuite' elements without
      *     package attribute
      *   - removes outer 'testsuite' container(s)
+     * @param DOMDocument $document
      */
     protected function fixDocument(DOMDocument $document)
     {
         $rootElement = $document->firstChild;
-        
+
         $xp = new DOMXPath($document);
-        
+
         $nodes = $xp->query("/testsuites/testsuite");
-        
+
         foreach ($nodes as $node) {
             $children = $xp->query("./testsuite", $node);
-            
+
             if ($children->length) {
                 foreach ($children as $child) {
-                    if (!$child->hasAttribute('package'))
-                    {
-                        $child->setAttribute('package', 'default');
-                    }
                     $rootElement->appendChild($child);
+
+                    if ($child->hasAttribute('package')) {
+                        continue;
+                    }
+
+                    if ($child->hasAttribute('namespace')) {
+                        $child->setAttribute('package', $child->getAttribute('namespace'));
+                        continue;
+                    }
+
+                    $package = 'default';
+                    $refClass = new ReflectionClass($child->getAttribute('name'));
+
+                    if (preg_match('/@package\s+(.*)\r?\n/m', $refClass->getDocComment(), $matches)) {
+                        $package = end($matches);
+                    } elseif (method_exists($refClass, 'getNamespaceName')) {
+                        $namespace = $refClass->getNamespaceName();
+
+                        if ($namespace !== '') {
+                            $package = $namespace;
+                        }
+                    }
+
+                    $child->setAttribute('package', trim($package));
                 }
-                
+
                 $rootElement->removeChild($node);
             }
         }
     }
-    
+
     /**
      * Initialize the task
      */
@@ -240,9 +264,9 @@ class PHPUnitReportTask extends Task
     {
         $testSuitesDoc = new DOMDocument();
         $testSuitesDoc->load((string) $this->inFile);
-        
+
         $this->fixDocument($testSuitesDoc);
-        
+
         $this->transform($testSuitesDoc);
     }
 }

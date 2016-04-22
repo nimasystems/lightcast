@@ -17,7 +17,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  *
- * @version $Id: DummyPDOQuerySplitter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 9e64e7e9e66982fa11e85ccde7b9ab5756076872 $
  * @package phing.tasks.ext.pdo
  */
 
@@ -26,10 +26,10 @@ require_once 'phing/tasks/ext/pdo/PDOQuerySplitter.php';
 /**
  * Dummy query splitter: converts entire input into single
  * SQL string
- * 
+ *
  * @author  Michiel Rook <mrook@php.net>
  * @package phing.tasks.ext.pdo
- * @version $Id: DummyPDOQuerySplitter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 9e64e7e9e66982fa11e85ccde7b9ab5756076872 $
  */
 class DummyPDOQuerySplitter extends PDOQuerySplitter
 {
@@ -40,23 +40,35 @@ class DummyPDOQuerySplitter extends PDOQuerySplitter
      */
     public function nextQuery()
     {
-        $sql      = null;
+        $sql = null;
 
         while (($line = $this->sqlReader->readLine()) !== null) {
             $delimiter = $this->parent->getDelimiter();
-            $project   = $this->parent->getOwningTarget()->getProject();
-            $line      = ProjectConfigurator::replaceProperties(
-                             $project, trim($line), $project->getProperties()
-                         );
+            $project = $this->parent->getOwningTarget()->getProject();
+            $line = ProjectConfigurator::replaceProperties(
+                $project,
+                trim($line),
+                $project->getProperties()
+            );
 
             if (($line != $delimiter) && (
-                StringHelper::startsWith("//", $line) ||
-                StringHelper::startsWith("--", $line) ||
-                StringHelper::startsWith("#", $line))) {
+                    StringHelper::startsWith("//", $line) ||
+                    StringHelper::startsWith("--", $line) ||
+                    StringHelper::startsWith("#", $line))
+            ) {
                 continue;
             }
 
             $sql .= " " . $line . "\n";
+
+            /**
+             * fix issue with PDO and wrong formated multistatements
+             * @issue 1108
+             */
+            if (StringHelper::endsWith($delimiter, $line)) {
+                break;
+            }
+
         }
 
         return $sql;

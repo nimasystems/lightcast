@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPCPDResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: e8921b5a15fd23ce437471250c7161884560e202 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -24,17 +24,17 @@
  *
  * @package phing.tasks.ext.phpcpd.formatter
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: PHPCPDResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e8921b5a15fd23ce437471250c7161884560e202 $
  */
 abstract class PHPCPDResultFormatter
 {
     /**
      * Processes a list of clones.
      *
-     * @param object $clones
-     * @param Project $project
-     * @param boolean $useFile
-     * @param PhingFile|null $outfile
+     * @param object         $clones
+     * @param Project        $project
+     * @param boolean        $useFile
+     * @param PhingFile|null $outFile
      */
     abstract public function processClones($clones, Project $project, $useFile = false, $outFile = null);
 }

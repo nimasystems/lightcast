@@ -26,6 +26,7 @@ class lcPropel extends Propel
     const TRANSLATION_DOMAIN = 'database_models';
 
     const BASE_CLASS = 'lcBasePropelObject';
+    const BASE_QUERY_CLASS = 'lcBaseQueryObject';
     const BASE_PEER_CLASS = 'lcBasePeer';
 
     const CONTEXT_TYPE_ATTR = 'lcContextType';

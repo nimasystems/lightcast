@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DbmsSyntaxOracle.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: adc9b31780df2145519b4d451cb462527bd200f5 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,24 +18,29 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 /**
  * Utility class for generating necessary server-specific SQL commands
  *
  * @author   Luke Crouch at SourceForge (http://sourceforge.net)
- * @version  $Id: DbmsSyntaxOracle.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: adc9b31780df2145519b4d451cb462527bd200f5 $
  * @package  phing.tasks.ext.dbdeploy
  */
-class DbmsSyntaxOracle extends DbmsSyntax 
+class DbmsSyntaxOracle extends DbmsSyntax
 {
+    /**
+     * @param $db
+     */
     public function applyAttributes($db)
     {
         $db->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
     }
-    
+
+    /**
+     * @return string
+     */
     public function generateTimestamp()
     {
         return "(sysdate - to_date('01-JAN-1970','DD-MON-YYYY')) * (86400)";
     }
 }
-

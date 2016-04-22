@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: PhingXMLContext.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 077aa8989e2f94958a9e053a52a3eff7e58938b0 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,18 +23,43 @@
  * Track the current state of the Xml parse operation.
  *
  * @author    Bryan Davis <bpd@keynetics.com>
- * @version   $Id: PhingXMLContext.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: 077aa8989e2f94958a9e053a52a3eff7e58938b0 $
  * @package   phing.parser
  */
-class PhingXMLContext {
+class PhingXMLContext
+{
+
+    /**
+     * Target that will hold all tasks/types placed outside of targets
+     *
+     * @var Target
+     */
+    private $implicitTarget;
+
+    /**
+     * Current target
+     *
+     * @var Target
+     */
+    private $currentTarget = null;
+
+    /**
+     * List of current targets
+     *
+     * @var Target[]
+     */
+    private $currentTargets = null;
 
     /**
      * Constructor
-     * @param $project the project to which this antxml context belongs to
+     * @param Project $project the project to which this antxml context belongs to
      */
-    public function __construct ($project) {
-      $this->project = $project;
+    public function __construct(Project $project)
+    {
+        $this->project = $project;
+        $this->implicitTarget = new Target();
+        $this->implicitTarget->setName("");
+        $this->implicitTarget->setHidden(true);
     }
 
     /** The project to configure. */
@@ -42,40 +67,106 @@ class PhingXMLContext {
 
     private $configurators = array();
 
-    public function startConfigure ($cfg) {
-      $this->configurators[] = $cfg;
+    /**
+     * @param $cfg
+     */
+    public function startConfigure($cfg)
+    {
+        $this->configurators[] = $cfg;
     }
 
-    public function endConfigure () {
-      array_pop($this->configurators);
+    public function endConfigure()
+    {
+        array_pop($this->configurators);
     }
 
-    public function getConfigurator () {
-      $l = count($this->configurators);
-      if (0 == $l) {
-        return null;
-      } else {
-        return $this->configurators[$l - 1];
-      }
+    /**
+     * @return null
+     */
+    public function getConfigurator()
+    {
+        $l = count($this->configurators);
+        if (0 == $l) {
+            return null;
+        } else {
+            return $this->configurators[$l - 1];
+        }
     }
 
     /** Impoerted files */
     private $importStack = array();
 
-    public function addImport ($file) {
-      $this->importStack[] = $file;
+    /**
+     * @param $file
+     */
+    public function addImport($file)
+    {
+        $this->importStack[] = $file;
     }
 
-    public function getImportStack () {
-      return $this->importStack;
+    /**
+     * @return array
+     */
+    public function getImportStack()
+    {
+        return $this->importStack;
     }
 
     /**
      * find out the project to which this context belongs
      * @return project
      */
-    public function getProject() {
+    public function getProject()
+    {
         return $this->project;
+    }
+
+    /**
+     * @return Target
+     */
+    public function getImplicitTarget()
+    {
+        return $this->implicitTarget;
+    }
+
+    /**
+     * @param Target $target
+     */
+    public function setImplicitTarget(Target $target)
+    {
+        $this->implicitTarget = $target;
+    }
+
+    /**
+     * @return Target
+     */
+    public function getCurrentTarget()
+    {
+        return $this->currentTarget;
+    }
+
+    /**
+     * @param Target $target
+     */
+    public function setCurrentTarget(Target $target)
+    {
+        $this->currentTarget = $target;
+    }
+
+    /**
+     * @return Target[]
+     */
+    public function &getCurrentTargets()
+    {
+        return $this->currentTargets;
+    }
+
+    /**
+     * @param Target[] $currentTargets
+     */
+    public function setCurrentTargets(array $currentTargets)
+    {
+        $this->currentTargets = $currentTargets;
     }
 
 } //end PhingXMLContext

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: WinNTFileSystem.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 266f998d45e1dc5b48fb3c01dc7a5a596bc9d1b9 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -16,7 +16,7 @@
  *
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
- * <http://phing.info>. 
+ * <http://phing.info>.
  */
 
 include_once 'phing/system/io/Win32FileSystem.php';
@@ -25,10 +25,9 @@ include_once 'phing/system/io/Win32FileSystem.php';
  * FileSystem for Windows NT/2000.
  * @package phing.system.io
  */
-class WinNTFileSystem extends Win32FileSystem {
+class WinNTFileSystem extends Win32FileSystem
+{
 
     /* -- class only for convenience and future use everything is inherinted --*/
 
-
 }
-

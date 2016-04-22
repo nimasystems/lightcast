@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: Amazon.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: d064a9ec403afcb58953d4531fd251c91fc15e20 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -17,7 +17,7 @@
  *
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
- * <http://phing.info>. 
+ * <http://phing.info>.
  */
 
 require_once "phing/Task.php";
@@ -26,7 +26,7 @@ require_once "phing/Task.php";
  * Abstract Service_Amazon class.
  *
  * Implements common methods & properties used by all Amazon services
- * 
+ *
  * @extends Task
  * @version $ID$
  * @package phing.tasks.ext
@@ -36,85 +36,99 @@ require_once "phing/Task.php";
 abstract class Service_Amazon extends Task
 {
     /**
-	 * Collection of set options
-	 *
-	 * We set these magically so we can also load then from the environment
-	 * 
-	 * (default value: array())
-	 * 
-	 * @var array
-	 * @access protected
-	 */
-	protected $_options = array();
-	
-	public function __set($var, $val)
-	{
-		$this->_options[$var] = $val;
-	}
-	
-	/**
-	 * Property getter
-	 *
-	 * If the property hasn't been previously set (through the task call normally),
-	 * it will try to load it from the project
-	 *
-	 * This way, we can define global properties for the "Amazon" service, like key and secret
-	 * 
-	 * @access public
-	 * @param mixed $var
-	 * @return void
-	 */
-	public function __get($var)
-	{
-		if(!isset($this->$var)) {
-			if(!($val = $this->getProject()->getProperty('amazon.' . strtolower($var)))) {
-				return false;
-			} else {
-				return $val;
-			}
-		}
-		
-		return $this->_options[$var];
-	}
-	
-	public function __isset($var)
-	{
-		return array_key_exists($var, $this->_options);
-	}
+     * Collection of set options
+     *
+     * We set these magically so we can also load then from the environment
+     *
+     * (default value: array())
+     *
+     * @var array
+     */
+    protected $_options = array();
 
-	public function setKey($key)
-	{
-		if(empty($key) || !is_string($key)) {
-			throw new BuildException('Key must be a non empty string');
-		}
-		
-		$this->key = $key;
-	}
-	
-	public function getKey()
-	{
-		if(!($key = $this->key)) {
-			throw new BuildException('Key is not set');
-		}
+    /**
+     * @param $var
+     * @param $val
+     */
+    public function __set($var, $val)
+    {
+        $this->_options[$var] = $val;
+    }
 
-		return $key;
-	}
-	
-	public function setSecret($secret)
-	{
-		if(empty($secret) || !is_string($secret)) {
-			throw new BuildException('Secret must be a non empty string');
-		}
-		
-		$this->secret = $secret;
-	}
-	
-	public function getSecret()
-	{
-		if(!($secret = $this->secret)) {
+    /**
+     * Property getter
+     *
+     * If the property hasn't been previously set (through the task call normally),
+     * it will try to load it from the project
+     *
+     * This way, we can define global properties for the "Amazon" service, like key and secret
+     *
+     * @param  mixed $var
+     * @return mixed
+     */
+    public function __get($var)
+    {
+        if (!isset($this->$var)) {
+            if (!($val = $this->getProject()->getProperty('amazon.' . strtolower($var)))) {
+                return false;
+            } else {
+                return $val;
+            }
+        }
+
+        return $this->_options[$var];
+    }
+
+    /**
+     * @param $var
+     * @return bool
+     */
+    public function __isset($var)
+    {
+        return array_key_exists($var, $this->_options);
+    }
+
+    /**
+     * @param $key
+     * @throws BuildException
+     */
+    public function setKey($key)
+    {
+        if (empty($key) || !is_string($key)) {
+            throw new BuildException('Key must be a non empty string');
+        }
+
+        $this->key = $key;
+    }
+
+    public function getKey()
+    {
+        if (!($key = $this->key)) {
+            throw new BuildException('Key is not set');
+        }
+
+        return $key;
+    }
+
+    /**
+     * @param $secret
+     * @throws BuildException
+     */
+    public function setSecret($secret)
+    {
+        if (empty($secret) || !is_string($secret)) {
+            throw new BuildException('Secret must be a non empty string');
+        }
+
+        $this->secret = $secret;
+    }
+
+    public function getSecret()
+    {
+        if (!($secret = $this->secret)) {
             throw new BuildException('Secret is not set');
         }
-        
+
         return $this->secret;
-	}
+    }
 }

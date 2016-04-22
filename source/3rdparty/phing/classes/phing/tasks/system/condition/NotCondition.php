@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: NotCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 9bcbe1b79aee7edb15117fbde13481e5e7ec098a $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,13 +29,18 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: NotCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: 9bcbe1b79aee7edb15117fbde13481e5e7ec098a $
  * @package   phing.tasks.system.condition
  */
-class NotCondition extends ConditionBase implements Condition {
+class NotCondition extends ConditionBase implements Condition
+{
 
-    function evaluate() {
+    /**
+     * @return bool
+     * @throws BuildException
+     */
+    public function evaluate()
+    {
         if ($this->countConditions() > 1) {
             throw new BuildException("You must not nest more than one condition into <not>");
         }
@@ -43,6 +48,7 @@ class NotCondition extends ConditionBase implements Condition {
             throw new BuildException("You must nest a condition into <not>");
         }
         $conds = $this->getIterator();
+
         return !$conds->current()->evaluate();
     }
 }

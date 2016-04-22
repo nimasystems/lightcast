@@ -1,7 +1,5 @@
 <?php
 /**
- * $Id: BatchTest.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -26,27 +24,32 @@ require_once 'phing/types/FileSet.php';
  * Scans a list of files given by the fileset attribute, extracts valid test cases
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: BatchTest.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package phing.tasks.ext.phpunit
+ *
  * @since 2.1.0
  */
 class BatchTest
 {
-    /** the list of filesets containing the testcase filename rules */
+    /**
+     * The list of filesets containing the testcase filename rules.
+     *
+     * @var array $filesets
+     */
     private $filesets = array();
 
     /** the reference to the project */
-    private $project = NULL;
+    private $project = null;
 
     /** the classpath to use with Phing::__import() calls */
-    private $classpath = NULL;
-    
+    private $classpath = null;
+
     /** names of classes to exclude */
     private $excludeClasses = array();
-    
+
     /** name of the batchtest/suite */
     protected $name = "Phing Batchtest";
-    
+
     /**
      * Create a new batchtest instance
      *
@@ -56,17 +59,22 @@ class BatchTest
     {
         $this->project = $project;
     }
-    
+
     /**
      * Sets the name of the batchtest/suite
+     * @param $name
      */
     public function setName($name)
     {
         $this->name = $name;
     }
-    
+
     /**
-     * Sets the classes to exclude
+     * Sets the classes to exclude.
+     *
+     * @param string $exclude
+     *
+     * @return void
      */
     public function setExclude($exclude)
     {
@@ -74,31 +82,37 @@ class BatchTest
     }
 
     /**
-     * Sets the classpath
+     * Sets the classpath.
+     *
+     * @param Path $classpath
+     *
+     * @return void
      */
     public function setClasspath(Path $classpath)
     {
-        if ($this->classpath === null)
-        {
+        if ($this->classpath === null) {
             $this->classpath = $classpath;
-        }
-        else
-        {
+        } else {
             $this->classpath->append($classpath);
         }
     }
 
     /**
-     * Creates a new Path object
+     * Creates a new Path object.
+     *
+     * @return Path
      */
     public function createClasspath()
     {
         $this->classpath = new Path();
+
         return $this->classpath;
     }
 
     /**
-     * Returns the classpath
+     * Returns the classpath.
+     *
+     * @return Path
      */
     public function getClasspath()
     {
@@ -106,9 +120,11 @@ class BatchTest
     }
 
     /**
-     * Add a new fileset containing the XML results to aggregate
+     * Add a new fileset containing the XML results to aggregate.
      *
-     * @param FileSet the new fileset containing XML results.
+     * @param FileSet $fileset the new fileset containing XML results.
+     *
+     * @return void
      */
     public function addFileSet(FileSet $fileset)
     {
@@ -124,38 +140,47 @@ class BatchTest
     {
         $filenames = array();
 
-        foreach ($this->filesets as $fileset)
-        {
+        foreach ($this->filesets as $fileset) {
             $ds = $fileset->getDirectoryScanner($this->project);
             $ds->scan();
 
             $files = $ds->getIncludedFiles();
 
-            foreach ($files as $file)
-            {
+            foreach ($files as $file) {
                 $filenames[] = $ds->getBaseDir() . "/" . $file;
             }
         }
 
         return $filenames;
     }
-    
+
     /**
-     * Checks wheter $input is a PHPUnit Test
+     * Checks wheter $input is a PHPUnit Test.
+     *
+     * @param $input
+     *
+     * @return bool
      */
     private function isTestCase($input)
-    {   
-        return is_subclass_of($input, 'PHPUnit_Framework_TestCase') || is_subclass_of($input, 'PHPUnit_Framework_TestSuite');
+    {
+        return is_subclass_of($input, 'PHPUnit_Framework_TestCase') || is_subclass_of(
+            $input,
+            'PHPUnit_Framework_TestSuite'
+        );
     }
-    
+
     /**
      * Filters an array of classes, removes all classes that are not test cases or test suites,
-     * or classes that are declared abstract
+     * or classes that are declared abstract.
+     *
+     * @param object $input
+     *
+     * @return bool
      */
     private function filterTests($input)
     {
         $reflect = new ReflectionClass($input);
-        
+
         return $this->isTestCase($input) && (!$reflect->isAbstract());
     }
 
@@ -165,66 +190,24 @@ class BatchTest
      *
      * @return array an array of tests.
      */
-    protected function elements()
+    public function elements()
     {
         $filenames = $this->getFilenames();
-        
-        $declaredClasses = array();     
 
-        foreach ($filenames as $filename)
-        {
+        $declaredClasses = array();
+
+        foreach ($filenames as $filename) {
             $definedClasses = PHPUnitUtil::getDefinedClasses($filename, $this->classpath);
-            
-            foreach($definedClasses as $definedClass) {
+
+            foreach ($definedClasses as $definedClass) {
                 $this->project->log("(PHPUnit) Adding $definedClass (from $filename) to tests.", Project::MSG_DEBUG);
             }
-            
+
             $declaredClasses = array_merge($declaredClasses, $definedClasses);
         }
-        
+
         $elements = array_filter($declaredClasses, array($this, "filterTests"));
 
         return $elements;
     }
-    
-    /**
-     * Returns a testsuite containing all the tests in this batch
-     *
-     * @deprecated
-     * @return PHPUnit_Framework_TestSuite
-     */
-    public function getTestSuite()
-    {
-        $suite = new PHPUnit_Framework_TestSuite($this->name);
-        
-        foreach ($this->elements() as $test)
-        {
-            $testClass = new $test();
-            if (!($testClass instanceof PHPUnit_Framework_TestSuite))
-            {
-              $testClass = new ReflectionClass($test);
-            }
-            
-            $suite->addTestSuite($testClass);
-        }
-        
-        return $suite;
-    }
-    
-    /**
-     * Add the tests in this batchtest to a test suite
-     * @param PHPUnit_Framework_TestSuite $suite
-     */
-    public function addToTestSuite(PHPUnit_Framework_TestSuite $suite)
-    {
-        foreach ($this->elements() as $element) {
-            $testClass = new $element();
-            if (!($testClass instanceof PHPUnit_Framework_TestSuite))
-            {
-                $testClass = new ReflectionClass($element);
-            }
-            $suite->addTestSuite($testClass);
-        }
-    }
-    
 }

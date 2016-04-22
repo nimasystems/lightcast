@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: e6377299d86c4e8c4e4eb5875b346d44baf9fe25 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,36 +19,40 @@
  * <http://phing.info>.
  */
 
-require_once 'PHPUnit/Framework/TestListener.php';
-
 require_once 'phing/system/io/Writer.php';
 
 /**
  * This abstract class describes classes that format the results of a PHPUnit testrun.
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: PHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e6377299d86c4e8c4e4eb5875b346d44baf9fe25 $
  * @package phing.tasks.ext.phpunit.formatter
  * @since 2.1.0
  */
 abstract class PHPUnitResultFormatter implements PHPUnit_Framework_TestListener
 {
-    protected $out = NULL;
-    
-    protected $project = NULL;
-    
+    protected $out = null;
+
+    protected $project = null;
+
+    /** @var bool|array */
     private $timers = false;
-    
+
+    /** @var bool|array */
     private $runCounts = false;
-    
+
+    /** @var bool|array */
     private $failureCounts = false;
-    
+
+    /** @var bool|array */
     private $errorCounts = false;
-    
+
+    /** @var bool|array */
     private $incompleteCounts = false;
-    
+
+    /** @var bool|array */
     private $skipCounts = false;
-    
+
     /**
      * Constructor
      * @param PHPUnitTask $parentTask Calling Task
@@ -57,13 +61,14 @@ abstract class PHPUnitResultFormatter implements PHPUnit_Framework_TestListener
     {
         $this->project = $parentTask->getProject();
     }
-    
+
     /**
      * Sets the writer the formatter is supposed to write its results to.
+     * @param Writer $out
      */
     public function setOutput(Writer $out)
     {
-        $this->out = $out;  
+        $this->out = $out;
     }
 
     /**
@@ -76,15 +81,21 @@ abstract class PHPUnitResultFormatter implements PHPUnit_Framework_TestListener
         return "";
     }
 
+    /**
+     * @return string
+     */
     public function getPreferredOutfile()
     {
         return "";
     }
-    
+
+    /**
+     * @param PHPUnit_Framework_TestResult $result
+     */
     public function processResult(PHPUnit_Framework_TestResult $result)
     {
     }
-    
+
     public function startTestRun()
     {
         $this->timers = array($this->getMicrotime());
@@ -94,11 +105,14 @@ abstract class PHPUnitResultFormatter implements PHPUnit_Framework_TestListener
         $this->incompleteCounts = array(0);
         $this->skipCounts = array(0);
     }
-    
+
     public function endTestRun()
     {
     }
-    
+
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
     public function startTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
         $this->timers[] = $this->getMicrotime();
@@ -108,96 +122,154 @@ abstract class PHPUnitResultFormatter implements PHPUnit_Framework_TestListener
         $this->incompleteCounts[] = 0;
         $this->skipCounts[] = 0;
     }
-    
+
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
     public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
         $lastRunCount = array_pop($this->runCounts);
         $this->runCounts[count($this->runCounts) - 1] += $lastRunCount;
-        
+
         $lastFailureCount = array_pop($this->failureCounts);
         $this->failureCounts[count($this->failureCounts) - 1] += $lastFailureCount;
-        
+
         $lastErrorCount = array_pop($this->errorCounts);
         $this->errorCounts[count($this->errorCounts) - 1] += $lastErrorCount;
-        
+
         $lastIncompleteCount = array_pop($this->incompleteCounts);
         $this->incompleteCounts[count($this->incompleteCounts) - 1] += $lastIncompleteCount;
-        
+
         $lastSkipCount = array_pop($this->skipCounts);
         $this->skipCounts[count($this->skipCounts) - 1] += $lastSkipCount;
-        
+
         array_pop($this->timers);
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     */
     public function startTest(PHPUnit_Framework_Test $test)
     {
         $this->runCounts[count($this->runCounts) - 1]++;
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param float $time
+     */
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
     public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->errorCounts[count($this->errorCounts) - 1]++;
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param PHPUnit_Framework_AssertionFailedError $e
+     * @param float $time
+     */
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
     {
         $this->failureCounts[count($this->failureCounts) - 1]++;
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
     public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->incompleteCounts[count($this->incompleteCounts) - 1]++;
     }
 
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
     public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
         $this->skipCounts[count($this->skipCounts) - 1]++;
     }
-    
+
+    /**
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
+    public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
+    {
+    }
+
+    /**
+     * @return mixed
+     */
     public function getRunCount()
     {
         return end($this->runCounts);
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getFailureCount()
     {
         return end($this->failureCounts);
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getErrorCount()
     {
         return end($this->errorCounts);
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getIncompleteCount()
     {
         return end($this->incompleteCounts);
     }
-    
+
+    /**
+     * @return mixed
+     */
     public function getSkippedCount()
     {
         return end($this->skipCounts);
     }
-    
+
+    /**
+     * @return float|int
+     */
     public function getElapsedTime()
     {
-        if (end($this->timers))
-        {
+        if (end($this->timers)) {
             return $this->getMicrotime() - end($this->timers);
-        }
-        else
-        {
+        } else {
             return 0;
         }
     }
 
-    private function getMicrotime() {
+    /**
+     * @return float
+     */
+    private function getMicrotime()
+    {
         list($usec, $sec) = explode(' ', microtime());
-        return (float)$usec + (float)$sec;
+
+        return (float) $usec + (float) $sec;
     }
 }
-

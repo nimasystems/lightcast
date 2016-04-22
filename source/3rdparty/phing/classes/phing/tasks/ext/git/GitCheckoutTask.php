@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitCheckoutTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 0eb5ad0732bc3acd74df7f9256b37952ddce3212 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,14 +18,14 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 /**
  * Wrapper around git-checkout
  *
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitCheckoutTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 0eb5ad0732bc3acd74df7f9256b37952ddce3212 $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.3
@@ -122,96 +122,148 @@ class GitCheckoutTask extends GitBaseTask
         }
 
         $this->log(
-            sprintf('git-checkout: checkout "%s" repository', $this->getRepository()), 
-            Project::MSG_INFO); 
+            sprintf('git-checkout: checkout "%s" repository', $this->getRepository()),
+            Project::MSG_INFO
+        );
         $this->log('git-checkout output: ' . trim($output), Project::MSG_INFO);
     }
 
+    /**
+     * @param $branchname
+     */
     public function setBranchname($branchname)
     {
         $this->branchname = $branchname;
     }
 
+    /**
+     * @return string
+     */
     public function getBranchname()
     {
         return $this->branchname;
     }
 
+    /**
+     * @param $startPoint
+     */
     public function setStartPoint($startPoint)
     {
         $this->startPoint = $startPoint;
     }
 
+    /**
+     * @return string
+     */
     public function getStartPoint()
     {
         return $this->startPoint;
     }
 
+    /**
+     * @param $flag
+     */
     public function setForce($flag)
     {
         $this->force = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getForce()
     {
         return $this->force;
     }
 
+    /**
+     * @return bool
+     */
     public function isForce()
     {
         return $this->getForce();
     }
 
+    /**
+     * @param $flag
+     */
     public function setQuiet($flag)
     {
         $this->quiet = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getQuiet()
     {
         return $this->quiet;
     }
 
+    /**
+     * @return bool
+     */
     public function isQuiet()
     {
         return $this->getQuiet();
     }
 
+    /**
+     * @param $flag
+     */
     public function setTrack($flag)
     {
         $this->track = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getTrack()
     {
         return $this->track;
     }
 
+    /**
+     * @return bool
+     */
     public function isTrack()
     {
         return $this->getTrack();
     }
 
+    /**
+     * @param $flag
+     */
     public function setNoTrack($flag)
     {
         $this->noTrack = $flag;
     }
 
+    /**
+     * @return bool
+     */
     public function getNoTrack()
     {
         return $this->noTrack;
     }
 
+    /**
+     * @return bool
+     */
     public function isNoTrack()
     {
         return $this->getNoTrack();
     }
-    
+
+    /**
+     * @param $flag
+     */
     public function setCreate($flag)
     {
         $this->extraOptions['b'] = $flag;
     }
-    
+
     public function getCreate()
     {
         return $this->extraOptions['b'];
@@ -224,11 +276,14 @@ class GitCheckoutTask extends GitBaseTask
 
     // -B flag is not found in all versions of git
     // --force is present everywhere
+    /**
+     * @param $flag
+     */
     public function setForceCreate($flag)
     {
         $this->setForce($flag);
     }
-    
+
     public function getForceCreate()
     {
         return $this->extraOptions['B'];
@@ -239,11 +294,14 @@ class GitCheckoutTask extends GitBaseTask
         return $this->getForceCreate();
     }
 
+    /**
+     * @param $flag
+     */
     public function setMerge($flag)
     {
         $this->extraOptions['m'] = $flag;
     }
-    
+
     public function getMerge()
     {
         return $this->extraOptions['m'];

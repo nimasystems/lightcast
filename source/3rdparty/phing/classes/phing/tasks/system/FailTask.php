@@ -1,7 +1,5 @@
 <?php
-/*
- *  $Id: FailTask.php 1441 2013-10-08 16:28:22Z mkovachev $
- *
+/**
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -18,8 +16,10 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
+require_once 'phing/ExitStatusException.php';
+require_once 'phing/tasks/system/condition/NestedCondition.php';
 
 /**
  * Exits the active build, giving an additional message
@@ -27,67 +27,163 @@ require_once 'phing/Task.php';
  *
  * @author    Hans Lellelid <hans@xmpl.org> (Phing)
  * @author    Nico Seessle <nico@seessle.de> (Ant)
- * @version   $Id: FailTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package   phing.tasks.system
  */
-class FailTask extends Task { 
+class FailTask extends Task
+{
+    /**
+     * @var string $message
+     */
+    protected $message;
 
-    private $message;
-    private $ifCondition;
-    private $unlessCondition;
+    /**
+     * @var string
+     */
+    protected $ifCondition;
+
+    /**
+     * @var string
+     */
+    protected $unlessCondition;
+
+    /**
+     * @var NestedCondition
+     */
+    protected $nestedCondition;
+
+    /**
+     * @var integer
+     */
+    protected $status;
 
     /**
      * A message giving further information on why the build exited.
      *
      * @param string $value message to output
+     *
+     * @return void
      */
-    public function setMsg($value) {
+    public function setMsg($value)
+    {
         $this->setMessage($value);
     }
 
     /**
      * A message giving further information on why the build exited.
      *
-     * @param value message to output
+     * @param string $value message to output
+     *
+     * @return void
      */
-    public function setMessage($value) {
+    public function setMessage($value)
+    {
         $this->message = $value;
     }
 
     /**
      * Only fail if a property of the given name exists in the current project.
-     * @param c property name
+     *
+     * @param string $c property name
+     *
+     * @return void
      */
-    public function setIf($c) {
+    public function setIf($c)
+    {
         $this->ifCondition = $c;
     }
 
     /**
      * Only fail if a property of the given name does not
      * exist in the current project.
-     * @param c property name
+     *
+     * @param string $c property name
+     *
+     * @return void
      */
-    public function setUnless($c) {
+    public function setUnless($c)
+    {
         $this->unlessCondition = $c;
     }
 
     /**
+     * Set the status code to associate with the thrown Exception.
+     * @param int $int the <code>int</code> status
+     */
+    public function setStatus($int)
+    {
+        $this->status = (int) $int;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     *
      * @throws BuildException
      */
-    public function main()  {
-        if ($this->testIfCondition() && $this->testUnlessCondition()) {
-            if ($this->message !== null) { 
-                throw new BuildException($this->message);
+    public function main()
+    {
+        $fail =  $this->nestedConditionPresent() ? $this->testNestedCondition() :
+            $this->testIfCondition() && $this->testUnlessCondition();
+
+        if ($fail) {
+            $text = null;
+            if ($this->message !== null && strlen(trim($this->message)) > 0) {
+                $text = trim($this->message);
             } else {
-                throw new BuildException("No message");
+                if ($this->ifCondition !== null && $this->ifCondition !== "" && $this->testIfCondition()) {
+                    $text = "if=" . $this->ifCondition;
+                }
+                if ($this->unlessCondition !== null && $this->unlessCondition !== "" && $this->testUnlessCondition()) {
+                    if ($text === null) {
+                        $text = "";
+                    } else {
+                        $text .= " and ";
+                    }
+                    $text .= "unless=" . $this->unlessCondition;
+                }
+                if ($this->nestedConditionPresent()) {
+                    $text = "condition satisfied";
+                } else {
+                    if ($text === null) {
+                        $text = "No message";
+                    }
+                }
             }
+
+            $this->log("failing due to " . $text, Project::MSG_DEBUG);
+            if ($this->status === null) {
+                throw new BuildException($text);
+            }
+
+            throw new ExitStatusException($text, $this->status);
         }
     }
 
     /**
-     * Set a multiline message.
+     * Add a condition element.
+     * @return NestedCondition
+     * @throws BuildException
      */
-    public function addText($msg) {
+    public function createCondition()
+    {
+        if ($this->nestedCondition !== null) {
+            throw new BuildException("Only one nested condition is allowed.");
+        }
+        $this->nestedCondition = new NestedCondition();
+        return $this->nestedCondition;
+    }
+
+    /**
+     * Set a multiline message.
+     *
+     * @param string $msg
+     *
+     * @return void
+     */
+    public function addText($msg)
+    {
         if ($this->message === null) {
             $this->message = "";
         }
@@ -97,22 +193,49 @@ class FailTask extends Task {
     /**
      * @return boolean
      */
-    private function testIfCondition() {
+    protected function testIfCondition()
+    {
         if ($this->ifCondition === null || $this->ifCondition === "") {
             return true;
         }
-        
+
         return $this->project->getProperty($this->ifCondition) !== null;
     }
-    
+
     /**
      * @return boolean
      */
-    private function testUnlessCondition() {
-        if ($this->unlessCondition === null || $this->unlessCondition ===  "") {
+    protected function testUnlessCondition()
+    {
+        if ($this->unlessCondition === null || $this->unlessCondition === "") {
             return true;
         }
+
         return $this->project->getProperty($this->unlessCondition) === null;
     }
 
+    /**
+     * test the nested condition
+     * @return bool true if there is none, or it evaluates to true
+     * @throws BuildException
+     */
+    private function testNestedCondition()
+    {
+        $result = $this->nestedConditionPresent();
+
+        if ($result && $this->ifCondition !== null || $this->unlessCondition !== null) {
+            throw new BuildException("Nested conditions not permitted in conjunction with if/unless attributes");
+        }
+
+        return $result && $this->nestedCondition->evaluate();
+    }
+
+    /**
+     * test whether there is a nested condition.
+     * @return boolean
+     */
+    private function nestedConditionPresent()
+    {
+        return (bool) $this->nestedCondition;
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitLogTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 95b6bc9543e4a1917767a9fe0103dbd9c1668192 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
 
@@ -27,7 +27,7 @@ require_once 'phing/tasks/ext/git/GitBaseTask.php';
  *
  * @author Evan Kaufman <evan@digitalflophouse.com>
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitLogTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 95b6bc9543e4a1917767a9fe0103dbd9c1668192 $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.5
@@ -39,37 +39,37 @@ class GitLogTask extends GitBaseTask
      * @var string|boolean
      */
     private $stat = false;
-    
+
     /**
      * Names + status of changed files. See --name-status of git-log
      * @var boolean
      */
     private $nameStatus = false;
-    
+
     /**
      * Number of commits to show. See -<n>|-n|--max-count of git-log
      * @var integer
      */
     private $maxCount;
-    
+
     /**
      * Don't show commits with more than one parent. See --no-merges of git-log
      * @var boolean
      */
     private $noMerges = false;
-    
+
     /**
      * Commit format. See --format of git-log
      * @var string
      */
     private $format = 'medium';
-    
+
     /**
      * Date format. See --date of git-log
      * @var string
      */
     private $date;
-    
+
     /**
      * <since> argument to git-log
      * @var string
@@ -81,20 +81,20 @@ class GitLogTask extends GitBaseTask
      * @var string
      */
     private $untilCommit = 'HEAD';
-    
+
     /**
      * <path> arguments to git-log
      * Accepts one or more paths delimited by PATH_SEPARATOR
      * @var string
      */
     private $paths;
-    
+
     /**
      * Property name to set with output value from git-log
      * @var string
      */
     private $outputProperty;
-    
+
     /**
      * The main entry point for the task
      */
@@ -111,11 +111,11 @@ class GitLogTask extends GitBaseTask
             ->setOption('name-status', $this->isNameStatus())
             ->setOption('no-merges', $this->isNoMerges())
             ->setOption('format', $this->getFormat());
-        
+
         if (null !== $this->getMaxCount()) {
             $command->setOption('max-count', $this->getMaxCount());
         }
-        
+
         if (null !== $this->getDate()) {
             $command->setOption('date', $this->getDate());
         }
@@ -147,121 +147,191 @@ class GitLogTask extends GitBaseTask
         }
 
         $this->log(
-            sprintf('git-log: commit log for "%s" repository', $this->getRepository()), 
-            Project::MSG_INFO); 
+            sprintf('git-log: commit log for "%s" repository', $this->getRepository()),
+            Project::MSG_INFO
+        );
         $this->log('git-log output: ' . trim($output), Project::MSG_INFO);
     }
-    
+
+    /**
+     * @param $stat
+     */
     public function setStat($stat)
     {
         $this->stat = $stat;
     }
-    
+
+    /**
+     * @return bool|string
+     */
     public function getStat()
     {
         return $this->stat;
     }
-    
+
+    /**
+     * @param $flag
+     */
     public function setNameStatus($flag)
     {
-        $this->nameStatus = (boolean)$flag;
+        $this->nameStatus = (boolean) $flag;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function getNameStatus()
     {
         return $this->nameStatus;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function isNameStatus()
     {
         return $this->getNameStatus();
     }
-    
+
+    /**
+     * @param $count
+     */
     public function setMaxCount($count)
     {
-        $this->maxCount = (int)$count;
+        $this->maxCount = (int) $count;
     }
-    
+
+    /**
+     * @return int
+     */
     public function getMaxCount()
     {
         return $this->maxCount;
     }
-    
+
+    /**
+     * @param $flag
+     */
     public function setNoMerges($flag)
     {
-        $this->noMerges = (bool)$flag;
+        $this->noMerges = (bool) $flag;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function getNoMerges()
     {
         return $this->noMerges;
     }
-    
+
+    /**
+     * @return bool
+     */
     public function isNoMerges()
     {
         return $this->getNoMerges();
     }
-    
+
+    /**
+     * @param $format
+     */
     public function setFormat($format)
     {
         $this->format = $format;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getFormat()
     {
         return $this->format;
     }
-    
+
+    /**
+     * @param $date
+     */
     public function setDate($date)
     {
         $this->date = $date;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getDate()
     {
         return $this->date;
     }
-    
+
+    /**
+     * @param $since
+     */
     public function setSince($since)
     {
         $this->sinceCommit = $since;
     }
 
+    /**
+     * @return string
+     */
     public function getSince()
     {
         return $this->sinceCommit;
     }
 
+    /**
+     * @param $after
+     */
     public function setAfter($after)
     {
         $this->setSince($after);
     }
 
+    /**
+     * @param $until
+     */
     public function setUntil($until)
     {
         $this->untilCommit = $until;
     }
 
+    /**
+     * @return string
+     */
     public function getUntil()
     {
         return $this->untilCommit;
     }
 
+    /**
+     * @param $before
+     */
     public function setBefore($before)
     {
         $this->setUntil($before);
     }
 
+    /**
+     * @param $paths
+     */
     public function setPaths($paths)
     {
         $this->paths = $paths;
     }
-    
+
+    /**
+     * @return string
+     */
     public function getPaths()
     {
         return $this->paths;
     }
-    
+
+    /**
+     * @param $prop
+     */
     public function setOutputProperty($prop)
     {
         $this->outputProperty = $prop;

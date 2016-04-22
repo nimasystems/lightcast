@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ForeachTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 46bd390ab29b8784b4a07b2a91afcba295b7d334 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -45,61 +45,62 @@ include_once 'phing/tasks/system/PhingTask.php';
  *
  * @author    Jason Hines <jason@greenhell.com>
  * @author    Hans Lellelid <hans@xmpl.org>
- * @version   $Id: ForeachTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 46bd390ab29b8784b4a07b2a91afcba295b7d334 $
  * @package   phing.tasks.system
  */
-class ForeachTask extends Task {
-    
+class ForeachTask extends Task
+{
+
     /** Delimter-separated list of values to process. */
     private $list;
-    
+
     /** Name of parameter to pass to callee */
     private $param;
-    
+
     /** Name of absolute path parameter to pass to callee */
     private $absparam;
-    
+
     /** Delimiter that separates items in $list */
     private $delimiter = ',';
-    
+
     /**
      * PhingCallTask that will be invoked w/ calleeTarget.
      * @var PhingCallTask
      */
     private $callee;
-    
+
     /** Array of filesets */
     private $filesets = array();
-    
+
     /** Instance of mapper **/
     private $mapperElement;
-    
+
     /**
      * Array of filelists
      * @var array
      */
     private $filelists = array();
-    
+
     /**
      * Target to execute.
      * @var string
      */
     private $calleeTarget;
-    
+
     /**
-     * Total number of files processed 
+     * Total number of files processed
      * @var integer
      */
     private $total_files = 0;
-    
+
     /**
-     * Total number of directories processed 
+     * Total number of directories processed
      * @var integer
      */
-    private $total_dirs  = 0;
-    
+    private $total_dirs = 0;
 
-    function init() {
+    public function init()
+    {
         $this->callee = $this->project->createTask("phingcall");
         $this->callee->setOwningTarget($this->getOwningTarget());
         $this->callee->setTaskName($this->getTaskName());
@@ -109,9 +110,11 @@ class ForeachTask extends Task {
 
     /**
      * This method does the work.
+     * @throws BuildException
      * @return void
-     */   
-    function main() {
+     */
+    public function main()
+    {
         if ($this->list === null && count($this->filesets) == 0 && count($this->filelists) == 0) {
             throw new BuildException("Need either list, nested fileset or nested filelist to iterate through");
         }
@@ -127,15 +130,15 @@ class ForeachTask extends Task {
         $callee->setInheritAll(true);
         $callee->setInheritRefs(true);
         $mapper = null;
-        
+
         if ($this->mapperElement !== null) {
             $mapper = $this->mapperElement->getImplementation();
         }
-        
+
         if (trim($this->list)) {
             $arr = explode($this->delimiter, $this->list);
             $total_entries = 0;
-        
+
             foreach ($arr as $value) {
                 $value = trim($value);
                 $premapped = '';
@@ -147,7 +150,10 @@ class ForeachTask extends Task {
                     }
                     $value = array_shift($value);
                 }
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log(
+                    "Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE
+                );
                 $prop = $callee->createProperty();
                 $prop->setOverride(true);
                 $prop->setName($this->param);
@@ -166,23 +172,29 @@ class ForeachTask extends Task {
 
         // filesets
         foreach ($this->filesets as $fs) {
-            $ds       = $fs->getDirectoryScanner($this->project);
+            $ds = $fs->getDirectoryScanner($this->project);
             $srcFiles = $ds->getIncludedFiles();
-            $srcDirs  = $ds->getIncludedDirectories();
+            $srcDirs = $ds->getIncludedDirectories();
 
             $this->process($callee, $fs->getDir($this->project), $srcFiles, $srcDirs);
         }
 
         if ($this->list === null) {
-            $this->log("Processed {$this->total_dirs} directories and {$this->total_files} files", Project::MSG_VERBOSE);
+            $this->log(
+                "Processed {$this->total_dirs} directories and {$this->total_files} files",
+                Project::MSG_VERBOSE
+            );
         } else {
-            $this->log("Processed $total_entries entr" . ($total_entries > 1 ? 'ies' : 'y') . " in list", Project::MSG_VERBOSE);
+            $this->log(
+                "Processed $total_entries entr" . ($total_entries > 1 ? 'ies' : 'y') . " in list",
+                Project::MSG_VERBOSE
+            );
         }
     }
 
     /**
-     * Processes a list of files & directories 
-     * 
+     * Processes a list of files & directories
+     *
      * @param Task      $callee
      * @param PhingFile $fromDir
      * @param array     $srcFiles
@@ -191,14 +203,14 @@ class ForeachTask extends Task {
     protected function process(Task $callee, PhingFile $fromDir, $srcFiles, $srcDirs)
     {
         $mapper = null;
-        
+
         if ($this->mapperElement !== null) {
             $mapper = $this->mapperElement->getImplementation();
         }
-        
+
         $filecount = count($srcFiles);
         $this->total_files += $filecount;
-        
+
         for ($j = 0; $j < $filecount; $j++) {
             $value = $srcFiles[$j];
             $premapped = "";
@@ -209,7 +221,7 @@ class ForeachTask extends Task {
                 $prop->setName($this->absparam);
                 $prop->setValue($fromDir . FileSystem::getFileSystem()->getSeparator() . $value);
             }
-            
+
             if ($mapper !== null) {
                 $premapped = $value;
                 $value = $mapper->main($value);
@@ -218,9 +230,12 @@ class ForeachTask extends Task {
                 }
                 $value = array_shift($value);
             }
-            
+
             if ($this->param) {
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log(
+                    "Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE
+                );
                 $prop = $callee->createProperty();
                 $prop->setOverride(true);
                 $prop->setName($this->param);
@@ -232,8 +247,8 @@ class ForeachTask extends Task {
 
         $dircount = count($srcDirs);
         $this->total_dirs += $dircount;
-        
-        for ($j = 0; $j <  $dircount; $j++) {
+
+        for ($j = 0; $j < $dircount; $j++) {
             $value = $srcDirs[$j];
             $premapped = "";
 
@@ -243,7 +258,7 @@ class ForeachTask extends Task {
                 $prop->setName($this->absparam);
                 $prop->setValue($fromDir . FileSystem::getFileSystem()->getSeparator() . $value);
             }
-            
+
             if ($mapper !== null) {
                 $premapped = $value;
                 $value = $mapper->main($value);
@@ -252,9 +267,12 @@ class ForeachTask extends Task {
                 }
                 $value = array_shift($value);
             }
-            
+
             if ($this->param) {
-                $this->log("Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''), Project::MSG_VERBOSE);
+                $this->log(
+                    "Setting param '$this->param' to value '$value'" . ($premapped ? " (mapped from '$premapped')" : ''),
+                    Project::MSG_VERBOSE
+                );
                 $prop = $callee->createProperty();
                 $prop->setOverride(true);
                 $prop->setName($this->param);
@@ -265,53 +283,78 @@ class ForeachTask extends Task {
         }
     }
 
-    function setList($list) {
+    /**
+     * @param $list
+     */
+    public function setList($list)
+    {
         $this->list = (string) $list;
     }
 
-    function setTarget($target) {
+    /**
+     * @param $target
+     */
+    public function setTarget($target)
+    {
         $this->calleeTarget = (string) $target;
     }
 
-    function setParam($param) {
+    /**
+     * @param $param
+     */
+    public function setParam($param)
+    {
         $this->param = (string) $param;
     }
 
-    function setAbsparam($absparam) {
+    /**
+     * @param $absparam
+     */
+    public function setAbsparam($absparam)
+    {
         $this->absparam = (string) $absparam;
     }
 
-    function setDelimiter($delimiter) {
+    /**
+     * @param $delimiter
+     */
+    public function setDelimiter($delimiter)
+    {
         $this->delimiter = (string) $delimiter;
     }
 
     /**
-     * Nested creator, adds a set of files (nested fileset attribute).
+     * Nested adder, adds a set of files (nested fileset attribute).
+     *
+     * @param FileSet $fs
+     * @return void
      */
-    function createFileSet() {
-        $num = array_push($this->filesets, new FileSet());
-        return $this->filesets[$num-1];
+    public function addFileSet(FileSet $fs)
+    {
+        $this->filesets[] = $fs;
     }
 
     /**
      * Nested creator, creates one Mapper for this task
      *
-     * @access  public
-     * @return  object  The created Mapper type object
-     * @throws  BuildException
+     * @return object         The created Mapper type object
+     * @throws BuildException
      */
-    function createMapper() {
+    public function createMapper()
+    {
         if ($this->mapperElement !== null) {
             throw new BuildException("Cannot define more than one mapper", $this->location);
         }
         $this->mapperElement = new Mapper($this->project);
+
         return $this->mapperElement;
     }
 
     /**
      * @return Property
      */
-    function createProperty() {
+    public function createProperty()
+    {
         return $this->callee->createProperty();
     }
 
@@ -319,8 +362,10 @@ class ForeachTask extends Task {
      * Supports embedded <filelist> element.
      * @return FileList
      */
-    public function createFileList() {
+    public function createFileList()
+    {
         $num = array_push($this->filelists, new FileList());
-        return $this->filelists[$num-1];
+
+        return $this->filelists[$num - 1];
     }
 }

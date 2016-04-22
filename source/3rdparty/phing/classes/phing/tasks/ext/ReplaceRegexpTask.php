@@ -1,7 +1,5 @@
 <?php
-/*
- *  $Id: ReplaceRegexpTask.php 1441 2013-10-08 16:28:22Z mkovachev $  
- * 
+/**
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -22,123 +20,161 @@
 require_once 'phing/Task.php';
 
 /**
- * ReplaceRegExp is a directory based task for replacing the occurrence of a given regular expression with a substitution 
- * pattern in a selected file or set of files.
- * 
+ * ReplaceRegExp is a directory based task for replacing the occurrence of a
+ * given regular expression with a substitution pattern in a selected file or
+ * set of files.
+ *
  * <code>
  * <replaceregexp file="${src}/build.properties"
  *                        match="OldProperty=(.*)"
  *                        replace="NewProperty=\1"
  *                        byline="true"/>
  * </code>
- * 
+ *
  * @author    Jonathan Bond-Caron <jbondc@openmv.com>
- * @version   $Id: ReplaceRegexpTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *
  * @package   phing.tasks.system
+ *
  * @link      http://ant.apache.org/manual/OptionalTasks/replaceregexp.html
  */
-class ReplaceRegexpTask extends Task {
-    
+class ReplaceRegexpTask extends Task
+{
     /** Single file to process. */
     private $file;
-    
-    /** Any filesets that should be processed. */
+
+    /**
+     * Any filesets that should be processed.
+     *
+     * @var array $filesets
+     */
     private $filesets = array();
-    
+
     /**
      * Regular expression
-     * 
+     *
      * @var RegularExpression
      */
     private $_regexp;
-        
+
     /**
      * File to apply regexp on
-     * 
-     * @param string $path
+     *
+     * @param PhingFile $path
+     *
+     * @return void
      */
     public function setFile(PhingFile $path)
     {
         $this->file = $path;
     }
-    
+
     /**
      * Sets the regexp match pattern
-     * 
-     * @param string $regexp 
+     *
+     * @param string $regexp
+     *
+     * @return void
      */
-    public function setMatch( $regexp )
+    public function setMatch($regexp)
     {
-        $this->_regexp->setPattern( $regexp );
+        $this->_regexp->setPattern($regexp);
     }
 
     /**
      * @see setMatch()
+     *
+     * @param $regexp
+     *
+     * @return void
      */
-    public function setPattern( $regexp )
+    public function setPattern($regexp)
     {
-        $this->setMatch( $regexp );
+        $this->setMatch($regexp);
     }
 
     /**
      * Sets the replacement string
-     * 
+     *
      * @param string $string
+     *
+     * @return void
      */
-    public function setReplace( $string )
+    public function setReplace($string)
     {
-        $this->_regexp->setReplace( $string );
+        $this->_regexp->setReplace($string);
     }
 
     /**
      * Sets the regexp flags
-     * 
+     *
      * @param string $flags
+     *
+     * @return void
+     *
+     * todo ... `$this->_regexp->setFlags( $flags );`
      */
-    public function setFlags( $flags )
+    public function setFlags($flags)
     {
-        // TODO... $this->_regexp->setFlags( $flags ); 
     }
 
     /**
      * Match only per line
-     * 
+     *
      * @param bool $yesNo
+     *
+     * @return void
      */
-    public function setByline( $yesNo )
+    public function setByline($yesNo)
     {
-        // TODO... $this->_regexp-> 
-    }
-    
-    /** Nested creator, adds a set of files (nested fileset attribute). */
-    public function createFileSet()
-    {
-        $num = array_push($this->filesets, new FileSet());
-        return $this->filesets[$num-1];
+        // TODO... $this->_regexp->
     }
 
+    /**
+     * Nested adder, adds a set of files (nested fileset attribute).
+     *
+     * @param FileSet $fs
+     *
+     * @return void
+     */
+    public function addFileSet(FileSet $fs)
+    {
+        $this->filesets[] = $fs;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     */
     public function init()
     {
-        $this->_regexp = new RegularExpression;
+        $this->_regexp = new RegularExpression();
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @return void
+     *
+     * @throws BuildException
+     */
     public function main()
     {
         if ($this->file === null && empty($this->filesets)) {
             throw new BuildException("You must specify a file or fileset(s) for the <ReplaceRegexp> task.");
         }
-        
+
         // compile a list of all files to modify, both file attrib and fileset elements
         // can be used.
         $files = array();
-        
+
         if ($this->file !== null) {
             $files[] = $this->file;
         }
-        
+
         if (!empty($this->filesets)) {
             $filenames = array();
-            foreach($this->filesets as $fs) {
+            foreach ($this->filesets as $fs) {
                 try {
                     $ds = $fs->getDirectoryScanner($this->project);
                     $filenames = $ds->getIncludedFiles(); // get included filenames
@@ -149,43 +185,45 @@ class ReplaceRegexpTask extends Task {
                 } catch (BuildException $be) {
                     $this->log($be->getMessage(), Project::MSG_WARN);
                 }
-            }                        
+            }
         }
-        
+
         $this->log("Applying Regexp processing to " . count($files) . " files.");
 
-        // These "slots" allow filters to retrieve information about the currently-being-process files      
+        // These "slots" allow filters to retrieve information about the currently-being-process files
         $slot = $this->getRegisterSlot("currentFile");
-        $basenameSlot = $this->getRegisterSlot("currentFile.basename"); 
+        $basenameSlot = $this->getRegisterSlot("currentFile.basename");
 
         $filter = new FilterChain($this->project);
 
-        $r = new ReplaceRegexp;
+        $r = new ReplaceRegexp();
         $r->setRegexps(array($this->_regexp));
 
         $filter->addReplaceRegexp($r);
         $filters = array($filter);
 
-        foreach($files as $file) {
+        foreach ($files as $file) {
             // set the register slots
-            
+
             $slot->setValue($file->getPath());
             $basenameSlot->setValue($file->getName());
-            
+
             // 1) read contents of file, pulling through any filters
             $in = null;
-            try {                
+            try {
                 $contents = "";
                 $in = FileUtils::getChainedReader(new FileReader($file), $filters, $this->project);
-                while(-1 !== ($buffer = $in->read())) {
+                while (-1 !== ($buffer = $in->read())) {
                     $contents .= $buffer;
                 }
                 $in->close();
             } catch (Exception $e) {
-                if ($in) $in->close();
+                if ($in) {
+                    $in->close();
+                }
                 $this->log("Error reading file: " . $e->getMessage(), Project::MSG_WARN);
             }
-            
+
             try {
                 // now create a FileWriter w/ the same file, and write to the file
                 $out = new FileWriter($file);
@@ -193,12 +231,13 @@ class ReplaceRegexpTask extends Task {
                 $out->close();
                 $this->log("Applying regexp processing to " . $file->getPath(), Project::MSG_VERBOSE);
             } catch (Exception $e) {
-                if ($out) $out->close();
+                if ($out) {
+                    $out->close();
+                }
                 $this->log("Error writing file back: " . $e->getMessage(), Project::MSG_WARN);
             }
-            
-        }
-                                
-    }   
 
+        }
+
+    }
 }

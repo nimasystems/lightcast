@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DbDeployTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 4a3c05035ee7d8e1b9c019e218eaa84cf6979df8 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,7 +22,6 @@
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/dbdeploy/DbmsSyntaxFactory.php';
 
-
 /**
  * Generate SQL script for db using dbdeploy schema version table
  * and delta scripts
@@ -31,7 +30,7 @@ require_once 'phing/tasks/ext/dbdeploy/DbmsSyntaxFactory.php';
  *     userid="dbdeploy" password="dbdeploy" dir="db" outputfile="">
  *
  * @author   Luke Crouch at SourceForge (http://sourceforge.net)
- * @version  $Id: DbDeployTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: 4a3c05035ee7d8e1b9c019e218eaa84cf6979df8 $
  * @package  phing.tasks.ext.dbdeploy
  */
 class DbDeployTask extends Task
@@ -126,7 +125,7 @@ class DbDeployTask extends Task
      * @var int
      */
     protected $checkall = false;
-    
+
     /**
      * The value of the 'applied_by' column for
      * each changelog entry
@@ -151,7 +150,7 @@ class DbDeployTask extends Task
 
             // figure out which revisions are in the db already
             $this->appliedChangeNumbers = $this->getAppliedChangeNumbers();
-            $this->log('Current db revision: '.$this->getLastChangeAppliedInDb());
+            $this->log('Current db revision: ' . $this->getLastChangeAppliedInDb());
             $this->log('Checkall: ' . ($this->checkall ? 'On' : 'Off'));
 
             $this->deploy();
@@ -184,6 +183,7 @@ class DbDeployTask extends Task
             }
             $this->appliedChangeNumbers = $appliedChangeNumbers;
         }
+
         return $this->appliedChangeNumbers;
     }
 
@@ -195,7 +195,7 @@ class DbDeployTask extends Task
     protected function getLastChangeAppliedInDb()
     {
         return (count($this->appliedChangeNumbers) > 0)
-                ? max($this->appliedChangeNumbers) : 0;
+            ? max($this->appliedChangeNumbers) : 0;
     }
 
     /**
@@ -215,8 +215,8 @@ class DbDeployTask extends Task
     /**
      * Generate the sql for doing/undoing the deployment and write it to a file
      *
-     * @param string $file
-     * @param bool $undo
+     * @param  string $file
+     * @param  bool   $undo
      * @return void
      */
     protected function createOutputFile($file, $undo = false)
@@ -229,7 +229,7 @@ class DbDeployTask extends Task
     /**
      * Generate the sql for doing/undoing this deployment
      *
-     * @param bool $undo
+     * @param  bool   $undo
      * @return string The sql
      */
     protected function generateSql($undo = false)
@@ -246,21 +246,29 @@ class DbDeployTask extends Task
                 if (!$undo) {
                     $sql .= 'INSERT INTO ' . DbDeployTask::$TABLE_NAME . '
                                 (change_number, delta_set, start_dt, applied_by, description)' .
-                            ' VALUES (' . $fileChangeNumber . ', \'' . $this->deltaSet . '\', ' .
-                                $this->dbmsSyntax->generateTimestamp() .
-                                ', \'' . $this->appliedBy . '\', \'' . $fileName . '\');' . "\n";
+                        ' VALUES (' . $fileChangeNumber . ', \'' . $this->deltaSet . '\', ' .
+                        $this->dbmsSyntax->generateTimestamp() .
+                        ', \'' . $this->appliedBy . '\', \'' . $fileName . '\');' . "\n";
                 }
 
                 // read the file
                 $fullFileName = $this->dir . '/' . $fileName;
                 $fh = fopen($fullFileName, 'r');
                 $contents = fread($fh, filesize($fullFileName));
+                $count_bad_comments = substr_count($contents, '--//');
+                if ($count_bad_comments > 0) {
+                    $this->log('Your SQL delta includes "--//" which, if a comment, should be replaced with "-- //"
+                    to avoid the delta failing.  You may need to manually undo part of this delta.\n\n'
+                        . $contents, Project::MSG_WARN);
+                }
                 // allow construct with and without space added
                 $split = strpos($contents, '-- //@UNDO');
-                if ($split === false)
+                if ($split === false) {
                     $split = strpos($contents, '--//@UNDO');
-                if ($split === false)
+                }
+                if ($split === false) {
                     $split = strlen($contents);
+                }
 
                 if ($undo) {
                     $sql .= substr($contents, $split + 10) . "\n";
@@ -269,6 +277,8 @@ class DbDeployTask extends Task
 	                         AND delta_set = \'' . $this->deltaSet . '\';' . "\n";
                 } else {
                     $sql .= substr($contents, 0, $split);
+                    // Ensuring there's a newline after the final -- //
+                    $sql .= PHP_EOL;
                     $sql .= 'UPDATE ' . DbDeployTask::$TABLE_NAME . '
 	                         SET complete_dt = ' . $this->dbmsSyntax->generateTimestamp() . '
 	                         WHERE change_number = ' . $fileChangeNumber . '
@@ -290,28 +300,29 @@ class DbDeployTask extends Task
     protected function getDeltasFilesArray()
     {
         $files = array();
-        
+
         $baseDir = realpath($this->dir);
         $dh = opendir($baseDir);
-        
+
         if ($dh === false) {
             return $files;
         }
-        
+
         $fileChangeNumberPrefix = '';
         while (($file = readdir($dh)) !== false) {
             if (preg_match('[\d+]', $file, $fileChangeNumberPrefix)) {
                 $files[intval($fileChangeNumberPrefix[0])] = $file;
             }
         }
+
         return $files;
     }
 
     /**
      * Sort files in the patch files directory (ascending or descending depending on $undo boolean)
      *
-     * @param array $files
-     * @param bool $undo
+     * @param  array $files
+     * @param  bool  $undo
      * @return void
      */
     protected function sortFiles(&$files, $undo)
@@ -327,9 +338,9 @@ class DbDeployTask extends Task
      * Determine if this patch file need to be deployed
      * (using fileChangeNumber, lastChangeAppliedInDb and $this->checkall)
      *
-     * @param int $fileChangeNumber
-     * @param string $lastChangeAppliedInDb
-     * @return bool True or false if patch file needs to be deployed
+     * @param  int    $fileChangeNumber
+     * @param  string $lastChangeAppliedInDb
+     * @return bool   True or false if patch file needs to be deployed
      */
     protected function fileNeedsToBeRead($fileChangeNumber, $lastChangeAppliedInDb)
     {
@@ -343,7 +354,7 @@ class DbDeployTask extends Task
     /**
      * Set the url for the database connection
      *
-     * @param string $url
+     * @param  string $url
      * @return void
      */
     public function setUrl($url)
@@ -354,7 +365,7 @@ class DbDeployTask extends Task
     /**
      * Set the userid for the database connection
      *
-     * @param string $userid
+     * @param  string $userid
      * @return void
      */
     public function setUserId($userid)
@@ -365,7 +376,7 @@ class DbDeployTask extends Task
     /**
      * Set the password for the database connection
      *
-     * @param string $password
+     * @param  string $password
      * @return void
      */
     public function setPassword($password)
@@ -376,7 +387,7 @@ class DbDeployTask extends Task
     /**
      * Set the directory where to find the patchfiles
      *
-     * @param string $dir
+     * @param  string $dir
      * @return void
      */
     public function setDir($dir)
@@ -387,7 +398,7 @@ class DbDeployTask extends Task
     /**
      * Set the outputfile which contains all patch sql statements for this deployment
      *
-     * @param string $outputFile
+     * @param  string $outputFile
      * @return void
      */
     public function setOutputFile($outputFile)
@@ -398,7 +409,7 @@ class DbDeployTask extends Task
     /**
      * Set the undo outputfile which contains all undo statements for this deployment
      *
-     * @param string $undoOutputFile
+     * @param  string $undoOutputFile
      * @return void
      */
     public function setUndoOutputFile($undoOutputFile)
@@ -409,7 +420,7 @@ class DbDeployTask extends Task
     /**
      * Set the lastchangetoapply property
      *
-     * @param int $lastChangeToApply
+     * @param  int  $lastChangeToApply
      * @return void
      */
     public function setLastChangeToApply($lastChangeToApply)
@@ -420,7 +431,7 @@ class DbDeployTask extends Task
     /**
      * Set the deltaset property
      *
-     * @param string $deltaSet
+     * @param  string $deltaSet
      * @return void
      */
     public function setDeltaSet($deltaSet)
@@ -431,18 +442,18 @@ class DbDeployTask extends Task
     /**
      * Set the checkall property
      *
-     * @param bool $checkall
+     * @param  bool $checkall
      * @return void
      */
     public function setCheckAll($checkall)
     {
-        $this->checkall = (int)$checkall;
+        $this->checkall = (int) $checkall;
     }
-    
+
     /**
      * Set the appliedBy property
      *
-     * @param string $appliedBy
+     * @param  string $appliedBy
      * @return void
      */
     public function setAppliedBy($appliedBy)
@@ -451,14 +462,13 @@ class DbDeployTask extends Task
     }
 
     /**
-     * Add a new fileset.
-     * @return FileSet
+     * Nested adder, adds a set of files (nested fileset attribute).
+     *
+     * @param FileSet $fs
+     * @return void
      */
-    public function createFileSet()
+    public function addFileSet(FileSet $fs)
     {
-        $this->fileset = new FileSet();
-        $this->filesets[] = $this->fileset;
-        return $this->fileset;
+        $this->filesets[] = $fs;
     }
 }
-

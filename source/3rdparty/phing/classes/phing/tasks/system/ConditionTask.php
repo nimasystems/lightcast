@@ -1,7 +1,7 @@
 <?php
 /*
- *  $Id: ConditionTask.php 1441 2013-10-08 16:28:22Z mkovachev $  
- * 
+ *  $Id: 4778e42a996baf0141a3c1b2de65f5e8fec17fef $
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -32,33 +32,44 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: ConditionTask.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: 4778e42a996baf0141a3c1b2de65f5e8fec17fef $
  * @package   phing.tasks.system
  */
-class ConditionTask extends ConditionBase {
-
+class ConditionTask extends ConditionBase
+{
+    /** @var string $property */
     private $property;
+
+    /** @var string $value */
     private $value = "true";
 
     /**
      * The name of the property to set. Required.
+     * @param string $p
+     * @return void
      */
-    function setProperty($p) {
+    public function setProperty($p)
+    {
         $this->property = $p;
     }
 
     /**
      * The value for the property to set. Defaults to "true".
+     * @param string $v
+     * @return void
      */
-    function setValue($v) {
+    public function setValue($v)
+    {
         $this->value = $v;
     }
 
     /**
      * See whether our nested condition holds and set the property.
+     * @throws BuildException
+     * @return void
      */
-    function main() {
+    public function main()
+    {
 
         if ($this->countConditions() > 1) {
             throw new BuildException("You must not nest more than one condition into <condition>");
@@ -66,7 +77,7 @@ class ConditionTask extends ConditionBase {
         if ($this->countConditions() < 1) {
             throw new BuildException("You must nest a condition into <condition>");
         }
-        $cs = $this->getIterator();        
+        $cs = $this->getIterator();
         if ($cs->current()->evaluate()) {
             $this->project->setProperty($this->property, $this->value);
         }

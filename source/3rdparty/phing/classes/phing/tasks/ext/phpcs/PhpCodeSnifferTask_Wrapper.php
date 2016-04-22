@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: PhpCodeSnifferTask_Wrapper.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 0165de67f7d92e363d668430c692ab7f3658dec6 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,10 +25,11 @@ require_once 'phing/Task.php';
  * Wrapper to disable PHPCS's destructor
  *
  * @author  Michiel Rook <mrook@php.net>
- * @version $Id: PhpCodeSnifferTask_Wrapper.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 0165de67f7d92e363d668430c692ab7f3658dec6 $
  * @package phing.tasks.ext
  */
-class PhpCodeSnifferTask_Wrapper extends PHP_CodeSniffer {
+class PhpCodeSnifferTask_Wrapper extends PHP_CodeSniffer
+{
     public function __destruct()
     {
         // override destructor

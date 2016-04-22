@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: IconvFilter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: fdd2765ea9675f36fde778b3faf373505cc0ccc2 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -39,12 +39,13 @@ include_once 'phing/filters/ChainableReader.php';
  * </pre>
  *
  * @author    Alexey Shockov, <alexey@shockov.com>
- * @version   $Id: IconvFilter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: fdd2765ea9675f36fde778b3faf373505cc0ccc2 $
  * @package   phing.filters
  */
 class IconvFilter
     extends BaseParamFilterReader
-    implements ChainableReader {
+    implements ChainableReader
+{
 
     private $_inputEncoding;
 
@@ -52,13 +53,15 @@ class IconvFilter
 
     /**
      * Returns first n lines of stream.
+     * @param null $len
      * @return the resulting stream, or -1
-     * if the end of the resulting stream has been reached
+     *             if the end of the resulting stream has been reached
      *
      * @exception IOException if the underlying stream throws an IOException
      * during reading
      */
-    function read($len = null) {
+    public function read($len = null)
+    {
         $this->_initialize();
 
         // Process whole text at once.
@@ -73,7 +76,8 @@ class IconvFilter
         }
 
         $this->log(
-            "Encoding " . $this->in->getResource() . " from " . $this->getInputEncoding() . " to " . $this->getOutputEncoding(),
+            "Encoding " . $this->in->getResource() . " from " . $this->getInputEncoding(
+            ) . " to " . $this->getOutputEncoding(),
             Project::MSG_VERBOSE
         );
 
@@ -84,7 +88,8 @@ class IconvFilter
      *
      * @param string $encoding Input encoding.
      */
-    public function setInputEncoding($encoding) {
+    public function setInputEncoding($encoding)
+    {
         $this->_inputEncoding = $encoding;
     }
 
@@ -92,7 +97,8 @@ class IconvFilter
      *
      * @return string
      */
-    public function getInputEncoding() {
+    public function getInputEncoding()
+    {
         return $this->_inputEncoding;
     }
 
@@ -100,7 +106,8 @@ class IconvFilter
      *
      * @param string $encoding Output encoding.
      */
-    public function setOutputEncoding($encoding) {
+    public function setOutputEncoding($encoding)
+    {
         $this->_outputEncoding = $encoding;
     }
 
@@ -108,18 +115,21 @@ class IconvFilter
      *
      * @return string
      */
-    public function getOutputEncoding() {
+    public function getOutputEncoding()
+    {
         return $this->_outputEncoding;
     }
 
     /**
      * Creates a new IconvFilter using the passed in Reader for instantiation.
      *
-     * @param object A Reader object providing the underlying stream. Must not be <code>null</code>.
+     * @param Reader $reader
+     * @internal param A $object Reader object providing the underlying stream. Must not be <code>null</code>.
      *
      * @return object A new filter based on this configuration, but filtering the specified reader.
      */
-    function chain(Reader $reader) {
+    public function chain(Reader $reader)
+    {
         $filter = new self($reader);
 
         $filter->setInputEncoding($this->getInputEncoding());
@@ -134,7 +144,8 @@ class IconvFilter
     /**
      * Configuring object from the parameters list.
      */
-    private function _initialize() {
+    private function _initialize()
+    {
         if ($this->getInitialized()) {
             return;
         }
@@ -144,8 +155,10 @@ class IconvFilter
             foreach ($params as $param) {
                 if ('in' == $param->getName()) {
                     $this->setInputEncoding($param->getValue());
-                } else if ('out' == $param->getName()) {
-                    $this->setOutputEncoding($param->getValue());
+                } else {
+                    if ('out' == $param->getName()) {
+                        $this->setOutputEncoding($param->getValue());
+                    }
                 }
             }
         }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: SecurityException.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: da792c6422c8e8b985c58d93efd578e45cbaeab4 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -22,5 +22,6 @@
 /**
  * @package phing.system.lang
  */
-class SecurityException extends Exception {}
-
+class SecurityException extends Exception
+{
+}

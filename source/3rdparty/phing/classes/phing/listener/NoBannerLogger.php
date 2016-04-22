@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: NoBannerLogger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: fde85729a4da71d69341a94fb05cbaa1f7c40d5b $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,28 +26,44 @@ require_once 'phing/listener/DefaultLogger.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: NoBannerLogger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: fde85729a4da71d69341a94fb05cbaa1f7c40d5b $
  * @package   phing.listener
  */
-class NoBannerLogger extends DefaultLogger {
+class NoBannerLogger extends DefaultLogger
+{
 
     private $targetName = null;
 
-    function targetStarted(BuildEvent $event) {
+    /**
+     * @param BuildEvent $event
+     */
+    public function targetStarted(BuildEvent $event)
+    {
         $target = $event->getTarget();
         $this->targetName = $target->getName();
     }
 
-    function targetFinished(BuildEvent $event) {
+    /**
+     * @param BuildEvent $event
+     */
+    public function targetFinished(BuildEvent $event)
+    {
         $this->targetName = null;
     }
 
-    function messageLogged(BuildEvent $event) {
-        
-        if ($event->getPriority() > $this->msgOutputLevel || null === $event->getMessage() || trim($event->getMessage() === "")) {
+    /**
+     * @param BuildEvent $event
+     */
+    public function messageLogged(BuildEvent $event)
+    {
+
+        if ($event->getPriority() > $this->msgOutputLevel || null === $event->getMessage() || trim(
+                $event->getMessage() === ""
+            )
+        ) {
             return;
         }
-        
+
         if ($this->targetName !== null) {
             $msg = PHP_EOL . $event->getProject()->getName() . ' > ' . $this->targetName . ':' . PHP_EOL;
             $this->printMessage($msg, $this->out, $event->getPriority());

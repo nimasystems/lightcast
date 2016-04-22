@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: CoverageMergerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 6d4732d2b352c992dc03cd92cd83ad1b81bf9e45 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,7 +29,7 @@ require_once 'phing/tasks/ext/coverage/CoverageMerger.php';
  * Merges code coverage snippets into a code coverage database
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: CoverageMergerTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 6d4732d2b352c992dc03cd92cd83ad1b81bf9e45 $
  * @package phing.tasks.ext.coverage
  * @since 2.1.0
  */
@@ -43,7 +43,7 @@ class CoverageMergerTask extends Task
      *
      * @param FileSet the new fileset containing .php files
      */
-    function addFileSet(FileSet $fileset)
+    public function addFileSet(FileSet $fileset)
     {
         $this->filesets[] = $fileset;
     }
@@ -57,36 +57,32 @@ class CoverageMergerTask extends Task
     {
         $files = array();
 
-        foreach ($this->filesets as $fileset)
-        {
+        foreach ($this->filesets as $fileset) {
             $ds = $fileset->getDirectoryScanner($this->project);
             $ds->scan();
 
             $includedFiles = $ds->getIncludedFiles();
-            
-            foreach ($includedFiles as $file)
-            {
+
+            foreach ($includedFiles as $file) {
                 $fs = new PhingFile(basename($ds->getBaseDir()), $file);
-                    
+
                 $files[] = $fs->getAbsolutePath();
             }
         }
 
         return $files;
     }
-    
-    function main()
+
+    public function main()
     {
         $files = $this->getFilenames();
-        
+
         $this->log("Merging " . count($files) . " coverage files");
 
-        foreach ($files as $file)
-        {
+        foreach ($files as $file) {
             $coverageInformation = unserialize(file_get_contents($file));
-            
+
             CoverageMerger::merge($this->project, array($coverageInformation));
         }
     }
 }
-

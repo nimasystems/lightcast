@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SvnUpdateTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: e29c24db4d10667a89d1829fe80075fbf8e3292c $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/tasks/ext/svn/SvnBaseTask.php';
  * Updates a repository in local directory
  *
  * @author Andrew Eddie <andrew.eddie@jamboworks.com>
- * @version $Id: SvnUpdateTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e29c24db4d10667a89d1829fe80075fbf8e3292c $
  * @package phing.tasks.ext.svn
  * @since 2.3.0
  */
@@ -34,9 +34,9 @@ class SvnUpdateTask extends SvnBaseTask
 {
     /**
      * Which Revision to Export
-     * 
+     *
      * @todo check if version_control_svn supports constants
-     * 
+     *
      * @var string
      */
     private $revision = 'HEAD';
@@ -46,11 +46,14 @@ class SvnUpdateTask extends SvnBaseTask
      *
      * @throws BuildException
      */
-    function main()
+    public function main()
     {
         $this->setup('update');
 
-        $this->log("Updating SVN repository at '" . $this->getToDir() . "'". ($this->revision=='HEAD'?'':" (revision: {$this->revision})"));
+        $this->log(
+            "Updating SVN repository at '" . $this->getToDir(
+            ) . "'" . ($this->revision == 'HEAD' ? '' : " (revision: {$this->revision})")
+        );
 
         // revision
         $switches = array(
@@ -60,6 +63,9 @@ class SvnUpdateTask extends SvnBaseTask
         $this->run(array($this->getToDir()), $switches);
     }
 
+    /**
+     * @param $revision
+     */
     public function setRevision($revision)
     {
         $this->revision = $revision;

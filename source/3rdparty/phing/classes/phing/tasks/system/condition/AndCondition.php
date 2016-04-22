@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: AndCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 8449167915cfddb5dead1d8e7535c49920f792c5 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,21 +26,27 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  * Iterates over all conditions and returns false as soon as one
  * evaluates to false.
- * 
+ *
  * @author    Hans Lellelid <hans@xmpl.org>
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: AndCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 8449167915cfddb5dead1d8e7535c49920f792c5 $
  * @package   phing.tasks.system.condition
  */
-class AndCondition extends ConditionBase implements Condition {
+class AndCondition extends ConditionBase implements Condition
+{
 
-    public function evaluate() {
-        foreach($this as $c) { // ConditionBase implements IteratorAggregator
-              if (!$c->evaluate()) {
+    /**
+     * @return bool
+     */
+    public function evaluate()
+    {
+        foreach ($this as $c) { // ConditionBase implements IteratorAggregator
+            if (!$c->evaluate()) {
                 return false;
             }
         }
-        return true;       
+
+        return true;
     }
 }

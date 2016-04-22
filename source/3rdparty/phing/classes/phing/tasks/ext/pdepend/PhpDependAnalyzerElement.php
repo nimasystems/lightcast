@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PhpDependAnalyzerElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: e97cb62953c381f62ab548dfe073b26071f0eb0a $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@ require_once 'phing/system/io/PhingFile.php';
  *
  * @package phing.tasks.ext.pdepend
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: PhpDependAnalyzerElement.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e97cb62953c381f62ab548dfe073b26071f0eb0a $
  * @since   2.4.1
  */
 class PhpDependAnalyzerElement
@@ -36,34 +36,32 @@ class PhpDependAnalyzerElement
      *
      * @var string
      */
-    protected $_type = '';
+    protected $type = '';
 
     /**
      * The value(s) for the analyzer option
      *
      * @var array
      */
-    protected $_value = array();
+    protected $value = array();
 
     /**
      * Sets the analyzer type
      *
      * @param string $type Type of the analyzer
      *
-     * @return void
+     * @throws BuildException
      */
     public function setType($type)
     {
-        $this->_type = $type;
+        $this->type = $type;
 
-        switch ($this->_type) {
+        switch ($this->type) {
             case 'coderank-mode':
                 break;
 
             default:
-                throw new BuildException(
-                    "Analyzer '" . $this->_type . "' not implemented"
-                );
+                throw new BuildException('Analyzer "' . $this->type . '" not implemented');
         }
     }
 
@@ -74,25 +72,23 @@ class PhpDependAnalyzerElement
      */
     public function getType()
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
      * Sets the value for the analyzer
      *
      * @param string $value Value for the analyzer
-     *
-     * @return void
      */
     public function setValue($value)
     {
-        $this->_value = array();
+        $this->value = array();
 
-        $token  = ' ,;';
+        $token = ' ,;';
         $values = strtok($value, $token);
 
         while ($values !== false) {
-            $this->_value[] = $values;
+            $this->value[] = $values;
             $values = strtok($token);
         }
     }
@@ -104,6 +100,6 @@ class PhpDependAnalyzerElement
      */
     public function getValue()
     {
-        return $this->_value;
+        return $this->value;
     }
 }

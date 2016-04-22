@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: OrCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 7d336fe23714db3d5de330e5cf549e49131308b0 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,18 +29,23 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright  2001,2002 THYRELL. All rights reserved
- * @version   $Id: OrCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: 7d336fe23714db3d5de330e5cf549e49131308b0 $
  * @package   phing.tasks.system.condition
  */
-class OrCondition extends ConditionBase implements Condition {
+class OrCondition extends ConditionBase implements Condition
+{
 
-    function evaluate() {
-        foreach($this as $c) { // ConditionBase implements IteratorAggregator
-              if ($c->evaluate()) {
+    /**
+     * @return bool
+     */
+    public function evaluate()
+    {
+        foreach ($this as $c) { // ConditionBase implements IteratorAggregator
+            if ($c->evaluate()) {
                 return true;
             }
         }
+
         return false;
     }
 }

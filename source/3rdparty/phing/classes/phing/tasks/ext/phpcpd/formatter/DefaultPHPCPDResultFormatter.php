@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: DefaultPHPCPDResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 20db9b04d2f5ea6acc7db0f00d83daa6b8580cec $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,25 +26,30 @@ require_once 'phing/tasks/ext/phpcpd/formatter/PHPCPDResultFormatter.php';
  *
  * @package phing.tasks.ext.phpcpd.formatter
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: DefaultPHPCPDResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 20db9b04d2f5ea6acc7db0f00d83daa6b8580cec $
  */
 class DefaultPHPCPDResultFormatter extends PHPCPDResultFormatter
 {
-
     /**
      * Processes a list of clones.
      *
-     * @param object $clones
-     * @param Project $project
-     * @param boolean $useFile
-     * @param PhingFile|null $outfile
+     * @param CodeCloneMap   $clones
+     * @param Project        $project
+     * @param boolean        $useFile
+     * @param PhingFile|null $outFile
      */
     public function processClones($clones, Project $project, $useFile = false, $outFile = null)
     {
-        if (get_class($clones) == 'PHPCPD_CloneMap') {
-            $logger = new PHPCPD_TextUI_ResultPrinter();
-        } else {
+        if (get_class($clones) == 'SebastianBergmann\PHPCPD\CodeCloneMap') {
+            if (class_exists('SebastianBergmann\PHPCPD\Log\Text')) {
+                $this->processClonesNew($clones, $useFile, $outFile);
+
+                return;
+            }
+
             $logger = new \SebastianBergmann\PHPCPD\TextUI\ResultPrinter();
+        } else {
+            $logger = new PHPCPD_TextUI_ResultPrinter();
         }
 
         // default format goes to logs, no buffering
@@ -58,5 +63,25 @@ class DefaultPHPCPDResultFormatter extends PHPCPDResultFormatter
         } else {
             file_put_contents($outFile->getPath(), $output);
         }
+    }
+
+    /**
+     * Wrapper for PHPCPD 2.0
+     *
+     * @param CodeCloneMap   $clones
+     * @param boolean        $useFile
+     * @param PhingFile|null $outFile
+     */
+    private function processClonesNew($clones, $useFile = false, $outFile = null)
+    {
+        if ($useFile) {
+            $resource = fopen($outFile->getPath(), "w");
+        } else {
+            $resource = fopen("php://output", "w");
+        }
+
+        $output = new \Symfony\Component\Console\Output\StreamOutput($resource);
+        $logger = new \SebastianBergmann\PHPCPD\Log\Text();
+        $logger->printResult($output, $clones);
     }
 }

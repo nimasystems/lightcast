@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PhkPackageWebAccessPath.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 9f3afed1a42d813cbd8fdb0c86baa2265e7e820c $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -29,6 +29,7 @@ class PhkPackageWebAccessPath
      * @var string
      */
     private $path;
+
     /**
      * @param string $path
      */
@@ -36,6 +37,7 @@ class PhkPackageWebAccessPath
     {
         $this->path = trim($path);
     }
+
     /**
      * @return string
      */

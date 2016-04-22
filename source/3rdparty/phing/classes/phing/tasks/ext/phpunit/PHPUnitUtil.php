@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: PHPUnitUtil.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 2bed201fd0c78712be2bc9c1eab23f75e646cf4c $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,34 +23,39 @@
  * Various utility functions
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: PHPUnitUtil.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 2bed201fd0c78712be2bc9c1eab23f75e646cf4c $
  * @package phing.tasks.ext.phpunit
  * @since 2.1.0
  */
 class PHPUnitUtil
 {
     protected static $definedClasses = array();
-    
+
     /**
      * Returns the package of a class as defined in the docblock of the class using @package
      *
      * @param string the name of the class
      * @return string the name of the package
      */
-    static function getPackageName($classname)
+    public static function getPackageName($classname)
     {
         $reflect = new ReflectionClass($classname);
 
-        if (preg_match('/@package[\s]+([\.\w]+)/', $reflect->getDocComment(), $matches))
-        {
+        if (method_exists($reflect, 'getNamespaceName')) {
+            $namespace = $reflect->getNamespaceName();
+
+            if ($namespace != '') {
+                return $namespace;
+            }
+        }
+
+        if (preg_match('/@package[\s]+([\.\w]+)/', $reflect->getDocComment(), $matches)) {
             return $matches[1];
         }
-        else
-        {
-            return "default";
-        }
+
+        return "default";
     }
-    
+
     /**
      * Returns the subpackage of a class as defined in the docblock of the class
      * using @subpackage
@@ -82,60 +87,56 @@ class PHPUnitUtil
     public static function getClassFromFileName($filename)
     {
         $filename = basename($filename);
-        
+
         $rpos = strrpos($filename, '.');
-        
-        if ($rpos != -1)
-        {
+
+        if ($rpos != -1) {
             $filename = substr($filename, 0, $rpos);
         }
-        
+
         return $filename;
     }
 
     /**
-     * @param string the filename
-     * @param Path optional classpath
+     * @param $filename
+     * @param null $classpath
+     * @throws Exception
+     * @internal param the $string filename
+     * @internal param optional $Path classpath
      * @return array list of classes defined in the file
      */
-    public static function getDefinedClasses($filename, $classpath = NULL)
+    public static function getDefinedClasses($filename, $classpath = null)
     {
         $filename = realpath($filename);
-        
-        if (!file_exists($filename))
-        {
+
+        if (!file_exists($filename)) {
             throw new Exception("File '" . $filename . "' does not exist");
         }
-        
-        if (isset(self::$definedClasses[$filename]))
-        {
+
+        if (isset(self::$definedClasses[$filename])) {
             return self::$definedClasses[$filename];
         }
-        
+
         Phing::__import($filename, $classpath);
 
         $declaredClasses = get_declared_classes();
-        
-        foreach ($declaredClasses as $classname)
-        {
+
+        foreach ($declaredClasses as $classname) {
             $reflect = new ReflectionClass($classname);
-            
+
             self::$definedClasses[$reflect->getFilename()][] = $classname;
-            
-            if (is_array(self::$definedClasses[$reflect->getFilename()]))
-            {           
-                self::$definedClasses[$reflect->getFilename()] = array_unique(self::$definedClasses[$reflect->getFilename()]);
+
+            if (is_array(self::$definedClasses[$reflect->getFilename()])) {
+                self::$definedClasses[$reflect->getFilename()] = array_unique(
+                    self::$definedClasses[$reflect->getFilename()]
+                );
             }
         }
-        
-        if (isset(self::$definedClasses[$filename]))
-        {
+
+        if (isset(self::$definedClasses[$filename])) {
             return self::$definedClasses[$filename];
-        }
-        else
-        {
+        } else {
             return array();
         }
     }
 }
-

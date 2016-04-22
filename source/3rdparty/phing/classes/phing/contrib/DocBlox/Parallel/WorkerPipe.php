@@ -90,7 +90,8 @@ class DocBlox_Parallel_WorkerPipe
         // push the gathered data onto a name pipe
         $pipe = fopen($this->path, 'w');
         fwrite(
-            $pipe, serialize(
+            $pipe,
+            serialize(
                 array(
                     $this->worker->getResult(),
                     $this->worker->getError(),
@@ -108,7 +109,17 @@ class DocBlox_Parallel_WorkerPipe
      */
     protected function readPipeContents()
     {
-        $pipe = fopen($this->path, 'r+');
+        $pipe = @fopen($this->path, 'r+');
+
+        if (! $pipe) {
+            $arguments = $this->worker->getArguments();
+            return array(
+                '',
+                'Worker died unexpectedly',
+                255
+            );
+        }
+
         $result = unserialize(fread($pipe, filesize($this->path)));
         fclose($pipe);
 
@@ -122,6 +133,6 @@ class DocBlox_Parallel_WorkerPipe
      */
     protected function release()
     {
-        unlink($this->path);
+        @unlink($this->path);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: PhingFilterReader.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 31c0eed7c2c8a83cd5055890b2034ae83089452e $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,33 +27,41 @@ include_once 'phing/types/Parameter.php';
  * and configuration of a Configurable FilterReader.
  *
  * @author    Yannick Lecaillez <yl@seasonfive.com>
- * @version   $Id: PhingFilterReader.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 31c0eed7c2c8a83cd5055890b2034ae83089452e $
  * @see       FilterReader
  * @package   phing.types
  */
-class PhingFilterReader extends DataType {
+class PhingFilterReader extends DataType
+{
 
     private $className;
     private $parameters = array();
     private $classPath;
 
-    function setClassName($className) {
+    /**
+     * @param $className
+     */
+    public function setClassName($className)
+    {
         $this->className = $className;
     }
 
-    function getClassName() {
+    public function getClassName()
+    {
         return $this->className;
     }
 
     /**
      * Set the classpath to load the FilterReader through (attribute).
      * @param Path $classpath
+     * @throws BuildException
      */
-    function setClasspath(Path $classpath) {
-        if ( $this->isReference() ) {
+    public function setClasspath(Path $classpath)
+    {
+        if ($this->isReference()) {
             throw $this->tooManyAttributes();
         }
-        if ( $this->classPath === null ) {
+        if ($this->classPath === null) {
             $this->classPath = $classpath;
         } else {
             $this->classPath->append($classpath);
@@ -63,48 +71,71 @@ class PhingFilterReader extends DataType {
     /*
      * Set the classpath to load the FilterReader through (nested element).
     */
-    function createClasspath() {
-        if ( $this->isReference() ) {
+    /**
+     * @return Path
+     * @throws BuildException
+     */
+    public function createClasspath()
+    {
+        if ($this->isReference()) {
             throw $this->noChildrenAllowed();
-        }        
-        if ( $this->classPath === null ) {
+        }
+        if ($this->classPath === null) {
             $this->classPath = new Path($this->project);
         }
+
         return $this->classPath->createPath();
     }
 
-    function getClasspath() {
+    public function getClasspath()
+    {
         return $this->classPath;
     }
 
-    function setClasspathRef(Reference $r) {
-        if ( $this->isReference() ) {
+    /**
+     * @param Reference $r
+     * @throws BuildException
+     */
+    public function setClasspathRef(Reference $r)
+    {
+        if ($this->isReference()) {
             throw $this->tooManyAttributes();
         }
         $o = $this->createClasspath();
         $o->setRefid($r);
     }
-    
-    function addParam(Parameter $param) {
+
+    /**
+     * @param Parameter $param
+     */
+    public function addParam(Parameter $param)
+    {
         $this->parameters[] = $param;
     }
 
-    function createParam() {
+    public function createParam()
+    {
         $num = array_push($this->parameters, new Parameter());
-        return $this->parameters[$num-1];
+
+        return $this->parameters[$num - 1];
     }
-        
-    function getParams() {
+
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
         // We return a COPY
         $ret = array();
-        for($i=0,$size=count($this->parameters); $i < $size; $i++) {
+        for ($i = 0, $size = count($this->parameters); $i < $size; $i++) {
             $ret[] = clone $this->parameters[$i];
         }
+
         return $ret;
     }
 
     /*
-     * Makes this instance in effect a reference to another PhingFilterReader 
+     * Makes this instance in effect a reference to another PhingFilterReader
      * instance.
      *
      * <p>You must not set another attribute or nest elements inside
@@ -113,24 +144,27 @@ class PhingFilterReader extends DataType {
      * @param Reference $r the reference to which this instance is associated
      * @exception BuildException if this instance already has been configured.
     */
-    function setRefid(Reference $r) {
-        if ( (count($this->parameters) !== 0) || ($this->className !== null) ) {
+    /**
+     * @param Reference $r
+     * @throws BuildException
+     */
+    public function setRefid(Reference $r)
+    {
+        if ((count($this->parameters) !== 0) || ($this->className !== null)) {
             throw $this->tooManyAttributes();
         }
         $o = $r->getReferencedObject($this->getProject());
-        if ( $o instanceof PhingFilterReader ) {
+        if ($o instanceof PhingFilterReader) {
             $this->setClassName($o->getClassName());
             $this->setClasspath($o->getClassPath());
-            foreach($o->getParams() as $p) {
+            foreach ($o->getParams() as $p) {
                 $this->addParam($p);
             }
         } else {
-            $msg = $r->getRefId()." doesn\'t refer to a PhingFilterReader";
+            $msg = $r->getRefId() . " doesn\'t refer to a PhingFilterReader";
             throw new BuildException($msg);
         }
 
         parent::setRefid($r);
     }
 }
-
-

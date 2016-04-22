@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: ZendGuardLicenseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 2e1e3730b96f5d5ea32d54fda8d9333b34eeaaba $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,7 +26,7 @@
  * license properties or it can use a template.
  *
  * @author    Petr Rybak <petr@rynawe.net>
- * @version   $Id: ZendGuardLicenseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 2e1e3730b96f5d5ea32d54fda8d9333b34eeaaba $
  * @package   phing.tasks.ext.zendguard
  * @since     2.4.3
  */
@@ -44,20 +44,20 @@ class ZendGuardLicenseTask extends Task
      */
     /**
      * Path to Zend Guard zendenc_sign executable
-     * 
+     *
      * @var string
      */
     protected $zendsignPath;
     /**
      * Path to private key that will be used to sign the license
-     * 
+     *
      * @var string
      */
     protected $privateKeyPath;
     /**
      * Where to store the signed license file
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $outputFile;
     /**
@@ -73,7 +73,7 @@ class ZendGuardLicenseTask extends Task
      * the PHP files.
      *
      * REQUIRED
-     * 
+     *
      * @var string
      */
     protected $productName;
@@ -81,8 +81,8 @@ class ZendGuardLicenseTask extends Task
      * The Name of the Registered owner of the license.
      *
      * REQUIRED
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $registeredTo;
     /**
@@ -98,38 +98,38 @@ class ZendGuardLicenseTask extends Task
      */
     protected $expires;
     /**
-     * Limits the use of the license to IP addresses that fall within specification. Supports 
-     * wildcards for any of the IP place holders, as well as the two types of net masks 
+     * Limits the use of the license to IP addresses that fall within specification. Supports
+     * wildcards for any of the IP place holders, as well as the two types of net masks
      * (filters).
-     * Netmask pair An IP a.b.c.d, and a netmask w.x.y.z. (That is., 10.1.0.0/255.255.0.0), 
+     * Netmask pair An IP a.b.c.d, and a netmask w.x.y.z. (That is., 10.1.0.0/255.255.0.0),
      * where the binary of mask is applied to filter IP addresses.
-     * ip/nnn (similar to a CIDR specification) This mask consists of nnn high-order 1 bits. 
-     * (That is, 10.1.0.0/16 is the same as 10.1.0.0/255.255.0.0). Instead of spelling out 
-     * the bits of the subnet mask, this mask notation is simply listed as the number of 1s 
-     * bits that start the mask. Rather than writing the address and subnet mask as 
-     * 192.60.128.0/255.255.252.0 the network address would be written simply as: 
+     * ip/nnn (similar to a CIDR specification) This mask consists of nnn high-order 1 bits.
+     * (That is, 10.1.0.0/16 is the same as 10.1.0.0/255.255.0.0). Instead of spelling out
+     * the bits of the subnet mask, this mask notation is simply listed as the number of 1s
+     * bits that start the mask. Rather than writing the address and subnet mask as
+     * 192.60.128.0/255.255.252.0 the network address would be written simply as:
      * 192.60.128.0/22 which indicates starting address of the network and number of 1s
-     * bits (22) in the network portion of the address. The mask in binary is 
+     * bits (22) in the network portion of the address. The mask in binary is
      * (11111111.11111111.11111100.00000000).
-     * 
+     *
      * OPTIONAL
-     * 
+     *
      * Example (Wildcard):
      * IP-Range = 10.1.*.*
      * Example (Net Mask):
      * IP-Range = 10.1.0.0/255.255.0.0
      * Example (Net Mask):
      * IP-Range = 10.1.0.0/16
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $ipRange;
     /**
-     * Coded string (Zend Host ID) used to lock the license to a specific hardware. The 
-     * Zend Host ID obtained from the machine where the encoded files and license are 
+     * Coded string (Zend Host ID) used to lock the license to a specific hardware. The
+     * Zend Host ID obtained from the machine where the encoded files and license are
      * to be installed. The Zend Host ID code can be obtained by using the zendid utility.
      * For more details, see Getting the Zend Host ID.
-     * 
+     *
      * REQUIRED if Hardware-Locked is set equal to YES.
      * Meaningless if Hardware-Locked is set equal to NO.
      *
@@ -137,14 +137,14 @@ class ZendGuardLicenseTask extends Task
      *
      * Example:
      * Host-ID = H:MFM43-Q9CXC-B9EDX-GWYSU;H:MFM43-Q9CXC-B9EDX-GWYTY
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $hostID;
     /**
      * Option that indicates if the license will be locked to a specific machine
      * using the Zend Host ID code(s). If set to YES, the Host-ID is required.
-     * 
+     *
      * OPTIONAL
      *
      * @var bool
@@ -175,17 +175,25 @@ class ZendGuardLicenseTask extends Task
      */
     protected $xUserDefinedValues;
 
-
+    /**
+     * @param $value
+     */
     public function setLicenseTemplate($value)
     {
         $this->licenseTemplate = $value;
     }
 
+    /**
+     * @param $productName
+     */
     public function setProductName($productName)
     {
         $this->productName = $productName;
     }
 
+    /**
+     * @param $registeredTo
+     */
     public function setRegisteredTo($registeredTo)
     {
         $this->registeredTo = $registeredTo;
@@ -199,6 +207,7 @@ class ZendGuardLicenseTask extends Task
      *
      * @param mixed $expires
      *
+     * @throws BuildException
      * @return string
      */
     public function setExpires($expires)
@@ -215,41 +224,65 @@ class ZendGuardLicenseTask extends Task
         }
     }
 
+    /**
+     * @param $iprange
+     */
     public function setIpRange($iprange)
     {
         $this->ipRange = $iprange;
     }
 
+    /**
+     * @param $hostID
+     */
     public function setHostID($hostID)
     {
         $this->hostID = $hostID;
     }
 
+    /**
+     * @param $hardwareLocked
+     */
     public function setHardwareLocked($hardwareLocked)
     {
         $this->hardwareLocked = (bool) $hardwareLocked;
     }
 
+    /**
+     * @param $userDefinedValues
+     */
     public function setUserDefinedValues($userDefinedValues)
     {
         $this->userDefinedValues = $userDefinedValues;
     }
 
+    /**
+     * @param $xUserDefinedValues
+     */
     public function setXUserDefinedValues($xUserDefinedValues)
     {
         $this->xUserDefinedValues = $xUserDefinedValues;
     }
 
+    /**
+     * @param $zendsignPath
+     */
     public function setZendsignPath($zendsignPath)
     {
         $this->zendsignPath = $zendsignPath;
     }
 
+    /**
+     * @param $privateKeyPath
+     */
     public function setPrivateKeyPath($privateKeyPath)
     {
         $this->privateKeyPath = $privateKeyPath;
     }
 
+    /**
+     * @param $outputFile
+     */
     public function setOutputFile($outputFile)
     {
         $this->outputFile = $outputFile;
@@ -378,7 +411,6 @@ class ZendGuardLicenseTask extends Task
         // add key path
         $command .= ' ' . $this->privateKeyPath;
 
-
         $this->zendsignCommand = $command;
 
         return $command;
@@ -405,6 +437,7 @@ class ZendGuardLicenseTask extends Task
     /**
      * Creates the signed license at the defined output path
      *
+     * @throws BuildException
      * @return void
      */
     protected function generateLicense()
@@ -427,6 +460,7 @@ class ZendGuardLicenseTask extends Task
      * It will generate a temporary license template
      * based on the properties defined.
      *
+     * @throws BuildException
      * @return string Path of the temporary license template file
      */
     protected function generateLicenseTemplate()
@@ -496,19 +530,23 @@ class ZendGuardLicenseTask extends Task
     }
 
     /**
-     * Parse the given string in format like key1=value1;key2=value2;... and 
+     * Parse the given string in format like key1=value1;key2=value2;... and
      * converts it to array
      *   (key1=>value1, key2=value2, ...)
      *
-     * @param stirng $valueString Semi-colon separated value pairs
-     * @param array  $valueArray Array to which the values will be added
+     * @param string $valueString Semi-colon separated value pairs
+     * @param array $valueArray Array to which the values will be added
      * @param string $keyPrefix Prefix to use when adding the key
      *
+     * @param string $pairSeparator
      * @return void
      */
-    protected function parseAndAddUserDefinedValues($valueString, array &$valueArray, $keyPrefix = '',
-                                                    $pairSeparator = ';')
-    {
+    protected function parseAndAddUserDefinedValues(
+        $valueString,
+        array &$valueArray,
+        $keyPrefix = '',
+        $pairSeparator = ';'
+    ) {
         // explode the valueString (semicolon)
         $valuePairs = explode($pairSeparator, $valueString);
         if (!empty($valuePairs)) {

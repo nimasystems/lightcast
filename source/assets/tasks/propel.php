@@ -37,8 +37,6 @@ class tPropel extends lcTaskController
     private $work_dir;
     private $phing_has_error;
 
-    private $phing_autoload_cache;
-
     public function getHelpInfo()
     {
         $help_info = <<<EOD
@@ -307,7 +305,7 @@ EOD;
         return $this->phingExecute('migrate');*/
     }
 
-    private function getMainPropelSchemaConfig($schema_name = null)
+    private function getMainPropelSchemaConfig()
     {
         $cfg_filename = $this->configuration->getBaseConfigDir() . DS . 'propel.yml';
 
@@ -348,7 +346,7 @@ EOD;
         return $data;
     }
 
-    private function getPluginPropelSchemaConfig($plugin_path, $schema_name = null)
+    private function getPluginPropelSchemaConfig($plugin_path)
     {
         $cfg_filename = $plugin_path . DS . 'config' . DS . 'propel.yml';
 
@@ -420,7 +418,7 @@ EOD;
                         throw new lcSystemException('Could not obtain plugin configuration');
                     }
 
-                    $plugin_propel_schema = $this->getPluginPropelSchemaConfig($plugin_data['path'], $plugin_name);
+                    $plugin_propel_schema = $this->getPluginPropelSchemaConfig($plugin_data['path']);
 
                     $plugin_tables = ($pl_config instanceof iSupportsDbModels) ? $pl_config->getDbModels() : null;
                     $plugin_tables = is_array($plugin_tables) && $plugin_tables ? $plugin_tables : array();
@@ -1187,47 +1185,22 @@ EOD;
         return $config;
     }
 
-    public function phingAutoloadClass($class_name)
+    public function includePhing()
     {
-        if (!$this->phing_autoload_cache) {
-            /** @noinspection PhpUndefinedMethodInspection */
-            /** @noinspection PhpIncludeInspection */
-            require_once($this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'autoload.php');
-            $phing_classmap = isset($phing_classmap) ? $phing_classmap : null;
-            $this->phing_autoload_cache = $phing_classmap;
-        }
+        /** @noinspection PhpIncludeInspection */
+        require_once($this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'vendor' . DS . 'autoload.php');
 
-        $phing_classmap = $this->phing_autoload_cache;
-
-        if (!$phing_classmap) {
-            return;
-        }
-
-        $path = isset($phing_classmap[$class_name]) ? $phing_classmap[$class_name] : null;
-
-        if ($path) {
-            /** @noinspection PhpIncludeInspection */
-            include_once($path);
-        }
+        /** @noinspection PhpIncludeInspection */
+        require_once 'phing/listener/AnsiColorLogger.php';
     }
 
     private function initPropelGenerator()
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        set_include_path(get_include_path() . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'lib' . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'classes');
+        set_include_path(get_include_path() . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'lib' .
+            PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'classes');
 
-        // register phing autoload file
-        spl_autoload_register(array(
-            $this,
-            'phingAutoloadClass'
-        ));
-
-        /*require_once 'phing/Phing.php';
-         require_once 'phing/Project.php';
-        require_once 'phing/types/FileSet.php';
-        require_once 'phing/system/io/PhingFile.php';
-        require_once 'phing/system/util/Properties.php';
-        require_once('phing/listener/AnsiColorLogger.php');*/
+        $this->includePhing();
 
         /** @noinspection PhpIncludeInspection */
         require_once 'task/PropelOMTask.php';
@@ -1357,23 +1330,34 @@ EOD;
             $stream = new OutputStream($php_output);
 
             Phing::setOutputStream($stream);
+            PropelPhing::setOutputStream($stream);
+
             Phing::setErrorStream($stream);
+            PropelPhing::setErrorStream($stream);
 
             Phing::startup();
+            PropelPhing::startup();
+
             Phing::setProperty('phing.home', getenv('PHING_HOME'));
+            PropelPhing::setProperty('phing.home', getenv('PHING_HOME'));
 
             // catch and store errors internally
             Phing::startPhpErrorCapture();
+            PropelPhing::startPhpErrorCapture();
 
-            Phing::fire($args);
+            if (!PropelPhing::fire($args)) {
+                throw new lcIOException($this->t('Phing command could not be executed'));
+            }
 
             Phing::stopPhpErrorCapture();
+            PropelPhing::stopPhpErrorCapture();
 
             Phing::shutdown();
+            PropelPhing::shutdown();
 
             @fclose($php_output);
 
-            $captured_errors = Phing::getCapturedPhpErrors();
+            $captured_errors = PropelPhing::getCapturedPhpErrors();
 
             // return success
             $success = true;

@@ -1,6 +1,6 @@
 <?php
 /**
- *  $Id: PHPMDTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 6de5c80e97545cd52494c53490e96c09aa61e703 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,7 +28,7 @@ require_once 'phing/tasks/ext/phpmd/PHPMDFormatterElement.php';
  *
  * @package phing.tasks.ext.phpmd
  * @author  Benjamin Schultz <bschultz@proqrent.de>
- * @version $Id: PHPMDTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 6de5c80e97545cd52494c53490e96c09aa61e703 $
  * @since   2.4.1
  */
 class PHPMDTask extends Task
@@ -43,7 +43,7 @@ class PHPMDTask extends Task
     /**
      * All fileset objects assigned to this task
      *
-     * @var array<FileSet>
+     * @var FileSet[]
      */
     protected $filesets = array();
 
@@ -85,16 +85,31 @@ class PHPMDTask extends Task
     /**
      * Formatter elements.
      *
-     * @var array<PHPMDFormatterElement>
+     * @var PHPMDFormatterElement[]
      */
     protected $formatters = array();
+
+    /**
+     * @var bool
+     */
+    protected $newVersion = true;
+
+    /**
+     * @var string
+     */
+    protected $pharLocation = "";
+
+    /**
+     * Cache data storage
+     *
+     * @var DataStore
+     */
+    protected $cache;
 
     /**
      * Set the input source file or directory.
      *
      * @param PhingFile $file The input source file or directory.
-     *
-     * @return void
      */
     public function setFile(PhingFile $file)
     {
@@ -102,22 +117,20 @@ class PHPMDTask extends Task
     }
 
     /**
-     * Nested creator, adds a set of files (nested fileset attribute).
+     * Nested adder, adds a set of files (nested fileset attribute).
      *
-     * @return FileSet The created fileset object
+     * @param FileSet $fs
+     * @return void
      */
-    public function createFileSet()
+    public function addFileSet(FileSet $fs)
     {
-        $num = array_push($this->filesets, new FileSet());
-        return $this->filesets[$num-1];
+        $this->filesets[] = $fs;
     }
 
     /**
      * Sets the minimum rule priority.
      *
      * @param integer $minimumPriority Minimum rule priority.
-     *
-     * @return void
      */
     public function setMinimumPriority($minimumPriority)
     {
@@ -127,10 +140,7 @@ class PHPMDTask extends Task
     /**
      * Sets the rule-sets.
      *
-     * @param string $ruleSetFileNames Comma-separated string of rule-set filenames
-     *                                 or identifier.
-     *
-     * @return void
+     * @param string $ruleSetFileNames Comma-separated string of rule-set filenames or identifier.
      */
     public function setRulesets($ruleSetFileNames)
     {
@@ -141,15 +151,13 @@ class PHPMDTask extends Task
      * Sets a list of filename extensions for valid php source code files.
      *
      * @param string $fileExtensions List of valid file extensions without leading dot.
-     *
-     * @return void
      */
     public function setAllowedFileExtensions($fileExtensions)
     {
         $this->allowedFileExtensions = array();
 
         $token = ' ,;';
-        $ext   = strtok($fileExtensions, $token);
+        $ext = strtok($fileExtensions, $token);
 
         while ($ext !== false) {
             $this->allowedFileExtensions[] = $ext;
@@ -158,18 +166,15 @@ class PHPMDTask extends Task
     }
 
     /**
-     * Sets a list of ignore patterns that is used to exclude directories from
-     * the source analysis.
+     * Sets a list of ignore patterns that is used to exclude directories from the source analysis.
      *
      * @param string $ignorePatterns List of ignore patterns.
-     *
-     * @return void
      */
     public function setIgnorePatterns($ignorePatterns)
     {
         $this->ignorePatterns = array();
 
-        $token   = ' ,;';
+        $token = ' ,;';
         $pattern = strtok($ignorePatterns, $token);
 
         while ($pattern !== false) {
@@ -186,69 +191,86 @@ class PHPMDTask extends Task
     public function createFormatter()
     {
         $num = array_push($this->formatters, new PHPMDFormatterElement());
-        return $this->formatters[$num-1];
+
+        return $this->formatters[$num - 1];
     }
 
     /**
-     * Executes PHPMD against PhingFile or a FileSet
-     *
-     * @throws BuildException - if the phpmd classes can't be loaded.
-     * @return void
+     * @param string $format
      */
-    public function main()
+    public function setFormat($format)
     {
-        /**
-         * Find PHPMD
-         */
-        @include_once 'PHP/PMD.php';
+        $this->format = $format;
+    }
 
-        if (! class_exists('PHP_PMD')) {
+    /**
+     * @param string $pharLocation
+     */
+    public function setPharLocation($pharLocation)
+    {
+        $this->pharLocation = $pharLocation;
+    }
+
+    /**
+     * Whether to store last-modified times in cache
+     *
+     * @param PhingFile $file
+     */
+    public function setCacheFile(PhingFile $file)
+    {
+        $this->cache = new DataStore($file);
+    }
+
+    /**
+     * Find PHPMD
+     *
+     * @return string
+     * @throws BuildException
+     */
+    protected function loadDependencies()
+    {
+        if (!empty($this->pharLocation)) {
+            include_once 'phar://' . $this->pharLocation . '/vendor/autoload.php';
+        }
+
+        $className = '\PHPMD\PHPMD';
+
+        if (!class_exists($className)) {
+            @include_once 'PHP/PMD.php';
+            $className = "PHP_PMD";
+            $this->newVersion = false;
+        }
+
+        if (!class_exists($className)) {
             throw new BuildException(
-                'PHPMDTask depends on PHPMD being installed and on include_path.',
+                'PHPMDTask depends on PHPMD being installed and on include_path or listed in pharLocation.',
                 $this->getLocation()
             );
         }
-        
-        require_once 'PHP/PMD/AbstractRule.php';
+
+        if ($this->newVersion) {
+            //weird syntax to allow 5.2 parser compatibility
+            $minPriority = constant('\PHPMD\AbstractRule::LOWEST_PRIORITY');
+            require_once 'phing/tasks/ext/phpmd/PHPMDRendererRemoveFromCache.php';
+        } else {
+            require_once 'PHP/PMD/AbstractRule.php';
+            $minPriority = PHP_PMD_AbstractRule::LOWEST_PRIORITY;
+        }
 
         if (!$this->minimumPriority) {
-            $this->minimumPriority = PHP_PMD_AbstractRule::LOWEST_PRIORITY;
-        }
-        
-        if (!isset($this->file) and count($this->filesets) == 0) {
-            throw new BuildException("Missing either a nested fileset or attribute 'file' set");
+            $this->minimumPriority = $minPriority;
         }
 
-        if (count($this->formatters) == 0) {
-            // turn legacy format attribute into formatter
-            $fmt = new PHPMDFormatterElement();
-            $fmt->setType($this->format);
-            $fmt->setUseFile(false);
-            $this->formatters[] = $fmt;
-        }
+        return $className;
+    }
 
-        $reportRenderers = array();
-
-        foreach ($this->formatters as $fe) {
-            if ($fe->getType() == '') {
-                throw new BuildException("Formatter missing required 'type' attribute.");
-            }
-            if ($fe->getUsefile() && $fe->getOutfile() === null) {
-                throw new BuildException("Formatter requires 'outfile' attribute when 'useFile' is true.");
-            }
-
-            $reportRenderers[] = $fe->getRenderer();
-        }
-
-        // Create a rule set factory
-        $ruleSetFactory = new PHP_PMD_RuleSetFactory();
-        $ruleSetFactory->setMinimumPriority($this->minimumPriority);
-
-        $phpmd = new PHP_PMD();
-
-        $phpmd->setFileExtensions($this->allowedFileExtensions);
-        $phpmd->setIgnorePattern($this->ignorePatterns);
-
+    /**
+     * Return the list of files to parse
+     *
+     * @return string[] list of absolute files to parse
+     */
+    protected function getFilesToParse()
+    {
         $filesToParse = array();
 
         if ($this->file instanceof PhingFile) {
@@ -256,26 +278,100 @@ class PHPMDTask extends Task
         } else {
             // append any files in filesets
             foreach ($this->filesets as $fs) {
-                $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
-                foreach ($files as $filename) {
-                     $f = new PhingFile($fs->getDir($this->project), $filename);
-                     $filesToParse[] = $f->getAbsolutePath();
+                $dir = $fs->getDir($this->project)->getAbsolutePath();
+                foreach ($fs->getDirectoryScanner($this->project)->getIncludedFiles() as $filename) {
+                    $fileAbsolutePath = $dir . DIRECTORY_SEPARATOR . $filename;
+                    if ($this->cache) {
+                        $lastMTime = $this->cache->get($fileAbsolutePath);
+                        $currentMTime = filemtime($fileAbsolutePath);
+                        if ($lastMTime >= $currentMTime) {
+                            continue;
+                        } else {
+                            $this->cache->put($fileAbsolutePath, $currentMTime);
+                        }
+                    }
+                    $filesToParse[] = $fileAbsolutePath;
                 }
             }
         }
-        
+        return $filesToParse;
+    }
+
+    /**
+     * Executes PHPMD against PhingFile or a FileSet
+     *
+     * @throws BuildException - if the phpmd classes can't be loaded.
+     */
+    public function main()
+    {
+        $className = $this->loadDependencies();
+
+        if (!isset($this->file) and count($this->filesets) == 0) {
+            throw new BuildException('Missing either a nested fileset or attribute "file" set');
+        }
+
+        if (count($this->formatters) == 0) {
+            // turn legacy format attribute into formatter
+            $fmt = new PHPMDFormatterElement();
+            $fmt->setType($this->format);
+            $fmt->setUseFile(false);
+
+            $this->formatters[] = $fmt;
+        }
+
+        $reportRenderers = array();
+
+        foreach ($this->formatters as $fe) {
+            if ($fe->getType() == '') {
+                throw new BuildException('Formatter missing required "type" attribute.');
+            }
+
+            if ($fe->getUsefile() && $fe->getOutfile() === null) {
+                throw new BuildException('Formatter requires "outfile" attribute when "useFile" is true.');
+            }
+
+            $reportRenderers[] = $fe->getRenderer();
+        }
+
+        if ($this->newVersion && $this->cache) {
+            $reportRenderers[] = new PHPMDRendererRemoveFromCache($this->cache);
+        } else {
+            $this->cache = null; // cache not compatible to old version
+        }
+
+        // Create a rule set factory
+        if ($this->newVersion) {
+            $ruleSetClass = '\PHPMD\RuleSetFactory';
+            $ruleSetFactory = new $ruleSetClass(); //php 5.2 parser compatibility
+
+        } else {
+            if (!class_exists("PHP_PMD_RuleSetFactory")) {
+                    @include 'PHP/PMD/RuleSetFactory.php';
+            }
+            $ruleSetFactory = new PHP_PMD_RuleSetFactory();
+        }
+        $ruleSetFactory->setMinimumPriority($this->minimumPriority);
+
+        /**
+         * @var PHPMD\PHPMD $phpmd
+         */
+        $phpmd = new $className();
+        $phpmd->setFileExtensions($this->allowedFileExtensions);
+        $phpmd->setIgnorePattern($this->ignorePatterns);
+
+        $filesToParse = $this->getFilesToParse();
+
         if (count($filesToParse) > 0) {
             $inputPath = implode(',', $filesToParse);
-    
+
             $this->log('Processing files...');
-    
-            $phpmd->processFiles(
-                $inputPath,
-                $this->rulesets,
-                $reportRenderers,
-                $ruleSetFactory
-            );
-    
+
+            $phpmd->processFiles($inputPath, $this->rulesets, $reportRenderers, $ruleSetFactory);
+
+            if ($this->cache) {
+                $this->cache->commit();
+            }
+
             $this->log('Finished processing files');
         } else {
             $this->log('No files to process');

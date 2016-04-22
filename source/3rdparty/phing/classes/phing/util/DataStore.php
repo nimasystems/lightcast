@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: DataStore.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 33628948aa5dc0ffef8f645df415c37b4a6268f2 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -19,7 +19,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/system/io/PhingFile.php';
 require_once 'phing/system/io/FileWriter.php';
 
@@ -28,36 +28,35 @@ require_once 'phing/system/io/FileWriter.php';
  *
  * @package phing.util
  * @author  Michiel Rook <mrook@php.net>
- * @version $Id: DataStore.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 33628948aa5dc0ffef8f645df415c37b4a6268f2 $
  */
 class DataStore
 {
-    private $data = array();    
+    private $data = array();
     private $file = null;
-    
+
     /**
      * Constructs a new data store
      *
      * @param PhingFile $file object pointing to the data store on disk
      */
-    function __construct(PhingFile $file)
+    public function __construct(PhingFile $file)
     {
         $this->file = $file;
-        
-        if ($this->file->exists())
-        {
+
+        if ($this->file->exists()) {
             $this->read();
         }
     }
-    
+
     /**
      * Destructor
      */
-    function __destruct()
+    public function __destruct()
     {
         $this->commit();
     }
-    
+
     /**
      * Retrieves a value from the data store
      *
@@ -67,22 +66,19 @@ class DataStore
      */
     public function get($key)
     {
-        if (!isset($this->data[$key]))
-        {
+        if (!isset($this->data[$key])) {
             return null;
-        }
-        else
-        {
+        } else {
             return $this->data[$key];
         }
     }
-    
+
     /**
      * Adds a value to the data store
      *
      * @param string  $key        the key
      * @param mixed   $value      the value
-     * @param boolean $autocommit whether to auto-commit (write) 
+     * @param boolean $autocommit whether to auto-commit (write)
      *                            the data store to disk
      *
      * @return none
@@ -90,13 +86,28 @@ class DataStore
     public function put($key, $value, $autocommit = false)
     {
         $this->data[$key] = $value;
-        
-        if ($autocommit)
-        {
+
+        if ($autocommit) {
             $this->commit();
         }
     }
-    
+
+    /**
+     * Remove a value from the data store
+     *
+     * @param string  $key        the key
+     * @param boolean $autocommit whether to auto-commit (write)
+     *                            the data store to disk
+     */
+    public function remove($key, $autocommit = false)
+    {
+        unset($this->data[$key]);
+
+        if ($autocommit) {
+            $this->commit();
+        }
+    }
+
     /**
      * Commits data store to disk
      *
@@ -106,23 +117,21 @@ class DataStore
     {
         $this->write();
     }
-    
+
     /**
      * Internal function to read data store from file
      *
+     * @throws BuildException
      * @return none
      */
     private function read()
     {
-        if (!$this->file->canRead())
-        {
-            throw new BuildException("Can't read data store from '" . 
-                $file->getPath() . "'");
-        }
-        else
-        {
+        if (!$this->file->canRead()) {
+            throw new BuildException("Can't read data store from '" .
+                $this->file->getPath() . "'");
+        } else {
             $serializedData = $this->file->contents();
-            
+
             $this->data = unserialize($serializedData);
         }
     }
@@ -130,22 +139,22 @@ class DataStore
     /**
      * Internal function to write data store to file
      *
+     * @throws BuildException
      * @return none
      */
     private function write()
     {
-        if (!$this->file->canWrite())
-        {
-            throw new BuildException("Can't write data store to '" . 
-                $file->getPath() . "'");
-        }
-        else
-        {
+        if (!$this->file->canWrite()) {
+            throw new BuildException("Can't write data store to '" .
+                $this->file->getPath() . "'");
+        } else {
             $serializedData = serialize($this->data);
 
             $writer = new FileWriter($this->file);
             $writer->write($serializedData);
             $writer->close();
         }
-    }    
-};
+    }
+}
+
+;

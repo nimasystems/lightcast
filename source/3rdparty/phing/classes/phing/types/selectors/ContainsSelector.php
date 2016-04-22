@@ -1,7 +1,7 @@
 <?php
 
 /*
- * $Id: ContainsSelector.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: eb9a1bff3c3a35a383e003cae076c0ca3e0d8ac7 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,19 +25,24 @@ include_once 'phing/types/selectors/BaseExtendSelector.php';
 /**
  * Selector that filters files based on whether they contain a
  * particular string.
- * 
+ *
  * @author Hans Lellelid <hans@xmpl.org> (Phing)
  * @author Bruce Atherton <bruce@callenish.com> (Ant)
  * @package phing.types.selectors
  */
-class ContainsSelector extends BaseExtendSelector {
+class ContainsSelector extends BaseExtendSelector
+{
 
     private $contains = null;
     private $casesensitive = true;
     const CONTAINS_KEY = "text";
     const CASE_KEY = "casesensitive";
 
-    public function toString() {
+    /**
+     * @return string
+     */
+    public function toString()
+    {
         $buf = "{containsselector text: ";
         $buf .= $this->contains;
         $buf .= " casesensitive: ";
@@ -47,6 +52,7 @@ class ContainsSelector extends BaseExtendSelector {
             $buf .= "false";
         }
         $buf .= "}";
+
         return $buf;
     }
 
@@ -55,7 +61,8 @@ class ContainsSelector extends BaseExtendSelector {
      *
      * @param string $contains the string that a file must contain to be selected.
      */
-    public function setText($contains) {
+    public function setText($contains)
+    {
         $this->contains = $contains;
     }
 
@@ -64,7 +71,8 @@ class ContainsSelector extends BaseExtendSelector {
      *
      * @param boolean $casesensitive whether to pay attention to case sensitivity
      */
-    public function setCasesensitive($casesensitive) {
+    public function setCasesensitive($casesensitive)
+    {
         $this->casesensitive = $casesensitive;
     }
 
@@ -73,13 +81,15 @@ class ContainsSelector extends BaseExtendSelector {
      * It translates each parameter into the appropriate setXXX() call.
      *
      * @param array $parameters the complete set of parameters for this selector
+     * @return mixed|void
      */
-    public function setParameters($parameters) {
+    public function setParameters($parameters)
+    {
         parent::setParameters($parameters);
         if ($parameters !== null) {
-            for ($i=0,$size=count($parameters); $i < $size; $i++) {
+            for ($i = 0, $size = count($parameters); $i < $size; $i++) {
                 $paramname = $parameters[$i]->getName();
-                switch(strtolower($paramname)) {
+                switch (strtolower($paramname)) {
                     case self::CONTAINS_KEY:
                         $this->setText($parameters[$i]->getValue());
                         break;
@@ -88,7 +98,7 @@ class ContainsSelector extends BaseExtendSelector {
                         break;
                     default:
                         $this->setError("Invalid parameter " . $paramname);
-                }                
+                }
             } // for each param
         } // if params
     }
@@ -98,7 +108,8 @@ class ContainsSelector extends BaseExtendSelector {
      * means that the pattern attribute has been set.
      *
      */
-    public function verifySettings() {
+    public function verifySettings()
+    {
         if ($this->contains === null) {
             $this->setError("The text attribute is required");
         }
@@ -108,12 +119,20 @@ class ContainsSelector extends BaseExtendSelector {
      * The heart of the matter. This is where the selector gets to decide
      * on the inclusion of a file in a particular fileset.
      *
-     * @param basedir the base directory the scan is being done from
-     * @param filename is the name of the file to check
-     * @param file a PhingFile object the selector can use
-     * @return whether the file should be selected or not
+     * @param PhingFile $basedir
+     * @param string $filename
+     * @param PhingFile $file
+     *
+     * @throws BuildException
+     *
+     * @internal param the $basedir base directory the scan is being done from
+     * @internal param is $filename the name of the file to check
+     * @internal param a $file PhingFile object the selector can use
+     *
+     * @return bool whether the file should be selected or not
      */
-    public function isSelected(PhingFile $basedir, $filename, PhingFile $file) {
+    public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
+    {
 
         $this->validate();
 
@@ -125,10 +144,10 @@ class ContainsSelector extends BaseExtendSelector {
         if (!$this->casesensitive) {
             $userstr = strtolower($this->contains);
         }
-        
+
         $in = null;
         try {
-            $in = new BufferedReader(new FileReader($file));        
+            $in = new BufferedReader(new FileReader($file));
             $teststr = $in->readLine();
             while ($teststr !== null) {
                 if (!$this->casesensitive) {
@@ -139,13 +158,15 @@ class ContainsSelector extends BaseExtendSelector {
                 }
                 $teststr = $in->readLine();
             }
+
+            $in->close();
+
             return false;
         } catch (IOException $ioe) {
-            if ($in) $in->close();
+            if ($in) {
+                $in->close();
+            }
             throw new BuildException("Could not read file " . $filename);
         }
-        $in->close();                
     }
-
 }
-

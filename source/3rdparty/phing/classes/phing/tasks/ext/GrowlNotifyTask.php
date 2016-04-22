@@ -33,7 +33,7 @@
  *
  * @category   Tasks
  * @package    phing.tasks.ext
- * @version    $Id: GrowlNotifyTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version    $Id: 50d0d2d926e6a51ab78d6801407e90f020dcbad9 $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link       https://github.com/llaville/phing-GrowlNotifyTask
@@ -48,7 +48,7 @@ require_once 'phing/Task.php';
  *
  * @category   Tasks
  * @package    phing.tasks.ext
- * @version    $Id: GrowlNotifyTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version    $Id: 50d0d2d926e6a51ab78d6801407e90f020dcbad9 $
  * @author     Laurent Laville <pear@laurent-laville.org>
  * @license    http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link       https://github.com/llaville/phing-GrowlNotifyTask
@@ -118,7 +118,7 @@ class GrowlNotifyTask extends Task
      *
      * @param string $name (optional) Name of the application
      *                     that appears in your Growl preferences
-     *                      Default: "Growl for Phing"
+     *                     Default: "Growl for Phing"
      *
      * @return void
      * @throws BuildException
@@ -145,18 +145,10 @@ class GrowlNotifyTask extends Task
      * @param bool $sticky (optional) Notification should be sticky
      *
      * @return void
-     * @throws BuildException
      */
     public function setSticky($sticky = true)
     {
-        if (!is_bool($sticky)) {
-            throw new BuildException(
-                '"sticky" attribute is invalid.' .
-                ' Expect to be a boolean, actual is ' . gettype($sticky)
-            );
-        }
-
-        $this->sticky = $sticky;
+        $this->sticky = (bool) $sticky;
     }
 
     /**
@@ -335,25 +327,25 @@ class GrowlNotifyTask extends Task
         }
 
         switch ($priority) {
-        case 'low' :
-            $priority = Net_Growl::PRIORITY_LOW;
-            break;
-        case 'moderate' :
-            $priority = Net_Growl::PRIORITY_MODERATE;
-            break;
-        case 'normal' :
-            $priority = Net_Growl::PRIORITY_NORMAL;
-            break;
-        case 'high' :
-            $priority = Net_Growl::PRIORITY_HIGH;
-            break;
-        case 'emergency' :
-            $priority = Net_Growl::PRIORITY_EMERGENCY;
-            break;
-        default :
-            throw new BuildException(
-                '"priority" attribute is invalid.'
-            );
+            case 'low' :
+                $priority = Net_Growl::PRIORITY_LOW;
+                break;
+            case 'moderate' :
+                $priority = Net_Growl::PRIORITY_MODERATE;
+                break;
+            case 'normal' :
+                $priority = Net_Growl::PRIORITY_NORMAL;
+                break;
+            case 'high' :
+                $priority = Net_Growl::PRIORITY_HIGH;
+                break;
+            case 'emergency' :
+                $priority = Net_Growl::PRIORITY_EMERGENCY;
+                break;
+            default :
+                throw new BuildException(
+                    '"priority" attribute is invalid.'
+                );
         }
 
         $this->priority = $priority;
@@ -379,14 +371,14 @@ class GrowlNotifyTask extends Task
         }
 
         switch ($protocol) {
-        case 'udp' :
-        case 'gntp' :
-            break;
-        default :
-            throw new BuildException(
-                '"protocol" attribute is invalid.' .
-                ' Expect to be either udp or gntp.'
-            );
+            case 'udp' :
+            case 'gntp' :
+                break;
+            default :
+                throw new BuildException(
+                    '"protocol" attribute is invalid.' .
+                    ' Expect to be either udp or gntp.'
+                );
         }
 
         $this->protocol = $protocol;
@@ -444,8 +436,8 @@ class GrowlNotifyTask extends Task
         $notifications = array(
             $this->notification
         );
-        $options  = array(
-            'host'     => $this->host,
+        $options = array(
+            'host' => $this->host,
             'protocol' => $this->protocol,
         );
         if (!empty($this->appicon)) {
@@ -457,7 +449,10 @@ class GrowlNotifyTask extends Task
                 $growl = $this->growl;
             } else {
                 $growl = Net_Growl::singleton(
-                    $this->name, $notifications, $this->password, $options
+                    $this->name,
+                    $notifications,
+                    $this->password,
+                    $options
                 );
             }
             $response = $growl->register();
@@ -476,14 +471,14 @@ class GrowlNotifyTask extends Task
             );
 
             $logRequest = array(
-                'Application-Name'      => $this->name,
-                'Application-Icon'      => $this->appicon,
-                'Notification-Name'     => $this->notification,
-                'Notification-Title'    => $this->title,
-                'Notification-Text'     => $this->message,
+                'Application-Name' => $this->name,
+                'Application-Icon' => $this->appicon,
+                'Notification-Name' => $this->notification,
+                'Notification-Title' => $this->title,
+                'Notification-Text' => $this->message,
                 'Notification-Priority' => $this->priority,
-                'Notification-Icon'     => $this->icon,
-                'Notification-Sticky'   => $this->sticky,
+                'Notification-Icon' => $this->icon,
+                'Notification-Sticky' => $this->sticky,
             );
             foreach ($logRequest as $key => $value) {
                 $this->log($key . ': ' . $value, Project::MSG_DEBUG);
@@ -491,12 +486,15 @@ class GrowlNotifyTask extends Task
             }
 
             $options = array(
-                'sticky'   => $this->sticky,
+                'sticky' => $this->sticky,
                 'priority' => $this->priority,
-                'icon'     => $this->icon,
+                'icon' => $this->icon,
             );
             $response = $growl->publish(
-                $this->notification, $this->title, $this->message, $options
+                $this->notification,
+                $this->title,
+                $this->message,
+                $options
             );
 
             if ($this->protocol == 'gntp') {

@@ -24,14 +24,13 @@ require_once 'phing/tasks/ext/liquibase/AbstractLiquibaseTask.php';
  * other!
  *
  * @author Stephan Hochdoerfer <S.Hochdoerfer@bitExpert.de>
- * @version $Id: LiquibaseTagTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 1a967314c731282d7e026e0e8670b003eaab9802 $
  * @since 2.4.10
  * @package phing.tasks.ext.liquibase
  */
 class LiquibaseTagTask extends AbstractLiquibaseTask
 {
     protected $tag;
-
 
     /**
      * Sets the name of tag which is used to mark the database state for
@@ -44,7 +43,6 @@ class LiquibaseTagTask extends AbstractLiquibaseTask
         $this->tag = $tag;
     }
 
-
     /**
      * @see AbstractTask::checkParams()
      */
@@ -52,17 +50,15 @@ class LiquibaseTagTask extends AbstractLiquibaseTask
     {
         parent::checkParams();
 
-        if(null === $this->tag)
-        {
+        if (null === $this->tag) {
             throw new BuildException(
-            sprintf(
-					'Please specify the tag!',
-            $this->tag
-            )
+                sprintf(
+                    'Please specify the tag!',
+                    $this->tag
+                )
             );
         }
     }
-
 
     /**
      * @see Task::main()

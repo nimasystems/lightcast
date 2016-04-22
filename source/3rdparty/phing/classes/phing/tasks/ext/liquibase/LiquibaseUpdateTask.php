@@ -22,7 +22,7 @@ require_once 'phing/tasks/ext/liquibase/AbstractLiquibaseTask.php';
  * Task to update the database to latest version of the changelog file.
  *
  * @author Stephan Hochdoerfer <S.Hochdoerfer@bitExpert.de>
- * @version $Id: LiquibaseUpdateTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 9bc3829efb98aff78729b2da69cfde7d9c1204ff $
  * @since 2.4.10
  * @package phing.tasks.ext.liquibase
  */

@@ -23,14 +23,13 @@ require_once 'phing/tasks/ext/liquibase/AbstractLiquibaseTask.php';
  * changelog.
  *
  * @author Stephan Hochdoerfer <S.Hochdoerfer@bitExpert.de>
- * @version $Id: LiquibaseDbDocTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: a8df74bfdcd6fceb45725bbaa7076682223fc8b1 $
  * @since 2.4.10
  * @package phing.tasks.ext.liquibase
  */
 class LiquibaseDbDocTask extends AbstractLiquibaseTask
 {
     protected $outputDir;
-
 
     /**
      * Sets the output directory where the documentation gets generated to.
@@ -42,7 +41,6 @@ class LiquibaseDbDocTask extends AbstractLiquibaseTask
         $this->outputDir = $outputDir;
     }
 
-
     /**
      * @see AbstractTask::checkParams()
      */
@@ -50,30 +48,26 @@ class LiquibaseDbDocTask extends AbstractLiquibaseTask
     {
         parent::checkParams();
 
-        if((null === $this->outputDir) or !is_dir($this->outputDir))
-        {
-            if(!mkdir($this->outputDir, 0777, true))
-            {
+        if ((null === $this->outputDir) or !is_dir($this->outputDir)) {
+            if (!mkdir($this->outputDir, 0777, true)) {
                 throw new BuildException(
-                sprintf(
-					'The directory "%s" does not exist and could not be created!',
-                $this->outputDir
-                )
+                    sprintf(
+                        'The directory "%s" does not exist and could not be created!',
+                        $this->outputDir
+                    )
                 );
             }
         }
 
-        if(!is_writable($this->outputDir))
-        {
+        if (!is_writable($this->outputDir)) {
             throw new BuildException(
-            sprintf(
-					'The directory "%s" is not writable!',
-            $this->outputDir
-            )
+                sprintf(
+                    'The directory "%s" is not writable!',
+                    $this->outputDir
+                )
             );
         }
     }
-
 
     /**
      * @see Task::main()

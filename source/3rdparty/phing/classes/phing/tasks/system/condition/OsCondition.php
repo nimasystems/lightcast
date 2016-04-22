@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: OsCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: b10985cbc87aaad2fa6658942033535e7c1d7666 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,21 +26,30 @@ require_once 'phing/tasks/system/condition/ConditionBase.php';
  *
  * @author    Andreas Aderhold <andi@binarycloud.com>
  * @copyright 2001,2002 THYRELL. All rights reserved
- * @version   $Id: OsCondition.php 1441 2013-10-08 16:28:22Z mkovachev $
- * @access    public
+ * @version   $Id: b10985cbc87aaad2fa6658942033535e7c1d7666 $
  * @package   phing.tasks.system.condition
  */
-class OsCondition implements Condition {
+class OsCondition implements Condition
+{
 
     private $family;
 
-    function setFamily($f) {
+    /**
+     * @param $f
+     */
+    public function setFamily($f)
+    {
         $this->family = strtolower($f);
     }
 
-    function evaluate() {
+    /**
+     * @return bool
+     * @throws BuildException
+     */
+    public function evaluate()
+    {
         $osName = strtolower(Phing::getProperty("os.name"));
-        
+
         if ($this->family !== null) {
             if ($this->family === "windows") {
                 return StringHelper::startsWith("win", $osName);
@@ -57,6 +66,7 @@ class OsCondition implements Condition {
             }
             throw new BuildException("Don't know how to detect os family '" . $this->family . "'");
         }
+
         return false;
     }
 

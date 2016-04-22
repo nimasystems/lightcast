@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: IniFileTokenReader.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 1787bbe5c2ac3fc35faf21652eed36899bff61b6 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -25,12 +25,13 @@ include_once 'phing/filters/ReplaceTokens.php'; // For class Token
 
 /**
  * Class that allows reading tokens from INI files.
- * 
+ *
  * @author    Manuel Holtgewe
- * @version   $Id: IniFileTokenReader.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: 1787bbe5c2ac3fc35faf21652eed36899bff61b6 $
  * @package   phing.filters.util
  */
-class IniFileTokenReader extends TokenReader {
+class IniFileTokenReader extends TokenReader
+{
 
     /**
      * Holds the path to the INI file that is to be read.
@@ -44,7 +45,7 @@ class IniFileTokenReader extends TokenReader {
      *              if omitted, all sections are loaded.
      */
     private $section = null;
-    
+
     /**
      * @var array
      */
@@ -53,51 +54,54 @@ class IniFileTokenReader extends TokenReader {
     /**
      * Reads the next token from the INI file
      *
-     * @throws  IOException     On error
+     * @throws BuildException
      * @return Token
      */
-    function readToken() {
+    public function readToken()
+    {
         if ($this->file === null) {
             throw new BuildException("No File set for IniFileTokenReader");
         }
-        
+
         if ($this->tokens === null) {
             $this->processFile();
         }
-        
+
         if (count($this->tokens) > 0) {
             return array_pop($this->tokens);
-        } else
+        } else {
             return null;
+        }
     }
-    
+
     /**
      * Parse & process the ini file
      */
     protected function processFile()
     {
         $arr = parse_ini_file($this->file->getAbsolutePath(), true);
-        
+
         if ($this->section !== null) {
             if (isset($arr[$this->section])) {
                 $this->processSection($arr[$this->section]);
             }
-            
+
             return;
         }
-        
+
         $values = array_values($arr);
-        
+
         if (!is_array($values[0])) {
             $this->processSection($arr);
+
             return;
         }
-        
+
         foreach ($values as $subArr) {
             $this->processSection($subArr);
         }
     }
-    
+
     /**
      * Process an individual section
      *
@@ -106,33 +110,39 @@ class IniFileTokenReader extends TokenReader {
     protected function processSection(array $section)
     {
         foreach ($section as $key => $value) {
-            $tok = new Token;
+            $tok = new Token();
             $tok->setKey($key);
             $tok->setValue($value);
             $this->tokens[] = $tok;
         }
     }
-    
+
     /**
      * @param string|PhingFile $file
+     * @throws BuildException
      */
-    public function setFile($file) {
+    public function setFile($file)
+    {
         if (is_string($file)) {
             $this->file = new PhingFile($file);
+
             return;
         }
-        
+
         if (is_object($file) && $file instanceof PhingFile) {
             $this->file = $file;
+
             return;
         }
-        
+
         throw new BuildException("Unsupported value " . (string) $file);
     }
 
-    function setSection($str) {
+    /**
+     * @param $str
+     */
+    public function setSection($str)
+    {
         $this->section = (string) $str;
     }
 }
-
-

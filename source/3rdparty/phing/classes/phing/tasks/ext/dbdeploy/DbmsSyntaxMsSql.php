@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: DbmsSyntaxMsSql.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: ff91eb484802be6835d70ee11c6c9d7fed1e09df $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,19 +18,21 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 /**
  * Utility class for generating necessary server-specific SQL commands
  *
  * @author   Luke Crouch at SourceForge (http://sourceforge.net)
- * @version  $Id: DbmsSyntaxMsSql.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: ff91eb484802be6835d70ee11c6c9d7fed1e09df $
  * @package  phing.tasks.ext.dbdeploy
  */
-class DbmsSyntaxMsSql extends DbmsSyntax 
+class DbmsSyntaxMsSql extends DbmsSyntax
 {
+    /**
+     * @return string
+     */
     public function generateTimestamp()
     {
         return "DATEDIFF(s, '19700101', GETDATE())";
     }
 }
-

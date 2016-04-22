@@ -1,7 +1,6 @@
 <?php
-
 /**
- *  $Id: ExecTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: a85845d6c6841c7b90d9d2a4689134f88ec69d4e $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -28,11 +27,14 @@ require_once 'phing/Task.php';
  * @author  Andreas Aderhold <andi@binarycloud.com>
  * @author  Hans Lellelid <hans@xmpl.org>
  * @author  Christian Weiske <cweiske@cweiske.de>
- * @version $Id: ExecTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: a85845d6c6841c7b90d9d2a4689134f88ec69d4e $
  * @package phing.tasks.system
  */
 class ExecTask extends Task
 {
+    const INVALID = PHP_INT_MAX;
+
+    private $exitValue = self::INVALID;
 
     /**
      * Command to be executed
@@ -59,6 +61,8 @@ class ExecTask extends Task
      */
     protected $dir;
 
+    protected $currdir;
+
     /**
      * Operating system.
      * @var string
@@ -73,7 +77,7 @@ class ExecTask extends Task
 
     /**
      * Where to direct output.
-     * @var File
+     * @var PhingFile
      */
     protected $output;
 
@@ -97,7 +101,7 @@ class ExecTask extends Task
 
     /**
      * Where to direct error output.
-     * @var File
+     * @var PhingFile
      */
     protected $error;
 
@@ -127,8 +131,9 @@ class ExecTask extends Task
      */
     protected $checkreturn = false;
 
-
-
+    /**
+     *
+     */
     public function __construct()
     {
         $this->commandline = new Commandline();
@@ -174,10 +179,12 @@ class ExecTask extends Task
         $this->log(
             sprintf(
                 'Operating system %s not found in %s',
-                $myos, $this->os
+                $myos,
+                $this->os
             ),
             Project::MSG_VERBOSE
         );
+
         return false;
     }
 
@@ -185,6 +192,7 @@ class ExecTask extends Task
      * Prepares the command building and execution, i.e.
      * changes to the specified directory.
      *
+     * @throws BuildException
      * @return void
      */
     protected function prepare()
@@ -206,6 +214,7 @@ class ExecTask extends Task
     /**
      * Builds the full command to execute and stores it in $command.
      *
+     * @throws BuildException
      * @return void
      * @uses   $command
      */
@@ -215,20 +224,24 @@ class ExecTask extends Task
             throw new BuildException(
                 'ExecTask: Please provide "command" OR "executable"'
             );
-        } else if ($this->command === null) {
-            $this->realCommand = Commandline::toString($this->commandline->getCommandline(), $this->escape);
-        } else if ($this->commandline->getExecutable() === null) {
-            $this->realCommand = $this->command;
-            
-            //we need to escape the command only if it's specified directly
-            // commandline takes care of "executable" already
-            if ($this->escape == true) {
-                $this->realCommand = escapeshellcmd($this->realCommand);
-            }
         } else {
-            throw new BuildException(
-                'ExecTask: Either use "command" OR "executable"'
-            );
+            if ($this->command === null) {
+                $this->realCommand = Commandline::toString($this->commandline->getCommandline(), $this->escape);
+            } else {
+                if ($this->commandline->getExecutable() === null) {
+                    $this->realCommand = $this->command;
+
+                    //we need to escape the command only if it's specified directly
+                    // commandline takes care of "executable" already
+                    if ($this->escape == true) {
+                        $this->realCommand = escapeshellcmd($this->realCommand);
+                    }
+                } else {
+                    throw new BuildException(
+                        'ExecTask: Either use "command" OR "executable"'
+                    );
+                }
+            }
         }
 
         if ($this->error !== null) {
@@ -292,8 +305,9 @@ class ExecTask extends Task
      * - verify return value
      *
      * @param integer $return Return code
-     * @param array   $output Array with command output
+     * @param array $output Array with command output
      *
+     * @throws BuildException
      * @return void
      */
     protected function cleanup($return, $output)
@@ -313,15 +327,38 @@ class ExecTask extends Task
 
         if ($this->outputProperty) {
             $this->project->setProperty(
-                $this->outputProperty, implode("\n", $output)
+                $this->outputProperty,
+                implode("\n", $output)
             );
         }
+
+        $this->setExitValue($return);
 
         if ($return != 0 && $this->checkreturn) {
             throw new BuildException("Task exited with code $return");
         }
     }
 
+    /**
+     * Set the exit value.
+     *
+     * @param int $value exit value of the process.
+     */
+    protected function setExitValue($value)
+    {
+        $this->exitValue = $value;
+    }
+
+    /**
+     * Query the exit value of the process.
+     *
+     * @return int the exit value or self::INVALID if no exit value has
+     *             been received.
+     */
+    public function getExitValue()
+    {
+        return $this->exitValue;
+    }
 
     /**
      * The command to use.
@@ -344,7 +381,7 @@ class ExecTask extends Task
      */
     public function setExecutable($executable)
     {
-        $this->commandline->setExecutable((string)$executable);
+        $this->commandline->setExecutable((string) $executable);
     }
 
     /**
@@ -372,7 +409,7 @@ class ExecTask extends Task
     }
 
     /**
-     * Specify OS (or muliple OS) that must match in order to execute this command.
+     * Specify OS (or multiple OS) that must match in order to execute this command.
      *
      * @param string $os Operating system string (e.g. "Linux")
      *
@@ -440,7 +477,7 @@ class ExecTask extends Task
      */
     public function setSpawn($spawn)
     {
-        $this->spawn  = (bool) $spawn;
+        $this->spawn = (bool) $spawn;
     }
 
     /**
@@ -484,30 +521,31 @@ class ExecTask extends Task
      *
      * @param string $level Log level
      *
+     * @throws BuildException
      * @return void
      */
     public function setLevel($level)
     {
         switch ($level) {
-        case 'error':
-            $this->logLevel = Project::MSG_ERR;
-            break;
-        case 'warning':
-            $this->logLevel = Project::MSG_WARN;
-            break;
-        case 'info':
-            $this->logLevel = Project::MSG_INFO;
-            break;
-        case 'verbose':
-            $this->logLevel = Project::MSG_VERBOSE;
-            break;
-        case 'debug':
-            $this->logLevel = Project::MSG_DEBUG;
-            break;
-        default:
-            throw new BuildException(
-                sprintf('Unknown log level "%s"', $level)
-            );
+            case 'error':
+                $this->logLevel = Project::MSG_ERR;
+                break;
+            case 'warning':
+                $this->logLevel = Project::MSG_WARN;
+                break;
+            case 'info':
+                $this->logLevel = Project::MSG_INFO;
+                break;
+            case 'verbose':
+                $this->logLevel = Project::MSG_VERBOSE;
+                break;
+            case 'debug':
+                $this->logLevel = Project::MSG_DEBUG;
+                break;
+            default:
+                throw new BuildException(
+                    sprintf('Unknown log level "%s"', $level)
+                );
         }
     }
 
@@ -521,4 +559,3 @@ class ExecTask extends Task
         return $this->commandline->createArgument();
     }
 }
-

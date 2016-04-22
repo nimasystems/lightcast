@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  $Id: SymfonyConsoleTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: e2d3229326c8a6b49e75ef4e9bf892816e26e350 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once dirname(__FILE__) . "/Arg.php";
  * Symfony Console Task
  * @author nuno costa <nuno@francodacosta.com>
  * @license GPL
- * @version $Id: SymfonyConsoleTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: e2d3229326c8a6b49e75ef4e9bf892816e26e350 $
  * @package phing.tasks.ext.symfony
  */
 class SymfonyConsoleTask extends Task
@@ -35,7 +35,7 @@ class SymfonyConsoleTask extends Task
 
     /**
      *
-     * @var Array of Arg a collection of Arg objects
+     * @var Arg[] a collection of Arg objects
      */
     private $args = array();
 
@@ -49,7 +49,7 @@ class SymfonyConsoleTask extends Task
      *
      * @var string path to symfony console application
      */
-    private $console = 'php app/console';
+    private $console = 'app/console';
 
     /**
      *
@@ -63,6 +63,12 @@ class SymfonyConsoleTask extends Task
      */
     private $checkreturn = false;
 
+    /**
+     * Is the symfony cli debug mode set? (true by default)
+     * @var boolean
+     */
+    private $debug = true;
+    
     /**
      * sets the symfony console command to execute
      * @param string $command
@@ -100,7 +106,7 @@ class SymfonyConsoleTask extends Task
     }
 
     /**
-     * Set the name of the property to store the hash value in
+     * Set the name of the property to store the application output in
      * @param $property
      * @return void
      */
@@ -121,6 +127,28 @@ class SymfonyConsoleTask extends Task
         $this->checkreturn = (bool) $checkreturn;
     }
 
+    
+    /**
+     * Whether to set the symfony cli debug mode
+     *
+     * @param boolean $debug If the symfony cli debug mode is set
+     *
+     * @return void
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = (bool) $debug;
+    }
+
+    /**
+     * Get if the symfony cli debug mode is set
+     * @return boolean
+     */
+    public function getDebug()
+    {
+        return $this->debug;
+    }
+
     /**
      * appends an arg tag to the arguments stack
      *
@@ -130,7 +158,8 @@ class SymfonyConsoleTask extends Task
     public function createArg()
     {
         $num = array_push($this->args, new Arg());
-        return $this->args[$num-1];
+
+        return $this->args[$num - 1];
     }
 
     /**
@@ -142,22 +171,43 @@ class SymfonyConsoleTask extends Task
         return $this->args;
     }
 
-
+    /**
+     * Check if the no-debug option was added via args
+     * @return boolean
+     */
+    private function isNoDebugArgPresent()
+    {
+        foreach($this->args as $arg) {
+            if ($arg->getName() == "no-debug") {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     /**
      * Gets the command string to be executed
      * @return string
      */
-    public function getCmdString() {
+    public function getCmdString()
+    {
+        // Add no-debug arg if it isn't already present
+        if (!$this->debug && !$this->isNoDebugArgPresent()) {
+            $this->createArg()->setName("no-debug");
+        }
         $cmd = array(
-                $this->console,
-                $this->command,
-                implode(' ', $this->args)
+            Commandline::quoteArgument($this->console),
+            $this->command,
+            implode(' ', $this->args)
         );
         $cmd = implode(' ', $cmd);
+
         return $cmd;
     }
+
     /**
-     * executes the synfony consile application
+     * executes the synfony console application
      */
     public function main()
     {
@@ -169,13 +219,13 @@ class SymfonyConsoleTask extends Task
         exec($cmd, $output, $return);
 
         $lines = implode("\r\n", $output);
-        
+
         $this->log($lines, Project::MSG_INFO);
-        
+
         if ($this->propertyName != null) {
             $this->project->setProperty($this->propertyName, $lines);
         }
-        
+
         if ($return != 0 && $this->checkreturn) {
             $this->log('Task exited with code: ' . $return, Project::MSG_ERR);
             throw new BuildException("SymfonyConsole execution failed");

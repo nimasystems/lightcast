@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: TryCatchTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 2059a94a0c48659f29e244115f17cae9e0b4b65b $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 include_once 'phing/Task.php';
 
 /**
@@ -28,13 +28,14 @@ include_once 'phing/Task.php';
  * Inspired by {@link http://ant-contrib.sourceforge.net/tasks/tasks/trycatch.html}
  *
  * @author   Michiel Rook <mrook@php.net>
- * @version  $Id: TryCatchTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: 2059a94a0c48659f29e244115f17cae9e0b4b65b $
  * @package  phing.tasks.system
  */
 class TryCatchTask extends Task
 {
     protected $propertyName = "";
-    
+    protected $referenceName = '';
+
     protected $tryContainer = null;
     protected $catchContainer = null;
     protected $finallyContainer = null;
@@ -44,37 +45,37 @@ class TryCatchTask extends Task
      *
      * @throws BuildException
      * @return void
-     */    
+     */
     public function main()
     {
         $exc = null;
-        
+
         if (empty($this->tryContainer)) {
             throw new BuildException('A nested <try> element is required');
         }
-        
+
         try {
             $this->tryContainer->perform();
         } catch (BuildException $e) {
             if (!empty($this->propertyName)) {
                 $this->project->setProperty($this->propertyName, $e->getMessage());
             }
-            
+
             if (!empty($this->referenceName)) {
                 $this->project->addReference($this->referenceName, $e);
             }
-            
+
             if (!empty($this->catchContainer)) {
                 $this->catchContainer->perform();
             } else {
                 $exc = $e;
             }
         }
-        
+
         if (!empty($this->finallyContainer)) {
             $this->finallyContainer->perform();
         }
-        
+
         if (!empty($exc)) {
             throw $exc;
         }
@@ -90,7 +91,20 @@ class TryCatchTask extends Task
     {
         $this->propertyName = (string) $property;
     }
-    
+
+    /**
+     * Sets the name of the reference that will
+     * contain the exception.
+     *
+     * @param Exception $reference
+     *
+     * @return void
+     */
+    public function setReference($reference)
+    {
+        $this->referenceName = $reference;
+    }
+
     /**
      * Add nested <try> element
      *

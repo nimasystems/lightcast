@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: TargetLogger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: e5ae611d970cd766f7f23fe5a70c6483e66aceb5 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -26,26 +26,37 @@ require_once 'phing/listener/AnsiColorLogger.php';
  *
  * @author    Patrick McAndrew <patrick@urg.name>
  * @copyright 2013. All rights reserved
- * @version   $Id: TargetLogger.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: e5ae611d970cd766f7f23fe5a70c6483e66aceb5 $
  * @package   phing.listener
  */
-class TargetLogger extends AnsiColorLogger {
+class TargetLogger extends AnsiColorLogger
+{
 
     private $targetName = null;
     private $targetStartTime;
 
-    function targetStarted(BuildEvent $event) {
+    /**
+     * @param BuildEvent $event
+     */
+    public function targetStarted(BuildEvent $event)
+    {
         parent::targetStarted($event);
         $target = $event->getTarget();
         $this->targetName = $target->getName();
         $this->targetStartTime = Phing::currentTimeMillis();
     }
 
-    function targetFinished(BuildEvent $event) {
-        $msg .= PHP_EOL . "Target time: " .self::formatTime(Phing::currentTimeMillis() - $this->targetStartTime) . PHP_EOL;
+    /**
+     * @param BuildEvent $event
+     */
+    public function targetFinished(BuildEvent $event)
+    {
+        $msg = PHP_EOL . "Target time: " . self::formatTime(
+                Phing::currentTimeMillis() - $this->targetStartTime
+            ) . PHP_EOL;
         $event->setMessage($msg, Project::MSG_INFO);
         $this->messageLogged($event);
         $this->targetName = null;
-        
+
     }
 }

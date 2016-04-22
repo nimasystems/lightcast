@@ -1,6 +1,6 @@
 <?php
 /*
- * $Id: LoadFileTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: 938e80d47e941acc8badd2686d960655f025ac3f $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,7 +27,7 @@ require_once 'phing/Task.php';
  * Supports filterchains.
  *
  * @author  Michiel Rook <mrook@php.net>
- * @version $Id: LoadFileTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 938e80d47e941acc8badd2686d960655f025ac3f $
  * @package phing.tasks.ext
  */
 class LoadFileTask extends Task
@@ -43,7 +43,7 @@ class LoadFileTask extends Task
      * @var string $property
      */
     private $property;
-    
+
     /**
      * Array of FilterChain objects
      * @var FilterChain[]
@@ -61,13 +61,14 @@ class LoadFileTask extends Task
 
     /**
      * Convenience setter to maintain Ant compatibility (@see setFile())
-     * @param PhingFile $file
+     * @param $srcFile
+     * @internal param PhingFile $file
      */
     public function setSrcFile($srcFile)
     {
         $this->file = $srcFile;
     }
-    
+
     /**
      * Set name of property to be set
      * @param $property
@@ -81,38 +82,40 @@ class LoadFileTask extends Task
     /**
      * Creates a filterchain
      *
-     * @return  object  The created filterchain object
+     * @return object The created filterchain object
      */
-    function createFilterChain() {
+    public function createFilterChain()
+    {
         $num = array_push($this->filterChains, new FilterChain($this->project));
-        return $this->filterChains[$num-1];
-    }                    
-    
+
+        return $this->filterChains[$num - 1];
+    }
+
     /**
      * Main method
      *
-     * @return  void
-     * @throws  BuildException
+     * @return void
+     * @throws BuildException
      */
     public function main()
     {
         if (empty($this->file)) {
             throw new BuildException("Attribute 'file' required", $this->getLocation());
         }
-        
+
         if (empty($this->property)) {
             throw new BuildException("Attribute 'property' required", $this->getLocation());
         }
-        
+
         // read file (through filterchains)
         $contents = "";
-        
+
         $reader = FileUtils::getChainedReader(new FileReader($this->file), $this->filterChains, $this->project);
-        while(-1 !== ($buffer = $reader->read())) {
+        while (-1 !== ($buffer = $reader->read())) {
             $contents .= $buffer;
         }
         $reader->close();
-        
+
         // publish as property
         $this->project->setProperty($this->property, $contents);
     }

@@ -1,6 +1,6 @@
 <?php
 /**
- * $Id: SummaryPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: f7d5ada145387c074b1e83a0a15bd56f089bcb54 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,45 +18,49 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/tasks/ext/phpunit/formatter/PHPUnitResultFormatter.php';
 
 /**
  * Prints short summary output of the test to Phing's logging system.
  *
  * @author Michiel Rook <mrook@php.net>
- * @version $Id: SummaryPHPUnitResultFormatter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: f7d5ada145387c074b1e83a0a15bd56f089bcb54 $
  * @package phing.tasks.ext.formatter
  * @since 2.1.0
- */ 
+ */
 class SummaryPHPUnitResultFormatter extends PHPUnitResultFormatter
 {
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
     public function endTestSuite(PHPUnit_Framework_TestSuite $suite)
     {
         parent::endTestSuite($suite);
     }
-    
+
     public function endTestRun()
     {
         parent::endTestRun();
-        
+
         $sb = "Total tests run: " . $this->getRunCount();
-        $sb.= ", Failures: " . $this->getFailureCount();
-        $sb.= ", Errors: " . $this->getErrorCount();
-        $sb.= ", Incomplete: " . $this->getIncompleteCount();
-        $sb.= ", Skipped: " . $this->getSkippedCount();
-        $sb.= ", Time elapsed: " . sprintf('%0.5f', $this->getElapsedTime()) . " s\n";
-        
-        if ($this->out != NULL)
-        {
+        $sb .= ", Failures: " . $this->getFailureCount();
+        $sb .= ", Errors: " . $this->getErrorCount();
+        $sb .= ", Incomplete: " . $this->getIncompleteCount();
+        $sb .= ", Skipped: " . $this->getSkippedCount();
+        $sb .= ", Time elapsed: " . sprintf('%0.5f', $this->getElapsedTime()) . " s\n";
+
+        if ($this->out != null) {
             $this->out->write($sb);
             $this->out->close();
         }
     }
-    
+
+    /**
+     * @return null
+     */
     public function getExtension()
     {
-        return NULL;
+        return null;
     }
 }
-

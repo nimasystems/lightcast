@@ -17,7 +17,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  *
- * @version $Id: PDOQuerySplitter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 918ec6d58131d6aea966b154be71a83c27e94b7c $
  * @package phing.tasks.ext.pdo
  */
 
@@ -26,38 +26,38 @@
  *
  * @author  Alexey Borzov <avb@php.net>
  * @package phing.tasks.ext.pdo
- * @version $Id: PDOQuerySplitter.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 918ec6d58131d6aea966b154be71a83c27e94b7c $
  */
 abstract class PDOQuerySplitter
 {
-   /**
-    * Task that uses the splitter
-    * @var PDOSQLExecTask
-    */
+    /**
+     * Task that uses the splitter
+     * @var PDOSQLExecTask
+     */
     protected $parent;
 
-   /**
-    * Reader with SQL source
-    * @var BufferedReader
-    */
+    /**
+     * Reader with SQL source
+     * @var BufferedReader
+     */
     protected $sqlReader;
 
-   /**
-    * Constructor, sets the parent task and reader with SQL source
-    * 
-    * @param PDOSQLExecTask $parent
-    * @param Reader $reader
-    */
+    /**
+     * Constructor, sets the parent task and reader with SQL source
+     *
+     * @param PDOSQLExecTask $parent
+     * @param Reader         $reader
+     */
     public function __construct(PDOSQLExecTask $parent, Reader $reader)
     {
-        $this->parent    = $parent;
+        $this->parent = $parent;
         $this->sqlReader = new BufferedReader($reader);
     }
 
-   /**
-    * Returns next query from SQL source, null if no more queries left
-    *
-    * @return string|null
-    */
+    /**
+     * Returns next query from SQL source, null if no more queries left
+     *
+     * @return string|null
+     */
     abstract public function nextQuery();
 }

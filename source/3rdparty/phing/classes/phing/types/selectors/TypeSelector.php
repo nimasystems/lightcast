@@ -1,7 +1,7 @@
 <?php
 
 /*
- * $Id: TypeSelector.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * $Id: a2775fcd20fded1d1bf890e4d77286dd0325ef22 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -27,10 +27,11 @@ require_once 'phing/types/selectors/BaseExtendSelector.php';
  *
  * @author    Hans Lellelid <hans@xmpl.org> (Phing)
  * @author    Jeff Turner <jefft@apache.org> (Ant)
- * @version   $Id: TypeSelector.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version   $Id: a2775fcd20fded1d1bf890e4d77286dd0325ef22 $
  * @package   phing.types.selectors
  */
-class TypeSelector extends BaseExtendSelector {
+class TypeSelector extends BaseExtendSelector
+{
 
     private $type;
 
@@ -43,8 +44,10 @@ class TypeSelector extends BaseExtendSelector {
     /**
      * @return string A string describing this object
      */
-    public function toString() {
+    public function toString()
+    {
         $buf = "{typeselector type: " . $this->type . "}";
+
         return $buf;
     }
 
@@ -52,7 +55,8 @@ class TypeSelector extends BaseExtendSelector {
      * Set the type of file to require.
      * @param string $type The type of file - 'file' or 'dir'
      */
-    public function setType($type) {
+    public function setType($type)
+    {
         $this->type = $type;
     }
 
@@ -61,11 +65,13 @@ class TypeSelector extends BaseExtendSelector {
      * It translates each parameter into the appropriate setXXX() call.
      *
      * @param array $parameters the complete set of parameters for this selector
+     * @return mixed|void
      */
-    public function setParameters($parameters) {
+    public function setParameters($parameters)
+    {
         parent::setParameters($parameters);
         if ($parameters !== null) {
-            for ($i = 0, $size=count($parameters); $i < $size; $i++) {
+            for ($i = 0, $size = count($parameters); $i < $size; $i++) {
                 $paramname = $parameters[$i]->getName();
                 if (self::TYPE_KEY == strtolower($paramname)) {
                     $this->setType($parameters[$i]->getValue());
@@ -81,7 +87,8 @@ class TypeSelector extends BaseExtendSelector {
      * means that the pattern attribute has been set.
      *
      */
-    public function verifySettings() {
+    public function verifySettings()
+    {
         if ($this->type === null) {
             $this->setError("The type attribute is required");
         } elseif (!in_array($this->type, self::$types, true)) {
@@ -93,24 +100,29 @@ class TypeSelector extends BaseExtendSelector {
      * The heart of the matter. This is where the selector gets to decide
      * on the inclusion of a file in a particular fileset.
      *
-     * @param PhingFile $basedir the base directory the scan is being done from
-     * @param string $filename is the name of the file to check
-     * @param PhingFile $file is a PhingFile object the selector can use
-     * @return boolean Whether the file should be selected or not
+     * @param  PhingFile $basedir  the base directory the scan is being done from
+     * @param  string    $filename is the name of the file to check
+     * @param  PhingFile $file     is a PhingFile object the selector can use
+     * @return boolean   Whether the file should be selected or not
      */
-    public function isSelected(PhingFile $basedir, $filename, PhingFile $file) {
+    public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
+    {
         // throw BuildException on error
         $this->validate();
 
-		if ($file->isLink()) {
-			if ($this->type == 'link')
-				return true;
+        if ($file->isLink()) {
+            if ($this->type == 'link') {
+                return true;
+            }
 
-			$this->log($file->getAbsolutePath() . " is a link, proceeding with " . $file->getCanonicalPath() . " instead.", Project::MSG_DEBUG);
-			$file = new PhingFile($file->getCanonicalPath());
-		}
+            $this->log(
+                $file->getAbsolutePath() . " is a link, proceeding with " . $file->getCanonicalPath() . " instead.",
+                Project::MSG_DEBUG
+            );
+            $file = new PhingFile($file->getCanonicalPath());
+        }
 
-		if ($file->isDirectory()) {
+        if ($file->isDirectory()) {
             return $this->type === 'dir';
         } else {
             return $this->type === 'file';

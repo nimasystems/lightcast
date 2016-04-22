@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: ConfigurationException.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: f5672973a0e8f94bc824729aed7285130e4322a3 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,10 +23,11 @@
  * ConfigurationException is thrown by Phing during the configuration and setup phase of the project.
  *
  * @author   Hans Lellelid <hans@xmpl.org>
- * @version  $Id: ConfigurationException.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version  $Id: f5672973a0e8f94bc824729aed7285130e4322a3 $
  * @package  phing
  */
-class ConfigurationException extends Exception {
+class ConfigurationException extends Exception
+{
 
     /**
      * Location in the xml file.
@@ -47,9 +48,10 @@ class ConfigurationException extends Exception {
      *         throw new BuildException($msg);
      *         throw new BuildException($msg, $causeExc);
      * @param Exception|string $p1
-     * @param Exception|null $p2
+     * @param Exception|null   $p2
      */
-    public function __construct($p1, $p2 = null) {
+    public function __construct($p1, $p2 = null)
+    {
 
         $cause = null;
         $msg = "";
@@ -69,17 +71,18 @@ class ConfigurationException extends Exception {
 
         if ($cause !== null) {
             $this->cause = $cause;
-            $this->message .= " [wrapped: " . $cause->getMessage() ."]";
+            $this->message .= " [wrapped: " . $cause->getMessage() . "]";
         }
     }
-    
+
     /**
      * Gets the cause exception.
      *
      * @return Exception
      */
-    public function getCause() {
+    public function getCause()
+    {
         return $this->cause;
     }
-     
+
 }

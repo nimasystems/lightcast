@@ -1,6 +1,6 @@
 <?php
 /*
- *  $Id: GitBaseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ *  $Id: 85ccdb98750754b0376c5a367925b260788f4086 $
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
  */
- 
+
 require_once 'phing/Task.php';
 require_once 'phing/BuildException.php';
 
@@ -26,7 +26,7 @@ require_once 'phing/BuildException.php';
  * Base class for Git tasks
  *
  * @author Victor Farazdagi <simple.square@gmail.com>
- * @version $Id: GitBaseTask.php 1441 2013-10-08 16:28:22Z mkovachev $
+ * @version $Id: 85ccdb98750754b0376c5a367925b260788f4086 $
  * @package phing.tasks.ext.git
  * @see VersionControl_Git
  * @since 2.4.3
@@ -48,17 +48,17 @@ abstract class GitBaseTask extends Task
      * Current repository directory
      * @var string
      */
-    private $repository; 
+    private $repository;
 
     /**
      * Initialize Task.
      * Check and include necessary libraries.
      */
-    public function init() 
+    public function init()
     {
         @include_once 'VersionControl/Git.php';
         if (false == class_exists('VersionControl_Git')) {
-            throw new BuildException("The Git tasks depend on PEAR\'s " 
+            throw new BuildException("The Git tasks depend on PEAR\'s "
                 . "VersionControl_Git package.", $this->getLocation());
         }
     }
@@ -66,12 +66,13 @@ abstract class GitBaseTask extends Task
     /**
      * Set repository directory
      *
-     * @param string $repository Repo directory
+     * @param  string      $repository Repo directory
      * @return GitBaseTask
      */
     public function setRepository($repository)
     {
         $this->repository = $repository;
+
         return $this;
     }
 
@@ -88,12 +89,13 @@ abstract class GitBaseTask extends Task
     /**
      * Set path to git executable
      *
-     * @param string $gitPath New path to git repository
+     * @param  string      $gitPath New path to git repository
      * @return GitBaseTask
      */
     public function setGitPath($gitPath)
     {
         $this->gitPath = $gitPath;
+
         return $this;
     }
 
@@ -107,14 +109,20 @@ abstract class GitBaseTask extends Task
         return $this->gitPath;
     }
 
+    /**
+     * @param bool $reset
+     * @param null $repository
+     * @return null|VersionControl_Git
+     * @throws BuildException
+     */
     protected function getGitClient($reset = false, $repository = null)
     {
         $this->gitClient = ($reset === true) ? null : $this->gitClient;
-        $repository = (null === $repository) 
-                    ? $this->getRepository() 
-                    : $repository;
+        $repository = (null === $repository)
+            ? $this->getRepository()
+            : $repository;
 
-        if(null === $this->gitClient) {
+        if (null === $this->gitClient) {
             try {
                 $this->gitClient = new VersionControl_Git($repository);
             } catch (VersionControl_Git_Exception $e) {
@@ -129,6 +137,3 @@ abstract class GitBaseTask extends Task
         return $this->gitClient;
     }
 }
-
-
-
