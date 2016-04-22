@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/Database.php';
  * @author     Leon Messerschmidt <leon@opticode.co.za> (Torque)
  * @author     John McNally <jmcnally@collab.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 class AppData

@@ -12,7 +12,7 @@
  * Interface for reverse engineering schema parsers.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.reverse
  */
 interface SchemaParser

@@ -17,7 +17,7 @@ require_once dirname(__FILE__) . '/NameGenerator.php';
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
  * @author     Byron Foster <byron_foster@yahoo.com> (Torque)
  * @author     Bernd Goldschmidt <bgoldschmidt@rapidsoft.de>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 class PhpNameGenerator implements NameGenerator

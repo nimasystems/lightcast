@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/VendorInfo.php';
  * An abstract class for elements represented by XML tags (e.g. Column, Table).
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 abstract class XMLElement

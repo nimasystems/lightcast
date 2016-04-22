@@ -21,7 +21,7 @@
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.map
  */
 class TableMap

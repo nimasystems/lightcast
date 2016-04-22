@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/XMLElement.php';
  * Data about an element with a name and optional namespace/schema/package attributes
  *
  * @author     Ulf Hermann <ulfhermann@kulturserver.de>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 abstract class ScopedElement extends XMLElement

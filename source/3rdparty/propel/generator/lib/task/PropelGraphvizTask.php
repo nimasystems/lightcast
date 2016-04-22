@@ -17,7 +17,7 @@ require_once 'util/PropelDotGenerator.php';
  *
  * @author     Mark Kimsal
  * @author     Toni Uebernickel <tuebernickel@gmail.com>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.task
  */
 class PropelGraphvizTask extends AbstractPropelDataModelTask

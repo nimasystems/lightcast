@@ -15,7 +15,7 @@
  * @author     Jon S. Stevens <jon@clearink.com> (Torque)
  * @author     Brett McLaughlin <bmclaugh@algx.net> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.adapter
  */
 class DBMySQL extends DBAdapter

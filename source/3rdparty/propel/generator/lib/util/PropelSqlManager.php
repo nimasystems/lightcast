@@ -15,7 +15,7 @@ require_once dirname(__FILE__) . '/../util/PropelSQLParser.php';
  * Service class for managing SQL.
  *
  * @author     William Durand <william.durand1@gmail.com>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.util
  */
 class PropelSqlManager

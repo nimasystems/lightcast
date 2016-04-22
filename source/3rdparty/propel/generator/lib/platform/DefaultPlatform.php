@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/../model/PropelTypes.php';
  * Default implementation for the Platform interface.
  *
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.platform
  */
 class DefaultPlatform implements PropelPlatformInterface

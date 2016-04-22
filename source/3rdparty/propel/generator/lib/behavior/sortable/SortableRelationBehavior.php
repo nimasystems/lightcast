@@ -12,7 +12,7 @@
  * Moves objects to the end of null scope of related table
  *
  * @author     rozwell
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior.sortable
  */
 class SortableRelationBehavior extends Behavior

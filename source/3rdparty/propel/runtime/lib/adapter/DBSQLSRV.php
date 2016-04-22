@@ -12,7 +12,7 @@
  * This is used to connect to a MSSQL database using pdo_sqlsrv driver.
  *
  * @author     Benjamin Runnels
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.adapter
  */
 class DBSQLSRV extends DBMSSQL

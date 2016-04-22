@@ -27,7 +27,7 @@ if (!defined('T_ML_COMMENT')) {
  * </code>
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.util
  */
 class PropelPHPParser

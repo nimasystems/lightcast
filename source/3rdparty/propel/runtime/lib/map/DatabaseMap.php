@@ -21,7 +21,7 @@
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
  * @author     Daniel Rall <dlr@collab.net> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.map
  */
 class DatabaseMap
@@ -180,6 +180,7 @@ class DatabaseMap
             $tmClass = constant($peerClass . '::TM_CLASS');
 
             $this->addTableFromMapClass($tmClass);
+
             return $this->tablesByPhpName[$phpName];
         } else {
             throw new PropelException("Cannot fetch TableMap for undefined table phpName: " . $phpName);

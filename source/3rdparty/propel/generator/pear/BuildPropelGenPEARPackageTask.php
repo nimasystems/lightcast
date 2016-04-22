@@ -8,7 +8,7 @@
  * @license    MIT License
  */
 /*
- *  $Id: BuildPropelGenPEARPackageTask.php 1443 2013-10-08 16:33:03Z mkovachev $
+ *  $Id$
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -35,7 +35,7 @@ include_once 'phing/tasks/ext/pearpackage/Fileset.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org>
  * @package    phing.tasks.ext
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  */
 class BuildPropelGenPEARPackageTask extends MatchingTask
 {

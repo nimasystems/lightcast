@@ -18,7 +18,7 @@ require_once dirname(__FILE__) . '/ConstraintNameGenerator.php';
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 class NameFactory

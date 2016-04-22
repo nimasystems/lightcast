@@ -13,7 +13,7 @@
  * Uses two additional columns storing the creation and update date
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior
  */
 class TimestampableBehavior extends Behavior

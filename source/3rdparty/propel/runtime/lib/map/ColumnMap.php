@@ -20,7 +20,7 @@
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.map
  */
 class ColumnMap

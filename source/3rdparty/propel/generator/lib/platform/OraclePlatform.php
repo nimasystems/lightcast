@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/DefaultPlatform.php';
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
  * @author     Denis Dalmais
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.platform
  */
 class OraclePlatform extends DefaultPlatform

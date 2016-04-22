@@ -12,7 +12,7 @@
  * Adds a primary key to models defined without one
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior
  */
 class AutoAddPkBehavior extends Behavior

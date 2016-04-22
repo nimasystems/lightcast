@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/I18nBehaviorPeerBuilderModifier.php';
  * Allows translation of text columns through transparent one-to-many relationship
  *
  * @author    Francois Zaninotto
- * @version		$Revision: 1443 $
+ * @version		$Revision$
  * @package		propel.generator.behavior.i18n
  */
 class I18nBehavior extends Behavior

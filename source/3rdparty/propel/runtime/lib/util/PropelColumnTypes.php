@@ -14,7 +14,7 @@
  * THIS CLASS MUST BE KEPT UP-TO-DATE WITH THE MORE EXTENSIVE GENERATOR VERSION OF THIS CLASS.
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.util
  */
 class PropelColumnTypes

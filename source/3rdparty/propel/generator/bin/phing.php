@@ -6,7 +6,7 @@
  * tests for all important paths and properties and kicks of the main command-
  * line entry point of phing located in phing.Phing
  *
- * @version $Revision: 1443 $
+ * @version $Revision: 552 $
  */
 
 // Set any INI options for PHP

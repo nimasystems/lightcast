@@ -22,7 +22,7 @@
  * @author     Fedor Karpelevitch <fedor.karpelevitch@home.com> (Torque)
  * @author     Jason van Zyl <jvanzyl@zenplex.com> (Torque)
  * @author     Daniel Rall <dlr@finemaltcoding.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.task
  */
 class PropelDataDumpTask extends AbstractPropelDataModelTask
@@ -281,19 +281,7 @@ class PropelDataDumpTask extends AbstractPropelDataModelTask
                     $this->log("Writing to XML file: " . $outFile->getName());
 
                     try {
-
-                        $url = str_replace("@DB@", $database->getName(), $this->databaseUrl);
-
-                        if ($url !== $this->databaseUrl) {
-                            $this->log("New (resolved) URL: " . $url, Project::MSG_VERBOSE);
-                        }
-
-                        if (empty($url)) {
-                            throw new BuildException("Unable to connect to database; no PDO connection URL specified.", $this->getLocation());
-                        }
-
-                        $this->conn = new PDO($url, $this->databaseUser, $this->databasePassword);
-                        $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                        $this->conn = $dataModel->getGeneratorConfig()->getBuildPDO($database->getName());
 
                         $doc = $this->createXMLDoc($database);
                         $doc->save($outFile->getAbsolutePath());

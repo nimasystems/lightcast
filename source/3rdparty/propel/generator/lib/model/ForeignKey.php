@@ -17,7 +17,7 @@ require_once dirname(__FILE__) . '/XMLElement.php';
  * @author     Fedor <fedor.karpelevitch@home.com>
  * @author     Daniel Rall <dlr@finemaltcoding.com>
  * @author     Ulf Hermann <ulfhermann@kulturserver.de>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.model
  */
 class ForeignKey extends XMLElement

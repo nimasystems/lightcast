@@ -16,7 +16,7 @@ require_once dirname(__FILE__) . '/VersionableBehaviorPeerBuilderModifier.php';
  * Keeps tracks of all the modifications in an ActiveRecord object
  *
  * @author    Francois Zaninotto
- * @version        $Revision: 1443 $
+ * @version        $Revision$
  * @package        propel.generator.behavior.versionable
  */
 class VersionableBehavior extends Behavior

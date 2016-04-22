@@ -15,7 +15,7 @@ require_once dirname(__FILE__) . '/ArchivableBehaviorQueryBuilderModifier.php';
  * Keeps tracks of an ActiveRecord object, even after deletion
  *
  * @author    Francois Zaninotto
- * @version        $Revision: 1443 $
+ * @version        $Revision$
  * @package        propel.generator.archivable
  */
 class ArchivableBehavior extends Behavior

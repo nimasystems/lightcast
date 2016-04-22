@@ -14,7 +14,7 @@
  * And an additional condition for every read query to only consider rows with no deletion date
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior
  */
 class SoftDeleteBehavior extends Behavior
@@ -94,7 +94,7 @@ public function unDelete(PropelPDO \$con = null)
         $script = "if (!empty(\$ret) && {$builder->getStubQueryBuilder()->getClassname()}::isSoftDeleteEnabled()) {";
 
         // prevent updated_at from changing when using a timestampable behavior
-        if ($this->getTable()->hasBehavior('timestampable')) {
+        if ($this->getTable()->hasBehavior('timestampable') && ($this->getTable()->getBehavior('timestampable')->getParameter('disable_updated_at') === 'false')) {
             $script .= "
     \$this->keepUpdateDateUnchanged();";
         }

@@ -14,7 +14,7 @@
  * concrete_inheritance_parent
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior.concrete_inheritance
  */
 class ConcreteInheritanceParentBehavior extends Behavior

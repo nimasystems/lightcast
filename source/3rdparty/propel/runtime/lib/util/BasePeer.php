@@ -24,7 +24,7 @@
  * @author     John D. McNally <jmcnally@collab.net> (Torque)
  * @author     Brett McLaughlin <bmclaugh@algx.net> (Torque)
  * @author     Stephen Haberman <stephenh@chase3000.com> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.util
  */
 class BasePeer
@@ -97,8 +97,8 @@ class BasePeer
      * Method to perform deletes based on values and keys in a
      * Criteria.
      *
-     * @param Criteria $criteria The criteria to use.
-     * @param PropelPDO $con A PropelPDO connection object.
+     * @param Criteria  $criteria The criteria to use.
+     * @param PropelPDO $con      A PropelPDO connection object.
      *
      * @return int The number of rows affected by last statement execution.  For most
      *                   uses there is only one delete statement executed, so this number
@@ -166,9 +166,9 @@ class BasePeer
      * }
      * </code>
      *
-     * @param string $tableName The name of the table to empty.
-     * @param PropelPDO $con A PropelPDO connection object.
-     * @param string $databaseName the name of the database.
+     * @param string    $tableName    The name of the table to empty.
+     * @param PropelPDO $con          A PropelPDO connection object.
+     * @param string    $databaseName the name of the database.
      *
      * @return int The number of rows affected by the statement.  Note
      *                   that the return value does require that this information
@@ -210,8 +210,8 @@ class BasePeer
      * If no primary key is defined for the table the values will be
      * inserted as specified in Criteria and null will be returned.
      *
-     * @param Criteria $criteria Object containing values to insert.
-     * @param PropelPDO $con A PropelPDO connection.
+     * @param Criteria  $criteria Object containing values to insert.
+     * @param PropelPDO $con      A PropelPDO connection.
      *
      * @return mixed The primary key for the new row if (and only if!) the primary key
      *                   is auto-generated.  Otherwise will return <code>null</code>.
@@ -274,8 +274,8 @@ class BasePeer
             }
 
             $sql = 'INSERT INTO ' . $tableName
-                . ' (' . implode(',', $columns) . ')'
-                . ' VALUES (';
+            . ' (' . implode(',', $columns) . ')'
+            . ' VALUES (';
             // . substr(str_repeat("?,", count($columns)), 0, -1) .
             for ($p = 1, $cnt = count($columns); $p <= $cnt; $p++) {
                 $sql .= ':p' . $p;
@@ -321,7 +321,7 @@ class BasePeer
      *
      * @param           $selectCriteria A Criteria object containing values used in where clause.
      * @param           $updateValues   A Criteria object containing values used in set clause.
-     * @param PropelPDO $con The PropelPDO connection object to use.
+     * @param PropelPDO $con            The PropelPDO connection object to use.
      *
      * @return int The number of rows affected by last update statement.  For most
      *                   uses there is only one update statement executed, so this number
@@ -457,8 +457,8 @@ class BasePeer
     /**
      * Executes query build by createSelectSql() and returns the resultset statement.
      *
-     * @param Criteria $criteria A Criteria.
-     * @param PropelPDO $con A PropelPDO connection to use.
+     * @param Criteria  $criteria A Criteria.
+     * @param PropelPDO $con      A PropelPDO connection to use.
      *
      * @return PDOStatement    The resultset.
      * @throws PropelException
@@ -499,8 +499,8 @@ class BasePeer
      * Executes a COUNT query using either a simple SQL rewrite or, for more complex queries, a
      * sub-select of the SQL created by createSelectSql() and returns the statement.
      *
-     * @param Criteria $criteria A Criteria.
-     * @param PropelPDO $con A PropelPDO connection to use.
+     * @param Criteria  $criteria A Criteria.
+     * @param PropelPDO $con      A PropelPDO connection to use.
      *
      * @return PDOStatement    The resultset statement.
      * @throws PropelException
@@ -559,9 +559,9 @@ class BasePeer
     /**
      * Applies any validators that were defined in the schema to the specified columns.
      *
-     * @param string $dbName The name of the database
+     * @param string $dbName    The name of the database
      * @param string $tableName The name of the table
-     * @param array $columns Array of column names as key and column values as value.
+     * @param array  $columns   Array of column names as key and column values as value.
      *
      * @return ValidationFailed[]|bool A list of validation failures, true if valid.
      */
@@ -651,7 +651,7 @@ class BasePeer
      * is to let the PDO layer handle all escaping & value formatting.
      *
      * @param Criteria $criteria Criteria for the SELECT query.
-     * @param array &$params Parameters that are to be replaced in prepared statement.
+     * @param array    &$params  Parameters that are to be replaced in prepared statement.
      *
      * @return string
      * @throws PropelException Trouble creating the query string.
@@ -708,8 +708,7 @@ class BasePeer
                 }
 
                 if (($criteria->isIgnoreCase() || $attachedCriterion->isIgnoreCase())
-                    && $dbMap->getTable($table)->getColumn($attachedCriterion->getColumn())->isText()
-                ) {
+                && $dbMap->getTable($table)->getColumn($attachedCriterion->getColumn())->isText()) {
                     $attachedCriterion->setIgnoreCase(true);
                 }
             }
@@ -839,12 +838,12 @@ class BasePeer
         $from .= $joinClause ? ' ' . implode(' ', $joinClause) : '';
 
         // Build the SQL from the arrays we compiled
-        $sql = $selectSql
-            . " FROM " . $from
-            . ($whereClause ? " WHERE " . implode(" AND ", $whereClause) : "")
-            . ($groupByClause ? " GROUP BY " . implode(",", $groupByClause) : "")
-            . ($havingString ? " HAVING " . $havingString : "")
-            . ($orderByClause ? " ORDER BY " . implode(",", $orderByClause) : "");
+        $sql =  $selectSql
+        ." FROM "  . $from
+        .($whereClause ? " WHERE ".implode(" AND ", $whereClause) : "")
+        .($groupByClause ? " GROUP BY ".implode(",", $groupByClause) : "")
+        .($havingString ? " HAVING ".$havingString : "")
+        .($orderByClause ? " ORDER BY ".implode(",", $orderByClause) : "");
 
         // APPLY OFFSET & LIMIT to the query.
         if ($criteria->getLimit() || $criteria->getOffset()) {
@@ -858,7 +857,7 @@ class BasePeer
      * Builds a params array, like the kind populated by Criterion::appendPsTo().
      * This is useful for building an array even when it is not using the appendPsTo() method.
      *
-     * @param array $columns
+     * @param array    $columns
      * @param Criteria $values
      *
      * @return array params array('column' => ..., 'table' => ..., 'value' => ...)

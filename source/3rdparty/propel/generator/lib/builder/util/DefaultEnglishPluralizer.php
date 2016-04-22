@@ -14,7 +14,7 @@ require_once dirname(__FILE__) . '/Pluralizer.php';
  * The default English pluralizer class.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.builder.util
  */
 class DefaultEnglishPluralizer implements Pluralizer

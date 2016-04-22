@@ -12,7 +12,7 @@
  * Speeds up queries on a model by caching the query
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.behavior.cacheable
  */
 class QueryCacheBehavior extends Behavior

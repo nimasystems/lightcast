@@ -17,7 +17,7 @@ require_once 'model/PropelTypes.php';
  * the database metadata.
  *
  * @author     Hans Lellelid <hans@xmpl.org>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.task
  */
 class PropelSchemaReverseTask extends PDOTask

@@ -14,7 +14,7 @@
  * In Torque this is an inner class of the Criteria class.
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.query
  */
 class Criterion

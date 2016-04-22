@@ -2,7 +2,7 @@
 
 rem *********************************************************************
 rem ** The Propel generator convenience script for Windows based systems
-rem ** $Id: propel-gen.bat 1443 2013-10-08 16:33:03Z mkovachev $
+rem ** $Id$
 rem *********************************************************************
 
 rem This script will do the following:

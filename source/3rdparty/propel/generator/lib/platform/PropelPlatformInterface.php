@@ -13,7 +13,7 @@
  *
  * @author     Hans Lellelid <hans@xmpl.org> (Propel)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.platform
  */
 interface PropelPlatformInterface

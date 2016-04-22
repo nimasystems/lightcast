@@ -23,7 +23,7 @@
  * </code>
  *
  * @author     Michael Aichler <aichler@mediacluster.de>
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.validator
  */
 class MinValueValidator implements BasicValidator

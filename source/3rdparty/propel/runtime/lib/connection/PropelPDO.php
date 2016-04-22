@@ -236,7 +236,7 @@ class PropelPDO extends PDO
             $return = parent::beginTransaction();
             if ($this->useDebug) {
                 $this->log('Begin transaction', null, __METHOD__);
-            } 
+            }
             $this->isUncommitable = false;
         }
         $this->nestedTransactionCount++;

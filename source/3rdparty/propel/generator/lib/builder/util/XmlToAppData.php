@@ -20,7 +20,7 @@ require_once dirname(__FILE__) . '/../../exception/SchemaException.php';
  * @author     Jason van Zyl <jvanzyl@apache.org> (Torque)
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
  * @author     Daniel Rall <dlr@collab.net> (Torque)
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.builder.util
  */
 class XmlToAppData

@@ -12,7 +12,7 @@
  * Simple templating system to ease behavior writing
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.builder.util
  */
 class PropelTemplate

@@ -16,7 +16,7 @@ require_once dirname(__FILE__).'/sfYaml.php';
  * @package    symfony
  * @subpackage yaml
  * @author     Fabien Potencier <fabien.potencier@symfony-project.com>
- * @version    SVN: $Id: sfYamlInline.php 1443 2013-10-08 16:33:03Z mkovachev $
+ * @version    SVN: $Id: sfYamlInline.class.php 16177 2009-03-11 08:32:48Z fabien $
  */
 class sfYamlInline
 {

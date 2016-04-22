@@ -12,7 +12,7 @@
  * Service class for parsing a large SQL string into an array of SQL statements
  *
  * @author     François Zaninotto
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.generator.util
  */
 class PropelSQLParser

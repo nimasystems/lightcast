@@ -12,7 +12,7 @@
  * This is an "inner" class that describes an object in the criteria.
  *
  * @author     Francois
- * @version    $Revision: 1443 $
+ * @version    $Revision$
  * @package    propel.runtime.query
  */
 class ModelCriterion extends Criterion
