@@ -175,6 +175,25 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return ($this->content ? $this->content : $this->getChildren(true));
     }
 
+    public function append($fields)
+    {
+        $content = $this->getContent();
+
+        if (is_array($fields)) {
+            foreach ($fields as $data) {
+                if ($data) {
+                    $content .= "\n" . $data;
+                }
+                unset($data);
+            }
+        } elseif ($fields) {
+            $content .= "\n" . $fields;
+        }
+
+        $this->setContent($content);
+        return $this;
+    }
+
     public function setContent($content)
     {
         if (!$this->is_closed) {

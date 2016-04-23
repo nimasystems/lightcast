@@ -82,6 +82,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     protected $is_hidden;
     protected $is_required;
     protected $is_read_only;
+    protected $is_numeric;
 
     protected $id_prefix;
     protected $name_suffix;
@@ -460,6 +461,17 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    public function getIsNumeric()
+    {
+        return $this->is_numeric;
+    }
+
+    public function setIsNumeric($is_numeric)
+    {
+        $this->is_numeric = $is_numeric;
+        return $this;
+    }
+
     public function getIsRequired()
     {
         return $this->is_required;
@@ -575,6 +587,10 @@ abstract class lcBaseActionFormWidget extends lcObj
 
         if (isset($options['title'])) {
             $this->title = $options['title'];
+        }
+
+        if (isset($options['numeric'])) {
+            $this->is_numeric = (bool)$options['numeric'];
         }
 
         return $this;

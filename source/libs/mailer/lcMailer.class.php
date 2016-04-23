@@ -113,6 +113,11 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->body = $body;
     }
 
+    public function setAttachments(array $attachments = null)
+    {
+        $this->attachments = $attachments;
+    }
+
     public function addAttachment(lcMailAttachment $attachment)
     {
         $this->attachments[] = $attachment;

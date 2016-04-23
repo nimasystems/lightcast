@@ -89,4 +89,15 @@ abstract class lcBasePropelObject extends BaseObject
     {
         return '#' . $this->getPrimaryKey();
     }
+
+    protected function translate($t)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        return $this->getPeer()->getTableMap()->translate($t);
+    }
+
+    protected function t($t)
+    {
+        return $this->translate($t);
+    }
 }
