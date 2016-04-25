@@ -218,7 +218,6 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     /**
      * @return mixed
-     * @deprecated use getDefaultData
      */
     public function getDefaultValue()
     {
@@ -228,7 +227,6 @@ abstract class lcBaseActionFormWidget extends lcObj
     /**
      * @param null $default_value
      * @return lcBaseActionFormWidget
-     * @deprecated use setDefaultData
      */
     public function setDefaultValue($default_value = null)
     {

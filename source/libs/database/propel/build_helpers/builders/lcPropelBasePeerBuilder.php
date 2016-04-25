@@ -26,6 +26,106 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
         }
     }
 
+    /**
+     * Adds the valueSet constants for ENUM columns.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addEnumColumnConstants(&$script)
+    {
+        foreach ($this->getTable()->getColumns() as $col) {
+            if ($col->isEnumType() || $col->getValueSet()) {
+                $script .= "
+    /** The enumerated values for the " . $col->getName() . " field */";
+                foreach ($col->getValueSet() as $value) {
+                    $script .= "
+    const " . $this->getColumnName($col) . '_' . $this->getEnumValueConstant($value) . " = '" . $value . "';";
+                }
+                $script .= "
+";
+            }
+        }
+    }
+
+    /**
+     * Adds the getValueSetsFormatted() method.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addGetValueSets(&$script)
+    {
+        parent::addGetValueSets($script);
+
+        $d = array();
+
+        foreach ($this->getTable()->getColumns() as $col) {
+            $tstr = null;
+
+            if ($col->isEnumType() || $col->getValueSet()) {
+                $tstr .= "     
+        self::" . $this->getColumnName($col) . " => array(
+        ";
+                $arg = array();
+
+                foreach ($col->getValueSet() as $value) {
+                    $arg[] = '        self::' . $this->getColumnName($col) . '_' . $this->getEnumValueConstant($value) . ' => $tableMap->translate(\'' . ucfirst($value) . '\')';
+                }
+                $tstr .= implode(', ' . "\n", $arg) . "
+        )";
+                $d[] = $tstr;
+            }
+        }
+
+        if ($d) {
+            $script .= "
+    /**
+     * Gets the list of translated titles for all ENUM columns
+     * @return array
+     */
+    public static function getValueSetsFormatted()
+    {
+        /** @var lcTableMap \$tableMap */
+        \$tableMap = self::getTableMap(); 
+        
+        return array(" . implode(",\n", $d) . ");
+    }
+";
+        }
+
+    }
+
+    /**
+     * Adds the getValueSet() method.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addGetValueSet(&$script)
+    {
+        parent::addGetValueSet($script);
+
+        $script .= "
+    /**
+     * Gets the list of values for an ENUM column with their corresonding translated titles
+     *
+     * @param string \$colname The ENUM column name.
+     *
+     * @return array list of possible values and titles for the column
+     */
+    public static function getValueSetFormattedMap(\$colname)
+    {
+        \$valueSets = " . $this->getPeerClassname() . "::getValueSets();
+
+        if (!isset(\$valueSets[\$colname])) {
+            throw new PropelException(sprintf('Column \"%s\" has no ValueSet.', \$colname));
+        }
+        
+        \$valueSetsFormatted = " . $this->getPeerClassname() . "::getValueSetsFormatted();
+    
+        return array_combine(\$valueSets[\$colname], \$valueSetsFormatted[\$colname]);
+    }
+";
+    }
+
     /*
      * Overriden method to allow adding custom XML attributes for Lightcast
      */
