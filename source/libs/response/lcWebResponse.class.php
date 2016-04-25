@@ -513,25 +513,37 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $request_uri = $this->request->getFullHostname() . $this->request->getRequestUri();
         $has_canonical = false;
 
-        if ($this->content_url && urldecode($request_uri) != urldecode($this->content_url)) {
+        if ($this->content_url && $request_uri != $this->content_url) {
             $has_canonical = true;
             $head[] = '<link rel="canonical" href="' . htmlspecialchars($this->content_url) . '" />';
         }
 
         // hreflang(s) - do not show if there is a canonical present
-        if (!$has_canonical) {
+        if (true || !$has_canonical) {
             $content_hreflangs = $this->content_hreflangs;
 
             if ($content_hreflangs) {
+                $head_hreflangs = array();
+                $current_url = null;
+
                 foreach ($content_hreflangs as $data) {
 
-                    $head[] = lcTagLink::create()
+                    $head_hreflangs[] = lcTagLink::create()
                         ->setRel('alternate')
                         ->setHref($data['url'])
                         ->setAttribute('hreflang', (isset($data['default']) && $data['default'] ? 'x-default' : $data['locale']))
                         ->toString();
 
+                    if (isset($data['current']) && $data['url'] == $request_uri) {
+                        $current_url = $data['url'];
+                    }
+
                     unset($data);
+                }
+
+                // if we have both canonical + hreflangs the canonical must be the 'self' of the current hreflang url
+                if (($has_canonical && $current_url) || !$has_canonical) {
+                    $head = array_merge($head, $head_hreflangs);
                 }
             }
         }
