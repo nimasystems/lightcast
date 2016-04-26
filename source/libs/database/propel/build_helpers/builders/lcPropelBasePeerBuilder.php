@@ -68,7 +68,8 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
                 $arg = array();
 
                 foreach ($col->getValueSet() as $value) {
-                    $arg[] = '        self::' . $this->getColumnName($col) . '_' . $this->getEnumValueConstant($value) . ' => $tableMap->translate(\'' . ucfirst($value) . '\')';
+                    $arg[] = '        self::' . $this->getColumnName($col) . '_' . $this->getEnumValueConstant($value) . ' => $tableMap->translate(\'' .
+                        ucfirst(lcInflector::subcamelize($value)) . '\')';
                 }
                 $tstr .= implode(', ' . "\n", $arg) . "
         )";
