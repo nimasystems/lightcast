@@ -400,6 +400,13 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return $event;
     }
 
+    /**
+     * @param lcEvent $event
+     * @param $value
+     * @param lcObj|null $invoker
+     * @return lcEvent
+     * @throws lcLogicException
+     */
     public function filter(lcEvent $event, $value, lcObj $invoker = null)
     {
         // notify observers
