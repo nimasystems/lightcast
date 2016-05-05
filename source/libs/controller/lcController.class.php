@@ -496,7 +496,6 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), array(
             'should_execute' => true
         ));
-        unset($notification_params);
 
         if ($execute_action_event->isProcessed()) {
             $event_params = $execute_action_event->getReturnValue();
@@ -511,6 +510,11 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $content = isset($rendered_view_contents['content']) ? $rendered_view_contents['content'] : null;
 
             unset($rendered_view_contents);
+
+            $notification_params['content_type'] = $content_type;
+            $notification_params['content'] = $content;
+
+            $this->event_dispatcher->notify(new lcEvent('controller.after_execute_action', $this, $notification_params));
         }
 
         // decorate content with layout view
