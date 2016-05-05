@@ -21,4 +21,39 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
         }
     }
 
+    protected function addClassBody(&$script)
+    {
+        parent::addClassBody($script);
+
+        $this->addTranslate($script);
+    }
+
+    protected function addTranslate(&$script)
+    {
+        $script .= "
+    /**
+     * Translate a string in the context of the model
+     * @param     string \$value String to translate
+     *
+     * @return string the translated string. Falls back to original string if cannot be translated
+     */
+    public function translate(\$value)
+    {
+        /** @var lcTableMap \$tblm */
+        \$tblm = \$this->getTableMap();
+        return \$tblm->translate(\$value);
+    }
+    
+    /**
+     * Translate a string in the context of the model
+     * @param     string \$value String to translate
+     *
+     * @return string the translated string. Falls back to original string if cannot be translated
+     */
+    public function t(\$value)
+    {
+        return \$this->translate(\$value);
+    }
+";
+    }
 }
