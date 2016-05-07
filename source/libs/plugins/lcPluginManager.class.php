@@ -277,30 +277,45 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     protected function tryIncludePluginConfigurationFile($root_dir, $plugin_name, $verify = false)
     {
+        $ret = null;
         $is_15 = $this->configuration->isTargetingLC15();
 
-        $filename = $root_dir . DS . 'config' . DS . ($is_15 ?
-                'config.php' : $plugin_name . '_config.php');
+        $filename = $root_dir . DS . 'config' . DS . $plugin_name . '_config.php';
 
-        if ($verify && !file_exists($filename)) {
-            return false;
+        if (!$verify) {
+            $ret = include_once($filename);
+        } else {
+            if (file_exists($filename)) {
+                $ret = include_once($filename);
+            }
         }
 
-        $ret = include_once($filename);
+        if (!$ret && $is_15) {
+            // try LC 1.5 config
+
+            $filename = $root_dir . DS . 'config' . DS . 'config.php';
+
+            if (!$verify) {
+                $ret = include_once($filename);
+            } else {
+                if (file_exists($filename)) {
+                    $ret = include_once($filename);
+                }
+            }
+        }
 
         if (!$ret) {
             return false;
         }
 
-        $camelized_class_name = $is_15 ? $plugin_name . '_plugin_configuration' : $plugin_name . '_config_configuration';
-        $class_name = lcInflector::camelize($camelized_class_name, false);
-
-        // this is now deprecated
-        $class_name_deprecated = $is_15 ? null : lcInflector::subcamelize($plugin_name . '_config', false);
+        $cls_names = array(
+            lcInflector::camelize($plugin_name . '_plugin_configuration', false),
+            lcInflector::camelize($plugin_name . '_config_configuration', false),
+            lcInflector::camelize($plugin_name . '_config', false)
+        );
 
         // cache this so we don't need to call subcamelize several times
-        $ret = $is_15 ? $class_name : array($class_name, $class_name_deprecated);
-        $this->included_plugin_classes[$plugin_name] = $ret;
+        $this->included_plugin_classes[$plugin_name] = $cls_names;
 
         return $ret;
     }

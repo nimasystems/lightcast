@@ -345,14 +345,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return $this;
     }
 
-    /**
-     * @return lcWebsiteConfigurationKey[]|null
-     */
-    public function getWebsiteConfigurationKeys()
-    {
-        return null;
-    }
-
     public function getConfigHandleMap()
     {
         // maps the configuration values to handlers
