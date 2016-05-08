@@ -34,6 +34,11 @@ class lcDatabaseMigrationsHelper extends lcSysObj
      */
     protected $dbc;
 
+    public function setDatabaseConnection(lcPropelConnection $dbc)
+    {
+        $this->dbc = $dbc;
+    }
+
     /**
      * @param iDatabaseMigrationsSchema $target
      * @return lcDatabaseMigrationsHelper
@@ -75,6 +80,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
               `schema_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
               `schema_identifier` varchar(50) NOT NULL,
               `schema_version` int(11) NOT NULL,
+              `data_installed` enum(\'yes\',\'no\') NOT NULL DEFAULT \'no\',
               `last_updated` datetime NOT NULL,
               PRIMARY KEY (`schema_id`),
               UNIQUE KEY `schema_identifier` (`schema_identifier`)
@@ -84,22 +90,28 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         // history
         $schemah = $this->createTableFromDDL(
             $this->schema_migrations_history_table_name,
-            'CREATE TABLE `core_package_migration_history` (
+            'CREATE TABLE `core_db_migration_history` (
               `migration_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-              `package_id` int(11) NOT NULL,
+              `schema_id` int(11) unsigned NOT NULL,
               `created_on` datetime NOT NULL,
-              `from_build_code` int(11) NOT NULL,
-              `to_build_code` int(11) NOT NULL,
-              `status` enum(\'success\',\'error\') NOT NULL DEFAULT \'success\',
-              `error_code` int(11) DEFAULT NULL,
-              `error_message` varchar(250) DEFAULT NULL,
+              `update_type` enum(\'schema_in\',\'schema_out\',\'data_in\',\'data_out\',\'schema_up\',\'schema_down\') NOT NULL DEFAULT \'schema_up\',
+              `from_schema_version` int(11) DEFAULT NULL,
+              `to_schema_version` int(11) DEFAULT NULL,
               PRIMARY KEY (`migration_id`),
-              KEY `package_id` (`package_id`),
-              CONSTRAINT `core_package_migration_history_ibfk_1` FOREIGN KEY (`package_id`) REFERENCES `core_package` (`package_id`) ON DELETE CASCADE
+              KEY `schema_id` (`schema_id`),
+              CONSTRAINT `core_db_migration_history_ibfk_1` FOREIGN KEY (`schema_id`) REFERENCES `core_db_schema` (`schema_id`) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8;'
         );
 
         return ($schemac && $schemah);
+    }
+
+    public function getInstalledSchemaVersionsFromMigrationTable($schema_identifier)
+    {
+        $sql = 'SELECT to_schema_version FROM ' . $this->dbc->quoteTableName($this->schema_migrations_history_table_name) .
+            ' th INNER JOIN ' . $this->dbc->quoteTableName($this->schema_table_name) . ' ts ON ts.schema_id = th.schema_id ' .
+            ' WHERE ts.schema_identifier = ' . $this->dbc->quote($schema_identifier) . ' AND th.update_type = \'schema_up\'';
+        return $this->dbc->query($sql)->fetchAll(PDO::FETCH_COLUMN);
     }
 
     public function getSchemaInfoFromMigrationTable($schema_identifier)
@@ -138,7 +150,9 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             // history
             $this->addSchemaUpdateHistory(
                 $schema_id,
-                'schema_in'
+                'schema_in',
+                null,
+                $initial_version
             );
 
             if (DO_DEBUG) {
@@ -164,12 +178,6 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             $sql = 'DELETE FROM ' . $this->dbc->quoteTableName($this->schema_table_name) .
                 ' WHERE schema_id = ' . $schema_id;
             $this->dbc->exec($sql);
-
-            // history
-            $this->addSchemaUpdateHistory(
-                $schema_id,
-                'schema_out'
-            );
 
             if (DO_DEBUG) {
                 $this->debug('Schema table updated (Removed schema: ' . $schema_identifier . ')');
@@ -215,7 +223,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         }
     }
 
-    protected function updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from_version, $to_version)
+    protected function updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from_version, $to_version, $add_history = true)
     {
         $schema_id = (int)$schema_id;
         $from_version = (int)$from_version;
@@ -232,13 +240,15 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             schema_id = ' . $schema_id;
             $this->dbc->exec($sql);
 
-            // history
-            $this->addSchemaUpdateHistory(
-                $schema_id,
-                ($to_version >= $from_version ? 'schema_up' : 'schema_down'),
-                $from_version,
-                $to_version
-            );
+            if ($add_history) {
+                // history
+                $this->addSchemaUpdateHistory(
+                    $schema_id,
+                    ($to_version >= $from_version ? 'schema_up' : 'schema_down'),
+                    $from_version,
+                    $to_version
+                );
+            }
 
             if (DO_DEBUG) {
                 $this->debug('Schema table updated (Changed version: ' . $schema_identifier . ', ' . $from_version . ' -> ' . $to_version . ')');
@@ -257,6 +267,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             ' (schema_id, created_on, update_type, from_schema_version, to_schema_version) ' .
             ' VALUES(' .
             (int)$schema_id . ', ' .
+            'Now(), ' .
             $this->dbc->quote($update_type) . ', ' .
             ((int)$from_ver ? (int)$from_ver : 'NULL') . ', ' .
             ((int)$to_ver ? (int)$to_ver : 'NULL') . ' ' .
@@ -401,8 +412,9 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         // validate it
         $this->prepareTarget($target);
 
+        // install the schema if not done yet
         if (!$this->isSchemaInstalled($target)) {
-            throw new lcNotAvailableException('Schema has not been installed');
+            $this->installSchema($target);
         }
 
         $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
@@ -447,23 +459,26 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function migrateSchema(iDatabaseMigrationsSchema $target)
+    public function migrateSchema(iDatabaseMigrationsSchema $target, $to_custom_schema_version = null)
     {
+        $to_custom_schema_version = isset($to_custom_schema_version) ? (int)$to_custom_schema_version : null;
+
         // check and create migration table if missing
         $this->createSchemaTables();
 
         // validate it
         $this->prepareTarget($target);
 
+        // install the schema if not done yet
         if (!$this->isSchemaInstalled($target)) {
-            throw new lcNotAvailableException('Schema has not been installed');
+            $this->installSchema($target);
         }
 
         $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
         $schema_id = (int)$schema_info['schema_id'];
 
         $current_schema_version = (int)$schema_info['schema_version'];
-        $target_schema_version = $target->getSchemaVersion();
+        $target_schema_version = ($to_custom_schema_version ? $to_custom_schema_version : $target->getSchemaVersion());
 
         if ($current_schema_version == $target_schema_version) {
             return true;
@@ -471,13 +486,15 @@ class lcDatabaseMigrationsHelper extends lcSysObj
 
         $is_migrate_up = $target_schema_version > $current_schema_version;
 
-        $from = ($is_migrate_up ? $current_schema_version : $target_schema_version);
-        $to = (!$is_migrate_up ? $current_schema_version : $target_schema_version);
-        $schema_identifier = $target->getSchemaIdentifier();
-
-        if (!$to || $to < $from) {
-            throw new lcInvalidArgumentException('Invalid target version for migrating up');
+        if ($is_migrate_up) {
+            $from = $current_schema_version;
+            $to = $target_schema_version;
+        } else {
+            $from = $current_schema_version;
+            $to = $target_schema_version;
         }
+
+        $schema_identifier = $target->getSchemaIdentifier();
 
         if ($to == $from) {
             return true;
@@ -506,10 +523,12 @@ class lcDatabaseMigrationsHelper extends lcSysObj
 
                 try {
                     // call the migration method
-                    $target->migrateUp($this->dbc, $_from, $_to);
+                    $migrated = $target->migrateUp($this->dbc, $_from, $_to);
 
-                    // update the stored version
-                    $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $_from, $_to);
+                    if ($migrated) {
+                        // update the stored version
+                        $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $_from, $_to);
+                    }
 
                     $this->dbc->commit();
                 } catch (Exception $e) {
@@ -517,28 +536,45 @@ class lcDatabaseMigrationsHelper extends lcSysObj
                     throw new lcDatabaseSchemaException('Schema upgrade error (' . $_from . ' -> ' . $_to . '): ' . $e->getMessage(), $e->getCode(), $e);
                 }
             }
+
+            // update the stored version
+            $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from, $to, false);
+
         } else {
-            for ($i = $from; $i >= $to - 1; $i++) {
-                $_from = $i;
-                $_to = $i - 1;
+            // we need to uninstall only what we installed!
+            $installed_schema_versions = $this->getInstalledSchemaVersionsFromMigrationTable($target);
 
-                $this->info('Running schema migrate down (' . $_from . ' -> ' . $_to . ')...');
+            if ($installed_schema_versions) {
+                for ($i = $from - 1; $i >= $to - 1; $i--) {
+                    $_from = $i;
+                    $_to = $i - 1;
 
-                $this->dbc->beginTransaction();
+                    $this->info('Running schema migrate down (' . $_from . ' -> ' . $_to . ')...');
 
-                try {
-                    // call the migration method
-                    $target->migrateDown($this->dbc, $_from, $_to);
+                    $this->dbc->beginTransaction();
 
-                    // update the stored version
-                    $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $_from, $_to);
+                    try {
+                        // call the migration method
+                        if (in_array($_from, $installed_schema_versions)) {
 
-                    $this->dbc->commit();
-                } catch (Exception $e) {
-                    $this->dbc->rollback();
-                    throw new lcDatabaseSchemaException('Schema upgrade error (' . $_from . ' -> ' . $_to . '): ' . $e->getMessage(), $e->getCode(), $e);
+                            $migrated = $target->migrateDown($this->dbc, $_from, $_to);
+
+                            if ($migrated) {
+                                // update the stored version
+                                $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $_from, $_to);
+                            }
+                        }
+
+                        $this->dbc->commit();
+                    } catch (Exception $e) {
+                        $this->dbc->rollback();
+                        throw new lcDatabaseSchemaException('Schema upgrade error (' . $_from . ' -> ' . $_to . '): ' . $e->getMessage(), $e->getCode(), $e);
+                    }
                 }
             }
+
+            // update the stored version
+            $this->updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from, $to, false);
         }
 
         // execute after

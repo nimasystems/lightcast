@@ -102,6 +102,32 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.startup', $this));
     }
 
+    public function getPluginDatabaseMigrationSchema($plugin_name)
+    {
+        $plugin_config = $this->getPluginConfiguration($plugin_name);
+        $schema = null;
+
+        if ($plugin_config) {
+            $schema = $plugin_config->getDatabaseMigrationsSchema();
+
+            if ($schema instanceof lcSysObj) {
+                $schema->setLogger($this->logger);
+                $schema->setI18n($this->i18n);
+                $schema->setConfiguration($this->configuration);
+                $schema->setEventDispatcher($this->event_dispatcher);
+
+                // start it up
+                $schema->initialize();
+            }
+
+            if ($schema instanceof lcPluginDatabaseMigrationsSchema) {
+                $schema->setPluginConfiguration($plugin_config);
+            }
+        }
+
+        return $schema;
+    }
+
     public function getPluginConfiguration($plugin_name)
     {
         if (!isset($this->plugin_configurations[$plugin_name])) {
@@ -518,6 +544,18 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         if ($minimum_version) {
             if (version_compare($minimum_version, LC_VER, '>=')) {
                 throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        $is_15 = $this->configuration->isTargetingLC15();
+
+        if ($is_15) {
+            if (!$plugin_configuration->getIdentifier()) {
+                throw new lcSystemRequirementException('LC 1.5 plugins are required to define an unique GUID');
+            }
+
+            if (!$plugin_configuration->getPackageName()) {
+                throw new lcSystemRequirementException('LC 1.5 plugins are required to define a package name');
             }
         }
 

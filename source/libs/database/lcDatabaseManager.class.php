@@ -33,6 +33,9 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     private $default_database = self::DEFAULT_DB;
     private $propel_initialized;
 
+    /**
+     * @var lcDatabaseMigrationsHelper
+     */
     protected $migration_helper;
 
     public function initialize()
@@ -62,6 +65,11 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
             if (!$manager || !($manager instanceof lcSysObj)) {
                 throw new lcSystemException('Migrations helper is not a valid object');
+            }
+
+            if ($manager instanceof lcDatabaseMigrationsHelper) {
+                /** @noinspection PhpParamsInspection */
+                $manager->setDatabaseConnection($this->getConnection());
             }
 
             $manager->setLogger($this->logger);

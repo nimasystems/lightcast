@@ -48,7 +48,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
      */
     public function getPackageName()
     {
-        return 'nimasystems_' . $this->getName();
+        return null;
     }
 
     /**
@@ -180,7 +180,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     {
         // subclassers may override this method to return the GUID identifier of
         // the plugin
-        return null;
+        return $this->getIdentifier();
     }
 
     public function getIdentifier()
@@ -415,27 +415,29 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     private function getDefaultDbMigrationsSchemaInstance()
     {
-        $class_name = $this->name . '_plugin_database_migrations_schema';
+        $class_name = lcInflector::camelize($this->name . '_plugin_database_migrations_schema');
+
+        $obj = null;
+
+        if (!class_exists($class_name)) {
+            $filename = $this->getConfigDir() . DS . self::DB_MIGRATIONS_FILENAME;
+
+            if (file_exists($filename)) {
+                include_once($filename);
+            }
+        }
 
         if (class_exists($class_name)) {
             $obj = new $class_name();
 
             if ($obj instanceof iDatabaseMigrationsSchema) {
-                return $obj;
-            }
-        }
 
-        $filename = $this->getConfigDir() . DS . self::DB_MIGRATIONS_FILENAME;
-
-        if (file_exists($filename)) {
-            include_once($filename);
-
-            if (class_exists($class_name)) {
-                $obj = new $class_name();
-
-                if ($obj instanceof iDatabaseMigrationsSchema) {
-                    return $obj;
+                if ($obj instanceof lcSysObj) {
+                    $obj->setContextName($this->getName());
+                    $obj->setContextType(lcSysObj::CONTEXT_PLUGIN);
                 }
+
+                return $obj;
             }
         }
 

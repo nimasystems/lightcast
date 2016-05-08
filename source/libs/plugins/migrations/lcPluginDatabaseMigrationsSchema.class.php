@@ -27,6 +27,11 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
 {
     protected $log_channel = 'db_migrations';
 
+    /**
+     * @var lcPluginConfiguration
+     */
+    private $plugin_configuration;
+
     public function initialize()
     {
         parent::initialize();
@@ -35,11 +40,21 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
     }
 
     /**
+     * @param lcPluginConfiguration $plugin_configuration
+     * @return lcPluginDatabaseMigrationsSchema
+     */
+    public function setPluginConfiguration($plugin_configuration)
+    {
+        $this->plugin_configuration = $plugin_configuration;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getSchemaIdentifier()
     {
-        return $this->getContainerPluginName();
+        return $this->plugin_configuration->getName() . '_' . $this->plugin_configuration->getIdentifier();
     }
 
     /**
@@ -50,13 +65,13 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
      */
     public function migrateUp(lcPropelConnection $db, $from_version, $to_version)
     {
-        $method_name = 'migrateUp_' . $from_version . '_' . $to_version;
+        $method_name = 'migrateUp_' . $to_version;
 
         if (method_exists($this, $method_name)) {
             return $this->$method_name($db);
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -67,13 +82,13 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
      */
     public function migrateDown(lcPropelConnection $db, $from_version, $to_version)
     {
-        $method_name = 'migrateDown_' . $from_version . '_' . $to_version;
+        $method_name = 'migrateDown_' . $to_version;
 
         if (method_exists($this, $method_name)) {
             return $this->$method_name($db);
         }
 
-        return true;
+        return false;
     }
 
     /**
@@ -83,7 +98,7 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
     public function schemaInstall(lcPropelConnection $db)
     {
         // to be inherited by children
-        return true;
+        return false;
     }
 
     /**
@@ -93,7 +108,7 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
     public function schemaUninstall(lcPropelConnection $db)
     {
         // to be inherited by children
-        return true;
+        return false;
     }
 
     /**
@@ -103,7 +118,7 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
     public function dataInstall(lcPropelConnection $db)
     {
         // to be inherited by children
-        return true;
+        return false;
     }
 
     /**
@@ -113,7 +128,7 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
     public function dataUninstall(lcPropelConnection $db)
     {
         // to be inherited by children
-        return true;
+        return false;
     }
 
     /**
@@ -136,5 +151,10 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
         $this->info('afterExecute: ' . $action);
 
         // to be inherited by children
+    }
+
+    public function __toString()
+    {
+        return (string)$this->getSchemaIdentifier();
     }
 }
