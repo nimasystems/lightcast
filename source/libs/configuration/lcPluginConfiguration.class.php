@@ -22,11 +22,13 @@
 
  */
 
-class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
+class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions, iSupportsDatabaseMigrations
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
     const STARTUP_TYPE_MANUAL = 'manual';
     const STARTUP_TYPE_EVENT_BASED = 'event_based';
+
+    const DB_MIGRATIONS_FILENAME = 'db_migrations.php';
 
     protected $name;
     protected $root_dir;
@@ -42,11 +44,11 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
-     * @return string|null
+     * @return string
      */
     public function getPackageName()
     {
-        return null;
+        return 'nimasystems_' . $this->getName();
     }
 
     /**
@@ -219,7 +221,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
      */
     public function getVersion()
     {
-        return $this->getMajorVersion() . '.' . $this->getMinorVersion() . '.' . $this->getBuildVersion() . '.' . $this->getRevisionVersion();
+        return $this->getMajorVersion() . '.' . $this->getMinorVersion() . '.' . $this->getBuildVersion();
     }
 
     /**
@@ -247,19 +249,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
      */
     public function getBuildVersion()
     {
-        // subclassers may override this method to return the build version of
-        // the plugin
-        return iSupportsVersions::BUILD_PRODUCTION;
+        // subclassers may override this method
+        return 0;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getRevisionVersion()
+    public function getStabilityCode()
     {
-        // subclassers may override this method to return the revision version of
-        // the plugin
-        return 0;
+        // subclassers may override this method
+        return iSupportsVersions::STABILITY_CODE_PRODUCTION;
     }
 
     /**
@@ -403,5 +403,42 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function getSupportedLocales()
     {
         return array('en_US');
+    }
+
+    /**
+     * @return iDatabaseMigrationsSchema
+     */
+    public function getDatabaseMigrationsSchema()
+    {
+        return $this->getDefaultDbMigrationsSchemaInstance();
+    }
+
+    private function getDefaultDbMigrationsSchemaInstance()
+    {
+        $class_name = $this->name . '_plugin_database_migrations_schema';
+
+        if (class_exists($class_name)) {
+            $obj = new $class_name();
+
+            if ($obj instanceof iDatabaseMigrationsSchema) {
+                return $obj;
+            }
+        }
+
+        $filename = $this->getConfigDir() . DS . self::DB_MIGRATIONS_FILENAME;
+
+        if (file_exists($filename)) {
+            include_once($filename);
+
+            if (class_exists($class_name)) {
+                $obj = new $class_name();
+
+                if ($obj instanceof iDatabaseMigrationsSchema) {
+                    return $obj;
+                }
+            }
+        }
+
+        return null;
     }
 }

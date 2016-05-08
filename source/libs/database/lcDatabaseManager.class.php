@@ -25,8 +25,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 {
     const DEFAULT_DB = 'primary';
 
-    /** @var lcDatabaseMigrationsManager */
-    protected $migrations_manager;
     /** @var lcLogger */
     protected $propel_logger;
     protected $propel_config;
@@ -35,11 +33,49 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     private $default_database = self::DEFAULT_DB;
     private $propel_initialized;
 
+    protected $migration_helper;
+
     public function initialize()
     {
         parent::initialize();
 
         $this->loadDatabaseConfiguration();
+    }
+
+    public function getMigrationsHelper()
+    {
+        if (!$this->migration_helper) {
+
+            $cfg = $this->configuration;
+            $clname = (string)$cfg['db.migrations.helper_class'];
+
+            if (!$clname) {
+                throw new lcConfigException('No migrations helper set in configuration');
+            }
+
+            if (!class_exists($clname)) {
+                throw new lcSystemException('Migrations helper class does not exist');
+            }
+
+            // init it
+            $manager = new $clname();
+
+            if (!$manager || !($manager instanceof lcSysObj)) {
+                throw new lcSystemException('Migrations helper is not a valid object');
+            }
+
+            $manager->setLogger($this->logger);
+            $manager->setI18n($this->i18n);
+            $manager->setConfiguration($this->configuration);
+            $manager->setEventDispatcher($this->event_dispatcher);
+
+            // start it up
+            $manager->initialize();
+
+            $this->migration_helper = $manager;
+        }
+
+        return $this->migration_helper;
     }
 
     private function loadDatabaseConfiguration()
@@ -314,12 +350,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     public function shutdown()
     {
-        // shutdown migrations manager if available
-        if ($this->migrations_manager) {
-            $this->migrations_manager->shutdown();
-            $this->migrations_manager = null;
-        }
-
         // shutdown databases
         if ($this->dbs && is_array($this->dbs)) {
             foreach ($this->dbs as $name => $obj) {
@@ -335,7 +365,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
             }
         }
 
-        $this->dbs = $this->migrations_manager = null;
+        $this->dbs = null;
 
         // shutdown the Propel logger
         if ($this->propel_logger) {
@@ -397,116 +427,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         }
 
         return $debug_info;
-    }
-
-    public function getMigrationsManager()
-    {
-        // factory method
-        if ($this->migrations_manager) {
-            return $this->migrations_manager;
-        }
-
-        $cfg = $this->configuration;
-        $clname = (string)$cfg['db.migrations.manager'];
-
-        if (!$clname) {
-            throw new lcConfigException('No migrations manager set in configuration');
-        }
-
-        try {
-            if (!class_exists($clname)) {
-                throw new lcSystemException('Migrations manager\'s class does not exist');
-            }
-
-            // init it
-            /** @var lcDatabaseMigrationsManager $manager */
-            $manager = new $clname();
-
-            if (!$manager || !($manager instanceof iDatabaseMigrationsManager)) {
-                throw new lcSystemException('Migrations manager is not valid');
-            }
-
-            $manager->setLogger($this->logger);
-            $manager->setI18n($this->i18n);
-            $manager->setConfiguration($this->configuration);
-            $manager->setEventDispatcher($this->event_dispatcher);
-
-            // start it up
-            $manager->initialize();
-
-            $this->migrations_manager = $manager;
-
-            return $this->migrations_manager;
-        } catch (Exception $e) {
-            throw new lcSystemException('Could not initialize migrations manager \'' . $clname . '\': ' . $e->getMessage(), $e->getCode(), $e);
-        }
-    }
-
-    public function getProjectMigrationsTarget($name = lcDatabasesConfigHandler::DEFAULT_PRIMARY_ADAPTER_NAME)
-    {
-        $name = isset($name) ? (string)$name : lcDatabasesConfigHandler::DEFAULT_PRIMARY_ADAPTER_NAME;
-
-        $cfg = $this->configuration;
-
-        // check if the database is found and if it has a migrations object set
-        if (!$this->dbs) {
-            throw new lcNotAvailableException('No databases available');
-        }
-
-        $dbs = array_keys($this->dbs);
-
-        if (!in_array($name, $dbs)) {
-            throw new lcNotAvailableException('Database adapter \'' . $name . '\' does not exist or is not initialized');
-        }
-
-        $database = $this->getDatabase($name);
-
-        if (!$database) {
-            throw new lcDatabaseException('Could not obtain a valid database for adapter \'' . $name . '\'');
-        }
-
-        // include the main schema filename which may or may not include the
-        // migration classes
-        $migrations_dir = (string)$cfg['db.migrations.migrations_dir'];
-
-        if (!$migrations_dir) {
-            throw new lcConfigException('Invalid project migrations dir');
-        }
-
-        $migrations_filename = $cfg->getProjectDir() . DS . $migrations_dir . DS . $name . '.php';
-
-        if (!file_exists($migrations_filename)) {
-            throw new lcIOException('Migrations filename does not exist');
-        }
-
-        // try to include it
-        /** @noinspection PhpIncludeInspection */
-        include_once($migrations_filename);
-
-        // check if the class exists
-        $clname = 'project' . lcInflector::camelize($name, false) . 'MigrationsTarget';
-
-        if (!class_exists($clname)) {
-            throw new lcNotAvailableException('Migrations target for database adapter \'' . $name . '\' does not exist (' . $clname . ')');
-        }
-
-        // init and verify the class
-        /** @var iDatabaseMigrationsTarget $cl */
-        $cl = new $clname();
-
-        if (!$cl || !($cl instanceof iDatabaseMigrationsTarget)) {
-            throw new lcSystemException('Migrations target \'' . $clname . '\' is not valid');
-        }
-
-        // initialize it
-        $cl->setDatabase($database);
-
-        // assign logger
-        if ($cl instanceof lcLoggingObj) {
-            $cl->setLogger($this->getLogger());
-        }
-
-        return $cl;
     }
 
     /**

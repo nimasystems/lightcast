@@ -19,19 +19,14 @@
 * ZIP Code: 4000
 * Address: 95 "Kapitan Raycho" Str.
 * E-Mail: info@nimasystems.com
+
+
 */
 
-interface iDatabaseMigrationsManager
+interface iSupportsDatabaseMigrations
 {
-    public function installSchema(lcBaseMigrationsTarget $target);
-
-    public function removeSchema(lcBaseMigrationsTarget $target);
-
-    public function installData(lcBaseMigrationsTarget $target);
-
-    public function removeData(lcBaseMigrationsTarget $target);
-
-    public function upgradeSchema(lcBaseMigrationsTarget $target, $to = null);
-
-    public function downgradeSchema(lcBaseMigrationsTarget $target, $to = null);
+    /**
+     * @return iDatabaseMigrationsSchema
+     */
+    public function getDatabaseMigrationsSchema();
 }

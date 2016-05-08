@@ -25,10 +25,10 @@
 
 interface iSupportsVersions
 {
-    const BUILD_ALPHA = 0;
-    const BUILD_BETA = 1;
-    const BUILD_RC = 2;
-    const BUILD_PRODUCTION = 3;
+    const STABILITY_CODE_ALPHA = 'a';
+    const STABILITY_CODE_BETA = 'b';
+    const STABILITY_CODE_RC = 'rc';
+    const STABILITY_CODE_PRODUCTION = 'p';
 
     public function getVersion();
 
@@ -38,5 +38,5 @@ interface iSupportsVersions
 
     public function getBuildVersion();
 
-    public function getRevisionVersion();
+    public function getStabilityCode();
 }

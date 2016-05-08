@@ -94,6 +94,11 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function getHelpInformation()
     {
+        // deprecated - for compatibility
+        if (method_exists($this, 'getHelpInfo')) {
+            return $this->getHelpInfo();
+        }
+
         $this->consoleDisplay('No help information provided by: \'' . $this->getControllerName() . '\'');
         return false;
     }

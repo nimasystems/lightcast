@@ -416,10 +416,9 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getVersion()
     {
-        return $this->getMajorVersion() . ' . ' .
-        $this->getMinorVersion() . ' . ' .
-        $this->getBuildVersion() . ' . ' .
-        $this->getRevisionVersion();
+        return $this->getMajorVersion() . '.' .
+        $this->getMinorVersion() . '.' .
+        $this->getBuildVersion();
     }
 
     public function getMajorVersion()
@@ -434,16 +433,22 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return 0;
     }
 
+    /**
+     * @return int
+     */
     public function getBuildVersion()
     {
-        // subclassers may override this method to return the build version of the project
-        return iSupportsVersions::BUILD_PRODUCTION;
+        // subclassers may override this method
+        return 0;
     }
 
-    public function getRevisionVersion()
+    /**
+     * @return string
+     */
+    public function getStabilityCode()
     {
-        // subclassers may override this method to return the revision version of the project
-        return 0;
+        // subclassers may override this method
+        return iSupportsVersions::STABILITY_CODE_PRODUCTION;
     }
 
     public function willBeginInitializingApp(lcApp $app)

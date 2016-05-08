@@ -31,24 +31,23 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
         return array('db' => array(
             'use_database' => false,
             'use_propel' => true,
-            'migrations' => array(
-                'table_name' => 'db_migration',
-                'manager' => 'lcDatabaseMigrationsManager',
-                'migrations_target_class_name' => 'lcMigrationsTarget',
+            'databases' => array(
+                self::DEFAULT_PRIMARY_ADAPTER_NAME => array(
+                    'classname' => 'lcPropelDatabase',
+                    'caching' => true,
+                    'persistent_connections' => true,
+                    'logging' => true,
+                    'datasource' => null,
+                    'driver' => 'mysql',
+                    'url' => 'mysql:host=localhost;dbname=',
+                    'user' => null,
+                    'password' => null,
+                    'charset' => 'utf8'
+                ),
             ),
-            'databases' => array(self::DEFAULT_PRIMARY_ADAPTER_NAME => array(
-                'classname' => 'lcPropelDatabase',
-                'caching' => true,
-                'persistent_connections' => true,
-                'logging' => true,
-                'datasource' => null,
-                'driver' => 'mysql',
-                'url' => 'mysql:host=localhost;dbname=',
-                'user' => null,
-                'password' => null,
-                'charset' => 'utf8',
-                'migrations' => 'projectPrimaryDatabaseMigrations'
-            ),),
+            'migrations' => array(
+                'helper_class' => 'lcDatabaseMigrationsHelper'
+            ),
             'propel_custom' => array(
                 'propel.lightcastOverrideBuildPath' => true,
                 'propel.lightcastBuildPath' => 'gen/propel/models/',
