@@ -23,7 +23,7 @@
 
 */
 
-abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDatabaseMigrationsSchema
+abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDatabaseMigrationSchema
 {
     protected $log_channel = 'db_migrations';
 
@@ -41,7 +41,7 @@ abstract class lcPluginDatabaseMigrationsSchema extends lcSysObj implements iDat
 
     /**
      * @param lcPluginConfiguration $plugin_configuration
-     * @return lcPluginDatabaseMigrationsSchema
+     * @return lcPackageDatabaseMigrationSchema
      */
     public function setPluginConfiguration($plugin_configuration)
     {

@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-interface iDatabaseMigrationsSchema
+interface iDatabaseMigrationSchema
 {
     const ACTION_MIGRATE_UP = 'migrate_up';
     const ACTION_MIGRATE_DOWN = 'migrate_down';

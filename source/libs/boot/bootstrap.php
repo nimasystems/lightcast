@@ -128,8 +128,8 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDb
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'view' . DS . 'filters' . DS . 'iViewFilterProvider.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'components' . DS . 'iSupportsComponentOperations.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'migrations' . DS . 'iDatabaseMigrationsSchema.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'migrations' . DS . 'iSupportsDatabaseMigrations.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'migrations' . DS . 'iDatabaseMigrationSchema.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'migrations' . DS . 'iSupportsDatabaseMigration.class.php');
 
 // load base classes
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iEventsListener.class.php');

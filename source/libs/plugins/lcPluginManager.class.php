@@ -108,7 +108,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $schema = null;
 
         if ($plugin_config) {
-            $schema = $plugin_config->getDatabaseMigrationsSchema();
+            $schema = $plugin_config->getDatabaseMigrationSchema();
 
             if ($schema instanceof lcSysObj) {
                 $schema->setLogger($this->logger);
@@ -120,7 +120,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 $schema->initialize();
             }
 
-            if ($schema instanceof lcPluginDatabaseMigrationsSchema) {
+            if ($schema instanceof lcPackageDatabaseMigrationSchema) {
                 $schema->setPluginConfiguration($plugin_config);
             }
         }
