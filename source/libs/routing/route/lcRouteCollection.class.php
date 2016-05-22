@@ -23,7 +23,7 @@
 
 */
 
-class lcRouteCollection extends lcBaseCollection
+class lcRouteCollection extends lcBaseCollection implements ArrayAccess
 {
     public function connect($name, $route, array $params = null, array $requirements = null)
     {
