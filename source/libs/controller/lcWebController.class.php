@@ -268,7 +268,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return $content;
         }
 
-        if ($view instanceof lcHtmlTemplateView) {
+        if ($view instanceof lcHTMLTemplateView) {
             $controllers = $view->getControllerActionsToDecorate();
             $fragments = $view->getFragmentsToDecorate();
 
