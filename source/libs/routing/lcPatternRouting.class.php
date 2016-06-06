@@ -443,7 +443,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         return $this->current_route;
     }
 
-    public function generate(array $params = null, $absolute = false, $name = null)
+    public function generate(array $params = null, $absolute = false, $name = null, $append_prefix = true)
     {
         $ret = null;
 
@@ -482,8 +482,12 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         }
 
         // append request prefix
+        // TODO: Remove this prefix completely as it's causing lots of pain!
         $prefix = isset($this->context['prefix']) ? $this->context['prefix'] : null;
-        $ret = $prefix . $ret;
+
+        if ($append_prefix) {
+            $ret = $prefix . $ret;
+        }
 
         $evn = $this->event_dispatcher->filter(new lcEvent('router.generate_url', $this, array(
             'url' => $ret,
