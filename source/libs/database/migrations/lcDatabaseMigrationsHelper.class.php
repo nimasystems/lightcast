@@ -40,11 +40,11 @@ class lcDatabaseMigrationsHelper extends lcSysObj
     }
 
     /**
-     * @param iDatabaseMigrationsSchema $target
+     * @param iDatabaseMigrationSchema $target
      * @return lcDatabaseMigrationsHelper
      * @throws lcSystemException
      */
-    protected function prepareTarget(iDatabaseMigrationsSchema $target)
+    protected function prepareTarget(iDatabaseMigrationSchema $target)
     {
         // validate it
         $this->validateMigrationsTarget($target);
@@ -276,11 +276,11 @@ class lcDatabaseMigrationsHelper extends lcSysObj
     }
 
     /**
-     * @param iDatabaseMigrationsSchema $target
+     * @param iDatabaseMigrationSchema $target
      * @return lcDatabaseMigrationsHelper
      * @throws lcSystemException
      */
-    protected function validateMigrationsTarget(iDatabaseMigrationsSchema $target)
+    protected function validateMigrationsTarget(iDatabaseMigrationSchema $target)
     {
         $valid = ($target->getSchemaIdentifier() && (int)$target->getSchemaVersion());
 
@@ -291,17 +291,17 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return $this;
     }
 
-    public function isSchemaInstalled(iDatabaseMigrationsSchema $target)
+    public function isSchemaInstalled(iDatabaseMigrationSchema $target)
     {
         return ((bool)$this->getSchemaInstalledVersion($target));
     }
 
-    public function getSchemaInstalledVersion(iDatabaseMigrationsSchema $target)
+    public function getSchemaInstalledVersion(iDatabaseMigrationSchema $target)
     {
         return $this->getSchemaVersionFromMigrationTable($target->getSchemaIdentifier());
     }
 
-    public function installSchema(iDatabaseMigrationsSchema $target)
+    public function installSchema(iDatabaseMigrationSchema $target)
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -327,13 +327,13 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             $this->addSchemaToMigrationTable($target->getSchemaIdentifier(), $new_version);
 
             // execute before
-            $target->beforeExecute($this->dbc, iDatabaseMigrationsSchema::ACTION_SCHEMA_INSTALL);
+            $target->beforeExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_INSTALL);
 
             // call the migration method
             $target->schemaInstall($this->dbc);
 
             // execute after
-            $target->afterExecute($this->dbc, iDatabaseMigrationsSchema::ACTION_SCHEMA_INSTALL);
+            $target->afterExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_INSTALL);
 
             /// Execute data install
             $this->installData($target);
@@ -347,7 +347,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function uninstallSchema(iDatabaseMigrationsSchema $target)
+    public function uninstallSchema(iDatabaseMigrationSchema $target)
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -374,13 +374,13 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             $this->uninstallData($target);
 
             // execute before
-            $target->beforeExecute($this->dbc, iDatabaseMigrationsSchema::ACTION_SCHEMA_UNINSTALL);
+            $target->beforeExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
 
             // call the migration method
             $target->schemaUninstall($this->dbc);
 
             // execute after
-            $target->afterExecute($this->dbc, iDatabaseMigrationsSchema::ACTION_SCHEMA_UNINSTALL);
+            $target->afterExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
 
             // remove the schema record
             $this->removeSchemaFromMigrationTable($schema_id, $target->getSchemaIdentifier());
@@ -394,17 +394,17 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function installData(iDatabaseMigrationsSchema $target)
+    public function installData(iDatabaseMigrationSchema $target)
     {
         return $this->installUninstallData($target, true);
     }
 
-    public function uninstallData(iDatabaseMigrationsSchema $target)
+    public function uninstallData(iDatabaseMigrationSchema $target)
     {
         return $this->installUninstallData($target, false);
     }
 
-    protected function installUninstallData(iDatabaseMigrationsSchema $target, $install = true)
+    protected function installUninstallData(iDatabaseMigrationSchema $target, $install = true)
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -432,8 +432,8 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $this->dbc->beginTransaction();
 
         try {
-            $action = ($install ? iDatabaseMigrationsSchema::ACTION_DATA_INSTALL :
-                iDatabaseMigrationsSchema::ACTION_DATA_UNINSTALL);
+            $action = ($install ? iDatabaseMigrationSchema::ACTION_DATA_INSTALL :
+                iDatabaseMigrationSchema::ACTION_DATA_UNINSTALL);
 
             // execute before
             $target->beforeExecute($this->dbc, $action);
@@ -459,7 +459,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function migrateSchema(iDatabaseMigrationsSchema $target, $to_custom_schema_version = null)
+    public function migrateSchema(iDatabaseMigrationSchema $target, $to_custom_schema_version = null)
     {
         $to_custom_schema_version = isset($to_custom_schema_version) ? (int)$to_custom_schema_version : null;
 
@@ -503,8 +503,8 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $this->info('Migrating schema ' . ($is_migrate_up ? 'UP' : 'DOWN') .
             ' (' . $schema_identifier . ') from version: ' . $from . ' to version: ' . $to);
 
-        $action = ($is_migrate_up ? iDatabaseMigrationsSchema::ACTION_MIGRATE_UP :
-            iDatabaseMigrationsSchema::ACTION_MIGRATE_DOWN);
+        $action = ($is_migrate_up ? iDatabaseMigrationSchema::ACTION_MIGRATE_UP :
+            iDatabaseMigrationSchema::ACTION_MIGRATE_DOWN);
 
         // execute before
         $target->beforeExecute($this->dbc, $action);

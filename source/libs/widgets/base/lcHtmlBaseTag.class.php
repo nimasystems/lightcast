@@ -237,6 +237,9 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this;
     }
 
+    /**
+     * @return string
+     */
     public function toString()
     {
         return $this->asHtml();

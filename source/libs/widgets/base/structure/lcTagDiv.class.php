@@ -32,6 +32,9 @@ class lcTagDiv extends lcHtmlTag
         $this->setContent($content);
     }
 
+    /**
+     * @return lcTagDiv
+     */
     public static function create()
     {
         return new lcTagDiv();

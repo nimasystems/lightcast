@@ -22,7 +22,7 @@
 
  */
 
-class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions, iSupportsDatabaseMigrations
+class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
     const STARTUP_TYPE_MANUAL = 'manual';
@@ -406,16 +406,11 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
-     * @return iDatabaseMigrationsSchema
+     * @return iDatabaseMigrationSchema|null
      */
-    public function getDatabaseMigrationsSchema()
+    protected function getDefaultDbMigrationSchemaInstance()
     {
-        return $this->getDefaultDbMigrationsSchemaInstance();
-    }
-
-    private function getDefaultDbMigrationsSchemaInstance()
-    {
-        $class_name = lcInflector::camelize($this->name . '_plugin_database_migrations_schema');
+        $class_name = lcInflector::camelize($this->name . '_package_database_migration_schema');
 
         $obj = null;
 
@@ -430,7 +425,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         if (class_exists($class_name)) {
             $obj = new $class_name();
 
-            if ($obj instanceof iDatabaseMigrationsSchema) {
+            if ($obj instanceof iDatabaseMigrationSchema) {
 
                 if ($obj instanceof lcSysObj) {
                     $obj->setContextName($this->getName());

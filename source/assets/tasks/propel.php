@@ -55,6 +55,8 @@ Possible commands:
 
 - insert-sql - builds and inserts the project\'s sql data into the database
 
+- build-sql - builds the project\'s sql data 
+
 - reverse - creates a SCHEMA file from a live database
 
 	OPTIONS:
@@ -117,6 +119,10 @@ EOD;
             }
             case 'insert-sql' : {
                 $ret = $this->propelInsertSql();
+                break;
+            }
+            case 'build-sql' : {
+                $ret = $this->propelBuildSql();
                 break;
             }
             case 'reverse' : {
@@ -1105,6 +1111,12 @@ EOD;
         return $this->phingExecute('create-db');
     }
 
+    private function propelBuildSql()
+    {
+        $this->propelInitSchemas();
+        return $this->phingExecute('build-sql');
+    }
+
     private function propelInsertSql()
     {
         $this->propelInitSchemas();
@@ -1274,6 +1286,10 @@ EOD;
 
         $build_properties_filename = $wd . 'build.properties';
 
+        if (DO_DEBUG) {
+            echo print_r($build_properties_contents, true);
+        }
+
         if (!@file_put_contents($build_properties_filename, $build_properties_str)) {
             throw new lcIOException('Could not copy the generated build.properties file: ' . $build_properties_filename);
         }
@@ -1319,6 +1335,10 @@ EOD;
         $args[] = $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'build.xml';
 
         $args[] = $cmd;
+
+        if ($this->configuration->isDebugging()) {
+            echo print_r($args, true);
+        }
 
         // set the database name manually
         if (!$db_conf['propel.project']) {

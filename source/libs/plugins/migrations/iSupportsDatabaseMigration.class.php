@@ -23,10 +23,10 @@
 
 */
 
-interface iSupportsDatabaseMigrations
+interface iSupportsDatabaseMigration
 {
     /**
-     * @return iDatabaseMigrationsSchema
+     * @return iDatabaseMigrationSchema
      */
-    public function getDatabaseMigrationsSchema();
+    public function getDatabaseMigrationSchema();
 }

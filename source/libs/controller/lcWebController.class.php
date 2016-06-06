@@ -111,7 +111,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     protected function addJavascriptCode($code, $identifier = null)
     {
         $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_javascript_code[$identifier] = $code;
+        $this->required_javascript_code[$identifier] = (is_array($code) ? implode("\n", $code) : $code);
     }
 
     public function getRequiredJavascriptIncludes()
@@ -268,7 +268,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return $content;
         }
 
-        if ($view instanceof lcHtmlTemplateView) {
+        if ($view instanceof lcHTMLTemplateView) {
             $controllers = $view->getControllerActionsToDecorate();
             $fragments = $view->getFragmentsToDecorate();
 
