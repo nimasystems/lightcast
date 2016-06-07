@@ -59,27 +59,47 @@ abstract class lcHtmlBaseTag implements iAsHTML
         //
     }
 
+    /**
+     * @param lcHtmlBaseTag $widget
+     * @return lcHtmlBaseTag
+     */
     public function useWidget(lcHtmlBaseTag $widget)
     {
         $this->parent_widget = $widget;
         return $widget;
     }
 
+    /**
+     * @return lcHtmlBaseTag
+     */
     public function endUse()
     {
         return $this->parent_widget;
     }
 
+    /**
+     * @return bool
+     */
     public function getIsClosed()
     {
         return $this->is_closed;
     }
 
+    /**
+     * @param $name
+     * @param null $value
+     * @return lcHtmlBaseTag
+     */
     public function attr($name, $value = null)
     {
         return $this->setAttribute($name, $value);
     }
 
+    /**
+     * @param $name
+     * @param null $value
+     * @return lcHtmlBaseTag
+     */
     public function setAttribute($name, $value = null)
     {
         if (!isset($value)) {
@@ -90,6 +110,11 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this;
     }
 
+    /**
+     * @param lcHtmlBaseTag $child
+     * @param null $tag
+     * @return lcHtmlBaseTag
+     */
     public function addChild(lcHtmlBaseTag $child, $tag = null)
     {
         $tag = $tag ? $tag : 'gen_' . lcStrings::randomString(10, true);
@@ -97,18 +122,29 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return $this;
     }
 
+    /**
+     * @param $tag
+     * @return lcHtmlBaseTag
+     */
     public function removeChild($tag)
     {
         unset($this->children[$tag]);
         return $this;
     }
 
+    /**
+     * @return lcHtmlBaseTag
+     */
     public function removeChildren()
     {
         $this->children = null;
         return $this;
     }
 
+    /**
+     * @param bool $compiled
+     * @return lcHtmlBaseTag[]|null|string
+     */
     public function getChildren($compiled = false)
     {
         if (!$compiled) {
@@ -128,11 +164,19 @@ abstract class lcHtmlBaseTag implements iAsHTML
         }
     }
 
+    /**
+     * @param $tag
+     * @return lcHtmlBaseTag|null
+     */
     public function getChild($tag)
     {
         return (isset($this->children[$tag]) ? $this->children[$tag] : null);
     }
 
+    /**
+     * @param $name
+     * @return lcHtmlBaseTag
+     */
     public function removeAttribute($name)
     {
         $this->attributes->remove($name);
@@ -175,22 +219,24 @@ abstract class lcHtmlBaseTag implements iAsHTML
         return ($this->content ? $this->content : $this->getChildren(true));
     }
 
+    /**
+     * @param array|string|lcHtmlBaseTag $fields
+     * @return lcHtmlBaseTag
+     * @throws lcInvalidArgumentException
+     */
     public function append($fields)
     {
-        $content = $this->getContent();
-
         if (is_array($fields)) {
             foreach ($fields as $data) {
-                if ($data) {
-                    $content .= "\n" . $data;
-                }
+                $this->append($data);
                 unset($data);
             }
+        } elseif ($fields instanceof lcHtmlBaseTag) {
+            $this->addChild($fields);
         } elseif ($fields) {
-            $content .= "\n" . $fields;
+            $this->setContent($this->getContent() . $fields);
         }
 
-        $this->setContent($content);
         return $this;
     }
 

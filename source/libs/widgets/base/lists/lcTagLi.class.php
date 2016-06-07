@@ -32,6 +32,9 @@ class lcTagLi extends lcHtmlTag
         $this->setContent($content);
     }
 
+    /**
+     * @return lcTagLi
+     */
     public static function create()
     {
         return new lcTagLi();
