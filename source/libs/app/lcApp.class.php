@@ -21,6 +21,13 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * Class lcApp
+ * @method lcPluginManager getPluginManager
+ * @method lcController getController
+ * @method lcI18n getI18n
+ * @method lcLogger getLogger
+ */
 class lcApp extends lcObj
 {
     const FRAMEWORK_CACHE_FILENAME = 'source/assets/misc/autoload/autoload.php';
@@ -39,7 +46,7 @@ class lcApp extends lcObj
     protected $delegate;
 
     /**
-     * @var lcProjectConfiguration, lcApplicationConfiguration
+     * @var lcProjectConfiguration|lcApplicationConfiguration
      */
     protected $configuration;
 
@@ -416,6 +423,7 @@ class lcApp extends lcObj
     {
         $fname = ROOT . DS . self::FRAMEWORK_CACHE_FILENAME;
 
+        /** @noinspection PhpIncludeInspection */
         require_once(ROOT . DS . 'source/libs/autoload/lcAutoloadCacheTool.class.php');
 
         $dirs = array(
@@ -822,6 +830,7 @@ class lcApp extends lcObj
 
                 // register into local class cache
                 if ($local_cache_manager && ($obj instanceof iCacheable)) {
+                    /** @noinspection PhpParamsInspection */
                     $local_cache_manager->registerCacheableObject($obj, self::LOADERS_OBJECT_CACHE_PREFIX . $loader);
                 }
 
@@ -1290,6 +1299,7 @@ class lcApp extends lcObj
             return $obj;
         }
 
+        /** @noinspection PhpVoidFunctionResultUsedInspection */
         return parent::__call($method, $params);
     }
 
