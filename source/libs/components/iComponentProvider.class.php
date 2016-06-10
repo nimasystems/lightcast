@@ -26,7 +26,7 @@
 interface iComponentProvider
 {
     /**
-     * @return lcComponent[]
+     * @return array
      */
     public function getControllerComponents();
 }

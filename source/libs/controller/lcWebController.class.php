@@ -96,19 +96,19 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return 'anon_' . $this->getControllerName() . '/' . $this->getActionName() . '_' . lcStrings::randomString(15);
     }
 
-    protected function addJavascriptInclude($location, $identifier = null)
+    public function addJavascriptInclude($location, $identifier = null)
     {
         $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
         $this->required_js_includes[$identifier] = $location;
     }
 
-    protected function addCssInclude($location, $identifier = null)
+    public function addCssInclude($location, $identifier = null)
     {
         $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
         $this->required_css_includes[$identifier] = $location;
     }
 
-    protected function addJavascriptCode($code, $identifier = null)
+    public function addJavascriptCode($code, $identifier = null)
     {
         $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
         $this->required_javascript_code[$identifier] = (is_array($code) ? implode("\n", $code) : $code);
