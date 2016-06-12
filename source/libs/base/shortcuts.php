@@ -39,7 +39,7 @@ define('L_TIME_YEAR', 32140800);
  */
 function __($string, $context_type = null, $context_name = null)
 {
-    return lcApp::translateInContext($string, $context_type, $context_name);
+    return lcApp::getInstance()->translateInContext($string, $context_type, $context_name);
 }
 
 function e($param, $return = false)

@@ -102,6 +102,11 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->validators = array();
     }
 
+    public function initialize()
+    {
+        //
+    }
+
     public function getIsUserControl()
     {
         return true;

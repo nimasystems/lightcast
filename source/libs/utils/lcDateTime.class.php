@@ -165,4 +165,147 @@ class lcDateTime
         );
         return $obj;
     }
+
+    public static function convertPhpDateToJsFormat($datetime_format)
+    {
+        return trim(preg_replace_callback("/\\(.?)/", function ($y) {
+            return self::convertPhpDatePartToMomentjsFormat($y) . ' ';
+        }, $datetime_format));
+    }
+
+    public static function convertStrftimeToJsFormat($datetime_format)
+    {
+        return trim(preg_replace_callback("/%(.?)/", function ($y) {
+            return self::convertStrtftimePartToMomentjsFormat($y);
+        }, $datetime_format));
+    }
+
+    private function convertPhpDatePartToMomentjsFormat($part)
+    {
+        $part = is_array($part) ? (count($part) ? $part[0] : null) : $part;
+
+        if (!$part) {
+            return null;
+        }
+
+        switch ($part) {
+            case "D":
+                return "ddd";
+            case "l":
+                return "dddd";
+            case "M":
+                return "MMM";
+            case "F":
+                return "MMMM";
+            case "j":
+                return "D";
+            case "m":
+                return "MM";
+            case "A":
+                return "A";
+            case "a":
+                return "a";
+            case "s":
+                return "ss";
+            case "i":
+                return "mm";
+            case "H":
+                return "HH";
+            case "g":
+                return "h";
+            case "h":
+                return "hh";
+            case "w":
+                return "d";
+            case "W":
+                return "ww";
+            case "y":
+                return "YY";
+            case "o":
+            case "Y":
+                return "YYYY";
+            case "O":
+                return "ZZ";
+            case "z":
+                return "DDD";
+            case "d":
+                return "DD";
+            case "n":
+                return "M";
+            case "G":
+                return "H";
+            case "e":
+                return "zz";
+            default:
+                return null;
+        }
+    }
+
+    private static function convertStrtftimePartToMomentjsFormat($part)
+    {
+        $part = is_array($part) ? (count($part) ? $part[0] : null) : $part;
+
+        if (!$part) {
+            return null;
+        }
+
+        switch ($part) {
+            case "%a":
+                return "ddd";
+            case "%A":
+                return "dddd";
+            case "%h":
+            case "%b":
+                return "MMM";
+            case "%B":
+                return "MMMM";
+            case "%c":
+                return "LLLL";
+            case "%d":
+                return "D";
+            case "%j":
+                return "DDDD";
+            case "%e":
+                return "Do";
+            case "%m":
+                return "MM";
+            case "%p":
+                return "A";
+            case "%P":
+                return "a";
+            case "%S":
+                return "ss";
+            case "%M":
+                return "mm";
+            case "%H":
+                return "HH";
+            case "%I":
+                return "hh";
+            case "%w":
+                return "d";
+            case "%W":
+            case "%U":
+                return "ww";
+            case '%x':
+                //return 'YYYY-MM-DD';
+                return "LL";
+            case "%X":
+                //return 'HH:mm:ss';
+                return "LT";
+            case "%g":
+            case "%y":
+                return "YY";
+            case "%G":
+            case "%Y":
+                return "YYYY";
+            case "%z":
+                return "ZZ";
+            case "%Z":
+                return "z";
+            case "%f":
+                return "SSS";
+            default:
+                return null;
+        }
+    }
 }
