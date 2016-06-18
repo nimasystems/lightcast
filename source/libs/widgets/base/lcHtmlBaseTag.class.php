@@ -23,7 +23,7 @@
 
 */
 
-abstract class lcHtmlBaseTag implements iAsHTML
+abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
 {
     protected $parent_widget;
 
@@ -54,14 +54,30 @@ abstract class lcHtmlBaseTag implements iAsHTML
         //
     }
 
-    public function __destruct()
+    public function __set($property, $value = null)
     {
-        //
+        $this->attr($property, $value);
+    }
+
+    public function __get($property)
+    {
+        return $this->attr($property);
+    }
+
+    public function __call($method, array $params = null)
+    {
+        if (lcStrings::startsWith($method, 'set') && (is_string($params) || is_numeric($params))) {
+            $tmp = lcInflector::controllerize(substr($method, 3, strlen($method)));
+            $this->attr($tmp, $params);
+            return;
+        }
+
+        parent::__call($method, $params);
     }
 
     /**
      * @param lcHtmlBaseTag $widget
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function useWidget(lcHtmlBaseTag $widget)
     {
@@ -70,7 +86,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
     }
 
     /**
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function endUse()
     {
@@ -88,7 +104,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
     /**
      * @param $name
      * @param null $value
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function attr($name, $value = null)
     {
@@ -98,7 +114,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
     /**
      * @param $name
      * @param null $value
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function setAttribute($name, $value = null)
     {
@@ -113,7 +129,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
     /**
      * @param lcHtmlBaseTag $child
      * @param null $tag
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function addChild(lcHtmlBaseTag $child, $tag = null)
     {
@@ -124,7 +140,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
 
     /**
      * @param $tag
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function removeChild($tag)
     {
@@ -133,7 +149,7 @@ abstract class lcHtmlBaseTag implements iAsHTML
     }
 
     /**
-     * @return lcHtmlBaseTag
+     * @return $this
      */
     public function removeChildren()
     {
@@ -207,11 +223,6 @@ abstract class lcHtmlBaseTag implements iAsHTML
     public function getName()
     {
         return $this->tagname;
-    }
-
-    public function __get($name)
-    {
-        return $this->attributes->get($name);
     }
 
     public function getContent()

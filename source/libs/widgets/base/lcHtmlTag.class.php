@@ -42,6 +42,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->classes;
     }
 
+    /**
+     * @param $class_name
+     * @return lcHtmlTag
+     */
     public function addClass($class_name)
     {
         $this->classes[$class_name] = $class_name;
@@ -49,6 +53,11 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this;
     }
 
+    /**
+     * @param $name
+     * @param null $value
+     * @return lcHtmlTag
+     */
     public function setAttribute($name, $value = null)
     {
         if ($name == 'class') {
@@ -59,6 +68,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this;
     }
 
+    /**
+     * @param null $value
+     * @return lcHtmlTag
+     */
     public function setClass($value = null)
     {
         if ($value) {

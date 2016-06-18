@@ -117,6 +117,12 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $this->params->__set($name, $value);
     }
 
+    public function setParams(array $params = null)
+    {
+        $this->params->setParams($params);
+        return $this;
+    }
+
     /*
      * Keep public for PHP 5.3 compatibility
      */

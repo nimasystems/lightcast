@@ -41,6 +41,9 @@ class lcTagSelect extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    /**
+     * @return lcTagSelect
+     */
     public static function create()
     {
         return new lcTagSelect();
@@ -50,6 +53,15 @@ class lcTagSelect extends lcHtmlTag
     {
         $this->setAttribute('name', $value);
         return $this;
+    }
+
+    /**
+     * @param string $placeholder
+     * @return $this
+     */
+    public function setPlaceholder($placeholder = null)
+    {
+        return $this->attr('placeholder', $placeholder);
     }
 
     /*
@@ -90,6 +102,42 @@ class lcTagSelect extends lcHtmlTag
         return array('name', 'size', 'multiply', 'disabled', 'tabindex');
     }
 
+    /**
+     * @param array $options
+     * @param string $key_identifier
+     * @param string $value_identifier
+     * @return $this
+     * @throws lcInvalidArgumentException
+     */
+    public function setOptions(array $options, $key_identifier = 'key', $value_identifier = 'value')
+    {
+        foreach ($options as $option) {
+
+            if ($option instanceof lcTagOption ||
+                $option instanceof lcOptGroup
+            ) {
+                $this->addOption($option);
+            } elseif (is_array($option)) {
+                if (isset($option[$key_identifier]) &&
+                    isset($option[$value_identifier])
+                ) {
+                    $this->addOption(lcTagOption::create()
+                        ->setValue($option[$value_identifier])
+                        ->setContent($option[$key_identifier]));
+                }
+            }
+
+            unset($option);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param lcTagOption|lcOptGroup $option
+     * @return $this
+     * @throws lcInvalidArgumentException
+     */
     public function addOption($option)
     {
         if ((!$option instanceof lcTagOption) && (!$option instanceof lcOptGroup)) {

@@ -100,4 +100,23 @@ abstract class lcBasePropelObject extends BaseObject
     {
         return $this->translate($t);
     }
+
+    public function getVirtualColumn($name)
+    {
+        // no exceptions at this point
+        // overriden for this purpose
+        return (isset($this->virtualColumns[$name]) ? $this->virtualColumns[$name] : null);
+    }
+
+    public function __call($name, $params)
+    {
+        if (preg_match('/set(\w+)/', $name, $matches)) {
+            $virtualColumn = $matches[1];
+            $value = isset($params[0]) ? $params[0] : true;
+
+            return $this->setVirtualColumn($virtualColumn, $value);
+        } else {
+            return parent::__call($name, $params);
+        }
+    }
 }
