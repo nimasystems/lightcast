@@ -119,4 +119,24 @@ abstract class lcBasePropelObject extends BaseObject
             return parent::__call($name, $params);
         }
     }
+
+    protected function logError($msg)
+    {
+        return $this->log($msg, Propel::LOG_ERR);
+    }
+
+    protected function logInfo($msg)
+    {
+        return $this->log($msg, Propel::LOG_INFO);
+    }
+
+    protected function logWarn($msg)
+    {
+        return $this->log($msg, Propel::LOG_WARNING);
+    }
+
+    protected function logDebug($msg)
+    {
+        return $this->log($msg, Propel::LOG_DEBUG);
+    }
 }
