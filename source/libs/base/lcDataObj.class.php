@@ -21,8 +21,11 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcDataObj extends lcObj implements ArrayAccess
+class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
 {
+    /**
+     * @var array
+     */
     protected $data;
 
     public function __call($method, array $params = null)
@@ -50,25 +53,39 @@ class lcDataObj extends lcObj implements ArrayAccess
         }
 
         parent::__call($method, $params);
+
         return true;
+    }
+
+    public function __construct(array $data = null)
+    {
+        parent::__construct();
+
+        $this->setData($data);
     }
 
     /**
      * @param mixed $data
+     * @param null $value
      * @return lcDataObj
      */
-    public function setData($data)
+    public function setData($data = null, $value = null)
     {
-        $this->data = $data;
+        if (!$data || is_array($data)) {
+            $this->data = $data;
+        } else {
+            $this->data[$data] = $value;
+        }
         return $this;
     }
 
     /**
+     * @param null $key
      * @return mixed
      */
-    public function getData()
+    public function getData($key = null)
     {
-        return $this->data;
+        return ($key ? (isset($this->data[$key]) ? $this->data[$key] : null) : $this->data);
     }
 
     /**
@@ -131,5 +148,17 @@ class lcDataObj extends lcObj implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->data[$offset]);
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    function jsonSerialize()
+    {
+        return (array)$this->getData();
     }
 }

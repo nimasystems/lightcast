@@ -22,13 +22,15 @@
 
  */
 
-class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
+class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, iCacheable
 {
     protected $model_paths = array();
     protected $registered_models = array();
     private $used_models = array();
 
     private $models_gen_dir;
+
+    protected $db_select_column_mappings;
 
     public function initialize()
     {
@@ -221,5 +223,65 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager
     public function getUsedModels()
     {
         return $this->used_models;
+    }
+
+    public function getDbSelectColumnMappings()
+    {
+        if (empty($this->db_select_column_mappings)) {
+
+            $plcs = $this->plugin_manager->getPluginConfigurations();
+
+            $all = array();
+
+            foreach ($plcs as $plc) {
+                if ($plc instanceof iProvidesDbSelectColumnMappings) {
+                    $selcols = $plc->getDbQuerySelectColumns();
+
+                    if ($selcols && is_array($selcols)) {
+                        foreach ($selcols as $package_identifier => $queries) {
+
+                            foreach ($queries as $query_identifier => $config) {
+                                $tmp = isset($all[$package_identifier][$query_identifier]) ?
+                                    (array)$all[$package_identifier][$query_identifier] : array();
+
+                                $tmp = array_merge($tmp, $config);
+
+                                $all[$package_identifier][$query_identifier] = $tmp;
+
+                                unset($query_identifier, $config, $tmp);
+                            }
+
+                            unset($package_identifier, $query_identifier);
+                        }
+                    }
+                }
+
+                unset($plc);
+            }
+
+            $this->db_select_column_mappings = $all;
+        }
+
+        return $this->db_select_column_mappings;
+    }
+
+    public function getQuerySelectColumns($container_identifier, $query_identifier)
+    {
+        $mappings = $this->getDbSelectColumnMappings();
+        return (isset($mappings[$container_identifier][$query_identifier]) ? $mappings[$container_identifier][$query_identifier] : null);
+    }
+
+    public function writeClassCache()
+    {
+        $cached_data = array(
+            'db_select_column_mappings' => $this->db_select_column_mappings
+        );
+
+        return $cached_data;
+    }
+
+    public function readClassCache(array $cached_data)
+    {
+        $this->db_select_column_mappings = isset($cached_data['db_select_column_mappings']) ? $cached_data['db_select_column_mappings'] : null;
     }
 }

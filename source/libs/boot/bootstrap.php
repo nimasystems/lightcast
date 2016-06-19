@@ -125,6 +125,7 @@ require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iSupportsVersion
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'iSupportsAutoload.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModels.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbViews.class.php');
+require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iProvidesDbSelectColumnMappings.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'view' . DS . 'filters' . DS . 'iViewFilterProvider.class.php');
 require(ROOT . DS . 'source' . DS . 'libs' . DS . 'components' . DS . 'iSupportsComponentOperations.class.php');

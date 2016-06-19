@@ -27,6 +27,7 @@
  * @method lcController getController
  * @method lcI18n getI18n
  * @method lcLogger getLogger
+ * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj
 {
@@ -618,6 +619,8 @@ class lcApp extends lcObj
         if ($obj->getHasInitialized()) {
             return;
         }
+
+        $obj->setPluginManager($this->getPluginManager());
 
         $obj->initialize();
 
