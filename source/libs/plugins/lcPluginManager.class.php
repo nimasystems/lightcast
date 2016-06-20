@@ -954,7 +954,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return;
         }
 
+        $current_app_name = $this->configuration->getApplicationName();
+
         foreach ($plugin_routes as $name => $details) {
+            $apps = isset($details['apps']) ? (array)$details['apps'] : null;
             $requirements = isset($details['requirements']) ? (array)$details['requirements'] : null;
             $url = isset($details['url']) ? (string)$details['url'] : null;
             $params = isset($details['params']) ? (array)$details['params'] : null;
@@ -963,6 +966,14 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             if (!$url) {
                 assert(false);
                 continue;
+            }
+
+            if ($apps) {
+                $apps = is_array($apps) ? $apps : array($apps);
+
+                if ($apps && !in_array($current_app_name, $apps)) {
+                    continue;
+                }
             }
 
             $route = new lcNamedRoute();
@@ -974,7 +985,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
             $router->prependRoute($route);
 
-            unset($name, $details, $route, $options, $params, $requirements, $url);
+            unset($name, $details, $route, $options, $params, $requirements, $url, $apps);
         }
     }
 
