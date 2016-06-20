@@ -106,7 +106,7 @@ class lcEvent extends lcObj implements ArrayAccess
 
     public function offsetGet($offset)
     {
-        return $this->params[$offset];
+        return (isset($this->params[$offset]) ? $this->params[$offset] : null);
     }
 
     public function offsetSet($offset, $value)

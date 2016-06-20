@@ -187,9 +187,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
     public function findMatchingRoute($url)
     {
-        $res = $this->getRouteThatMatchesUrl($url);
-
-        return $res;
+        return $this->getRouteThatMatchesUrl($url);
     }
 
     protected function getRouteThatMatchesUrl($url)
