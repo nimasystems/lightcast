@@ -207,6 +207,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         try {
             // get an instance of the controller first
+            /** @var lcWebController $controller_instance */
             $controller_instance = $this->getControllerInstance($module);
 
             if (!$controller_instance) {

@@ -35,6 +35,9 @@ class lcTagLink extends lcHtmlTag
         $this->setMedia($media);
     }
 
+    /**
+     * @return lcTagLink
+     */
     public static function create()
     {
         return new lcTagLink();

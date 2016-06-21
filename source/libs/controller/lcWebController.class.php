@@ -688,9 +688,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->title;
     }
 
-    protected function setTitle($title)
+    public function setTitle($title)
     {
         $this->title = $title;
+        return $this;
     }
 
     public function getDescription()
@@ -698,9 +699,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->description;
     }
 
-    protected function setDescription($description)
+    public function setDescription($description)
     {
         $this->description = $description;
+        return $this;
     }
 
     public function getKeywords()
@@ -708,8 +710,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->keywords;
     }
 
-    protected function setKeywords($keywords)
+    public function setKeywords($keywords)
     {
         $this->keywords = $keywords;
+        return $this;
     }
 }

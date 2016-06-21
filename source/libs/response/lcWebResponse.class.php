@@ -410,7 +410,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->event_dispatcher->notify(
             new lcEvent('response.will_send_response', $this, array()));
 
-        if ($this->content_should_be_processed) {
+        if ($this->content_should_be_processed && !$this->request->isAjax()) {
             // set html customizations
             if ($this->content_type == 'text/html') {
                 $content = str_replace("\n", self::TR_MULTILINE_DETECT_REP, $content);
@@ -705,6 +705,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // custom body end
         $html_body_custom = $this->html_body_custom;
 
+        // TODO: the only reason that the javascripts do not get added to ajax calls is
+        // that there is no <body> tag usually in there.. this must be fixed!
+
         if (isset($html_body_custom['end'])) {
             $content = preg_replace("/\<\/body\>/i", implode("\n", $html_body_custom['end']) . '</body>', $content);
         }
@@ -786,10 +789,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
             unset($start, $end);
         }
-
-        unset($html_body_custom);
-
-        unset($body_tags1);
 
         return $content;
     }
