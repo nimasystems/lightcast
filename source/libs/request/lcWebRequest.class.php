@@ -1196,6 +1196,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     protected function resetAllGlobals()
     {
+        /** @noinspection PhpUnusedLocalVariableInspection */
         $HTTP_POST_VARS = $HTTP_POST_FILES = $HTTP_GET_VARS = $HTTP_COOKIE_VARS = $HTTP_ENV_VARS = $HTTP_SERVER_VARS = null;
         $_POST = $_FILES = $_GET = null;
         //$_SERVER = $_ENV = $_REQUEST = null; we leave these for compatibility with 3rd party software

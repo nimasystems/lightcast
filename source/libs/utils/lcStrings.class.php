@@ -421,6 +421,10 @@ class lcStrings
      *     $string - The string to sanitize.
      *     $force_lowercase - Force the string to lowercase?
      *     $anal - If set to *true*, will remove all non-alphanumeric characters.
+     * @param $string
+     * @param bool $force_lowercase
+     * @param bool $anal
+     * @return mixed|string
      */
     public static function sanitize($string, $force_lowercase = true, $anal = false)
     {
@@ -877,10 +881,9 @@ class lcStrings
      * Gets a random word from the dictionary database, minimum len is 3, max is 12
      * @param int $minLen
      * @param int $maxLen
-     * @return  <string> $word
+     * @return mixed <string> $word
      * @internal param $ <int> $minLen
      * @internal param $ <int> $maxLen
-     *
      */
     public static function getWord($minLen = 3, $maxLen = 12)
     {

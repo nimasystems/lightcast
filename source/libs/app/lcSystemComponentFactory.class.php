@@ -719,9 +719,11 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     /**
      * @param $form_name
-     * @param null $context_type
-     * @param null $context_name
      * @return lcBaseActionForm
+     * @throws lcNotAvailableException
+     * @throws lcSystemException
+     * @internal param null $context_type
+     * @internal param null $context_name
      */
     public function getActionFormInstance($form_name)
     {
