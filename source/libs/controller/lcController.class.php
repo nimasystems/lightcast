@@ -662,7 +662,6 @@ abstract class lcController extends lcBaseController implements iDebuggable
             assert(isset($filter_results['filter']));
             assert(isset($filter_results['result']));
 
-            $filter = $filter_results['filter'];
             $result = $filter_results['result'];
 
             $allow_forward = isset($result['allow_forward']) ? (bool)$result['allow_forward'] : true;

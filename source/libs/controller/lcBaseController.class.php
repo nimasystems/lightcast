@@ -788,8 +788,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     /**
      * @param $plugin_name string - The plugin's name
+     * @param bool $optional
      * @return lcPlugin The plugin's instance
-     * @throws lcNotAvailableException
      */
     protected function getPlugin($plugin_name, $optional = false)
     {

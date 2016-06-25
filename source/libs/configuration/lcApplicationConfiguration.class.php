@@ -44,7 +44,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->project_configuration = $project_configuration ? $project_configuration : new lcProjectConfiguration();
         $this->project_configuration->setProjectDir($project_dir);
 
-        parent::__construct($project_dir, $project_configuration);
+        parent::__construct();
     }
 
     public function __call($func, array $args = null)

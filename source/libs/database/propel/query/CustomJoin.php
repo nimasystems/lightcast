@@ -27,9 +27,10 @@ class CustomJoin extends Join
      *
      * @param string $left The left column of the join condition
      *                         (may contain an alias name)
-     * @param string $right The right column of the join condition
-     *                         (may contain an alias name)
+     * @param $value
      * @param string $operator The comparison operator of the join condition, default Join::EQUAL
+     * @internal param string $right The right column of the join condition
+     *                         (may contain an alias name)
      */
     public function addRightValueCondition($left, $value, $operator = self::EQUAL)
     {

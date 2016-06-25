@@ -314,28 +314,6 @@ class tLightcastUpgrader extends lcTaskController
         return true;
     }
 
-    private function rmd($dirs)
-    {
-        $d = is_array($dirs) ? $dirs : array($dirs);
-
-        if (!$d) {
-            return false;
-        }
-
-        foreach ($d as $dir) {
-            $dir = $this->project_dir . DS . $dir;
-
-            if (!is_dir($dir)) {
-                $this->display('D (d) ' . $dir);
-                lcDirs::rmdirRecursive($dir);
-            }
-
-            unset($dir);
-        }
-
-        return true;
-    }
-
     private function updateTemplateDifferences()
     {
         // create dirs if missing
@@ -1046,6 +1024,7 @@ class tLightcastUpgrader extends lcTaskController
         }
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private function _lc14ApplyProjectTreeFixes($item_type, array $details)
     {
         $filename = $details['filename'];
@@ -1076,6 +1055,7 @@ class tLightcastUpgrader extends lcTaskController
         }
     }
 
+    /** @noinspection PhpUnusedPrivateMethodInspection */
     private function upgradeFromLC14()
     {
         $project_dir = $this->project_dir;
