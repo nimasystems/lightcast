@@ -1029,6 +1029,13 @@ class lcApp extends lcObj
         return $this->configuration->isDebugging();
     }
 
+    private $no_shutdown;
+
+    public function setNoShutdown($no_sh)
+    {
+        $this->no_shutdown = $no_sh;
+    }
+
     public function shutdown()
     {
         // protect against double calling this method!
@@ -1057,6 +1064,11 @@ class lcApp extends lcObj
                 if (DO_DEBUG) {
                     throw new lcSystemException('Error while notifying event dispatcher on shutdown: ' . $e->getMessage(), $e->getCode(), $e);
                 }
+            }
+
+            if ($this->no_shutdown) {
+                $this->initialized = false;
+                return;
             }
 
             // shutdown all loader objects as we created them
