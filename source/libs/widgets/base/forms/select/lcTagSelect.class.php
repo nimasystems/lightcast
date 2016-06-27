@@ -122,8 +122,8 @@ class lcTagSelect extends lcHtmlTag
                     isset($option[$value_identifier])
                 ) {
                     $this->addOption(lcTagOption::create()
-                        ->setValue($option[$value_identifier])
-                        ->setContent($option[$key_identifier]));
+                        ->setValue($option[$key_identifier])
+                        ->setContent($option[$value_identifier]));
                 }
             }
 
