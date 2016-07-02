@@ -39,6 +39,9 @@ class lcTagA extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
+    /**
+     * @return lcTagA
+     */
     public static function create()
     {
         return new lcTagA();
