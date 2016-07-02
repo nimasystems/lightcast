@@ -244,6 +244,12 @@ class lcFrontWebServiceController extends lcFrontWebController
         return $params;
     }
 
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    {
+        // final stop - we need to handle it as json
+        throw new lcControllerForwardException('Could not forward to controller action');
+    }
+
     private function extractRequestParams(lcRequest $request)
     {
         /** @var lcWebRequest $request */
