@@ -1308,6 +1308,11 @@ class lcApp extends lcObj
         return parent::__call($method, $params);
     }
 
+    public function getEventDispatcher()
+    {
+        return $this->event_dispatcher;
+    }
+
     public function getProfiler()
     {
         return $this->profiler;
