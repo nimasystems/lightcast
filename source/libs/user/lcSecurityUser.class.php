@@ -24,7 +24,7 @@
 abstract class lcSecurityUser extends lcUser implements iDebuggable
 {
     const NS_KEY = 'user_security';
-    const DEFAULT_TIMEOUT = 30;
+    const DEFAULT_TIMEOUT = 30; // in minutes
     /** @var array */
     protected $authentication_data;
     /** @var lcStorage */
