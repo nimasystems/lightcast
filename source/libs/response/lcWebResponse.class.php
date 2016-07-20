@@ -1213,9 +1213,15 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->javascript_code = array($tag => $code);
     }
 
-    public function getJavascriptCode()
+    public function getJavascriptCode($combined = true)
     {
-        return $this->javascript_code;
+        if ($combined) {
+            $jscode = is_array($this->javascript_code) ? implode("\n", array_filter(array_values($this->javascript_code))) : $this->javascript_code;
+            $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
+            return $jscode;
+        } else {
+            return $this->javascript_code;
+        }
     }
 
     public function addJavascriptCode($code, $tag = null)
