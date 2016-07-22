@@ -116,7 +116,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
      */
     public function offsetGet($offset)
     {
-        return $this->data[$offset];
+        return (isset($this->data[$offset]) ? $this->data[$offset] : null);
     }
 
     /**
