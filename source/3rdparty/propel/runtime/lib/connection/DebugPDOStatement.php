@@ -101,7 +101,7 @@ class DebugPDOStatement extends PDOStatement
         $debug = $this->pdo->getDebugSnapshot();
         $return = parent::execute($input_parameters);
 
-        $sql = $this->getExecutedQueryString($input_parameters?$input_parameters:array());
+        $sql = $this->getExecutedQueryString($input_parameters ? $input_parameters : array());
         $this->pdo->log($sql, null, __METHOD__, $debug);
         $this->pdo->setLastExecutedQuery($sql);
         $this->pdo->incrementQueryCount();
@@ -113,23 +113,23 @@ class DebugPDOStatement extends PDOStatement
      * Binds a value to a corresponding named or question mark placeholder in the SQL statement
      * that was use to prepare the statement. Returns a boolean value indicating success.
      *
-     * @param integer $pos   Parameter identifier (for determining what to replace in the query).
-     * @param mixed   $value The value to bind to the parameter.
-     * @param integer $type  Explicit data type for the parameter using the PDO::PARAM_* constants. Defaults to PDO::PARAM_STR.
+     * @param integer $pos Parameter identifier (for determining what to replace in the query).
+     * @param mixed $value The value to bind to the parameter.
+     * @param integer $type Explicit data type for the parameter using the PDO::PARAM_* constants. Defaults to PDO::PARAM_STR.
      *
      * @return boolean
      */
     public function bindValue($pos, $value, $type = PDO::PARAM_STR)
     {
-        $debug = $this->pdo->getDebugSnapshot();
-        $typestr = isset(self::$typeMap[$type]) ? self::$typeMap[$type] : '(default)';
+        //$debug = $this->pdo->getDebugSnapshot();
+        //$typestr = isset(self::$typeMap[$type]) ? self::$typeMap[$type] : '(default)';
         $return = parent::bindValue($pos, $value, $type);
-        $valuestr = $type == PDO::PARAM_LOB ? '[LOB value]' : var_export($value, true);
-        $msg = sprintf('Binding %s at position %s w/ PDO type %s', $valuestr, $pos, $typestr);
+        //$valuestr = $type == PDO::PARAM_LOB ? '[LOB value]' : ($length > 100 ? '[Large value]' : var_export($value, true));
+        //$msg = sprintf('Binding %s at position %s w/ PDO type %s', $valuestr, $pos, $typestr);
 
         $this->boundValues[$pos] = $value;
 
-        $this->pdo->log($msg, null, __METHOD__, $debug);
+        //$this->pdo->log($msg, null, __METHOD__, $debug);
 
         return $return;
     }
@@ -140,11 +140,11 @@ class DebugPDOStatement extends PDOStatement
      * as a reference and will only be evaluated at the time that PDOStatement::execute() is called.
      * Returns a boolean value indicating success.
      *
-     * @param integer $pos            Parameter identifier (for determining what to replace in the query).
-     * @param mixed   $value          The value to bind to the parameter.
-     * @param integer $type           Explicit data type for the parameter using the PDO::PARAM_* constants. Defaults to PDO::PARAM_STR.
-     * @param integer $length         Length of the data type. To indicate that a parameter is an OUT parameter from a stored procedure, you must explicitly set the length.
-     * @param mixed   $driver_options
+     * @param integer $pos Parameter identifier (for determining what to replace in the query).
+     * @param mixed $value The value to bind to the parameter.
+     * @param integer $type Explicit data type for the parameter using the PDO::PARAM_* constants. Defaults to PDO::PARAM_STR.
+     * @param integer $length Length of the data type. To indicate that a parameter is an OUT parameter from a stored procedure, you must explicitly set the length.
+     * @param mixed $driver_options
      *
      * @return boolean
      */
