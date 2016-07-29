@@ -61,6 +61,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      */
     protected $javascripts_end;
     protected $javascript_code;
+    protected $javascript_code_before;
+    protected $javascript_code_after;
     /**
      * @var array
      */
@@ -135,6 +137,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->css_at_end_forced = (bool)$this->configuration['view.stylesheets_at_end'];
         $this->javascripts_async = (bool)$this->configuration['view.javascripts_async'];
         $this->no_scripts = (bool)$this->configuration['view.no_scripts'];
+        $this->javascript_code_before = $this->configuration['view.javascript_code_before'];
+        $this->javascript_code_after = $this->configuration['view.javascript_code_after'];
 
         // dir
         $this->lang_dir = (string)$this->configuration['view.dir'];
@@ -663,12 +667,30 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             unset($event);
 
             if ($jscode) {
-                $this->html_body_custom['end'][] = lcTagScript::create()
-                    ->setContent($jscode)
-                    ->toString();
+
+                if (DO_DEBUG) {
+                    if (is_array($jscode)) {
+                        foreach ($jscode as $key => $code) {
+
+                            $jscode[$key] = '/** ' . $key . ' */' . "\n" . $code;
+
+                            unset($key, $code);
+                        }
+                    }
+                }
+
+                $jscode = is_array($jscode) ? implode("\n", array_filter(array_values($jscode))) : $jscode;
+                $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
+
+                if ($jscode) {
+                    $this->html_body_custom['end'][] = lcTagScript::create()
+                        ->setContent($this->javascript_code_before .
+                            $jscode .
+                            $this->javascript_code_after)
+                        ->toString();
+                }
             }
         }
-
 
         // rss feeds
         $rssfeeds = $this->rssfeeds;
@@ -709,7 +731,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // that there is no <body> tag usually in there.. this must be fixed!
 
         if (isset($html_body_custom['end'])) {
-            $content = preg_replace("/\<\/body\>/i", implode("\n", $html_body_custom['end']) . '</body>', $content);
+            $content = preg_replace("/\<\/body\>/i", "\n" . implode("\n", $html_body_custom['end']) . "\n" . '</body>', $content);
         }
 
         // head parts
@@ -1185,14 +1207,27 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    public function setJavascriptCode($code)
+    public function setJavascriptCode($code, $tag = null)
     {
-        $this->javascript_code = $code;
+        $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
+        $this->javascript_code = array($tag => $code);
     }
 
-    public function getJavascriptCode()
+    public function getJavascriptCode($combined = true)
     {
-        return $this->javascript_code;
+        if ($combined) {
+            $jscode = is_array($this->javascript_code) ? implode("\n", array_filter(array_values($this->javascript_code))) : $this->javascript_code;
+            $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
+            return $jscode;
+        } else {
+            return $this->javascript_code;
+        }
+    }
+
+    public function addJavascriptCode($code, $tag = null)
+    {
+        $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
+        $this->javascript_code[$tag] = $code;
     }
 
     /*
@@ -1405,6 +1440,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return null;
     }
 
+    /**
+     * @param $code
+     * @param null $tag
+     * @deprecated This is obsoleted by addJavascriptCode
+     */
     public function addBodyJavascript($code, $tag = null)
     {
         $this->customBodyHtml(null, $code, $tag, true);
