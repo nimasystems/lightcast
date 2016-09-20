@@ -835,6 +835,7 @@ EOD;
     private function getPluginModels($plugin_name, $plugin_path)
     {
         $plcfg = $this->getPluginConfig($plugin_name, $plugin_path);
+
         return ($plcfg && $plcfg instanceof iSupportsDbModels ? $plcfg->getDbModels() : null);
     }
 

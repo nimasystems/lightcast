@@ -89,6 +89,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
         }
 
+        $this->enabled_plugins = array_unique((array)$this->configuration->getEnabledPlugins());
+
+        $this->loadAutoloadPluginConfig();
+
         if ($this->should_load_plugins) {
             $this->initializeEnabledPlugins();
         }
@@ -100,6 +104,23 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->connect('router.load_configuration', $this, 'onRouterLoadConfiguration');
 
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.startup', $this));
+    }
+
+    protected function loadAutoloadPluginConfig()
+    {
+        $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
+
+        if ($this->configuration->isTargetingLC15()) {
+            // new autoload files
+            foreach ($available_plugins as $plugin_name => $plugin_details) {
+                $path = $plugin_details['path'];
+
+                // include and store the autoload configuration
+                $this->tryIncludePluginAutoloadClassMapFile($path, $plugin_name);
+
+                unset($plugin_name, $path, $plugin_details);
+            }
+        }
     }
 
     public function getPluginDatabaseMigrationSchema($plugin_name)
@@ -149,26 +170,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     protected function initializeEnabledPlugins()
     {
-        // init enabled plugins
-        $this->enabled_plugins = array_unique((array)$this->configuration->getEnabledPlugins());
-
-        if (!$this->system_component_factory) {
-            throw new lcNotAvailableException('System Component Factory not available');
-        }
-
         $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
-
-        if ($this->configuration->isTargetingLC15()) {
-            // new autoload files
-            foreach ($available_plugins as $plugin_name => $plugin_details) {
-                $path = $plugin_details['path'];
-
-                // include and store the autoload configuration
-                $this->tryIncludePluginAutoloadClassMapFile($path, $plugin_name);
-
-                unset($plugin_name, $path, $plugin_details);
-            }
-        }
 
         // walk all available plugins and include their configurations
         // they will reside live throughout the entire live of the application
@@ -337,13 +339,14 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $cls_names = array(
             lcInflector::camelize($plugin_name . '_plugin_configuration', false),
             lcInflector::camelize($plugin_name . '_config_configuration', false),
-            lcInflector::camelize($plugin_name . '_config', false)
+            lcInflector::camelize($plugin_name . '_config', false),
+            lcfirst(lcInflector::camelize($plugin_name . '_config', false))
         );
 
         // cache this so we don't need to call subcamelize several times
         $this->included_plugin_classes[$plugin_name] = $cls_names;
 
-        return $ret;
+        return $cls_names;
     }
 
     public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null)
@@ -679,11 +682,12 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $plugin_name = $plugin_object->getPluginName();
         $plugin_config = $plugin_object->getPluginConfiguration();
 
-        if (!($plugin_config instanceof iPluginRequirements)) {
-            return;
-        }
+        $requirements = ($plugin_object->getName() != 'core' ? array('core') : array());
 
-        $requirements = (array)$plugin_config->getRequiredPlugins();
+        if ($plugin_config instanceof iPluginRequirements) {
+            $requirements = array_merge($requirements,
+                (array)$plugin_config->getRequiredPlugins());
+        }
 
         if (!$requirements || !is_array($requirements)) {
             return;
