@@ -682,7 +682,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $plugin_name = $plugin_object->getPluginName();
         $plugin_config = $plugin_object->getPluginConfiguration();
 
-        $requirements = ($plugin_object->getName() != 'core' ? array('core') : array());
+        $requirements = array();
 
         if ($plugin_config instanceof iPluginRequirements) {
             $requirements = array_merge($requirements,
