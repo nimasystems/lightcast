@@ -342,6 +342,17 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             throw new lcInvalidRequestException('Invalid server environment');
         }
 
+        // fix broken HTTP_AUTHORIZATION for phpfcgi
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            if (isset($_SERVER['Authorization']) && (strlen($_SERVER['Authorization']) > 0)) {
+                list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['Authorization'], 6)));
+                if (strlen($_SERVER['PHP_AUTH_USER']) == 0 || strlen($_SERVER['PHP_AUTH_PW']) == 0) {
+                    unset($_SERVER['PHP_AUTH_USER']);
+                    unset($_SERVER['PHP_AUTH_PW']);
+                }
+            }
+        }
+
         // merge all
         $merged_env_vars = array_merge((array)$_SERVER, (array)$_ENV/*, (array)$_REQUEST* fixed in 1.4 - not valid to merge it here*/);
 
@@ -356,7 +367,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
         foreach ($merged_env_vars as $key => $val) {
             $this->env[$key] = $this->_env($key);
-
             unset($key, $val);
         }
     }
