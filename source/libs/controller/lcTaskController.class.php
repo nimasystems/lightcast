@@ -51,7 +51,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         // prefetch exceptions and display just the error message if in release mode
         if (!DO_DEBUG) {
             $event->setProcessed(true);
-            $this->consoleDisplay('Error: ' . $exception->getMessage(), false);
+            $this->displayException($exception);
             return true;
         }
 
@@ -118,6 +118,15 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $response->setExitCode($execute_status);
         $response->setContent($content);
         $response->sendResponse();
+    }
+
+    public function displayException(Exception $exception, $prefixed = true, $return = false)
+    {
+        $data = lcConsolePainter::formatColoredConsoleText($exception->getMessage(), 'red');
+        $data .= "\n\n";
+        $data .= lcConsolePainter::formatColoredConsoleText($exception->getTraceAsString(), 'yellow');
+        $data .= "\n\n";
+        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function displayError($data, $prefixed = true, $return = false)
