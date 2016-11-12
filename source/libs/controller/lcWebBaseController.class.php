@@ -46,6 +46,11 @@ abstract class lcWebBaseController extends lcController
         return $url;
     }
 
+    protected function renderJson($content)
+    {
+        $this->renderRaw(lcVm::json_encode($content, true), 'application/json');
+    }
+
     protected function renderRaw($content, $content_type = 'text/html', $decorated = false)
     {
         if (!$decorated) {
