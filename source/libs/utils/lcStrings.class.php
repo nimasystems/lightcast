@@ -28,6 +28,15 @@ class lcStrings
         return strstr($haystack, $needle);
     }
 
+    /**
+     * Check if a string is serialized
+     * @param string $string
+     */
+    public static function isSerialized($string)
+    {
+        return (@unserialize($string) !== false || $string == 'b:0;');
+    }
+
     public static function splitLocaleCode($locale)
     {
         $locale_code = null;
