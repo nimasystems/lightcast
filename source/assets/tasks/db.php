@@ -79,6 +79,8 @@ class tDb extends lcTaskController
 
                     $col_name = $row['Field'];
                     $type = strtolower($row['Type']);
+                    $can_be_null = $row['Null'] == 'YES';
+                    $default = $row['Default'];
 
                     if (strstr($type, 'varchar(') || strstr($type, 'char(') ||
                         strstr($type, 'text') || strstr($type, 'enum')
@@ -86,7 +88,10 @@ class tDb extends lcTaskController
                         $this->display('Converting table: ' . $table . ':' . $col_name);
 
                         $sql = 'ALTER TABLE `' . $table . '` CHANGE `' . $col_name . '` `' . $col_name . '` 
-                        ' . $type . ' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci';
+                        ' . $type .
+                            ' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci' .
+                            (!$can_be_null ? ' NOT NULL' : null) .
+                            ($default ? ' DEFAULT \'' . $default . '\'' : null);
 
                         try {
                             $db->exec($sql);
