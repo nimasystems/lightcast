@@ -423,6 +423,16 @@ class lcPropelConnection extends PropelPDO
      * SELECT statements are performed in a nonlocking fashion, but a possible earlier version of a row might be used. Thus, using this isolation level, such reads are not consistent. This is also called a “dirty read.” Otherwise, this isolation level works like READ COMMITTED.
     */
 
+    /**
+     * @param $query
+     * @param $cache_label
+     * @param null $namespace
+     * @param int $timeout
+     * @param bool $enable_cache
+     * @param bool $is_cached
+     * @return array|null
+     * @throws lcInvalidArgumentException
+     */
     public function cachedQueryRows($query, $cache_label, $namespace = null, $timeout = self::QUERY_CACHE_TIMEOUT_DEFAULT, $enable_cache = true, &$is_cached = false)
     {
         $query = (string)$query;
@@ -471,6 +481,7 @@ class lcPropelConnection extends PropelPDO
             return null;
         }
 
+        /** @var array $rows */
         $rows = $res->fetchAll(PDO::FETCH_ASSOC);
 
         if (!$rows || !is_array($rows)) {
