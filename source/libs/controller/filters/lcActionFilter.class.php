@@ -44,9 +44,16 @@ abstract class lcActionFilter extends lcSysObj
         $this->next = $filter;
     }
 
-    public function filterAction(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null)
+    public function filterAction(lcController $parent_controller, $controller_name, $action_name,
+                                 array $request_params = null, array $controller_context = null, array $skip_filter_categories = null)
     {
-        if ($this->getShouldApplyFilter()) {
+        $filter_category = $this->getFilterCategory();
+
+        if ($this->getShouldApplyFilter() &&
+            (!$filter_category ||
+                (null !== $skip_filter_categories && !in_array($filter_category, $skip_filter_categories)) ||
+                null === $skip_filter_categories)
+        ) {
             try {
                 // if a filter returns true it means it takes responsibility
                 // over the action and we stop further processing
@@ -69,7 +76,8 @@ abstract class lcActionFilter extends lcSysObj
 
         // process the next filter
         if ($this->next) {
-            return $this->next->filterAction($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
+            return $this->next->filterAction($parent_controller, $controller_name, $action_name,
+                $request_params, $controller_context, $skip_filter_categories);
         }
 
         // no filter has taken responsibility - take no further action

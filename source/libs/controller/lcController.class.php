@@ -630,7 +630,9 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
         // check action_filters to see if the controller requests different credentials
         // and no filter processing
-        if (!$this->shouldApplyActionFilters($action_name, (isset($action_params['type']) ? $action_params['type'] : null))) {
+        $skip_filter_categories = $this->shouldApplyActionFilters($action_name, (isset($action_params['type']) ? $action_params['type'] : null));
+
+        if (!$skip_filter_categories) {
             return false;
         }
 
@@ -656,7 +658,9 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $controller_instance->getContextName(),
             ($controller_instance->getParentPlugin() ? $controller_instance->getParentPlugin()->getPluginName() : null),
             $action_name,
-            $action_params);
+            $action_params,
+            is_array($skip_filter_categories) ? $skip_filter_categories : null
+        );
 
         if ($filter_results) {
             assert(isset($filter_results['filter']));
@@ -713,22 +717,25 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $ac = $action_filters[$action_name];
 
         if (!isset($ac['type']) || $ac['type'] == $action_type) {
-            $should_apply_filters = (!isset($ac['skip_filters']) || !$ac['skip_filters']);
-            return $should_apply_filters;
+            $should_filter = isset($ac['skip_filters']) ?
+                (is_array($ac['skip_filters']) && array_filter($ac['skip_filters']) ? array_filter($ac['skip_filters']) : true) : true;
+            return $should_filter;
         }
 
         return true;
     }
 
-    protected function executeControllerFilterChain($controller_name, $controller_filename, $controller_context_type, $controller_context_name, $controller_parent_plugin_name,
-                                                    $action_name, array $action_params = null)
+    protected function executeControllerFilterChain($controller_name, $controller_filename, $controller_context_type,
+                                                    $controller_context_name, $controller_parent_plugin_name,
+                                                    $action_name, array $action_params = null,
+                                                    array $skip_filter_categories = null)
     {
         $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, array(
             'controller_context_name' => $controller_context_name,
             'controller_context_type' => $controller_context_type,
             'controller_filename' => $controller_filename,
             'controller_parent_plugin' => $controller_parent_plugin_name
-        ));
+        ), $skip_filter_categories);
 
         return $filter_results;
     }
