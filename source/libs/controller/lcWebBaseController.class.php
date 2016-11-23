@@ -34,6 +34,8 @@ abstract class lcWebBaseController extends lcController
     /** @var lcWebResponse */
     protected $response;
 
+    private $last_redirect_url;
+
     public function generateUrl(array $params = null, $route = null, $absolute_url = false)
     {
         $router = $this->routing;
@@ -116,6 +118,8 @@ abstract class lcWebBaseController extends lcController
             throw new lcNotAvailableException('Response not available');
         }
 
+        $this->last_redirect_url = $url;
+
         $res = array(
             'http_code' => $http_code,
             'allow_redirect' => true,
@@ -142,7 +146,13 @@ abstract class lcWebBaseController extends lcController
             $url = isset($v['url']) ? (string)$v['url'] : $url;
         }
 
+        $this->last_redirect_url = $url;
         $this->response->redirect($url, $http_code);
+    }
+
+    public function getLastRedirectUrl()
+    {
+        return $this->last_redirect_url;
     }
 
     public function redirectIfNot($url, $condition, $http_code = 302)

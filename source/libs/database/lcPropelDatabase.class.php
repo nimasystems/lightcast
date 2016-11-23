@@ -24,7 +24,9 @@
 class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithCache
 {
     const PROPEL_CONNECTION_CLASS = 'lcPropelConnection';
+
     const DEFAULT_CHARSET = 'utf8';
+    const DEFAULT_COLLATION = 'utf8_general_ci';
 
     /** @var lcPropelConnection */
     protected $conn;
@@ -106,8 +108,12 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
             // IMPORTANT: SQL quote / escaping methods are HIGHLY affected by
             // this!
             $charset = isset($this->options['charset']) ? (string)$this->options['charset'] : self::DEFAULT_CHARSET;
+            $collation = isset($this->options['collation']) ? (string)$this->options['collation'] : self::DEFAULT_COLLATION;
 
-            $this->conn->exec('SET NAMES \'' . $this->conn->quoteTrimmed($charset) . '\'');
+            if ($charset) {
+                $this->conn->exec('SET NAMES ' . $this->conn->quoteTrimmed($charset) .
+                    ($collation ? ' COLLATE ' . $this->conn->quoteTrimmed($collation) : null));
+            }
 
             // initialize the connection with lightcast specific vars
             $this->conn->setEventDispatcher($this->event_dispatcher);

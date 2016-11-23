@@ -25,10 +25,18 @@
 
 class lcPDODatabase extends lcDatabase
 {
+    const DEFAULT_CHARSET = 'utf8';
+    const DEFAULT_COLLATION = 'utf8_general_ci';
+
+    protected $charset = self::DEFAULT_CHARSET;
+    protected $collation = self::DEFAULT_COLLATION;
+
+    /**
+     * @var PDO
+     */
     protected $conn;
 
     protected $driver;
-    protected $charset;
     protected $persistentc;
     protected $connection_url;
     protected $username;
@@ -42,6 +50,8 @@ class lcPDODatabase extends lcDatabase
         $url = isset($this->options['url']) ? (string)$this->options['url'] : null;
         $password = isset($this->options['password']) ? (string)$this->options['password'] : null;
         $user = isset($this->options['user']) ? (string)$this->options['user'] : null;
+        $charset = isset($this->options['charset']) ? (string)$this->options['charset'] : null;
+        $collation = isset($this->options['collation']) ? (string)$this->options['collation'] : null;
 
         if (!$url) {
             throw new lcConfigException('No database connection url defined');
@@ -54,6 +64,8 @@ class lcPDODatabase extends lcDatabase
         $this->setConnectionUrl($url);
         $this->setUsername($user);
         $this->setPassword($password);
+        $this->setCharset($charset);
+        $this->setCollation($collation);
     }
 
     public function shutdown()
@@ -101,6 +113,16 @@ class lcPDODatabase extends lcDatabase
     public function setCharset($charset)
     {
         $this->charset = $charset;
+    }
+
+    public function getCollation()
+    {
+        return $this->collation;
+    }
+
+    public function setCollation($collation)
+    {
+        $this->collation = $collation;
     }
 
     public function getPersistentConnectionsUsage()
@@ -159,6 +181,12 @@ class lcPDODatabase extends lcDatabase
             $pdo_class = 'PDO';
 
             $this->conn = new $pdo_class($this->connection_url, $this->username, $this->password, $options);
+
+            if ($this->charset) {
+                $this->conn->exec('SET NAMES ' . $this->charset .
+                    ($this->collation ? ' COLLATE ' . $this->collation : null));
+            }
+
         } catch (Exception $e) {
             throw new lcDatabaseException('PDO cannot connect to database: ' . $e->getMessage(), null, $e);
         }
