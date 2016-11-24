@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-abstract class lcController extends lcBaseController implements iDebuggable
+abstract class lcController extends lcBaseController
 {
     const TYPE_ACTION = 'action';
     const TYPE_PARTIAL = 'partial';
@@ -141,9 +141,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
             return null;
         }
 
-        $partial_view = $this->getPartialViewBasedOnParams($partial_url);
-
-        return $partial_view;
+        return $this->getPartialViewBasedOnParams($partial_url);
     }
 
     public function getPartialViewBasedOnParams($params /* dynamic - string or array */)
@@ -320,8 +318,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
 
     public function isTopController()
     {
-        $res = ($this->getTopController() === $this) ? false : true;
-        return $res;
+        return ($this->getTopController() === $this) ? false : true;
     }
 
     public function getTopController()
@@ -431,7 +428,8 @@ abstract class lcController extends lcBaseController implements iDebuggable
      * @deprecated The method is used by LC 1.4 projects
     */
 
-    public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller = null, $action_name, array $action_params = null)
+    public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller = null, $action_name,
+                                              array $action_params = null)
     {
         if (!$controller_instance || !$action_name) {
             throw new lcInvalidArgumentException('Invalid controller / action');
@@ -682,7 +680,8 @@ abstract class lcController extends lcBaseController implements iDebuggable
                 $this->info('Controller action denied by filter: Previous: ' .
                     $controller_name . '/' . $action_name . ' => New: ' .
                     ($credentials_module . '/' . $credentials_action) .
-                    ' (Type: ' . (isset($action_params['type']) ? $action_params['type'] : null) . '), Reason: ' . ($deny_reason ? $deny_reason : ' - none given - '));
+                    ' (Type: ' . (isset($action_params['type']) ? $action_params['type'] : null) . '), Reason: ' .
+                    ($deny_reason ? $deny_reason : ' - none given - '));
 
 
                 if ($credentials_module && $credentials_action) {
@@ -717,8 +716,17 @@ abstract class lcController extends lcBaseController implements iDebuggable
         $ac = $action_filters[$action_name];
 
         if (!isset($ac['type']) || $ac['type'] == $action_type) {
-            $should_filter = isset($ac['skip_filters']) ?
-                (is_array($ac['skip_filters']) && array_filter($ac['skip_filters']) ? array_filter($ac['skip_filters']) : true) : true;
+            $should_filter = true;
+
+            if (isset($ac['skip_filters'])) {
+                if (is_bool($ac['skip_filters'])) {
+                    $should_filter = !(bool)$ac['skip_filters'];
+                } elseif (is_array($ac['skip_filters'])) {
+                    $should_filter = array_filter($ac['skip_filters']);
+                    $should_filter = $should_filter ? $should_filter : true;
+                }
+            }
+
             return $should_filter;
         }
 
@@ -746,7 +754,8 @@ abstract class lcController extends lcBaseController implements iDebuggable
             throw new lcInvalidArgumentException('Invalid controller / action');
         }
 
-        //$this->info('Rendering action (' . $controller->getControllerName() . '/' . $action_name . ': ' . "\n\n" . print_r($action_params, true) . "\n\n");
+        //$this->info('Rendering action (' . $controller->getControllerName() . '/' .
+        // $action_name . ': ' . "\n\n" . print_r($action_params, true) . "\n\n");
 
         // set params
         $controller->setControllerStack($this->controller_stack);
@@ -872,9 +881,7 @@ abstract class lcController extends lcBaseController implements iDebuggable
             $render_result['content'] = $layout_content;
         }
 
-        $content = $render_result['content'];
-
-        return $content;
+        return $render_result['content'];
     }
 
     public function getDecoratorView()
