@@ -49,7 +49,7 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     protected $init_javascript;
 
-    /** @var lcCoreValidator|lcBaseActionFormValidator[] */
+    /** @var lcBaseActionFormValidator[] */
     protected $validators;
 
     protected $validation_rules;
@@ -621,7 +621,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     {
         $this->clearValidationFailures();
 
-        $validators = (array)$this->validators;
+        $validators = $this->validators;
 
         $is_valid = true;
         $validation_failures = array();
@@ -676,11 +676,7 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->validators;
     }
 
-    /**
-     * @param lcCoreValidator|lcBaseActionFormValidator $validator
-     * @return $this
-     */
-    public function addValidator($validator)
+    public function addValidator(lcBaseActionFormValidator $validator)
     {
         $this->validators[] = $validator;
         return $this;
