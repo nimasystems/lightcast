@@ -38,11 +38,11 @@ if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
 }
 
 // define the current lightcast version
-define('LIGHTCAST_VER', '1.5.2');
+define('LIGHTCAST_VER', '1.5.1.1469');
 define('LC_VER_MAJOR', 1);
 define('LC_VER_MINOR', 5);
-define('LC_VER_BUILD', 2);
-define('LC_VER_REVISION', 1);
+define('LC_VER_BUILD', 1);
+define('LC_VER_REVISION', 1469);
 define('LC_VER', LIGHTCAST_VER);
 
 // check min allowed framework version
