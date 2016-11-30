@@ -337,11 +337,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
      * Override user based param vars
     */
 
-    public function getRealRequestUri()
-    {
-        return $this->context['real_request_uri'];
-    }
-
     public function getRequestUri()
     {
         return $this->context['request_uri'];
@@ -1068,21 +1063,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'host' => $this->getHostname(),
             'is_secure' => $this->isSecure(),
             'is_xml_http_request' => $this->isXmlHttpRequest(),
-            'request_uri' => parent::getRequestUri(),
-            'real_request_uri' => $this->generateRealRequestUri()
+            'request_uri' => parent::getRequestUri()
         );
-    }
-
-    protected function generateRealRequestUri()
-    {
-        $real_request_uri = $this->env('REQUEST_URI');
-
-        if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && isset($_SERVER['REDIRECT_URL'])) {
-            $scrf = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
-            $real_request_uri = str_replace($scrf, '', $_SERVER['REDIRECT_URL']);
-        }
-
-        return $real_request_uri;
     }
 
     public function getMethod()
