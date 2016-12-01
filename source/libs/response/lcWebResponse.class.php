@@ -653,44 +653,44 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         unset($javascripts);
 
-        //if (!$this->no_scripts) {
-        // javascript code
-        $jscode = $this->javascript_code;
+        if (!$this->no_scripts) {
+            // javascript code
+            $jscode = $this->javascript_code;
 
-        $event = $this->event_dispatcher->filter(
-            new lcEvent('response.send_response_javascript_code', $this, array()), $jscode);
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.send_response_javascript_code', $this, array()), $jscode);
 
-        if ($event->isProcessed()) {
-            $jscode = $event->getReturnValue();
-        }
-
-        unset($event);
-
-        if ($jscode) {
-
-            if (DO_DEBUG) {
-                if (is_array($jscode)) {
-                    foreach ($jscode as $key => $code) {
-
-                        $jscode[$key] = '/** ' . $key . ' */' . "\n" . $code;
-
-                        unset($key, $code);
-                    }
-                }
+            if ($event->isProcessed()) {
+                $jscode = $event->getReturnValue();
             }
 
-            $jscode = is_array($jscode) ? implode("\n", array_filter(array_values($jscode))) : $jscode;
-            $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
+            unset($event);
 
             if ($jscode) {
-                $this->html_body_custom['end'][] = lcTagScript::create()
-                    ->setContent($this->javascript_code_before .
-                        $jscode .
-                        $this->javascript_code_after)
-                    ->toString();
+
+                if (DO_DEBUG) {
+                    if (is_array($jscode)) {
+                        foreach ($jscode as $key => $code) {
+
+                            $jscode[$key] = '/** ' . $key . ' */' . "\n" . $code;
+
+                            unset($key, $code);
+                        }
+                    }
+                }
+
+                $jscode = is_array($jscode) ? implode("\n", array_filter(array_values($jscode))) : $jscode;
+                $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
+
+                if ($jscode) {
+                    $this->html_body_custom['end'][] = lcTagScript::create()
+                        ->setContent($this->javascript_code_before .
+                            $jscode .
+                            $this->javascript_code_after)
+                        ->toString();
+                }
             }
         }
-        //}
 
         // rss feeds
         $rssfeeds = $this->rssfeeds;
