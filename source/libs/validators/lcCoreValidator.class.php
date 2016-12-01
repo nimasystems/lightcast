@@ -21,7 +21,7 @@ abstract class lcCoreValidator extends lcObj implements iI18nProvider
 
     abstract protected function doValidate($value = null);
 
-    public static function validateValue($validator_name, $value, array $options = null, lcCoreValidator $validator)
+    public static function validateValue($validator_name, $value, array $options = null, lcCoreValidator &$validator = null)
     {
         $validator = self::getValidator($validator_name, false);
         return $validator ? $validator->setOptions($options)->validate($value) : false;
