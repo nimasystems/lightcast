@@ -84,13 +84,6 @@ abstract class lcBaseActionForm extends lcSysObj
         return $this->controller;
     }
 
-    public function initializeFormWidgets()
-    {
-        $this->controller->getEventDispatcher()->notify(new lcEvent('action_form.iniitialize_form_widgets', $this));
-
-        return $this;
-    }
-
     protected function getPlugin($plugin_name)
     {
         return $this->plugin_manager->getPlugin($plugin_name);
