@@ -48,7 +48,7 @@ class lcDeviceDetective
         'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-'
     );
     private $useragent;
-    private $httpaccept;
+    //private $httpaccept;
 
     //Device Versions//
     /*private static $versions = array
@@ -96,7 +96,7 @@ class lcDeviceDetective
         $this->request = $request;
 
         $this->useragent = strtolower($this->request->env('HTTP_USER_AGENT'));
-        $this->httpaccept = strtolower($this->request->env('HTTP_ACCEPT'));
+        //$this->httpaccept = strtolower($this->request->env('HTTP_ACCEPT'));
 
         //$this->useragent = strtolower('Mozilla/5.0 (SymbianOS/9.4; Series60/3.1 NokiaN97-1/12.0.024');
         //$this->useragent = strtolower('th_touch_prot722 opera mini/9.50 (windows nt 5.1; u; en)');

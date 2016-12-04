@@ -70,8 +70,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
         if ($subnodes) {
             foreach ($subnodes as $name => $subnode) {
-                unset($this->subnodes[$name]);
-                unset($name, $subnode);
+                unset($subnode, $this->subnodes[$name], $name);
             }
         }
 
@@ -79,8 +78,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
         if ($node_repeats) {
             foreach ($node_repeats as $idx => $node) {
-                unset($this->node_repeats[$idx]);
-                unset($idx, $node);
+                unset($this->node_repeats[$idx], $idx, $node);
             }
         }
 
@@ -148,8 +146,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
     public function getNode($name, $params = null)
     {
-        assert(isset($name));
-
         if (isset($this->subnodes[$name])) {
             return $this->subnodes[$name];
         }
@@ -165,7 +161,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     {
         $rep = count($this->node_repeats);
 
-        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);;
+        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);
 
         return $this->node_repeats[$rep];
     }
@@ -177,7 +173,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         }
 
         if ($node_deep_name{strlen($node_deep_name) - 1} == '/') {
-            $node_deep_name = substr($node_deep_name, 0, strlen($node_deep_name) - 1);
+            $node_deep_name = substr($node_deep_name, 0, -1);
         }
 
         $tmp = explode('/', $node_deep_name);
@@ -222,7 +218,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
     public function rawText($text = null)
     {
-        if (isset($text)) {
+        if (null !== $text) {
             $this->params = null;
             $this->node_repeats = null;
             $this->raw_text = $text;
@@ -283,9 +279,19 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->set($name, $value);
     }
 
+    public function __isset($name)
+    {
+        return isset($this->params[$name]);
+    }
+
     public function set($name, $value)
     {
         $this->setParam($name, $value);
+    }
+
+    public function has($name)
+    {
+        return isset($this->params[$name]);
     }
 
     public function setParam($name, $value)

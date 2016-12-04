@@ -179,10 +179,10 @@ class lcAutoloadCacheTool extends lcObj
                         switch (filetype($file_path)) {
                             case 'dir':
 
-                                if ($file != "." && $file != "..") {
+                                if ($file != '.' && $file != '..') {
                                     if (file_exists($file_path . DS . self::NOINDEX_SUFFIX)) {
                                         //then we should not index
-                                        continue;
+                                        continue 2;
                                     }
 
                                     /* parse on recursively */
@@ -204,12 +204,12 @@ class lcAutoloadCacheTool extends lcObj
                                 if (!sizeof($this->class_file_endings) || in_array(substr($file, strrpos($file, '.')), $this->class_file_endings)) {
                                     $size = filesize($file_path);
 
-                                    if ($size && $php_file = fopen($file_path, "r")) {
+                                    if ($size && $php_file = fopen($file_path, 'rb')) {
                                         if ($buf = fread($php_file, $size)) {
                                             $result = array();
 
-                                            if (preg_match_all('%(interface|class)\s+(\w+)\s+(extends\s+(\w+)\s+)?(implements\s+\w+\s*(,\s*\w+\s*)*)?{%', $buf, $result)) {
-                                                foreach ($result[2] as $class_name) {
+                                            if (preg_match_all('%(interface|class)\s+(\w+)\s+(extends\s+(\w+)\s+)?(implements\s+\w+\s*(,\s*\w+\s*)*)?\{%', $buf, $result)) {
+                                                foreach ((array)$result[2] as $class_name) {
                                                     $file_path_clean = str_replace($initial_directory_path, '', $file_path);
 
                                                     $found_classes[$class_name] = $file_path_clean;
@@ -231,8 +231,7 @@ class lcAutoloadCacheTool extends lcObj
                         }
                     }
 
-                    unset($file_path);
-                    unset($file);
+                    unset($file_path, $file);
                 }
 
                 return true;
@@ -270,7 +269,7 @@ class lcAutoloadCacheTool extends lcObj
             }
         }
 
-        $class_array_data = implode(",", $class_array_data);
+        $class_array_data = implode(',', $class_array_data);
 
         // prepare and write the data
         $ver = LC_VER;

@@ -25,6 +25,6 @@ class lcEmailCoreValidator extends lcCoreValidator
 
     protected function doValidate($value = null)
     {
-        return $value && (preg_match("/^([a-zA-Z0-9])+([\.a-zA-Z0-9_-])*@([a-zA-Z0-9])+(\.[a-zA-Z0-9_-]+)+$/", $value) != 0);
+        return $value && (preg_match("/^([a-zA-Z0-9])+([.a-zA-Z0-9_-])*@([a-zA-Z0-9])+(\.[a-zA-Z0-9_-]+)+$/", $value) != 0);
     }
 }

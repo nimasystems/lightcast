@@ -74,9 +74,13 @@ abstract class lcCoreValidator extends lcObj implements iI18nProvider
         return self::validateValue('string', $string, array('alpha_numeric' => true));
     }
 
+    /**
+     * @param $string
+     * @return mixed
+     */
     public static function validateCleanNumeric($string)
     {
-        return preg_replace('/[a-zA-Z \+\\\\\/]*/', '', $string);
+        return preg_replace('/[a-zA-Z +\\\\\/]*/', '', $string);
     }
 
 

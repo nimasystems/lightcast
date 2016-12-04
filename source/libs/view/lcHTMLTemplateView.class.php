@@ -109,12 +109,17 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
 
     public function __get($name)
     {
-        return $this->params->__get($name);
+        return $this->params->$name;
     }
 
     public function __set($name, $value = null)
     {
-        return $this->params->__set($name, $value);
+        return $this->params->$name = $value;
+    }
+
+    public function __isset($name)
+    {
+        return $this->params->has($name);
     }
 
     public function setParams(array $params = null)
@@ -212,20 +217,17 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     {
         $template_filename = $this->template_filename;
 
-        if (!isset($template_filename)) {
+        if (null === $template_filename) {
             throw new lcInvalidArgumentException('No template filename has been set to view');
         }
 
-        $data = @file_get_contents($template_filename);
-
-        return $data;
+        return @file_get_contents($template_filename);
     }
 
     protected function didApplyFilters($content)
     {
         // parse the content to obtain partials / fragments
-        $content = $this->parseParticles($content);
-        return $content;
+        return $this->parseParticles($content);
     }
 
     protected function parseParticles($data)
@@ -280,9 +282,9 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         $type = 'file';
 
         // a web page
-        if ((substr($url, 0, 7) == 'http://') ||
-            (substr($url, 0, 8) == 'https://') ||
-            (substr($url, 0, 4) == 'www.')
+        if (0 === strpos($url, 'http://') ||
+            0 === strpos($url, 'https://') ||
+            0 === strpos($url, 'www.')
         ) {
             $type = 'url';
             $res = $url;
@@ -291,9 +293,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
             // otherwise try to include it directly
             $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
 
-            $do_include =
-                lcFiles::getFileExt($res) == '.php' ?
-                    true : false;
+            $do_include = lcFiles::getFileExt($res) == '.php';
 
             if ($do_include) {
                 $type = 'php';

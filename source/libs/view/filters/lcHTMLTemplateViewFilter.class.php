@@ -162,14 +162,12 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         $matches[1] = str_replace('[---n---]', "\n", $matches[1]);
 
-        unset($getfrom);
-
         return $matches[1];
     }
 
     protected function insertHtmlNode($insertwhere, $ret, $content = null, $noinsert_ifempty = false)
     {
-        if ((strlen($content) < 1) && (!$noinsert_ifempty)) {
+        if (!$noinsert_ifempty && !$content) {
             $content = $this->insertHtmlNode($insertwhere, $ret);
         }
 
@@ -192,7 +190,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         $self = $this;
         $tmp_node_params = $this->tmp_node_params;
-        $template = preg_replace_callback("/\{[\$]([\w\d\s\:]+)\}/i", function ($m) use ($self, $tmp_node_params) {
+        $template = preg_replace_callback("/\{[$]([\w\d\s:]+)\}/i", function ($m) use ($self, $tmp_node_params) {
             return $self->parseParam(@$m[1], $tmp_node_params);
         }, $template);
 
@@ -209,8 +207,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
      */
     public function parseParam($param, array $all_params = null)
     {
-        assert(isset($param));
-
         $p = explode(':', $param);
 
         $param_default = '{$' . $param . '}';
@@ -262,7 +258,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         } elseif ($category == 'seopath') {
             if ($ret) {
                 $ret = preg_replace('/\s{2,}/', '', $ret);
-                $ret = preg_replace('/\s{1,}/', '-', $ret);
+                $ret = preg_replace('/\s+/', '-', $ret);
                 $ret = str_replace('/', '_', $ret);
                 return $ret;
             }
@@ -286,8 +282,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             return $ret;
         } elseif ($category == 'config') {
             $config = $this->configuration;
-            $r = $config[$name];
-            return $r;
+            return $config[$name];
         } elseif ($category == 'controller') {
             $ctrl = $this->view->getController();
 
@@ -373,6 +368,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             return $text;
         }
 
+        /** @noinspection ForeachInvariantsInspection */
         for ($i = 0; $i <= $total_count; $i++) {
             if (!isset($matches[1][$i])) {
                 continue;
@@ -390,12 +386,10 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
     protected function postCompile($data)
     {
         // clear template
-        $data = preg_replace("/\{\\$(.*?)\}/i", '', $data);
-
         // clear empty lines
         // TODO: Test the speed of this!
         //$data = preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $data);
 
-        return $data;
+        return preg_replace("/\{\\$(.*?)\}/i", '', $data);
     }
 }

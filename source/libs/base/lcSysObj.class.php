@@ -333,24 +333,24 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
 
     public function emerg($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_EMERG, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_EMERG, ($channel ?: $this->log_channel));
     }
 
     public function log($message_code, $severity = null, $channel = null)
     {
         if ($this->logger) {
-            $this->logger->log($message_code, $severity, ($channel ? $channel : $this->log_channel));
+            $this->logger->log($message_code, $severity, ($channel ?: $this->log_channel));
         }
     }
 
     public function alert($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_ALERT, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_ALERT, ($channel ?: $this->log_channel));
     }
 
     public function crit($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_CRIT, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_CRIT, ($channel ?: $this->log_channel));
     }
 
     /*
@@ -359,38 +359,38 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
 
     public function err($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_ERR, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_ERR, ($channel ?: $this->log_channel));
     }
 
     public function warn($message_code, $channel = null)
     {
-        $this->warning($message_code, ($channel ? $channel : $this->log_channel));
+        $this->warning($message_code, ($channel ?: $this->log_channel));
     }
 
     public function warning($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_WARNING, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_WARNING, ($channel ?: $this->log_channel));
     }
 
     public function notice($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_NOTICE, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_NOTICE, ($channel ?: $this->log_channel));
     }
 
     public function info($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_INFO, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_INFO, ($channel ?: $this->log_channel));
     }
 
     public function debug($message_code, $channel = null)
     {
-        $this->log($message_code, lcLogger::LOG_DEBUG, ($channel ? $channel : $this->log_channel));
+        $this->log($message_code, lcLogger::LOG_DEBUG, ($channel ?: $this->log_channel));
     }
 
     public function logExtended($message, $severity = null, $filename = null, $ignore_severity_check = false, $cleartext = false, $channel = null)
     {
         if ($this->logger) {
-            $this->logger->logExtended($message, $severity, $filename, $ignore_severity_check, $cleartext, ($channel ? $channel : $this->log_channel));
+            $this->logger->logExtended($message, $severity, $filename, $ignore_severity_check, $cleartext, ($channel ?: $this->log_channel));
         }
     }
 }

@@ -93,7 +93,6 @@ class lcHTMLTemplateLayoutView extends lcHTMLTemplateView implements iSupportsLa
 
     protected function getViewContent()
     {
-        $c = parent::getViewContent();
-        return $c;
+        return parent::getViewContent();
     }
 }

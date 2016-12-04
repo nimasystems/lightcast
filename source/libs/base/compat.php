@@ -62,7 +62,7 @@ if (!function_exists('http_build_url')) {
      *                       composed url like parse_url() would return
      * @return string
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = array())
+    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, array &$new_url = array())
     {
         is_array($url) || $url = parse_url($url);
         is_array($parts) || $parts = parse_url($parts);

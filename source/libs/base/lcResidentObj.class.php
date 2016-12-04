@@ -28,7 +28,7 @@ abstract class lcResidentObj extends lcSysObj implements iEventsListener
     {
         $this->beforeAttachRegisteredEvents();
 
-        $events = $this->getListenerEvents();
+        $events = (array)$this->getListenerEvents();
 
         if ($events) {
             foreach ($events as $event => $listener) {

@@ -34,17 +34,44 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
      */
     protected $view;
 
+    /**
+     * @var string[]
+     */
     protected $required_js_includes;
+
+    /**
+     * @var string[]
+     */
     protected $required_css_includes;
 
+    /**
+     * @var string[]
+     */
     protected $required_javascript_code;
 
+    /**
+     * @var string
+     */
     protected $web_path;
 
+    /**
+     * @var string
+     */
     protected $title;
+
+    /**
+     * @var string
+     */
     protected $description;
+
+    /**
+     * @var string
+     */
     protected $keywords;
 
+    /**
+     * @var bool
+     */
     private $show_extra_debugging;
 
     private $default_decorator;

@@ -25,8 +25,7 @@ class lcDataView extends lcRawContentView
 {
     public function getViewContent()
     {
-        $content = $this->formatContent();
-        return $content;
+        return $this->formatContent();
     }
 
     protected function formatContent()

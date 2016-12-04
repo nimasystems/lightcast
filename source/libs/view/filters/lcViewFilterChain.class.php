@@ -52,8 +52,7 @@ class lcViewFilterChain extends lcSysObj
             return $content;
         }
 
-        $ret = $this->first_view_filter->filterView($view, $content, $content_type);
-        return $ret;
+        return $this->first_view_filter->filterView($view, $content, $content_type);
     }
 
     public function addViewFilter(lcViewFilter $view_filter)

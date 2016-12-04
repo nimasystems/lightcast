@@ -297,7 +297,7 @@ class lcApp extends lcObj
 
         // attach error handlers
         set_error_handler(array($this, 'handlePHPError'));
-        set_exception_handler(array($this, "handleException"));
+        set_exception_handler(array($this, 'handleException'));
 
         // Raise assertions only in debug mode
         if ($this->error_handler && $this->error_handler->supportsAssertions()) {
@@ -368,7 +368,7 @@ class lcApp extends lcObj
             $cache_version = 0;
             $should_recreate_cache = false;
 
-            if (@include_once($class_cache_filename)) {
+            if (@include $class_cache_filename) {
                 $cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
                 $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
             } else {
@@ -383,7 +383,7 @@ class lcApp extends lcObj
                 $this->recreateFrameworkAutoloadCache();
 
                 // reread the file
-                if (@include_once($class_cache_filename)) {
+                if (@include $class_cache_filename) {
                     //$cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
                     $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
                 }
@@ -415,7 +415,7 @@ class lcApp extends lcObj
         $fname = ROOT . DS . self::FRAMEWORK_CACHE_FILENAME;
 
         /** @noinspection PhpIncludeInspection */
-        require_once(ROOT . DS . 'source/libs/autoload/lcAutoloadCacheTool.class.php');
+        require_once ROOT . DS . 'source/libs/autoload/lcAutoloadCacheTool.class.php';
 
         $dirs = array(
             ROOT . DS . 'source' . DS . 'libs',
@@ -448,7 +448,7 @@ class lcApp extends lcObj
         $this->initialized_objects = array();
 
         $configuration = $this->configuration;
-        assert(!is_null($configuration));
+        assert(null !== $configuration);
 
         // system objects
         $config_objects = $configuration->getSystemObjectInstances();
@@ -476,7 +476,7 @@ class lcApp extends lcObj
 
     protected function configureSystemObject(lcSysObj $obj, $object_type, $class_name, $add_local_cache = false)
     {
-        assert(!is_null($obj) && !is_null($class_name) && !is_null($object_type));
+        assert(null !== $obj && null !== $class_name && null !== $object_type);
 
         $configuration = $this->configuration;
         $event_dispatcher = $this->event_dispatcher;
@@ -1214,7 +1214,7 @@ class lcApp extends lcObj
                 array(
                     'exception' => $exception,
                     'message' => $exception->getMessage(),
-                    'domain' => (($exception instanceof iDomainException) ? $exception->getDomain() : lcException::DEFAULT_DOMAIN),
+                    'domain' => ($exception instanceof iDomainException) ? $exception->getDomain() : lcException::DEFAULT_DOMAIN,
                     'code' => $exception->getCode(),
                     'cause' => $exception->getPrevious(),
                     'trace' => $exception->getTraceAsString(),
@@ -1382,8 +1382,6 @@ class lcApp extends lcObj
             return false;
         }
 
-        $loader = $this->initialized_objects[$loader_name];
-
-        return $loader;
+        return $this->initialized_objects[$loader_name];
     }
 }
