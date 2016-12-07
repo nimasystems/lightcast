@@ -35,6 +35,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
         if ($sub == 'set' || $sub == 'get') {
             $subp = lcInflector::underscore(substr($method, 3, strlen($method)));
 
+            /** @noinspection NotOptimalIfConditionsInspection */
             if ($sub == 'set') {
                 $value = isset($params[0]) && $params[0];
 
@@ -46,7 +47,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
 
                 return true;
 
-            } elseif ($sub == 'get') {
+            } /** @noinspection NotOptimalIfConditionsInspection */ elseif ($sub == 'get') {
                 return (isset($this->data[$subp]) ? $this->data[$subp] : null);
             }
 

@@ -485,6 +485,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $content;
     }
 
+    /**
+     * @param $form_name
+     * @return lcBaseActionForm|null
+     * @throws lcNotAvailableException
+     */
     public function getActionFormInstance($form_name)
     {
         if (!$this->system_component_factory) {
@@ -510,8 +515,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $form_instance->setPluginManager($this->plugin_manager);
 
         $form_instance->setController($this);
-
-        $form_instance->initialize();
 
         $this->action_forms[] = $form_instance;
 

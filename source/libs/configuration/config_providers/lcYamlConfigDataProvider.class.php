@@ -20,7 +20,7 @@
  * E-Mail: info@nimasystems.com
  */
 
-require_once('parsers' . DS . 'lcYamlFileParser.class.php');
+require_once 'parsers' . DS . 'lcYamlFileParser.class.php';
 
 class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
 {

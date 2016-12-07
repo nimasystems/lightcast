@@ -62,7 +62,7 @@ if (!function_exists('http_build_url')) {
      *                       composed url like parse_url() would return
      * @return string
      */
-    function http_build_url($url, $parts = array(), $flags = HTTP_URL_REPLACE, array &$new_url = array())
+    function http_build_url($url, array $parts = array(), $flags = HTTP_URL_REPLACE, array &$new_url = array())
     {
         is_array($url) || $url = parse_url($url);
         is_array($parts) || $parts = parse_url($parts);
@@ -95,8 +95,8 @@ if (!function_exists('http_build_url')) {
                 }
             }
         } else {
-            if (isset($parts['path']) && ($flags & HTTP_URL_JOIN_PATH)) {
-                if (isset($url['path']) && substr($parts['path'], 0, 1) !== '/') {
+            if (($flags & HTTP_URL_JOIN_PATH) && isset($parts['path'])) {
+                if (isset($url['path']) && 0 !== strpos($parts['path'], '/')) {
                     // Workaround for trailing slashes
                     $url['path'] .= 'a';
                     $url['path'] = rtrim(
@@ -108,7 +108,7 @@ if (!function_exists('http_build_url')) {
                 }
             }
 
-            if (isset($parts['query']) && ($flags & HTTP_URL_JOIN_QUERY)) {
+            if (($flags & HTTP_URL_JOIN_QUERY) && isset($parts['query'])) {
                 if (isset($url['query'])) {
                     parse_str($url['query'], $url_query);
                     parse_str($parts['query'], $parts_query);
@@ -125,7 +125,7 @@ if (!function_exists('http_build_url')) {
             }
         }
 
-        if (isset($url['path']) && $url['path'] !== '' && substr($url['path'], 0, 1) !== '/') {
+        if (isset($url['path']) && $url['path'] !== '' && 0 !== strpos($url['path'], '/')) {
             $url['path'] = '/' . $url['path'];
         }
 

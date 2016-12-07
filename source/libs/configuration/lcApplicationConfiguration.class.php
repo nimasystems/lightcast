@@ -41,7 +41,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
         // create the default instance of project configuration which
         // may be overriden before initialization
-        $this->project_configuration = $project_configuration ? $project_configuration : new lcProjectConfiguration();
+        $this->project_configuration = $project_configuration ?: new lcProjectConfiguration();
         $this->project_configuration->setProjectDir($project_dir);
 
         parent::__construct();
@@ -53,7 +53,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             // up to 5 params use the fast calls, more than that - use
             // call_user_func_array which is slower
             if (!method_exists($this->project_configuration, $func)) {
-                return parent::__call($func, $args);
+                parent::__call($func, $args);
             }
 
             switch (count($args)) {
@@ -75,7 +75,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             }
         }
 
-        return parent::__call($func, $args);
+        parent::__call($func, $args);
     }
 
     public function initialize()
@@ -284,7 +284,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             $this->getConfigEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+            ($this->unique_id_suffix ?: null);
 
         $ret = md5($ret);
 
@@ -302,7 +302,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             $this->getConfigEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+            ($this->unique_id_suffix ?: null);
 
         $ret = md5($ret);
 
@@ -352,10 +352,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             parent::readClassCache($cached_data['parent_cache']);
         }
 
-        if ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) {
-            if (isset($cached_data['project_cache'])) {
-                $this->project_configuration->readClassCache($cached_data['project_cache']);
-            }
+        if ($this->project_configuration && ($this->project_configuration instanceof iCacheable) &&
+            isset($cached_data['project_cache'])
+        ) {
+            $this->project_configuration->readClassCache($cached_data['project_cache']);
         }
     }
 

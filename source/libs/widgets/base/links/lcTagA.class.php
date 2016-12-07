@@ -47,24 +47,40 @@ class lcTagA extends lcHtmlTag
         return new lcTagA();
     }
 
+    /**
+     * @param null $href
+     * @return lcTagA
+     */
     public function setHref($href = null)
     {
         $this->setAttribute('href', $href);
         return $this;
     }
 
+    /**
+     * @param null $tabindex
+     * @return lcTagA
+     */
     public function setTarget($tabindex = null)
     {
         $this->setAttribute('target', $tabindex);
         return $this;
     }
 
+    /**
+     * @param null $rel
+     * @return lcTagA
+     */
     public function setRel($rel = null)
     {
         $this->setAttribute('rel', $rel);
         return $this;
     }
 
+    /**
+     * @param null $rev
+     * @return lcTagA
+     */
     public function setRev($rev = null)
     {
         $this->setAttribute('rev', $rev);

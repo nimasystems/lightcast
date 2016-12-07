@@ -219,10 +219,8 @@ class lcApp extends lcObj
 
         $this->initialized = true;
 
-        if (DO_DEBUG) {
-            if ($this->logger) {
-                $this->logger->debug('[' . $this->configuration->getUniqueId() . '] initialized completely');
-            }
+        if (DO_DEBUG && $this->logger) {
+            $this->logger->debug('[' . $this->configuration->getUniqueId() . '] initialized completely');
         }
 
         // register data providers
@@ -369,7 +367,7 @@ class lcApp extends lcObj
             $should_recreate_cache = false;
 
             if (@include $class_cache_filename) {
-                $cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
+                $cache_version = null !== $$class_cache_version_varname ? (int)$$class_cache_version_varname : 0;
                 $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
             } else {
                 $should_recreate_cache = true;
@@ -503,10 +501,8 @@ class lcApp extends lcObj
         }
 
         // register to class cache
-        if ($add_local_cache) {
-            if ($this->local_cache_manager && ($obj instanceof iCacheable)) {
-                $this->local_cache_manager->registerCacheableObject($obj, self::SYSTEM_OBJECTS_CACHE_PREFIX . $object_type);
-            }
+        if ($add_local_cache && $this->local_cache_manager && ($obj instanceof iCacheable)) {
+            $this->local_cache_manager->registerCacheableObject($obj, self::SYSTEM_OBJECTS_CACHE_PREFIX . $object_type);
         }
 
         $this->initialized_objects[$object_type] = $obj;
@@ -531,16 +527,12 @@ class lcApp extends lcObj
         $target_version = $project_configuration->getTargetFrameworkVersion();
         $minimum_version = $project_configuration->getMinimumFrameworkVersion();
 
-        if ($target_version) {
-            if (version_compare($target_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
-            }
+        if ($target_version && version_compare($target_version, LC_VER, '>=')) {
+            throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
         }
 
-        if ($minimum_version) {
-            if (version_compare($minimum_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
-            }
+        if ($minimum_version && version_compare($minimum_version, LC_VER, '>=')) {
+            throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
         }
 
         // assign the configuration to be the delegate of the app
@@ -1368,13 +1360,13 @@ class lcApp extends lcObj
     {
         $loader_name = $event->event_name;
 
-        if (!isset($loader_name)) {
+        if (null === $loader_name) {
             return false;
         }
 
         $loader_name = substr($loader_name, strlen('loader.'), strlen($loader_name));
 
-        if (!isset($loader_name)) {
+        if (null === $loader_name) {
             return false;
         }
 

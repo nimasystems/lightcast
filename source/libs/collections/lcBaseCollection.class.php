@@ -43,7 +43,7 @@ abstract class lcBaseCollection extends lcObj
         }
 
         $splclass = self::SPL_OBJECT_NAME;
-        $this->list = new $splclass($data ? $data : array());
+        $this->list = new $splclass($data ?: array());
     }
 
     public function __destruct()
@@ -189,12 +189,12 @@ abstract class lcBaseCollection extends lcObj
 
     protected function setColl($value, $offset = null)
     {
-        $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
+        $this->list->offsetSet($offset ?: $this->list->key(), $value);
     }
 
     protected function delete($offset = null)
     {
-        $this->list->offsetUnset($offset ? $offset : $this->key());
+        $this->list->offsetUnset($offset ?: $this->key());
     }
 
     /*

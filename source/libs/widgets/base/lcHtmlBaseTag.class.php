@@ -38,6 +38,8 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
 
     public function __construct($tagname, $is_closed = false)
     {
+        parent::__construct();
+
         $this->tagname = $tagname;
         $this->is_closed = $is_closed;
 
@@ -64,9 +66,13 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
         return $this->attr($property);
     }
 
-    public function __call($method, array $params = null)
+    /**
+     * @param $method
+     * @param string|array|null $params
+     */
+    public function __call($method, $params = null)
     {
-        if (lcStrings::startsWith($method, 'set') && (is_string($params) || is_numeric($params))) {
+        if ((is_string($params) || is_numeric($params)) && lcStrings::startsWith($method, 'set')) {
             $tmp = lcInflector::controllerize(substr($method, 3, strlen($method)));
             $this->attr($tmp, $params);
             return;
@@ -118,7 +124,7 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
      */
     public function setAttribute($name, $value = null)
     {
-        if (!isset($value)) {
+        if (null === $value) {
             $this->attributes->remove($name);
         } else {
             $this->attributes->set($name, $value);
@@ -128,12 +134,12 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
 
     /**
      * @param lcHtmlBaseTag $child
-     * @param null $tag
+     * @param string|null $tag
      * @return $this
      */
     public function addChild(lcHtmlBaseTag $child, $tag = null)
     {
-        $tag = $tag ? $tag : 'gen_' . lcStrings::randomString(10, true);
+        $tag = $tag ?: 'gen_' . lcStrings::randomString(10, true);
         $this->children[$tag] = $child;
         return $this;
     }
@@ -227,7 +233,7 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
 
     public function getContent()
     {
-        return ($this->content ? $this->content : $this->getChildren(true));
+        return ($this->content ?: $this->getChildren(true));
     }
 
     /**
@@ -238,7 +244,7 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
     public function append($fields)
     {
         if (is_array($fields)) {
-            foreach ($fields as $data) {
+            foreach ((array)$fields as $data) {
                 $this->append($data);
                 unset($data);
             }
@@ -280,12 +286,12 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
     public function asHtml()
     {
         return '<' . trim(implode(' ',
-                array(
-                    $this->tagname,
-                    $this->attributes->asHtml()
-                ))
-        ) .
-        ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
+                    array(
+                        $this->tagname,
+                        $this->attributes->asHtml()
+                    ))
+            ) .
+            ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
     }
 
     protected function setIsClosed($is_closed = true)

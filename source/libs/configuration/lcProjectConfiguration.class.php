@@ -199,34 +199,31 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected function getDefaultClassAutoloader()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'lcClassAutoloader.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'lcClassAutoloader.class.php';
 
-        $autoloader = new lcClassAutoloader();
-        return $autoloader;
+        return new lcClassAutoloader();
     }
 
     protected function getDefaultEventDispatcher()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEvent.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'iEventObserver.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEventDispatcher.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEvent.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'iEventObserver.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEventDispatcher.class.php';
 
-        $event_dispatcher = new lcEventDispatcher();
-
-        return $event_dispatcher;
+        return new lcEventDispatcher();
     }
 
     protected function getDefaultCacheInstance($skip_cli_check = false)
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheStorage.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheMultiStorage.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcAPC.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcXCache.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheStorage.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheMultiStorage.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcAPC.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcXCache.class.php';
 
         $object = null;
 
         // do not allow calling in CLI
-        $in_cli = (0 == strncasecmp(PHP_SAPI, 'cli', 3));
+        $in_cli = (0 == stripos(PHP_SAPI, 'cli'));
 
         if ($in_cli && !$skip_cli_check) {
             return null;
@@ -243,46 +240,38 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected function getDefaultPluginManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'lcPluginManager.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'lcPluginManager.class.php';
 
-        $plugin_manager = new lcPluginManager();
-
-        return $plugin_manager;
+        return new lcPluginManager();
     }
 
     protected function getDefaultErrorHandler()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'iErrorHandler.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'lcErrorHandler.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'iErrorHandler.class.php';
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'lcErrorHandler.class.php';
 
-        $error_handler = new lcErrorHandler();
-
-        return $error_handler;
+        return new lcErrorHandler();
     }
 
     protected function getDefaultLocalCacheManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'lcLocalCacheManager.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'lcLocalCacheManager.class.php';
 
-        $cache_manager = new lcLocalCacheManager();
-
-        return $cache_manager;
+        return new lcLocalCacheManager();
     }
 
     protected function getDefaultSystemComponentFactory()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcSystemComponentFactory.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcSystemComponentFactory.class.php';
 
-        $factory = new lcSystemComponentFactory();
-        return $factory;
+        return new lcSystemComponentFactory();
     }
 
     protected function getDefaultModelManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'lcDatabaseModelManager.class.php');
+        require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'lcDatabaseModelManager.class.php';
 
-        $manager = new lcDatabaseModelManager();
-        return $manager;
+        return new lcDatabaseModelManager();
     }
 
     public function getDebugInfo()
@@ -290,9 +279,9 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $debug_parent = (array)parent::getDebugInfo();
 
         $debug = array(
-            'class_autoloader' => ($this->class_autoloader ? get_class($this->class_autoloader) : null),
-            'error_handler' => ($this->error_handler ? get_class($this->error_handler) : null),
-            'cache' => ($this->cache ? get_class($this->cache) : null),
+            'class_autoloader' => $this->class_autoloader ? get_class($this->class_autoloader) : null,
+            'error_handler' => $this->error_handler ? get_class($this->error_handler) : null,
+            'cache' => $this->cache ? get_class($this->cache) : null,
             'root_dir' => $this->root_dir,
             'app_root_dir' => $this->app_root_dir,
             'is_debugging' => $this->debugging,
@@ -312,11 +301,9 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        return array(
             'project_name' => $this->getProjectName(),
         );
-
-        return $debug;
     }
 
     public function getSystemObjectInstances()
@@ -366,8 +353,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getBaseConfigDir()
     {
-        $ret = $this->getConfigDir() . DS . $this->config_variation;
-        return $ret;
+        return $this->getConfigDir() . DS . $this->config_variation;
     }
 
     public function getConfigDir()
@@ -417,8 +403,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getVersion()
     {
         return $this->getMajorVersion() . '.' .
-        $this->getMinorVersion() . '.' .
-        $this->getBuildVersion();
+            $this->getMinorVersion() . '.' .
+            $this->getBuildVersion();
     }
 
     public function getMajorVersion()
@@ -643,7 +629,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         $locations_new = array();
 
-        foreach ($locations as $path) {
+        foreach ((array)$locations as $path) {
             $path = lcMisc::isPathAbsolute($path) ? $path : ($this->app_root_dir . DS . $path);
 
             // TODO: Think how to allow assets_path in configuration so it is not hardcoded to this
@@ -764,10 +750,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getUsedDbModels()
     {
-        if (!$this->use_models) {
-            if ($this->getDatabaseModelManager()) {
-                return $this->getDatabaseModelManager()->getRegisteredModelNames();
-            }
+        if (!$this->use_models && $this->getDatabaseModelManager()) {
+            return $this->getDatabaseModelManager()->getRegisteredModelNames();
         }
 
         return $this->use_models;
@@ -820,9 +804,13 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->tmp_dir . DS . 'temp';
     }
 
+    /**
+     * @param string|null $environment
+     * @return string
+     */
     public function getCacheDir($environment = null)
     {
-        $environment = $environment ? $environment : $this->getConfigEnvironment();
+        $environment = $environment ?: $this->getConfigEnvironment();
         return $this->tmp_dir . DS . 'cache' . DS . $environment;
     }
 
@@ -836,9 +824,13 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->config_environment = $environment;
     }
 
+    /**
+     * @param string|null $environment
+     * @return string
+     */
     public function getSpoolDir($environment = null)
     {
-        $environment = $environment ? $environment : $this->getConfigEnvironment();
+        $environment = $environment ?: $this->getConfigEnvironment();
         return $this->tmp_dir . DS . 'spool' . DS . $environment;
     }
 
@@ -937,7 +929,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         parent::setEnvironment($environment);
 
         // set debugging if environment = debug
-        $this->setIsDebugging(($environment == lcEnvConfigHandler::ENVIRONMENT_DEBUG));
+        $this->setIsDebugging($environment == lcEnvConfigHandler::ENVIRONMENT_DEBUG);
     }
 
     public function setIsDebugging($debug = true)
@@ -990,8 +982,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $project_cache = array(
             'project_db_models' => $this->project_db_models
         );
-        $cache = array_merge($parent_cache, $project_cache);
-        return $cache;
+        return array_merge($parent_cache, $project_cache);
     }
 
     protected function loadConfigurationData()

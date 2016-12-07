@@ -163,79 +163,76 @@ class lcAutoloadCacheTool extends lcObj
 
     protected function parseDir($initial_directory_path, $directory_path, array & $found_classes)
     {
-        assert(isset($directory_path));
         $directory_path = (string)$directory_path;
 
         if ($directory_path{strlen($directory_path) - 1} != DS) {
             $directory_path .= DS;
         }
 
-        if (is_dir($directory_path)) {
-            if ($dh = opendir($directory_path)) {
-                while (($file = readdir($dh)) !== false) {
-                    $file_path = $directory_path . $file;
+        if (is_dir($directory_path) && $dh = opendir($directory_path)) {
+            while (($file = readdir($dh)) !== false) {
+                $file_path = $directory_path . $file;
 
-                    if (!$this->ignore_hidden_files || $file{0} != '.') {
-                        switch (filetype($file_path)) {
-                            case 'dir':
+                if (!$this->ignore_hidden_files || $file{0} != '.') {
+                    switch (filetype($file_path)) {
+                        case 'dir':
 
-                                if ($file != '.' && $file != '..') {
-                                    if (file_exists($file_path . DS . self::NOINDEX_SUFFIX)) {
-                                        //then we should not index
-                                        continue 2;
-                                    }
-
-                                    /* parse on recursively */
-                                    $this->parseDir($initial_directory_path, $file_path, $found_classes);
+                            if ($file != '.' && $file != '..') {
+                                if (file_exists($file_path . DS . self::NOINDEX_SUFFIX)) {
+                                    //then we should not index
+                                    continue 2;
                                 }
 
-                                break;
-                            case 'link':
+                                /* parse on recursively */
+                                $this->parseDir($initial_directory_path, $file_path, $found_classes);
+                            }
 
-                                if ($this->follow_symlinks) {
-                                    /* follow link, parse on recursively */
-                                    $this->parseDir($initial_directory_path, $file_path, $found_classes);
-                                }
+                            break;
+                        case 'link':
 
-                                break;
-                            case 'file':
-                                /* a non-empty endings array implies an ending check
-                                 * TODO: Write a more sophisticated suffix check. */
-                                if (!sizeof($this->class_file_endings) || in_array(substr($file, strrpos($file, '.')), $this->class_file_endings)) {
-                                    $size = filesize($file_path);
+                            if ($this->follow_symlinks) {
+                                /* follow link, parse on recursively */
+                                $this->parseDir($initial_directory_path, $file_path, $found_classes);
+                            }
 
-                                    if ($size && $php_file = fopen($file_path, 'rb')) {
-                                        if ($buf = fread($php_file, $size)) {
-                                            $result = array();
+                            break;
+                        case 'file':
+                            /* a non-empty endings array implies an ending check
+                             * TODO: Write a more sophisticated suffix check. */
+                            if (!count($this->class_file_endings) || in_array(substr($file, strrpos($file, '.')), $this->class_file_endings)) {
+                                $size = filesize($file_path);
 
-                                            if (preg_match_all('%(interface|class)\s+(\w+)\s+(extends\s+(\w+)\s+)?(implements\s+\w+\s*(,\s*\w+\s*)*)?\{%', $buf, $result)) {
-                                                foreach ((array)$result[2] as $class_name) {
-                                                    $file_path_clean = str_replace($initial_directory_path, '', $file_path);
+                                if ($size && $php_file = fopen($file_path, 'rb')) {
+                                    if ($buf = fread($php_file, $size)) {
+                                        $result = array();
 
-                                                    $found_classes[$class_name] = $file_path_clean;
+                                        if (preg_match_all('%(interface|class)\s+(\w+)\s+(extends\s+(\w+)\s+)?(implements\s+\w+\s*(,\s*\w+\s*)*)?\{%', $buf, $result)) {
+                                            foreach ((array)$result[2] as $class_name) {
+                                                $file_path_clean = str_replace($initial_directory_path, '', $file_path);
 
-                                                    unset($class_name, $file_path_clean);
-                                                }
+                                                $found_classes[$class_name] = $file_path_clean;
+
+                                                unset($class_name, $file_path_clean);
                                             }
-
-                                            unset($result);
                                         }
 
-                                        unset($buf);
+                                        unset($result);
                                     }
 
-                                    unset($size);
+                                    unset($buf);
                                 }
 
-                                break;
-                        }
-                    }
+                                unset($size);
+                            }
 
-                    unset($file_path, $file);
+                            break;
+                    }
                 }
 
-                return true;
+                unset($file_path, $file);
             }
+
+            return true;
         }
 
         return false;
@@ -260,7 +257,7 @@ class lcAutoloadCacheTool extends lcObj
 
         if ($found_classes && is_array($found_classes)) {
             foreach ($found_classes as $path => $classes) {
-                foreach ($classes as $class_name => $filename) {
+                foreach ((array)$classes as $class_name => $filename) {
                     $filename = ($filename{0} == '/') ? substr($filename, 1, strlen($filename)) : $filename;
                     $class_array_data[] = '\'' . $class_name . '\' => \'' . (($this->write_base_path ? $path . DS : null) . $filename) . '\'';
                     unset($class_name, $filename);

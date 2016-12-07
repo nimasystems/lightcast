@@ -21,7 +21,7 @@
 
  */
 
-require_once('parsers' . DS . 'lcIniFileParser.class.php');
+require_once 'parsers' . DS . 'lcIniFileParser.class.php';
 
 class lcIniConfigDataProvider extends lcObj implements iConfigDataProvider
 {

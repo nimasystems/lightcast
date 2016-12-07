@@ -63,11 +63,16 @@ abstract class lcBaseActionForm extends lcSysObj
      */
     abstract public function getValidationFailures();
 
+    /**
+     * @return lcBaseActionForm
+     */
     public function initialize()
     {
         parent::initialize();
 
         $this->controller->getEventDispatcher()->notify(new lcEvent('action_form.iniitialize', $this));
+
+        return $this;
     }
 
     public function setController(lcBaseController $controller)

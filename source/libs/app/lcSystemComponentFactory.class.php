@@ -67,27 +67,27 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         parent::initialize();
 
         // initialize and merge the system configurations
-        if (is_null($this->config_system_plugins)) {
+        if (null === $this->config_system_plugins) {
             $this->initConfigSystemPlugins();
         }
 
-        if (is_null($this->config_controller_modules)) {
+        if (null === $this->config_controller_modules) {
             $this->initConfigControllerModules();
         }
 
-        if (is_null($this->config_controller_web_services)) {
+        if (null === $this->config_controller_web_services) {
             $this->initConfigControllerWebServices();
         }
 
-        if (is_null($this->config_controller_tasks)) {
+        if (null === $this->config_controller_tasks) {
             $this->initConfigControllerTasks();
         }
 
-        if (is_null($this->config_controller_components)) {
+        if (null === $this->config_controller_components) {
             $this->initConfigControllerComponents();
         }
 
-        if (is_null($this->config_controller_action_forms)) {
+        if (null === $this->config_controller_action_forms) {
             $this->initConfigActionForms();
         }
 
@@ -314,10 +314,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                     /** @var lcPluginConfiguration $plugin_config */
                     $filename_ = $plugin_config->getPluginDir() . DS . $filename;
 
-                    if (DO_DEBUG) {
-                        if (!file_exists($filename_)) {
-                            throw new lcIOException('Plugin autoload class (' . $class . ') with filename: ' . $filename_ . ' does not exist');
-                        }
+                    if (DO_DEBUG && !file_exists($filename_)) {
+                        throw new lcIOException('Plugin autoload class (' . $class . ') with filename: ' . $filename_ . ' does not exist');
                     }
 
                     // add to class autoloader
@@ -364,7 +362,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 foreach ($loaders as $loader) {
                     $ld = is_array($loader) ? $loader : array($loader);
 
-                    foreach ($ld as $loader_info) {
+                    foreach ((array)$ld as $loader_info) {
                         $details = array(
                             'context_type' => lcSysObj::CONTEXT_PLUGIN,
                             'context_name' => $plugin_name,

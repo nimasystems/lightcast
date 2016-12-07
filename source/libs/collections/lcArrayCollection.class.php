@@ -27,7 +27,7 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     {
         parent::__construct();
 
-        if (isset($values)) {
+        if (null !== $values) {
             foreach ($values as $key => $val) {
                 $this->append($key, $val);
                 unset($key, $val);

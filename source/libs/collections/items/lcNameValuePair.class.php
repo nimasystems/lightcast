@@ -34,7 +34,7 @@ class lcNameValuePair extends lcObj
 
         $this->name = $name;
 
-        if (isset($value)) {
+        if (null !== $value) {
             $this->value = $value;
         }
     }

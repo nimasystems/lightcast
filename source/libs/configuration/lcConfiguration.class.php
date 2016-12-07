@@ -45,23 +45,23 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     {
         parent::initialize();
 
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'iConfigDataProvider.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'lcYamlConfigDataProvider.class.php');
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'iConfigDataProvider.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'lcYamlConfigDataProvider.class.php';
 
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcEnvConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppPluginsConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppSecurityConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppSettingsConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConsoleConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcDatabasesConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcLoadersConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcPluginConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcPluginViewConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcProjectConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcRoutingConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcViewConfigHandler.class.php');
-        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcWebServiceConfigHandler.class.php');
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcEnvConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppPluginsConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppSecurityConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcAppSettingsConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConsoleConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcDatabasesConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcLoadersConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcPluginConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcPluginViewConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcProjectConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcRoutingConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcViewConfigHandler.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcWebServiceConfigHandler.class.php';
 
         // read the configuration (unless already loaded - by class cache for
         // example)
@@ -89,7 +89,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         $base_config_dir = $this->getBaseConfigDir();
 
         foreach ($map as $options) {
-            if (!is_array($options) || !isset($options['handler']) || !isset($options['config_key'])) {
+            if (!is_array($options) || !isset($options['handler'], $options['config_key'])) {
                 throw new lcConfigException('Invalid configuration (' . get_class($this) . ') - missing handler/config_key');
             }
 
@@ -121,7 +121,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
                 throw new lcConfigException('Error while loading configuration from handler: ' . $config_handler_type . ', Config Key: ' . $config_key . ': ' . $e->getMessage(), $e->getCode(), $e);
             }
 
-            if (isset($handler_configuration) && !is_array($handler_configuration)) {
+            if (null !== $handler_configuration && !is_array($handler_configuration)) {
                 assert(false);
                 continue;
             }
@@ -174,15 +174,12 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function getDebugInfo()
     {
-        $debug = array('configuration' => $this->configuration,);
-
-        return $debug;
+        return array('configuration' => $this->configuration,);
     }
 
     public function getShortDebugInfo()
     {
-        $debug = array('environment' => $this->environment,);
-        return $debug;
+        return array('environment' => $this->environment,);
     }
 
     public function getEnvironment()
@@ -235,6 +232,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         $tmp = null;
 
         /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection OnlyWritesOnParameterInspection */
         $configuration = $this->configuration;
 
         $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
@@ -258,6 +256,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     public function get($name)
     {
         /** @noinspection PhpUnusedLocalVariableInspection */
+        /** @noinspection OnlyWritesOnParameterInspection */
         $configuration = $this->configuration;
 
         $arr_str = '$configuration[\'' . str_replace('.', '\'][\'', $name) . '\']';
@@ -301,7 +300,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     {
         $cfg = $this->configuration;
 
-        if (!isset($cfg)) {
+        if (null === $cfg) {
             return '';
         }
 
@@ -310,9 +309,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function writeClassCache()
     {
-        $cache = array('configuration' => $this->configuration);
-
-        return $cache;
+        return array('configuration' => $this->configuration);
     }
 
     public function readClassCache(array $cached_data)

@@ -116,7 +116,7 @@ abstract class lcObj
 
     public function getClassEndLine()
     {
-        return $this->getReflection()->getEndline();
+        return $this->getReflection()->getEndLine();
     }
 
     public function getClassModifiers()

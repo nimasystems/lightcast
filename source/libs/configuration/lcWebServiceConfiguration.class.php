@@ -25,11 +25,6 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
 {
     const DEFAULT_APP_NAME = 'ws';
 
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
     public function getApplicationName()
     {
         return self::DEFAULT_APP_NAME;

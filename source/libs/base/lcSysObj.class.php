@@ -270,8 +270,7 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
 
     public function getContainerPluginName()
     {
-        $ret = $this->parent_plugin ? $this->parent_plugin->getPluginName() : null;
-        return $ret;
+        return $this->parent_plugin ? $this->parent_plugin->getPluginName() : null;
     }
 
     public function getI18n()

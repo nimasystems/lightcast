@@ -281,7 +281,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         } else {
             $implements_all = true;
 
-            foreach ($interface_name as $class_name) {
+            foreach ((array)$interface_name as $class_name) {
                 $implements_all = ($this instanceof $class_name || in_array($class_name, (array)$this->getImplements()));
 
                 if (!$implements_all) {
@@ -418,7 +418,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             $filename = $this->getConfigDir() . DS . self::DB_MIGRATIONS_FILENAME;
 
             if (file_exists($filename)) {
-                include_once($filename);
+                include_once $filename;
             }
         }
 

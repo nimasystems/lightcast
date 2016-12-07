@@ -163,7 +163,8 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
                     }
 
                     try {
-                        call_user_func_array(array($obj, $func), array($class_name));
+                        $obj->$func(array($class_name));
+                        //call_user_func_array(array($obj, $func), array($class_name));
 
                         $included = class_exists($class_name, false);
 

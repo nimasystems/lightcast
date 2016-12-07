@@ -27,16 +27,6 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
 {
     protected $classes = array();
 
-    public function __construct($tagname, $is_closed = false)
-    {
-        parent::__construct($tagname, $is_closed);
-    }
-
-    public function asHtml()
-    {
-        return parent::asHtml();
-    }
-
     public function getClasses()
     {
         return $this->classes;
@@ -54,7 +44,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param null $value
      * @return lcHtmlTag
      */
@@ -69,7 +59,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
     }
 
     /**
-     * @param null $value
+     * @param string|array|null $value
      * @return lcHtmlTag
      */
     public function setClass($value = null)
@@ -77,7 +67,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         if ($value) {
             $classes = is_array($value) ? $value : array_filter(explode(' ', $value));
 
-            foreach ($classes as $class) {
+            foreach ((array)$classes as $class) {
                 $this->classes[$class] = $class;
                 unset($class);
             }
@@ -95,6 +85,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return implode(' ', (array)$this->classes);
     }
 
+    /**
+     * @param string $class_name
+     * @return lcHtmlTag
+     */
     public function removeClass($class_name)
     {
         if ($this->hasClass($class_name)) {
@@ -114,6 +108,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('id');
     }
 
+    /**
+     * @param string $value
+     * @return lcHtmlTag
+     */
     public function setId($value)
     {
         $this->setAttribute('id', $value);
@@ -125,6 +123,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('title');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setTitle($value = null)
     {
         $this->setAttribute('title', $value);
@@ -136,6 +138,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->getAttribute('disabled');
     }
 
+    /**
+     * @param bool $disabled
+     * @return lcHtmlTag
+     */
     public function setDisabled($disabled = true)
     {
         if ($disabled) {
@@ -151,6 +157,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('style');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setStyle($value = null)
     {
         $this->setAttribute('style', $value);
@@ -162,6 +172,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onclick');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnClick($value = null)
     {
         $this->setAttribute('onclick', $value);
@@ -173,6 +187,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onchange');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnChange($value = null)
     {
         $this->setAttribute('onchange', $value);
@@ -184,6 +202,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('ondblclick');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnDblClick($value = null)
     {
         $this->setAttribute('ondblclick', $value);
@@ -195,6 +217,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmousedown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseDown($value = null)
     {
         $this->setAttribute('onmousedown', $value);
@@ -206,6 +232,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseup');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseUp($value = null)
     {
         $this->setAttribute('onmouseup', $value);
@@ -217,6 +247,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseover');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseOver($value = null)
     {
         $this->setAttribute('onmouseover', $value);
@@ -228,6 +262,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmousemove');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseMove($value = null)
     {
         $this->setAttribute('onmousemove', $value);
@@ -239,6 +277,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseout');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseOut($value = null)
     {
         $this->setAttribute('onmouseout', $value);
@@ -250,6 +292,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeypress');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyPress($value = null)
     {
         $this->setAttribute('onkeypress', $value);
@@ -261,6 +307,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeydown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyDown($value = null)
     {
         $this->setAttribute('onkeydown', $value);
@@ -272,6 +322,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeydown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyUp($value = null)
     {
         $this->setAttribute('onkeyup', $value);
