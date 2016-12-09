@@ -11,7 +11,7 @@ class lcStrings
 
     public static function startsWith($haystack, $needle)
     {
-        return ($haystack && $needle && $haystack{0} == $needle{0}) ? strncmp($haystack, $needle, lcUnicode::strlen($needle)) === 0 : false;
+        return ($haystack && $needle && $haystack{0} == $needle{0}) ? 0 === lcUnicode::strpos($haystack, $needle) : false;
     }
 
     public static function endsWith($haystack, $needle, $case = true)

@@ -35,7 +35,7 @@ class lcUnicode
     public static function ucfirst($string, $encoding = 'UTF8')
     {
         if (self::$has_mb) {
-            $firstChar = mb_substr($string, 0, 1, $encoding);
+            $firstChar = $string[0];
             $then = mb_substr($string, 1, null, $encoding);
             return mb_strtoupper($firstChar, $encoding) . $then;
         } else {
@@ -60,7 +60,12 @@ class lcUnicode
 
     public static function strpos($haystack, $needle, $offset = null, $encoding = 'UTF8')
     {
-        return self::$has_mb ? mb_strpos($haystack, $needle, $offset, $encoding) : strripos($haystack, $needle, $offset);
+        return self::$has_mb ? mb_strpos($haystack, $needle, $offset, $encoding) : strpos($haystack, $needle, $offset);
+    }
+
+    public static function stripos($haystack, $needle, $offset = null, $encoding = 'UTF8')
+    {
+        return self::$has_mb ? mb_stripos($haystack, $needle, $offset, $encoding) : stripos($haystack, $needle, $offset);
     }
 
     public static function strripos($haystack, $needle, $offset = null, $encoding = 'UTF8')
