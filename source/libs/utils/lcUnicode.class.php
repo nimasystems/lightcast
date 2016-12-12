@@ -35,7 +35,8 @@ class lcUnicode
     public static function ucfirst($string, $encoding = 'UTF8')
     {
         if (self::$has_mb) {
-            $firstChar = $string[0];
+            /** @noinspection SubStrUsedAsArrayAccessInspection */
+            $firstChar = mb_substr($string, 0, 1, $encoding);
             $then = mb_substr($string, 1, null, $encoding);
             return mb_strtoupper($firstChar, $encoding) . $then;
         } else {
