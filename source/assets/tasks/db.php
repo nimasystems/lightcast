@@ -29,8 +29,13 @@ class tDb extends lcTaskController
             lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
             lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
             lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
-            'schema:upgrade_to_utf8mb4 - Upgrade the database and all tables to the UTF8MB4 / UT8MB4_UNICODE_CI collation
-                --db - database name';
+            'schema:upgrade_encoding - Upgrade the database and all tables to another encoding/collation (for example: UTF8MB4 / UT8MB4_UNICODE_CI)
+                --db - database name
+                --hostname=localhost
+                --user=root
+                --pass
+                --encoding=utf8m4
+                --collation=utf8mb4_unicode_ci';
 
         return $help;
     }
@@ -40,9 +45,8 @@ class tDb extends lcTaskController
         $action = $this->getRequest()->getParam('action');
 
         switch ($action) {
-            /* schema:upgrade_to_utf8mb4 */
-            case 'schema:upgrade_to_utf8mb4':
-                return $this->upgradeEncodingToUTF8MB4();
+            case 'schema:upgrade_encoding':
+                return $this->upgradeEncoding();
 
             default:
                 $this->display($this->getHelpInfo(), false);
@@ -50,17 +54,31 @@ class tDb extends lcTaskController
         }
     }
 
-    private function upgradeEncodingToUTF8MB4()
+    private function upgradeEncoding()
     {
         $db_name = $this->getRequest()->getParam('db');
 
-        if (!$db_name) {
+        $hostname = $this->getRequest()->getParam('hostname');
+        $hostname = $hostname ?: 'localhost';
+
+        $user = $this->getRequest()->getParam('user');
+        $user = $user ?: 'root';
+
+        $pass = $this->getRequest()->getParam('pass');
+        $encoding = $this->getRequest()->getParam('encoding');
+        $collation = $this->getRequest()->getParam('collation');
+
+        if (!$db_name || !$hostname || !$encoding || !$collation) {
             throw new lcInvalidArgumentException($this->t('Invalid database'));
         }
 
-        $db_name = '`' . $db_name . '`';
+        $dsn = 'mysql:host=' . $hostname . ';dbname=' . $db_name;
+        $db = new PDO($dsn, $user, $pass, array(
+            PDO::ERRMODE_EXCEPTION
+        ));
+        $db->exec('SET NAMES ' . $encoding . ' COLLATE ' . $collation);
 
-        $db = $this->dbc;
+        $db_name = '`' . $db_name . '`';
 
         $tables = $db->query('SHOW FULL TABLES WHERE Table_type = \'BASE TABLE\'')->fetchAll(PDO::FETCH_COLUMN);
 
@@ -82,8 +100,8 @@ class tDb extends lcTaskController
                     $can_be_null = $row['Null'] == 'YES';
                     $default = $row['Default'];
 
-                    if (strstr($type, 'varchar(') || strstr($type, 'char(') ||
-                        strstr($type, 'text') || strstr($type, 'enum')
+                    if (false !== strpos($type, 'varchar(') || false !== strpos($type, 'char(') ||
+                        false !== strpos($type, 'text') || false !== strpos($type, 'enum')
                     ) {
                         $this->display('Converting table: ' . $table . ':' . $col_name);
 
