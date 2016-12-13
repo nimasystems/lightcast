@@ -141,8 +141,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     protected function classMethodForAction($action_name, array $action_params = null)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $method_name = $action_type . ucfirst(lcInflector::camelize($action_name));
-        return $method_name;
+        return $action_type . ucfirst(lcInflector::camelize($action_name));
     }
 
     protected function actionExists($action_name, array $action_params = null)

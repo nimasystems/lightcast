@@ -94,6 +94,7 @@ class lcVars
 
         for ($i = 0; $i <= $strLen; $i++) {
             // Grab the next character in the string.
+            /** @noinspection SubStrUsedAsArrayAccessInspection */
             $char = substr($json, $i, 1);
 
             // Are we inside a quoted string?

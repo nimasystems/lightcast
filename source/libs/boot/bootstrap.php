@@ -67,26 +67,27 @@ if (defined('MAX_LC_VER')) {
 
 if (!defined('PHP_VERSION_ID')) {
     $version = explode('.', PHP_VERSION);
-    define('PHP_VERSION_ID', ($version[0] * 10000 + $version[1] * 100 + $version[2]));
+    define('PHP_VERSION_ID', $version[0] * 10000 + $version[1] * 100 + $version[2]);
 }
 
-define('PHP_GREATER_EQUAL_54', (PHP_VERSION_ID >= 50400));
+define('PHP_GREATER_EQUAL_54', PHP_VERSION_ID >= 50400);
 
 // default timezone
 date_default_timezone_set('UTC');
 
 // set mb_string encoding
 if (function_exists('mb_internal_encoding')) {
-    mb_internal_encoding("UTF-8");
+    mb_internal_encoding('UTF-8');
 }
 
-define('ROOT', realpath(dirname(__FILE__) . '/../../../'));
+/** @noinspection RealpathInSteamContextInspection */
+define('ROOT', realpath(__DIR__ . '/../../../'));
 define('DS', DIRECTORY_SEPARATOR);
 
 // enable profiling
 if (defined('PROFILER_ENABLED') && PROFILER_ENABLED) {
     // include the 'prepend' profile start file
-    require(ROOT . DS . 'source' . DS . 'libs' . DS . 'debug' . DS . 'profile_prepend.php');
+    require ROOT . DS . 'source' . DS . 'libs' . DS . 'debug' . DS . 'profile_prepend.php';
 }
 
 // include lightcast in the filepath
@@ -94,101 +95,101 @@ set_include_path(get_include_path() . PATH_SEPARATOR . ROOT . DS . 'source' . DS
     ROOT . DS . 'source' . DS . '3rdparty' . DS . 'propel' . DS . 'runtime' . DS . 'lib');
 
 // load shortcut funcs
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'shortcuts.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'shortcuts.php';
 
 // compatibility functions
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'compat.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'compat.php';
 
 // debugging
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'debug' . DS . 'iDebuggable.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'debug' . DS . 'iDebuggable.class.php';
 
 // load utils
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcSys.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcInflector.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcStrings.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcFiles.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcArrays.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcMisc.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcDirs.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcVm.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcSys.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcInflector.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcStrings.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcFiles.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcArrays.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcMisc.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcDirs.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcVm.class.php';
 
 // interfaces
 
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iProvidesCapabilities.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iRequiresCapabilities.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'logger' . DS . 'iLoggable.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'i18n' . DS . 'iI18nProvider.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModelOperations.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'iCacheable.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iAppDelegate.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iSupportsVersions.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'iSupportsAutoload.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModels.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbViews.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iProvidesDbSelectColumnMappings.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'view' . DS . 'filters' . DS . 'iViewFilterProvider.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'components' . DS . 'iSupportsComponentOperations.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'migrations' . DS . 'iDatabaseMigrationSchema.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'migrations' . DS . 'iSupportsDatabaseMigration.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iProvidesCapabilities.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iRequiresCapabilities.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'logger' . DS . 'iLoggable.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'i18n' . DS . 'iI18nProvider.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModelOperations.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'iCacheable.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iAppDelegate.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iSupportsVersions.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'iSupportsAutoload.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModels.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbViews.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iProvidesDbSelectColumnMappings.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iDatabaseModelManager.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'view' . DS . 'filters' . DS . 'iViewFilterProvider.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'components' . DS . 'iSupportsComponentOperations.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'migrations' . DS . 'iDatabaseMigrationSchema.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'migrations' . DS . 'iSupportsDatabaseMigration.class.php';
 
 // load base classes
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iEventsListener.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iEventsListener.class.php';
 
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcObj.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcDataObj.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcSysObj.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcResidentObj.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcApp.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcObj.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcDataObj.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcSysObj.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'lcResidentObj.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcApp.class.php';
 
 // profiler
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'profiler' . DS . 'lcProfiler.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'profiler' . DS . 'lcProfiler.class.php';
 
 // configuration
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConfigHandler.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcEnvConfigHandler.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcProjectConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcApplicationConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebManagementConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcConsoleConfiguration.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebServiceConfiguration.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConfigHandler.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcEnvConfigHandler.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcProjectConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcApplicationConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebManagementConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcConsoleConfiguration.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'lcWebServiceConfiguration.class.php';
 
 // exceptions
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'iDomainException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'iHTTPException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcSystemException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcConfigException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcPHPException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAssertException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcIOException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAuthException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAccessDeniedException.class.php');
-require(ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcInvalidArgumentException.class.php');
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'iDomainException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'iHTTPException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcSystemException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcConfigException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcPHPException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAssertException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcIOException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAuthException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcAccessDeniedException.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcInvalidArgumentException.class.php';
 
 // 3rdParty widely used libraries
 
 // PHPMailer
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.phpmailer.php');
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.pop3.php');
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.smtp.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.phpmailer.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.pop3.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.smtp.php';
 
 // Browser Detection
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'browser_detection' . DS . 'Browser.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'browser_detection' . DS . 'Browser.php';
 
 // GlobToRegex
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'GlobToRegex' . DS . 'sfGlobToRegex.class.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'GlobToRegex' . DS . 'sfGlobToRegex.class.php';
 
 // Spyc
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'spyc' . DS . 'spyc.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'spyc' . DS . 'spyc.php';
 
 // Thumbnail GD
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'thumbnailGD' . DS . 'thumbnail.inc.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'thumbnailGD' . DS . 'thumbnail.inc.php';
 
 // uagent_info
-require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'uagent_info' . DS . 'uagent_info.class.php');
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'uagent_info' . DS . 'uagent_info.class.php';
 
 // UTF8Compat - too heavy on memory - must be included separately
 //require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'UTF8Compat' . DS . 'UTF8Compat.php');

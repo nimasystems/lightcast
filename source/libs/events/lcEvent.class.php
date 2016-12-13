@@ -41,12 +41,14 @@ class lcEvent extends lcObj implements ArrayAccess
 
     public function __construct($event_name, & $subject = null, array $params = null)
     {
+        parent::__construct();
+
         $this->event_name = $event_name;
         $this->subject = &$subject;
         $this->max_processing_iterations = 0;
         $this->actual_processing_iterations = 0;
 
-        $this->params = isset($params) ? $params : array();
+        $this->params = null !== $params ? $params : array();
     }
 
     public function __get($property)

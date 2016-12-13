@@ -30,7 +30,7 @@ class lcVm
     {
         if (!function_exists('file_put_contents')) {
             if (is_array($data)) {
-                $data = join('', $data);
+                $data = implode('', $data);
             }
 
             $res = @fopen($fileName, 'w+b');
@@ -47,9 +47,7 @@ class lcVm
             }
             return false;
         } else {
-            $written = file_put_contents($fileName, $data);
-
-            return $written;
+            return file_put_contents($fileName, $data);
         }
     }
 
@@ -59,6 +57,8 @@ class lcVm
             return json_encode($data, ($unescaped_unicode ? JSON_UNESCAPED_UNICODE : 0));
         } else {
             $data = json_encode($data);
+
+            $str = $data;
 
             if ($unescaped_unicode) {
                 // <= 5.3 support for JSON_UNESCAPED_UNICODE
@@ -74,8 +74,6 @@ class lcVm
                     },
                     $data
                 );
-            } else {
-                $str = $data;
             }
 
             return $str;
@@ -85,6 +83,7 @@ class lcVm
     // php log event
     public static function error_log($message, $message_type, $destination = null, $extra_headers = null)
     {
+        /** @noinspection ForgottenDebugOutputInspection */
         return error_log($message, $message_type, $destination, $extra_headers);
     }
 
@@ -114,22 +113,18 @@ class lcVm
 
     public static function memory_get_usage()
     {
-        if (substr(PHP_OS, 0, 3) == 'WIN') {
-            if (substr(PHP_OS, 0, 3) == 'WIN') {
-                $output = array();
-                exec('tasklist /FI "PID eq ' . getmypid() . '" /FO LIST', $output);
+        if (0 === strpos(PHP_OS, 'WIN')) {
+            $output = array();
+            exec('tasklist /FI "PID eq ' . getmypid() . '" /FO LIST', $output);
 
-                return preg_replace('/[\D]/', '', $output[5]) * 1024;
-            }
+            return preg_replace('/[\D]/', '', $output[5]) * 1024;
         } else {
             $pid = getmypid();
             exec("ps -eo%mem,rss,pid | grep $pid", $output);
-            $output = explode("  ", $output[0]);
+            $output = explode('  ', $output[0]);
 
             return $output[1] * 1024;
         }
-
-        return null;
     }
 
     public static function php_check_syntax($filename, &$error_message = null)
@@ -142,8 +137,7 @@ class lcVm
             $res = false;
             $cmd = 'php -l ' . escapeshellarg($filename);
             $error_message = lcSys::execCmd($cmd, $res);
-
-            $res = ($res == '0') ? true : false;
+            $res = ($res == '0');
         }
 
         return $res;

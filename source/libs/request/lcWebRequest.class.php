@@ -176,8 +176,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'base_url' => $this->getBaseUrl(),
             'remote_addr' => $this->getRealRemoteAddr()
         );
-        $ret = array_filter(array_merge($keys, $nk));
-        return $ret;
+        return array_filter(array_merge($keys, $nk));
     }
 
     public function getFullHostname()
