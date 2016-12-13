@@ -28,6 +28,7 @@ abstract class lcBaseActionForm extends lcSysObj
     /** @var lcWebController */
     protected $controller;
 
+    // TODO: these should NOT be abstract (getters)
     abstract public function getName();
 
     abstract public function getFormId();

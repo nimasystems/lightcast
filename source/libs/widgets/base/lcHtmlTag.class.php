@@ -151,6 +151,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('style');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setStyle($value = null)
     {
         $this->setAttribute('style', $value);
@@ -162,6 +166,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onclick');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnClick($value = null)
     {
         $this->setAttribute('onclick', $value);
@@ -173,6 +181,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onchange');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnChange($value = null)
     {
         $this->setAttribute('onchange', $value);
@@ -184,6 +196,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('ondblclick');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnDblClick($value = null)
     {
         $this->setAttribute('ondblclick', $value);
@@ -195,6 +211,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmousedown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseDown($value = null)
     {
         $this->setAttribute('onmousedown', $value);
@@ -206,6 +226,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseup');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseUp($value = null)
     {
         $this->setAttribute('onmouseup', $value);
@@ -217,6 +241,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseover');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseOver($value = null)
     {
         $this->setAttribute('onmouseover', $value);
@@ -228,6 +256,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmousemove');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseMove($value = null)
     {
         $this->setAttribute('onmousemove', $value);
@@ -239,6 +271,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onmouseout');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnMouseOut($value = null)
     {
         $this->setAttribute('onmouseout', $value);
@@ -250,6 +286,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeypress');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyPress($value = null)
     {
         $this->setAttribute('onkeypress', $value);
@@ -261,6 +301,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeydown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyDown($value = null)
     {
         $this->setAttribute('onkeydown', $value);
@@ -272,6 +316,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('onkeydown');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setOnKeyUp($value = null)
     {
         $this->setAttribute('onkeyup', $value);
