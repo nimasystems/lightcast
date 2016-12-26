@@ -368,7 +368,7 @@ class lcApp extends lcObj
             $cache_version = 0;
             $should_recreate_cache = false;
 
-            if (@include_once($class_cache_filename)) {
+            if (@include($class_cache_filename)) {
                 $cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
                 $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
             } else {
@@ -383,7 +383,7 @@ class lcApp extends lcObj
                 $this->recreateFrameworkAutoloadCache();
 
                 // reread the file
-                if (@include_once($class_cache_filename)) {
+                if (@include($class_cache_filename)) {
                     //$cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
                     $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
                 }
