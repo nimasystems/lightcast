@@ -92,6 +92,11 @@ abstract class lcBaseActionFormWidget extends lcObj
     protected $field_tag_id;
     protected $field_tag_id_prefix;
 
+    /**
+     * @var array|null
+     */
+    protected $tags;
+
     abstract public function render();
 
     public function __construct()
@@ -183,9 +188,21 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->validation_rules = $rules;
     }
 
+    public function hasValidationRule($rule)
+    {
+        $rules = (array)$this->getValidationRules();
+        return isset($rules[$rule]) || in_array($rule, $rules);
+    }
+
     public function getValidationRules()
     {
         return $this->validation_rules;
+    }
+
+    public function getValidationRule($rule_name)
+    {
+        $rules = (array)$this->getValidationRules();
+        return isset($rules[$rule_name]) ? $rules[$rule_name] : null;
     }
 
     public function getNamePrefix()
@@ -340,6 +357,26 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function setAttribute($key, $value)
     {
         $this->additional_tag_attributes[$key] = $value;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    public function hasTag($tag)
+    {
+        $tags = $this->getTags();
+        return in_array($tag, (array)$tags);
+    }
+
+    public function hasAttribute($key)
+    {
+        $attribs = $this->getAttributes();
+        return isset($attribs[$key]);
     }
 
     public function getAttributes()
@@ -530,6 +567,10 @@ abstract class lcBaseActionFormWidget extends lcObj
             $this->ui_requirements = $options['help']['requirements'];
         }
 
+        if (isset($options['tags'])) {
+            $this->tags = (array)$options['tags'];
+        }
+
         if (isset($options['placeholder'])) {
             $this->placeholder = $options['placeholder'];
         }
@@ -629,7 +670,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         if ($validators) {
             $data = $this->getData();
 
+            /** @var lcCoreValidator $validator */
             foreach ($validators as $validator) {
+
+                // custom case scenario for 'identical validator'
+                // we need to obtain the 'other' widget
+                if ($validator instanceof lcIdenticalCoreValidator) {
+                    $data = $this->getIdenticalValidatorOtherField();
+                }
+
                 $validator_result = $validator->validate($data);
 
                 if (!$validator_result) {
