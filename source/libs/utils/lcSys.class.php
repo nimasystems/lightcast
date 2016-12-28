@@ -55,7 +55,7 @@ class lcSys
 
     public static function microtime_float()
     {
-        list($usec, $sec) = explode(" ", microtime());
+        list($usec, $sec) = explode(' ', microtime());
         return ((float)$usec + (float)$sec);
     }
 
@@ -66,38 +66,29 @@ class lcSys
 
     public static function isOSWin()
     {
-        if (strtolower(substr(self::getOSType(), 0, 3)) == strtolower('WIN')) {
-            return true;
-        }
-
-        return false;
+        return (0 === strpos(self::getOSType(), 'win'));
     }
 
     public static function getOSType($basic = false)
     {
-        $ostype = $basic ? PHP_OS : php_uname();
-        return $ostype;
+        return $basic ? PHP_OS : php_uname();
     }
 
     public static function isOSLinux()
     {
-        if (strtolower(substr(self::getOSType(), 0, 3)) == strtolower('LIN')) {
-            return true;
-        }
-
-        return false;
+        return (0 === strpos(self::getOSType(), 'lin'));
     }
 
     public static function getPhpVer($php_extension = null)
     {
-        return isset($php_extension) ? phpversion($php_extension) : phpversion();
+        return null !== $php_extension ? phpversion($php_extension) : phpversion();
     }
 
     public static function getProcessOwner()
     {
         //works only in Linux
-        if (substr(self::getOSType(), 0, 3) != 'Lin') {
-            return false;
+        if (!self::isOSLinux()) {
+            return null;
         }
 
         $processUser = posix_getpwuid(posix_geteuid());
@@ -111,7 +102,7 @@ class lcSys
 
     public static function isRunningCLI()
     {
-        return 0 == strncasecmp(PHP_SAPI, 'cli', 3);
+        return 0 === stripos(PHP_SAPI, 'cli');
     }
 
     /**
@@ -121,7 +112,7 @@ class lcSys
      */
     public static function getPhpCli()
     {
-        $path = getenv('PATH') ? getenv('PATH') : getenv('Path');
+        $path = getenv('PATH') ?: getenv('Path');
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ?
             explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) :
             array('');
@@ -200,7 +191,7 @@ class lcSys
         return getmygid();
     }
 
-    public static function getMemoryUsage($humanize = false, $precision = 2, $size_in = null)
+    public static function getMemoryUsage($humanize = false, $precision = 2)
     {
         $mem = memory_get_usage();
 
@@ -221,7 +212,7 @@ class lcSys
         return number_format($bytes, $precision) . ' ' . $suffix[$i];
     }
 
-    public static function getMemoryPeakUsage($emalloc = false, $humanize = false, $precision = 2, $size_in = null)
+    public static function getMemoryPeakUsage($emalloc = false, $humanize = false, $precision = 2)
     {
         $mem = lcVm::memory_get_peak_usage($emalloc);
 
@@ -235,16 +226,14 @@ class lcSys
         $max_fs = self::getPHPVarBytesRepresentation(ini_get('upload_max_filesize'));
         $post_max_size = self::getPHPVarBytesRepresentation(ini_get('post_max_size'));
 
-        $max = ($max_fs > $post_max_size) ? $max_fs : $post_max_size;
-
-        return $max;
+        return ($max_fs > $post_max_size) ? $max_fs : $post_max_size;
     }
 
     public static function getPHPVarBytesRepresentation($input)
     {
         $ret = 0;
 
-        if (stristr($input, 'b')) {
+        if (false !== stripos($input, 'b')) {
             $ret = $input;
         } elseif (stristr($input, 'k')) {
             $ret = $input * 1024;
@@ -264,7 +253,7 @@ class lcSys
         # $file_size MUST be in bytes
         $object_size = (int)$object_size;
 
-        if (!isset($size_in)) {
+        if (null === $size_in) {
             if ($object_size < 1) {
                 return '-';
             }
@@ -339,15 +328,15 @@ class lcSys
 
         if ($lavg) {
             if (isset($lavg[0])) {
-                $lavg[0] = sprintf("%01.2f", $lavg[0]);
+                $lavg[0] = sprintf('%01.2f', $lavg[0]);
             }
 
             if (isset($lavg[1])) {
-                $lavg[1] = sprintf("%01.2f", $lavg[1]);
+                $lavg[1] = sprintf('%01.2f', $lavg[1]);
             }
 
             if (isset($lavg[2])) {
-                $lavg[2] = sprintf("%01.2f", $lavg[2]);
+                $lavg[2] = sprintf('%01.2f', $lavg[2]);
             }
         }
 
@@ -365,9 +354,7 @@ class lcSys
         $result = null;
         lcSys::execCmd('ps -p ' . $pid, $result, false);
 
-        $ret = ($result == '0');
-
-        return $ret;
+        return $result == '0';
     }
 
     public static function execCmd($cmd, &$result = null, $dont_implode = false)

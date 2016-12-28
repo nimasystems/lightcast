@@ -567,6 +567,16 @@ abstract class lcController extends lcBaseController
             $full_template_name = $view->getTemplateFilename();
 
             if ($full_template_name) {
+                // check if the same as the current decorator
+                if ($this->layout_view && $this->layout_view instanceof lcHTMLTemplateView) {
+                    /** @var lcHTMLTemplateView $lview */
+                    $lview = $this->layout_view;
+
+                    if ($lview->getTemplateFilename() == $full_template_name) {
+                        return;
+                    }
+                }
+
                 $params['template_filename'] = $full_template_name;
                 $params['template_name'] = basename($full_template_name);
             }

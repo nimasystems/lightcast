@@ -29,9 +29,7 @@ class lcArrays
             return $array;
         }
 
-        $ret = array_filter(array_filter($array, 'is_numeric'));
-
-        return $ret;
+        return array_filter(array_filter($array, 'is_numeric'));
     }
 
     public static function arrayContainsArrayValues(array $needle, array $haystack)
@@ -43,9 +41,12 @@ class lcArrays
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
+                /** @noinspection ReferenceMismatchInspection */
                 $value = self::arrayFilterDeep($value, $null_only);
             }
         }
+
+        unset($value);
 
         $ret = null;
 
@@ -141,8 +142,8 @@ class lcArrays
                 $append = array_filter(array($append));
             }
 
-            foreach ($append as $key => $value) {
-                if (!array_key_exists($key, $base) and !is_numeric($key)) {
+            foreach ((array)$append as $key => $value) {
+                if (!array_key_exists($key, $base) && !is_numeric($key)) {
                     $base[$key] = $append[$key];
                     continue;
                 }

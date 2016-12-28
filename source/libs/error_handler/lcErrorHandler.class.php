@@ -146,7 +146,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         $recipient = (string)$configuration['exceptions.mail.recipient'];
-        $recipient = $recipient ? $recipient : $configuration->getAdminEmail();
+        $recipient = $recipient ?: $configuration->getAdminEmail();
 
         if (!$recipient) {
             return;
@@ -214,23 +214,23 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         $message =
-            "<strong>Application:</strong> " . $application_name . "<br />\n" .
+            '<strong>Application:</strong> ' . $application_name . "<br />\n" .
             (
             !$in_cli ?
 
-                "<strong>Hostname:</strong> " . $hostname . "<br />\n" .
-                "<strong>Client IP:</strong> " . $ipaddr . "<br />\n" : null) .
+                '<strong>Hostname:</strong> ' . $hostname . "<br />\n" .
+                '<strong>Client IP:</strong> ' . $ipaddr . "<br />\n" : null) .
 
-            "<strong>Date/Time of Event:</strong> " . date('d.m.y H:i:s') . "<br />\n" .
-            "<strong>Exception:</strong> <cite>" . $type . "</cite> / Code: " . $exception_code . " (" . $exception_domain . "): " . "<br />\n" .
-            "<strong>Filename:</strong> " . $exception_file . ' (' . $exception_line . ')' . "<br />\n" .
-            "<strong>Message:</strong> " . $exception_message . "<br />\n<br />\n" .
-            ($exception_cause ? "<strong>Exception Cause:</strong>: " . gettype($exception_cause) . "<br />\n" : null) .
+            '<strong>Date/Time of Event:</strong> ' . date('d.m.y H:i:s') . "<br />\n" .
+            '<strong>Exception:</strong> <cite>' . $type . '</cite> / Code: ' . $exception_code . ' (' . $exception_domain . '): ' . "<br />\n" .
+            '<strong>Filename:</strong> ' . $exception_file . ' (' . $exception_line . ')' . "<br />\n" .
+            '<strong>Message:</strong> ' . $exception_message . "<br />\n<br />\n" .
+            ($exception_cause ? '<strong>Exception Cause:</strong>: ' . gettype($exception_cause) . "<br />\n" : null) .
             ($exception_trace_str ? "<strong>Stack trace:</strong> <br />\n<br />\n" . nl2br($exception_trace_str) . "<br />\n<br />\n" : null) .
-            (isset($_GET) && $_GET ? "<strong>GET:</strong> <br />\n<br />\n" . ee($_GET, true) . "<br />\n" : null) .
-            (isset($_POST) && $_POST ? "<strong>POST:</strong> <br />\n<br />\n" . ee($_POST, true) . "<br />\n" : null) .
-            (isset($_SERVER) && $_SERVER ? "<strong>SERVER:</strong> <br />\n<br />\n" . ee($_SERVER, true) . "<br />\n" : null) .
-            (isset($_REQUEST) && $_REQUEST ? "<strong>REQUEST:</strong> <br />\n<br />\n" . ee($_REQUEST, true) . "<br />\n" : null) .
+            (null !== $_GET && $_GET ? "<strong>GET:</strong> <br />\n<br />\n" . ee($_GET, true) . "<br />\n" : null) .
+            (null !== $_POST && $_POST ? "<strong>POST:</strong> <br />\n<br />\n" . ee($_POST, true) . "<br />\n" : null) .
+            (null !== $_SERVER && $_SERVER ? "<strong>SERVER:</strong> <br />\n<br />\n" . ee($_SERVER, true) . "<br />\n" : null) .
+            (null !== $_REQUEST && $_REQUEST ? "<strong>REQUEST:</strong> <br />\n<br />\n" . ee($_REQUEST, true) . "<br />\n" : null) .
             ($debug_snapshot ? "<strong>Debug Snapshot:</string> <br />\n<br />\n" . ee($debug_snapshot, true) . "<br /><br />\n\n" : null) .
             "----------------------------------------------------------------<br />\n" .
             "This is an automatically sent e-mail. Please, do not reply.<br />\n<br />\n";
@@ -261,7 +261,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
         if ($trace) {
             foreach ($trace as $key => $trace1) {
-                array_push($compiled_stack_trace, $trace1);
+                $compiled_stack_trace[] = $trace1;
                 unset($key, $trace1);
             }
         }
@@ -286,9 +286,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             unset($trace);
         }
 
-        $str = !$return_array ? implode("\n", $txt_trace) : $txt_trace;
-
-        return $str;
+        return !$return_array ? implode("\n", $txt_trace) : $txt_trace;
     }
 
     private function showTextTrace($_trace, $_i)
@@ -300,7 +298,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         if (array_key_exists('line', $_trace)) {
-            $htmldoc .= '(' . $_trace["line"] . '): ';
+            $htmldoc .= '(' . $_trace['line'] . '): ';
         }
 
         if (array_key_exists('class', $_trace) && array_key_exists('type', $_trace)) {
@@ -308,13 +306,13 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         if (array_key_exists('function', $_trace)) {
-            $htmldoc .= $_trace["function"] . '(';
+            $htmldoc .= $_trace['function'] . '(';
 
             if (array_key_exists('args', $_trace)) {
                 if (count($_trace['args']) > 0) {
                     $prep = array();
 
-                    foreach ($_trace['args'] as $arg) {
+                    foreach ((array)$_trace['args'] as $arg) {
                         $type = gettype($arg);
                         $value = $arg;
                         $str = '';
@@ -326,9 +324,11 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                                 $str .= 'false';
                             }
                         } elseif ($type == 'integer' || $type == 'double') {
+                            /** @noinspection TypesCastingWithFunctionsInspection */
                             if (settype($value, 'string')) {
                                 $str .= $value;
                             } else {
+                                /** @noinspection NotOptimalIfConditionsInspection */
                                 if ($type == 'integer') {
                                     $str .= '? integer ?';
                                 } else {
@@ -351,9 +351,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
                         $prep[] = $str;
 
-                        unset($type);
-                        unset($value);
-                        unset($arg);
+                        unset($type, $value, $arg);
                     }
 
                     if ($prep) {
@@ -438,7 +436,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $in_cli = lcSys::isRunningCLI();
 
         // check request Accept to determine if response should output html or something else
-        $request_content_type = (isset($this->request) && $this->request && !$in_cli && $this->request instanceof lcWebRequest) ? $this->request->getAcceptMimetype()->getPreferred() : null;
+        $request_content_type = (isset($this->request) && $this->request && !$in_cli && $this->request instanceof lcWebRequest) ?
+            $this->request->getAcceptMimetype()->getPreferred() : null;
         $request_content_type = $request_content_type && is_array($request_content_type) && count($request_content_type) ? $request_content_type[0] : null;
 
         $content_type = null;
@@ -446,7 +445,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         if ($request_content_type) {
             $content_type = $request_content_type;
         } else {
-            $content_type = (isset($this->response) && $this->response && !$in_cli && $this->response instanceof lcWebResponse) ? $this->response->getContentType() :
+            $content_type = (isset($this->response) && $this->response && !$in_cli && $this->response instanceof lcWebResponse) ?
+                $this->response->getContentType() :
                 ($in_cli ? 'text/plain' : 'text/html');
         }
 
@@ -506,8 +506,9 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $exceptions_custom_module = (string)$configuration['exceptions.module'];
             $exceptions_custom_action = (string)$configuration['exceptions.action'];
 
-            if (!DO_DEBUG && $this->request && !$in_cli && $this->request instanceof lcWebRequest &&
-                $this->request->isGet() && !$this->response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action
+            if (!DO_DEBUG && $this->request && !$in_cli && $exceptions_custom_module && $exceptions_custom_action &&
+                $this->request instanceof lcWebRequest &&
+                $this->request->isGet() && !$this->response->getIsResponseSent()
             ) {
                 $front_controller = $this->controller;
 
@@ -710,10 +711,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $error_output = $this->processTemplate($exception, $template, $content_type);
 
             $exception_full_str = $this->getExceptionOverridenMessage($exception) . ' (' . $exception->getCode() . ')';
-            $error_output = $error_output ? $error_output : $exception_full_str;
+            $error_output = $error_output ?: $exception_full_str;
         }
-
-        assert(!is_null($error_output));
 
         return $error_output;
     }
@@ -774,10 +773,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         // make our stack trace
         $matches = array();
         $tmpd = preg_replace("/\n/", '<---n--->', $data);
-        preg_match("/<!-- BEGIN stackline -->(.*)<!-- END stackline -->/", $tmpd, $matches);
+        preg_match('/<!-- BEGIN stackline -->(.*)<!-- END stackline -->/', $tmpd, $matches);
 
         if ($matches) {
-            $tracetemp = preg_replace("/<---n--->/", "", $matches[1]);
+            $tracetemp = preg_replace('/<---n--->/', '', $matches[1]);
 
             $i = 0;
             $tracestr = '';
@@ -797,8 +796,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             unset($fulltrace);
 
             $data = preg_replace("/\n/", '<---n--->', $data);
-            $data = preg_replace("/<!-- BEGIN stackline -->.*<!-- END stackline -->/", $tracestr, $data);
-            $data = preg_replace("/<---n--->/", "\n", $data);
+            $data = preg_replace('/<!-- BEGIN stackline -->.*<!-- END stackline -->/', $tracestr, $data);
+            $data = preg_replace('/<---n--->/', "\n", $data);
         }
 
         return $data;
@@ -830,7 +829,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         if (array_key_exists('line', $_trace)) {
-            $htmldoc .= '(<span style="color: red; font-weight: bold">' . $_trace["line"] . '</span>): ';
+            $htmldoc .= '(<span style="color: red; font-weight: bold">' . $_trace['line'] . '</span>): ';
         }
 
         if (array_key_exists('class', $_trace) && array_key_exists('type', $_trace)) {
@@ -838,7 +837,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         if (array_key_exists('function', $_trace)) {
-            $htmldoc .= $_trace["function"] . '(';
+            $htmldoc .= $_trace['function'] . '(';
 
             if (array_key_exists('args', $_trace)) {
                 if (count($_trace['args']) > 0) {
@@ -854,9 +853,11 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                             $htmldoc .= 'false';
                         }
                     } elseif ($type == 'integer' || $type == 'double') {
+                        /** @noinspection TypesCastingWithFunctionsInspection */
                         if (settype($value, 'string')) {
                             $htmldoc .= $value;
                         } else {
+                            /** @noinspection NotOptimalIfConditionsInspection */
                             if ($type == 'integer') {
                                 $htmldoc .= '? integer ?';
                             } else {
@@ -877,8 +878,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                         $htmldoc .= '? unknown type ?';
                     }
 
-                    unset($type);
-                    unset($value);
+                    unset($type, $value);
                 }
 
                 if (count($_trace['args']) > 1) {
@@ -889,10 +889,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $htmldoc .= ')</div>';
         }
 
-        if (isset($_trace['file']) && isset($_trace['line'])) {
+        if (isset($_trace['file'], $_trace['line'])) {
             $htmldoc .=
                 '<div style="font-size:10px; line-height: 12px;">' .
-                self::fileExcerpt($_trace['file'], $_trace['line']) .
+                $this->fileExcerpt($_trace['file'], $_trace['line']) .
                 '</div>';
         }
 

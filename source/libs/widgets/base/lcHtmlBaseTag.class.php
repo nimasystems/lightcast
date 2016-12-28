@@ -70,7 +70,7 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
      * @param $method
      * @param string|array|null $params
      */
-    public function __call($method, $params = null)
+    public function __call($method, array $params = null)
     {
         if ((is_string($params) || is_numeric($params)) && lcStrings::startsWith($method, 'set')) {
             $tmp = lcInflector::controllerize(substr($method, 3, strlen($method)));
