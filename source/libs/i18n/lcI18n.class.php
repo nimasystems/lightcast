@@ -59,11 +59,9 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        return array(
             'locale' => $this->getLocale(),
         );
-
-        return $debug;
     }
 
     abstract public function setLocale($locale);

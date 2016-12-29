@@ -33,9 +33,14 @@
  */
 abstract class lcBaseActionFormWidget extends lcObj
 {
-    /** @var lcActionForm */
+    /**
+     * @var lcActionForm
+     */
     protected $action_form;
 
+    /**
+     * @var string
+     */
     protected $field_name;
 
     /** @var array */
@@ -44,22 +49,50 @@ abstract class lcBaseActionFormWidget extends lcObj
     /** @var array */
     protected $additional_tag_attributes;
 
+    /**
+     * @var mixed|null
+     */
     protected $data;
+
+    /**
+     * @var mixed|null
+     */
+    protected $default_data;
+
+    /**
+     * @var string|null
+     */
     protected $data_alias;
 
+    /**
+     * @var string|null
+     */
     protected $init_javascript;
 
     /** @var lcCoreValidator|lcBaseActionFormValidator[] */
     protected $validators;
 
+    /**
+     * @var string[]
+     */
     protected $validation_rules;
 
     /** @var lcBaseActionFormValidationFailure[] */
     protected $validation_failures;
 
+    /**
+     * @var bool
+     */
     protected $is_validated;
+
+    /**
+     * @var bool
+     */
     protected $is_valid;
 
+    /**
+     * @var int|null
+     */
     protected $priority;
 
     protected $label_shown_after;
@@ -72,8 +105,6 @@ abstract class lcBaseActionFormWidget extends lcObj
     protected $ui_requirements;
 
     protected $placeholder;
-
-    protected $default_value;
 
     /** @var array|null */
     protected $constraints;
@@ -241,18 +272,18 @@ abstract class lcBaseActionFormWidget extends lcObj
     /**
      * @return mixed
      */
-    public function getDefaultValue()
+    public function getDefaultData()
     {
-        return $this->default_value;
+        return $this->default_data;
     }
 
     /**
-     * @param null $default_value
+     * @param mixed|null $data
      * @return lcBaseActionFormWidget
      */
-    public function setDefaultValue($default_value = null)
+    public function setDefaultData($data = null)
     {
-        $this->default_value = $default_value;
+        $this->default_data = $data;
         return $this;
     }
 
@@ -442,7 +473,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function getFieldId()
     {
         $container_prefix = $this->container_name ? strtolower($this->container_name) . '_' : null;
-        $id = ($this->field_tag_id ? (string)$this->field_tag_id : ($this->field_tag_id_prefix ? $this->field_tag_id_prefix : null)) .
+        $id = ($this->field_tag_id ? (string)$this->field_tag_id : ($this->field_tag_id_prefix ?: null)) .
             $container_prefix . $this->getFieldName();
         return $id;
     }
@@ -575,8 +606,9 @@ abstract class lcBaseActionFormWidget extends lcObj
             $this->placeholder = $options['placeholder'];
         }
 
-        if (isset($options['default_value'])) {
-            $this->default_value = $options['default_value'];
+        /** deprecation compat. - default_value */
+        if (isset($options['default_value']) || isset($options['default_data'])) {
+            $this->default_data = isset($options['default_value']) ? $options['default_value'] : $options['default_data'];
         }
 
         if (isset($options['container'])) {
@@ -630,16 +662,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function getRawData()
-    {
-        return $this->getData();
-    }
-
     public function getOptions()
     {
         return $this->options;
     }
 
+    /**
+     * @param mixed|null $data
+     * @return lcBaseActionFormWidget
+     */
     public function setData($data = null)
     {
         $this->data = $data;
@@ -651,14 +682,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->data;
     }
 
-    public function getValue()
-    {
-        return $this->data;
-    }
-
     #pragma mark - Validation
 
-    public function validate()
+    public function validate(\ArrayIterator $request)
     {
         $this->clearValidationFailures();
 
@@ -668,7 +694,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         $validation_failures = array();
 
         if ($validators) {
-            $data = $this->getData();
+            $request_data = isset($request[$this->container_name][$this->field_name]) ?
+                $request[$this->container_name][$this->field_name] : null;
+            $data = $request_data ?: $this->getData();
 
             /** @var lcCoreValidator $validator */
             foreach ($validators as $validator) {
@@ -677,9 +705,9 @@ abstract class lcBaseActionFormWidget extends lcObj
 
                 // custom case scenario for 'identical validator'
                 // we need to obtain the 'other' widget
-                if ($validator instanceof lcIdenticalCoreValidator) {
+                /*if ($validator instanceof lcIdenticalCoreValidator) {
                     $data = $this->getIdenticalValidatorOtherField();
-                }
+                }*/
 
                 $validator_result = $validator->validate($data);
 
@@ -759,6 +787,6 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function __toString()
     {
-        return (!is_array($this->data) ? $this->data : '');
+        return (!is_array($this->data) ? (string)$this->data : '');
     }
 }

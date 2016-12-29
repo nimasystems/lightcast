@@ -42,12 +42,14 @@ abstract class lcBaseActionForm extends lcSysObj
 
     abstract public function render();
 
+    abstract public function setRequest(\ArrayIterator $request);
+
     /**
      * @return iActionFormExecuteSubmitResponse
      */
     abstract public function execute();
 
-    abstract public function bindDefaultData(array $data);
+    abstract public function setWidgetDefaults(array $data);
 
     abstract public function bindData(array $data);
 
