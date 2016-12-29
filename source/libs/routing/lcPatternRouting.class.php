@@ -81,7 +81,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $routes = $this->configuration['routing.routes'];
 
         if ($routes) {
-            foreach ($routes as $name => $route) {
+            foreach ((array)$routes as $name => $route) {
                 $requirements = isset($route['requirements']) ? (array)$route['requirements'] : null;
                 $url = isset($route['url']) ? (string)$route['url'] : null;
                 $params = isset($route['params']) ? (array)$route['params'] : null;

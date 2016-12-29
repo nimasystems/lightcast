@@ -673,6 +673,8 @@ abstract class lcBaseActionFormWidget extends lcObj
             /** @var lcCoreValidator $validator */
             foreach ($validators as $validator) {
 
+                // TODO: FIXME
+
                 // custom case scenario for 'identical validator'
                 // we need to obtain the 'other' widget
                 if ($validator instanceof lcIdenticalCoreValidator) {
