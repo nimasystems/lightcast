@@ -677,6 +677,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    /**
+     * Allows to override the data to be rendered
+     * @return mixed|null
+     */
+    public function getRenderData()
+    {
+        return $this->getData();
+    }
+
     public function getData()
     {
         return $this->data;
