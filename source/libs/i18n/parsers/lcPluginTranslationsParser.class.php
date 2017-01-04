@@ -35,6 +35,7 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
     public function getDirsToParse()
     {
         return array(
+            'config',
             'lib',
             'components',
             'tasks',

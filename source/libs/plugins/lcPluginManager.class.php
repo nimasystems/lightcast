@@ -101,6 +101,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         //$this->event_dispatcher->notify(new lcEvent('local_cache.register', $this, array('key' => 'plugins')));
 
         $this->event_dispatcher->connect('response.send_response', $this, 'onSendResponse');
+        $this->event_dispatcher->connect('i18n.startup', $this, 'onI18nStartup');
         $this->event_dispatcher->connect('router.load_configuration', $this, 'onRouterLoadConfiguration');
 
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.startup', $this));
@@ -125,6 +126,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function getPluginDatabaseMigrationSchema($plugin_name)
     {
+        throw new lcNotImplemented();
+
+        /*
         $plugin_config = $this->getPluginConfiguration($plugin_name);
         $schema = null;
 
@@ -146,7 +150,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
         }
 
-        return $schema;
+        return $schema;*/
     }
 
     public function getPluginConfiguration($plugin_name)
@@ -154,17 +158,18 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         if (!isset($this->plugin_configurations[$plugin_name])) {
             $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
 
-            foreach ($available_plugins as $plugin_name => $plugin_details) {
+            foreach ((array)$available_plugins as $plugin_name1 => $plugin_details) {
                 $path = $plugin_details['path'];
-                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
+                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name1 . '/' :
                     (isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null);
 
                 // initialize and store plugin configuration
-                $this->plugin_configurations[$plugin_name] =
-                    isset($this->plugin_configurations[$plugin_name]) ? $this->plugin_configurations[$plugin_name] :
-                        $this->getInstanceOfPluginConfiguration($path, $plugin_name, $web_path);
+                $this->plugin_configurations[$plugin_name1] =
+                    isset($this->plugin_configurations[$plugin_name1]) ? $this->plugin_configurations[$plugin_name1] :
+                        $this->getInstanceOfPluginConfiguration($path, $plugin_name1, $web_path);
             }
         }
+
         return $this->plugin_configurations[$plugin_name];
     }
 
@@ -279,7 +284,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $this->autoload_class_map_file_exists_map[$plugin_name] = true;
         }
 
-        $ret = include_once($filename);
+        $ret = include $filename;
 
         if (!$ret) {
             return null;
@@ -311,10 +316,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $filename = $root_dir . DS . 'config' . DS . $plugin_name . '_config.php';
 
         if (!$verify) {
-            $ret = include_once($filename);
+            $ret = include $filename;
         } else {
             if (file_exists($filename)) {
-                $ret = include_once($filename);
+                $ret = include $filename;
             }
         }
 
@@ -324,10 +329,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $filename = $root_dir . DS . 'config' . DS . 'config.php';
 
             if (!$verify) {
-                $ret = include_once($filename);
+                $ret = include $filename;
             } else {
                 if (file_exists($filename)) {
-                    $ret = include_once($filename);
+                    $ret = include $filename;
                 }
             }
         }
@@ -408,6 +413,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $configuration->setEnvironment($this->configuration->getEnvironment());
         $configuration->setEnvironments($this->configuration->getEnvironments());
 
+        $configuration->setI18n($this->getI18n());
+        $configuration->setTranslationContext(lcSysObj::CONTEXT_PLUGIN, $plugin_name);
+
         $configuration->initialize();
 
         return $configuration;
@@ -424,7 +432,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         if ($plugins && is_array($plugins)) {
             $plugins = array_reverse($plugins, true);
 
-            foreach ($plugins as $plugin) {
+            foreach ((array)$plugins as $plugin) {
                 /** @var lcPlugin $plugin */
                 $name = $plugin->getName();
 
@@ -454,8 +462,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         if ($plugin_configurations) {
             foreach ($plugin_configurations as $plugin_name => $configuration) {
                 $configuration->shutdown();
-                unset($this->plugin_configurations[$plugin_name]);
-                unset($plugin_name, $configuration);
+                unset($this->plugin_configurations[$plugin_name], $plugin_name, $configuration);
             }
         }
 
@@ -489,9 +496,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
         }
 
-        $debug = $dbg;
-
-        return $debug;
+        return $dbg;
     }
 
     // @codingStandardsIgnoreEnd
@@ -513,7 +518,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     {
         $plugins = $this->plugin_autostart_events[$event_name];
 
-        foreach ($plugins as $idx => $plugin_name) {
+        foreach ((array)$plugins as $idx => $plugin_name) {
             // if already initialized do nothing
             if (!isset($this->plugins[$plugin_name])) {
                 // initialize
@@ -538,16 +543,13 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $target_version = $plugin_configuration->getTargetFrameworkVersion();
         $minimum_version = $plugin_configuration->getMinimumFrameworkVersion();
 
-        if ($target_version) {
-            if (version_compare($target_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
-            }
+        if ($target_version && version_compare($target_version, LC_VER, '>=')) {
+            throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
         }
 
-        if ($minimum_version) {
-            if (version_compare($minimum_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
-            }
+        if ($minimum_version && version_compare($minimum_version, LC_VER, '>=')) {
+            throw new lcUnsupportedException('The application requires at least Lightcast ver ' .
+                $minimum_version . ' (current LC version: ' . LC_VER . ')');
         }
 
         $is_15 = $this->configuration->isTargetingLC15();
@@ -669,7 +671,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function hasPlugin($plugin_name)
     {
-        if (!isset($plugin_name)) {
+        if (null === $plugin_name) {
             assert(false);
             return false;
         }
@@ -849,6 +851,20 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $this->runtime_plugins;
     }
 
+    public function onI18nStartup(lcEvent $event)
+    {
+        // pass i18n to all plugin configs
+        /** @var lcI18n $i18n */
+        $i18n = $event->getSubject();
+
+        if ($this->plugin_configurations) {
+            foreach ($this->plugin_configurations as $cfg) {
+                $cfg->setI18n($i18n);
+                unset($cfg);
+            }
+        }
+    }
+
     public function onSendResponse(lcEvent $event, $value)
     {
         $response = $event->getSubject();
@@ -862,10 +878,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
                     // stylesheets
                     if ($t = $plugin_configuration['view.stylesheets']) {
-                        foreach ($t as $media => $files) {
+                        foreach ((array)$t as $media => $files) {
                             if ($files && is_array($files)) {
-                                foreach ($files as $file) {
-                                    $href = $plugin->getAssetsWebpath() . 'css/' . $file;
+                                foreach ((array)$files as $file) {
+                                    $href = $plugin->getAssetsWebPath() . 'css/' . $file;
                                     $response->setStylesheet($href, $media);
 
                                     unset($file, $href);
@@ -882,8 +898,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     $t = $plugin_configuration['view.javascripts'];
 
                     if ($t && is_array($t)) {
-                        foreach ($t as $file) {
-                            $response->setJavascript($plugin->getAssetsWebpath() . 'js/' . $file);
+                        foreach ((array)$t as $file) {
+                            $response->setJavascript($plugin->getAssetsWebPath() . 'js/' . $file);
 
                             unset($file);
                         }
@@ -895,7 +911,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     $t = $plugin_configuration['view.metatags'];
 
                     if ($t && is_array($t)) {
-                        foreach ($t as $title => $value1) {
+                        foreach ((array)$t as $title => $value1) {
                             $response->setMetatag($title, $value1);
                             unset($title, $value1);
                         }
@@ -1003,7 +1019,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      */
     public function getPlugin($plugin_name, $try_initialize = true, $throw_if_missing = true)
     {
-        if (!isset($this->plugins[$plugin_name]) && $try_initialize) {
+        if ($try_initialize && !isset($this->plugins[$plugin_name])) {
             // try to initialize it
             $this->initializePlugin($plugin_name, true, $throw_if_missing);
         }
@@ -1021,19 +1037,17 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     {
         $plugin = $event->event_name;
 
-        if (!isset($plugin)) {
+        if (null === $plugin) {
             return false;
         }
 
         $plugin = substr($plugin, strlen('plugin.'), strlen($plugin));
 
-        if (!isset($plugin)) {
+        if (null === $plugin) {
             return false;
         }
 
-        $instance = isset($this->plugins[$plugin]) ? $this->plugins[$plugin] : null;
-
-        return $instance;
+        return isset($this->plugins[$plugin]) ? $this->plugins[$plugin] : null;
     }
 
     public function writeClassCache()
@@ -1041,8 +1055,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // we need to store them serialized and read them later on - when all classes are made available
         // otherwise when expanding them into objects - they won't be found!
         $cached_data = array(
-            'plugin_configurations' => ($this->plugin_configurations ? serialize($this->plugin_configurations) : null),
-            'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null),
+            'plugin_configurations' => $this->plugin_configurations ? serialize($this->plugin_configurations) : null,
+            'plugin_autoload_configurations' => $this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null,
             'autoload_class_map_file_exists_map' => $this->autoload_class_map_file_exists_map,
         );
 
