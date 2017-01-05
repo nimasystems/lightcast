@@ -429,6 +429,9 @@ abstract class lcBaseActionFormWidget extends lcObj
             unset($name, $value);
         }
 
+        // add the data-field-name attrib
+        $tag->setAttribute('data-field-name', $this->getFieldName());
+
         return $this;
     }
 
@@ -710,14 +713,9 @@ abstract class lcBaseActionFormWidget extends lcObj
             /** @var lcCoreValidator $validator */
             foreach ($validators as $validator) {
 
-                // TODO: FIXME
-
-                // custom case scenario for 'identical validator'
-                // we need to obtain the 'other' widget
-                /*if ($validator instanceof lcIdenticalCoreValidator) {
-                    $data = $this->getIdenticalValidatorOtherField();
-                }*/
-
+                $validator->setOptions(array_merge((array)$validator->getOptions(), array(
+                    'request' => $request[$this->container_name]
+                )));
                 $validator_result = $validator->validate($data);
 
                 if (!$validator_result) {

@@ -25,6 +25,11 @@ class lcIdenticalCoreValidator extends lcCoreValidator
 
     protected function doValidate($value = null)
     {
-        return is_array($value) && isset($value[0]) && isset($value[1]) && $value[0] === $value[1];
+        $options = $this->getOptions();
+        $field_name = isset($options['field_name']) ? $options['field_name'] : null;
+        $request = isset($options['request']) ? $options['request'] : null;
+        $field_value = isset($request[$field_name]) ? $request[$field_name] : null;
+
+        return $field_value === $value;
     }
 }
