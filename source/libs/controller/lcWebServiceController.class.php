@@ -35,8 +35,10 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     {
         parent::initialize();
 
-        $this->send_direct_response = isset($this->configuration['settings.send_direct_response']) ? (bool)$this->configuration['settings.send_direct_response'] : true;
-        $this->send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ? (bool)$this->configuration['settings.send_server_timezone'] : true;
+        $this->send_direct_response = isset($this->configuration['settings.send_direct_response']) ?
+            (bool)$this->configuration['settings.send_direct_response'] : true;
+        $this->send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ?
+            (bool)$this->configuration['settings.send_server_timezone'] : true;
     }
 
     /**
@@ -76,7 +78,8 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         $this->action_params = $action_params;
         $this->action_type = $action_type;
 
-        $method_params = isset($action_params['method_params']) && is_array($action_params['method_params']) ? $action_params['method_params'] : null;
+        $method_params = isset($action_params['method_params']) && is_array($action_params['method_params']) ?
+            $action_params['method_params'] : null;
         $action = $this->classMethodForAction($action_name, $action_params);
         $controller_name = $this->controller_name;
 
@@ -85,7 +88,8 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         // echo $controller_name . '/' . $action . ' (' . $this->action_type . ')<br />';
 
         if (DO_DEBUG) {
-            $this->debug(sprintf('%-40s %s', 'Execute ' . ($this->parent_plugin ? 'p-' . $this->parent_plugin->getPluginName() . ' :: ' : null) . $controller_name . '/' . $action_name .
+            $this->debug(sprintf('%-40s %s', 'Execute ' . ($this->parent_plugin ?
+                    'p-' . $this->parent_plugin->getPluginName() . ' :: ' : null) . $controller_name . '/' . $action_name .
                 '(' . $this->action_type . ')', '{' . lcArrays::arrayToString($action_params) . '}'));
         }
 
@@ -141,8 +145,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     protected function classMethodForAction($action_name, array $action_params = null)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $method_name = $action_type . ucfirst(lcInflector::camelize($action_name));
-        return $method_name;
+        return $action_type . ucfirst(lcInflector::camelize($action_name));
     }
 
     protected function actionExists($action_name, array $action_params = null)

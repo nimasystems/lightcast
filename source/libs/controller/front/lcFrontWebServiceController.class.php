@@ -35,7 +35,8 @@ class lcFrontWebServiceController extends lcFrontWebController
     {
         parent::initialize();
 
-        $this->use_actual_get_params = isset($this->configuration['settings.use_actual_get_params']) ? (bool)$this->configuration['settings.use_actual_get_params'] : true;
+        $this->use_actual_get_params = isset($this->configuration['settings.use_actual_get_params']) ?
+            (bool)$this->configuration['settings.use_actual_get_params'] : true;
 
         $this->event_dispatcher->connect('app.exception', $this, 'onAppException');
     }
@@ -43,7 +44,7 @@ class lcFrontWebServiceController extends lcFrontWebController
     public function onAppException(lcEvent $event)
     {
         // handle exceptions in a custom way
-        $exception = $event->params['exception'] ? $event->params['exception'] : null;
+        $exception = $event->params['exception'] ?: null;
 
         if ($exception) {
             $this->sendErrorResponseFromException($exception);
@@ -71,7 +72,8 @@ class lcFrontWebServiceController extends lcFrontWebController
         $response->header("API-Error", $error_code);
 
         // timezone
-        $send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ? (bool)$this->configuration['settings.send_server_timezone'] : true;
+        $send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ?
+            (bool)$this->configuration['settings.send_server_timezone'] : true;
 
         if ($send_server_timezone) {
             $response->header(lcWebServiceController::TIMEZONE_RESPONSE_HEADER, date_default_timezone_get());
