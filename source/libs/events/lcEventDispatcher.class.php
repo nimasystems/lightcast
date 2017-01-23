@@ -145,7 +145,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return $this->total_notifications_sent;
     }
 
-    public function connect($event_name, lcObj & $listener, $callback_func, $once = true)
+    public function connect($event_name, lcObj $listener, $callback_func, $once = true)
     {
         $notify_event = $this->notifyOnConnectForEvent($event_name);
 
@@ -185,7 +185,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             $evs = isset($this->event_listeners[$event_name]) ? $this->event_listeners[$event_name] : null;
 
             if ($evs) {
-                foreach ($evs as $d) {
+                foreach ((array)$evs as $d) {
                     $listener_ = $this->listeners[$d];
 
                     if ($listener_ === $listener) {
@@ -200,7 +200,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             unset($evs);
         }
 
-        $c = (isset($listener_index) && is_numeric($listener_index)) ? $listener_index : count($listeners);
+        $c = (null !== $listener_index && is_numeric($listener_index)) ? $listener_index : count($listeners);
 
         $listeners[$c] = $listener;
         $listener_events[$c][$event_name] = $callback_func;
@@ -257,7 +257,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return null;
     }
 
-    public function disconnectListener(lcObj & $listener)
+    public function disconnectListener(lcObj $listener)
     {
         $listeners = $this->listeners;
         $listener_events = $this->listener_events;
@@ -273,8 +273,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             return false;
         }
 
-        unset($listeners[$listener_index]);
-        unset($listener_events[$listener_index]);
+        unset($listeners[$listener_index], $listener_events[$listener_index]);
 
         // remove from event listeners
         $event_listeners = $this->event_listeners;
@@ -298,7 +297,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return true;
     }
 
-    public function disconnect($event_name, lcObj & $listener)
+    public function disconnect($event_name, lcObj $listener)
     {
         $listeners = $this->listeners;
         $listener_events = $this->listener_events;
@@ -335,7 +334,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                     unset($listeners1[$k]);
                 }
 
-                unset($event_name, $listeners1);
+                unset($listeners1);
             }
         }
 
@@ -374,7 +373,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                 continue;
             }
 
-            foreach ($events as $event_name => $callback_func) {
+            foreach ((array)$events as $event_name => $callback_func) {
                 if ($event_name != $event->event_name) {
                     continue;
                 }
@@ -455,7 +454,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                     $filters = $this->filter_processors;
                     $filters_out = '';
 
-                    if (isset($filters) && is_array($filters)) {
+                    if (null !== $filters && is_array($filters)) {
                         foreach ($filters as $filter) {
                             $filters_out .= $filter['subject'] . ' => ' . $filter['event_name'] . "\n";
 
@@ -468,7 +467,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                     );
                 }
 
-                $actual += 1;
+                ++$actual;
 
                 $this->max_filter_requests_actual[$event_name] = $actual;
             }
@@ -491,7 +490,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                 $value_out = $found_listener->$callback_func($event, $new_value);
             }
 
-            if ($event->isProcessed() || $new_value !== $value) {
+            if ($new_value !== $value || $event->isProcessed()) {
                 $event->actual_processing_iterations++;
 
                 $event->filtered_by = &$found_listener;
@@ -538,7 +537,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         foreach ($event_listeners as $event_type => $data) {
             $listeners = array();
 
-            foreach ($data as $idx) {
+            foreach ((array)$data as $idx) {
                 $listeners[] = array(
                     'listener' => get_class($this->listeners[$idx]),
                     'callback' => $this->listener_events[$idx][$event_type]);
@@ -555,7 +554,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return $this->notifications;
     }
 
-    public function registerProvider($object_name, lcObj &$listener, $callback_func)
+    public function registerProvider($object_name, lcObj $listener, $callback_func)
     {
         $listener_name = get_class($listener);
 
@@ -563,7 +562,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         $this->object_listeners_objects[$listener_name] = &$listener;
     }
 
-    public function provide($object_name, lcObj &$listener, array $params = null)
+    public function provide($object_name, lcObj $listener, array $params = null)
     {
         // check in objects and classes
         if (isset($this->object_listeners[$object_name])) {
@@ -573,7 +572,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             foreach ($listeners as $object_name1 => $listeners1) {
                 if ($object_name1 == $object_name) {
                     // if no specific provider has been set - use the first one
-                    if (!isset($listener_name)) {
+                    if (null === $listener_name) {
                         // return the first found object
                         $listener_name = $listeners1[0][0];
                         $callback_func = $listeners1[0][1];
@@ -611,7 +610,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         return $event;
     }
 
-    public function attachConnectListener($event_name, lcObj & $listener, $callback_func = null)
+    public function attachConnectListener($event_name, lcObj $listener, $callback_func = null)
     {
         $listener_name = get_class($listener);
 

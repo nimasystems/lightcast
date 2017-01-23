@@ -37,6 +37,7 @@ class lcFileLoggerNG extends lcLogger
     protected $logs;
     protected $files;
     protected $channels;
+    protected $default_channel = self::DEFAULT_CHANNEL;
     protected $dont_log_request_header;
 
     protected $request;
@@ -106,7 +107,7 @@ class lcFileLoggerNG extends lcLogger
                     }
                 } else {
                     $severity = $log_info;
-                    $channel = self::DEFAULT_CHANNEL;
+                    $channel = $this->default_channel;
 
                     $this->setupLogFile($channel, $filename, $severity);
                 }
@@ -432,15 +433,15 @@ class lcFileLoggerNG extends lcLogger
         // if the channel at which the log is to be written
         // is not setup - we will log to GENERIC instead
         if (!isset($channels1[$channel])) {
-            $channel_faked = self::DEFAULT_CHANNEL;
+            $channel_faked = $this->default_channel;
             $write_channel_name_in_log = true;
         }
 
         if (!$cleartext) {
-            if ($channel == self::DEFAULT_CHANNEL || $write_channel_name_in_log) {
+            if ($channel == $this->default_channel || $write_channel_name_in_log) {
                 // add the channel name in the generic channel
                 $ch = isset($logged_channel_name) ? $logged_channel_name : $channel;
-                $ch = $ch ? $ch : self::DEFAULT_CHANNEL;
+                $ch = $ch ? $ch : $this->default_channel;
 
                 $string_log = sprintf('%-17s %-12s %-10s %s',
                     '[' . $this->getTimeTick() . ']',
@@ -470,11 +471,11 @@ class lcFileLoggerNG extends lcLogger
         $channel = $channel_faked ? $channel_faked : $channel;
 
         // first log to the GENERIC channel if channel is not it
-        if ($channel != self::DEFAULT_CHANNEL && !$custom_file) {
+        if ($channel != $this->default_channel && !$custom_file) {
             // it's important that we wrap this call here in try catch - otherwise a circular
             // logging may occur
             try {
-                $this->internalLog($string, $severity, $custom_file, $cleartext, self::DEFAULT_CHANNEL, $channel);
+                $this->internalLog($string, $severity, $custom_file, $cleartext, $this->default_channel, $channel);
             } catch (Exception $e) {
                 if (DO_DEBUG) {
                     // in case of looping errors - exit right away
@@ -579,5 +580,23 @@ class lcFileLoggerNG extends lcLogger
         }
 
         return $this->syslog->log($message, $priority, $facility, $prefix);
+    }
+
+    /**
+     * @param string $default_channel
+     * @return lcFileLoggerNG
+     */
+    public function setDefaultChannel($default_channel)
+    {
+        $this->default_channel = $default_channel;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultChannel()
+    {
+        return $this->default_channel;
     }
 }

@@ -48,12 +48,20 @@ class lcTagOption extends lcHtmlTag
         return $this;
     }
 
+    /**
+     * @param bool $selected
+     * @return lcTagOption
+     */
     public function setSelected($selected = false)
     {
         $this->setAttribute('selected', $selected ? 'selected' : null);
         return $this;
     }
 
+    /**
+     * @param null $value
+     * @return lcTagOption
+     */
     public function setValue($value = null)
     {
         $this->setAttribute('value', $value);

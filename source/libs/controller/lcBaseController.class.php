@@ -401,7 +401,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         return $is_valid;
     }
 
-    protected function validateData(array $config, array &$failed_validations)
+    protected function validateData(array $config, array &$failed_validations = null)
     {
         if (!$config) {
             return false;
@@ -422,10 +422,24 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                 continue;
             }
 
-            $validator = null;
-            $is_valid = lcCoreValidator::validateValue($validator_name,
-                $value, (isset($options['validator_options']) ? $options['validator_options'] : null),
-                $validator);
+            // find a validator
+            $cl_name = 'lc' . lcInflector::camelize($validator_name, false) . 'Validator';
+
+            if (!class_exists($cl_name)) {
+                assert(false);
+                $is_validated = false;
+                continue;
+            }
+
+            $validator = new $cl_name();
+
+            if (!($validator instanceof lcValidator)) {
+                assert(false);
+                $is_validated = false;
+                continue;
+            }
+
+            $is_valid = $validator->validate($value);
 
             if (!$is_valid) {
                 $failed_validations[] = new lcValidatorFailure($data_name, $fail_msg, $validator);

@@ -23,6 +23,10 @@
 
 */
 
+/**
+ * Class lcTagSelect
+ * @method lcTagSelect addClass($class_name)
+ */
 class lcTagSelect extends lcHtmlTag
 {
     /** @var lcTagOption[] */

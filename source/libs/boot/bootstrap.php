@@ -80,6 +80,7 @@ if (function_exists('mb_internal_encoding')) {
     mb_internal_encoding('UTF-8');
 }
 
+/** @noinspection RealpathInSteamContextInspection */
 define('ROOT', realpath(__DIR__ . '/../../../'));
 define('DS', DIRECTORY_SEPARATOR);
 

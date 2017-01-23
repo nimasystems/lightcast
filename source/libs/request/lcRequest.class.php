@@ -120,9 +120,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             throw new lcInvalidArgumentException('Invalid params');
         }
 
-        $ret = $this->getParam($key);
-
-        return $ret;
+        return $this->getParam($key);
     }
 
     public function getParam($name)
@@ -160,9 +158,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             //return parent::__call($method, $params);
         }
 
-        $res = $env[$str];
-
-        return $res;
+        return $env[$str];
     }
 
     public function offsetExists($name)
