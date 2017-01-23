@@ -660,7 +660,7 @@ abstract class lcController extends lcBaseController
         $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
 
         // if dispatched from front controller - check access
-        if ($check_access && $this->is_front_dispatched) {
+        if ($callable_check && $check_access && $this->is_front_dispatched) {
             $reflection = new ReflectionMethod($this, $method_name);
 
             if (!$reflection->isPublic()) {
