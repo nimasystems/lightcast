@@ -55,6 +55,8 @@ abstract class lcController extends lcBaseController
     protected $action_params;
     protected $action_type;
 
+    private $is_front_dispatched;
+
     /**
      * @var array
      */
@@ -333,9 +335,25 @@ abstract class lcController extends lcBaseController
         return $controller;
     }
 
-    abstract protected function classMethodForAction($action_name, array $action_params = null);
+    /**
+     * @return mixed
+     */
+    public function getIsFrontDispatched()
+    {
+        return $this->is_front_dispatched;
+    }
 
-    abstract protected function actionExists($action_name, array $action_params = null);
+    /**
+     * @param mixed $is_front_dispatched
+     * @return lcController
+     */
+    public function setIsFrontDispatched($is_front_dispatched)
+    {
+        $this->is_front_dispatched = $is_front_dispatched;
+        return $this;
+    }
+
+    abstract protected function classMethodForAction($action_name, array $action_params = null);
 
     protected function beforeExecute()
     {
@@ -628,6 +646,29 @@ abstract class lcController extends lcBaseController
          * @deprecated Left for LC 1.4 compatibility
         */
         $this->event_dispatcher->registerProvider('controller.partial_view', $this, 'getPartialViewByEvent');
+    }
+
+    protected function actionExists($action_name, array $action_params = null, $check_access = true)
+    {
+        /*
+         * We need to make this call with both is_callable, method_exists
+        *  as the inherited classes may contain a __call()
+        *  magic method which will be raised also lcObj as the last parent
+        *  in this tree - throws an exception!
+        */
+        $method_name = $this->classMethodForAction($action_name, $action_params);
+        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+
+        // if dispatched from front controller - check access
+        if ($check_access && $this->is_front_dispatched) {
+            $reflection = new ReflectionMethod($this, $method_name);
+
+            if (!$reflection->isPublic()) {
+                return false;
+            }
+        }
+
+        return $callable_check;
     }
 
     protected function applyActionFilters(lcController $controller_instance, $controller_name, $action_name, array $action_params = null)

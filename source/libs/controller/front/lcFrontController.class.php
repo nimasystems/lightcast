@@ -229,6 +229,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         // save the dispatch params so they can be reused and recombined with further forwards later
         $controller->setDispatchParams($action_params);
+        $controller->setIsFrontDispatched(true);
 
         try {
             // forward to the action

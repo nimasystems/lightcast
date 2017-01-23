@@ -169,25 +169,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
         return $this->action_result;
     }
 
-    protected function actionExists($action_name, array $action_params = null)
-    {
-        /*
-         * We need to make this call with both is_callable, method_exists
-        *  as the inherited classes may contain a __call()
-        *  magic method which will be raised also lcObj as the last parent
-        *  in this tree - throws an exception!
-        */
-        $method_name = $this->classMethodForAction($action_name, $action_params);
-
-        if (!$method_name) {
-            return false;
-        }
-
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
-
-        return $callable_check;
-    }
-
     protected function classMethodForAction($action_name, array $action_params = null)
     {
         return 'executeTask';
