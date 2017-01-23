@@ -221,7 +221,9 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         // if unavailable process and output the error
         if (!$controller) {
-            $this->handleControllerNotReachable($controller_name, $action_name, $action_params);
+            $this->handleControllerNotReachable($controller_name, $action_name, $action_params, array(
+                'not_found_reason' => 'controller_not_found'
+            ));
         }
 
         // prepare it
@@ -235,8 +237,13 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             // forward to the action
             $controller->forwardToControllerAction($controller, null, $action_name, $action_params);
         } catch (Exception $e) {
-            if ($e instanceof lcControllerNotFoundException || $e instanceof lcActionNotFoundException) {
-                $this->handleControllerNotReachable($controller_name, $action_name, $action_params);
+            if ($e instanceof lcControllerNotFoundException || $e instanceof lcActionNotFoundException ||
+                $e instanceof lcNotAvailableException
+            ) {
+                $reason = $e instanceof lcNotAvailableException ? 'content_not_found' : 'action_not_found';
+                $this->handleControllerNotReachable($controller_name, $action_name, $action_params, array(
+                    'not_found_reason' => $reason
+                ));
             }
 
             throw $e;
@@ -271,7 +278,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         }
     }
 
-    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
         // loop protection
         static $already_forwarded;
@@ -279,11 +286,14 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         if (!$already_forwarded) {
             $already_forwarded = true;
 
+            $not_found_reason = isset($opt['not_found_reason']) ? $opt['not_found_reason'] : null;
+
             // notify listeners
             $this->event_dispatcher->notify(new lcEvent('controller.not_found', $this,
                 array('controller_name' => $controller_name,
                     'action_name' => $action_name,
-                    'action_type' => (isset($action_params['type']) ? $action_params['type'] : null),
+                    'not_found_reason' => $not_found_reason,
+                    'action_type' => isset($action_params['type']) ? $action_params['type'] : null,
                     'action_params' => $action_params,
                 )
             ));
@@ -295,6 +305,8 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             $nf_action = isset($nf['action']) ? (string)$nf['action'] : null;
 
             if ($nf_module && $nf_action) {
+                $action_params['not_found_reason'] = $not_found_reason;
+
                 $this->info('Forwarding to \'routing.not_found_action\': ' . $nf_module . '/' . $nf_action);
                 $this->forward($nf_module, $nf_action, $action_params);
             }
@@ -359,11 +371,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
     protected static function forwardReservedParams()
     {
-        $ret = array(
+        return array(
             'type',
             'request',
         );
-        return $ret;
     }
 
     public function getSystemComponentFactory()

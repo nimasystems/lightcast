@@ -246,7 +246,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         return $params;
     }
 
-    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
         // final stop - we need to handle it as json
         throw new lcControllerForwardException('Could not forward to controller action');
@@ -275,8 +275,6 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         ksort($extraction);
 
-        $res = $this->use_actual_get_params ? $arr2 : array_values($extraction);
-
-        return $res;
+        return $this->use_actual_get_params ? $arr2 : array_values($extraction);
     }
 }

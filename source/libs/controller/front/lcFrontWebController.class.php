@@ -128,9 +128,9 @@ class lcFrontWebController extends lcFrontController
         return $params;
     }
 
-    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
-        parent::handleControllerNotReachable($controller_name, $action_name, $action_params);
+        parent::handleControllerNotReachable($controller_name, $action_name, $action_params, $options);
 
         /** @var lcWebResponse $response */
         $response = $this->response;
