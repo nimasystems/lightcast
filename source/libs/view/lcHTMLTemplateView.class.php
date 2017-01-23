@@ -135,7 +135,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     /**
      * @param $name
      * @param null $params
-     * @return lcHtmlTemplateView
+     * @return lcIterateParamHolder
      */
     public function getNode($name, $params = null)
     {
@@ -149,7 +149,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     /**
      * @param $name
      * @param null $params
-     * @return lcHtmlTemplateView
+     * @return lcIterateParamHolder
      */
     public function repeat($name, $params = null)
     {
@@ -158,7 +158,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
 
     /**
      * @param $node_deep_name
-     * @return lcHtmlTemplateView
+     * @return lcIterateParamHolder
      */
     public function getDeepNode($node_deep_name)
     {
@@ -166,7 +166,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     }
 
     /**
-     * @return lcHtmlTemplateView[]
+     * @return lcIterateParamHolder[]
      */
     public function getNodes()
     {
