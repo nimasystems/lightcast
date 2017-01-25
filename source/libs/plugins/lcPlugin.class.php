@@ -415,7 +415,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $component_instance;
     }
 
-    protected function getPluginManager()
+    public function getPluginManager()
     {
         return $this->plugin_manager;
     }

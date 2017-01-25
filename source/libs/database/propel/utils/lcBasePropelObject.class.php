@@ -12,6 +12,8 @@ abstract class lcBasePropelObject extends BaseObject
      */
     protected $application_configuration;
 
+    abstract public function getPrimaryKey();
+
     public function __construct()
     {
         parent::__construct();
@@ -19,7 +21,41 @@ abstract class lcBasePropelObject extends BaseObject
         $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
     }
 
-    abstract public function getPrimaryKey();
+    public function __call($name, $params)
+    {
+        if (preg_match('/set(\w+)/', $name, $matches)) {
+            $virtualColumn = $matches[1];
+            $value = isset($params[0]) ? $params[0] : true;
+
+            return $this->setVirtualColumn($virtualColumn, $value);
+        } else {
+            return parent::__call($name, $params);
+        }
+    }
+
+    public function __get($name)
+    {
+        $m = 'get' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+
+        if (method_exists($this, $m)) {
+            return $this->$m();
+        }
+    }
+
+    public function __set($name, $value)
+    {
+        $m = 'set' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+
+        if (method_exists($this, $m)) {
+            $this->$m($value);
+        }
+    }
+
+    public function __isset($name)
+    {
+        $m = 'get' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+        return method_exists($this, $m);
+    }
 
     public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
     {
@@ -106,18 +142,6 @@ abstract class lcBasePropelObject extends BaseObject
         // no exceptions at this point
         // overriden for this purpose
         return (isset($this->virtualColumns[$name]) ? $this->virtualColumns[$name] : null);
-    }
-
-    public function __call($name, $params)
-    {
-        if (preg_match('/set(\w+)/', $name, $matches)) {
-            $virtualColumn = $matches[1];
-            $value = isset($params[0]) ? $params[0] : true;
-
-            return $this->setVirtualColumn($virtualColumn, $value);
-        } else {
-            return parent::__call($name, $params);
-        }
     }
 
     protected function logError($msg)

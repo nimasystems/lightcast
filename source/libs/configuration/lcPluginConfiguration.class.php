@@ -22,7 +22,7 @@
 
  */
 
-class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
+class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions, iSupportsComposer
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
     const STARTUP_TYPE_MANUAL = 'manual';
@@ -437,5 +437,20 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         }
 
         return null;
+    }
+
+    public function getVendorDir()
+    {
+        return $this->getPluginDir() . DS . 'vendor';
+    }
+
+    public function getComposerAutoloadFilename()
+    {
+        return $this->getVendorDir() . DS . 'autoload.php';
+    }
+
+    public function shouldAutoloadComposer()
+    {
+        return false;
     }
 }

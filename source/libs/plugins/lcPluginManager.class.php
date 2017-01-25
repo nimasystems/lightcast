@@ -224,6 +224,17 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     'configuration' => &$plugin_config
                 )));
 
+                // composer inclusion
+                if ($plugin_config instanceof iSupportsComposer &&
+                    $plugin_config->shouldAutoloadComposer()
+                ) {
+                    $autoload_filename = $plugin_config->getComposerAutoloadFilename();
+
+                    if ($autoload_filename && !include $autoload_filename) {
+                        throw new lcComponentException($this->t('Could not include vendor autoloader'));
+                    }
+                }
+
                 // check if plugin should be started automatically, it should be if:
                 // - it's startup type is set to STARTUP_TYPE_AUTOMATIC
                 // otherwise the plugin may be started later on - if manually called / automatic startup events are defined and detected.

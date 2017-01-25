@@ -59,6 +59,25 @@ class lcArrays
         return $ret;
     }
 
+    /**
+     * @param array $array
+     * @return stdClass
+     */
+    public static function arrayToObject(array $array)
+    {
+        $obj = new stdClass;
+        foreach ($array as $k => $v) {
+            if ($k) {
+                $obj->{$k} = $v;
+
+                if (is_array($v)) {
+                    $obj->{$k} = lcArrays::arrayToObject($v); //RECURSION
+                }
+            }
+        }
+        return $obj;
+    }
+
     /*
      * Original author: symfony framework
     * All copyrights reserved to symfony
@@ -99,6 +118,7 @@ class lcArrays
                 } else {
                     return $args[1];
                 }
+                break;
             default:
                 $args = func_get_args();
                 $args[1] = lcArrays::arrayDeepMerge($args[0], $args[1]);

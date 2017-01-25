@@ -117,6 +117,7 @@ require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcVm.class.php
 
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iProvidesCapabilities.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iRequiresCapabilities.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iSupportsComposer.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'logger' . DS . 'iLoggable.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'i18n' . DS . 'iI18nProvider.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModelOperations.class.php';

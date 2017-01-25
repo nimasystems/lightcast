@@ -28,6 +28,8 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
      */
     protected $registered_classes = array();
 
+    private $included_classes = array();
+
     protected $spl_registered;
 
     public function initialize()
@@ -124,94 +126,26 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
 
     public function loadClass($class_name)
     {
-        $included = false;
+        if (in_array($class_name, $this->included_classes)) {
+            return true;
+        }
 
         // check if class is registered
-        $class_registered = isset($this->registered_classes[$class_name]);
+        $cls_fname = isset($this->registered_classes[$class_name]) ?
+            $this->registered_classes[$class_name] : null;
 
-        // we check if there are more than 2 autoloaders (this one and propel's one which is used for nothing)
-        // if there are - we do not throw an exception here but allow the other autoloaders to also try to load the class
-
-        if ($class_registered) {
-            // try to include it
-            /** @noinspection PhpIncludeInspection */
-            $included = (bool)include $this->registered_classes[$class_name];
-        }
-
-        if (!$included) {
-            $error_message = null;
-            $error_code = 0;
-
-            // try other autoloaders if available
-            $autoloaders = spl_autoload_functions();
-
-            if ($autoloaders) {
-                // try with each loader
-                // store the first detected error
-                foreach ($autoloaders as $autoloader) {
-
-                    if (!is_array($autoloader) || $autoloader instanceof Closure) {
-                        continue;
-                    }
-
-                    $obj = $autoloader[0];
-                    $func = $autoloader[1];
-
-                    // skip the current one
-                    if ($obj === $this && $func == 'loadClass') {
-                        continue;
-                    }
-
-                    try {
-                        // TODO: check this
-                        //$obj->$func(array($class_name));
-                        call_user_func_array(array($obj, $func), array($class_name));
-
-                        $included = class_exists($class_name, false);
-
-                        if ($included) {
-                            break;
-                        }
-                    } catch (Exception $e) {
-                        if (!$error_message) {
-                            $error_message = $e->getMessage();
-                        }
-
-                        if (!$error_code) {
-                            $error_code = $e->getCode();
-                        }
-
-                        continue;
-                    }
-
-                    unset($autoloader);
-                }
-            }
-
-            // if we have a success
-            if ($included) {
-                return true;
-            }
-
-            // unfortunately - at this moment there is no way to distinguish between a class_exists() call or
-            // trying to instantiate a missing class
-            // so if we throw an exception here - it might be an exception thrown to a class_exists() check
-            // that should not happen...
-            // until PHP resolves this issue (because it IS an issue) we cannot apply this
-            // and we silently exit and do nothing further.... pitty..
+        if (!$cls_fname) {
             return false;
-
-            /*
-            $this->event_dispatcher->notify(new lcEvent('class_autoloader.class_not_found', $this, array(
-                    'class_name' => $class_name,
-                    'error_message' => $error_message,
-                    'error_code' => $error_code
-            )));
-
-            throw new Exception('Could not load class: ' . $class_name);*/
         }
 
-        return true;
+        include_once $this->registered_classes[$class_name];
+        $cls_exists = class_exists($class_name, false);
+
+        if ($cls_exists) {
+            $this->included_classes[] = $class_name;
+        }
+
+        return $cls_exists;
     }
 
     public function writeClassCache()
