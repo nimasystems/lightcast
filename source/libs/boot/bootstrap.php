@@ -32,8 +32,8 @@ if (defined('DO_DEBUG')) {
 }
 
 // check the PHP Version Requirement
-if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
-    echo 'Lightcast PHP Framework requires PHP Version 5.3.0 or higher';
+if (!version_compare(PHP_VERSION, '5.6.0', '>=')) {
+    echo 'Lightcast PHP Framework requires PHP Version 5.6.0 or higher';
     exit(2);
 }
 
