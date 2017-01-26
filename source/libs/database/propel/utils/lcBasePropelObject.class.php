@@ -67,6 +67,15 @@ abstract class lcBasePropelObject extends BaseObject
         $this->application_configuration = $configuration;
     }
 
+    public function postSave(PropelPDO $con = null)
+    {
+        parent::postSave($con);
+
+        if ($this->event_dispatcher) {
+            $this->event_dispatcher->notify(new lcEvent('data_model.after_save', $this));
+        }
+    }
+
     public function preInsert(PropelPDO $con = null)
     {
         if ($this->event_dispatcher) {

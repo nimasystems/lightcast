@@ -234,15 +234,15 @@ class lcSys
         $ret = 0;
 
         if (false !== stripos($input, 'b')) {
-            $ret = $input;
+            $ret = str_ireplace('b', '', $input);
         } elseif (stristr($input, 'k')) {
-            $ret = $input * 1024;
+            $ret = str_ireplace('k', '', $input) * 1024;
         } elseif (stristr($input, 'm')) {
-            $ret = $input * 1048576;
+            $ret = str_ireplace('m', '', $input) * 1048576;
         } elseif (stristr($input, 'g')) {
-            $ret = $input * 1073741824;
+            $ret = str_ireplace('g', '', $input) * 1073741824;
         } elseif (stristr($input, 't')) {
-            $ret = $input * 1099511627776;
+            $ret = str_ireplace('t', '', $input) * 1099511627776;
         }
 
         return $ret;
