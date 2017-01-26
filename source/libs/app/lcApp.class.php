@@ -1194,7 +1194,13 @@ class lcApp extends lcObj
         throw new lcAssertException($file, $line, $code);
     }
 
-    public function handleException(Exception $exception)
+    /**
+     * @param Exception|Throwable|mixed $exception
+     * @return mixed
+     * @throws Exception
+     * @throws Throwable
+     */
+    public function handleException($exception)
     {
         // notify listeners - allow them to intercept the exception and
         // do something else

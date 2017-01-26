@@ -417,8 +417,19 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $this->mailer = $event->subject;
     }
 
-    public function handleException(Exception $exception)
+    public function handleException($exception)
     {
+        // PHP7 compat
+        if (!$exception instanceof Exception) {
+            $exception = new ErrorException(
+                $exception->getMessage(),
+                $exception->getCode(),
+                E_ERROR,
+                $exception->getFile(),
+                $exception->getLine()
+            );
+        }
+
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
 
         if ($should_send_email) {
