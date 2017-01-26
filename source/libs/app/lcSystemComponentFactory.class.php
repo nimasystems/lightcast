@@ -108,9 +108,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getPluginsInPath($path, $location);
-
-                $plugins = array_merge($plugins, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $plugins += (array)lcComponentLocator::getPluginsInPath($path, $location);
 
                 unset($location, $found, $path);
             }
@@ -131,9 +130,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getActionFormsInPath($path, $location);
-
-                $forms = array_merge($forms, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $forms += (array)lcComponentLocator::getActionFormsInPath($path, $location);
 
                 unset($location, $found, $path);
             }
@@ -154,9 +152,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getControllerModulesInPath($path, $location);
-
-                $controllers = array_merge($controllers, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $controllers += (array)lcComponentLocator::getControllerModulesInPath($path, $location);
 
                 unset($location, $found, $path);
             }
@@ -177,9 +174,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getControllerWebServicesInPath($path, $location);
-
-                $controllers = array_merge($controllers, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $controllers += (array)lcComponentLocator::getControllerWebServicesInPath($path, $location);
 
                 unset($location, $found, $path);
             }
@@ -200,9 +196,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getControllerTasksInPath($path, $location);
-
-                $controllers = array_merge($controllers, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $controllers += (array)lcComponentLocator::getControllerTasksInPath($path, $location);
 
                 unset($location, $found, $path);
             }
@@ -223,9 +218,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $path = $location['path'];
 
-                $found = lcComponentLocator::getControllerComponentsInPath($path, $location);
-
-                $controllers = array_merge($controllers, (array)$found);
+                /** @noinspection AdditionOperationOnArraysInspection */
+                $controllers += (array)lcComponentLocator::getControllerComponentsInPath($path, $location);
 
                 unset($location, $found, $path);
             }
