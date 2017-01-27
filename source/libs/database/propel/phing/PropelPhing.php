@@ -1589,11 +1589,14 @@ class PropelPhing
         switch ($last) {
             // The 'G' modifier is available since PHP 5.1.0
             case 'g':
-                $val *= 1024;
+                $val = (int)str_replace('g', '', $val) * 1024;
+                break;
             case 'm':
-                $val *= 1024;
+                $val = (int)str_replace('m', '', $val) * 1024;
+                break;
             case 'k':
-                $val *= 1024;
+                $val = (int)str_replace('k', '', $val) * 1024;
+                break;
         }
 
         return $val;

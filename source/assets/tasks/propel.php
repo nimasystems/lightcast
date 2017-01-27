@@ -98,6 +98,9 @@ EOD;
         // check necessary requirements
         $this->precheck();
 
+        set_time_limit(300);
+        ini_set('memory_limit', '512M');
+
         $ret = false;
 
         switch ($this->getRequest()->getParam('action')) {
