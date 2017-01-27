@@ -591,9 +591,6 @@ abstract class OMBuilder extends DataModelBuilder
      */
     private function clean($content)
     {
-        // TODO: Fixme - this is not the place for this here - but something is overriding it on the way!
-        ini_set('memory_limit', '512M');
-
         // trailing whitespaces
         $content = preg_replace('/[ \t]*$/m', '', $content);
 
