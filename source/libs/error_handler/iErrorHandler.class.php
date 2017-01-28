@@ -25,7 +25,11 @@
 
 interface iErrorHandler
 {
-    public function handleException(Exception $exception);
+    /**
+     * @param Exception|Error $exception
+     * @return mixed
+     */
+    public function handleException($exception);
 
     public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars);
 
