@@ -61,8 +61,7 @@ class lcInflector
 
     public static function asFolderName($input)
     {
-        $input = lcStrings::toAlphaNum($input, array('-', '.', ':'));
-        return $input;
+        return lcStrings::toAlphaNum($input, array('-', '.', ':'));
     }
 
     # when we need to remove 'c','v','t' to find a filename
@@ -100,6 +99,8 @@ class lcInflector
     public static function humanize($camelCasedWord)
     {
         $replace = ucfirst(strtolower(preg_replace('/(?<=\\w)([A-Z])/', ' \\1', $camelCasedWord)));
+        $replace = str_replace(array('_', '-'), ' ', $replace);
+        $replace = trim($replace);
         return $replace;
     }
 }
