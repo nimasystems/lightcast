@@ -1648,12 +1648,12 @@ class Phing
         self::$origIniSettings['allow_call_time_pass_reference'] = ini_set('allow_call_time_pass_reference', 'on');
         self::$origIniSettings['track_errors'] = ini_set('track_errors', 1);
 
-        $mem_limit = (int)self::convertShorthand(ini_get('memory_limit'));
+        /*$mem_limit = (int)self::convertShorthand(ini_get('memory_limit'));
         if ($mem_limit < (32 * 1024 * 1024) && $mem_limit > -1) {
             // We do *not* need to save the original value here, since we don't plan to restore
             // this after shutdown (we don't trust the effectiveness of PHP's garbage collection).
             ini_set('memory_limit', '32M'); // nore: this may need to be higher for many projects
-        }
+        }*/
     }
 
     /**
