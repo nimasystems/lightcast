@@ -135,7 +135,7 @@ class lcPropelConnection extends PropelPDO
     public function rollback($emulated = true)
     {
         if ($emulated) {
-            return parent::rollback();
+            return parent::rollBack();
         } else {
             if (!$this->exec('ROLLBACK')) {
                 return false;
@@ -153,8 +153,8 @@ class lcPropelConnection extends PropelPDO
         // http://dev.mysql.com/doc/refman/5.0/en/lock-tables-and-transactions.html
 
         $this->beginTransaction();
-        $this->disableAutocommit();
-        $this->lockTables($tables);
+        //$this->disableAutocommit();
+        //$this->lockTables($tables);
 
         return true;
     }
@@ -162,6 +162,11 @@ class lcPropelConnection extends PropelPDO
     public function disableAutocommit()
     {
         return $this->exec('SET autocommit = 0');
+    }
+
+    public function enableAutocommit()
+    {
+        return $this->exec('SET autocommit = 1');
     }
 
     public function exec($sql)
@@ -177,31 +182,26 @@ class lcPropelConnection extends PropelPDO
         } elseif (is_array($sql)) {
             // execute multiply statements in a transaction
             $this->beginTransaction();
-            $this->disableAutocommit();
 
-            foreach ($sql as $statement) {
-                try {
+            try {
+                foreach ($sql as $statement) {
                     parent::exec($statement);
                     unset($statement);
-                } catch (Exception $e) {
-                    parent::rollBack();
-                    throw $e;
                 }
-            }
 
-            parent::commit();
-            $this->enableAutocommit();
+                $this->commit();
+
+            } catch (Exception $e) {
+                $this->rollback();
+
+                throw $e;
+            }
         }
 
         return false;
     }
 
     #pragma mark - Caching
-
-    public function enableAutocommit()
-    {
-        return $this->exec('SET autocommit = 1');
-    }
 
     public function lockTables(array $tables)
     {
@@ -227,9 +227,12 @@ class lcPropelConnection extends PropelPDO
 
     public function commitAndUnlockTables()
     {
-        $this->unlockTables();
         parent::commit();
+
+        /*
+        $this->unlockTables();
         $this->enableAutocommit();
+*/
 
         return true;
     }
@@ -241,9 +244,12 @@ class lcPropelConnection extends PropelPDO
 
     public function rollbackAndUnlockTables()
     {
-        $this->unlockTables();
         parent::rollBack();
+
+        /*
+        $this->unlockTables();
         $this->enableAutocommit();
+*/
 
         return true;
     }
