@@ -71,7 +71,8 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->initViewFilterChain();
 
         // max forwards
-        $this->max_forwards = isset($this->configuration['controller.max_forwards']) ? (int)$this->configuration['controller.max_forwards'] : self::DEFAULT_MAX_FORWARDS;
+        $this->max_forwards = isset($this->configuration['controller.max_forwards']) ? (int)$this->configuration['controller.max_forwards'] :
+            self::DEFAULT_MAX_FORWARDS;
 
         // enabled / disabled modules
         $this->enabled_modules = (array)$this->configuration['settings.enabled_modules'];
