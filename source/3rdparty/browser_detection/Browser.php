@@ -347,9 +347,9 @@ class Browser
     public function __toString()
     {
         return "<strong>Browser Name:</strong> {$this->getBrowser()}<br/>\n" .
-        "<strong>Browser Version:</strong> {$this->getVersion()}<br/>\n" .
-        "<strong>Browser User Agent String:</strong> {$this->getUserAgent()}<br/>\n" .
-        "<strong>Platform:</strong> {$this->getPlatform()}<br/>";
+            "<strong>Browser Version:</strong> {$this->getVersion()}<br/>\n" .
+            "<strong>Browser User Agent String:</strong> {$this->getUserAgent()}<br/>\n" .
+            "<strong>Platform:</strong> {$this->getPlatform()}<br/>";
     }
 
     /**
@@ -677,18 +677,20 @@ class Browser
     {
         if (stripos($this->_agent, 'Chrome') !== false) {
             $aresult = explode('/', stristr($this->_agent, 'Chrome'));
-            $aversion = explode(' ', $aresult[1]);
-            $this->setVersion($aversion[0]);
-            $this->setBrowser(self::BROWSER_CHROME);
-            //Chrome on Android
-            if (stripos($this->_agent, 'Android') !== false) {
-                if (stripos($this->_agent, 'Mobile') !== false) {
-                    $this->setMobile(true);
-                } else {
-                    $this->setTablet(true);
+            if (isset($aresult[1])) {
+                $aversion = explode(' ', $aresult[1]);
+                $this->setVersion($aversion[0]);
+                $this->setBrowser(self::BROWSER_CHROME);
+                //Chrome on Android
+                if (stripos($this->_agent, 'Android') !== false) {
+                    if (stripos($this->_agent, 'Mobile') !== false) {
+                        $this->setMobile(true);
+                    } else {
+                        $this->setTablet(true);
+                    }
                 }
+                return true;
             }
-            return true;
         }
         return false;
     }
