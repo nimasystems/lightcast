@@ -1202,6 +1202,17 @@ class lcApp extends lcObj
      */
     public function handleException($exception)
     {
+        // PHP7 compat
+        if (!$exception instanceof Exception) {
+            $exception = new ErrorException(
+                $exception->getMessage(),
+                $exception->getCode(),
+                E_ERROR,
+                $exception->getFile(),
+                $exception->getLine()
+            );
+        }
+
         // notify listeners - allow them to intercept the exception and
         // do something else
         $should_be_handled = true;

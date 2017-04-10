@@ -86,8 +86,24 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
     }
 
-    public function notifyOfException(Exception $exception)
+    /**
+     * @param Exception|Throwable $exception
+     * @return mixed|void
+     * @throws lcInvalidArgumentException
+     */
+    public function notifyOfException($exception)
     {
+        // PHP7 compat
+        if (!$exception instanceof Exception) {
+            $exception = new ErrorException(
+                $exception->getMessage(),
+                $exception->getCode(),
+                E_ERROR,
+                $exception->getFile(),
+                $exception->getLine()
+            );
+        }
+
         if (!$exception) {
             throw new lcInvalidArgumentException('Invalid params');
         }

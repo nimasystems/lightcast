@@ -37,5 +37,9 @@ interface iErrorHandler
 
     public function supportsAssertions();
 
-    public function notifyOfException(Exception $exception);
+    /**
+     * @param Exception|Throwable|mixed $exception
+     * @return mixed
+     */
+    public function notifyOfException($exception);
 }
