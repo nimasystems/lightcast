@@ -27,11 +27,13 @@ interface iFrontController
 {
     /**
      * @param $controller_name
+     * @param $action_name
+     * @param $action_type
      * @param null $context_type
      * @param null $context_name
      * @return lcController
      */
-    public function getControllerInstance($controller_name, $context_type = null, $context_name = null);
+    public function getControllerInstance($controller_name, $action_name = null, $action_type = null, $context_type = null, $context_name = null);
 
     public function filterForwardParams(array &$forward_params);
 

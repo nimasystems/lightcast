@@ -255,6 +255,14 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getObjectOverrides()
+    {
+        return (array)$this['overrides'];
+    }
+
     public function getAdminEmail()
     {
         $email = $this->get('admin_email');

@@ -62,6 +62,11 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     /** @var array */
     private $config_controller_action_forms;
 
+    /**
+     * @var array
+     */
+    private $config_overrides;
+
     public function initialize()
     {
         parent::initialize();
@@ -91,9 +96,19 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             $this->initConfigActionForms();
         }
 
+        if (null === $this->config_overrides) {
+            $this->initConfigOverrides();
+        }
+
         // observe for plugin startups - to obtain their derivatives
         $this->event_dispatcher->connect('plugin.will_startup', $this, 'onPluginWillStartup');
         $this->event_dispatcher->connect('plugin_manager.plugin_configuration_loaded', $this, 'onPluginConfigurationLoaded');
+    }
+
+    private function initConfigOverrides()
+    {
+        assert(!$this->config_overrides);
+        $this->config_overrides = $this->configuration->getObjectOverrides();
     }
 
     private function initConfigSystemPlugins()
@@ -671,25 +686,104 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     /**
      * @param $controller_name
+     * @param null $action_name
+     * @param null|string $action_type
      * @param null $context_type
      * @param null $context_name
      * @return lcWebController
      * @throws lcInvalidArgumentException
-     * @throws lcNotAvailableException
      * @throws lcSystemException
      */
-    public function getControllerModuleInstance($controller_name, $context_type = null, $context_name = null)
+    public function getControllerModuleInstance($controller_name, $action_name = null, $action_type = 'action',
+                                                $context_type = null, $context_name = null)
+    {
+        $instance = $this->getControllerModuleInstanceInternal('module', $controller_name, $action_name,
+            $action_type, $context_type, $context_name);
+
+        if ($instance && !($instance instanceof lcWebController)) {
+            throw new lcSystemException('Invalid web controller');
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param $controller_name
+     * @param null $action_name
+     * @param null $action_type
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcWebServiceController
+     * @throws \lcInvalidArgumentException
+     * @throws lcSystemException
+     */
+    public function getControllerWebServiceInstance($controller_name, $action_name = null, $action_type = null,
+                                                    $context_type = null, $context_name = null)
+    {
+        $instance = $this->getControllerModuleInstanceInternal('ws', $controller_name, $action_name,
+            'action', $context_type, $context_name);
+
+        // check type
+        if ($instance && !($instance instanceof lcWebServiceController)) {
+            throw new lcSystemException('Invalid web service controller');
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param $controller_name
+     * @param null $action_name
+     * @param null $action_type
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcTaskController
+     * @throws \lcInvalidArgumentException
+     * @throws lcSystemException
+     */
+    public function getControllerTaskInstance($controller_name, $action_name = null, $action_type = null,
+                                              $context_type = null, $context_name = null)
+    {
+        $instance = $this->getControllerModuleInstanceInternal('task', $controller_name, $action_name,
+            'action', $context_type, $context_name);
+
+        // check type
+        if ($instance && !($instance instanceof lcTaskController)) {
+            throw new lcSystemException('Invalid web service controller');
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @param $controller_type
+     * @param $controller_name
+     * @param null $action_name
+     * @param null|string $action_type
+     * @param null $context_type
+     * @param null $context_name
+     * @return lcWebController
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
+    public function getControllerModuleInstanceInternal($controller_type, $controller_name, $action_name = null, $action_type = 'action',
+                                                        $context_type = null, $context_name = null)
     {
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');
         }
 
-        $details = null;
+        // check for overriden type
+        $override_details = $action_type && $action_name && isset($this->config_overrides['controller'][$action_type][$controller_name][$action_name]) ?
+            $this->config_overrides['controller'][$action_type][$controller_name][$action_name] : null;
 
-        // first check config, then others
-        $details = isset($this->config_controller_modules[$controller_name]) ?
-            $this->config_controller_modules[$controller_name] :
-            (isset($this->controllers[$controller_name]) ? $this->controllers[$controller_name] : null);
+        if ($override_details) {
+            $override_detailsk = array_keys($override_details);
+            $controller_name = $override_detailsk[0];
+            $action_name = $override_details[$override_detailsk[0]];
+        }
+
+        $details = $this->getControllerDetails($controller_name, $controller_type);
 
         if (!$details) {
             return null;
@@ -701,12 +795,33 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             return null;
         }
 
-        // check type
-        if (!($instance instanceof lcWebController)) {
-            throw new lcSystemException('Invalid web controller');
+        if ($action_name) {
+            $instance->setActionName($action_name);
+        }
+
+        if ($action_type) {
+            $instance->setActionType($action_type);
         }
 
         return $instance;
+    }
+
+    protected function getControllerDetails($controller_name, $controller_type = 'module')
+    {
+        if ($controller_type == 'task') {
+            return isset($this->config_controller_tasks[$controller_name]) ?
+                $this->config_controller_tasks[$controller_name] :
+                (isset($this->tasks[$controller_name]) ? $this->tasks[$controller_name] : null);
+        }
+
+        if ($controller_type == 'ws') {
+            isset($this->config_controller_web_services[$controller_name]) ?
+                $this->config_controller_web_services[$controller_name] :
+                (isset($this->web_services[$controller_name]) ? $this->web_services[$controller_name] : null);
+        }
+        return isset($this->config_controller_modules[$controller_name]) ?
+            $this->config_controller_modules[$controller_name] :
+            (isset($this->controllers[$controller_name]) ? $this->controllers[$controller_name] : null);
     }
 
     /**
@@ -802,90 +917,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $instance->setContextName($context_name);
         $instance->setAssetsPath($assets_path);
         $instance->setAssetsWebpath($assets_webpath);
-
-        return $instance;
-    }
-
-    /**
-     * @param $controller_name
-     * @param null $context_type
-     * @param null $context_name
-     * @return lcWebServiceController
-     * @throws lcInvalidArgumentException
-     * @throws lcNotAvailableException
-     * @throws lcSystemException
-     */
-    public function getControllerWebServiceInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-
-        if (!$controller_name) {
-            throw new lcInvalidArgumentException('Invalid controller name');
-        }
-
-        $details = null;
-
-        // first check config, then others
-        $details = isset($this->config_controller_web_services[$controller_name]) ?
-            $this->config_controller_web_services[$controller_name] :
-            (isset($this->web_services[$controller_name]) ? $this->web_services[$controller_name] : null);
-
-        if (!$details) {
-            return null;
-        }
-
-        $instance = $this->getController($details);
-
-        if (!$instance) {
-            return null;
-        }
-
-        // check type
-        if (!($instance instanceof lcWebServiceController)) {
-            throw new lcSystemException('Invalid web service controller');
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @param $controller_name
-     * @param null $context_type
-     * @param null $context_name
-     * @return lcTaskController
-     * @throws lcInvalidArgumentException
-     * @throws lcNotAvailableException
-     * @throws lcSystemException
-     */
-    public function getControllerTaskInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-
-        if (!$controller_name) {
-            throw new lcInvalidArgumentException('Invalid controller name');
-        }
-
-        $details = null;
-
-        // first check config, then others
-        $details = isset($this->config_controller_tasks[$controller_name]) ?
-            $this->config_controller_tasks[$controller_name] :
-            (isset($this->tasks[$controller_name]) ? $this->tasks[$controller_name] : null);
-
-        if (!$details) {
-            return null;
-        }
-
-        $instance = $this->getController($details);
-
-        if (!$instance) {
-            return null;
-        }
-
-        // check type
-        if (!($instance instanceof lcTaskController)) {
-            throw new lcSystemException('Invalid task controller');
-        }
 
         return $instance;
     }
@@ -1009,7 +1040,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             'config_controller_web_services' => $this->config_controller_web_services,
             'config_controller_tasks' => $this->config_controller_tasks,
             'config_controller_components' => $this->config_controller_components,
-            'config_system_plugins' => $this->config_system_plugins
+            'config_system_plugins' => $this->config_system_plugins,
+            'config_overrides' => $this->config_overrides
         );
 
         return $cached_data;
@@ -1023,5 +1055,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->config_controller_tasks = isset($cached_data['config_controller_tasks']) ? $cached_data['config_controller_tasks'] : null;
         $this->config_controller_components = isset($cached_data['config_controller_components']) ? $cached_data['config_controller_components'] : null;
         $this->config_system_plugins = isset($cached_data['config_system_plugins']) ? $cached_data['config_system_plugins'] : null;
+        $this->config_overrides = isset($cached_data['config_overrides']) ? $cached_data['config_overrides'] : null;
     }
 }

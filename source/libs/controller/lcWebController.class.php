@@ -347,11 +347,14 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                             try {
                                 // obtain an instance of the controller
                                 /** @var lcWebController $decorating_controller */
-                                $decorating_controller = $this->getControllerInstance($module);
+                                $decorating_controller = $this->getControllerInstance($module, $action, $action_type);
 
                                 if (!$decorating_controller) {
                                     throw new lcControllerNotFoundException('Controller not found');
                                 }
+
+                                // reset in case of object overrides
+                                $action = $decorating_controller->getActionName();
 
                                 $this->prepareControllerInstance($decorating_controller);
 

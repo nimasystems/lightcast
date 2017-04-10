@@ -208,11 +208,14 @@ abstract class lcController extends lcBaseController
         try {
             // get an instance of the controller first
             /** @var lcWebController $controller_instance */
-            $controller_instance = $this->getControllerInstance($module);
+            $controller_instance = $this->getControllerInstance($module, $action_name, 'partial');
 
             if (!$controller_instance) {
                 throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
             }
+
+            // reset in case of object overrides
+            $action_name = $controller_instance->getActionName();
 
             $rendered_contents = null;
 
@@ -397,13 +400,17 @@ abstract class lcController extends lcBaseController
             $this->getRootController()->validateForward($action_name, $controller_name);
         }
 
-        $controller_instance = $this->getControllerInstance($controller_name);
+        $action_type = (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION);
+        $controller_instance = $this->getControllerInstance($controller_name, $action_name, $action_type);
 
         if (!$controller_instance || !$action_name) {
             throw new lcControllerNotFoundException('Controller ' .
                 ($action_name ? 'action ' : null) . ' \'' .
                 $controller_name . ($action_name ? ' / ' . $action_name : null) . '\' not found');
         }
+
+        // reset in case of object overrides
+        $action_name = $controller_instance->getActionName();
 
         $controller_instance->setDispatchParams($this->dispatch_params);
 
@@ -412,7 +419,7 @@ abstract class lcController extends lcBaseController
 
         $action_params = array(
             'request' => (array)$action_params,
-            'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION)
+            'type' => $action_type
         );
 
         // override the web controller's forward for the sake of using this method within
@@ -428,18 +435,18 @@ abstract class lcController extends lcBaseController
         return $this->root_controller;
     }
 
-    public function setRootController(iFrontController & $controller = null)
+    public function setRootController(iFrontController $controller = null)
     {
         $this->root_controller = $controller;
     }
 
-    protected function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    protected function getControllerInstance($controller_name, $action_name = null, $action_type = null, $context_type = null, $context_name = null)
     {
         if (!$this->root_controller) {
             throw new lcNotAvailableException('Root controller not available');
         }
 
-        return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
+        return $this->root_controller->getControllerInstance($controller_name, $action_name, $action_type, $context_type, $context_name);
     }
 
     /*

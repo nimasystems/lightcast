@@ -44,8 +44,7 @@ abstract class lcWebBaseController extends lcController
             throw new lcNotAvailableException('Router not available');
         }
 
-        $url = $router->generate($params, $absolute_url, $route);
-        return $url;
+        return $router->generate($params, $absolute_url, $route);
     }
 
     protected function renderJson($content)

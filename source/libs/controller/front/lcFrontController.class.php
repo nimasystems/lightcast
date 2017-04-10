@@ -216,8 +216,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // validate and throw exception if not possible to forward
         $this->validateForward($action_name, $controller_name);
 
+        $action_type = isset($action_params['type']) ? $action_params['type'] : null;
+
         // get an instance of the controller
-        $controller = ($controller_name ? $this->getControllerInstance($controller_name) : null);
+        $controller = ($controller_name ? $this->getControllerInstance($controller_name, $action_name, $action_type) : null);
 
         // if unavailable process and output the error
         if (!$controller) {
@@ -225,6 +227,9 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
                 'not_found_reason' => 'controller_not_found'
             ));
         }
+
+        // reset in case of object overrides
+        $action_name = $controller->getActionName();
 
         // prepare it
         //$this->prepareControllerInstance($controller);
