@@ -16,9 +16,9 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
 
         if ($overriden_path) {
             return $overriden_path;
-        } else {
-            return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
+
+        return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
     }
 
     protected function addClassBody(&$script)
@@ -26,6 +26,74 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
         parent::addClassBody($script);
 
         $this->addTranslate($script);
+        $this->addDataTableJoin($script);
+    }
+
+    protected function addDataTableJoin(&$script)
+    {
+        $script .= "/**
+     * Fetches data from PRIMARY and DATA tables with 1 query
+     *
+     * @param string|null \$scope The scope to fetch the data from the VIEW (global or view)
+     * @param int|null \$website_id The website_id if a view scope is requested
+     * @param int|null $app_id The app_id if a view scope is requested
+     * @param array|null \$columns Custom columns in the form of:
+     *
+     * array(
+     *  array('column' => 'title', 'alias' => 'title_col')
+     * )
+     *
+     * @return " . $this->getClassname() . "
+     */
+    public function joinDataView(\$scope = 'global', \$website_id = null,
+                                \$app_id = null,
+                                 array \$columns = null)
+    {
+        \$tblmap = \$this->getTableMap();
+        \$data_table_name = \$tblmap->getPhpName() . 'Data';
+        \$data_query = \$data_table_name . 'Query';
+        /** @var ModelCriteria \$data_query_instance */
+        \$data_query_instance = new \$data_query();
+        /** @var TableMap \$data_query_tblmap */
+        \$data_query_tblmap = \$data_query_instance->getTableMap();
+
+        \$pks = array_keys(\$tblmap->getPrimaryKeys());
+        \$data_pks = array_keys(\$data_query_tblmap->getPrimaryKeys());
+
+        if (!\$columns) {
+            \$columns_it = \$data_query_tblmap->getColumns();
+            \$columns = array();
+
+            foreach ((array)\$columns_it as \$column) {
+
+                \$column_name = \$column->getName();
+
+                if (\$column_name == 'scope' ||
+                    \$column_name == 'app_id' ||
+                    \$column_name == 'website_id' ||
+                    in_array(\$column_name, \$data_pks)
+                ) {
+                    continue;
+                }
+
+                \$columns[] = array(
+                    'column' => \$column_name,
+                    'alias' => lcInflector::camelize(\$column_name)
+                );
+
+                unset(\$column);
+            }
+        }
+
+        CoreHelper::addWebsitePropelJoinCriteria(\$this, \$tblmap->getPhpName() . 'Data',
+            \$pks,
+            \$columns,
+            \$website_id,
+            \$app_id
+        );
+
+        return \$this;
+    }";
     }
 
     protected function addTranslate(&$script)

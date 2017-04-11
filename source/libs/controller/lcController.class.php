@@ -746,8 +746,9 @@ abstract class lcController extends lcBaseController
                     ' (Type: ' . (isset($action_params['type']) ? $action_params['type'] : null) . '), Reason: ' .
                     ($deny_reason ? $deny_reason : ' - none given - '));
 
+                $throw_on_deny = isset($action_params['throw_on_deny']) && $action_params['throw_on_deny'];
 
-                if ($credentials_module && $credentials_action) {
+                if (!$throw_on_deny && $credentials_module && $credentials_action) {
                     $this->forward(
                         $credentials_action,
                         $credentials_module,
@@ -758,9 +759,9 @@ abstract class lcController extends lcBaseController
 
                     if ($exception) {
                         throw $exception;
-                    } else {
-                        throw new lcAuthException(($deny_reason ? $deny_reason : 'Access Denied (' . $controller_name . '/' . $action_name . ')'));
                     }
+
+                    throw new lcAccessDeniedException(($deny_reason ? $deny_reason : 'Access Denied (' . $controller_name . '/' . $action_name . ')'));
                 }
             }
         }
