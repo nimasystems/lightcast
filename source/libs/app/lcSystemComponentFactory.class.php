@@ -815,10 +815,11 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         }
 
         if ($controller_type == 'ws') {
-            isset($this->config_controller_web_services[$controller_name]) ?
+            return isset($this->config_controller_web_services[$controller_name]) ?
                 $this->config_controller_web_services[$controller_name] :
                 (isset($this->web_services[$controller_name]) ? $this->web_services[$controller_name] : null);
         }
+
         return isset($this->config_controller_modules[$controller_name]) ?
             $this->config_controller_modules[$controller_name] :
             (isset($this->controllers[$controller_name]) ? $this->controllers[$controller_name] : null);
