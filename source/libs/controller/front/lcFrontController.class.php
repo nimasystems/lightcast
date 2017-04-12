@@ -242,8 +242,8 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             // forward to the action
             $controller->forwardToControllerAction($controller, null, $action_name, $action_params);
         } catch (Exception $e) {
-            if ($e instanceof lcControllerNotFoundException || $e instanceof lcActionNotFoundException ||
-                $e instanceof lcNotAvailableException
+            if ($e instanceof lcControllerNotFoundException || $e instanceof lcActionNotFoundException /*||
+                $e instanceof lcNotAvailableException*/
             ) {
                 $reason = $e instanceof lcNotAvailableException ? 'content_not_found' : 'action_not_found';
                 $this->handleControllerNotReachable($controller_name, $action_name, $action_params, array(
