@@ -85,7 +85,7 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
             }
         }
 
-        CoreHelper::addWebsitePropelJoinCriteria(\$this, \$tblmap->getPhpName() . 'Data',
+        CoreHelper::addWebsitePropelJoinCriteria(\$this, \$tblmap->getName() . '_data',
             \$pks,
             \$columns,
             \$website_id,
