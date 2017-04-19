@@ -1,312 +1,208 @@
 <?php
 
-/*
- * Lightcast - A PHP MVC Framework
-* Copyright (C) 2005 Nimasystems Ltd
-*
-* This program is NOT free software; you cannot redistribute and/or modify
-* it's sources under any circumstances without the explicit knowledge and
-* agreement of the rightful owner of the software - Nimasystems Ltd.
-*
-* This program is distributed WITHOUT ANY WARRANTY; without even the
-* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-* PURPOSE.  See the LICENSE.txt file for more information.
-*
-* You should have received a copy of LICENSE.txt file along with this
-* program; if not, write to:
-* NIMASYSTEMS LTD
-* Plovdiv, Bulgaria
-* ZIP Code: 4000
-* Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
-*/
+use LightnCandy\LightnCandy;
 
-class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable, iDecoratingView
+/**
+ * Class lcHandlebarsView
+ * https://github.com/zordius/lightncandy
+ */
+class lcHandlebarsView extends lcHTMLView
 {
-    const FRAGMENT_PREFIX = 'f#';
-    const PARTIAL_PREFIX = 'p#';
+    /**
+     * @var string
+     */
+    protected $template_ext = '.handlebars';
 
-    protected $view_contents;
-
-    /** @var lcIterateParamHolder */
-    protected $params;
-
-    protected $found_controller_actions = array();
-    protected $found_fragments = array();
-
+    /**
+     * @var string
+     */
     protected $template_filename;
 
-    protected $enable_partials = true;
-    protected $enable_fragments = true;
+    /**
+     * @var int
+     */
+    protected $handlebar_flags = LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_STANDALONEPHP;
 
-    public function initialize()
-    {
-        parent::initialize();
+    /**
+     * @var array
+     */
+    protected $handlebar_helpers;
 
-        $this->params = new lcIterateParamHolder();
-    }
+    /**
+     * @var
+     */
+    protected $template_hash;
 
-    public function shutdown()
-    {
-        if ($this->params) {
-            $this->params = null;
-        }
+    /**
+     * @var bool
+     */
+    protected $use_cache;
 
-        $this->view_contents =
-        $this->found_controller_actions =
-        $this->found_fragments = null;
+    /**
+     * @var array
+     */
+    protected $data;
 
-        parent::shutdown();
-    }
-
-    public function __toString()
-    {
-        return 'Template filename: ' . $this->template_filename;
-    }
-
-    public function getDebugInfo()
-    {
-        $debug_parent = (array)parent::getDebugInfo();
-
-        $debug = array(
-            'template_filename' => $this->template_filename,
-        );
-
-        $debug = array_merge($debug_parent, $debug);
-
-        return $debug;
-    }
-
-    public function getShortDebugInfo()
-    {
-        return false;
-    }
-
-    public function getControllerActionsToDecorate()
-    {
-        return $this->found_controller_actions;
-    }
-
-    public function getFragmentsToDecorate()
-    {
-        return $this->found_fragments;
-    }
-
+    /**
+     * @return string
+     */
     public function getTemplateFilename()
     {
         return $this->template_filename;
     }
 
-    public function setTemplateFilename($filename)
+    /**
+     * @param string $template_filename
+     * @return lcHandlebarsView
+     */
+    public function setTemplateFilename($template_filename)
     {
-        $this->template_filename = $filename;
-    }
-
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    public function __get($name)
-    {
-        return $this->params->$name;
-    }
-
-    public function __set($name, $value = null)
-    {
-        return $this->params->$name = $value;
-    }
-
-    public function __isset($name)
-    {
-        return $this->params->has($name);
-    }
-
-    public function setParams(array $params = null)
-    {
-        $this->params->setParams($params);
+        $this->template_filename = $template_filename;
+        $this->template_hash = $this->getTemplateHash($template_filename);
         return $this;
     }
 
-    /*
-     * Keep public for PHP 5.3 compatibility
-     */
-
     /**
-     * @param $name
-     * @param null $params
-     * @return lcIterateParamHolder
+     * @param bool $use_cache
+     * @return lcHandlebarsView
      */
-    public function getNode($name, $params = null)
+    public function setUseCache($use_cache)
     {
-        return $this->params->getNode($name, $params);
-    }
-
-    /*
-     * Keep public for PHP 5.3 compatibility
-     */
-
-    /**
-     * @param $name
-     * @param null $params
-     * @return lcIterateParamHolder
-     */
-    public function repeat($name, $params = null)
-    {
-        return $this->params->repeat($name, $params);
+        $this->use_cache = $use_cache;
+        return $this;
     }
 
     /**
-     * @param $node_deep_name
-     * @return lcIterateParamHolder
+     * @return bool
      */
-    public function getDeepNode($node_deep_name)
+    public function getUseCache()
     {
-        return $this->params->getDeepNode($node_deep_name);
+        return $this->use_cache;
     }
 
     /**
-     * @return lcIterateParamHolder[]
+     * @param array $data
+     * @return lcHandlebarsView
      */
-    public function getNodes()
+    public function setData($data)
     {
-        return $this->params->getNodes();
+        $this->data = $data;
+        return $this;
     }
 
-    public function insertNode($name, lcIterateParamHolder $node)
+    /**
+     * @return array
+     */
+    public function getData()
     {
-        return $this->params->insertNode($name, $node);
+        return $this->data;
     }
 
-    public function copyNode($name, lcIterateParamHolder $node)
+    /**
+     * @param int $handlebar_flags
+     * @return lcHandlebarsView
+     */
+    public function setHandlebarFlags($handlebar_flags)
     {
-        return $this->params->copyNode($name, $node);
+        $this->handlebar_flags = $handlebar_flags;
+        return $this;
     }
 
-    public function rawText($text = null)
+    /**
+     * @return int
+     */
+    public function getHandlebarFlags()
     {
-        return $this->params->rawText($text);
+        return $this->handlebar_flags;
     }
 
-    public function offsetExists($name)
+    /**
+     * @param array $handlebar_helpers
+     * @return lcHandlebarsView
+     */
+    public function setHandlebarHelpers($handlebar_helpers)
     {
-        return $this->params->offsetExists($name);
+        $this->handlebar_helpers = $handlebar_helpers;
+        return $this;
     }
 
-    public function offsetGet($name)
+    /**
+     * @return array
+     */
+    public function getHandlebarHelpers()
     {
-        return $this->params->offsetGet($name);
+        return $this->handlebar_helpers;
     }
 
-    public function offsetSet($name, $value)
+    protected function renderHandlebars()
     {
-        $this->params->offsetSet($name, $value);
+        $template_data = null;
+        $ret = null;
+
+        $cache = $this->getController()->getCache();
+
+        if ($this->use_cache) {
+            $template_data = $cache->get($this->template_hash);
+        }
+
+        if (!$template_data) {
+            $template = @file_get_contents($this->template_filename);
+
+            if ($template) {
+                $template_data = LightnCandy::compile($template, $this->getHandlebarCompileOptions());
+
+                if ($template_data && $this->use_cache && $cache) {
+                    $cache->set($this->template_hash, $template_data);
+                }
+            }
+        }
+
+        if ($template_data) {
+            $renderer = $this->getHandlebarRenderer($template_data);
+
+            if ($renderer) {
+                /** @var Closure $renderer */
+                $ret = $renderer($this->data);
+            }
+        }
+
+        return $ret;
     }
 
-    public function offsetUnset($name)
+    /**
+     * @param string $phpcode
+     * @return false|Closure
+     */
+    protected function getHandlebarRenderer($phpcode)
     {
-        $this->params->offsetUnset($name);
+        return LightnCandy::prepare($phpcode);
+    }
+
+    protected function getHandlebarCompileOptions()
+    {
+        return array(
+            'flags' => $this->handlebar_flags,
+            'helpers' => $this->handlebar_helpers
+        );
     }
 
     protected function getViewContent()
     {
-        return $this->getTemplateData();
-    }
+        $controller = $this->getController();
 
-    protected function getTemplateData()
-    {
-        $template_filename = $this->template_filename;
-
-        if (null === $template_filename) {
-            throw new lcInvalidArgumentException('No template filename has been set to view');
+        if (!$controller) {
+            throw new lcNotAvailableException($this->t('Controller not set'));
         }
 
-        return @file_get_contents($template_filename);
+        $action_name = $controller->getActionName();
+        $template_filename = $controller->getControllerDirectory() . DS . 'templates' . DS . $action_name . $this->template_ext;
+        $this->setTemplateFilename($template_filename);
+
+        return $this->renderHandlebars();
     }
 
-    protected function didApplyFilters($content)
+    protected function getTemplateHash($filename)
     {
-        // parse the content to obtain partials / fragments
-        return $this->parseParticles($content);
-    }
-
-    protected function parseParticles($data)
-    {
-        // parse and find info of found partials
-        $self = $this;
-        $data = preg_replace_callback("/<!--\s*PARTIAL\s*(.*?)\s*-->/i", function ($m) use ($self) {
-            return $self->parsePartialDetails(@$m[1]);
-        }, $data);
-
-        // parse all find info of found fragments
-        $data = preg_replace_callback("/<!--\s*FRAGMENT\s*(.*?)\s*-->/i", function ($m) use ($self) {
-            return $self->parseFragmentDetails(@$m[1]);
-        }, $data);
-
-        return $data;
-    }
-
-    /**
-     * @param $url
-     * @warning Leave as public for PHP 5.3x compatibility (some methods are calling from lambdas below)
-     * @return null|string
-     */
-    public function parsePartialDetails($url)
-    {
-        if (!$url) {
-            return null;
-        }
-
-        $url = stripslashes($url);
-
-        $rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions) + 1) . '#' . $url . '#';
-
-        $this->found_controller_actions[] = array(
-            'tag_name' => $rep_tag,
-            'route' => $url,
-            'action_type' => 'partial'
-        );
-
-        // return the tag as the replacement of the preg - this is
-        // how we'll match it later on to replace with actual content
-        return $rep_tag;
-    }
-
-    public function parseFragmentDetails($url)
-    {
-        if (!$url) {
-            return null;
-        }
-
-        $res = null;
-        $type = 'file';
-
-        // a web page
-        if (0 === strpos($url, 'http://') ||
-            0 === strpos($url, 'https://') ||
-            0 === strpos($url, 'www.')
-        ) {
-            $type = 'url';
-            $res = $url;
-        } else {
-            // if relative - search for the file within the assets folder of the module
-            // otherwise try to include it directly
-            $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
-
-            $do_include = lcFiles::getFileExt($res) == '.php';
-
-            if ($do_include) {
-                $type = 'php';
-            }
-        }
-
-        $rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments) + 1);
-        $this->found_fragments[] = array(
-            'tag_name' => $rep_tag,
-            'url' => $res,
-            'type' => $type
-        );
-
-        return $rep_tag;
+        return 'handlebars_ctrl_view_' . sha1($filename);
     }
 }

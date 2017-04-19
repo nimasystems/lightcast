@@ -331,6 +331,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this->unique_id_suffix;
     }
 
+    public function getDefaultViewClass()
+    {
+        return 'lcHTMLTemplateView';
+    }
+
     public function setUniqueIdSuffix($unique_id_suffx)
     {
         // override the automatically generated unique_id with an appended suffix
@@ -348,6 +353,14 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getEnabledPlugins()
     {
         return $this['plugins.enabled'];
+    }
+
+    /**
+     * @return array
+     */
+    public function getViewTypes()
+    {
+        return (array)$this['view.types'];
     }
 
     public function writeClassCache()

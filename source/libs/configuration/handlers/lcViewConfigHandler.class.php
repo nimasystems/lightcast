@@ -26,24 +26,31 @@ class lcViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('view' => array(
-            'filters' => array(),
-            'content_type' => 'text/html',
-            'charset' => 'utf-8',
-            'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)',),
-            'base' => null,
-            'dir' => 'ltr',
-            'htmlver' => '4',
-            'allow_javascripts' => true,
-            'allow_stylesheets' => true,
-            'allow_rss_feeds' => true,
-            'allow_metatags' => true,
-            'has_layout' => true,
-            'decorator' => 'index',
-            'extension' => 'htm',
-            'google_analytics' => null,
-            'replacement_policy' => 'level',
-            'clientside_js' => false,
-        ));
+        return array('view' =>
+            array(
+                'filters' => array(),
+                'content_type' => 'text/html',
+                'charset' => 'utf-8',
+                'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)',),
+                'base' => null,
+                'dir' => 'ltr',
+                'htmlver' => '4',
+                'allow_javascripts' => true,
+                'allow_stylesheets' => true,
+                'allow_rss_feeds' => true,
+                'allow_metatags' => true,
+                'has_layout' => true,
+                'decorator' => 'index',
+                'extension' => 'htm',
+                'google_analytics' => null,
+                'replacement_policy' => 'level',
+                'clientside_js' => false,
+                'types' => array(
+                    'handlebars' => 'lcHandlebarsView',
+                    'htm' => 'lcHtmlTemplateView',
+                    'html' => 'lcHtmlTemplateView'
+                )
+            )
+        );
     }
 }

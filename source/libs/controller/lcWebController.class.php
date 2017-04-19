@@ -30,7 +30,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     const ASSETS_DIR = 'templates';
 
     /**
-     * @var lcHtmlTemplateView
+     * @var lcHTMLView
      */
     protected $view;
 
@@ -191,9 +191,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 return lcTagScript::create()
                     ->setContent($out)
                     ->toString();
-            } else {
-                return $out;
             }
+
+            return $out;
         }
 
         return null;
@@ -206,7 +206,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return;
         }
 
-        $extension = $extension ? $extension : $this->default_decorator_extension;
+        $extension = $extension ?: $this->default_decorator_extension;
 
         $full_template_name = $this->configuration->getLayoutsDir() . DS . $decorator_template_name . '.' . $extension;
 
@@ -216,7 +216,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return;
         }
 
+        $this->configureControllerView($view);
         $view->setTemplateFilename($full_template_name);
+        $view->initialize();
 
         $this->setDecoratorView($view);
     }
@@ -224,13 +226,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function getDefaultLayoutViewInstance()
     {
         $view = new lcHTMLTemplateLayoutView();
-
-        $view->setEventDispatcher($this->event_dispatcher);
-        $view->setConfiguration($this->configuration);
-        $view->setController($this);
         $view->setReplacementString(self::LAYOUT_CONTENT_REPLACEMENT);
-        $view->initialize();
-
         return $view;
     }
 
@@ -274,8 +270,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     public function setCustomTemplate($filename)
     {
-        $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
-        $this->view->setTemplateFilename($full_filename);
+        if ($this->view && $this->view instanceof lcHTMLTemplateView) {
+            $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
+            /** @noinspection PhpUndefinedMethodInspection */
+            $this->view->setTemplateFilename($full_filename);
+        }
     }
 
     public function unsetDecorator()
@@ -557,8 +556,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         // configure the default view
         if (!$this->getView()) {
-            $this->configureControllerView();
+            $this->setView($this->getDefaultViewInstance());
         }
+
+        $this->configureControllerView($this->view);
+        $this->view->initialize();
 
         // run before execute
         call_user_func_array(array($this, 'beforeExecute'), $action_params);
@@ -595,37 +597,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $action_type . ucfirst(lcInflector::camelize($action_name));
     }
 
-    protected function configureControllerView()
-    {
-        // create and set a view to the controller
-        $view = $this->getDefaultViewInstance();
-
-        if (!$view) {
-            return;
-        }
-
-        $view->setOptions(array(
-            'action_name' => $this->getActionName(),
-            'action_params' => $this->getActionParams(),
-        ));
-        $view->setConfiguration($this->getConfiguration());
-        $view->setEventDispatcher($this->getEventDispatcher());
-
-        // set the view template
-        $template_filename = $this->getAssetsPath() . DS . $this->getActionName() . '.htm';
-
-        $view->setTemplateFilename($template_filename);
-        $view->setController($this);
-
-        $view->initialize();
-
-        // set to controller
-        $this->setView($view);
-    }
-
     public function getDefaultViewInstance()
     {
-        return new lcHTMLTemplateView();
+        $cls = $this->configuration->getDefaultViewClass();
+        return new $cls;
     }
 
     public function getAssetsPath()

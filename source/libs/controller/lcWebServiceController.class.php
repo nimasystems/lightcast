@@ -99,8 +99,13 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
             throw new lcActionNotFoundException('Controller action: \'' . $this->controller_name . ' / ' . $action_name . '\' is not valid');
         }
 
+        if (!$this->getView()) {
+            $this->setView($this->getDefaultViewInstance());
+        }
+
         // configure the view
-        $this->configureControllerView();
+        $this->configureControllerView($this->view);
+        $this->view->initialize();
 
         // run before execute
         call_user_func_array(array($this, 'beforeExecute'), $action_params);
@@ -148,29 +153,11 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         return $action_type . ucfirst(lcInflector::camelize($action_name));
     }
 
-    protected function configureControllerView()
+    protected function configureControllerView(lcView $view)
     {
-        // create and set a view to the controller
-        $view = $this->getDefaultViewInstance();
-
-        if (!$view) {
-            return;
-        }
-
-        $view->setOptions(array(
-            'action_name' => $this->getActionName(),
-            'action_params' => $this->getActionParams(),
-        ));
-        $view->setConfiguration($this->getConfiguration());
-        $view->setEventDispatcher($this->getEventDispatcher());
-        $view->setController($this);
+        parent::configureControllerView($view);
 
         $view->setContentType('application/json; charset=' . $this->response->getServerCharset());
-
-        $view->initialize();
-
-        // set to controller
-        $this->setView($view);
     }
 
     public function getDefaultViewInstance()
