@@ -21,8 +21,17 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * Class lcApplicationConfiguration
+ * @method bool isDebugging
+ * @method string getProjectName
+ * @method string getConfigEnvironment
+ */
 abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
 {
+    /**
+     * @var lcProjectConfiguration
+     */
     protected $project_configuration;
 
     protected $use_classes;

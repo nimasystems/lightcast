@@ -80,6 +80,11 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected $debugging;
 
+    /**
+     * @var bool
+     */
+    protected $has_composer = true;
+
     public function __construct()
     {
         parent::__construct();
@@ -99,6 +104,11 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         if (!$this->app_root_dir) {
             throw new lcConfigException('Project dir not set');
+        }
+
+        if ($this->has_composer) {
+            // require vendor autoloads
+            require_once $this->getProjectDir() . DS . 'vendor' . DS . 'autoload.php';
         }
 
         $this->tmp_dir = !$this->tmp_dir ? $this->getProjectDir() . DS . self::TMP_DIR_NAME : $this->tmp_dir;

@@ -337,6 +337,9 @@ class lcApp extends lcObj
 
     private function initClassAutoloader()
     {
+        // require vendor autoloads
+        require_once ROOT . DS . 'vendor' . DS . 'autoload.php';
+
         $class_autoloader = $this->class_autoloader;
 
         if (!$class_autoloader) {

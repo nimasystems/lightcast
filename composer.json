@@ -1,0 +1,14 @@
+{
+    "name": "nimasystems/lightcast",
+    "description": "Lightcast (TM) is a lightweight PHP based framework",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Martin Kovachev",
+            "email": "miracle@nimasystems.com"
+        }
+    ],
+    "require": {
+        "zordius/lightncandy": "dev-master"
+    }
+}
