@@ -130,6 +130,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     private function detectParameters()
     {
         $url = isset($this->context['path_info']) ? (string)$this->context['path_info'] : null;
+        $params_prev = array();
 
         // allow others to filter and provider params before the router
         $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, array(
@@ -137,6 +138,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             'context' => $this->context
         ), false), array(
             'url' => $url,
+            'params' => $params_prev,
             'context' => $this->context
         ));
 
@@ -144,6 +146,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             $rv = $evn->getReturnValue();
             $this->context = $rv['context'];
             $url = $rv['url'];
+            $params_prev = $rv['params'];
 
             if (isset($rv['resolved_params'])) {
                 return $rv['resolved_params'];
@@ -166,7 +169,9 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             assert(isset($info['params']));
             assert(isset($info['route']));
 
-            $params = isset($info['params']) ? (array)$info['params'] : null;
+            $params = isset($info['params']) ? (array)$info['params'] : array();
+            $params = array_merge($params_prev, $params);
+            $info['params'] = $params;
 
             $this->current_params = $params;
             $this->current_route = $info['route'];

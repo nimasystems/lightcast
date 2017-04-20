@@ -234,8 +234,9 @@ abstract class lcController extends lcBaseController
 
             if ($return_params) {
                 $content = array(
-                    'content' => (isset($rendered_contents['content']) ? $rendered_contents['content'] : null),
-                    'content_type' => (isset($rendered_contents['content_type']) ? $rendered_contents['content_type'] : null),
+                    'content' => isset($rendered_contents['content']) ? $rendered_contents['content'] : null,
+                    'content_type' => isset($rendered_contents['content_type']) ? $rendered_contents['content_type'] : null,
+                    'javascript' => $controller_instance->renderJavascriptCode(true, false),
                     'controller' => $controller_instance
                 );
             } else {
@@ -812,6 +813,11 @@ abstract class lcController extends lcBaseController
         return $filter_results;
     }
 
+    /**
+     * @param $filename
+     * @return lcView
+     * @throws lcUnsupportedException
+     */
     public function loadView($filename)
     {
         $view_types = $this->configuration->getViewTypes();
@@ -826,6 +832,7 @@ abstract class lcController extends lcBaseController
             throw new lcUnsupportedException($this->t('Unsupported view type: ' . $fext['ext']));
         }
 
+        /** @var lcView $view */
         $view = new $cls();
 
         if (!($view instanceof lcView)) {
@@ -836,6 +843,8 @@ abstract class lcController extends lcBaseController
         $view->initialize();
 
         $this->setView($view);
+
+        return $view;
     }
 
     protected function configureControllerView(lcView $view)
