@@ -369,6 +369,7 @@ class lcApp extends lcObj
             $cache_version = 0;
             $should_recreate_cache = false;
 
+            /** @noinspection UsageOfSilenceOperatorInspection */
             if (@include $class_cache_filename) {
                 $cache_version = null !== $$class_cache_version_varname ? (int)$$class_cache_version_varname : 0;
                 $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
@@ -384,6 +385,7 @@ class lcApp extends lcObj
                 $this->recreateFrameworkAutoloadCache();
 
                 // reread the file
+                /** @noinspection UsageOfSilenceOperatorInspection */
                 if (@include $class_cache_filename) {
                     //$cache_version = isset($$class_cache_version_varname) ? (int)$$class_cache_version_varname : 0;
                     $registered_classes = isset($$class_cache_varname) ? $$class_cache_varname : null;
@@ -559,7 +561,10 @@ class lcApp extends lcObj
         $configuration->initialize();
 
         // set timezone from configuration
-        $this->setSystemTimezone();
+        // only for < 1.5 projects - from 1.5 onward we keep the tz = UTC internally
+        if (version_compare($this->configuration->getTargetFrameworkVersion(), '1.5') <= -1) {
+            $this->setSystemTimezone();
+        }
 
         // set php limits
         if ($time_limit = (int)$this->configuration['settings.time_limit']) {

@@ -345,6 +345,16 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $config_objects;
     }
 
+    /**
+     * @return string
+     */
+    public function getTimezone()
+    {
+        $tz = $this['settings.timezone'];
+        $tz = $tz ?: lcVm::date_default_timezone_get();
+        return $tz;
+    }
+
     public function getProjectConfigDir()
     {
         return null;

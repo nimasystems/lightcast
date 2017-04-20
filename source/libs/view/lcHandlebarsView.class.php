@@ -6,7 +6,7 @@ use LightnCandy\LightnCandy;
  * Class lcHandlebarsView
  * https://github.com/zordius/lightncandy
  */
-class lcHandlebarsView extends lcHTMLView
+class lcHandlebarsView extends lcHTMLView implements ArrayAccess
 {
     /**
      * @var string
@@ -21,7 +21,9 @@ class lcHandlebarsView extends lcHTMLView
     /**
      * @var int
      */
-    protected $handlebar_flags = LightnCandy::FLAG_ERROR_LOG | LightnCandy::FLAG_STANDALONEPHP;
+    protected $handlebar_flags = LightnCandy::FLAG_HANDLEBARS |
+    LightnCandy::FLAG_ERROR_LOG |
+    LightnCandy::FLAG_ERROR_EXCEPTION;
 
     /**
      * @var array
@@ -96,6 +98,20 @@ class lcHandlebarsView extends lcHTMLView
     public function getData()
     {
         return $this->data;
+    }
+
+    public function set($name, $value = null)
+    {
+        if (!$value) {
+            unset($this->data[$value]);
+        } else {
+            $this->data[$name] = $value;
+        }
+    }
+
+    public function get($name)
+    {
+        return isset($this->data[$name]) ? $this->data[$name] : null;
     }
 
     /**
@@ -204,5 +220,25 @@ class lcHandlebarsView extends lcHTMLView
     protected function getTemplateHash($filename)
     {
         return 'handlebars_ctrl_view_' . sha1($filename);
+    }
+
+    public function offsetExists($offset)
+    {
+        return isset($this->data[$offset]);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->data[$offset];
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->data[$offset] = $value;
+    }
+
+    public function offsetUnset($offset)
+    {
+        unset($this->data[$offset]);
     }
 }
