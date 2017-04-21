@@ -78,6 +78,30 @@ class lcTagSelect extends lcHtmlTag
         return $this;
     }
 
+    /**
+     * @param array $options
+     * @return lcTagSelect
+     */
+    public function addOptionsFromArray(array $options)
+    {
+        foreach ($options as $key => $value) {
+
+            /** @var lcTagOption $opt */
+            $opt = lcTagOption::create()
+                ->setValue($key)
+                ->setContent($value);
+            $this->addOption($opt);
+
+            unset($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param bool $value
+     * @return lcTagSelect
+     */
     public function setIsMultiple($value = false)
     {
         $this->setAttribute('multiple', $value ? 'multiple' : null);
@@ -122,8 +146,7 @@ class lcTagSelect extends lcHtmlTag
             ) {
                 $this->addOption($option);
             } elseif (is_array($option)) {
-                if (isset($option[$key_identifier]) &&
-                    isset($option[$value_identifier])
+                if (isset($option[$key_identifier], $option[$value_identifier])
                 ) {
                     $this->addOption(lcTagOption::create()
                         ->setValue($option[$key_identifier])
@@ -139,15 +162,10 @@ class lcTagSelect extends lcHtmlTag
 
     /**
      * @param lcTagOption|lcOptGroup $option
-     * @return $this
-     * @throws lcInvalidArgumentException
+     * @return lcTagSelect
      */
     public function addOption($option)
     {
-        if ((!$option instanceof lcTagOption) && (!$option instanceof lcOptGroup)) {
-            throw new lcInvalidArgumentException('Select options can be either \'option\' or \'option group\'');
-        }
-
         $this->options[] = $option;
         return $this;
     }
