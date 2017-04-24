@@ -27,6 +27,7 @@
  * @method lcController getController
  * @method lcI18n getI18n
  * @method lcLogger getLogger
+ * @method lcRouting getRouter
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj

@@ -532,6 +532,8 @@ abstract class lcRoute extends lcObj
 
     public function generate($params)
     {
+        $params = (array)$params;
+
         if (!$this->compiled) {
             $this->compile();
         }
@@ -544,7 +546,7 @@ abstract class lcRoute extends lcObj
             return '/';
         }
 
-        $merged = array_unique(array_merge(array_keys($params), array_keys($this->default_params)));
+        $merged = array_unique(array_merge(array_keys($params), array_keys((array)$this->default_params)));
 
         foreach ($merged as $param) {
             $route = str_replace(':' . $param, isset($params[$param]) ?

@@ -450,7 +450,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     {
         $ret = null;
 
-        $params = array_filter($params);
+        $params = array_filter((array)$params);
 
         // if no params given - return the current request uri
         if (!count($params)) {
@@ -474,7 +474,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         }
 
         // pass the url generation to the route
-        if (count($params) && $route) {
+        if ($route) {
             // route will generate the url
             if (!$ret = $route->generate($params)) {
                 $ret = $this->context['request_uri'];

@@ -36,6 +36,11 @@ class lcHandlebarsView extends lcHTMLView implements ArrayAccess
     protected $template_hash;
 
     /**
+     * @var Callable
+     */
+    protected $partial_resolver;
+
+    /**
      * @var bool
      */
     protected $use_cache;
@@ -44,6 +49,107 @@ class lcHandlebarsView extends lcHTMLView implements ArrayAccess
      * @var array
      */
     protected $data;
+
+    public function __get($name)
+    {
+        return isset($this->data[$name]) ? $this->data[$name] : null;
+    }
+
+    public function __set($name, $value = null)
+    {
+        return $this->data[$name] = $value;
+    }
+
+    public function __isset($name)
+    {
+        return isset($this->data[$name]);
+    }
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->setDefaults();
+    }
+
+    protected function setDefaults()
+    {
+        $this->handlebar_helpers = self::getDefaultHelpers($this);
+        $this->partial_resolver = self::getDefaultPartialResolver($this);
+    }
+
+    protected static function getDefaultPartialResolver(lcHandlebarsView $ctx)
+    {
+        return function ($cx, $name) use ($ctx) {
+            $bd = dirname($ctx->template_filename);
+            $fn = $bd . DS . $name . '.handlebars';
+
+            if (file_exists($fn)) {
+                return file_get_contents($fn);
+            }
+            return "[partial (file:$name.handlebars) not found]";
+        };
+    }
+
+    protected static function getDefaultHelpers(lcHandlebarsView $ctx)
+    {
+        return array(
+            'ifEqual' => function ($data, $template_var, $ctx) {
+                if ($data === $template_var) {
+                    return $ctx['fn']();
+                } else {
+                    return $ctx['inverse']();
+                }
+            },
+            'generateUrl' => function ($route_name, $params, $ctx) {
+                if ($route_name) {
+                    $app = lcApp::getInstance();
+
+                    /** @var lcPatternRouting $router */
+                    $router = $app->getRouter();
+                    $np = array();
+
+                    if ($params) {
+                        $pp = array();
+                        $_this = $ctx['_this'];
+
+                        parse_str($params, $pp);
+
+                        if ($pp) {
+                            foreach ($pp as $k => $v) {
+                                if (strpos($v, ':') !== false) {
+                                    $kd = explode(':', $v);
+
+                                    if (count($kd) >= 2) {
+                                        $modifier = $kd[1];
+                                        $modified_val = $kd[0];
+
+                                        if ($modifier == 'urlkey') {
+                                            $modified_val = isset($_this[$kd[0]]) ? $_this[$kd[0]] : null;
+                                            $modified_val = lcStrings::url_slug($modified_val);
+                                        }
+
+                                        $np[$k] = $modified_val;
+                                    }
+                                } else {
+                                    $np[$k] = isset($_this[$v]) ? $_this[$v] : null;
+                                }
+
+                                unset($k, $v);
+                            }
+                        }
+
+                        $np = array_filter($np);
+                    }
+
+                    return $router->generate($np, false, $route_name, false);
+                }
+            },
+            'uri' => function ($url, $options, $ctx) {
+                return $url;
+            }
+        );
+    }
 
     /**
      * @return string
@@ -198,7 +304,8 @@ class lcHandlebarsView extends lcHTMLView implements ArrayAccess
     {
         return array(
             'flags' => $this->handlebar_flags,
-            'helpers' => $this->handlebar_helpers
+            'helpers' => $this->handlebar_helpers,
+            'partialresolver' => $this->partial_resolver
         );
     }
 
