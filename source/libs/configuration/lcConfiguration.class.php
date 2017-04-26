@@ -116,7 +116,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             $handler->setEnvironments($this->environments);
 
             try {
-                $handler_configuration = $handler->getConfigurationData($config_key, $this->environment, $defaults);
+                $handler_configuration = $handler->getConfigurationData($config_key, $this->environment, $defaults, $this->getConfigParserVars());
             } catch (Exception $e) {
                 throw new lcConfigException('Error while loading configuration from handler: ' . $config_handler_type . ', Config Key: ' . $config_key . ': ' . $e->getMessage(), $e->getCode(), $e);
             }
@@ -139,6 +139,11 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
         return $configuration;
     }
+
+    /**
+     * @return array
+     */
+    abstract public function getConfigParserVars();
 
     public function getBaseConfigDir()
     {

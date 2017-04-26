@@ -25,7 +25,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
     const DEFAULT_BASE_CONFIG_DIR = 'default';
-    const DEFAULT_CONFIG_ENV = 'production';
 
     const DEFAULT_PLUGINS_LOCATION = 'addons/plugins';
     const DEFAULT_PROJECT_NAME = 'default';
@@ -71,7 +70,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     protected $project_db_models;
 
     protected $config_variation;
-    protected $config_environment;
     protected $config_version;
 
     protected $app_root_dir;
@@ -95,7 +93,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         // set vars
         $this->root_dir = ROOT;
         $this->config_variation = self::DEFAULT_BASE_CONFIG_DIR;
-        $this->config_environment = self::DEFAULT_CONFIG_ENV;
     }
 
     public function initialize()
@@ -830,18 +827,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
      */
     public function getCacheDir($environment = null)
     {
-        $environment = $environment ?: $this->getConfigEnvironment();
+        $environment = $environment ?: $this->getEnvironment();
         return $this->tmp_dir . DS . 'cache' . DS . $environment;
-    }
-
-    public function getConfigEnvironment()
-    {
-        return $this->config_environment;
-    }
-
-    public function setConfigEnvironment($environment)
-    {
-        $this->config_environment = $environment;
     }
 
     /**
@@ -850,7 +837,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
      */
     public function getSpoolDir($environment = null)
     {
-        $environment = $environment ?: $this->getConfigEnvironment();
+        $environment = $environment ?: $this->getEnvironment();
         return $this->tmp_dir . DS . 'spool' . DS . $environment;
     }
 
@@ -947,9 +934,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function setEnvironment($environment)
     {
         parent::setEnvironment($environment);
-
-        // set debugging if environment = debug
-        $this->setIsDebugging($environment == lcEnvConfigHandler::ENVIRONMENT_DEBUG);
     }
 
     public function setIsDebugging($debug = true)
@@ -961,10 +945,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         // disable caching the configuration if debugging
         if ($debug) {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
+            //$this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
             $this->use_class_cache = false;
         } else {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
+            //$this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
             $this->use_class_cache = true;
         }
     }
@@ -1008,5 +992,15 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     protected function loadConfigurationData()
     {
         // do not load the configuration yet - allow application configurations to do it
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [
+            'configver' => $this->getConfigVersion()
+        ];
     }
 }

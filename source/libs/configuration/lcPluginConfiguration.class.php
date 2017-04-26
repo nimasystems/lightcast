@@ -453,4 +453,12 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     {
         return false;
     }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [];
+    }
 }

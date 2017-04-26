@@ -25,7 +25,7 @@
  * Class lcApplicationConfiguration
  * @method bool isDebugging
  * @method string getProjectName
- * @method string getConfigEnvironment
+ * @method string getEnvironment
  */
 abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
 {
@@ -182,11 +182,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
 
         // disable caching the configuration if debugging
-        if ($debug) {
+        /*if ($debug) {
             $this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
         } else {
             $this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
-        }
+        }*/
     }
 
     public function setEnvironment($environment)
@@ -298,7 +298,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $ret = $this->getProjectName() .
             ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
             $this->getEnvironment() .
-            $this->getConfigEnvironment() .
+            $this->getEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
             ($this->unique_id_suffix ?: null);
@@ -316,7 +316,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $ret = $this->getProjectAppName($this->getApplicationName()) .
             ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
             $this->getEnvironment() .
-            $this->getConfigEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
             ($this->unique_id_suffix ?: null);
@@ -395,5 +394,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getGenDir()
     {
         return $this->project_configuration->getGenDir();
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return $this->project_configuration->getConfigParserVars();
     }
 }

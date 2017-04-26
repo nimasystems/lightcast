@@ -83,7 +83,7 @@ abstract class lcConfigHandler extends lcObj
         $this->environments = $environments;
     }
 
-    public function getConfigurationData($config_key, $environment, array $source_defaults = null)
+    public function getConfigurationData($config_key, $environment, array $source_defaults = null, array $config_vars = null)
     {
         if (!$this->data_provider) {
             throw new lcConfigException('No data provider set');
@@ -114,7 +114,7 @@ abstract class lcConfigHandler extends lcObj
             foreach ($dirs as $dir) {
                 $opts = $this->options;
                 $opts['dir'] = $dir;
-                $data = $this->data_provider->readConfigData($config_key, $opts);
+                $data = $this->data_provider->readConfigData($config_key, $opts, $config_vars);
 
                 if ($data && is_array($data)) {
                     break;

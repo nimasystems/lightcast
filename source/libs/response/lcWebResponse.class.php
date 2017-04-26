@@ -656,12 +656,23 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (!$this->no_scripts) {
             // javascript code
             $jscode = $this->javascript_code;
+            $js_before = $this->javascript_code_before;
+            $js_after = $this->javascript_code_after;
+
+            $jsf = [
+                'js' => $jscode,
+                'before' => $js_before,
+                'after' => $js_after
+            ];
 
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_response_javascript_code', $this, array()), $jscode);
+                new lcEvent('response.send_response_javascript_code', $this, array()), $jsf);
 
             if ($event->isProcessed()) {
-                $jscode = $event->getReturnValue();
+                $jsf = $event->getReturnValue();
+                $jscode = $jsf['js'];
+                $js_before = $jsf['before'];
+                $js_after = $jsf['after'];
             }
 
             unset($event);
@@ -684,9 +695,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
                 if ($jscode) {
                     $this->html_body_custom['end'][] = lcTagScript::create()
-                        ->setContent($this->javascript_code_before .
+                        ->setContent(
+                            $js_before .
                             $jscode .
-                            $this->javascript_code_after)
+                            $js_after
+                        )
                         ->toString();
                 }
             }

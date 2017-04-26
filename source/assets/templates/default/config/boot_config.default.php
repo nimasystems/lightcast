@@ -16,7 +16,5 @@ define(CONFIG_ENV, 'default');
  */
 $configuration = isset($configuration) ? $configuration : null;
 $configuration->setIsDebugging(DO_DEBUG);
-$configuration->setConfigEnvironment(CONFIG_ENV);
+$configuration->setEnvironment(CONFIG_ENV);
 //$configuration->setConfigVersion(CONFIG_VER);
-
-?>

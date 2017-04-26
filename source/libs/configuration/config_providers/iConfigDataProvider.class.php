@@ -24,7 +24,7 @@
 
 interface iConfigDataProvider
 {
-    public function readConfigData($config_key, array $options = null);
+    public function readConfigData($config_key, array $options = null, array $config_vars = null);
 
     public function writeConfigData($config_key, array $config_data, array $options = null);
 }
