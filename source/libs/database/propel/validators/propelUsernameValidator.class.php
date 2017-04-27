@@ -24,6 +24,6 @@ class propelUsernameValidator implements BasicValidator
 {
     public function isValid(ValidatorMap $map, $str)
     {
-        return lcValidator::validateUsername($str);
+        return lcCoreValidator::getValidator('username')->validate($str);
     }
 }
