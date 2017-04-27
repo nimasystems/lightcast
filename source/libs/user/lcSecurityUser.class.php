@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-abstract class lcSecurityUser extends lcUser implements iDebuggable
+abstract class lcSecurityUser extends lcUser
 {
     const NS_KEY = 'user_security';
     const DEFAULT_TIMEOUT = 30; // in minutes
