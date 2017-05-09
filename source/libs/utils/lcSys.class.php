@@ -311,13 +311,13 @@ class lcSys
         if (stristr($input, 'b')) {
             $ret = $input;
         } elseif (stristr($input, 'k')) {
-            $ret = $input * 1024;
+            $ret = (int)$input * 1024;
         } elseif (stristr($input, 'm')) {
-            $ret = $input * 1048576;
+            $ret = (int)$input * 1048576;
         } elseif (stristr($input, 'g')) {
-            $ret = $input * 1073741824;
+            $ret = (int)$input * 1073741824;
         } elseif (stristr($input, 't')) {
-            $ret = $input * 1099511627776;
+            $ret = (int)$input * 1099511627776;
         }
 
         return $ret;
