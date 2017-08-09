@@ -451,10 +451,18 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // IMPORTANT: COOKIES / HEADERS MUST BE SENT LAST!
 
         // send the cookies
-        $this->sendCookies();
+        $sent_cookies = $this->sendCookies();
 
         // send the headers
-        $this->sendHeaders();
+        $sent_headers = $this->sendHeaders();
+
+        // notify with an event
+        $this->event_dispatcher->notify(
+            new lcEvent('response.did_send_response', $this, array(
+                'cookies' => $sent_cookies,
+                'headers' => $sent_headers,
+                'content' => $content
+            )));
     }
 
     private function processHtmlContent($content)
@@ -957,6 +965,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $cookies = $event->getReturnValue();
         }
 
+        $sent_cookies = array();
+
         if ($cookies && $cookies instanceof lcCookiesCollection) {
             $log = array();
             $cookies = $cookies->getAll();
@@ -974,6 +984,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     throw new lcSystemException('Could not set cookie ' . $sl->getName());
                 }
 
+                $sent_cookies[$sl->getName()] = $sl->getValue();
+
                 if (DO_DEBUG) {
                     $log[] = $sl->getName() . ': ' . $sl->getValue();
                 }
@@ -985,6 +997,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 $this->debug('response has output cookies: ' . "\n\n" . implode("\n", $log));
             }
         }
+
+        return $sent_cookies;
     }
 
     protected function sendHeaders()
@@ -1076,6 +1090,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 unset($header);
             }
         }
+
+        return $prepared_headers;
     }
 
     protected function _outputContent()

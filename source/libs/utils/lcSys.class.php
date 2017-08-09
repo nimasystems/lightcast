@@ -142,6 +142,70 @@ class lcSys
         throw new lcSystemException('Unable to find PHP executable.');
     }
 
+    /**
+     * Credits: http://stackoverflow.com/questions/10421613/match-ipv4-address-given-ip-range-mask
+     * @param $network
+     * @param $ip
+     * @return bool
+     */
+    public static function ipMatchesNetwork($ip, $network)
+    {
+        $network = trim($network);
+        //$orig_network = $network;
+        $ip = trim($ip);
+
+        if (!strstr($network, '/')) {
+            $network .= '/0';
+        }
+
+        if ($ip == $network) {
+            //echo "used network ($network) for ($ip)\n";
+            return true;
+        }
+
+        $network = str_replace(' ', '', $network);
+
+        if (strpos($network, '*') !== FALSE) {
+            if (strpos($network, '/') !== FALSE) {
+                $asParts = explode('/', $network);
+                $network = @ $asParts[0];
+            }
+            $nCount = substr_count($network, '*');
+            $network = str_replace('*', '0', $network);
+            if ($nCount == 1) {
+                $network .= '/24';
+            } else if ($nCount == 2) {
+                $network .= '/16';
+            } else if ($nCount == 3) {
+                $network .= '/8';
+            } else if ($nCount > 3) {
+                return true; // if *.*.*.*, then all, so matched
+            }
+        }
+
+        //echo "from original network($orig_network), used network ($network) for ($ip)\n";
+
+        $d = strpos($network, '-');
+        if ($d === FALSE) {
+            $ip_arr = explode('/', $network);
+            if (!preg_match("@\d*\.\d*\.\d*\.\d*@", $ip_arr[0], $matches)) {
+                $ip_arr[0] .= '.0';    // Alternate form 194.1.4/24
+            }
+
+            $network_long = ip2long($ip_arr[0]);
+            $x = ip2long($ip_arr[1]);
+            $mask = long2ip($x) == $ip_arr[1] ? $x : (0xffffffff << (32 - $ip_arr[1]));
+            $ip_long = ip2long($ip);
+
+            return ($ip_long & $mask) == ($network_long & $mask);
+        } else {
+            $from = trim(ip2long(substr($network, 0, $d)));
+            $to = trim(ip2long(substr($network, $d + 1)));
+            $ip = ip2long($ip);
+            return ($ip >= $from and $ip <= $to);
+        }
+    }
+
     /*public static function getPhpCli()
      {
     if (self::isOSLinux()) return '/usr/bin/php'; else
@@ -247,13 +311,13 @@ class lcSys
         if (stristr($input, 'b')) {
             $ret = $input;
         } elseif (stristr($input, 'k')) {
-            $ret = $input * 1024;
+            $ret = (int)$input * 1024;
         } elseif (stristr($input, 'm')) {
-            $ret = $input * 1048576;
+            $ret = (int)$input * 1048576;
         } elseif (stristr($input, 'g')) {
-            $ret = $input * 1073741824;
+            $ret = (int)$input * 1073741824;
         } elseif (stristr($input, 't')) {
-            $ret = $input * 1099511627776;
+            $ret = (int)$input * 1099511627776;
         }
 
         return $ret;
