@@ -23,6 +23,13 @@ class lcStrings
         return (strcasecmp(lcUnicode::substr($haystack, lcUnicode::strlen($haystack) - lcUnicode::strlen($needle)), $needle) === 0);
     }
 
+    public static function removeUtf8Bom($text)
+    {
+        $bom = pack('H*', 'EFBBBF');
+        $text = preg_replace("/^$bom/", '', $text);
+        return $text;
+    }
+
     public static function contains($haystack, $needle)
     {
         return strstr($haystack, $needle);
