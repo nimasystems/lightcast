@@ -124,13 +124,3 @@ function gc($objname)
 {
     return get_class_methods($objname);
 }
-
-/*
- * @deprecated
- * Helper method to silence PHPSniffer unused function parameters error
- * wherever necessary
- */
-function fnothing()
-{
-    //
-}

@@ -392,7 +392,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     /**
      * @return mixed
-     * @deprecated Use core config base_url
      */
     public function getRequestPrefix()
     {
@@ -402,7 +401,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     /**
      * Gets the url protocol plus the hostname together
      * @return mixed
-     * @deprecated Use core config base_url
      */
     public function getUrlPrefix()
     {
@@ -835,12 +833,14 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $this->initHttpMethod();
 
         // TODO: This is temporary until we figure out how to handle the rest
-        if ($this->request_method != lcHttpMethod::METHOD_GET &&
-            $this->request_method != lcHttpMethod::METHOD_POST
+        /*if ($this->request_method != lcHttpMethod::METHOD_GET &&
+            $this->request_method != lcHttpMethod::METHOD_POST &&
+            $this->request_method != lcHttpMethod::METHOD_PUT &&
+            $this->request_method != lcHttpMethod::METHOD_DELETE
         ) {
             $this->warning('Unsupported request method: ' . $this->env('REQUEST_METHOD') . ' - exiting');
             exit(0);
-        }
+        }*/
 
         // init protocol type
         $in_https = isset($this->env['HTTPS']) || isset($this->env['REDIRECT_HTTPS']) ||
@@ -1178,8 +1178,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
                                 $file['tmp_name'][$key2],
                                 $file['error'][$key2],
                                 $file['size'][$key2],
-                                $file['type'][$key2],
-                                $key2
+                                $file['type'][$key2]
                             )
                         );
                     }

@@ -50,9 +50,27 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
     }
 
-    public function sendErrorResponseFromException(Exception $e, $custom_domain = null, $custom_error_code = null,
+    /**
+     * @param Exception|Error $e
+     * @param null $custom_domain
+     * @param null $custom_error_code
+     * @param null $custom_message
+     * @param null $custom_http_error_code
+     */
+    public function sendErrorResponseFromException($e, $custom_domain = null, $custom_error_code = null,
                                                    $custom_message = null, $custom_http_error_code = null)
     {
+        // PHP7 compat
+        if (!$e instanceof Exception) {
+            $e = new ErrorException(
+                $e->getMessage(),
+                $e->getCode(),
+                E_ERROR,
+                $e->getFile(),
+                $e->getLine()
+            );
+        }
+
         $custom_domain = isset($custom_domain) ? (string)$custom_domain : null;
         $custom_error_code = isset($custom_error_code) ? (string)$custom_error_code : null;
         $custom_message = isset($custom_message) ? (string)$custom_message : null;
