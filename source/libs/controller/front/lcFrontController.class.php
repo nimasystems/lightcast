@@ -202,6 +202,12 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // and security is enabled - we must not return the not found error response
         // but an access denied instead.
 
+        $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, array(
+            'module_name' => $controller,
+            'action_name' => $action,
+            'request_params' => $request_params
+        )));
+
         // forward the request
         $this->forward($controller, $action, array('request' => $request_params));
     }
