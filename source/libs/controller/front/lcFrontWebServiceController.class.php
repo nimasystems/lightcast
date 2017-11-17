@@ -75,9 +75,19 @@ class lcFrontWebServiceController extends lcFrontWebController
         $custom_error_code = isset($custom_error_code) ? (string)$custom_error_code : null;
         $custom_message = isset($custom_message) ? (string)$custom_message : null;
 
+        $cfg = $this->configuration;
+
         $response = $this->response;
 
         $response->clear();
+
+        if ($cfg['settings.exception_http_header.enabled']) {
+            $err_header = $cfg['settings.exception_http_header.header'];
+
+            if ($err_header) {
+                $response->header($err_header, '');
+            }
+        }
 
         $err = (string)$e;
 
