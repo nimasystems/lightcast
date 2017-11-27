@@ -68,7 +68,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         parent::initialize();
 
         // cache folder must be relative to app_root_dir
-        $this->cache_folder = (string)$this->configuration['cache']['cache_dir'];
+        $this->cache_folder = (string)$this->configuration->getCacheDir();
 
         if (!isset($this->cache_folder)) {
             throw new lcConfigException('Cache folder not set');
