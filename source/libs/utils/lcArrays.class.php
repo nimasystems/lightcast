@@ -50,7 +50,9 @@ class lcArrays
         $ret = null;
 
         if ($null_only) {
-            $ret = array_filter($input, create_function('$a', 'return (is_array($a) && $a) || (!is_array($a) && (is_bool($a) || (is_string($a) && strlen(trim($a))) || is_numeric($a)));'));
+            $ret = array_filter($input, function ($a) {
+                return (is_array($a) && $a) || (!is_array($a) && (is_bool($a) || (is_string($a) && strlen(trim($a))) || is_numeric($a)));
+            });
         } else {
             $ret = array_filter($input);
         }

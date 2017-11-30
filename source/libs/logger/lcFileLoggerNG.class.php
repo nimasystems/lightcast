@@ -143,7 +143,7 @@ class lcFileLoggerNG extends lcLogger
             lcDirs::create($dirname, true);
         }
 
-        $next = count($this->files);
+        $next = is_array($this->files) ? count($this->files) : null;
 
         $this->files[$next] = array('channel' => $channel, 'filename' => $full_filename);
 
