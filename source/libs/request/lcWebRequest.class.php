@@ -670,6 +670,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return ($this->request_method == lcHttpMethod::METHOD_GET);
     }
 
+    public function isDelete()
+    {
+        return ($this->request_method == lcHttpMethod::METHOD_DELETE);
+    }
+
     /*
      * Gets a parser object for
     * ACCEPT_ENCODING
@@ -1032,6 +1037,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $this->request_method = lcHttpMethod::METHOD_PUT;
         } elseif ($this->env('REQUEST_METHOD') == 'HEAD') {
             $this->request_method = lcHttpMethod::METHOD_HEAD;
+        } elseif ($this->env('REQUEST_METHOD') == 'DELETE') {
+            $this->request_method = lcHttpMethod::METHOD_DELETE;
         } else {
             $this->request_method = null;
         }

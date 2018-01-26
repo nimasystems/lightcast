@@ -182,6 +182,7 @@ abstract class lcWebBaseController extends lcController
                 if (($arg == self::VPOST && !$this->request->isPost()) ||
                     ($arg == self::VPUT && !$this->request->isPut()) ||
                     ($arg == self::VGET && !$this->request->isGet()) ||
+                    ($arg == self::VDELETE && !$this->request->isDelete()) ||
                     ($arg == self::VAJAX && !$this->request->isAjax()) ||
                     ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
                     ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||

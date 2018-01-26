@@ -35,6 +35,7 @@ class lcHttpMethod
     const METHOD_PUT = 2;
     const METHOD_POST = 3;
     const METHOD_HEAD = 4;
+    const METHOD_DELETE = 5;
 
     const METHOD_CHECKOUT = 5;
     const METHOD_SHOWMETHOD = 6;
@@ -53,6 +54,8 @@ class lcHttpMethod
             return self::METHOD_ANY;
         } elseif ($string == 'get') {
             return self::METHOD_GET;
+        } elseif ($string == 'delete') {
+            return self::METHOD_DELETE;
         } elseif ($string == 'put') {
             return self::METHOD_PUT;
         } elseif ($string == 'post') {

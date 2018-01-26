@@ -32,6 +32,7 @@ abstract class lcController extends lcBaseController
     const VPOST = 'is_post';
     const VPUT = 'is_put';
     const VGET = 'is_get';
+    const VDELETE = 'is_delete';
     const VAJAX = 'is_ajax';
     const VAUTH = 'is_authenticated';
     const VNAUTH = 'not_authenticated';
