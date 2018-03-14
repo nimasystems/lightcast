@@ -31,6 +31,11 @@ class lcException extends Exception implements iDomainException
     protected $domain;
     protected $extra_data;
 
+    /**
+     * @var array
+     */
+    protected $options;
+
     public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
     {
         $message = $message ? $message : '';
@@ -53,6 +58,24 @@ class lcException extends Exception implements iDomainException
         } else {
             parent::__construct($message, $code);
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     * @return lcException
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
+        return $this;
     }
 
     public function getDomain()

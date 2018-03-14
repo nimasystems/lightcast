@@ -25,7 +25,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 {
     const DEFAULT_LOCALE_UNIX = 'en_US';
     const DEFAULT_LOCALE_WIN = 'us';
-    const DEFAULT_CATEGORY = LC_ALL;
+    const DEFAULT_CATEGORY = array(LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_TIME, LC_MESSAGES);
     const DEFAULT_CHARSET = 'UTF-8';
     protected $locale;
     protected $charset = self::DEFAULT_CHARSET;
@@ -238,6 +238,8 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 
     private function internalSetLocale($locale, $category)
     {
+        $categories = is_array($category) ? $category : array($category);
+
         /*
          * Try appending some character set names; some systems (like FreeBSD) need this.  Some
         * require a format with hyphen (eg. Gentoo) and others without (eg. FreeBSD).
@@ -248,9 +250,18 @@ abstract class lcGettext extends lcI18n implements iDebuggable
             'EUC', 'Big5');
 
         foreach ($charsets as $charset) {
-            if (($ret = setlocale($category, $locale . '.' . $charset)) !== false) {
-                $this->charset = $charset;
+            $ret = false;
 
+            foreach ($categories as $cat_) {
+                if (($ret = setlocale($cat_, $locale . '.' . $charset)) !== false) {
+                    $this->charset = $charset;
+                    $ret = true;
+                } else {
+                    break;
+                }
+            }
+
+            if ($ret) {
                 return $ret;
             }
 
@@ -264,8 +275,18 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         */
         if ($codes = i18nHelper::LangCountryLocalesToThreeLetterCode($locale)) {
             foreach ($codes as $code) {
-                if (($ret = setlocale($category, $code)) !== false) {
-                    $this->charset = 'UTF-8';
+                $ret = false;
+
+                foreach ($categories as $cat_) {
+                    if (($ret = setlocale($cat_, $code)) !== false) {
+                        $this->charset = 'UTF-8';
+                        $ret = true;
+                    } else {
+                        break;
+                    }
+                }
+
+                if ($ret) {
                     return $ret;
                 }
 
@@ -275,7 +296,15 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 
         unset($code, $codes);
 
-        if (($ret = setlocale($category, $locale)) !== false) {
+        $ret = false;
+
+        foreach ($categories as $cat_) {
+            if (($ret = setlocale($cat_, $locale)) !== false) {
+                $ret = true;
+            }
+        }
+
+        if ($ret) {
             return $ret;
         }
 
