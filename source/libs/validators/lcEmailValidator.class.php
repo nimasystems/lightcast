@@ -23,9 +23,19 @@
 
 class lcEmailValidator extends lcValidator
 {
+    private static $should_compare_with_filter_var = null;
+
     public function validate($data)
     {
-        //return (bool)preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data);
-        return (bool)preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*(\+[a-z0-9-]+)?@[a-z0-9-]+(\.[a-z0-9-]+)*$/i", $data);
+        if (self::$should_compare_with_filter_var === null) {
+            self::$should_compare_with_filter_var = version_compare(PHP_VERSION, '5.2.0', '>=');
+        }
+
+        if (self::$should_compare_with_filter_var) {
+            return filter_var($data, FILTER_VALIDATE_EMAIL);
+        } else {
+            //return (bool)preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/", $data);
+            return (bool)preg_match("/^[_a-z0-9-]+(\.[_a-z0-9-]+)*(\+[a-z0-9-]+)?@[a-z0-9-]+(\.[a-z0-9-]+)*$/i", $data);
+        }
     }
 }
