@@ -42,6 +42,14 @@ abstract class lcValidatorBase extends lcObj
 
     public static function validateAge($birthday, $age = 18)
     {
+        if (!$birthday) {
+            return false;
+        }
+
+        if (!$age) {
+            return true;
+        }
+
         // $birthday can be UNIX_TIMESTAMP or just a string-date.
         if (is_string($birthday)) {
             $birthday = strtotime($birthday);
