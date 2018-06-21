@@ -95,8 +95,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $this->warning('Notifying of handled exception: ' . $exception);
 
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
+        $exception_min_severity = (int)$this->configuration['exceptions.mail.severity'];
 
-        if ($should_send_email) {
+        if ($should_send_email && (!$exception_min_severity || !($exception instanceof lcException) ||
+                ($exception instanceof lcException && $exception->getSeverity() <= $exception_min_severity))) {
             try {
                 $this->emailException($exception);
             } catch (exception $e) {
@@ -421,11 +423,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     /**
      * @param Exception|Error $exception
+     * @throws Exception
      */
     public function handleException($exception)
     {
         // PHP7 compat
-        if (!$exception instanceof Exception) {
+        if (!($exception instanceof Exception)) {
             $exception = new ErrorException(
                 $exception->getMessage(),
                 $exception->getCode(),
@@ -436,8 +439,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
 
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
+        $exception_min_severity = (int)$this->configuration['exceptions.mail.severity'];
 
-        if ($should_send_email) {
+        if ($should_send_email && (!$exception_min_severity || !($exception instanceof lcException) ||
+                ($exception instanceof lcException && $exception->getSeverity() <= $exception_min_severity))) {
             try {
                 $this->emailException($exception);
             } catch (exception $e) {
@@ -451,21 +456,27 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $is_debugging = $this->is_debugging;
         $in_cli = lcSys::isRunningCLI();
 
+        /** @var lcWebRequest $request */
+        $request = $this->request;
+
         // check request Accept to determine if response should output html or something else
-        $request_content_type = (isset($this->request) && $this->request && !$in_cli && $this->request instanceof lcWebRequest) ? $this->request->getAcceptMimetype()->getPreferred() : null;
+        $request_content_type = ($request && !$in_cli && $request instanceof lcWebRequest) ? $request->getAcceptMimetype()->getPreferred() : null;
         $request_content_type = $request_content_type && is_array($request_content_type) && count($request_content_type) ? $request_content_type[0] : null;
+
+        /** @var lcWebResponse $response */
+        $response = $this->response;
 
         $content_type = null;
 
         if ($request_content_type) {
             $content_type = $request_content_type;
         } else {
-            $content_type = (isset($this->response) && $this->response && !$in_cli && $this->response instanceof lcWebResponse) ? $this->response->getContentType() :
+            $content_type = ($response && !$in_cli && $response instanceof lcWebResponse) ? $response->getContentType() :
                 ($in_cli ? 'text/plain' : 'text/html');
         }
 
         // override content_type for XMLHTTP requests!
-        if ($this->request && $this->request instanceof lcWebRequest && $this->request->isXmlHttpRequest()) {
+        if ($request && $request instanceof lcWebRequest && $request->isXmlHttpRequest()) {
             $content_type = isset($configuration['exceptions.ajax_content_type']) ?
                 (string)$configuration['exceptions.ajax_content_type'] :
                 self::AJAX_REQUEST_CONTENT_TYPE;
@@ -520,8 +531,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $exceptions_custom_module = (string)$configuration['exceptions.module'];
             $exceptions_custom_action = (string)$configuration['exceptions.action'];
 
-            if (!DO_DEBUG && $this->request && !$in_cli && $this->request instanceof lcWebRequest &&
-                $this->request->isGet() && !$this->response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action
+            if (!DO_DEBUG && $request && !$in_cli && $request instanceof lcWebRequest &&
+                $request->isGet() && !$response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action
             ) {
                 $front_controller = $this->controller;
 
@@ -665,40 +676,47 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $error_output = null;
 
         switch ($content_type) {
-            case 'text/html': {
-                $fname = 'html.err';
-                break;
-            }
-            case 'text/xml': {
-                $fname = 'xml.err';
-                break;
-            }
-            case 'text/plain': {
-                $fname = 'txt.err';
-                break;
-            }
-            case 'text/javascript': {
-                $fname = 'js.err';
-                break;
-            }
-            case 'text/css': {
-                $fname = 'css.err';
-                break;
-            }
-            case 'application/json': {
-                $fname = null;
-                $error_output = @json_encode(array('error' => $this->getExceptionDetails($exception)));
-
-                if ($error_output && DO_DEBUG) {
-                    $error_output = lcVars::indentJson($error_output);
+            case 'text/html':
+                {
+                    $fname = 'html.err';
+                    break;
                 }
+            case 'text/xml':
+                {
+                    $fname = 'xml.err';
+                    break;
+                }
+            case 'text/plain':
+                {
+                    $fname = 'txt.err';
+                    break;
+                }
+            case 'text/javascript':
+                {
+                    $fname = 'js.err';
+                    break;
+                }
+            case 'text/css':
+                {
+                    $fname = 'css.err';
+                    break;
+                }
+            case 'application/json':
+                {
+                    $fname = null;
+                    $error_output = @json_encode(array('error' => $this->getExceptionDetails($exception)));
 
-                break;
-            }
-            default: {
-                $fname = 'txt.err';
-                break;
-            }
+                    if ($error_output && DO_DEBUG) {
+                        $error_output = lcVars::indentJson($error_output);
+                    }
+
+                    break;
+                }
+            default:
+                {
+                    $fname = 'txt.err';
+                    break;
+                }
         }
 
         $libs_dir = $this->configuration->getLibsDir();

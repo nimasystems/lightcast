@@ -25,4 +25,6 @@
 
 class lcTaskException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_ERROR;
+
 }

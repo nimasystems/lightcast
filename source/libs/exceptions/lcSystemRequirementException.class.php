@@ -25,4 +25,6 @@
 
 class lcSystemRequirementException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_CRIT;
+
 }

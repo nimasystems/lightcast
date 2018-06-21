@@ -25,6 +25,8 @@
 
 class lcPHPException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_ERROR;
+
     public function __construct($errmsg, $errno, $filename, $linenum, $vars = null)
     {
         $message = 'PHP Error: ' . $errmsg . ', Code: ' . $errno . ', File: ' . $filename . ', Line: ' . $linenum;

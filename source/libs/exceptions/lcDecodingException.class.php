@@ -25,4 +25,6 @@
 
 class lcDecodingException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_WARNING;
+
 }

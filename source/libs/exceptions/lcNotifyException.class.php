@@ -25,4 +25,6 @@
 
 class lcNotifyException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_WARNING;
+
 }

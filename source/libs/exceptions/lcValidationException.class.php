@@ -23,6 +23,8 @@
 
 class lcValidationException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_WARNING;
+
     /** @var lcValidatorFailure[] */
     protected $validation_failures;
 

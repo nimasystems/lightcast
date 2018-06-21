@@ -25,6 +25,8 @@
 
 class lcNotImplemented extends lcException implements iHTTPException
 {
+    protected $severity = self::SEVERITY_LEVEL_ERROR;
+
     public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
     {
         if (!isset($message)) {
