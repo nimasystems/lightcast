@@ -25,6 +25,8 @@
 
 class lcSystemException extends lcException implements iHTTPException
 {
+    protected $severity = self::SEVERITY_LEVEL_CRIT;
+
     public function getStatusCode()
     {
         return 500;

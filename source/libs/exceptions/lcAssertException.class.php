@@ -25,6 +25,8 @@
 
 class lcAssertException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_ERROR;
+
     public function __construct($file, $line, $code)
     {
         $message = 'Assertion failed: File: ' . $file . ', Line: ' . $line . ', Code: ' . $code;

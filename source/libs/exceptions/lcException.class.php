@@ -25,11 +25,20 @@ class lcException extends Exception implements iDomainException
 {
     const DEFAULT_DOMAIN = 'com.lightcast.generic';
 
+    const SEVERITY_LEVEL_CRIT = 0;
+    const SEVERITY_LEVEL_ERROR = 1;
+    const SEVERITY_LEVEL_WARNING = 2;
+
     protected $cause;
     protected $content_type;
 
     protected $domain;
     protected $extra_data;
+
+    /**
+     * @var int
+     */
+    protected $severity = self::SEVERITY_LEVEL_CRIT;
 
     /**
      * @var array
@@ -111,5 +120,23 @@ class lcException extends Exception implements iDomainException
         } else {
             return $this->cause;
         }
+    }
+
+    /**
+     * @param int $severity
+     * @return lcException
+     */
+    public function setSeverity($severity)
+    {
+        $this->severity = $severity;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSeverity()
+    {
+        return $this->severity;
     }
 }

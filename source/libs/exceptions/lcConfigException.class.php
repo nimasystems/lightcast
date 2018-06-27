@@ -25,4 +25,6 @@
 
 class lcConfigException extends lcException
 {
+    protected $severity = self::SEVERITY_LEVEL_ERROR;
+
 }
