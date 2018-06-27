@@ -107,7 +107,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $this->params;
     }
 
-    public function __get($name)
+    /*public function __get($name)
     {
         return $this->params->__get($name);
     }
@@ -115,7 +115,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     public function __set($name, $value = null)
     {
         return $this->params->__set($name, $value);
-    }
+    }*/
 
     public function setParams(array $params = null)
     {
@@ -130,7 +130,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     /**
      * @param $name
      * @param null $params
-     * @return lcHtmlTemplateView
+     * @return lcIterateParamHolder
      */
     public function getNode($name, $params = null)
     {
