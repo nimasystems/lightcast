@@ -34,6 +34,12 @@ class lcDateTime
         return strftime($format, $timestamp);
     }
 
+    public static function utcDateTime($timestamp = false)
+    {
+        $d = new \DateTime('now', new \DateTimeZone('UTC'));
+        return $timestamp ? $d->getTimestamp() : $d;
+    }
+
     public static function getMicrotimeFloat()
     {
         list($usec, $sec) = explode(" ", microtime());
@@ -42,14 +48,21 @@ class lcDateTime
         return $res;
     }
 
+    public static function hoursToSeconds($hours)
+    {
+        return self::hoursToMinutes($hours) * 60;
+    }
+
     public static function hoursToMinutes($hours)
     {
         $minutes = 0;
+
         if (strpos($hours, ':') !== false) {
             // Split hours and minutes.
             list($hours, $minutes) = explode(':', $hours);
         }
-        return $hours * 60 + $minutes;
+
+        return (int)$hours * 60 + $minutes;
     }
 
     public static function minutesToHours($minutes)
@@ -67,7 +80,7 @@ class lcDateTime
         return $timeDiff;
     }
 
-    public static function humanizeDateDifference($now, $otherDate = null, $offset = null, $config = array())
+    public static function humanizeDateDifference($now, $otherDate = null, $offset = null, $config = [])
     {
         if ($otherDate != null) {
             $offset = $now - $otherDate;
@@ -85,7 +98,7 @@ class lcDateTime
             return null;
         }
 
-        $localization_strings = (isset($config['localization']) ? $config['localization'] : array());
+        $localization_strings = (isset($config['localization']) ? $config['localization'] : []);
 
         if ($deltaD > 1) {
             if ($deltaD > 365) {
@@ -135,8 +148,15 @@ class lcDateTime
         }
     }
 
-    public static function secondsToTime($inputSeconds)
+    public static function secondsToTime($inputSeconds, $format = null, array $options = null)
     {
+        if (!$inputSeconds) {
+            return null;
+        }
+
+        $append_leading_zero = (isset($options['append_leading_zero']) && $options['append_leading_zero']) ||
+            !isset($options['append_leading_zero']);
+
         $secondsInAMinute = 60;
         $secondsInAnHour = 60 * $secondsInAMinute;
         $secondsInADay = 24 * $secondsInAnHour;
@@ -156,14 +176,34 @@ class lcDateTime
         $remainingSeconds = $minuteSeconds % $secondsInAMinute;
         $seconds = ceil($remainingSeconds);
 
+        $ns = $append_leading_zero ? '2' : '1';
+        $mod = '%0' . $ns . 'd';
+
         // return the final array
-        $obj = array(
-            'd' => (int)$days,
-            'h' => (int)$hours,
-            'm' => (int)$minutes,
-            's' => (int)$seconds,
-        );
-        return $obj;
+        $obj = [
+            'd' => sprintf($mod, $days),
+            'h' => sprintf($mod, $hours),
+            'm' => sprintf($mod, $minutes),
+            's' => sprintf($mod, $seconds),
+        ];
+
+        if ($format) {
+            $tstr = [];
+
+            $formata = str_split($format);
+
+            foreach ($formata as $v) {
+                $tstr[] = isset($obj[$v]) ? $obj[$v] : $v;
+                unset($v);
+            }
+
+            $tstr = array_filter($tstr);
+            $tstr = implode('', $tstr);
+
+            return $tstr;
+        } else {
+            return $obj;
+        }
     }
 
     public static function convertPhpDateToJsFormat($datetime_format)
