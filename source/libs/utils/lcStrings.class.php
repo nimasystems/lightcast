@@ -6,8 +6,24 @@ class lcStrings
     const NUMBERS = '1234567890';
     const WORD_COUNT_MASK = "/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}\p{Nd}]*/u";
 
-    protected static $dict_index = array();
-    protected static $dict_data = array();
+    protected static $dict_index = [];
+    protected static $dict_data = [];
+
+    public static function isValidBase64($string)
+    {
+        $decoded = base64_decode($string, true);
+
+        // Check if there is no invalid character in string
+        if (!preg_match('/^[a-zA-Z0-9\/\r\n+]*={0,2}$/', $string)) return false;
+
+        // Decode the string in strict mode and send the response
+        if (!base64_decode($string, true)) return false;
+
+        // Encode and compare it to original one
+        if (base64_encode($decoded) != $string) return false;
+
+        return true;
+    }
 
     public static function startsWith($haystack, $needle)
     {
@@ -35,10 +51,6 @@ class lcStrings
         return strstr($haystack, $needle);
     }
 
-    /**
-     * Check if a string is serialized
-     * @param string $string
-     */
     public static function isSerialized($string)
     {
         return (@unserialize($string) !== false || $string == 'b:0;');
@@ -49,7 +61,7 @@ class lcStrings
         $locale_code = null;
         $country_code = null;
 
-        $separators = array('_', '-');
+        $separators = ['_', '-'];
         $sel_sep = null;
 
         foreach ($separators as $sep) {
@@ -73,10 +85,10 @@ class lcStrings
             $locale_code = $locale;
         }
 
-        return array(
+        return [
             'country' => $country_code,
             'locale' => $locale_code
-        );
+        ];
     }
 
     public static function splitEmail($str)
@@ -86,7 +98,7 @@ class lcStrings
         preg_match($sPattern, $str, $aMatch);
         $name = (isset($aMatch[1])) ? $aMatch[1] : '';
         $email = (isset($aMatch[3])) ? $aMatch[3] : '';
-        return array('name' => trim($name), 'email' => trim($email));
+        return ['name' => trim($name), 'email' => trim($email)];
     }
 
     public static function permaLink(array $key_cols, array $keywords, $prefix = null)
@@ -105,7 +117,7 @@ class lcStrings
         $keywords_ = null;
 
         if (isset($keywords)) {
-            $keys = array();
+            $keys = [];
 
             foreach ($keywords as $keyword) {
                 if (strlen($keyword) > 60) {
@@ -151,7 +163,7 @@ class lcStrings
         $len = strlen($mail);
         $i = 0;
 
-        $par = array();
+        $par = [];
 
         while ($i < $len) {
             $c = mt_rand(1, 4);
@@ -164,11 +176,11 @@ class lcStrings
 
     public static function getTopKeywords($string, $min_word_len = 3, $max_words = 30, $imploded = false)
     {
-        $skipwords = array(
+        $skipwords = [
             'and', 'the', 'is', 'of', 'from', 'to', 'an', 'a', 'with',
             'are', 'me', 'she', 'because', 'otherwise', 'without', 'select',
             'selected', 'were', 'by', 'in', 'his', 'her', 'at', 'to'
-        );
+        ];
 
         if (!isset($min_word_len)) {
             $min_word_len = 3;
@@ -181,7 +193,7 @@ class lcStrings
 
         $latinchars = self::getLatinChars();
 
-        $narr = array();
+        $narr = [];
 
         foreach ($tokens as $key => $token) {
             $str = '';
@@ -228,7 +240,7 @@ class lcStrings
 
     public static function tokenize($string)
     {
-        $tokens = array();
+        $tokens = [];
         preg_match_all('/"[^"]+"|[^"\s,]+/', $string, $tokens);
 
         if (!$tokens) {
@@ -253,7 +265,7 @@ class lcStrings
 
     public static function getLatinChars()
     {
-        $narr = array();
+        $narr = [];
         $str = self::LATIN_CHARS;
 
         for ($i = 0; $i < strlen($str); $i++) {
@@ -348,7 +360,7 @@ class lcStrings
 
         $query = explode('&', $query);
 
-        $params = array();
+        $params = [];
 
         foreach ($query as $t) {
             $t = explode('=', $t);
@@ -365,7 +377,7 @@ class lcStrings
         return $params;
     }
 
-    public static function toAlphaNum($string, array $allowed = array())
+    public static function toAlphaNum($string, array $allowed = [])
     {
         $allow = null;
 
@@ -414,7 +426,7 @@ class lcStrings
 
     public static function strCaseSplit($string)
     {
-        $parts = array();
+        $parts = [];
 
         $t = 0;
         $len = strlen($string);
@@ -444,9 +456,9 @@ class lcStrings
      */
     public static function sanitize($string, $force_lowercase = true, $anal = false)
     {
-        $strip = array("~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
+        $strip = ["~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
             "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-            "â€”", "â€“", ",", "<", ".", ">", "/", "?");
+            "â€”", "â€“", ",", "<", ".", ">", "/", "?"];
         $clean = trim(str_replace($strip, "", strip_tags($string)));
         $clean = preg_replace('/\s+/', "-", $clean);
         $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean;
@@ -481,11 +493,11 @@ class lcStrings
     public static function getLongTailKeywords($str, $len = 3, $min = 2)
     {
         if (!$str) {
-            return array();
+            return [];
         }
 
-        $keywords = array();
-        $common = array('i', 'a', 'about', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'com', 'de', 'en', 'for', 'from', 'how', 'in', 'is', 'it', 'la', 'of', 'on', 'or', 'that', 'the', 'this', 'to', 'was', 'what', 'when', 'where', 'who', 'will', 'with', 'und', 'the', 'www');
+        $keywords = [];
+        $common = ['i', 'a', 'about', 'an', 'and', 'are', 'as', 'at', 'be', 'by', 'com', 'de', 'en', 'for', 'from', 'how', 'in', 'is', 'it', 'la', 'of', 'on', 'or', 'that', 'the', 'this', 'to', 'was', 'what', 'when', 'where', 'who', 'will', 'with', 'und', 'the', 'www'];
         $str = preg_replace('/[^a-z0-9\s-]+/', '', strtolower(strip_tags($str)));
         $str = preg_split('/\s+-\s+|\s+/', $str, -1, PREG_SPLIT_NO_EMPTY);
 
@@ -507,7 +519,7 @@ class lcStrings
             }
         }
 
-        $return = array();
+        $return = [];
 
         foreach ($keywords as &$keyword) {
             $keyword = array_filter($keyword, function ($v) use ($min) {
@@ -547,7 +559,7 @@ class lcStrings
                 break;
             case 2:
                 preg_match_all(self::WORD_COUNT_MASK, $string, $matches, PREG_OFFSET_CAPTURE);
-                $result = array();
+                $result = [];
 
                 foreach ($matches[0] as $match) {
                     $result[$match[1]] = $match[0];
@@ -562,23 +574,23 @@ class lcStrings
         return $ret;
     }
 
-    public static function url_slug($str, $options = array())
+    public static function url_slug($str, $options = [])
     {
         // Make sure string is in UTF-8 and strip invalid UTF-8 characters
         $str = mb_convert_encoding((string)$str, 'UTF-8', mb_list_encodings());
 
-        $defaults = array(
+        $defaults = [
             'delimiter' => '-',
             'limit' => null,
             'lowercase' => true,
-            'replacements' => array(),
+            'replacements' => [],
             'transliterate' => false,
-        );
+        ];
 
         // Merge options
         $options = array_merge($defaults, $options);
 
-        $char_map = array(
+        $char_map = [
             // Latin
             'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C',
             'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I',
@@ -635,7 +647,7 @@ class lcStrings
             'Š' => 'S', 'Ū' => 'u', 'Ž' => 'Z',
             'ā' => 'a', 'č' => 'c', 'ē' => 'e', 'ģ' => 'g', 'ī' => 'i', 'ķ' => 'k', 'ļ' => 'l', 'ņ' => 'n',
             'š' => 's', 'ū' => 'u', 'ž' => 'z'
-        );
+        ];
 
         // Make custom replacements
         $str = preg_replace(array_keys($options['replacements']), $options['replacements'], $str);
@@ -663,7 +675,7 @@ class lcStrings
     public static function sluggable($string, $separator = '-')
     {
         $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
-        $special_cases = array('&' => 'and');
+        $special_cases = ['&' => 'and'];
         $string = mb_strtolower(trim($string), 'UTF-8');
         $string = str_replace(array_keys($special_cases), array_values($special_cases), $string);
         $string = preg_replace($accents_regex, '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'));
@@ -740,7 +752,7 @@ class lcStrings
 
             if ($cut_to - $len > 10) {
                 $overflow = true;
-            } elseif ($cut_to - $len < -10) {
+            } else if ($cut_to - $len < -10) {
                 $overflow = true;
             }
 
