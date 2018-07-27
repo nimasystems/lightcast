@@ -462,6 +462,12 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         return $this->loaded_components;
     }
 
+    /**
+     * @param $component_name
+     * @return lcComponent|null
+     * @throws lcComponentException
+     * @throws lcInvalidArgumentException
+     */
     public function getComponent($component_name)
     {
         if (!$component_name) {

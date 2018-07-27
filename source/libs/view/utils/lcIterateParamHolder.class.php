@@ -105,18 +105,21 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     public function setReplacementPolicyStr($policy_str)
     {
         switch ($policy_str) {
-            case 'level': {
-                $this->setReplacementPolicy(self::REPLACE_LEVEL);
-                break;
-            }
-            case 'deep': {
-                $this->setReplacementPolicy(self::REPLACE_DEEP);
-                break;
-            }
-            default: {
-                $this->setReplacementPolicy(self::REPLACE_LEVEL);
-                break;
-            }
+            case 'level':
+                {
+                    $this->setReplacementPolicy(self::REPLACE_LEVEL);
+                    break;
+                }
+            case 'deep':
+                {
+                    $this->setReplacementPolicy(self::REPLACE_DEEP);
+                    break;
+                }
+            default:
+                {
+                    $this->setReplacementPolicy(self::REPLACE_LEVEL);
+                    break;
+                }
         }
     }
 
@@ -273,7 +276,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return true;
     }
 
-    public function __get($name)
+    /*public function __get($name)
     {
         return $this->get($name);
     }
@@ -281,7 +284,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     public function __set($name, $value = null)
     {
         $this->set($name, $value);
-    }
+    }*/
 
     public function set($name, $value)
     {
