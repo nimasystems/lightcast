@@ -30,10 +30,21 @@ class lcMoneyFormatter
         return number_format($number, 0, ',', ' ');
     }
 
-    public static function standartOutput($value)
+    public static function standartOutput($value, array $options = null)
     {
-        $value = round($value, 2);
+        if (!$value) {
+            return $value;
+        }
 
-        return sprintf('%01.2f', $value);
+        $format = isset($options['format']) && $options['format'] ? $options['format'] : null;
+        $decimals = isset($options['decimals']) && $options['decimals'] ? $options['decimals'] : 2;
+        $decimal_point = isset($options['decimal_point']) && $options['decimal_point'] ?
+            $options['decimal_point'] : '.';
+        $thousands_separator = isset($options['thousands_separator']) && $options['thousands_separator'] ?
+            $options['thousands_separator'] : '';
+        //$value = round($value, $decimals);
+
+        $nf = number_format($value, $decimals, $decimal_point, $thousands_separator);
+        return $format ? sprintf($format, $nf) : $nf;
     }
 }
