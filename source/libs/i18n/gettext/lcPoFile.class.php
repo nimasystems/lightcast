@@ -30,7 +30,7 @@ class lcPoFile extends lcObj
     private $filename;
 
     private $description;
-    private $headers = array();
+    private $headers = [];
     //private $charset = 'UTF-8';
 
     /*
@@ -44,12 +44,12 @@ class lcPoFile extends lcObj
      msgstr translated-string
      */
 
-    private $translator_comments = array();
-    private $extracted_comments = array();
-    private $references = array();
-    private $flags = array();
+    private $translator_comments = [];
+    private $extracted_comments = [];
+    private $references = [];
+    private $flags = [];
 
-    private $messages = array();
+    private $messages = [];
 
     public function __construct($filename = null)
     {
@@ -64,7 +64,7 @@ class lcPoFile extends lcObj
 
     public function setDefaultHeaders()
     {
-        $this->headers = array(
+        $this->headers = [
             'Project-Id-Version' => '1.0.0.0',
             'Report-Msgid-Bugs-To' => 'i18n@nimasystems.com',
             'POT-Creation-Date' => date(self::DATE_FORMAT),
@@ -75,7 +75,7 @@ class lcPoFile extends lcObj
             'MIME-Version' => '1.0',
             'Content-Type' => 'text/plain; charset=UTF-8',
             'Content-Transfer-Encoding' => '8bit'
-        );
+        ];
 
         $this->description =
             '# TRANSLATION FILE' . "\n" .
@@ -92,11 +92,11 @@ class lcPoFile extends lcObj
 
         $this->data_loaded = false;
         $this->filename = $filename;
-        $this->messages = array();
-        $this->translator_comments = array();
-        $this->extracted_comments = array();
-        $this->references = array();
-        $this->flags = array();
+        $this->messages = [];
+        $this->translator_comments = [];
+        $this->extracted_comments = [];
+        $this->references = [];
+        $this->flags = [];
         $this->clearHeaders();
 
         // open and parse
@@ -122,7 +122,7 @@ class lcPoFile extends lcObj
 
     public function clearHeaders()
     {
-        $this->headers = array();
+        $this->headers = [];
     }
 
     private function parseHeader(&$data)
@@ -225,12 +225,12 @@ class lcPoFile extends lcObj
             return;
         }
 
-        $translator_comments = array();
-        $extracted_comments = array();
-        $references = array();
-        $flags = array();
-        $message_keys = array();
-        $message_vals = array();
+        $translator_comments = [];
+        $extracted_comments = [];
+        $references = [];
+        $flags = [];
+        $message_keys = [];
+        $message_vals = [];
 
         $i = 0;
 
@@ -254,34 +254,34 @@ class lcPoFile extends lcObj
                     if ($tmp) {
                         $translator_comments[$i][$tmp] = $tmp;
                     }
-                } elseif (mb_substr($str, 0, 3) == '#. ') {
+                } else if (mb_substr($str, 0, 3) == '#. ') {
                     // extracted comment
                     $tmp = trim(mb_substr($str, 3, $ss));
 
                     if ($tmp) {
                         $extracted_comments[$i][$tmp] = $tmp;
                     }
-                } elseif (mb_substr($str, 0, 3) == '#: ') {
+                } else if (mb_substr($str, 0, 3) == '#: ') {
                     // referenced file
                     $tmp = trim(mb_substr($str, 3, $ss));
 
                     if ($tmp) {
                         $references[$i][$tmp] = $tmp;
                     }
-                } elseif (mb_substr($str, 0, 3) == '#, ') {
+                } else if (mb_substr($str, 0, 3) == '#, ') {
                     // flag
                     $tmp = trim(mb_substr($str, 3, $ss));
 
                     if ($tmp) {
                         $flags[$i][$tmp] = $tmp;
                     }
-                } elseif (mb_substr($str, 0, 8) == 'msgstr "' && mb_substr($str, $ss - 1, $ss) == '"') {
+                } else if (mb_substr($str, 0, 8) == 'msgstr "' && mb_substr($str, $ss - 1, $ss) == '"') {
                     // msgstr line
                     $tmp = mb_substr($str, 8, $ss - 9);
                     $message_vals[$i] = $tmp;
 
                     $msgstr_next = true;
-                } elseif (mb_substr($str, 0, 1) == '"' && mb_substr($str, $ss - 1, $ss) == '"') {
+                } else if (mb_substr($str, 0, 1) == '"' && mb_substr($str, $ss - 1, $ss) == '"') {
                     // msgid/msgstr extended lines
                     $res = mb_substr($str, 1, $ss - 2);
 
@@ -292,7 +292,7 @@ class lcPoFile extends lcObj
                     }
 
                     unset($res);
-                } elseif (mb_substr($str, 0, 7) == 'msgid "' && mb_substr($str, $ss - 1, $ss) == '"') {
+                } else if (mb_substr($str, 0, 7) == 'msgid "' && mb_substr($str, $ss - 1, $ss) == '"') {
                     // msgid lines
                     $res = mb_substr($str, 7, $ss - 8);
 
@@ -315,11 +315,11 @@ class lcPoFile extends lcObj
             return;
         }
 
-        $translator_comments_ = array();
-        $extracted_comments_ = array();
-        $references_ = array();
-        $flags_ = array();
-        $messages_ = array();
+        $translator_comments_ = [];
+        $extracted_comments_ = [];
+        $references_ = [];
+        $flags_ = [];
+        $messages_ = [];
 
         // start walking keys
         foreach ($message_keys as $idx => $key) {
@@ -476,7 +476,7 @@ class lcPoFile extends lcObj
 
     public function compile()
     {
-        $contents = array();
+        $contents = [];
 
         // set description
         if ($this->description) {
@@ -521,6 +521,10 @@ class lcPoFile extends lcObj
         $flags = array_filter((array)$this->flags);
 
         if ($messages && is_array($messages)) {
+            uasort($messages, function ($a, $b) {
+                return strlen($a) > strlen($b) ? 1 : -1;
+            });
+
             foreach ($messages as $msgid => $msgstr) {
                 $msgid_ = $msgid;
                 $msgid = $this->slashMessageValue($msgid);
@@ -636,7 +640,7 @@ class lcPoFile extends lcObj
     public function clearTranslatorComments($msgid = null)
     {
         if (!$msgid) {
-            $this->translator_comments = array();
+            $this->translator_comments = [];
             return;
         }
 
@@ -648,7 +652,7 @@ class lcPoFile extends lcObj
     public function clearExtractedComments($msgid = null)
     {
         if (!$msgid) {
-            $this->extracted_comments = array();
+            $this->extracted_comments = [];
             return;
         }
 
@@ -660,7 +664,7 @@ class lcPoFile extends lcObj
     public function clearReferencedFiles($msgid = null)
     {
         if (!$msgid) {
-            $this->references = array();
+            $this->references = [];
             return;
         }
 
@@ -672,7 +676,7 @@ class lcPoFile extends lcObj
     public function clearFlags($msgid = null)
     {
         if (!$msgid) {
-            $this->flags = array();
+            $this->flags = [];
             return;
         }
 
@@ -726,7 +730,7 @@ class lcPoFile extends lcObj
 
     public function clearMessages()
     {
-        $this->messages = array();
+        $this->messages = [];
     }
 
     public function getMessageCount()
