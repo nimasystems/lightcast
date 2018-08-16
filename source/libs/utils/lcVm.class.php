@@ -114,7 +114,7 @@ class lcVm
     public static function memory_get_usage()
     {
         if (0 === strpos(PHP_OS, 'WIN')) {
-            $output = array();
+            $output = [];
             exec('tasklist /FI "PID eq ' . getmypid() . '" /FO LIST', $output);
 
             return preg_replace('/[\D]/', '', $output[5]) * 1024;

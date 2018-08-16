@@ -31,8 +31,8 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     /** @var lcIterateParamHolder */
     protected $params;
 
-    protected $found_controller_actions = array();
-    protected $found_fragments = array();
+    protected $found_controller_actions = [];
+    protected $found_fragments = [];
 
     protected $template_filename;
 
@@ -68,9 +68,9 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'template_filename' => $this->template_filename,
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -107,15 +107,17 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $this->params;
     }
 
-    /*public function __get($name)
+    // left here for compatibility
+    public function __get($name)
     {
         return $this->params->__get($name);
     }
 
+    // left here for compatibility
     public function __set($name, $value = null)
     {
         return $this->params->__set($name, $value);
-    }*/
+    }
 
     public function setParams(array $params = null)
     {
@@ -259,11 +261,11 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
 
         $rep_tag = self::PARTIAL_PREFIX . (count($this->found_controller_actions) + 1) . '#' . $url . '#';
 
-        $this->found_controller_actions[] = array(
+        $this->found_controller_actions[] = [
             'tag_name' => $rep_tag,
             'route' => $url,
             'action_type' => 'partial'
-        );
+        ];
 
         // return the tag as the replacement of the preg - this is
         // how we'll match it later on to replace with actual content
@@ -301,11 +303,11 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         }
 
         $rep_tag = self::FRAGMENT_PREFIX . (count($this->found_fragments) + 1);
-        $this->found_fragments[] = array(
+        $this->found_fragments[] = [
             'tag_name' => $rep_tag,
             'url' => $res,
             'type' => $type
-        );
+        ];
 
         return $rep_tag;
     }

@@ -53,7 +53,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
         $this->node_name = $node_name;
         $this->params = $params;
-        $this->node_repeats = array();
+        $this->node_repeats = [];
         $this->replacement_policy = $replacement_policy;
     }
 
@@ -276,15 +276,17 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return true;
     }
 
-    /*public function __get($name)
+    // left here for compatibility
+    public function __get($name)
     {
         return $this->get($name);
     }
 
+    // left here for compatibility
     public function __set($name, $value = null)
     {
         $this->set($name, $value);
-    }*/
+    }
 
     public function set($name, $value)
     {
