@@ -69,12 +69,12 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
             'cache_enabled' => $this->getIsCacheEnabled(),
             'cache_timeout' => $this->getCacheTimeout()
-        );
+        ];
 
         return $debug;
     }
@@ -115,6 +115,12 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
                     ($collation ? ' COLLATE ' . $this->conn->quoteTrimmed($collation) : null));
             }
 
+            $tz = isset($this->options['timezone']) ? (string)$this->options['timezone'] : null;
+
+            if ($tz) {
+                $this->conn->exec('SET time_zone = ' . $this->conn->quote($tz));
+            }
+
             // initialize the connection with lightcast specific vars
             $this->conn->setEventDispatcher($this->event_dispatcher);
             $this->conn->setLightcastConfiguration($this->configuration);
@@ -151,11 +157,11 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
             'cache_enabled' => $this->getIsCacheEnabled()
-        );
+        ];
 
         return $debug;
     }
