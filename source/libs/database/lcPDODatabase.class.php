@@ -175,7 +175,7 @@ class lcPDODatabase extends lcDatabase
 
         assert($this->options);
 
-        $options = ($this->persistentc) ? array(PDO::ATTR_PERSISTENT => true) : array();
+        $options = ($this->persistentc) ? [PDO::ATTR_PERSISTENT => true] : [];
 
         try {
             $pdo_class = 'PDO';
