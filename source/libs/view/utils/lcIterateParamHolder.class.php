@@ -149,6 +149,14 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         return $node;
     }
 
+    public function repeatFromArray($name, array $data)
+    {
+        foreach ($data as $el) {
+            $tpl = $this->repeat($name);
+            $tpl->setParams($el);
+        }
+    }
+
     public function getNode($name, $params = null)
     {
         assert(isset($name));
