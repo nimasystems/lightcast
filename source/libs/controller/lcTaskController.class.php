@@ -86,6 +86,14 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $this->consoleDisplay($data, $prefixed, $return);
     }
 
+    public function displayDebug($data, $prefixed = true, $return = false)
+    {
+        if ($this->configuration->isDebugging()) {
+            $data = lcConsolePainter::formatColoredConsoleText($data, 'gray');
+            $this->consoleDisplay($data, $prefixed, $return);
+        }
+    }
+
     public function displayWarning($data, $prefixed = true, $return = false)
     {
         $data = lcConsolePainter::formatColoredConsoleText($data, 'yellow');
@@ -153,7 +161,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         }
 
         // run before execute
-        call_user_func_array(array($this, 'beforeExecute'), $action_params);
+        call_user_func_array([$this, 'beforeExecute'], $action_params);
 
         // call the action
         $action = $this->classMethodForAction($action_name, $action_params);
@@ -164,7 +172,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         }
 
         // run after execute
-        call_user_func_array(array($this, 'afterExecute'), $action_params);
+        call_user_func_array([$this, 'afterExecute'], $action_params);
 
         return $this->action_result;
     }
@@ -183,7 +191,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
             return false;
         }
 
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+        $callable_check = is_callable([$this, $method_name]) && method_exists($this, $method_name);
 
         return $callable_check;
     }
