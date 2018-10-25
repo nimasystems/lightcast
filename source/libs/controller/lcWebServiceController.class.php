@@ -99,28 +99,28 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         $this->configureControllerView();
 
         // run before execute
-        call_user_func_array(array($this, 'beforeExecute'), $action_params);
+        call_user_func_array([$this, 'beforeExecute'], $action_params);
 
         // call the action
         // unfortunately the way we are handling variables at the moment
         // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
         // so we fall back to the default way
         //$call_result = $this->__call($action, $params);
-        $this->action_result = call_user_func_array(array($this, $action), $action_params);
+        $this->action_result = call_user_func_array([$this, $action], $action_params);
 
         // run after execute
-        call_user_func_array(array($this, 'afterExecute'), $action_params);
+        call_user_func_array([$this, 'afterExecute'], $action_params);
 
         // notify after the action has been executed
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
-                array('controller_name' => $this->controller_name,
+                ['controller_name' => $this->controller_name,
                     'action_name' => $this->action_name,
                     'action_type' => $this->action_type,
                     'controller' => $this,
                     'action_params' => $this->action_params,
                     'action_result' => $this->action_result,
-                )
+                ]
             ));
         }
 
@@ -128,10 +128,10 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         $view = $this->getView();
 
         if ($view && $view instanceof lcDataView) {
-            $view_contents = $this->send_direct_response ? $this->action_result : array(
+            $view_contents = $this->send_direct_response ? $this->action_result : [
                 'error' => 0,
                 'result' => $this->action_result
-            );
+            ];
             $view->setContent($view_contents);
         }
 
@@ -158,7 +158,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
             return false;
         }
 
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+        $callable_check = is_callable([$this, $method_name]) && method_exists($this, $method_name);
 
         return $callable_check;
     }
@@ -172,10 +172,10 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
             return;
         }
 
-        $view->setOptions(array(
+        $view->setOptions([
             'action_name' => $this->getActionName(),
             'action_params' => $this->getActionParams(),
-        ));
+        ]);
         $view->setConfiguration($this->getConfiguration());
         $view->setEventDispatcher($this->getEventDispatcher());
         $view->setController($this);

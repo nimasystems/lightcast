@@ -47,14 +47,14 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     public function getListenerEvents()
     {
-        return array(
+        return [
             'app.startup' => 'onAppStartup',
             'request.startup' => 'onRequestStartup',
             'response.startup' => 'onResponseStartup',
             'mailer.startup' => 'onMailerStartup',
             'controller.startup' => 'onControllerStartup',
             'error_handler.exception_notify' => 'onExceptionNotificationReported',
-        );
+        ];
     }
 
     public function shutdown()
@@ -72,9 +72,9 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'error_handler'
-        );
+        ];
     }
 
     public function onExceptionNotificationReported(lcEvent $event)
@@ -115,14 +115,14 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $exception_cause = ($exception instanceof lcException) ? $exception->getCause() : null;
         $exception_domain = ($exception instanceof iDomainException) ? $exception->getDomain() : lcException::DEFAULT_DOMAIN;
 
-        $exception_trace = array();
+        $exception_trace = [];
         $this->getStackTrace($exception, $exception_trace);
         $exception_trace_str = $this->getTextTrace($exception_trace);
 
         $system_snapshot = $this->app_context ? $this->app_context->getDebugSnapshot() : null;
 
         $this->event_dispatcher->notify(new lcEvent('app.exception', $this,
-            array(
+            [
                 'exception' => $exception,
                 'message' => $exception_message,
                 'domain' => $exception_domain,
@@ -130,7 +130,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 'cause' => $exception_cause,
                 'trace' => $exception_trace_str,
                 'system_snapshot' => $system_snapshot
-            )));
+            ]));
     }
 
     public function emailException(Exception $exception)
@@ -200,7 +200,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $exception_file = $exception->getFile();
         $exception_line = $exception->getLine();
 
-        $exception_trace = array();
+        $exception_trace = [];
         $this->getStackTrace($exception, $exception_trace);
         $exception_trace_str = $this->getTextTrace($exception_trace);
 
@@ -240,7 +240,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         try {
             // send it using ordinary email if mailer is not available
             if ($this->mailer) {
-                $this->mailer->sendMail(array($recipient), $message, $subject);
+                $this->mailer->sendMail([$recipient], $message, $subject);
             } else {
                 $headers = 'From: ' . $recipient;
                 @mail($recipient, $subject, $message, $headers);
@@ -277,7 +277,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             return false;
         }
 
-        $txt_trace = array();
+        $txt_trace = [];
 
         $i = 0;
 
@@ -314,7 +314,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
             if (array_key_exists('args', $_trace)) {
                 if (count($_trace['args']) > 0) {
-                    $prep = array();
+                    $prep = [];
 
                     foreach ($_trace['args'] as $arg) {
                         $type = gettype($arg);
@@ -327,7 +327,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                             } else {
                                 $str .= 'false';
                             }
-                        } elseif ($type == 'integer' || $type == 'double') {
+                        } else if ($type == 'integer' || $type == 'double') {
                             if (settype($value, 'string')) {
                                 $str .= $value;
                             } else {
@@ -337,17 +337,17 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                                     $str .= '? double or float ?';
                                 }
                             }
-                        } elseif ($type == 'string') {
+                        } else if ($type == 'string') {
                             $str .= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
-                        } elseif ($type == 'array') {
+                        } else if ($type == 'array') {
                             $str .= 'Array';
-                        } elseif ($type == 'object') {
+                        } else if ($type == 'object') {
                             $str .= 'Object';
-                        } elseif ($type == 'resource') {
+                        } else if ($type == 'resource') {
                             $str .= 'Resource';
-                        } elseif ($type == 'NULL') {
+                        } else if ($type == 'NULL') {
                             $str .= 'null';
-                        } elseif ($type == 'unknown type') {
+                        } else if ($type == 'unknown type') {
                             $str .= '? unknown type ?';
                         }
 
@@ -486,13 +486,13 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $exception_message = $this->getExceptionOverridenMessage($exception, $content_type);
         $exception_cause = ($exception instanceof lcException) ? $exception->getCause() : null;
 
-        $exception_trace = array();
+        $exception_trace = [];
         $this->getStackTrace($exception, $exception_trace);
         $exception_trace_str = $this->getTextTrace($exception_trace);
 
         // exception domain
         $exception_domain = ($exception instanceof iDomainException) ? $exception->getDomain() : lcException::DEFAULT_DOMAIN;
-        $exception_http_status_code = ($exception instanceof iHTTPException) ? $exception->getStatusCode() : 200;
+        $exception_http_status_code = ($exception instanceof iHTTPException) ? $exception->getStatusCode() : 500;
 
         /*
          * In some cases we might not have a live configuration object
@@ -538,7 +538,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
                 if ($front_controller) {
                     try {
-                        $params = array(
+                        $params = [
                             'exception' => get_class($exception),
                             'message' => $exception_message,
                             'domain' => $exception_domain,
@@ -546,9 +546,9 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                             'cause' => $exception_cause,
                             'exception_object' => $exception,
                             'trace' => $exception_trace_str
-                        );
+                        ];
 
-                        $front_controller->forward($exceptions_custom_module, $exceptions_custom_action, array('request' => $params));
+                        $front_controller->forward($exceptions_custom_module, $exceptions_custom_action, ['request' => $params]);
 
                         // just in case
                         exit($exception_code);
@@ -575,7 +575,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                     }
                 }
 
-                @header('X-Powered-By: Lightcast PHP Framework - lightcast.nimasystems.com');
+                //@header('X-Powered-By: Lightcast PHP Framework - lightcast.nimasystems.com');
             }
 
             $this->sendResponse($error_output, $content_type, 1, $exception_http_status_code);
@@ -704,7 +704,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             case 'application/json':
                 {
                     $fname = null;
-                    $error_output = @json_encode(array('error' => $this->getExceptionDetails($exception)));
+                    $error_output = @json_encode(['error' => $this->getExceptionDetails($exception)]);
 
                     if ($error_output && DO_DEBUG) {
                         $error_output = lcVars::indentJson($error_output);
@@ -758,7 +758,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
         $outmsg = $this->getExceptionOverridenMessage($exception);
 
-        $details = array();
+        $details = [];
         $details['error_code'] = $exception->getCode();
         $details['error_subject'] = nl2br($outmsg);
         $details['domain'] = $exception_domain;
@@ -772,7 +772,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $details['line'] = $exception->getLine();
             //$details['file_excerpt'] = $this->fileExcerpt($exception->getFile(), $exception->getLine());
 
-            $fulltrace = array();
+            $fulltrace = [];
             $this->getStackTrace($exception, $fulltrace);
 
             $details['trace'] = $this->getTextTrace($fulltrace, true);
@@ -804,7 +804,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $data = str_replace('{$file_excerpt}', $this->fileExcerpt($exception->getFile(), $exception->getLine()), $data);
 
         // make our stack trace
-        $matches = array();
+        $matches = [];
         $tmpd = preg_replace("/\n/", '<---n--->', $data);
         preg_match("/<!-- BEGIN stackline -->(.*)<!-- END stackline -->/", $tmpd, $matches);
 
@@ -814,7 +814,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $i = 0;
             $tracestr = '';
 
-            $fulltrace = array();
+            $fulltrace = [];
             $this->getStackTrace($exception, $fulltrace);
 
             foreach ($fulltrace as $trace) {
@@ -844,7 +844,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
         $content = preg_split('#<br />#', highlight_file($file, true));
 
-        $lines = array();
+        $lines = [];
 
         for ($i = max($line - 6, 1), $max = min($line + 6, count($content)); $i <= $max; $i++) {
             $lines[] = '<li' . ($i == $line ? ' class="selected"' : '') . '>' . $content[$i - 1] . '</li>';
@@ -885,7 +885,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                         } else {
                             $htmldoc .= 'false';
                         }
-                    } elseif ($type == 'integer' || $type == 'double') {
+                    } else if ($type == 'integer' || $type == 'double') {
                         if (settype($value, 'string')) {
                             $htmldoc .= $value;
                         } else {
@@ -895,17 +895,17 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                                 $htmldoc .= '? double or float ?';
                             }
                         }
-                    } elseif ($type == 'string') {
+                    } else if ($type == 'string') {
                         $htmldoc .= "'$value'";
-                    } elseif ($type == 'array') {
+                    } else if ($type == 'array') {
                         $htmldoc .= 'Array';
-                    } elseif ($type == 'object') {
+                    } else if ($type == 'object') {
                         $htmldoc .= 'Object';
-                    } elseif ($type == 'resource') {
+                    } else if ($type == 'resource') {
                         $htmldoc .= 'Resource';
-                    } elseif ($type == 'NULL') {
+                    } else if ($type == 'NULL') {
                         $htmldoc .= 'null';
-                    } elseif ($type == 'unknown type') {
+                    } else if ($type == 'unknown type') {
                         $htmldoc .= '? unknown type ?';
                     }
 
