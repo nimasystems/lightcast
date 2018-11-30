@@ -21,12 +21,15 @@
 * E-Mail: info@nimasystems.com
 */
 
-abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities, Serializable, ArrayAccess, iKeyValueProvider, iDebuggable
+abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities, Serializable,
+    ArrayAccess, iKeyValueProvider, iDebuggable
 {
     /**
      * @var lcArrayCollection
      */
     protected $params;
+
+    protected $call_style;
 
     /**
      * @var array
@@ -78,6 +81,16 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     abstract public function getRequestContext();
+
+    /*
+     * Initialization of the Request
+    */
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->call_style = $this->configuration['controller.call_style'];
+    }
 
     public function getAllKeys()
     {
@@ -163,12 +176,20 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function offsetExists($name)
     {
-        return isset($this->env[$name]);
+        if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
+            return $this->params->has($name);
+        } else {
+            return isset($this->env[$name]);
+        }
     }
 
     public function offsetGet($name)
     {
-        return $this->env($name);
+        if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
+            return $this->params->get($name);
+        } else {
+            return $this->env($name);
+        }
     }
 
     /*

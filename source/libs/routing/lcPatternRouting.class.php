@@ -257,15 +257,15 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
         // at this point no route matched
         // return the last available route as the default one (lowest priority one)
-        $route = $all[count($all) - 1];
+        $route = count($all) ? $all[count($all) - 1] : null;
 
-        $route = array(
+        $route = $route ? [
             'name' => $route->getName(),
             'pattern' => $route->getPattern(),
             'params' => $route->getDefaultParams(),
             'options' => $route->getOptions(),
             'route' => $route
-        );
+        ] : null;
 
         return $route;
     }

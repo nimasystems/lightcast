@@ -23,6 +23,8 @@
 
 abstract class lcController extends lcBaseController
 {
+    const CALL_STYLE_REQRESP = 'reqresp';
+
     const TYPE_ACTION = 'action';
     const TYPE_PARTIAL = 'partial';
 

@@ -106,7 +106,12 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
         // so we fall back to the default way
         //$call_result = $this->__call($action, $params);
-        $this->action_result = call_user_func_array([$this, $action], $action_params);
+
+        $call_style = $this->configuration['controller.call_style'];
+        $call_input = $call_style == lcController::CALL_STYLE_REQRESP ?
+            [$this->getRequest()] : $action_params;
+
+        $this->action_result = call_user_func_array([$this, $action], $call_input);
 
         // run after execute
         call_user_func_array([$this, 'afterExecute'], $action_params);

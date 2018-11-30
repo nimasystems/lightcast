@@ -100,7 +100,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_system_plugins);
 
-        $plugins = array();
+        $plugins = [];
 
         $locations = $this->configuration->getPluginLocations();
 
@@ -123,7 +123,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_controller_action_forms);
 
-        $forms = array();
+        $forms = [];
 
         $locations = $this->configuration->getActionFormLocations();
 
@@ -146,7 +146,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_controller_modules);
 
-        $controllers = array();
+        $controllers = [];
 
         $locations = $this->configuration->getControllerModuleLocations();
 
@@ -169,7 +169,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_controller_web_services);
 
-        $controllers = array();
+        $controllers = [];
 
         $locations = $this->configuration->getControllerWebServiceLocations();
 
@@ -192,7 +192,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_controller_tasks);
 
-        $controllers = array();
+        $controllers = [];
 
         $locations = $this->configuration->getControllerTaskLocations();
 
@@ -215,7 +215,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     {
         assert(!$this->config_controller_components);
 
-        $controllers = array();
+        $controllers = [];
 
         $locations = $this->configuration->getControllerComponentLocations();
 
@@ -259,7 +259,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
         if ($plugin) {
             // use the plugin's models
-            $models = array();
+            $models = [];
 
             // check the configuration
             $plcfg = $plugin->getPluginConfiguration();
@@ -308,7 +308,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             $autoload_classes = $plugin_config->getAutoloadClasses();
 
             if ($autoload_classes && is_array($autoload_classes)) {
-                $autoload_classes_ = array();
+                $autoload_classes_ = [];
 
                 foreach ($autoload_classes as $class => $filename) {
                     /** @var lcPluginConfiguration $plugin_config */
@@ -345,9 +345,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 $path_to_models = $plugin_dir . DS . lcPlugin::MODELS_PATH;
 
                 // notify to anyone who is able to register models
-                $this->event_dispatcher->filter(new lcEvent('database_model_manager.register_models', $this, array(
+                $this->event_dispatcher->filter(new lcEvent('database_model_manager.register_models', $this, [
                     'path_to_models' => $path_to_models
-                )), $models);
+                ]), $models);
 
                 unset($path_to_models);
             }
@@ -362,13 +362,13 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
             if ($loaders && is_array($loaders)) {
                 foreach ($loaders as $loader) {
-                    $ld = is_array($loader) ? $loader : array($loader);
+                    $ld = is_array($loader) ? $loader : [$loader];
 
                     foreach ($ld as $loader_info) {
-                        $details = array(
+                        $details = [
                             'context_type' => lcSysObj::CONTEXT_PLUGIN,
                             'context_name' => $plugin_name,
-                        );
+                        ];
 
                         $this->addSystemLoader($loader_info, $details);
 
@@ -524,8 +524,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function addControllerComponent($controller_name, array $details)
     {
         if (isset($this->components[$controller_name])) {
-            assert(false);
-            return;
+            throw new lcSystemException('Duplicate controller being added: ' . $controller_name);
         }
 
         $this->components[$controller_name] = $details;
@@ -534,8 +533,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function addControllerTask($controller_name, array $details)
     {
         if (isset($this->tasks[$controller_name])) {
-            assert(false);
-            return;
+            throw new lcSystemException('Duplicate controller being added: ' . $controller_name);
         }
 
         $this->tasks[$controller_name] = $details;
@@ -544,8 +542,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function addControllerWebService($controller_name, array $details)
     {
         if (isset($this->web_services[$controller_name])) {
-            assert(false);
-            return;
+            throw new lcSystemException('Duplicate controller being added: ' . $controller_name);
         }
 
         $this->web_services[$controller_name] = $details;
@@ -553,12 +550,12 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     public function getProjectContext()
     {
-        $contexts = array(
-            lcSysObj::CONTEXT_PROJECT => array(),
-            lcSysObj::CONTEXT_APP => array(),
-            lcSysObj::CONTEXT_PLUGIN => array(),
-            lcSysObj::CONTEXT_FRAMEWORK => array()
-        );
+        $contexts = [
+            lcSysObj::CONTEXT_PROJECT => [],
+            lcSysObj::CONTEXT_APP => [],
+            lcSysObj::CONTEXT_PLUGIN => [],
+            lcSysObj::CONTEXT_FRAMEWORK => []
+        ];
 
         $project_dir = $this->configuration->getProjectDir();
 
@@ -600,7 +597,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function getAvailableProjectApplications()
     {
         $app_locations = $this->configuration->getApplicationLocations();
-        $applications = array();
+        $applications = [];
 
         if ($app_locations) {
             foreach ($app_locations as $location) {
@@ -1011,14 +1008,14 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     public function writeClassCache()
     {
-        $cached_data = array(
+        $cached_data = [
             'config_controller_modules' => $this->config_controller_modules,
             'config_controller_action_forms' => $this->config_controller_action_forms,
             'config_controller_web_services' => $this->config_controller_web_services,
             'config_controller_tasks' => $this->config_controller_tasks,
             'config_controller_components' => $this->config_controller_components,
             'config_system_plugins' => $this->config_system_plugins
-        );
+        ];
 
         return $cached_data;
     }
