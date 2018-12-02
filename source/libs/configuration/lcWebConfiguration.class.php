@@ -51,7 +51,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array('app_dir' => $this->app_dir,);
+        $debug = ['app_dir' => $this->app_dir];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -78,32 +78,32 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         $parent_map = (array)parent::getConfigHandleMap();
 
         // maps the configuration values to handlers
-        $config_map = array(
-            array(
+        $config_map = [
+            [
                 'handler' => 'loaders',
                 'config_key' => 'loaders'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'routing',
                 'config_key' => 'routing'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'app_security',
                 'config_key' => 'security'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'app_plugins',
                 'config_key' => 'plugins'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'app_settings',
                 'config_key' => 'settings'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'view',
                 'config_key' => 'view'
-            )
-        );
+            ]
+        ];
 
         $app_map = array_merge($parent_map, $config_map);
 
@@ -119,14 +119,14 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
 
     public function getActionFormLocations()
     {
-        $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : array();
+        $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : [];
 
         // app modules
-        $controller_locations = array(array(
+        $controller_locations = [[
             'context_type' => lcSysObj::CONTEXT_APP,
             'context_name' => $this->getApplicationName(),
             'path' => $this->app_dir . DS . 'forms'
-        ),);
+        ],];
 
         $locations = array_merge((array)$parent_locations, $controller_locations);
 
@@ -135,14 +135,14 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
 
     public function getControllerModuleLocations()
     {
-        $parent_locations = $this->project_configuration ? $this->project_configuration->getControllerModuleLocations() : array();
+        $parent_locations = $this->project_configuration ? $this->project_configuration->getControllerModuleLocations() : [];
 
         // app modules
-        $controller_locations = array(array(
+        $controller_locations = [[
             'context_type' => lcSysObj::CONTEXT_APP,
             'context_name' => $this->getApplicationName(),
             'path' => $this->app_dir . DS . 'modules'
-        ),);
+        ],];
 
         $locations = array_merge((array)$parent_locations, $controller_locations);
 

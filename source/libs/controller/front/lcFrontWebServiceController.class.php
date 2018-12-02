@@ -31,6 +31,11 @@ class lcFrontWebServiceController extends lcFrontWebController
     /** @var lcWebResponse */
     protected $response;
 
+    /**
+     * @var lcWebServiceConfiguration
+     */
+    protected $configuration;
+
     public function initialize()
     {
         parent::initialize();
@@ -128,7 +133,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         // TODO: Hide system related messages
         $internal_message = $e->getMessage();
 
-        $err_ar = array('domain' => $exception_domain, 'code' => $error_code, 'message' => $internal_message);
+        $err_ar = ['domain' => $exception_domain, 'code' => $error_code, 'message' => $internal_message];
 
         if ($extra_data) {
             if (is_array($extra_data)) {
@@ -163,14 +168,14 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
 
         if ($validation_failures) {
-            $fails = array();
+            $fails = [];
 
             foreach ($validation_failures as $failure) {
-                $fails[] = array_filter(array(
+                $fails[] = array_filter([
                     'name' => $failure->getName(),
                     'message' => $failure->getMessage(),
                     'extra_data' => $failure->getExtraData()
-                ));
+                ]);
             }
 
             $err_ar['validation_failures'] = $fails;
@@ -178,11 +183,12 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
 
         // send it
-        $response_result = array('error' => $err_ar);
+        $response_result = ['error' => $err_ar];
 
         $response_content_type = 'application/json; charset=' . $response->getServerCharset();
 
         if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            /** @noinspection PhpComposerExtensionStubsInspection */
             $output = @json_encode($response_result, JSON_UNESCAPED_UNICODE);
         } else {
             $output = @json_encode($response_result);
@@ -194,7 +200,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         }
 
         // set the API level
-        $response->header(self::XLC_APILEVEL_HEADER_NAME, $this->getConfiguration()->getApiLevel());
+        $response->header(self::XLC_APILEVEL_HEADER_NAME, $this->configuration->getApiLevel());
 
         // send the response
         $response->header('Content-Type', $response_content_type);
@@ -244,7 +250,7 @@ class lcFrontWebServiceController extends lcFrontWebController
 
     protected function prepareDispatchParams(lcRequest $request)
     {
-        $params = array();
+        $params = [];
 
         // TODO: Change this in 1.5 - remove it
         // as it harcodes the usage of lcPHPRouting only!
@@ -286,8 +292,8 @@ class lcFrontWebServiceController extends lcFrontWebController
         $params = $request->isPost() ? $request->getPostParams()->getArrayCopy() :
             $request->getGetParams()->getArrayCopy();
 
-        $extraction = array();
-        $arr2 = array();
+        $extraction = [];
+        $arr2 = [];
 
         if (!empty($params)) {
             foreach ($params as $param) {

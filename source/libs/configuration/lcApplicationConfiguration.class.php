@@ -21,8 +21,17 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * @method getProjectDir()
+ * @method getProjectName()
+ * @method getConfigEnvironment()
+ * @method getProjectAppName($getApplicationName)
+ */
 abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
 {
+    /**
+     * @var lcProjectConfiguration
+     */
     protected $project_configuration;
 
     protected $use_classes;
@@ -53,7 +62,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             // up to 5 params use the fast calls, more than that - use
             // call_user_func_array which is slower
             if (!method_exists($this->project_configuration, $func)) {
-                return parent::__call($func, $args);
+                parent::__call($func, $args);
             }
 
             switch (count($args)) {
@@ -75,7 +84,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             }
         }
 
-        return parent::__call($func, $args);
+        parent::__call($func, $args);
     }
 
     public function initialize()
@@ -110,7 +119,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getConfigHandleMap()
     {
         // we load the project's config map ourselves
-        $config_map_project = $this->project_configuration ? $this->project_configuration->getConfigHandleMap() : array();
+        $config_map_project = $this->project_configuration ? $this->project_configuration->getConfigHandleMap() : [];
         return $config_map_project;
     }
 
@@ -146,7 +155,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
     public function getUsedDbModels()
     {
-        $project_models = ($this->project_configuration && $this->project_configuration instanceof iSupportsDbModelOperations) ? $this->project_configuration->getUsedDbModels() : array();
+        $project_models = ($this->project_configuration && $this->project_configuration instanceof iSupportsDbModelOperations) ? $this->project_configuration->getUsedDbModels() : [];
 
         $models = array_unique(array_merge((array)$this->use_models, (array)$project_models));
 
@@ -157,7 +166,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array('application_name' => $this->getApplicationName());
+        $debug = ['application_name' => $this->getApplicationName()];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -336,12 +345,12 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function writeClassCache()
     {
         $parent_cache = (array)parent::writeClassCache();
-        $project_cache = ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) ? $this->project_configuration->writeClassCache() : array();
+        $project_cache = ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) ? $this->project_configuration->writeClassCache() : [];
 
-        $cache = array(
+        $cache = [
             'parent_cache' => $parent_cache,
             'project_cache' => $project_cache
-        );
+        ];
 
         return $cache;
     }

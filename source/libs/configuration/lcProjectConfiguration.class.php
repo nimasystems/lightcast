@@ -289,7 +289,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'class_autoloader' => ($this->class_autoloader ? get_class($this->class_autoloader) : null),
             'error_handler' => ($this->error_handler ? get_class($this->error_handler) : null),
             'cache' => ($this->cache ? get_class($this->cache) : null),
@@ -297,7 +297,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
             'app_root_dir' => $this->app_root_dir,
             'is_debugging' => $this->debugging,
             'project_name' => $this->getProjectName(),
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -312,16 +312,16 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'project_name' => $this->getProjectName(),
-        );
+        ];
 
         return $debug;
     }
 
     public function getSystemObjectInstances()
     {
-        $instances = array();
+        $instances = [];
 
         $system_objects = $this->getSystemObjectNames();
 
@@ -336,14 +336,14 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         // order of system objects IS important
         // they are loaded initially in the same order!
-        $config_objects = array(
+        $config_objects = [
             'error_handler',
             'cache',
             'local_cache_manager',
             'database_model_manager',
             'system_component_factory',
             'plugin_manager',
-        );
+        ];
 
         return $config_objects;
     }
@@ -356,10 +356,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getConfigHandleMap()
     {
         // maps the configuration values to handlers
-        $config_map = array(
-            array('handler' => 'project', 'dirs' => array($this->getBaseConfigDir(), $this->getConfigDir()), 'config_key' => 'project'),
-            array('handler' => 'databases', 'dirs' => array($this->getBaseConfigDir(), $this->getConfigDir()), 'config_key' => 'databases'),
-        );
+        $config_map = [
+            ['handler' => 'project', 'dirs' => [$this->getBaseConfigDir(), $this->getConfigDir()], 'config_key' => 'project'],
+            ['handler' => 'databases', 'dirs' => [$this->getBaseConfigDir(), $this->getConfigDir()], 'config_key' => 'databases'],
+        ];
 
         return $config_map;
     }
@@ -417,8 +417,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getVersion()
     {
         return $this->getMajorVersion() . '.' .
-        $this->getMinorVersion() . '.' .
-        $this->getBuildVersion();
+            $this->getMinorVersion() . '.' .
+            $this->getBuildVersion();
     }
 
     public function getMajorVersion()
@@ -486,7 +486,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         if (!$this->project_db_models) {
             // initialize the models - scan the models folder
             $t = lcDirs::searchDir($this->getModelsDir(), true);
-            $models = array();
+            $models = [];
 
             if ($t) {
                 foreach ($t as $obj) {
@@ -621,13 +621,13 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getApplicationLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $this->getProjectDir() . DS . 'applications'
-            )
-        );
+            ]
+        ];
 
         return $locations;
     }
@@ -635,24 +635,24 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function getPluginLocations()
     {
         $locations = isset($this->configuration['plugins']['locations']) && is_array($this->configuration['plugins']['locations']) ?
-            $this->configuration['plugins']['locations'] : array(self::DEFAULT_PLUGINS_LOCATION);
+            $this->configuration['plugins']['locations'] : [self::DEFAULT_PLUGINS_LOCATION];
 
         if (!$locations) {
             return false;
         }
 
-        $locations_new = array();
+        $locations_new = [];
 
         foreach ($locations as $path) {
             $path = lcMisc::isPathAbsolute($path) ? $path : ($this->app_root_dir . DS . $path);
 
             // TODO: Think how to allow assets_path in configuration so it is not hardcoded to this
-            $locations_new[] = array(
+            $locations_new[] = [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $path,
                 'web_path' => '/addons/plugins/'
-            );
+            ];
 
             unset($path);
         }
@@ -662,26 +662,26 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getActionFormLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
                 'path' => $this->getAssetsDir() . DS . 'forms'
-            ),
+            ],
             /* app modules to be overriden in the inherited app config class */
-        );
+        ];
 
         return $locations;
     }
 
     public function getControllerModuleLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
                 'path' => $this->getAssetsDir() . DS . 'modules'
-            ),
+            ],
             /* app modules to be overriden in the inherited app config class */
-        );
+        ];
 
         return $locations;
     }
@@ -708,17 +708,17 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getControllerComponentLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
                 'path' => $this->getAssetsDir() . DS . 'components'
-            ),
-            array(
+            ],
+            [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $this->getAddonsDir() . DS . 'components'
-            )
-        );
+            ]
+        ];
 
         return $locations;
     }
@@ -730,34 +730,34 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getControllerTaskLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
                 'path' => $this->getAssetsDir() . DS . 'tasks'
-            ),
-            array(
+            ],
+            [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $this->getProjectDir() . DS . 'tasks'
-            ),
-        );
+            ],
+        ];
 
         return $locations;
     }
 
     public function getControllerWebServiceLocations()
     {
-        $locations = array(
-            array(
+        $locations = [
+            [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
                 'path' => $this->getAssetsDir() . DS . 'ws'
-            ),
-            array(
+            ],
+            [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $this->getProjectDir() . DS . 'ws'
-            ),
-        );
+            ],
+        ];
 
         return $locations;
     }
@@ -987,9 +987,9 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function writeClassCache()
     {
         $parent_cache = (array)parent::writeClassCache();
-        $project_cache = array(
+        $project_cache = [
             'project_db_models' => $this->project_db_models
-        );
+        ];
         $cache = array_merge($parent_cache, $project_cache);
         return $cache;
     }

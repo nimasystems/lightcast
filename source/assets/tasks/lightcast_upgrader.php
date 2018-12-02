@@ -612,7 +612,7 @@ class tLightcastUpgrader extends lcTaskController
         $cfg_files = array(
             'config/lcApiConfiguration.class.php' => array(
                 'new_class' => 'ApiConfiguration',
-                'old_class' => 'lcApiConfiguration',
+                'old_class' => 'lcWsConfiguration',
                 'new_filename' => 'api_configuration.php'
             ),
             'config/lcProjectConfiguration.class.php' => array(

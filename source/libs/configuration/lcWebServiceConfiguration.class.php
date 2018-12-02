@@ -25,11 +25,6 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
 {
     const DEFAULT_APP_NAME = 'ws';
 
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
     public function getApplicationName()
     {
         return self::DEFAULT_APP_NAME;
@@ -50,24 +45,24 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
         $parent_map = (array)parent::getConfigHandleMap();
 
         // maps the configuration values to handlers
-        $config_map = array(
-            array(
+        $config_map = [
+            [
                 'handler' => 'web_service',
-                'dirs' => array(
+                'dirs' => [
                     $this->getBaseConfigDir(),
                     $this->getConfigDir()
-                ),
+                ],
                 'config_key' => 'ws'
-            ),
-            array(
+            ],
+            [
                 'handler' => 'routing',
-                'dirs' => array(
+                'dirs' => [
                     $this->getBaseConfigDir(),
                     $this->getConfigDir()
-                ),
+                ],
                 'config_key' => 'ws_routing'
-            ),
-        );
+            ],
+        ];
 
         $app_map = array_merge($parent_map, $config_map);
 
