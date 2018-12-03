@@ -415,6 +415,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $validator_name = isset($options['validator']) ? $options['validator'] : null;
             $value = isset($options['value']) ? $options['value'] : null;
             $fail_msg = isset($options['fail']) ? $options['fail'] : null;
+            $options_v = isset($options['options']) ? $options['options'] : null;
 
             if (!$validator_name || !$data_name) {
                 assert(false);
@@ -438,6 +439,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                 $is_validated = false;
                 continue;
             }
+
+            $validator->setOptions($options_v);
 
             $is_valid = $validator->validate($value);
 

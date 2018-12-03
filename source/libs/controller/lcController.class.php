@@ -404,8 +404,10 @@ abstract class lcController extends lcBaseController
         // the context of the root view controller
         $this->forwardToControllerAction(
             $controller_instance,
-            $this,
-            $action_name, $action_params);
+            $action_name,
+            $action_params,
+            $this
+        );
     }
 
     public function getRootController()
@@ -431,8 +433,10 @@ abstract class lcController extends lcBaseController
      * @deprecated The method is used by LC 1.4 projects
     */
 
-    public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller, $action_name,
-                                              array $action_params = null)
+    public function forwardToControllerAction(lcController $controller_instance,
+                                              $action_name,
+                                              array $action_params = null,
+                                              lcController $parent_controller = null)
     {
         if (!$controller_instance || !$action_name) {
             throw new lcInvalidArgumentException('Invalid controller / action');

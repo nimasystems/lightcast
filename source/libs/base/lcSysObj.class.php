@@ -87,22 +87,26 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         $context_type = null;
 
         switch ($context_type_str) {
-            case 'app': {
-                $context_type = self::CONTEXT_APP;
-                break;
-            }
-            case 'framework': {
-                $context_type = self::CONTEXT_FRAMEWORK;
-                break;
-            }
-            case 'plugin': {
-                $context_type = self::CONTEXT_PLUGIN;
-                break;
-            }
-            case 'project': {
-                $context_type = self::CONTEXT_PROJECT;
-                break;
-            }
+            case 'app':
+                {
+                    $context_type = self::CONTEXT_APP;
+                    break;
+                }
+            case 'framework':
+                {
+                    $context_type = self::CONTEXT_FRAMEWORK;
+                    break;
+                }
+            case 'plugin':
+                {
+                    $context_type = self::CONTEXT_PLUGIN;
+                    break;
+                }
+            case 'project':
+                {
+                    $context_type = self::CONTEXT_PROJECT;
+                    break;
+                }
         }
 
         return $context_type;
@@ -114,22 +118,26 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         $str = null;
 
         switch ($context_type) {
-            case self::CONTEXT_APP: {
-                $str = 'app';
-                break;
-            }
-            case self::CONTEXT_FRAMEWORK: {
-                $str = 'framework';
-                break;
-            }
-            case self::CONTEXT_PLUGIN: {
-                $str = 'plugin';
-                break;
-            }
-            case self::CONTEXT_PROJECT: {
-                $str = 'project';
-                break;
-            }
+            case self::CONTEXT_APP:
+                {
+                    $str = 'app';
+                    break;
+                }
+            case self::CONTEXT_FRAMEWORK:
+                {
+                    $str = 'framework';
+                    break;
+                }
+            case self::CONTEXT_PLUGIN:
+                {
+                    $str = 'plugin';
+                    break;
+                }
+            case self::CONTEXT_PROJECT:
+                {
+                    $str = 'project';
+                    break;
+                }
         }
 
         return $str;
@@ -183,6 +191,15 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     }
 
     public function getConfiguration()
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * New style config getter
+     * @return lcApplicationConfiguration|lcProjectConfiguration
+     */
+    public function getConfig()
     {
         return $this->configuration;
     }

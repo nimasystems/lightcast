@@ -200,11 +200,11 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         return $view;
     }
 
-    protected function forwardToAction($parent_controller, $action_name, $controller_name = null, array $custom_params = null)
+    protected function forwardToAction($parent_controller, $action_name, array $custom_params = null, $controller = null)
     {
         // custom handling of exceptions in web service mode
         try {
-            parent::forwardToControllerAction($parent_controller, $action_name, $controller_name, $custom_params);
+            parent::forwardToControllerAction($parent_controller, $action_name, $custom_params, $controller);
         } catch (Exception $e) {
             $front_controller = $this->getRootController();
 

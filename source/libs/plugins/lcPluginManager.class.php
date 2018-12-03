@@ -767,22 +767,15 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // initialize
         $this->app_context->setLoadersOntoObject($plugin);
 
-        try {
-            $plugin->initializeApp($this->app_context);
+        $plugin->initializeApp($this->app_context);
 
-            // initialize web / console based methods
-            if ($this->configuration instanceof lcConsoleConfiguration) {
-                $plugin->initializeConsoleComponents();
-            } elseif ($this->configuration instanceof lcWebConfiguration) {
-                $plugin->initializeWebComponents();
-            } elseif ($this->configuration instanceof lcWebServiceConfiguration) {
-                $plugin->initializeWebServiceComponents();
-            }
-        } catch (Exception $e) {
-            throw new lcPluginException('Plugin \'' . $plugin->getPluginName() . '\' could not be initialized upon app start: ' .
-                $e->getMessage(),
-                $e->getCode(),
-                $e);
+        // initialize web / console based methods
+        if ($this->configuration instanceof lcConsoleConfiguration) {
+            $plugin->initializeConsoleComponents();
+        } elseif ($this->configuration instanceof lcWebConfiguration) {
+            $plugin->initializeWebComponents();
+        } elseif ($this->configuration instanceof lcWebServiceConfiguration) {
+            $plugin->initializeWebServiceComponents();
         }
     }
 

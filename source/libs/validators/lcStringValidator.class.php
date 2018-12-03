@@ -32,20 +32,20 @@ class lcStringValidator extends lcValidator
         $max_length = isset($this->options['max_length']) ? (int)$this->options['max_length'] : 0;
         $min_length = isset($this->options['min_length']) ? (int)$this->options['min_length'] : 0;
         $alphanum_only = isset($this->options['alpha_numeric']) ? (int)$this->options['alpha_numeric'] : false;
-        $allow_whitespace = isset($this->options['allow_whitespace']) ? (int)$this->options['allow_whitespace'] : false;
+        $allow_whitespace = isset($this->options['allow_whitespace']) ? (int)$this->options['allow_whitespace'] : true;
 
         // min length
-        if (($min_length && strlen($data) < $min_length)) {
+        if (($min_length && lcUnicode::strlen($data) < $min_length)) {
             return false;
         }
 
         // max length
-        if (($max_length && strlen($data) > $max_length)) {
+        if (($max_length && lcUnicode::strlen($data) > $max_length)) {
             return false;
         }
 
         // space
-        if (!$allow_whitespace && strpos($data, ' ') !== false) {
+        if (!$allow_whitespace && lcUnicode::strpos($data, ' ') !== false) {
             return false;
         }
 
