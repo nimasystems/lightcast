@@ -120,12 +120,12 @@ abstract class lcWebBaseController extends lcController
 
         $this->last_redirect_url = $url;
 
-        $res = array(
+        $res = [
             'http_code' => $http_code,
             'allow_redirect' => true,
             'controller_name' => $this->getControllerName(),
             'action_name' => $this->getActionName(),
-        );
+        ];
 
         // notify about this redirect and allow others to rewrite it
 

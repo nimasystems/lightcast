@@ -73,9 +73,9 @@ class tDb extends lcTaskController
         }
 
         $dsn = 'mysql:host=' . $hostname . ';dbname=' . $db_name;
-        $db = new PDO($dsn, $user, $pass, array(
+        $db = new PDO($dsn, $user, $pass, [
             PDO::ERRMODE_EXCEPTION
-        ));
+        ]);
         $db->exec('SET NAMES ' . $encoding . ' COLLATE ' . $collation);
 
         $db_name = '`' . $db_name . '`';

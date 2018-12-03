@@ -162,7 +162,7 @@ abstract class lcController extends lcBaseController
 
             assert(isset($router));
 
-            $options = array('url' => $params);
+            $options = ['url' => $params];
             $params = $router->getParamsByCriteria($options);
 
             if (!$params) {
@@ -191,17 +191,17 @@ abstract class lcController extends lcBaseController
 
     public function getPartial($action_name, $module, array $params = null, $return_params = false)
     {
-        $params = array(
+        $params = [
             'request' => array_merge(
-                array(
+                [
                     'module' => $module,
                     'action' => $action_name,
                     'type' => lcController::TYPE_PARTIAL,
-                ),
+                ],
                 (array)$params
             ),
             'type' => lcController::TYPE_PARTIAL
-        );
+        ];
 
         $content = null;
         $controller_instance = null;
@@ -231,11 +231,11 @@ abstract class lcController extends lcBaseController
             }
 
             if ($return_params) {
-                $content = array(
+                $content = [
                     'content' => (isset($rendered_contents['content']) ? $rendered_contents['content'] : null),
                     'content_type' => (isset($rendered_contents['content_type']) ? $rendered_contents['content_type'] : null),
                     'controller' => $controller_instance
-                );
+                ];
             } else {
                 $content = (isset($rendered_contents['content']) ? $rendered_contents['content'] : null);
             }
@@ -246,7 +246,7 @@ abstract class lcController extends lcBaseController
                     '<div style="color:white;background-color:pink;border:1px solid gray;padding:2px;font-size:10px">Decorator error: ' .
                     $e->getMessage() . "<br />\n<br />\n" . nl2br(htmlspecialchars($e->getTraceAsString())) . '</div>';
                 if ($return_params) {
-                    $content = array('content' => $content, 'controller' => $controller_instance);
+                    $content = ['content' => $content, 'controller' => $controller_instance];
                 }
             }
 
@@ -395,10 +395,10 @@ abstract class lcController extends lcBaseController
         $action_params['module'] = $controller_name;
         $action_params['action'] = $action_name;
 
-        $action_params = array(
+        $action_params = [
             'request' => (array)$action_params,
             'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION)
-        );
+        ];
 
         // override the web controller's forward for the sake of using this method within
         // the context of the root view controller
@@ -431,7 +431,7 @@ abstract class lcController extends lcBaseController
      * @deprecated The method is used by LC 1.4 projects
     */
 
-    public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller = null, $action_name,
+    public function forwardToControllerAction(lcController $controller_instance, lcController $parent_controller, $action_name,
                                               array $action_params = null)
     {
         if (!$controller_instance || !$action_name) {
@@ -477,11 +477,11 @@ abstract class lcController extends lcBaseController
         // notify about this forward
         // LC 1.4 Compatibility - this notification should be a notification - not a filter
         // but to keep compatibility with previous version - we leave it like this for the moment
-        $notification_params = array(
+        $notification_params = [
             'controller_name' => $controller_name,
             'action_name' => $action_name,
             'params' => $action_params,
-        );
+        ];
         $this->event_dispatcher->filter(new lcEvent('controller.change_action', $this, $notification_params), $notification_params);
 
         $should_execute = true;
@@ -495,9 +495,9 @@ abstract class lcController extends lcBaseController
         $notification_params['content_type'] = $content_type;
 
         // this is the new filter which we use
-        $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), array(
+        $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), [
             'should_execute' => true
-        ));
+        ]);
 
         if ($execute_action_event->isProcessed()) {
             $event_params = $execute_action_event->getReturnValue();
@@ -560,9 +560,9 @@ abstract class lcController extends lcBaseController
     public function setDecoratorView(iSupportsLayoutDecoration $view = null)
     {
         // LC 1.4 compatibility fixes:
-        $params = array(
+        $params = [
             'view' => $view
-        );
+        ];
 
         $full_template_name = null;
 
@@ -638,12 +638,12 @@ abstract class lcController extends lcBaseController
         }
 
         // allow event filterers to disable action filters
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.should_apply_filters', $this, array(
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.should_apply_filters', $this, [
             'controller_instance' => $controller_instance,
             'controller_name' => $controller_name,
             'action_name' => $action_name,
             'action_params' => $action_params
-        )), true);
+        ]), true);
 
         if ($event->isProcessed()) {
             if (!$event->getReturnValue()) {
@@ -741,12 +741,12 @@ abstract class lcController extends lcBaseController
                                                     $action_name, array $action_params = null,
                                                     array $skip_filter_categories = null)
     {
-        $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, array(
+        $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, [
             'controller_context_name' => $controller_context_name,
             'controller_context_type' => $controller_context_type,
             'controller_filename' => $controller_filename,
             'controller_parent_plugin' => $controller_parent_plugin_name
-        ), $skip_filter_categories);
+        ], $skip_filter_categories);
 
         return $filter_results;
     }
@@ -767,12 +767,12 @@ abstract class lcController extends lcBaseController
 
         // execute the request
         $action_result = null;
-        $action_params = $action_params ? $action_params : array();
+        $action_params = $action_params ? $action_params : [];
 
-        $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, array(
+        $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, [
             'action_params' => $action_params,
             'action_name' => $action_name
-        )));
+        ]));
 
         $action_result = $controller->execute($action_name, $action_params);
 
@@ -800,11 +800,11 @@ abstract class lcController extends lcBaseController
             }
 
             // notify about this render
-            $notification_params = array(
+            $notification_params = [
                 'controller_name' => $controller->getControllerName(),
                 'action_name' => $action_name,
                 'params' => $action_params,
-            );
+            ];
             $this->event_dispatcher->filter(new lcEvent('controller.did_render_action', $this, $notification_params), $notification_params);
             unset($notification_params);
 
@@ -828,14 +828,14 @@ abstract class lcController extends lcBaseController
         }
 
         // notify / filter
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this, array(
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.render_layout', $this, [
             'controller_name' => $this->getControllerName(),
             'action_name' => $this->getActionName(),
-        )), array(
+        ]), [
             'use_layout' => true,
             'content' => $layout_content,
             'content_type' => $layout_content_type
-        ));
+        ]);
 
         if ($event->isProcessed()) {
             $r = $event->getReturnValue();
@@ -866,10 +866,10 @@ abstract class lcController extends lcBaseController
         }
 
         // notify / filter
-        $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), array(
+        $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), [
             'content' => $render_result['content'],
             'content_type' => $layout_content_type
-        ));
+        ]);
 
         if ($event->isProcessed()) {
             $r = $event->getReturnValue();
@@ -917,7 +917,7 @@ abstract class lcController extends lcBaseController
 
             // get the view's output
             $this->event_dispatcher->notify(
-                new lcEvent('view.will_render', $this, array(
+                new lcEvent('view.will_render', $this, [
                     'view' => $view,
                     'controller_name' => $controller_name,
                     'action_name' => $action_name,
@@ -925,14 +925,14 @@ abstract class lcController extends lcBaseController
                     'context_type' => $controller->getContextType(),
                     'translation_context_name' => $controller->getTranslationContextName(),
                     'translation_context_type' => $controller->getTranslationContextType()
-                )));
+                ]));
 
             // render the view
             $output = $view->render();
 
             // send view render event
             $event = $this->event_dispatcher->filter(
-                new lcEvent('view.render', $this, array(
+                new lcEvent('view.render', $this, [
                     'view' => $view,
                     'controller_name' => $controller_name,
                     'action_name' => $action_name,
@@ -940,7 +940,7 @@ abstract class lcController extends lcBaseController
                     'context_name' => $controller->getContextName(),
                     'translation_context_name' => $controller->getTranslationContextName(),
                     'translation_context_type' => $controller->getTranslationContextType()
-                )), $output);
+                ]), $output);
 
             if ($event->isProcessed()) {
                 $output = $event->getReturnValue();
@@ -953,10 +953,10 @@ abstract class lcController extends lcBaseController
                 $e);
         }
 
-        $ret = array(
+        $ret = [
             'content_type' => $content_type,
             'content' => $output
-        );
+        ];
 
         return $ret;
     }

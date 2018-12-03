@@ -23,8 +23,8 @@
 
 class lcDeviceDetective
 {
-    private static $device_strings = array
-    (
+    private static $device_strings =
+        [
         'symbian' => 'symbian',
         'windows ce' => 'winmobile',
         'windows' => 'winmobile',
@@ -34,9 +34,9 @@ class lcDeviceDetective
         'iphone' => 'iphone',
         'ipad' => 'ipad',
         'android' => 'android'
-    );
-    private static $mobile_agents = array
-    (
+        ];
+    private static $mobile_agents =
+        [
         'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
         'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
         'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
@@ -46,7 +46,7 @@ class lcDeviceDetective
         'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
         'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
         'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-'
-    );
+        ];
     private $useragent;
     private $httpaccept;
 
@@ -112,10 +112,10 @@ class lcDeviceDetective
     public function detectMobileDevice()
     {
         if (!$this->isMobileBrowser()) {
-            return array();
+            return [];
         }
 
-        $data = array();
+        $data = [];
 
         foreach (self::$device_strings as $haystack => $device_key) {
             //find device key and proccess it//
@@ -169,19 +169,19 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 2) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'iphone',
                         'sdk' => $matches[1][0]
-                    );
+                        ];
                 }
 
                 //default case unknow symbian device//
-                return array
-                (
+                return
+                    [
                     'device' => 'iphone',
                     'sdk' => null
-                );
+                    ];
 
                 break;
             }
@@ -191,19 +191,19 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 2) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'ipad',
                         'sdk' => $matches[1][0]
-                    );
+                        ];
                 }
 
                 //default case unknow symbian device//
-                return array
-                (
+                return
+                    [
                     'device' => 'ipad',
                     'sdk' => null
-                );
+                    ];
 
                 break;
             }
@@ -213,19 +213,19 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 2) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'android',
                         'sdk' => $matches[1][0]
-                    );
+                        ];
                 }
 
                 //default case unknow android device//
-                return array
-                (
+                return
+                    [
                     'device' => 'android',
                     'sdk' => null
-                );
+                    ];
 
                 break;
             }
@@ -235,21 +235,21 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 3) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'symbian',
                         'sdk' => (int)$matches[1][0],
                         'fp' => $this->getFpCodeByBrowser($matches[2][0])
-                    );
+                        ];
                 }
 
                 //default case unknow symbian device//
-                return array
-                (
+                return
+                    [
                     'device' => 'symbian',
                     'sdk' => 0,
                     'fp' => false
-                );
+                    ];
 
                 break;
             }
@@ -259,11 +259,11 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 2) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'winmobile',
                         'os_version' => (float)$matches[1][0]
-                    );
+                        ];
                 }
 
                 //opera
@@ -271,11 +271,11 @@ class lcDeviceDetective
                 $matches = array_filter($matches);
 
                 if ($matches && count($matches) == 2) {
-                    return array
-                    (
+                    return
+                        [
                         'device' => 'winmobile',
                         'os_version' => (float)$matches[1][0]
-                    );
+                        ];
                 }
 
                 //opera sucks//
@@ -284,23 +284,23 @@ class lcDeviceDetective
                     $matches = array_filter($matches);
 
                     if ($matches && count($matches) == 2) {
-                        return array
-                        (
+                        return
+                            [
                             'device' => 'winmobile',
                             'os_version' => (float)$matches[1][0]
-                        );
+                            ];
                     }
                 }
 
                 //i dont know what are you!
-                return array
-                (
+                return
+                    [
                     'device' => 'winmobile',
                     'os_version' => 0
-                );
+                    ];
             }
             default: {
-                return array();
+                return [];
             }
         }
     }

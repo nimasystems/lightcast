@@ -37,9 +37,9 @@ abstract class lcDataStorage extends lcResidentObj implements iProvidesCapabilit
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'data_storage'
-        );
+        ];
     }
 
     // Save a file into the data storage - pass an array of $item_info metadata objects

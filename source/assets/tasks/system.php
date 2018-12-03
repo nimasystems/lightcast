@@ -219,7 +219,7 @@ class tSystem extends lcTaskController
                     $this->consoleDisplay(lcConsolePainter::formatConsoleText('Frozen configuration files are more than the currently available ones', 'error'));
 
                     //prepare for path check//
-                    $tmp = array();
+                    $tmp = [];
 
                     foreach ($cleanup_files as $file_path) {
                         $tmp[] = str_replace(DIR_APP, '', $file_path);
@@ -384,7 +384,7 @@ class tSystem extends lcTaskController
                 $this->consoleDisplay(lcConsolePainter::formatConsoleText('Frozen configuration files are more than the currently available ones', 'error'));
 
                 //prepare for path check//
-                $tmp = array();
+                $tmp = [];
 
                 foreach ($cleanup_files as $file_path) {
                     $tmp[] = str_replace(DIR_APP, '', $file_path);
@@ -499,7 +499,7 @@ class tSystem extends lcTaskController
 
         $this->consoleDisplay(lcConsolePainter::formatConsoleText('Configuration freeze operation started', 'error'));
 
-        $tmp = array();
+        $tmp = [];
 
         $tmp['cache_info'] = 'Lightcast settings Backup Date: ' . date('d.m.Y H:i');
         $tmp['user_info'] = 'Configs Owner: "' . php_uname('n') . '", phpversion: "' . phpversion() . '"';
@@ -544,7 +544,7 @@ class tSystem extends lcTaskController
 
         $this->consoleDisplay(lcConsolePainter::formatConsoleText('Configuration freeze operation started', 'error'));
 
-        $tmp = array();
+        $tmp = [];
 
         $tmp['cache_info'] = 'Lightcast settings Backup Date: ' . date('d.m.Y H:i');
         $tmp['user_info'] = 'Configs Owner: "' . php_uname('n') . '", phpversion: "' . phpversion() . '"';
@@ -651,13 +651,13 @@ class tSystem extends lcTaskController
 
     private function getFrzFilename()
     {
-        $filename = array(
+        $filename = [
             $this->configuration->getProjectName(),
             $this->configuration->getVersion(),
             'at_' . date('Y_m_d_H_i_s'),
             'by_' . get_current_user(),
             php_uname('n')
-        );
+        ];
         $filename = implode('_', $filename) . '.' . self::CFG_BACKUP_FILE_EXT;
 
         return $filename;
@@ -665,7 +665,7 @@ class tSystem extends lcTaskController
 
     private function getCfgFileSystemInfo()
     {
-        $ret = array(
+        $ret = [
             'project_name' => $this->configuration->getProjectName(),
             'version' => $this->configuration->getVersion(),
             'date_created' => date('Y-m-d H-i-s'),
@@ -673,7 +673,7 @@ class tSystem extends lcTaskController
             'lc_version' => LC_VER,
             'machine' => php_uname('n'),
             'php_version' => phpversion()
-        );
+        ];
         return $ret;
     }
 
@@ -681,11 +681,11 @@ class tSystem extends lcTaskController
     {
         $filename = $this->getFrzFilename();
 
-        $ret = array(
+        $ret = [
             'path' => DIR_APP . DS . 'data' . DS . 'config_backups' . DS,
             'filename' => $filename,
             'backup_filename' => $filename
-        );
+        ];
         return $ret;
     }
 }

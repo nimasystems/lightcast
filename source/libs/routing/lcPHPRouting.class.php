@@ -39,9 +39,9 @@ class lcPHPRouting extends lcRouting
         $this->context['default_action'] = $this->default_action;
 
         // allow others to be notified when base routes have been loaded
-        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
+        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, [
             'context' => $this->context
-        )));
+        ]));
 
         // try to detect the parameters from request
         $this->detectParameters();
@@ -53,7 +53,7 @@ class lcPHPRouting extends lcRouting
         $result = null;
 
         if ($res && isset($res['module']) && isset($res['action'])) {
-            $result = array('params' => $res);
+            $result = ['params' => $res];
         }
 
         $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, $result));
@@ -71,7 +71,7 @@ class lcPHPRouting extends lcRouting
         $this->context['action_prefix'] = $this->configuration['routing.action_prefix'] ?
             $this->configuration['routing.action_prefix'] : 'action';
 
-        $params = array();
+        $params = [];
 
         // not really sure about this - but we know the application name for sure (as it was booted with it)
         $params['application'] = $this->configuration->getApplicationName();
@@ -126,7 +126,7 @@ class lcPHPRouting extends lcRouting
         return false;
     }
 
-    public function generate($params = array(), $absolute = false, $name = null)
+    public function generate($params = [], $absolute = false, $name = null)
     {
         !isset($params['application']) ?
             $params['application'] = $this->getDefaultParams()->get('application') :

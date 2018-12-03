@@ -68,7 +68,7 @@ class lcSpatialUtils
         $maxlng = false;
 
         foreach ($points as $data_element) {
-            $data_coords = array($data_element->getLatitude(), $data_element->getLongtitude());
+            $data_coords = [$data_element->getLatitude(), $data_element->getLongtitude()];
 
             if (isset($data_coords[1])) {
                 if ($minlat === false) {
@@ -183,6 +183,6 @@ class lcSpatialUtils
         $lng_rads = atan2($x3, $y3);
         $lat_rads = asin($z3);
 
-        return array_map('rad2deg', array($lat_rads, $lng_rads));
+        return array_map('rad2deg', [$lat_rads, $lng_rads]);
     }
 }

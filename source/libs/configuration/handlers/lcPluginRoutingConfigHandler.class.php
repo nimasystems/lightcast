@@ -26,6 +26,6 @@ class lcPluginRoutingConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('routes' => array());
+        return ['routes' => []];
     }
 }

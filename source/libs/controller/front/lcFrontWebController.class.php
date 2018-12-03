@@ -78,7 +78,7 @@ class lcFrontWebController extends lcFrontController
     {
         // parse the request params and merge them
         // pass to forwarded method for easier access
-        $params = array();
+        $params = [];
 
         /** @var lcWebRequest $request */
 

@@ -24,9 +24,9 @@
 
 class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, iCacheable
 {
-    protected $model_paths = array();
-    protected $registered_models = array();
-    private $used_models = array();
+    protected $model_paths = [];
+    protected $registered_models = [];
+    private $used_models = [];
 
     private $models_gen_dir;
 
@@ -151,21 +151,21 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
         $model_inf = !$already_camelized ? lcInflector::camelize($model_name, false) : $model_name;
 
-        $classes = array(
+        $classes = [
             $model_inf => $path_to_model . DS . $model_inf . '.php',
             $model_inf . 'Peer' => $path_to_model . DS . $model_inf . 'Peer.php',
             $model_inf . 'Query' => $path_to_model . DS . $model_inf . 'Query.php',
-        );
+        ];
 
         // use custom gen dir or in place with models
         $path_to_gen_classes = $this->models_gen_dir ? $this->models_gen_dir : $path_to_model;
 
-        $gen_classes = array(
+        $gen_classes = [
             'Base' . $model_inf => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . '.php',
             'Base' . $model_inf . 'Peer' => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . 'Peer.php',
             'Base' . $model_inf . 'Query' => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . 'Query.php',
             $model_inf . 'TableMap' => $path_to_gen_classes . DS . 'map' . DS . $model_inf . 'TableMap.php',
-        );
+        ];
 
         $classes = array_merge($classes, $gen_classes);
 
@@ -231,7 +231,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
             $plcs = $this->plugin_manager->getPluginConfigurations();
 
-            $all = array();
+            $all = [];
 
             foreach ($plcs as $plc) {
                 if ($plc instanceof iProvidesDbSelectColumnMappings) {
@@ -242,7 +242,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
                             foreach ($queries as $query_identifier => $config) {
                                 $tmp = isset($all[$package_identifier][$query_identifier]) ?
-                                    (array)$all[$package_identifier][$query_identifier] : array();
+                                    (array)$all[$package_identifier][$query_identifier] : [];
 
                                 $tmp = array_merge($tmp, $config);
 
@@ -273,9 +273,9 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function writeClassCache()
     {
-        $cached_data = array(
+        $cached_data = [
             'db_select_column_mappings' => $this->db_select_column_mappings
-        );
+        ];
 
         return $cached_data;
     }

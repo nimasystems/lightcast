@@ -26,7 +26,7 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
     /**
      * @var array
      */
-    protected $registered_classes = array();
+    protected $registered_classes = [];
 
     protected $spl_registered;
 
@@ -44,7 +44,7 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
             return true;
         }
 
-        $registered = spl_autoload_register(array($this, 'loadClass'));
+        $registered = spl_autoload_register([$this, 'loadClass']);
 
         $this->spl_registered = $registered;
 
@@ -65,7 +65,7 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
             return false;
         }
 
-        $registered = spl_autoload_unregister(array($this, 'loadClass'));
+        $registered = spl_autoload_unregister([$this, 'loadClass']);
 
         $this->spl_registered = false;
 
@@ -163,7 +163,7 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
                     }
 
                     try {
-                        call_user_func_array(array($obj, $func), array($class_name));
+                        call_user_func_array([$obj, $func], [$class_name]);
 
                         $included = class_exists($class_name, false);
 
@@ -214,9 +214,9 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
 
     public function writeClassCache()
     {
-        $cache = array(
+        $cache = [
             'registered_classes' => $this->registered_classes,
-        );
+        ];
         return $cache;
     }
 

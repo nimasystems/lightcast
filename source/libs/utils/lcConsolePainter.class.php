@@ -23,17 +23,17 @@
 
 class lcConsolePainter
 {
-    protected static $styles = array(
-        'error' => array('bg' => 'red', 'fg' => 'white', 'bold' => true, 'blink' => true),
-        'info' => array('fg' => 'green', 'bold' => true),
-        'information' => array('fg' => 'green', 'bold' => true),
-        'comment' => array('fg' => 'yellow', 'blink' => true),
-        'question' => array('bg' => 'cyan', 'fg' => 'black',),
-    );
+    protected static $styles = [
+        'error' => ['bg' => 'red', 'fg' => 'white', 'bold' => true, 'blink' => true],
+        'info' => ['fg' => 'green', 'bold' => true],
+        'information' => ['fg' => 'green', 'bold' => true],
+        'comment' => ['fg' => 'yellow', 'blink' => true],
+        'question' => ['bg' => 'cyan', 'fg' => 'black',],
+    ];
 
-    protected static $options = array('bold' => 1, 'underscore' => 4, 'blink' => 5, 'reverse' => 7, 'conceal' => 8);
-    protected static $foreground = array('black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'white' => 37);
-    protected static $background = array('black' => 40, 'red' => 41, 'green' => 42, 'yellow' => 43, 'blue' => 44, 'magenta' => 45, 'cyan' => 46, 'white' => 4);
+    protected static $options = ['bold' => 1, 'underscore' => 4, 'blink' => 5, 'reverse' => 7, 'conceal' => 8];
+    protected static $foreground = ['black' => 30, 'red' => 31, 'green' => 32, 'yellow' => 33, 'blue' => 34, 'magenta' => 35, 'cyan' => 36, 'white' => 37];
+    protected static $background = ['black' => 40, 'red' => 41, 'green' => 42, 'yellow' => 43, 'blue' => 44, 'magenta' => 45, 'cyan' => 46, 'white' => 4];
 
     public static function formatColoredConsoleText($text, $foreground_color = 'white', $background_color = 'black')
     {
@@ -41,7 +41,7 @@ class lcConsolePainter
             return $text;
         }
 
-        $codes = array();
+        $codes = [];
 
         if (isset(self::$foreground[$foreground_color])) {
             $codes[] = self::$foreground[$foreground_color];
@@ -61,7 +61,7 @@ class lcConsolePainter
             return $text;
         }
 
-        $codes = array();
+        $codes = [];
 
         if (isset(self::$styles[$style]['fg'])) {
             $codes[] = self::$foreground[self::$styles[$style]['fg']];

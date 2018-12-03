@@ -25,7 +25,7 @@
 
 abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEventAttributes
 {
-    protected $classes = array();
+    protected $classes = [];
 
     public function __construct($tagname, $is_closed = false)
     {
@@ -82,7 +82,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
                 unset($class);
             }
         } else {
-            $this->classes = array();
+            $this->classes = [];
         }
 
         parent::setAttribute('class', $this->getClass());

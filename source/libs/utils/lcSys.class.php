@@ -123,10 +123,10 @@ class lcSys
     {
         $path = getenv('PATH') ? getenv('PATH') : getenv('Path');
         $suffixes = DIRECTORY_SEPARATOR == '\\' ? (getenv('PATHEXT') ?
-            explode(PATH_SEPARATOR, getenv('PATHEXT')) : array('.exe', '.bat', '.cmd', '.com')) :
-            array('');
+            explode(PATH_SEPARATOR, getenv('PATHEXT')) : ['.exe', '.bat', '.cmd', '.com']) :
+            [''];
 
-        foreach (array('php5', 'php') as $phpCli) {
+        foreach (['php5', 'php'] as $phpCli) {
             foreach ($suffixes as $suffix) {
                 $pp = explode(PATH_SEPARATOR, $path);
 
@@ -275,7 +275,7 @@ class lcSys
 
     public static function formatObjectSize($bytes, $precision = 2)
     {
-        $suffix = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $suffix = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $total = count($suffix);
 
         for ($i = 0; $bytes > 1024 && $i < $total; $i++) {

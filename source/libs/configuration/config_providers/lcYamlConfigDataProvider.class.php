@@ -56,10 +56,10 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
         $filename = $dir . DS . $config_key . self::DEFAULT_EXT;
 
         $yaml_parser = new lcYamlFileParser($filename);
-        return $yaml_parser->writeData($config_data, array(
+        return $yaml_parser->writeData($config_data, [
             'indent' => $indent,
             'word_wrap' => $word_wrap
-        ));
+        ]);
     }
 
     protected function trimYamlValue($val)

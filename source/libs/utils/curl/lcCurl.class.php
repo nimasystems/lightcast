@@ -38,7 +38,7 @@ class lcCurl extends lcObj
     private $referer;
     //private $session;
     private $response;
-    private $headers = array('Except:');
+    private $headers = ['Except:'];
     private $include_header;
     private $nobody;
     private $http_status;
@@ -52,6 +52,8 @@ class lcCurl extends lcObj
 
     public function __construct($url)
     {
+        parent::__construct();
+
         assert(isset($url));
 
         $this->url = $url;
@@ -157,7 +159,7 @@ class lcCurl extends lcObj
     public function setPost(array $post_fields = null)
     {
         $this->post = true;
-        $this->post_fields = isset($post_fields) ? $post_fields : array();
+        $this->post_fields = isset($post_fields) ? $post_fields : [];
     }
 
     public function isPost()
@@ -275,7 +277,7 @@ class lcCurl extends lcObj
             return null;
         }
 
-        $ret = array();
+        $ret = [];
 
         foreach ($this->post_fields as $name => $value) {
             $ret[] = $name . '=' . $value;

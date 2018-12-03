@@ -26,7 +26,7 @@
 class lcControllerStack extends lcSysObj
 {
     /** @var lcControllerStackItem[] */
-    protected $stack = array();
+    protected $stack = [];
 
     public function shutdown()
     {
@@ -97,7 +97,7 @@ class lcControllerStack extends lcSysObj
     public function __toString()
     {
         // return a string representation of the current controllers in the stack
-        $ret = array();
+        $ret = [];
 
         if ($this->stack) {
             $i = 1;

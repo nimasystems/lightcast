@@ -37,7 +37,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
     {
         parent::__construct();
 
-        $this->cacheable_objects = array();
+        $this->cacheable_objects = [];
         $this->cache_ttl = self::DEFAULT_CACHE_TTL;
     }
 
@@ -127,17 +127,17 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'cache'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'cache_type' => ($this->cache ? get_class($this->cache) : null),
             'cacheable_objects' => (is_array($this->cacheable_objects) ? array_keys($this->cacheable_objects) : null)
-        );
+        ];
 
         return $debug;
     }
@@ -198,7 +198,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
     public function registerCacheableObject(iCacheable $object, $key)
     {
         $class_name = get_class($object);
-        $this->cacheable_objects[$class_name] = array('key' => $key, 'object' => $object);
+        $this->cacheable_objects[$class_name] = ['key' => $key, 'object' => $object];
 
         // read cache
         $key = $this->getICacheableCacheKey($class_name, $key);

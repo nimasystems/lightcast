@@ -97,12 +97,12 @@ class lcTagArea extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('alt');
+        return ['alt'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex');
+        return ['shape', 'coords', 'href', 'nohref', 'accesskey', 'tabindex'];
     }
 
     public function getAlt()

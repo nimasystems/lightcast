@@ -77,12 +77,12 @@ class lcTagParam extends lcHtmlBaseTag
 
     public static function getRequiredAttributes()
     {
-        return array('name');
+        return ['name'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('value', 'id', 'type', 'valuetype');
+        return ['value', 'id', 'type', 'valuetype'];
     }
 
     public function getName()

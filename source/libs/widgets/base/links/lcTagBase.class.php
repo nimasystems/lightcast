@@ -45,12 +45,12 @@ class lcTagBase extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('href');
+        return ['href'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array();
+        return [];
     }
 
     public function getHref()

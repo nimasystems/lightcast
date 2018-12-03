@@ -56,7 +56,7 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
     {
         parent::addGetValueSets($script);
 
-        $d = array();
+        $d = [];
 
         foreach ($this->getTable()->getColumns() as $col) {
             $tstr = null;
@@ -65,7 +65,7 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
                 $tstr .= "     
         self::" . $this->getColumnName($col) . " => array(
         ";
-                $arg = array();
+                $arg = [];
 
                 foreach ($col->getValueSet() as $value) {
                     $arg[] = '        self::' . $this->getColumnName($col) . '_' . $this->getEnumValueConstant($value) . ' => $tableMap->translate(\'' .

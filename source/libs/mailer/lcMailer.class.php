@@ -54,8 +54,8 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
         $this->parseDefaultSender();
 
-        $this->recipients = array();
-        $this->attachments = array();
+        $this->recipients = [];
+        $this->attachments = [];
     }
 
     public function shutdown()
@@ -69,9 +69,9 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'mailer'
-        );
+        ];
     }
 
     public function getRecipients()
@@ -170,8 +170,8 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
     public function clear()
     {
-        $this->recipients = array();
-        $this->attachments = array();
+        $this->recipients = [];
+        $this->attachments = [];
 
         $this->body = null;
         $this->subject = null;
@@ -229,28 +229,27 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         }
 
         $error_message = null;
-        $res = false;
 
         try {
             // filter event to allow stop the sending / change the email's contents
-            $res = array(
+            $res = [
                 'allow_sending' => true,
                 'attachments' => $this->attachments,
                 'body' => $this->body,
                 'recipients' => $this->recipients,
                 'sender' => $this->sender,
                 'subject' => $this->subject
-            );
+            ];
 
             // notify about this forward
             $event = new lcEvent('mailer.send_mail', $this,
-                array(
+                [
                     'attachments' => $this->attachments,
                     'body' => $this->body,
                     'recipients' => $this->recipients,
                     'sender' => $this->sender,
                     'subject' => $this->subject
-                ));
+                ]);
 
             $evn = $this->event_dispatcher->filter($event, $res);
 
@@ -266,9 +265,9 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
                 }
 
                 // process change fields
-                $this->attachments = (isset($res['attachments']) && is_array($res['attachments'])) ? $res['attachments'] : array();
+                $this->attachments = (isset($res['attachments']) && is_array($res['attachments'])) ? $res['attachments'] : [];
                 $this->body = isset($res['body']) ? $res['body'] : null;
-                $this->recipients = (isset($res['recipients']) && is_array($res['recipients'])) ? $res['recipients'] : array();
+                $this->recipients = (isset($res['recipients']) && is_array($res['recipients'])) ? $res['recipients'] : [];
                 $this->sender = (isset($res['sender']) && $res['sender'] instanceof lcMailRecipient) ? $res['sender'] : null;
                 $this->subject = isset($res['subject']) ? $res['subject'] : null;
 

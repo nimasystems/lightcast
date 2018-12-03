@@ -101,12 +101,12 @@ class lcTagInput extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('name', 'type', 'value', 'maxlength', 'src', 'accept', 'disabled', 'readonly', 'accesskey', 'tabindex');
+        return ['name', 'type', 'value', 'maxlength', 'src', 'accept', 'disabled', 'readonly', 'accesskey', 'tabindex'];
     }
 
     public function getType()

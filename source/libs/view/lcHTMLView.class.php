@@ -26,7 +26,7 @@ abstract class lcHTMLView extends lcView
     public function getSupportedContentTypes()
     {
         // only text/html supported
-        return array($this->getContentType());
+        return [$this->getContentType()];
     }
 
     public function getContentType()

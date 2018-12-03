@@ -128,13 +128,13 @@ class lcSessionStorage extends lcStorage implements iDebuggable
     {
         $parent_debug = parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'session_id' => $this->session_id,
             'timeout' => $this->timeout,
             'last_request' => $this->last_request,
             'default_namespace' => self::DEFAULT_NAMESPACE,
             'default_timeout' => self::DEFAULT_TIMEOUT
-        );
+        ];
 
         $debug = array_merge($parent_debug, $debug);
 
@@ -311,7 +311,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
     protected function trackTime()
     {
         // update the last request time at shutdown so it can be overriden
-        $this->storage['_internal'] = array('last_request' => time());
+        $this->storage['_internal'] = ['last_request' => time()];
     }
 
     protected function readFromStorage()
@@ -328,8 +328,8 @@ class lcSessionStorage extends lcStorage implements iDebuggable
 
         // move all variables from global var to local var
         // in shutdown() we will do exactly the opposite so session is not lost
-        $this->storage = (isset($_SESSION) && is_array($_SESSION)) ? $_SESSION : array();
-        $_SESSION = array();
+        $this->storage = (isset($_SESSION) && is_array($_SESSION)) ? $_SESSION : [];
+        $_SESSION = [];
 
         /*
          * Because the integrated PHP methods are not 100% reliable:
@@ -363,18 +363,18 @@ class lcSessionStorage extends lcStorage implements iDebuggable
         if ($new_time > $old_time) {
             $this->info('storage session has expired. Last action: ' . date('d.m.Y H:i:s', $this->last_request));
 
-            $_SESSION = array();
+            $_SESSION = [];
             session_destroy();
 
             // restart
             session_start();
 
             $this->session_id = session_id();
-            $this->storage = array();
+            $this->storage = [];
 
             // send an event
             $this->event_dispatcher->notify(new lcEvent('storage.gc', $this,
-                array('max_lifetime' => $last_request, 'session_id' => $this->session_id)
+                ['max_lifetime' => $last_request, 'session_id' => $this->session_id]
             ));
 
             $gctime = date('Y-m-d H:i:s', $last_request);

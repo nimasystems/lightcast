@@ -51,8 +51,8 @@ class tMisc extends lcTaskController
     {
         $this->consoleDisplay('Find models started');
 
-        $this->found_models = array();
-        $this->found_php_files = array();
+        $this->found_models = [];
+        $this->found_php_files = [];
 
         $this->_findModels();
 
@@ -69,8 +69,8 @@ class tMisc extends lcTaskController
 
         if ($plugins) {
             foreach ($plugins as $name => $info) {
-                $php_files = array();
-                $models = array();
+                $php_files = [];
+                $models = [];
 
                 // plugin master file
                 $php_files[] = $info['path'] . DS . $name . '.php';
@@ -140,7 +140,7 @@ class tMisc extends lcTaskController
 
         if ($apps) {
             foreach ($apps as $name => $details) {
-                $php_files = array();
+                $php_files = [];
 
                 // app modules
                 $modules_path = DIR_APP . DS . 'applications' . DS . $name . DS . 'modules';
@@ -168,7 +168,7 @@ class tMisc extends lcTaskController
         $tasks = lcDirs::searchDir($tasks_path, true);
 
         if ($tasks) {
-            $php_files = array();
+            $php_files = [];
 
             foreach ($tasks as $task) {
                 $task_name = $task['name'];
@@ -187,7 +187,7 @@ class tMisc extends lcTaskController
         $web_services = lcDirs::searchDir($ws_path, true);
 
         if ($web_services) {
-            $php_files = array();
+            $php_files = [];
 
             foreach ($web_services as $web_service) {
                 $web_service_name = $web_service['name'];
@@ -206,7 +206,7 @@ class tMisc extends lcTaskController
         $models_ = lcDirs::searchDir($models_path, true);
 
         if ($models_) {
-            $models = array();
+            $models = [];
 
             foreach ($models_ as $m) {
                 $models[] = str_replace('.php', '', $m['name']);

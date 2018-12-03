@@ -2,9 +2,9 @@
 
 class cHome extends lcWebController
 {
-	protected $use_plugins = array();
-	protected $use_components = array();
-	protected $use_models = array();
+	protected $use_plugins = [];
+	protected $use_components = [];
+	protected $use_models = [];
 
 	/*
 	 * Website home page

@@ -67,12 +67,12 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
 
     public static function getRequiredAttributes()
     {
-        return array('xmlns');
+        return ['xmlns'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('dir', 'lang', 'xml:lang');
+        return ['dir', 'lang', 'xml:lang'];
     }
 
     public function getDir()

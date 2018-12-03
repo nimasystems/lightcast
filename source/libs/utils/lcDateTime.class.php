@@ -220,7 +220,7 @@ class lcDateTime
         }, $datetime_format));
     }
 
-    private function convertPhpDatePartToMomentjsFormat($part)
+    private static function convertPhpDatePartToMomentjsFormat($part)
     {
         $part = is_array($part) ? (count($part) ? $part[0] : null) : $part;
 

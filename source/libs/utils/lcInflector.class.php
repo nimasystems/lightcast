@@ -53,7 +53,7 @@ class lcInflector
 
     public static function asClassName($input, $type)
     {
-        $input = lcStrings::toAlphaNum($input, array('-', '_', '.', ':'));
+        $input = lcStrings::toAlphaNum($input, ['-', '_', '.', ':']);
         $input = self::camelize($input);
 
         return $type . $input;
@@ -61,7 +61,7 @@ class lcInflector
 
     public static function asFolderName($input)
     {
-        return lcStrings::toAlphaNum($input, array('-', '.', ':'));
+        return lcStrings::toAlphaNum($input, ['-', '.', ':']);
     }
 
     # when we need to remove 'c','v','t' to find a filename
@@ -72,7 +72,7 @@ class lcInflector
 
     public static function asFuncName($input)
     {
-        $input = lcStrings::toAlphaNum($input, array('-', '_', '.', ':'));
+        $input = lcStrings::toAlphaNum($input, ['-', '_', '.', ':']);
         $input = self::camelize($input);
 
         $input{0} = strtolower($input{0});
@@ -82,7 +82,7 @@ class lcInflector
 
     public static function asVarName($input)
     {
-        $input = lcStrings::toAlphaNum($input, array('-', '_', '.', ':'));
+        $input = lcStrings::toAlphaNum($input, ['-', '_', '.', ':']);
         $input = self::camelize($input);
 
         $input{0} = strtolower($input{0});
@@ -99,7 +99,7 @@ class lcInflector
     public static function humanize($camelCasedWord)
     {
         $replace = ucfirst(strtolower(preg_replace('/(?<=\\w)([A-Z])/', ' \\1', $camelCasedWord)));
-        $replace = str_replace(array('_', '-'), ' ', $replace);
+        $replace = str_replace(['_', '-'], ' ', $replace);
         $replace = trim($replace);
         return $replace;
     }

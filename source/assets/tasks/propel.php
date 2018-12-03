@@ -82,10 +82,10 @@ EOD;
         // cleanup in case the script failed
         $this->phingCleanUp();
 
-        spl_autoload_unregister(array(
+        spl_autoload_unregister([
             $this,
             'phingAutoloadClass'
-        ));
+        ]);
 
         parent::shutdown();
     }
@@ -172,7 +172,7 @@ EOD;
         return true;
     }
 
-    private $plugin_configs = array();
+    private $plugin_configs = [];
 
     private function getPluginConfig($plugin_name, $plugin_path)
     {
@@ -191,7 +191,7 @@ EOD;
 
     private function getPluginSchemas()
     {
-        $schemas = array();
+        $schemas = [];
 
         $plugins = $this->system_component_factory->getSystemPluginDetails();
 
@@ -201,10 +201,10 @@ EOD;
                 $plconf = $this->getPluginConfig($plugin_name, $plugin_data['path']);
 
                 if ($plconf && $plconf instanceof iSupportsDbModels) {
-                    $schemas[$plugin_data['name']] = array(
+                    $schemas[$plugin_data['name']] = [
                         'plugin_data' => $plugin_data,
                         'schema_filename' => $plugin_data['path'] . DS . 'config' . DS . self::SCHEMA_FILE
-                    );
+                    ];
                 }
 
                 unset($plugin_data, $plugin_name);
@@ -220,10 +220,10 @@ EOD;
     {
         // holder for all folders containing schemas
         // all schemas will be looked up - *-schema.xml, schema.xml
-        $schemas = array();
+        $schemas = [];
 
         // general project schemas
-        $schemas[lcSysObj::CONTEXT_PROJECT] = array();
+        $schemas[lcSysObj::CONTEXT_PROJECT] = [];
 
         if ((isset($only_entities)) && (in_array('project', $only_entities)) || (!isset($only_entities))) {
             $schemas[lcSysObj::CONTEXT_PROJECT]['main']['path'] = $this->configuration->getConfigDir();
@@ -231,7 +231,7 @@ EOD;
         }
 
         // plugin schemas
-        $schemas[lcSysObj::CONTEXT_PLUGIN] = array();
+        $schemas[lcSysObj::CONTEXT_PLUGIN] = [];
 
         $plugins = $this->system_component_factory->getSystemPluginDetails();
 
@@ -318,7 +318,7 @@ EOD;
     {
         $cfg_filename = $this->configuration->getBaseConfigDir() . DS . 'propel.yml';
 
-        $data = array();
+        $data = [];
 
         if (file_exists($cfg_filename)) {
             $parser = new lcYamlFileParser($cfg_filename);
@@ -338,7 +338,7 @@ EOD;
         /** @noinspection PhpUndefinedMethodInspection */
         $cfg = $this->configuration->getProjectConfiguration();
         $schema_views = ($cfg instanceof iSupportsDbViews) ? $cfg->getDbViews() : null;
-        $schema_views = is_array($schema_views) && $schema_views ? $schema_views : array();
+        $schema_views = is_array($schema_views) && $schema_views ? $schema_views : [];
 
         if ($schema_views) {
             $data['views'] = $schema_views;
@@ -409,7 +409,7 @@ EOD;
 
         // find tables in each detected plugin
         $plugin_schemas = $this->getPluginSchemas();
-        $plugin_all_tables = array();
+        $plugin_all_tables = [];
 
         //$plugin_manager = $this->getPluginManager();
 
@@ -430,10 +430,10 @@ EOD;
                     $plugin_propel_schema = $this->getPluginPropelSchemaConfig($plugin_data['path']);
 
                     $plugin_tables = ($pl_config instanceof iSupportsDbModels) ? $pl_config->getDbModels() : null;
-                    $plugin_tables = is_array($plugin_tables) && $plugin_tables ? $plugin_tables : array();
+                    $plugin_tables = is_array($plugin_tables) && $plugin_tables ? $plugin_tables : [];
 
                     $plugin_views = ($pl_config instanceof iSupportsDbViews) ? $pl_config->getDbViews() : null;
-                    $plugin_views = is_array($plugin_views) && $plugin_views ? $plugin_views : array();
+                    $plugin_views = is_array($plugin_views) && $plugin_views ? $plugin_views : [];
 
                     if ($plugin_views) {
                         $plugin_propel_schema['views'] = $plugin_views;
@@ -694,7 +694,7 @@ EOD;
             }
 
             //begin fix propel foreign key bug
-            $aForeignKeys = array();
+            $aForeignKeys = [];
             $oForeignKeys = $itm->getElementsByTagName('foreign-key');
             // all foreign keys as dom elements selection
             $sForeignKeysLen = $oForeignKeys->length;
@@ -790,16 +790,16 @@ EOD;
                     lcFiles::putFile($target_filename, $this->getDefaultSchemaContent());
                 }
 
-                $this->schema_files_tmp[$path][] = array(
+                $this->schema_files_tmp[$path][] = [
                     $source_filename,
                     $rf
-                );
+                ];
 
                 // fix CASCADE/RESTRICT/SET NULL problems on windows
                 // (uppercase)
                 $this->fixWindowsUppercaseRestrictions($target_filename);
 
-                $options = array('datasource' => $datasource_name);
+                $options = ['datasource' => $datasource_name];
 
                 $options['context_type'] = $type_name;
 
@@ -844,11 +844,11 @@ EOD;
 
     private function fixWindowsUppercaseRestrictions($filename)
     {
-        $rep = array(
+        $rep = [
             '"CASCADE"',
             '"SET NULL"',
             '"RESTRICT"'
-        );
+        ];
 
         $f = lcFiles::getFile($filename);
 
@@ -1149,11 +1149,11 @@ EOD;
         // try to create the dir
         lcDirs::mkdirRecursive($dir);
 
-        $properties = array(
+        $properties = [
             'propel.reverse.parser.class' => self::PROPEL_REVERSE_PARSE_CLASS,
             'propel.default.schema.basename' => $filename,
             'propel.schema.dir' => $dir,
-        );
+        ];
 
         return $this->phingExecute('reverse', $properties, null, null);
     }
@@ -1180,19 +1180,19 @@ EOD;
 
     private function getPrimaryDatabaseConfig()
     {
-        $config = array();
+        $config = [];
 
         if ($d = $this->configuration['db.databases']) {
             if (isset($d['primary'])) {
                 $d = $d['primary'];
 
-                $config = array(
+                $config = [
                     'propel.project' => @$d['datasource'],
                     'propel.database.buildUrl' => @$d['url'],
                     'propel.database.user' => @$d['user'],
                     'propel.database.password' => @$d['password'],
                     'propel.database.encoding' => @$d['charset']
-                );
+                ];
             }
 
             unset($d);
@@ -1255,12 +1255,12 @@ EOD;
         $wd = $work_dir ? $work_dir : (realpath($this->work_dir) . DS);
 
         /** @noinspection PhpUndefinedMethodInspection */
-        $properties = array(
+        $properties = [
             'propel.output.dir' => $this->configuration->getAppRootDir(),
             'propel.schema.xsd.file' => $projectPath . DS . 'resources/xsd/database.xsd',
             'propel.schema.xsl.file' => $projectPath . DS . 'resources/xsl/database.xsl',
             'propel.dbd2propel.xsl.file' => $projectPath . DS . 'resources/xsd/dbd2propel.xsl',
-        );
+        ];
 
         // propel generator configuration
         $config_properties = (array)$this->configuration['db.propel'];
@@ -1278,7 +1278,7 @@ EOD;
         lcDirs::mkdirRecursive($wd);
 
         // write the build properties file to temp location
-        $build_properties_contents = array();
+        $build_properties_contents = [];
 
         foreach ($properties as $key => $value) {
             $build_properties_contents[] = $key . ' = ' . $value;
@@ -1302,7 +1302,7 @@ EOD;
 
         unset($properties);
 
-        $args = array();
+        $args = [];
 
         // add project arg
         $args[] = "-Dproject.dir=" . $wd;

@@ -30,13 +30,13 @@
 class lcFinder
 {
     private $find_type = '';
-    private $filter_rules = array();
+    private $filter_rules = [];
 
     private $mindepth = 0;
     private $maxdepth = 10000;
 
-    private $ignore_files = array('.svn', '.arch-params', '.monotone', '.bzr', '.git', '.hg', '.project');
-    private $ignore_rules = array();
+    private $ignore_files = ['.svn', '.arch-params', '.monotone', '.bzr', '.git', '.hg', '.project'];
+    private $ignore_rules = [];
 
     private $sort_order = 1;
 
@@ -92,7 +92,7 @@ class lcFinder
     public function do_search_in($start_directory)
     {
         if (!is_dir($start_directory)) {
-            return array();
+            return [];
         }
 
         $files = $this->search_in($start_directory, 0);
@@ -105,14 +105,14 @@ class lcFinder
         $dir = realpath($dir);
 
         if ($depth >= $this->maxdepth) {
-            return array();
+            return [];
         }
 
         if (is_link($dir)) {
-            return array();
+            return [];
         }
 
-        $files = array();
+        $files = [];
         $current_file = scandir($dir, $this->sort_order);
 
         foreach ($current_file as $entryname) {

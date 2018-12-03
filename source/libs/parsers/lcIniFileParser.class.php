@@ -40,7 +40,7 @@ class lcIniFileParser extends lcFileParser
 
         $data = (array)array_filter(explode("\n", $data));
 
-        $vals = array();
+        $vals = [];
 
         foreach ($data as $k => $line) {
             if (!$line = trim($line)) {
@@ -76,7 +76,7 @@ class lcIniFileParser extends lcFileParser
     {
         $data = is_array($data) ? $data : null;
 
-        $str = array();
+        $str = [];
 
         foreach ($data as $name => $value) {
             // TODO: ini file data escaping must be done here

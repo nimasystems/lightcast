@@ -25,7 +25,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 {
     const DEFAULT_LOCALE_UNIX = 'en_US';
     const DEFAULT_LOCALE_WIN = 'us';
-    const DEFAULT_CATEGORY = array(LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_TIME, LC_MESSAGES);
+    const DEFAULT_CATEGORY = [LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_TIME, LC_MESSAGES];
     const DEFAULT_CHARSET = 'UTF-8';
     protected $locale;
     protected $charset = self::DEFAULT_CHARSET;
@@ -76,12 +76,12 @@ abstract class lcGettext extends lcI18n implements iDebuggable
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'charset' => $this->charset,
             'category' => $this->category,
             'domain_path' => $this->domain_path,
             'domain' => $this->domain
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -238,16 +238,16 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 
     private function internalSetLocale($locale, $category)
     {
-        $categories = is_array($category) ? $category : array($category);
+        $categories = is_array($category) ? $category : [$category];
 
         /*
          * Try appending some character set names; some systems (like FreeBSD) need this.  Some
         * require a format with hyphen (eg. Gentoo) and others without (eg. FreeBSD).
         */
-        $charsets = array('UTF-8', 'UTF8', 'utf8', 'utf-8',
+        $charsets = ['UTF-8', 'UTF8', 'utf8', 'utf-8',
             'ISO8859-1', 'ISO8859-2', 'ISO8859-5', 'ISO8859-7', 'ISO8859-9',
             'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-5', 'ISO-8859-7', 'ISO-8859-9',
-            'EUC', 'Big5');
+            'EUC', 'Big5'];
 
         foreach ($charsets as $charset) {
             $ret = false;

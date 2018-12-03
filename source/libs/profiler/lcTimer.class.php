@@ -32,6 +32,8 @@ class lcTimer extends lcObj
 
     public function __construct($name = '')
     {
+        parent::__construct();
+
         $this->name = $name;
         $this->start();
     }

@@ -29,7 +29,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     protected $propel_logger;
     protected $propel_config;
     /** @var array lcDatabase[] */
-    private $dbs = array();
+    private $dbs = [];
     private $default_database = self::DEFAULT_DB;
     private $propel_initialized;
 
@@ -150,11 +150,11 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
                     // send an event ONCE - for the default db only!
                     if ($db['is_default']) {
-                        $res = array(
+                        $res = [
                             'is_default' => $db['is_default'],
                             'name' => $db['name'],
                             'connection' => $db_object->getConnection()
-                        );
+                        ];
 
                         $connection = $this->dbs[$name];
 
@@ -241,7 +241,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     private function makePropelConfig()
     {
-        $propel_config = array();
+        $propel_config = [];
 
         $default_datasource = null;
         $dbs = $this->configuration['db.databases'];
@@ -293,7 +293,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
             return null;
         }
 
-        $params = array();
+        $params = [];
 
         $params_tmp = explode(':', $db_config['url']);
 
@@ -309,22 +309,22 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
         unset($params_tmp);
 
-        $options = array();
-        $attributes = array();
+        $options = [];
+        $attributes = [];
 
         $persistent_connections = isset($db_config['persistent_connections']) ? (bool)$db_config['persistent_connections'] : true;
         $emulated_prepare_statements = isset($db_config['emulate_prepares']) ? (bool)$db_config['emulate_prepares'] : false;
 
         // persistent connections are now enabled by default from LC 1.5
         if ($persistent_connections) {
-            $options['ATTR_PERSISTENT'] = array('value' => true);
+            $options['ATTR_PERSISTENT'] = ['value' => true];
         }
 
         // emulated prepared statements - as of 1.5 it's disabled by default
         // http://stackoverflow.com/questions/10113562/pdo-mysql-use-pdoattr-emulate-prepares-or-not
 
         if ($emulated_prepare_statements) {
-            $attributes = array('ATTR_EMULATE_PREPARES' => array('value' => true,),);
+            $attributes = ['ATTR_EMULATE_PREPARES' => ['value' => true,],];
         }
 
         $username = isset($db_config['user']) ? (string)$db_config['user'] : null;
@@ -337,21 +337,21 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         // $this->propel_class_release;
         $propel_class = lcPropelDatabase::PROPEL_CONNECTION_CLASS;
 
-        $ret = array(
+        $ret = [
             'datasource' => $db_config['datasource'],
-            'config' => array(
+            'config' => [
                 'adapter' => $params['phptype'],
-                'connection' => array(
+                'connection' => [
                     'dsn' => $db_config['url'],
                     'user' => $params['username'],
                     'password' => $params['password'],
                     'classname' => $propel_class,
                     'options' => $options,
                     'attributes' => $attributes,
-                    'settings' => array('charset' => array('value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET))
-                )
-            )
-        );
+                    'settings' => ['charset' => ['value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET]]
+                ]
+            ]
+        ];
 
         return $ret;
     }
@@ -391,15 +391,15 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     public function getCapabilities()
     {
-        return array('database');
+        return ['database'];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'databases' => array_keys($this->dbs),
             'primary' => self::DEFAULT_DB
-        );
+        ];
 
         return $debug;
     }
@@ -410,7 +410,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     {
         $databases = $this->dbs;
 
-        $debug_info = array();
+        $debug_info = [];
 
         if ($databases) {
             foreach ($databases as $adapter_name => $db) {

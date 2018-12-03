@@ -141,7 +141,7 @@ class lcApp extends lcObj
          * this class would get destructed).
          * This way we assure this class will be shutdown first!
          */
-        register_shutdown_function(array($this, 'shutdown'));
+        register_shutdown_function([$this, 'shutdown']);
 
         $this->configuration = $configuration;
         $this->configuration->initDefaultSystemObjects();
@@ -296,12 +296,12 @@ class lcApp extends lcObj
         $this->error_handler = $this->configuration->getErrorHandler();
 
         // attach error handlers
-        set_error_handler(array($this, 'handlePHPError'));
-        set_exception_handler(array($this, "handleException"));
+        set_error_handler([$this, 'handlePHPError']);
+        set_exception_handler([$this, "handleException"]);
 
         // Raise assertions only in debug mode
         if ($this->error_handler && $this->error_handler->supportsAssertions()) {
-            assert_options(ASSERT_CALLBACK, array($this, 'handleAssertion'));
+            assert_options(ASSERT_CALLBACK, [$this, 'handleAssertion']);
         }
 
         if ($this->error_handler) {
@@ -364,7 +364,7 @@ class lcApp extends lcObj
             $class_cache_varname = self::FRAMEWORK_CACHE_VAR_NAME;
             $class_cache_version_varname = self::FRAMEWORK_CACHE_VERSION_VAR_NAME;
 
-            $registered_classes = array();
+            $registered_classes = [];
             $cache_version = 0;
             $should_recreate_cache = false;
 
@@ -417,10 +417,10 @@ class lcApp extends lcObj
         /** @noinspection PhpIncludeInspection */
         require_once(ROOT . DS . 'source/libs/autoload/lcAutoloadCacheTool.class.php');
 
-        $dirs = array(
+        $dirs = [
             ROOT . DS . 'source' . DS . 'libs',
             ROOT . DS . 'source' . DS . '3rdparty' . DS . 'propel' . DS . 'runtime' . DS . 'lib'
-        );
+        ];
 
         $tool = new lcAutoloadCacheTool($dirs, $fname, self::FRAMEWORK_CACHE_VAR_NAME, self::FRAMEWORK_CACHE_VERSION_VAR_NAME);
         $tool->setCacheVersion(LC_VER_REVISION);
@@ -445,7 +445,7 @@ class lcApp extends lcObj
 
     private function createSystemObjects()
     {
-        $this->initialized_objects = array();
+        $this->initialized_objects = [];
 
         $configuration = $this->configuration;
         assert(!is_null($configuration));
@@ -1216,7 +1216,7 @@ class lcApp extends lcObj
 
         try {
             $event = $this->event_dispatcher->filter(new lcEvent('app.exception', $this,
-                array(
+                [
                     'exception' => $exception,
                     'message' => $exception->getMessage(),
                     'domain' => (($exception instanceof iDomainException) ? $exception->getDomain() : lcException::DEFAULT_DOMAIN),
@@ -1224,7 +1224,7 @@ class lcApp extends lcObj
                     'cause' => $exception->getPrevious(),
                     'trace' => $exception->getTraceAsString(),
                     'system_snapshot' => $this->getDebugSnapshot()
-                )), $should_be_handled);
+                ]), $should_be_handled);
         } catch (Exception $e) {
             // an exception should not be thrown in the exception handlers
             if ($this->error_handler) {
@@ -1251,14 +1251,14 @@ class lcApp extends lcObj
 
     public function getDebugSnapshot($short = false)
     {
-        $snapshot = array(
+        $snapshot = [
             'is_debugging' => DO_DEBUG,
             'lc_version' => LC_VER,
             'app_version' => APP_VER,
             'memory_usage' => lcSys::getMemoryUsage(true),
             'php_ver' => lcSys::getPhpVer(),
             'php_api' => lcSys::get_sapi()
-        );
+        ];
 
         $local_cache = $this->configuration->getCache();
         $local_cache_name = $local_cache ? get_class($local_cache) : null;

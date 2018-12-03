@@ -73,7 +73,7 @@ class lcArrays
                 return func_get_arg(0);
             case 2:
                 $args = func_get_args();
-                $args[2] = array();
+                $args[2] = [];
 
                 if (is_array($args[0]) && is_array($args[1])) {
                     $m = array_unique(array_merge(array_keys($args[0]), array_keys($args[1])));
@@ -104,7 +104,7 @@ class lcArrays
                 $args = func_get_args();
                 $args[1] = lcArrays::arrayDeepMerge($args[0], $args[1]);
                 array_shift($args);
-                return call_user_func_array(array('lcArrays', 'arrayDeepMerge'), $args);
+                return call_user_func_array(['lcArrays', 'arrayDeepMerge'], $args);
                 break;
         }
     }
@@ -135,12 +135,12 @@ class lcArrays
         $base = array_shift($arrays);
 
         if (!is_array($base)) {
-            $base = empty($base) ? array() : array($base);
+            $base = empty($base) ? [] : [$base];
         }
 
         foreach ($arrays as $append) {
             if (!is_array($append)) {
-                $append = array_filter(array($append));
+                $append = array_filter([$append]);
             }
 
             foreach ($append as $key => $value) {
@@ -181,7 +181,7 @@ class lcArrays
 
         $out = '';
 
-        $a = array();
+        $a = [];
 
         foreach ($arr as $key => $val) {
             $a[] = $key . '=' . $val;

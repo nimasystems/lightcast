@@ -166,12 +166,12 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
 
             // if we just want the total cache entries
             if ($get_type == self::READ_METAINFO) {
-                return array(
+                return [
                     'total_entries' => (int)$line[1],
                     'next_dir' => (int)$line[2],
                     'next_subdir' => (int)$line[3],
                     'next_file' => (int)$line[4]
-                );
+                ];
             }
 
             $line = null;
@@ -222,12 +222,12 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
 
         // if just requesting the last time
         if ($get_type == self::READ_ALL) {
-            return array(
+            return [
                 'status' => $data[0],
                 'key' => $data[1],
                 'timestamp' => $data[2],
                 'cache_filename' => $data[3]
-            );
+            ];
         } elseif ($get_type == self::READ_FILENAME) {
             return $data[3];
         } elseif ($get_type == self::READ_TIMESTAMP) {
@@ -295,19 +295,19 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'cache_folder' => $this->cache_folder,
             'total_entries' => $this->total_entries
-        );
+        ];
 
         return $debug;
     }
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'total_entries' => $this->total_entries
-        );
+        ];
 
         return $debug;
     }
@@ -325,7 +325,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
                 throw new lcIOException('Cannot open cache file');
             }
 
-            $data = array();
+            $data = [];
             $line_num = 0;
 
             while (!feof($f)) {

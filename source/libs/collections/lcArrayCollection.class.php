@@ -132,7 +132,7 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 
     public function getKeyValueArray()
     {
-        $out = array();
+        $out = [];
 
         if ($this->count()) {
             $all = $this->getAll()->getArrayCopy();
@@ -157,7 +157,7 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         $out = '';
 
         if ($this->count()) {
-            $a = array();
+            $a = [];
 
             $all = $this->getAll()->getArrayCopy();
 

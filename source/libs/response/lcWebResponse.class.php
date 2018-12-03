@@ -196,7 +196,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         // compile cookies
         $cc1 = $this->cookies;
-        $ca = array();
+        $ca = [];
 
         if ($cc1) {
             /** @var lcNameValuePair[] $c */
@@ -213,7 +213,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             unset($c);
         }
 
-        $debug = array(
+        $debug = [
             'status_code' => $this->status_code,
             'http_response_message' => $this->reason_string,
             'http_version' => $this->http_version,
@@ -221,7 +221,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             'charset' => $this->server_charset,
             'content_type' => $this->content_type,
             'cookies' => ($ca ? $ca : null),
-        );
+        ];
 
         return $debug;
     }
@@ -235,10 +235,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function getAllKeys()
     {
-        $ret = array(
+        $ret = [
             'page_title',
             'page_description'
-        );
+        ];
         return $ret;
     }
 
@@ -337,7 +337,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // check if response sending is allowed
         $event = $this->event_dispatcher->filter(
-            new lcEvent('response.should_send_response', $this, array()), array());
+            new lcEvent('response.should_send_response', $this, []), []);
 
         if ($event->isProcessed()) {
             $should_send_response = (bool)$event->getReturnValue();
@@ -389,9 +389,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // notify listeners if this is an errorous response
         if (!$this->no_http_errors_processing && $this->status_code != lcHttpStatusCode::OK) {
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_http_error', $this, array(
+                new lcEvent('response.send_http_error', $this, [
                     'status_code' => $this->status_code,
-                )), $content);
+                ]), $content);
 
             if ($event->isProcessed()) {
                 $content = $event->getReturnValue();
@@ -401,7 +401,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // notify listeners
         if ($this->content_should_be_processed) {
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_response', $this, array()), $content);
+                new lcEvent('response.send_response', $this, []), $content);
 
             if ($event->isProcessed()) {
                 $content = $event->getReturnValue();
@@ -412,7 +412,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // notify with an event
         $this->event_dispatcher->notify(
-            new lcEvent('response.will_send_response', $this, array()));
+            new lcEvent('response.will_send_response', $this, []));
 
         if ($this->content_should_be_processed && !$this->request->isAjax()) {
             // set html customizations
@@ -426,7 +426,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // notify listeners
         if ($this->content_should_be_processed) {
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.output_content', $this, array()), $content);
+                new lcEvent('response.output_content', $this, []), $content);
 
             if ($event->isProcessed()) {
                 $content = $event->getReturnValue();
@@ -458,11 +458,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // notify with an event
         $this->event_dispatcher->notify(
-            new lcEvent('response.did_send_response', $this, array(
+            new lcEvent('response.did_send_response', $this, [
                 'cookies' => $sent_cookies,
                 'headers' => $sent_headers,
                 'content' => $content
-            )));
+            ]));
     }
 
     private function processHtmlContent($content)
@@ -471,24 +471,24 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             return null;
         }
 
-        $head = array();
+        $head = [];
 
         // flush based on allowances
         if (!$this->allow_metatags) {
-            $this->metatags = array();
+            $this->metatags = [];
         }
 
         if (!$this->allow_javascripts) {
-            $this->javascripts = array();
-            $this->javascripts_end = array();
+            $this->javascripts = [];
+            $this->javascripts_end = [];
         }
 
         if (!$this->allow_stylesheets) {
-            $this->stylesheets = array();
+            $this->stylesheets = [];
         }
 
         if (!$this->allow_rss_feeds) {
-            $this->rssfeeds = array();
+            $this->rssfeeds = [];
         }
 
         // process view based config vars
@@ -535,7 +535,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $content_hreflangs = $this->content_hreflangs;
 
             if ($content_hreflangs) {
-                $head_hreflangs = array();
+                $head_hreflangs = [];
                 $current_url = null;
 
                 foreach ($content_hreflangs as $data) {
@@ -616,7 +616,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
-                $oattr = array();
+                $oattr = [];
                 if (isset($data['other_attribs']) && $data['other_attribs']) {
                     foreach ($data['other_attribs'] as $key => $v) {
                         $oattr[] = $key . '="' . htmlspecialchars($v) . '"';
@@ -640,7 +640,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
-                $oattr = array();
+                $oattr = [];
                 if (isset($data['other_attribs']) && $data['other_attribs']) {
                     foreach ($data['other_attribs'] as $key => $v) {
                         $oattr[] = $key . '="' . htmlspecialchars($v) . '"';
@@ -666,7 +666,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $jscode = $this->javascript_code;
 
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.send_response_javascript_code', $this, array()), $jscode);
+                new lcEvent('response.send_response_javascript_code', $this, []), $jscode);
 
             if ($event->isProcessed()) {
                 $jscode = $event->getReturnValue();
@@ -755,7 +755,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $body_tags1 = $this->body_tags;
 
         if ($body_tags1) {
-            $body_tags = array();
+            $body_tags = [];
 
             foreach ($body_tags1 as $name => $value) {
                 $body_tags[] = $name . '="' . $value . '"';
@@ -868,11 +868,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     // relative or absolute path
                     $p = ($sheet && ($sheet{0} == '/' || lcStrings::startsWith($sheet, 'http'))) ? $sheet : $stylesheet_path . $sheet;
 
-                    $this->stylesheets[$sheet] = array(
+                    $this->stylesheets[$sheet] = [
                         'href' => $p,
                         'type' => 'text/css',
                         'media' => $type
-                    );
+                    ];
 
                     unset($sheet, $p);
                 }
@@ -904,11 +904,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 // relative or absolute path
                 $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
-                $jd = array(
+                $jd = [
                     'src' => $p,
                     'type' => 'text/javascript',
                     'async' => $async
-                );
+                ];
 
                 $this->javascripts[$js_path . $js] = $jd;
 
@@ -934,11 +934,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 // relative or absolute path
                 $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
 
-                $jd = array(
+                $jd = [
                     'src' => $p,
                     'type' => 'text/javascript',
                     'async' => $async
-                );
+                ];
 
                 $this->javascripts_end[$js_path . $js] = $jd;
 
@@ -959,16 +959,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // notify with an event
         $event = $this->event_dispatcher->filter(
-            new lcEvent('response.send_cookies', $this, array()), $cookies);
+            new lcEvent('response.send_cookies', $this, []), $cookies);
 
         if ($event->isProcessed()) {
             $cookies = $event->getReturnValue();
         }
 
-        $sent_cookies = array();
+        $sent_cookies = [];
 
         if ($cookies && $cookies instanceof lcCookiesCollection) {
-            $log = array();
+            $log = [];
             $cookies = $cookies->getAll();
 
             foreach ($cookies as $sl) {
@@ -1003,7 +1003,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     protected function sendHeaders()
     {
-        $prepared_headers = array();
+        $prepared_headers = [];
 
         // set status code
         if ($this->http_version) {
@@ -1077,7 +1077,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // notify with an event
         $event = $this->event_dispatcher->filter(
-            new lcEvent('response.send_headers', $this, array()), $prepared_headers);
+            new lcEvent('response.send_headers', $this, []), $prepared_headers);
 
         if ($event->isProcessed()) {
             $prepared_headers = $event->getReturnValue();
@@ -1106,7 +1106,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         } else {
             // notify with an event
             $event = $this->event_dispatcher->filter(
-                new lcEvent('response.optimize_content', $this, array()), $content);
+                new lcEvent('response.optimize_content', $this, []), $content);
 
             if ($event->isProcessed()) {
                 $content = $event->getReturnValue();
@@ -1226,7 +1226,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     public function setJavascriptCode($code, $tag = null)
     {
         $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
-        $this->javascript_code = array($tag => $code);
+        $this->javascript_code = [$tag => $code];
     }
 
     public function getJavascriptCode($combined = true)
@@ -1283,9 +1283,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
         } else {
             if ($at_end) {
-                $this->javascripts_end[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+                $this->javascripts_end[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
             } else {
-                $this->javascripts[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+                $this->javascripts[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
             }
 
             if (DO_DEBUG) {
@@ -1302,8 +1302,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         $at_end = ($this->js_at_end_forced ? true : $at_end);
 
-        $new = array();
-        $new[$src] = array('src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs);
+        $new = [];
+        $new[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
 
         if ($at_end) {
             $this->javascripts_end = array_merge($new, (array)$this->javascripts_end);
@@ -1337,7 +1337,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 unset($h);
             }
         } else {
-            $this->stylesheets[$href] = array('href' => $href, 'type' => $type, 'media' => $media);
+            $this->stylesheets[$href] = ['href' => $href, 'type' => $type, 'media' => $media];
 
             if (DO_DEBUG) {
                 $this->debug('set stylesheet: ' . $href . ' : ' . $media);
@@ -1351,7 +1351,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function clearMetatags()
     {
-        $this->metatags = array();
+        $this->metatags = [];
     }
 
     /*
@@ -1374,7 +1374,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function setRSSFeed($href, $title = '', $media = 'all')
     {
-        $this->rssfeeds[$href] = array('href' => $href, 'title' => $title, 'media' => $media);
+        $this->rssfeeds[$href] = ['href' => $href, 'title' => $title, 'media' => $media];
 
         if (DO_DEBUG) {
             $this->debug('set rss feed: ' . $href);
@@ -1392,7 +1392,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function setIcon($href, $type = 'image/png')
     {
-        $this->icon = array('href' => $href, 'type' => $type);
+        $this->icon = ['href' => $href, 'type' => $type];
 
         if (DO_DEBUG) {
             $this->debug('set icon: ' . $href);
@@ -1440,7 +1440,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             return false;
         }
 
-        $this->html_head_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
+        $this->html_head_custom[] = ['start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript];
 
         return null;
     }
@@ -1451,7 +1451,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             return false;
         }
 
-        $this->html_body_custom[] = array('start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript);
+        $this->html_body_custom[] = ['start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript];
 
         return null;
     }
@@ -1484,7 +1484,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         // notify listeners
         $event = $this->event_dispatcher->filter(
-            new lcEvent('response.set_content_url', $this, array()), $content_url);
+            new lcEvent('response.set_content_url', $this, []), $content_url);
 
         if ($event->isProcessed()) {
             $content_url = $event->getReturnValue();

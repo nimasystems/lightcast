@@ -45,7 +45,7 @@ class lcTagInputFile extends lcTagInput
 
     public static function getOptionalAttributes()
     {
-        return implode(array('accept'), parent::getOptionalAttributes());
+        return implode(['accept'], parent::getOptionalAttributes());
     }
 
     public function getAccept()

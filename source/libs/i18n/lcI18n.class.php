@@ -35,18 +35,18 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'i18n'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'locale' => $this->getLocale(),
             'context_type' => $this->getTranslationContextType(),
             'context_name' => $this->getTranslationContextName()
-        );
+        ];
 
         return $debug;
     }
@@ -59,9 +59,9 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'locale' => $this->getLocale(),
-        );
+        ];
 
         return $debug;
     }
@@ -76,7 +76,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
             return false;
         }
 
-        $delimiters = array('_', '-');
+        $delimiters = ['_', '-'];
 
         $found_delimiter = null;
 
@@ -92,7 +92,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
         if (!$found_delimiter) {
             $locale = strtolower($locale);
 
-            $res = array('locale' => $locale, 'lang_code' => $locale, 'country_code' => null);
+            $res = ['locale' => $locale, 'lang_code' => $locale, 'country_code' => null];
         } else {
             $locale = array_filter(explode($found_delimiter, $locale));
 
@@ -106,7 +106,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
             $country_code = strtoupper($country_code);
             $locale = $lang_code . '_' . $country_code;
 
-            $res = array('locale' => $locale, 'lang_code' => $lang_code, 'country_code' => $country_code);
+            $res = ['locale' => $locale, 'lang_code' => $lang_code, 'country_code' => $country_code];
         }
 
         $res['locale_is_default'] = true;
@@ -154,9 +154,9 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getAllKeys()
     {
-        $ret = array(
+        $ret = [
             'locale'
-        );
+        ];
         return $ret;
     }
 

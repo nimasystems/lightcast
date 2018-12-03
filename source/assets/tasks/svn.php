@@ -197,7 +197,7 @@ class tSvn extends lcTaskController
             return false;
         }
 
-        $files = array();
+        $files = [];
 
         foreach ($output as $line) {
             $mod = trim(substr($line, 0, strpos($line, ' ')));

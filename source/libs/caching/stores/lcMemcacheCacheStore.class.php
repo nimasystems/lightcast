@@ -58,7 +58,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         }
 
         // internal storage
-        $this->internal_storage = array();
+        $this->internal_storage = [];
         $this->should_use_internal_storage = isset($this->configuration['cache.use_internal_storage']) ? (bool)$this->configuration['cache.use_internal_storage'] : true;
 
         // init from the current configuration
@@ -87,7 +87,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                     continue;
                 }
 
-                if ($ex2[0] == $ex[0] && $c != $y) {
+                if ($ex2[0] === $ex[0] && $c != $y) {
                     throw new lcConfigException('Duplicate server detected: ' . $ex2[0]);
                 }
 
@@ -124,9 +124,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'namespace_prefix' => $this->namespace_prefix,
-        );
+        ];
 
         return $debug;
     }
@@ -144,7 +144,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         $use_internal_storage = $this->should_use_internal_storage;
 
         if ($use_internal_storage) {
-            $this->internal_storage = array();
+            $this->internal_storage = [];
         }
     }
 
@@ -187,7 +187,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function set($key, $value = null, $lifetime = null, $flags = null)
     {
-        $all_kv = array();
+        $all_kv = [];
 
         if (is_array($key)) {
 
@@ -317,9 +317,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
     {
         $use_internal_storage = $this->should_use_internal_storage;
 
-        $keys = array();
-        $unnamespaced_keys = array();
-        $results = array();
+        $keys = [];
+        $unnamespaced_keys = [];
+        $results = [];
 
         // allow fetching multiply values with keys
         if (is_array($key)) {
@@ -341,7 +341,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                 throw new lcInvalidArgumentException('Invalid params');
             }
 
-            $keys = array($key1);
+            $keys = [$key1];
             $unnamespaced_keys[$key1] = $key;
             unset($key1);
         }

@@ -26,26 +26,26 @@
 class lcDataStorageItem extends lcObj
 {
     const DEFAULT_CHUNK_SIZE = 8192;
-    protected $attributes = array();
+    protected $attributes = [];
     protected $data_location_attribute_name;
     /** @var iDataStorageItemListener */
     protected $delegate;
     private $is_receiving;
     private $total_bytes_read = 0;
-    private $errors = array();
+    private $errors = [];
     private $fpointer;
 
     // factory
 
-    public function __construct($attributes = array(), $data_location_attribute_name = null)
+    public function __construct($attributes = [], $data_location_attribute_name = null)
     {
         parent::__construct();
 
         $this->data_location_attribute_name = $data_location_attribute_name;
-        $this->attributes = is_array($attributes) ? $attributes : array();
+        $this->attributes = is_array($attributes) ? $attributes : [];
     }
 
-    public static function itemWithAttributes($attributes = array(), $data_location_attribute_name = null)
+    public static function itemWithAttributes($attributes = [], $data_location_attribute_name = null)
     {
         $tmp = new lcDataStorageItem($attributes, $data_location_attribute_name);
 
@@ -167,7 +167,7 @@ class lcDataStorageItem extends lcObj
         }
 
         $this->is_receiving = true;
-        $this->errors = array();
+        $this->errors = [];
 
         // inform the delegate
         $this->delegate->onBeginReceivingData($this);

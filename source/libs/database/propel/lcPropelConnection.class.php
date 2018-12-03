@@ -28,7 +28,7 @@ class lcPropelConnection extends PropelPDO
     const QUERY_CACHE_TIMEOUT_MINUTE = 60;    // in seconds
     const QUERY_CACHE_TIMEOUT_DAY = 86400;
     const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
-    protected static $defaultLogMethods = array(
+    protected static $defaultLogMethods = [
         'PropelPDO::exec',
         'PropelPDO::query',
         'PropelPDO::prepare',
@@ -39,7 +39,7 @@ class lcPropelConnection extends PropelPDO
         'lcPropelConnection::exec',
         'lcPropelConnection::query',
         'lcPropelConnection::prepare',
-    );
+    ];
     /** @var lcEventDispatcher */
     private $event_dispatcher;
 
@@ -58,7 +58,7 @@ class lcPropelConnection extends PropelPDO
 
     private $is_php53_or_lower;
 
-    public function __construct($dsn, $username = null, $password = null, $driver_options = array())
+    public function __construct($dsn, $username = null, $password = null, $driver_options = [])
     {
         parent::__construct($dsn, $username, $password, $driver_options);
 
@@ -209,7 +209,7 @@ class lcPropelConnection extends PropelPDO
             throw new lcInvalidArgumentException('Invalid params');
         }
 
-        $l = array();
+        $l = [];
 
         foreach ($tables as $table => $write_lock) {
             $write_lock = (bool)$write_lock;
@@ -254,7 +254,7 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
-    public function prepare($sql, $driver_options = array())
+    public function prepare($sql, $driver_options = [])
     {
         if (!$sql) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -522,9 +522,9 @@ class lcPropelConnection extends PropelPDO
 
         // php 5.3 or lower handles this differently
         if ($this->is_php53_or_lower) {
-            $return = call_user_func_array(array($this, 'parent::query'), $args);
+            $return = call_user_func_array([$this, 'parent::query'], $args);
         } else {
-            $return = call_user_func_array(array('parent', 'query'), $args);
+            $return = call_user_func_array(['parent', 'query'], $args);
         }
 
         return $return;

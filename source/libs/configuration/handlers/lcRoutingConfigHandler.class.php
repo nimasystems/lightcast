@@ -25,11 +25,11 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('routing' => array(
+        return ['routing' => [
             'send_http_errors' => true,
             'default_module' => 'home',
             'default_action' => 'index',
-        ));
+        ]];
     }
 
     protected function postReadConfigData($environment, array $data)
@@ -47,24 +47,24 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
 
     public function getDefaultRoutes()
     {
-        $routes = array(
-            'view_item' => array(
+        $routes = [
+            'view_item' => [
                 'url' => '/:module/view/:id',
-                'params' => array('action' => 'view')
-            ),
-            'default' => array('url' => '/:module/:action'),
-            'module_default' => array(
+                'params' => ['action' => 'view']
+            ],
+            'default' => ['url' => '/:module/:action'],
+            'module_default' => [
                 'url' => '/:module',
-                'params' => array('action' => 'index')
-            ),
-            'homepage' => array(
+                'params' => ['action' => 'index']
+            ],
+            'homepage' => [
                 'url' => '/',
-                'params' => array(
+                'params' => [
                     'module' => 'home',
                     'action' => 'index'
-                )
-            )
-        );
+                ]
+            ]
+        ];
 
         return $routes;
     }

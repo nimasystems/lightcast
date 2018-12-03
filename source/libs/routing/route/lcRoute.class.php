@@ -64,10 +64,10 @@ abstract class lcRoute extends lcObj
     private $ext;
     private $compare_regex;
     private $custom_param_validate = '\+';
-    private $tokenizers = array(
+    private $tokenizers = [
         '/',
         '.'
-    );
+    ];
 
     public function getRoute()
     {
@@ -139,8 +139,8 @@ abstract class lcRoute extends lcObj
         }
         //if (!$this->route) return false;
 
-        $this->tokens = array();
-        $this->params = array();
+        $this->tokens = [];
+        $this->params = [];
         $this->compare_regex = null;
         $this->ext = null;
 
@@ -156,7 +156,7 @@ abstract class lcRoute extends lcObj
 
         // find the ereg replaces in the route and save them for later usage
         $ereg_pattern = "/\`(.*?)\`/u";
-        $saved_eregs = array();
+        $saved_eregs = [];
 
         if (preg_match_all($ereg_pattern, $this->fixed_route, $ereg_matches)) {
             if ($ereg_matches) {
@@ -184,7 +184,7 @@ abstract class lcRoute extends lcObj
         }*/
 
         $last_ereg = 0;
-        $compare_regex = array();
+        $compare_regex = [];
         $new_route = self::DEFAULT_TOKENIZER;
         $lastval = '';
 
@@ -323,7 +323,7 @@ abstract class lcRoute extends lcObj
 
             // add the value to the current route token
             if ($route_param) {
-                $this->tokens[] = array('type' => $type, 'value' => $route_param);
+                $this->tokens[] = ['type' => $type, 'value' => $route_param];
                 $lastval = $route_param;
             }
 
@@ -431,7 +431,7 @@ abstract class lcRoute extends lcObj
         }
 
         $params = $this->params;
-        $newparams = array();
+        $newparams = [];
 
         foreach ($matches as $key => $val) {
             if (is_int($key) || !$val || !in_array($key, $params)) {

@@ -271,7 +271,7 @@ class lcDirs
         if ($files) {
             foreach ($files as $file) {
                 $filename = $file['name'];
-                call_user_func_array($callback_func, array_merge(array($dir . $filename), (array)$callback_params));
+                call_user_func_array($callback_func, array_merge([$dir . $filename], (array)$callback_params));
                 unset($file);
             }
         }
@@ -315,7 +315,7 @@ class lcDirs
             return false;
         }
 
-        $files = array();
+        $files = [];
 
         while (($file = readdir($dh)) !== false) {
             if ($skip_system_dirs && (($file == '.') || ($file == '..'))) {
@@ -336,10 +336,10 @@ class lcDirs
                 }
             }
 
-            $files[] = array(
+            $files[] = [
                 'name' => $file,
                 'type' => $t
-            );
+            ];
             unset($file, $t);
         }
 
@@ -354,7 +354,7 @@ class lcDirs
             return false;
         }
 
-        $dirs = array();
+        $dirs = [];
 
         while (false !== ($entry = $d->read())) {
             if (($entry == '.') || ($entry == '..') || !is_dir($dir . DS . $entry) || substr($entry, 0, 1) == '.' || ((isset($skip)) && ($entry == $skip))) {

@@ -71,9 +71,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getListenerEvents()
     {
-        return array(
+        return [
             'router.detect_parameters' => 'onRouterDetectParameters'
-        );
+        ];
     }
 
     public function shutdown()
@@ -125,7 +125,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         // compile cookies
         $cc1 = $this->cookies;
-        $ca = array();
+        $ca = [];
 
         if ($cc1) {
             /** @var lcNameValuePair[] $c */
@@ -142,7 +142,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             unset($c);
         }
 
-        $debug = array(
+        $debug = [
             'method' => $this->request_method,
             'accept_mimetype' => $this->accept_mimetype,
             'accept_language' => $this->accept_language,
@@ -155,7 +155,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'params' => ($this->params ? $this->params->getKeyValueArray() : null),
             'post_params' => ($this->post_params ? $this->post_params->getKeyValueArray() : null),
             'get_params' => ($this->get_params ? $this->get_params->getKeyValueArray() : null)
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -170,12 +170,12 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getAllKeys()
     {
         $keys = (array)parent::getAllKeys();
-        $nk = array(
+        $nk = [
             'url_prefix' => $this->prefix,
             'full_hostname' => $this->getFullHostname(),
             'base_url' => $this->getBaseUrl(),
             'remote_addr' => $this->getRealRemoteAddr()
-        );
+        ];
         return array_filter(array_merge($keys, $nk));
     }
 
@@ -253,7 +253,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             $this->files,
             $this->post_params,
             $this->get_params,
@@ -265,7 +265,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $this->accept_charset,
             $this->cookies,
             $this->context
-        ));
+        ]);
     }
 
     public function unserialize($serialized)
@@ -291,12 +291,12 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         assert(isset($params) && is_array($params));
 
-        $request_params = isset($params['params']) ? $params['params'] : array();
+        $request_params = isset($params['params']) ? $params['params'] : [];
 
         $processed_event = $this->event_dispatcher->filter(
             new lcEvent('request.filter_parameters', $this,
-                array('context' => $this->context, 'parameters' => $params)
-            ), array());
+                ['context' => $this->context, 'parameters' => $params]
+            ), []);
 
         if ($processed_event->isProcessed()) {
             $request_params = (array)$processed_event->getReturnValue();
@@ -613,7 +613,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $srv = $_SERVER;
 
             if ($srv) {
-                $ar = array();
+                $ar = [];
 
                 foreach ($srv as $k => $v) {
                     if (substr($k, 0, 5) != 'HTTP_') {
@@ -624,7 +624,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
                     $k = strtolower($k);
                     $k = explode('_', $k);
 
-                    $o = array();
+                    $o = [];
 
                     foreach ($k as $f) {
                         $o[] = ucfirst($f);
@@ -959,7 +959,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $uri = null;
 
         if (!isset($in_url)) {
-            $checkin = array('HTTP_X_REWRITE_URL', 'REQUEST_URI', 'argv');
+            $checkin = ['HTTP_X_REWRITE_URL', 'REQUEST_URI', 'argv'];
 
             foreach ($checkin as $var) {
                 if ($uri = $this->env($var)) {
@@ -1074,7 +1074,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     protected function setDefaultContext()
     {
-        $this->context = array(
+        $this->context = [
             'path_info' => parent::getPathInfo(),
             'post_params' => $this->post_params,
             'get_params' => $this->get_params,
@@ -1086,7 +1086,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'is_xml_http_request' => $this->isXmlHttpRequest(),
             'request_uri' => parent::getRequestUri(),
             'real_request_uri' => $this->generateRealRequestUri()
-        );
+        ];
     }
 
     public function getMethod()

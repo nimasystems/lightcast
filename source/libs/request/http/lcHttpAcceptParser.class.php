@@ -25,7 +25,7 @@ class lcHttpAcceptParser extends lcObj
 {
     private $type;
     private $hasparsed;
-    private $accepts = array();
+    private $accepts = [];
     private $acceptstring;
 
     public function __construct($type, $parse_string)
@@ -72,8 +72,8 @@ class lcHttpAcceptParser extends lcObj
         $e = explode(',', $this->acceptstring);
 
         if (count($e) > 0) {
-            $narr = array();
-            $narr2 = array();
+            $narr = [];
+            $narr2 = [];
 
             foreach ($e as $key => $val) {
                 $ex1 = explode(';q=', $val);
@@ -105,8 +105,8 @@ class lcHttpAcceptParser extends lcObj
         $e = explode(',', $this->acceptstring);
 
         if (count($e) > 0) {
-            $narr = array();
-            $narr2 = array();
+            $narr = [];
+            $narr2 = [];
 
             foreach ($e as $key => $val) {
                 $ex1 = explode(';q=', $val);

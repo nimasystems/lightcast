@@ -37,7 +37,7 @@ class lcComponentLocator
 
         $subdirs = lcDirs::getSubDirsOfDir($path);
 
-        $applications = array();
+        $applications = [];
 
         if ($subdirs) {
             foreach ($subdirs as $dir) {
@@ -54,10 +54,10 @@ class lcComponentLocator
 
     public static function getProjectApplicationContextInfo($application_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $application_name,
             'path' => $path,
-        );
+        ];
         return $ret;
     }
 
@@ -69,7 +69,7 @@ class lcComponentLocator
 
         $subdirs = lcDirs::getSubDirsOfDir($path);
 
-        $plugins = array();
+        $plugins = [];
 
         if ($subdirs) {
             foreach ($subdirs as $dir) {
@@ -91,12 +91,12 @@ class lcComponentLocator
 
     public static function getPluginContextInfo($plugin_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $plugin_name,
             'path' => $path,
             'filename' => $plugin_name . '.php',
             'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false)
-        );
+        ];
         return $ret;
     }
 
@@ -109,7 +109,7 @@ class lcComponentLocator
         // scan the location for modules
         $subdirs = lcDirs::searchDir($path, false, true);
 
-        $components = array();
+        $components = [];
 
         if ($subdirs) {
             foreach ($subdirs as $info) {
@@ -135,12 +135,12 @@ class lcComponentLocator
 
     public static function getControllerComponentContextInfo($controller_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.class.php',
             'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
+        ];
         return $ret;
     }
 
@@ -153,7 +153,7 @@ class lcComponentLocator
         // scan the location for modules
         $subdirs = lcDirs::searchDir($path, false, true);
 
-        $forms = array();
+        $forms = [];
 
         if ($subdirs) {
             foreach ($subdirs as $info) {
@@ -179,12 +179,12 @@ class lcComponentLocator
 
     public static function getActionFormContextInfo($form_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $form_name,
             'path' => $path,
             'filename' => $form_name . '.php',
             'class' => lcInflector::camelize($form_name, false) . 'Form'
-        );
+        ];
         return $ret;
     }
 
@@ -197,7 +197,7 @@ class lcComponentLocator
         // scan the location for modules
         $subdirs = lcDirs::searchDir($path, false, true);
 
-        $modules = array();
+        $modules = [];
 
         if ($subdirs) {
             foreach ($subdirs as $info) {
@@ -223,12 +223,12 @@ class lcComponentLocator
 
     public static function getControllerModuleContextInfo($controller_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
             'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
+        ];
         return $ret;
     }
 
@@ -238,7 +238,7 @@ class lcComponentLocator
             throw new lcInvalidArgumentException('Invalid path');
         }
 
-        $web_services = array();
+        $web_services = [];
 
         // scan the location for web services
         $subfiles = lcDirs::searchDir($path, true, true);
@@ -276,12 +276,12 @@ class lcComponentLocator
 
     public static function getControllerWebServiceContextInfo($controller_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
             'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
+        ];
         return $ret;
     }
 
@@ -291,7 +291,7 @@ class lcComponentLocator
             throw new lcInvalidArgumentException('Invalid path');
         }
 
-        $tasks = array();
+        $tasks = [];
 
         // scan the location for tasks
         $subfiles = lcDirs::searchDir($path, true, true);
@@ -329,12 +329,12 @@ class lcComponentLocator
 
     public static function getControllerTaskContextInfo($controller_name, $path)
     {
-        $ret = array(
+        $ret = [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
             'class' => self::TASK_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
-        );
+        ];
         return $ret;
     }
 }

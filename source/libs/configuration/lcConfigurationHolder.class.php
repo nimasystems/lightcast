@@ -54,24 +54,24 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
             $this->config_namespaces[$namespace][$name] = $value;
         }
 
-        $this->idx[$namespace . '.' . $name] = array(
+        $this->idx[$namespace . '.' . $name] = [
             $namespace,
             $name
-        );
+        ];
 
         return true;
     }
 
     public function setNamespace($namespace, array $values = null)
     {
-        $this->config_namespaces[$namespace] = $values ? $values : array();
+        $this->config_namespaces[$namespace] = $values ? $values : [];
 
         if (isset($values)) {
             foreach ($values as $key => $val) {
-                $this->idx[$namespace . '.' . $key] = array(
+                $this->idx[$namespace . '.' . $key] = [
                     $namespace,
                     $key
-                );
+                ];
 
                 unset($key, $val);
             }
@@ -129,10 +129,10 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function serialize()
     {
-        $tmp = array(
+        $tmp = [
             $this->config_namespaces,
             $this->idx
-        );
+        ];
 
         return serialize($tmp);
     }

@@ -91,7 +91,7 @@ abstract class lcValidatorBase extends lcObj
 
     public static function validateUsername($username, $min_length = 6, $max_length = 30, &$errors = null)
     {
-        $options = array('min_length' => $min_length, 'max_length' => $max_length);
+        $options = ['min_length' => $min_length, 'max_length' => $max_length];
         $validator = new lcUsernameValidator();
         $validator->setOptions($options);
         return $validator->validate($username);
@@ -111,7 +111,7 @@ abstract class lcValidatorBase extends lcObj
 
     public static function validateAlnum($string, $allowWhiteSpace = false)
     {
-        $options = array('alpha_numeric' => true, 'allow_whitespace' => $allowWhiteSpace);
+        $options = ['alpha_numeric' => true, 'allow_whitespace' => $allowWhiteSpace];
         $validator = new lcStringValidator();
         $validator->setOptions($options);
         return $validator->validate($string);
@@ -119,7 +119,7 @@ abstract class lcValidatorBase extends lcObj
 
     public static function validateAlpha($string)
     {
-        $options = array('alpha_numeric' => true);
+        $options = ['alpha_numeric' => true];
         $validator = new lcStringValidator();
         $validator->setOptions($options);
         return $validator->validate($string);

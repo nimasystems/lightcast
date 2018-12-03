@@ -158,9 +158,9 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'logger'
-        );
+        ];
     }
 
     public function onAppException(lcEvent $event)

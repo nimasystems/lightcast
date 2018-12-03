@@ -202,14 +202,16 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // and security is enabled - we must not return the not found error response
         // but an access denied instead.
 
-        $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, array(
+        $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, [
             'module_name' => $controller,
             'action_name' => $action,
-            'request_params' => $request_params
-        )));
+            'request_params' => (array)$request_params
+        ]));
+
+        $request->setRequestData($request_params);
 
         // forward the request
-        $this->forward($controller, $action, array('request' => $request_params));
+        $this->forward($controller, $action, ['request' => $request_params]);
     }
 
     abstract protected function beforeDispatch();
@@ -287,11 +289,11 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
             // notify listeners
             $this->event_dispatcher->notify(new lcEvent('controller.not_found', $this,
-                array('controller_name' => $controller_name,
+                ['controller_name' => $controller_name,
                     'action_name' => $action_name,
                     'action_type' => (isset($action_params['type']) ? $action_params['type'] : null),
                     'action_params' => $action_params,
-                )
+                ]
             ));
 
             // fetch the not_found config from routing and forward
@@ -365,10 +367,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
     protected static function forwardReservedParams()
     {
-        $ret = array(
+        $ret = [
             'type',
             'request',
-        );
+        ];
         return $ret;
     }
 

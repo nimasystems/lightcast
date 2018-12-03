@@ -60,10 +60,10 @@ abstract class lcActionFilter extends lcSysObj
                 $filter_result = $this->applyFilter($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
 
                 if ($filter_result) {
-                    return array(
+                    return [
                         'filter' => &$this,
                         'result' => $filter_result
-                    );
+                    ];
                 }
             } catch (Exception $e) {
                 throw new lcFilterException('Could not apply action filter (' . get_class($this) . '): ' .

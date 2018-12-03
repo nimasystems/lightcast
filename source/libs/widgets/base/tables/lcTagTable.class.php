@@ -89,12 +89,12 @@ class lcTagTable extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('summary', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'width');
+        return ['summary', 'border', 'cellpadding', 'cellspacing', 'frame', 'rules', 'width'];
     }
 
     public function getWidth()

@@ -29,15 +29,15 @@ abstract class lcTranslationsParser extends lcObj
     protected $event_dispatcher;
     protected $configuration;
     protected $base_dir;
-    protected $conditions = array(
-        'template' => array(
-            array("/\{t\}(.*?)\{\/t\}/i" => '1'),
-        ),
-        'php' => array(
-            array("/this-\>(t|translate)\(('|\")(.*?)('|\")(\)?)/i" => '3'),
-            array("/__\(('|\")(.*?)('|\")\)/i" => '2')
-        )
-    );
+    protected $conditions = [
+        'template' => [
+            ["/\{t\}(.*?)\{\/t\}/i" => '1'],
+        ],
+        'php' => [
+            ["/this-\>(t|translate)\(('|\")(.*?)('|\")(\)?)/i" => '3'],
+            ["/__\(('|\")(.*?)('|\")\)/i" => '2']
+        ]
+    ];
 
     protected $results;
 
@@ -74,10 +74,10 @@ abstract class lcTranslationsParser extends lcObj
             return false;
         }
 
-        $this->results[$category_name][] = array(
+        $this->results[$category_name][] = [
             'filename' => $filename,
             'strings' => $parsed
-        );
+        ];
 
         return true;
     }
@@ -107,7 +107,7 @@ abstract class lcTranslationsParser extends lcObj
             return false;
         }
 
-        $matched = array();
+        $matched = [];
 
         $conditions = isset($this->conditions[$filetype]) ? $this->conditions[$filetype] : null;
 
@@ -169,7 +169,7 @@ abstract class lcTranslationsParser extends lcObj
 
     public function parse()
     {
-        $this->results = array();
+        $this->results = [];
 
         $base_dir = $this->base_dir;
 
@@ -181,16 +181,16 @@ abstract class lcTranslationsParser extends lcObj
 
         if ($dirs) {
             if ($dirs == self::ALL_SUBDIRS) {
-                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'));
+                lcDirs::recursiveFilesCallback($base_dir, [$this, 'internalParseFile']);
             } elseif (is_array($dirs)) {
                 // parse the base dir first
-                lcDirs::recursiveFilesCallback($base_dir, array($this, 'internalParseFile'), array(self::DEFAULT_CATEGORY_NAME), false);
+                lcDirs::recursiveFilesCallback($base_dir, [$this, 'internalParseFile'], [self::DEFAULT_CATEGORY_NAME], false);
 
                 foreach ($dirs as $dir) {
                     $category = isset($categorization_map[$dir]) ? $categorization_map[$dir] : self::DEFAULT_CATEGORY_NAME;
                     $fullpath = $base_dir . DS . $dir;
 
-                    lcDirs::recursiveFilesCallback($fullpath, array($this, 'internalParseFile'), array($category));
+                    lcDirs::recursiveFilesCallback($fullpath, [$this, 'internalParseFile'], [$category]);
 
                     unset($dir, $fullpath, $category);
                 }

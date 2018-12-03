@@ -29,6 +29,8 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
      */
     protected $params;
 
+    protected $request_data;
+
     protected $call_style;
 
     /**
@@ -50,18 +52,18 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'request'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'env' => $this->env,
             'sapi' => $this->sapi,
             'in_cli' => $this->is_running_cli
-        );
+        ];
 
         return $debug;
     }
@@ -100,7 +102,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         if ($p) {
             /** @var lcNameValuePair[] $pp */
             $pp = $p->getArrayCopy();
-            $keys = array();
+            $keys = [];
 
             foreach ($pp as $a) {
                 $keys[] = $a->getName();
@@ -158,7 +160,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         $prs = strlen($prefix);
 
         if (substr($method, 0, $prs) != $prefix) {
-            return parent::__call($method, $params);
+            parent::__call($method, $params);
         }
 
         $env = $this->env;
@@ -177,7 +179,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function offsetExists($name)
     {
         if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
-            return $this->params->has($name);
+            return isset($this->request_data[$name]);
         } else {
             return isset($this->env[$name]);
         }
@@ -186,7 +188,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function offsetGet($name)
     {
         if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
-            return $this->params->get($name);
+            return isset($this->request_data[$name]) ? $this->request_data[$name] : null;
         } else {
             return $this->env($name);
         }
@@ -313,7 +315,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function serialize()
     {
-        return serialize(array($this->env));
+        return serialize([$this->env]);
     }
 
     /*
@@ -323,6 +325,24 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function unserialize($serialized)
     {
         list($this->env) = unserialize($serialized);
+    }
+
+    /**
+     * @param mixed $request_data
+     * @return lcRequest
+     */
+    public function setRequestData($request_data)
+    {
+        $this->request_data = $request_data;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRequestData()
+    {
+        return $this->request_data;
     }
 
     /*
@@ -353,7 +373,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     private function initializeEnvironment()
     {
-        $this->env = array();
+        $this->env = [];
 
         if (!isset($_SERVER)) {
             throw new lcInvalidRequestException('Invalid server environment');

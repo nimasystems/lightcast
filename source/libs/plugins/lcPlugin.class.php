@@ -115,7 +115,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
             return;
         }
 
-        $loaded_components = array();
+        $loaded_components = [];
 
         foreach ($used_components as $component_name) {
             try {
@@ -235,11 +235,11 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'name' => $this->controller_name,
             'configuration' => ($this->plugin_configuration && $this->plugin_configuration instanceof iDebuggable ?
                 $this->plugin_configuration->getDebugInfo() : null)
-        );
+        ];
 
         return $debug;
     }

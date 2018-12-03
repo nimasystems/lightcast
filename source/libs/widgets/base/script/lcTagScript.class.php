@@ -79,7 +79,7 @@ class lcTagScript extends lcHtmlBaseTag
 
     public static function getOptionalAttributes()
     {
-        return array('type', 'src', 'charset', 'defer', 'async');
+        return ['type', 'src', 'charset', 'defer', 'async'];
     }
 
     public function getType()

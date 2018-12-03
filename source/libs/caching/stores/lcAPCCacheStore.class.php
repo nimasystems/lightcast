@@ -48,9 +48,9 @@ class lcAPCCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, 
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'namespace_prefix' => $this->namespace_prefix,
-        );
+        ];
 
         return $debug;
     }

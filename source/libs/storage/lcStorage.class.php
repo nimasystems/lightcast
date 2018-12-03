@@ -65,16 +65,16 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'storage'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
         $namespaces = $this->getNamespaces();
 
-        $out = array();
+        $out = [];
 
         if ($namespaces) {
             foreach ($namespaces as $namespace) {
@@ -107,9 +107,9 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
             }
         }
 
-        $debug = array(
+        $debug = [
             'items' => $out
-        );
+        ];
 
         return $debug;
     }

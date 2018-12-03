@@ -103,7 +103,7 @@ abstract class lcConfigHandler extends lcObj
         $defaults = (array)$this->getDefaultValues();
 
         // acquire data from config file
-        $data = array();
+        $data = [];
 
         $options = $this->options;
         $dirs = isset($options['dirs']) && is_array($options['dirs']) ? $options['dirs'] : null;
@@ -124,7 +124,7 @@ abstract class lcConfigHandler extends lcObj
             }
         }
 
-        $data = $data ? $data : array();
+        $data = $data ? $data : [];
 
         // allow subclassers to alter it
         $data = (array)$this->preReadConfigData($environment, $data);

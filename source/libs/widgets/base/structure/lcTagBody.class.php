@@ -53,12 +53,12 @@ class lcTagBody extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('onload', 'onunload');
+        return ['onload', 'onunload'];
     }
 
     public function getOnLoad()

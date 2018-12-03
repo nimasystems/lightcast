@@ -23,9 +23,9 @@
 
 class tLightcastUpgrader extends lcTaskController
 {
-    private $upgradeable_versions = array(
+    private $upgradeable_versions = [
         '1.4' => 'upgradeFromLC14'
-    );
+    ];
 
     private $tpl_dir;
 
@@ -117,7 +117,7 @@ class tLightcastUpgrader extends lcTaskController
             return false;
         }
 
-        $matches = array();
+        $matches = [];
         $matched = preg_match_all($regex, $content, $matches);
 
         if (!$matched) {
@@ -208,7 +208,7 @@ class tLightcastUpgrader extends lcTaskController
 
     private function rm($files)
     {
-        $f = is_array($files) ? $files : array($files);
+        $f = is_array($files) ? $files : [$files];
 
         if (!$f) {
             return false;
@@ -230,11 +230,11 @@ class tLightcastUpgrader extends lcTaskController
 
     private function cpt($files)
     {
-        $files = is_array($files) ? $files : array($files);
+        $files = is_array($files) ? $files : [$files];
 
         foreach ($files as $filename => $options) {
             $filename = is_array($options) ? $filename : $options;
-            $options = is_array($options) ? $options : array();
+            $options = is_array($options) ? $options : [];
 
             // possible options:
             // overwrite = true/false
@@ -294,7 +294,7 @@ class tLightcastUpgrader extends lcTaskController
 
     private function mkd($dirs)
     {
-        $d = is_array($dirs) ? $dirs : array($dirs);
+        $d = is_array($dirs) ? $dirs : [$dirs];
 
         if (!$d) {
             return false;
@@ -318,7 +318,7 @@ class tLightcastUpgrader extends lcTaskController
     {
         // create dirs if missing
         $this->mkd(
-            array(
+            [
                 'addons/extensions',
                 'addons/plugins',
                 'applications',
@@ -332,61 +332,61 @@ class tLightcastUpgrader extends lcTaskController
                 'tmp/logs',
                 'tmp/temp',
                 'tmp/cache'
-            )
+            ]
         );
 
         // copy / replace missing files
         $this->cpt(
-            array(
+            [
                 '.htaccess',
-                'config/boot_config.default.php' => array(
+                'config/boot_config.default.php' => [
                     'overwrite' => true,
                     'destination' => 'config/boot_config.php'
-                ),
-                'config/preboot_config.default.php' => array(
+                ],
+                'config/preboot_config.default.php' => [
                     'overwrite' => true,
                     'destination' => 'config/preboot_config.php'
-                ),
+                ],
                 'config/api_configuration.php',
                 'config/project_configuration.php',
                 'data/.htaccess',
-                'lib/custom_errors' => array(
+                'lib/custom_errors' => [
                     'recursive_dir_copy' => true
-                ),
+                ],
                 'lib/.htaccess',
-                'lib/boot.php' => array(
+                'lib/boot.php' => [
                     'overwrite' => true
-                ),
-                'shell/cmd' => array(
+                ],
+                'shell/cmd' => [
                     'overwrite' => true,
                     'chmod' => 777
-                ),
-                'shell/cmd_debug' => array(
+                ],
+                'shell/cmd_debug' => [
                     'overwrite' => true,
                     'chmod' => 777
-                ),
-                'shell/console.bat' => array(
+                ],
+                'shell/console.bat' => [
                     'overwrite' => true,
                     'chmod' => 777
-                ),
+                ],
                 'webroot/.htaccess',
                 'webroot/robots.txt',
-                'LICENSE' => array(
+                'LICENSE' => [
                     'overwrite' => true
-                ),
-                'README' => array(
+                ],
+                'README' => [
                     'overwrite' => true
-                ),
-            )
+                ],
+            ]
         );
 
         // remove obsolete files
         $this->rm(
-            array(
+            [
                 'lib/debug_include.php',
                 'shell/console',
                 'shell/console_debug',
-            )
+            ]
         );
 
         return true;
@@ -532,7 +532,7 @@ class tLightcastUpgrader extends lcTaskController
             return $regex;
         }
 
-        $vars = array(
+        $vars = [
             'translation_context_type',
             'translation_context_name',
             'parent_plugin',
@@ -543,10 +543,10 @@ class tLightcastUpgrader extends lcTaskController
             'class_autoloader',
             'event_dispatcher',
             'configuration'
-        );
+        ];
 
-        $regex = array();
-        $reps = array();
+        $regex = [];
+        $reps = [];
 
         foreach ($vars as $var) {
             $regex[] = "/(private|public)[\s]+\\$" . $var . "\s*;/i";
@@ -555,10 +555,10 @@ class tLightcastUpgrader extends lcTaskController
             unset($var);
         }
 
-        $regex = array(
+        $regex = [
             'regex' => $regex,
             'reps' => $reps
-        );
+        ];
 
         return $regex;
     }
@@ -571,7 +571,7 @@ class tLightcastUpgrader extends lcTaskController
             return $regex;
         }
 
-        $vars = array(
+        $vars = [
             'request',
             'response',
             'routing',
@@ -582,10 +582,10 @@ class tLightcastUpgrader extends lcTaskController
             'cache',
             'mailer',
             'dbc'
-        );
+        ];
 
-        $regex = array();
-        $reps = array();
+        $regex = [];
+        $reps = [];
 
         foreach ($vars as $var) {
             $regex[] = "/(private|public)[\s]+\\$" . $var . "\s*;/i";
@@ -594,10 +594,10 @@ class tLightcastUpgrader extends lcTaskController
             unset($var);
         }
 
-        $regex = array(
+        $regex = [
             'regex' => $regex,
             'reps' => $reps
-        );
+        ];
 
         return $regex;
     }
@@ -609,29 +609,29 @@ class tLightcastUpgrader extends lcTaskController
 
         // remove template configs if 'lc' prefixed versions exist
         // rename 'lc' prefixed versions to non-lc prefixed files
-        $cfg_files = array(
-            'config/lcApiConfiguration.class.php' => array(
+        $cfg_files = [
+            'config/lcApiConfiguration.class.php' => [
                 'new_class' => 'ApiConfiguration',
                 'old_class' => 'lcWsConfiguration',
                 'new_filename' => 'api_configuration.php'
-            ),
-            'config/lcProjectConfiguration.class.php' => array(
+            ],
+            'config/lcProjectConfiguration.class.php' => [
                 'new_class' => 'ProjectConfiguration',
                 'old_class' => 'lcProjectConfiguration',
                 'new_filename' => 'project_configuration.php'
-            ),
-        );
+            ],
+        ];
 
         if ($available_apps) {
             foreach ($available_apps as $app) {
                 $app_cam = lcInflector::camelize($app, false);
                 $f = 'applications' . DS . $app . DS . 'config' . DS . 'lc' . $app_cam . 'Configuration.class.php';
-                $cfg_files[$f] = array(
+                $cfg_files[$f] = [
                     'new_class' => $app_cam . 'Configuration',
                     'old_class' => 'lc' . $app_cam . 'Configuration',
                     'new_filename' => $app . '_configuration.php',
                     'is_app' => true
-                );
+                ];
                 unset($app, $f);
             }
         }
@@ -684,18 +684,18 @@ class tLightcastUpgrader extends lcTaskController
             return null;
         }
 
-        $ret = array();
+        $ret = [];
 
         $app_modules = $this->getApplicationModules($app_dir);
 
         if ($app_modules) {
             foreach ($app_modules as $module) {
-                $ret[] = array(
+                $ret[] = [
                     'name' => $module,
                     'parent' => 'lcAppObj',
                     'class' => 'c' . lcInflector::camelize($module, false),
                     'filename' => $app_dir . DS . 'modules' . DS . $module . DS . $module . '.php'
-                );
+                ];
                 unset($module);
             }
         }
@@ -711,7 +711,7 @@ class tLightcastUpgrader extends lcTaskController
             return null;
         }
 
-        $ret = array();
+        $ret = [];
 
         foreach ($tasks as $task_filename) {
             $b = basename($task_filename);
@@ -722,12 +722,12 @@ class tLightcastUpgrader extends lcTaskController
                 continue;
             }
 
-            $ret[] = array(
+            $ret[] = [
                 'name' => $b,
                 'parent' => 'lcAppObj',
                 'class' => 'ws' . lcInflector::camelize($b, false),
                 'filename' => $task_filename
-            );
+            ];
 
             unset($task_filename, $b);
         }
@@ -743,7 +743,7 @@ class tLightcastUpgrader extends lcTaskController
             return null;
         }
 
-        $ret = array();
+        $ret = [];
 
         foreach ($tasks as $task_filename) {
             $b = basename($task_filename);
@@ -754,12 +754,12 @@ class tLightcastUpgrader extends lcTaskController
                 continue;
             }
 
-            $ret[] = array(
+            $ret[] = [
                 'name' => $b,
                 'parent' => 'lcAppObj',
                 'class' => 't' . lcInflector::camelize($b, false),
                 'filename' => $task_filename
-            );
+            ];
 
             unset($task_filename, $b);
         }
@@ -775,13 +775,13 @@ class tLightcastUpgrader extends lcTaskController
         $available_apps = $this->available_apps;
         $available_plugins = $this->available_plugins;
 
-        $tree = array(
-            'config' => array(),
-            'applications' => array(),
-            'tasks' => array(),
-            'web_services' => array(),
-            'plugins' => array()
-        );
+        $tree = [
+            'config' => [],
+            'applications' => [],
+            'tasks' => [],
+            'web_services' => [],
+            'plugins' => []
+        ];
 
         // get applications web module protected vars
         if ($available_apps) {
@@ -789,11 +789,11 @@ class tLightcastUpgrader extends lcTaskController
                 $app_dir = $project_dir . DS . 'applications' . DS . $app;
 
                 // app config
-                $el = array(
+                $el = [
                     'class' => lcInflector::camelize($app . '_configuration', false),
                     'parent' => 'lcSysObj',
                     'filename' => $app_dir . DS . 'config' . DS . $app . '_configuration.php'
-                );
+                ];
                 $tree[$app]['config'][] = $el;
 
                 if ($walk_callback) {
@@ -834,22 +834,22 @@ class tLightcastUpgrader extends lcTaskController
         }
 
         // get project configurations protected vars
-        $el = array(
+        $el = [
             'class' => 'ProjectConfiguration',
             'parent' => 'lcSysObj',
             'filename' => $project_dir . DS . 'config' . DS . 'project_configuration.php'
-        );
+        ];
         $tree['config'][] = $el;
 
         if ($walk_callback) {
             $this->$walk_callback('config', $el);
         }
 
-        $el = array(
+        $el = [
             'class' => 'ApiConfiguration',
             'parent' => 'lcSysObj',
             'filename' => $project_dir . DS . 'config' . DS . 'api_configuration.php'
-        );
+        ];
         $tree['config'][] = $el;
 
         if ($walk_callback) {
@@ -861,11 +861,11 @@ class tLightcastUpgrader extends lcTaskController
             foreach ($available_plugins as $plugin) {
                 $plugin_dir = $project_dir . DS . 'addons' . DS . 'plugins' . DS . $plugin;
 
-                $pl = array(
+                $pl = [
                     'class' => 'p' . lcInflector::camelize($plugin, false),
                     'parent' => 'lcAppObj',
                     'filename' => $plugin_dir . DS . $plugin . '.php'
-                );
+                ];
 
                 if ($walk_callback) {
                     $this->$walk_callback('plugin', $pl);
@@ -922,7 +922,7 @@ class tLightcastUpgrader extends lcTaskController
 
         // parse and find out the previous plugins
         //
-        $used_components = array();
+        $used_components = [];
 
         /*
          $matches = array();
@@ -947,7 +947,7 @@ class tLightcastUpgrader extends lcTaskController
 
         if ($used_components) {
             // insert in the class
-            $matches = array();
+            $matches = [];
             $matched = preg_match("/^class\s*" . $class . "\s*extends.*\{$/smi", $c, $matches, PREG_OFFSET_CAPTURE);
 
             if (!$matched) {
@@ -980,7 +980,7 @@ class tLightcastUpgrader extends lcTaskController
 
         // parse and find out the previous plugins
         //
-        $used_plugins = array();
+        $used_plugins = [];
 
         /*
          * $matches = array();
@@ -1005,7 +1005,7 @@ class tLightcastUpgrader extends lcTaskController
 
         if ($used_plugins) {
             // insert in the class
-            $matches = array();
+            $matches = [];
             $matched = preg_match("/^class\s*" . $class . "\s*extends.*\{$/smi", $c, $matches, PREG_OFFSET_CAPTURE);
 
             if (!$matched) {

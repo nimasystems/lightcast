@@ -31,7 +31,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
     {
         parent::initialize();
 
-        $this->storage = array();
+        $this->storage = [];
     }
 
     public function shutdown()
@@ -131,7 +131,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
 
     public function clearAll()
     {
-        $this->storage = array();
+        $this->storage = [];
     }
 
     public function hasValues($namespace = null)

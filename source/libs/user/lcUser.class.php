@@ -23,7 +23,7 @@
 
 abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, ArrayAccess, iKeyValueProvider, iDebuggable
 {
-    protected $attributes = array();
+    protected $attributes = [];
 
     abstract public function setFlash($flash_message = null);
 
@@ -47,16 +47,16 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'user'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
         $attributes = $this->getAttributes();
 
-        $out = array();
+        $out = [];
 
         if ($attributes) {
             foreach ($attributes as $key => $value) {
@@ -79,9 +79,9 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
             }
         }
 
-        $debug = array(
+        $debug = [
             'attributes' => $out
-        );
+        ];
 
         return $debug;
     }
@@ -93,7 +93,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function setAttributes(array $attributes = null)
     {
-        $this->attributes = isset($attributes) ? $attributes : array();
+        $this->attributes = isset($attributes) ? $attributes : [];
     }
 
     public function getShortDebugInfo()
@@ -103,7 +103,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function unsetAttributes()
     {
-        $this->attributes = array();
+        $this->attributes = [];
     }
 
     public function hasAttribute($name)

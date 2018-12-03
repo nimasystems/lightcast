@@ -32,7 +32,7 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
     {
         $this->attributes = isset($attributes) ?
             $attributes :
-            array();
+            [];
     }
 
     public function set($name, $value = null)
@@ -68,7 +68,7 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
 
     public function clear()
     {
-        $this->attributes = array();
+        $this->attributes = [];
         return $this;
     }
 
@@ -109,7 +109,7 @@ class lcHtmlAttributeCollection implements ArrayAccess, iAsHTML
             return '';
         }
 
-        $out = array();
+        $out = [];
 
         foreach ($this->attributes as $name => $value) {
             if (!in_array($name, (array)$this->always_added_attribs)) {

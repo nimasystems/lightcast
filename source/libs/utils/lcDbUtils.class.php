@@ -48,9 +48,9 @@ class lcDbUtils
             return $errstr . $e->getMessage();
         }
 
-        $errors = array(
+        $errors = [
             23000 => 'Duplicate Record Name'
-        );
+        ];
 
         if (!array_key_exists($e->getCause()->getCode(), $errors)) {
             return $errstr . $e->getMessage();

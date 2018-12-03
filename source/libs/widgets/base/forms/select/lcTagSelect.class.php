@@ -98,12 +98,12 @@ class lcTagSelect extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('name', 'size', 'multiply', 'disabled', 'tabindex');
+        return ['name', 'size', 'multiply', 'disabled', 'tabindex'];
     }
 
     /**
@@ -210,7 +210,7 @@ class lcTagSelect extends lcHtmlTag
         $options_html = null;
 
         if ($this->options) {
-            $all_rendered = array();
+            $all_rendered = [];
 
             foreach ($this->options as $opt) {
                 $all_rendered[] = $opt->asHtml();

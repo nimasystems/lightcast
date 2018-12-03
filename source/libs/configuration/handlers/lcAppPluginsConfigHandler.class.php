@@ -25,10 +25,10 @@ class lcAppPluginsConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array(
-            'plugins' => array(
-                'enabled' => array()
-            )
-        );
+        return [
+            'plugins' => [
+                'enabled' => []
+            ]
+        ];
     }
 }

@@ -28,11 +28,11 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
 
     public function getDefaultValues()
     {
-        return array('db' => array(
+        return ['db' => [
             'use_database' => false,
             'use_propel' => true,
-            'databases' => array(
-                self::DEFAULT_PRIMARY_ADAPTER_NAME => array(
+            'databases' => [
+                self::DEFAULT_PRIMARY_ADAPTER_NAME => [
                     'classname' => 'lcPropelDatabase',
                     'caching' => true,
                     'persistent_connections' => true,
@@ -43,19 +43,19 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                     'user' => null,
                     'password' => null,
                     'charset' => 'utf8'
-                ),
-            ),
-            'migrations' => array(
+                ],
+            ],
+            'migrations' => [
                 'helper_class' => 'lcDatabaseMigrationsHelper'
-            ),
-            'propel_custom' => array(
+            ],
+            'propel_custom' => [
                 'propel.lightcastOverrideBuildPath' => true,
                 'propel.lightcastBuildPath' => 'gen/propel/models/',
                 'gen_dir' => 'propel',
-            ),
-            'models' => array(),
-            'views' => array(),
-            'propel' => array(
+            ],
+            'models' => [],
+            'views' => [],
+            'propel' => [
                 'propel.database' => 'mysql',
                 'propel.mysql.tableType' => 'innodb',
                 'propel.emulateForeignKeyConstraints' => true,
@@ -92,7 +92,7 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                 'propel.builder.addComments' => true,
                 'propel.builder.addBehaviors' => true,
                 'propel.defaultTranslator' => 'lcPropelTranslator'
-            )
-        ));
+            ]
+        ]];
     }
 }

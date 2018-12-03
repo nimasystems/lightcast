@@ -52,12 +52,12 @@ class lcTagLegend extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('accesskey');
+        return ['accesskey'];
     }
 
     public function getAccessKey()

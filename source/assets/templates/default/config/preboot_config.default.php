@@ -11,4 +11,3 @@
 //define(PROFILER_CALLBACK, 'ProfileDebugHelper::profilerCallback');
 //define(PROFILER_XHPROF_EXTRA_FLAGS, null);
 
-?>

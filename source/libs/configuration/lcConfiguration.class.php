@@ -33,13 +33,13 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     /*
      * Default configuration environments
      */
-    protected $configuration = array();
+    protected $configuration = [];
     protected $base_config_dir;
-    private $environments = array(
+    private $environments = [
         lcEnvConfigHandler::ENVIRONMENT_DEBUG,
         lcEnvConfigHandler::ENVIRONMENT_RELEASE,
         lcEnvConfigHandler::ENVIRONMENT_TESTING
-    );
+    ];
 
     public function initialize()
     {
@@ -84,7 +84,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             return false;
         }
 
-        $configuration = array();
+        $configuration = [];
 
         $base_config_dir = $this->getBaseConfigDir();
 
@@ -104,10 +104,10 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             $project_config_key_dir = $project_config_dir ? ($project_config_dir{0} == '/' ? $project_config_dir : ($base_config_dir ? $base_config_dir . DS . $project_config_dir : null)) : null;
 
             // merge some additional configuration based options
-            $nd = array_filter(array(
+            $nd = array_filter([
                 $project_config_key_dir,
                 $this->getConfigDir()
-            ));
+            ]);
             $dirs = isset($options['dirs']) && is_array($options['dirs']) ? array_merge(array_values($options['dirs']), array_values($nd)) : $nd;
             $options['dirs'] = $dirs;
 
@@ -174,14 +174,14 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function getDebugInfo()
     {
-        $debug = array('configuration' => $this->configuration,);
+        $debug = ['configuration' => $this->configuration,];
 
         return $debug;
     }
 
     public function getShortDebugInfo()
     {
-        $debug = array('environment' => $this->environment,);
+        $debug = ['environment' => $this->environment,];
         return $debug;
     }
 
@@ -310,7 +310,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function writeClassCache()
     {
-        $cache = array('configuration' => $this->configuration);
+        $cache = ['configuration' => $this->configuration];
 
         return $cache;
     }

@@ -9,4 +9,3 @@ $configuration = new ApiConfiguration(realpath(dirname(__FILE__) . '/../'), new 
 
 lcApp::bootstrap($configuration)->dispatch();
 
-?>

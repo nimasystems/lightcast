@@ -96,7 +96,7 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
 
     protected function buildCustomRelations()
     {
-        $relations = array();
+        $relations = [];
 
         foreach ($this->getTable()->getForeignKeys() as $fkey) {
             $relations[] = addslashes($fkey->getTableName());

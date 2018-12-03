@@ -27,22 +27,22 @@ class lcDatabaseModelsTranslationsParser extends lcTranslationsParser
 
     public function getDirsToParse()
     {
-        return array(
-            'map' => array(
-                'file_endings' => array('TableMap.php')
-            ),
-            'om' => array(
-                'file_endings' => array('.php', 'Peer.php', 'Query.php')
-            )
-        );
+        return [
+            'map' => [
+                'file_endings' => ['TableMap.php']
+            ],
+            'om' => [
+                'file_endings' => ['.php', 'Peer.php', 'Query.php']
+            ]
+        ];
     }
 
     public function getCategorizationMap()
     {
-        return array(
+        return [
             'map' => 'database_models',
             'om' => 'database_models',
-        );
+        ];
     }
 
     public function setModels($models)
@@ -56,7 +56,7 @@ class lcDatabaseModelsTranslationsParser extends lcTranslationsParser
             throw new lcInvalidArgumentException('Models are required');
         }
 
-        $this->results = array();
+        $this->results = [];
 
         $base_dir = $this->base_dir;
 

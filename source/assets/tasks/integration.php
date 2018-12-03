@@ -82,7 +82,7 @@ class tIntegration extends lcTaskController
 
         $this->display('Validating PHP syntax in: ' . $root_dir);
 
-        lcDirs::recursiveFilesCallback($root_dir, array($this, '_validatePhpFiles'), array(), true);
+        lcDirs::recursiveFilesCallback($root_dir, [$this, '_validatePhpFiles'], [], true);
 
         return true;
     }

@@ -39,11 +39,11 @@ class lcTagAbbr extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array();
+        return [];
     }
 }

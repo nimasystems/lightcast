@@ -102,7 +102,7 @@ class lcCookiesCollection extends lcBaseCollection
             /** @var lcCookie[] $all */
             $all = $all1->getArrayCopy();
 
-            $ret = array();
+            $ret = [];
 
             foreach ($all as $cookie) {
                 $val = $cookie->getValue();

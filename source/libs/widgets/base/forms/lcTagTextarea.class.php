@@ -95,12 +95,12 @@ class lcTagTextarea extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('rows', 'cols');
+        return ['rows', 'cols'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('name', 'disabled', 'readonly', 'accesskey', 'tabindex');
+        return ['name', 'disabled', 'readonly', 'accesskey', 'tabindex'];
     }
 
     public function getRows()

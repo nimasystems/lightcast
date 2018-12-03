@@ -87,14 +87,14 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         $parent_map = (array)parent::getConfigHandleMap();
 
         // maps the configuration values to handlers
-        $config_map = array(array(
+        $config_map = [[
             'handler' => 'console',
-            'dirs' => array(
+            'dirs' => [
                 $this->getBaseConfigDir(),
                 $this->getConfigDir()
-            ),
+            ],
             'config_key' => 'console'
-        ),);
+        ],];
 
         $app_map = array_merge($parent_map, $config_map);
 

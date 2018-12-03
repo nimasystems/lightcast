@@ -39,4 +39,3 @@ $configuration = new lcConsoleConfiguration(realpath(dirname(__FILE__) . '/../')
 $configuration->setIsDebugging(false);
 lcApp::bootstrap($configuration)->dispatch();
 
-?>

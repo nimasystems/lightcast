@@ -115,51 +115,51 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     {
         // subclassers may override this method to return informationa bout the
         // author of the plugin
-        return array(
-            'company' => array(
+        return [
+            'company' => [
                 'url' => 'http://www.nimasystems.com',
                 'email' => 'info@nimasystems.com',
                 'name' => 'Nimasystems Ltd'
-            ),
-            'license' => array(
+            ],
+            'license' => [
                 'url' => 'http://www.nimasystems.com/lightcast',
                 'type' => 'private'
-            ),
+            ],
             'copyright' => 'Nimasystems Ltd 2007-2013 (&copy;) All Rights Reserved.',
-            'developers' => array(array(
+            'developers' => [[
                 'email' => 'miracle@nimasystems.com',
                 'team' => 'PHP Development',
                 'role' => 'PHP Developer',
                 'name' => 'Martin Kovachev'
-            ))
-        );
+            ]]
+        ];
     }
 
     public function getPluginDescription()
     {
         // subclassers may override this method to return additional short
         // introduction of the plugin
-        return array(
+        return [
             'description' => 'No additional description provided',
-            'urls' => array(
-                array(
+            'urls' => [
+                [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin',
                     'title' => 'Homepage'
-                ),
-                array(
+                ],
+                [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/download',
                     'title' => 'Download'
-                ),
-                array(
+                ],
+                [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/readme',
                     'title' => 'README'
-                ),
-                array(
+                ],
+                [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/install',
                     'title' => 'INSTALL'
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
@@ -262,9 +262,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return iSupportsVersions::STABILITY_CODE_PRODUCTION;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getImplements()
     {
         // subclassers may override this method to return custom class names which the plugin implements
@@ -348,23 +345,23 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function getConfigHandleMap()
     {
         // maps the configuration values to handlers
-        $config_map = array(
-            array(
+        $config_map = [
+            [
                 'handler' => 'plugin',
                 'config_key' => 'settings',
                 'defaults' => $this->getDefaultConfiguration()
-            ),
-            array(
+            ],
+            [
                 'handler' => 'plugin_routing',
                 'config_key' => 'routing',
                 'defaults' => $this->getDefaultRoutingConfiguration()
-            ),
-            array(
+            ],
+            [
                 'handler' => 'plugin_view',
                 'config_key' => 'view',
                 'defaults' => $this->getDefaultViewConfiguration()
-            ),
-        );
+            ],
+        ];
 
         return $config_map;
     }
@@ -402,7 +399,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
 
     public function getSupportedLocales()
     {
-        return array('en_US');
+        return ['en_US'];
     }
 
     /**

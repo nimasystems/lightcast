@@ -25,28 +25,28 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array(
-            'project' => array('project_name' => 'Lightcast project'),
+        return [
+            'project' => ['project_name' => 'Lightcast project'],
 
-            'settings' => array(
+            'settings' => [
                 'timezone' => 'Europe/Sofia',
-                'exception_http_header' => array(
+                'exception_http_header' => [
                     'enabled' => false,
                     'header' => 'HTTP/1.1 500 Internal Server Error'
-                )
-            ),
-            'tools' => array('htmldoc' => '/usr/bin/htmldoc'),
-            'plugins' => array('locations' => array('addons/plugins')),
-            'exceptions' => array(
+                ]
+            ],
+            'tools' => ['htmldoc' => '/usr/bin/htmldoc'],
+            'plugins' => ['locations' => ['addons/plugins']],
+            'exceptions' => [
                 'module' => null,
                 'action' => null,
-                'mail' => array(
+                'mail' => [
                     'enabled' => false,
                     'recipient' => null,
-                    'skip_exceptions' => array(),
-                    'only_exceptions' => array()
-                )
-            )
-        );
+                    'skip_exceptions' => [],
+                    'only_exceptions' => []
+                ]
+            ]
+        ];
     }
 }

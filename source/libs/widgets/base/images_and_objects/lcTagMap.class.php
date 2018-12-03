@@ -54,12 +54,12 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
 
     public static function getRequiredAttributes()
     {
-        return array('id');
+        return ['id'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('dir', 'lang', 'xml:lang', 'class', 'title');
+        return ['dir', 'lang', 'xml:lang', 'class', 'title'];
     }
 
     public function getDir()

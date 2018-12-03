@@ -19,4 +19,3 @@ $configuration->setIsDebugging(DO_DEBUG);
 $configuration->setConfigEnvironment(CONFIG_ENV);
 //$configuration->setConfigVersion(CONFIG_VER);
 
-?>

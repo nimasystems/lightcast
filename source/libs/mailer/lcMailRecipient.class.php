@@ -30,6 +30,8 @@ class lcMailRecipient extends lcObj
 
     public function __construct($email, $name = '')
     {
+        parent::__construct();
+
         $this->name = isset($name) ? (string)$name : null;
         $this->email = (string)$email;
     }

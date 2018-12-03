@@ -44,11 +44,11 @@ class lcValidatorFailure implements Serializable, JsonSerializable
 
     public function serialize()
     {
-        return serialize(array(
+        return serialize([
             'name' => $this->name,
             'message' => $this->message,
             'extra_data' => $this->extra_data
-        ));
+        ]);
     }
 
     public function unserialize($serialized)
@@ -63,10 +63,10 @@ class lcValidatorFailure implements Serializable, JsonSerializable
 
     public function jsonSerialize()
     {
-        return json_encode(array(
+        return json_encode([
             'name' => $this->name,
             'message' => $this->message,
             'extra_data' => $this->extra_data
-        ));
+        ]);
     }
 }

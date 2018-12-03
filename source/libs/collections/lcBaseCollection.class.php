@@ -43,7 +43,7 @@ abstract class lcBaseCollection extends lcObj
         }
 
         $splclass = self::SPL_OBJECT_NAME;
-        $this->list = new $splclass($data ? $data : array());
+        $this->list = new $splclass($data ? $data : []);
     }
 
     public function __destruct()
@@ -154,7 +154,7 @@ abstract class lcBaseCollection extends lcObj
         $out = '';
 
         if ($this->count()) {
-            $a = array();
+            $a = [];
             $list = $this->list;
 
             if ($list && is_array($list)) {

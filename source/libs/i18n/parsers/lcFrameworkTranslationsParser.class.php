@@ -27,9 +27,9 @@ class lcFrameworkTranslationsParser extends lcTranslationsParser
 {
     public function getDirsToParse()
     {
-        return array(
+        return [
             'assets',
             'libs',
-        );
+        ];
     }
 }

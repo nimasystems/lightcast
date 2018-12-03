@@ -8,6 +8,3 @@ $configuration = new BackendConfiguration(realpath(dirname(__FILE__) . '/../'), 
 @include_once('../config/boot_config.php');
 
 lcApp::bootstrap($configuration)->dispatch();
-
-
-?>

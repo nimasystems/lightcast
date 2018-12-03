@@ -26,1470 +26,1470 @@ class CountryHelper
 
     public static function getAll()
     {
-        $countryDataByCountryCode = array(
-            'BG' => array(
+        $countryDataByCountryCode = [
+            'BG' => [
                 'country_name' => 'Bulgaria',
                 'country_localized_name' => 'България',
                 'phone_code' => '+359',
                 'language_iso' => 'bg',
-            ),
-            'US' => array(
+            ],
+            'US' => [
                 'country_name' => 'United States',
                 'country_localized_name' => 'United States',
                 'phone_code' => '+44',
                 'language_iso' => 'en',
-            ),
-            'ES' => array(
+            ],
+            'ES' => [
                 'country_name' => 'Spain',
                 'country_localized_name' => 'España',
                 'phone_code' => '+34',
                 'language_iso' => 'es',
-            ),
-            'CN' => array(
+            ],
+            'CN' => [
                 'country_name' => 'China',
                 'country_localized_name' => '中國',
                 'phone_code' => '+86',
                 'language_iso' => 'zh',
-            ),
-            'IT' => array(
+            ],
+            'IT' => [
                 'country_name' => 'Italy',
                 'country_localized_name' => 'Italia',
                 'phone_code' => '+39 ',
                 'language_iso' => 'it',
-            ),
-            'AF' => array(
+            ],
+            'AF' => [
                 'country_name' => 'Afghanistan',
                 'country_localized_name' => 'افغانستان',
                 'phone_code' => '+93 ',
                 'language_iso' => 'ps',
-            ),
-            'AX' => array(
+            ],
+            'AX' => [
                 'country_name' => 'Åland Islands',
                 'country_localized_name' => 'Åland Islands',
                 'phone_code' => '+358',
                 'language_iso' => 'sv',
-            ),
-            'AL' => array(
+            ],
+            'AL' => [
                 'country_name' => 'Albania',
                 'country_localized_name' => 'Shqipëria',
                 'phone_code' => '+355 ',
                 'language_iso' => 'sq',
-            ),
-            'DZ' => array(
+            ],
+            'DZ' => [
                 'country_name' => 'Algeria',
                 'country_localized_name' => 'الجزائر',
                 'phone_code' => '+213 ',
                 'language_iso' => 'ar',
-            ),
-            'AS' => array(
+            ],
+            'AS' => [
                 'country_name' => 'American Samoa',
                 'country_localized_name' => 'Sāmoa',
                 'phone_code' => '+684',
                 'language_iso' => 'sm',
-            ),
-            'AD' => array(
+            ],
+            'AD' => [
                 'country_name' => 'Andorra',
                 'country_localized_name' => 'Andorra',
                 'phone_code' => '+376 ',
                 'language_iso' => 'ca',
-            ),
-            'AO' => array(
+            ],
+            'AO' => [
                 'country_name' => 'Angola',
                 'country_localized_name' => 'Angola',
                 'phone_code' => '+244 ',
                 'language_iso' => 'pt',
-            ),
-            'AI' => array(
+            ],
+            'AI' => [
                 'country_name' => 'Anguilla',
                 'country_localized_name' => 'Anguilla',
                 'phone_code' => '+1 264',
                 'language_iso' => 'en',
-            ),
-            'AQ' => array(
+            ],
+            'AQ' => [
                 'country_name' => 'Antarctica',
                 'country_localized_name' => 'Antarctica',
                 'phone_code' => '+672 ',
                 'language_iso' => 'en',
-            ),
-            'AG' => array(
+            ],
+            'AG' => [
                 'country_name' => 'Antigua and Barbuda',
                 'country_localized_name' => 'Antigua and Barbuda',
                 'phone_code' => '+1 268',
                 'language_iso' => 'en',
-            ),
-            'AR' => array(
+            ],
+            'AR' => [
                 'country_name' => 'Argentina',
                 'country_localized_name' => 'Argentina',
                 'phone_code' => '+54 ',
                 'language_iso' => 'es',
-            ),
-            'AM' => array(
+            ],
+            'AM' => [
                 'country_name' => 'Armenia',
                 'country_localized_name' => 'Հայաստան',
                 'phone_code' => '+374 ',
                 'language_iso' => 'hy',
-            ),
-            'AW' => array(
+            ],
+            'AW' => [
                 'country_name' => 'Aruba',
                 'country_localized_name' => 'Aruba',
                 'phone_code' => '+297 ',
                 'language_iso' => 'nl',
-            ),
-            'AU' => array(
+            ],
+            'AU' => [
                 'country_name' => 'Australia',
                 'country_localized_name' => 'Australia',
                 'phone_code' => '+61 ',
                 'language_iso' => 'en',
-            ),
-            'AT' => array(
+            ],
+            'AT' => [
                 'country_name' => 'Austria',
                 'country_localized_name' => 'Österreich',
                 'phone_code' => '+43 ',
                 'language_iso' => 'de',
-            ),
-            'AZ' => array(
+            ],
+            'AZ' => [
                 'country_name' => 'Azerbaijan',
                 'country_localized_name' => 'Azərbaycan',
                 'phone_code' => '+994 ',
                 'language_iso' => 'az',
-            ),
-            'BS' => array(
+            ],
+            'BS' => [
                 'country_name' => 'Bahamas',
                 'country_localized_name' => 'Bahamas',
                 'phone_code' => '+1 242',
                 'language_iso' => 'en',
-            ),
-            'BH' => array(
+            ],
+            'BH' => [
                 'country_name' => 'Bahrain',
                 'country_localized_name' => 'البحرين',
                 'phone_code' => '+973 ',
                 'language_iso' => 'ar',
-            ),
-            'BD' => array(
+            ],
+            'BD' => [
                 'country_name' => 'Bangladesh',
                 'country_localized_name' => 'বাংলাদেশ',
                 'phone_code' => '+880 ',
                 'language_iso' => 'bn',
-            ),
-            'BB' => array(
+            ],
+            'BB' => [
                 'country_name' => 'Barbados',
                 'country_localized_name' => 'Barbados',
                 'phone_code' => '+1 246',
                 'language_iso' => 'en',
-            ),
-            'BY' => array(
+            ],
+            'BY' => [
                 'country_name' => 'Belarus',
                 'country_localized_name' => 'Беларусь',
                 'phone_code' => '+375 ',
                 'language_iso' => 'be',
-            ),
-            'BE' => array(
+            ],
+            'BE' => [
                 'country_name' => 'Belgium',
                 'country_localized_name' => 'België',
                 'phone_code' => '+32 ',
                 'language_iso' => 'nl',
-            ),
-            'BZ' => array(
+            ],
+            'BZ' => [
                 'country_name' => 'Belize',
                 'country_localized_name' => 'Belize',
                 'phone_code' => '+501 ',
                 'language_iso' => 'en',
-            ),
-            'BJ' => array(
+            ],
+            'BJ' => [
                 'country_name' => 'Benin',
                 'country_localized_name' => 'Bénin',
                 'phone_code' => '+229 ',
                 'language_iso' => 'fr',
-            ),
-            'BM' => array(
+            ],
+            'BM' => [
                 'country_name' => 'Bermuda',
                 'country_localized_name' => 'Bermuda',
                 'phone_code' => '+1 441',
                 'language_iso' => 'en',
-            ),
-            'BT' => array(
+            ],
+            'BT' => [
                 'country_name' => 'Bhutan',
                 'country_localized_name' => 'འབྲུག་ཡུལ་',
                 'phone_code' => '+975 ',
                 'language_iso' => 'dz',
-            ),
-            'BO' => array(
+            ],
+            'BO' => [
                 'country_name' => 'Bolivia',
                 'country_localized_name' => 'Wuliwya',
                 'phone_code' => '+591 ',
                 'language_iso' => 'es',
-            ),
-            'BA' => array(
+            ],
+            'BA' => [
                 'country_name' => 'Bosnia and Herzegovina',
                 'country_localized_name' => 'Bosna i Hercegovina',
                 'phone_code' => '+387 ',
                 'language_iso' => 'hr',
-            ),
-            'BW' => array(
+            ],
+            'BW' => [
                 'country_name' => 'Botswana',
                 'country_localized_name' => 'Botswana',
                 'phone_code' => '+267 ',
                 'language_iso' => 'en',
-            ),
-            'BV' => array(
+            ],
+            'BV' => [
                 'country_name' => 'Bouvet Island',
                 'country_localized_name' => 'Bouvetøya',
                 'phone_code' => '+47',
                 'language_iso' => 'nb',
-            ),
-            'BR' => array(
+            ],
+            'BR' => [
                 'country_name' => 'Brazil',
                 'country_localized_name' => 'Brasil',
                 'phone_code' => '+55 ',
                 'language_iso' => 'pt',
-            ),
-            'IO' => array(
+            ],
+            'IO' => [
                 'country_name' => 'British Indian Ocean Territory',
                 'country_localized_name' => 'भारत',
                 'phone_code' => '+0 ',
                 'language_iso' => 'hi',
-            ),
-            'VG' => array(
+            ],
+            'VG' => [
                 'country_name' => 'Virgin Islands, British',
                 'country_localized_name' => 'Virgin Islands',
                 'phone_code' => '+1 284',
                 'language_iso' => 'en',
-            ),
-            'BN' => array(
+            ],
+            'BN' => [
                 'country_name' => 'Brunei Darussalam',
                 'country_localized_name' => 'Brunei',
                 'phone_code' => '+673 ',
                 'language_iso' => 'ms',
-            ),
-            'BF' => array(
+            ],
+            'BF' => [
                 'country_name' => 'Burkina Faso',
                 'country_localized_name' => 'Burkina Faso',
                 'phone_code' => '+226 ',
                 'language_iso' => 'fr',
-            ),
-            'BI' => array(
+            ],
+            'BI' => [
                 'country_name' => 'Burundi',
                 'country_localized_name' => 'Uburundi',
                 'phone_code' => '+257 ',
                 'language_iso' => 'fr',
-            ),
-            'KH' => array(
+            ],
+            'KH' => [
                 'country_name' => 'Cambodia',
                 'country_localized_name' => 'កម្ពុជា',
                 'phone_code' => '+855 ',
                 'language_iso' => 'km',
-            ),
-            'CM' => array(
+            ],
+            'CM' => [
                 'country_name' => 'Cameroon',
                 'country_localized_name' => 'Cameroun',
                 'phone_code' => '+237 ',
                 'language_iso' => 'en',
-            ),
-            'CA' => array(
+            ],
+            'CA' => [
                 'country_name' => 'Canada',
                 'country_localized_name' => 'Canada',
                 'phone_code' => '+1 ',
                 'language_iso' => 'en',
-            ),
-            'CV' => array(
+            ],
+            'CV' => [
                 'country_name' => 'Cape Verde',
                 'country_localized_name' => 'Cabo Verde',
                 'phone_code' => '+238 ',
                 'language_iso' => 'pt',
-            ),
-            'KY' => array(
+            ],
+            'KY' => [
                 'country_name' => 'Cayman Islands',
                 'country_localized_name' => 'Cayman Islands',
                 'phone_code' => '+1 345',
                 'language_iso' => 'en',
-            ),
-            'CF' => array(
+            ],
+            'CF' => [
                 'country_name' => 'Central African Republic',
                 'country_localized_name' => 'République centrafricaine',
                 'phone_code' => '+236 ',
                 'language_iso' => 'fr',
-            ),
-            'TD' => array(
+            ],
+            'TD' => [
                 'country_name' => 'Chad',
                 'country_localized_name' => 'Tchad',
                 'phone_code' => '+235 ',
                 'language_iso' => 'fr',
-            ),
-            'CL' => array(
+            ],
+            'CL' => [
                 'country_name' => 'Chile',
                 'country_localized_name' => 'Chile',
                 'phone_code' => '+56 ',
                 'language_iso' => 'es',
-            ),
-            'CX' => array(
+            ],
+            'CX' => [
                 'country_name' => 'Christmas Island',
                 'country_localized_name' => 'Christmas Island',
                 'phone_code' => '+61 ',
                 'language_iso' => 'en',
-            ),
-            'CC' => array(
+            ],
+            'CC' => [
                 'country_name' => 'Cocos (Keeling) Islands',
                 'country_localized_name' => 'Cocos (Keeling) Islands',
                 'phone_code' => '+61 ',
                 'language_iso' => 'en',
-            ),
-            'CO' => array(
+            ],
+            'CO' => [
                 'country_name' => 'Colombia',
                 'country_localized_name' => 'Colombia',
                 'phone_code' => '+57 ',
                 'language_iso' => 'es',
-            ),
-            'KM' => array(
+            ],
+            'KM' => [
                 'country_name' => 'Comoros',
                 'country_localized_name' => 'Komori',
                 'phone_code' => '+269 ',
                 'language_iso' => 'fr',
-            ),
-            'CD' => array(
+            ],
+            'CD' => [
                 'country_name' => 'Congo, the Democratic Republic of the',
                 'country_localized_name' => 'République démocratique du Congo',
                 'phone_code' => '+243 ',
                 'language_iso' => 'fr',
-            ),
-            'CG' => array(
+            ],
+            'CG' => [
                 'country_name' => 'Congo',
                 'country_localized_name' => 'République du Congo',
                 'phone_code' => '+242 ',
                 'language_iso' => 'fr',
-            ),
-            'CK' => array(
+            ],
+            'CK' => [
                 'country_name' => 'Cook Islands',
                 'country_localized_name' => 'Cook Islands',
                 'phone_code' => '+682 ',
                 'language_iso' => 'en',
-            ),
-            'CR' => array(
+            ],
+            'CR' => [
                 'country_name' => 'Costa Rica',
                 'country_localized_name' => 'Costa Rica',
                 'phone_code' => '+506 ',
                 'language_iso' => 'es',
-            ),
-            'HR' => array(
+            ],
+            'HR' => [
                 'country_name' => 'Croatia',
                 'country_localized_name' => 'Hrvatska',
                 'phone_code' => '+385 ',
                 'language_iso' => 'hr',
-            ),
-            'CU' => array(
+            ],
+            'CU' => [
                 'country_name' => 'Cuba',
                 'country_localized_name' => 'Cuba',
                 'phone_code' => '+53 ',
                 'language_iso' => 'es',
-            ),
-            'CY' => array(
+            ],
+            'CY' => [
                 'country_name' => 'Cyprus',
                 'country_localized_name' => 'Κύπρος',
                 'phone_code' => '+357 ',
                 'language_iso' => 'gr',
-            ),
-            'CZ' => array(
+            ],
+            'CZ' => [
                 'country_name' => 'Czech Republic',
                 'country_localized_name' => 'Česká republika',
                 'phone_code' => '+420 ',
                 'language_iso' => 'cs',
-            ),
-            'DK' => array(
+            ],
+            'DK' => [
                 'country_name' => 'Denmark',
                 'country_localized_name' => 'Danmark',
                 'phone_code' => '+45 ',
                 'language_iso' => 'da',
-            ),
-            'DJ' => array(
+            ],
+            'DJ' => [
                 'country_name' => 'Djibouti',
                 'country_localized_name' => 'جيبوتي',
                 'phone_code' => '+253 ',
                 'language_iso' => 'ar',
-            ),
-            'DM' => array(
+            ],
+            'DM' => [
                 'country_name' => 'Dominica',
                 'country_localized_name' => 'Dominica',
                 'phone_code' => '+1 767',
                 'language_iso' => 'en',
-            ),
-            'DO' => array(
+            ],
+            'DO' => [
                 'country_name' => 'Dominican Republic',
                 'country_localized_name' => 'República Dominicana',
                 'phone_code' => '+1 809',
                 'language_iso' => 'es',
-            ),
-            'EC' => array(
+            ],
+            'EC' => [
                 'country_name' => 'Ecuador',
                 'country_localized_name' => 'Ecuador',
                 'phone_code' => '+593 ',
                 'language_iso' => 'es',
-            ),
-            'EG' => array(
+            ],
+            'EG' => [
                 'country_name' => 'Egypt',
                 'country_localized_name' => 'مصر',
                 'phone_code' => '+20 ',
                 'language_iso' => 'ar',
-            ),
-            'SV' => array(
+            ],
+            'SV' => [
                 'country_name' => 'El Salvador',
                 'country_localized_name' => 'El Salvador',
                 'phone_code' => '+503 ',
                 'language_iso' => 'es',
-            ),
-            'GQ' => array(
+            ],
+            'GQ' => [
                 'country_name' => 'Equatorial Guinea',
                 'country_localized_name' => 'Guinée',
                 'phone_code' => '+240 ',
                 'language_iso' => 'es',
-            ),
-            'ER' => array(
+            ],
+            'ER' => [
                 'country_name' => 'Eritrea',
                 'country_localized_name' => 'ኤርትራ',
                 'phone_code' => '+291 ',
                 'language_iso' => 'ti',
-            ),
-            'EE' => array(
+            ],
+            'EE' => [
                 'country_name' => 'Estonia',
                 'country_localized_name' => 'Eesti',
                 'phone_code' => '+372 ',
                 'language_iso' => 'et',
-            ),
-            'ET' => array(
+            ],
+            'ET' => [
                 'country_name' => 'Ethiopia',
                 'country_localized_name' => 'ኢትዮጵያ',
                 'phone_code' => '+251 ',
                 'language_iso' => 'am',
-            ),
-            'FO' => array(
+            ],
+            'FO' => [
                 'country_name' => 'Faroe Islands',
                 'country_localized_name' => 'Føroyar',
                 'phone_code' => '+298 ',
                 'language_iso' => 'fo',
-            ),
-            'FK' => array(
+            ],
+            'FK' => [
                 'country_name' => 'Falkland Islands (Malvinas)',
                 'country_localized_name' => 'Falkland Islands (Malvinas)',
                 'phone_code' => '+500 ',
                 'language_iso' => 'en',
-            ),
-            'FJ' => array(
+            ],
+            'FJ' => [
                 'country_name' => 'Fiji',
                 'country_localized_name' => 'Viti',
                 'phone_code' => '+679 ',
                 'language_iso' => 'fj',
-            ),
-            'FI' => array(
+            ],
+            'FI' => [
                 'country_name' => 'Finland',
                 'country_localized_name' => 'Suomi',
                 'phone_code' => '+358 ',
                 'language_iso' => 'fi',
-            ),
-            'FR' => array(
+            ],
+            'FR' => [
                 'country_name' => 'France',
                 'country_localized_name' => 'France',
                 'phone_code' => '+33 ',
                 'language_iso' => 'fr',
-            ),
-            'GF' => array(
+            ],
+            'GF' => [
                 'country_name' => 'French Guiana',
                 'country_localized_name' => 'Guyane française',
                 'phone_code' => '+33',
                 'language_iso' => 'fr',
-            ),
-            'PF' => array(
+            ],
+            'PF' => [
                 'country_name' => 'French Polynesia',
                 'country_localized_name' => 'Polynésie française',
                 'phone_code' => '+689 ',
                 'language_iso' => 'fr',
-            ),
-            'TF' => array(
+            ],
+            'TF' => [
                 'country_name' => 'French Southern Territories',
                 'country_localized_name' => 'Terres australes françaises',
                 'phone_code' => '+33',
                 'language_iso' => 'fr',
-            ),
-            'GA' => array(
+            ],
+            'GA' => [
                 'country_name' => 'Gabon',
                 'country_localized_name' => 'Gabon',
                 'phone_code' => '+241 ',
                 'language_iso' => 'fr',
-            ),
-            'GM' => array(
+            ],
+            'GM' => [
                 'country_name' => 'Gambia',
                 'country_localized_name' => 'Gambia',
                 'phone_code' => '+220 ',
                 'language_iso' => 'en',
-            ),
-            'GE' => array(
+            ],
+            'GE' => [
                 'country_name' => 'Georgia',
                 'country_localized_name' => 'საქართველო',
                 'phone_code' => '+995 ',
                 'language_iso' => 'ka',
-            ),
-            'DE' => array(
+            ],
+            'DE' => [
                 'country_name' => 'Germany',
                 'country_localized_name' => 'Deutschland',
                 'phone_code' => '+49 ',
                 'language_iso' => 'de',
-            ),
-            'GH' => array(
+            ],
+            'GH' => [
                 'country_name' => 'Ghana',
                 'country_localized_name' => 'Ghana',
                 'phone_code' => '+233 ',
                 'language_iso' => 'en',
-            ),
-            'GI' => array(
+            ],
+            'GI' => [
                 'country_name' => 'Gibraltar',
                 'country_localized_name' => 'Gibraltar',
                 'phone_code' => '+350 ',
                 'language_iso' => 'en',
-            ),
-            'GR' => array(
+            ],
+            'GR' => [
                 'country_name' => 'Greece',
                 'country_localized_name' => 'Ελλάδα',
                 'phone_code' => '+30 ',
                 'language_iso' => 'el',
-            ),
-            'GL' => array(
+            ],
+            'GL' => [
                 'country_name' => 'Greenland',
                 'country_localized_name' => 'Kalaallit Nunaat',
                 'phone_code' => '+299 ',
                 'language_iso' => 'kl',
-            ),
-            'GD' => array(
+            ],
+            'GD' => [
                 'country_name' => 'Grenada',
                 'country_localized_name' => 'Grenada',
                 'phone_code' => '+1 473',
                 'language_iso' => 'en',
-            ),
-            'GP' => array(
+            ],
+            'GP' => [
                 'country_name' => 'Guadeloupe',
                 'country_localized_name' => 'Guadeloupe',
                 'phone_code' => '+33',
                 'language_iso' => 'fr',
-            ),
-            'GU' => array(
+            ],
+            'GU' => [
                 'country_name' => 'Guam',
                 'country_localized_name' => 'Guam',
                 'phone_code' => '+1 671',
                 'language_iso' => 'en',
-            ),
-            'GT' => array(
+            ],
+            'GT' => [
                 'country_name' => 'Guatemala',
                 'country_localized_name' => 'Guatemala',
                 'phone_code' => '+502 ',
                 'language_iso' => 'es',
-            ),
-            'GG' => array(
+            ],
+            'GG' => [
                 'country_name' => 'Guernsey',
                 'country_localized_name' => 'Guernsey',
                 'phone_code' => '+441481',
                 'language_iso' => 'en',
-            ),
-            'GN' => array(
+            ],
+            'GN' => [
                 'country_name' => 'Guinea',
                 'country_localized_name' => 'Guinée',
                 'phone_code' => '+224 ',
                 'language_iso' => 'fr',
-            ),
-            'GW' => array(
+            ],
+            'GW' => [
                 'country_name' => 'Guinea-Bissau',
                 'country_localized_name' => 'Guiné-Bissau',
                 'phone_code' => '+245 ',
                 'language_iso' => 'pt',
-            ),
-            'GY' => array(
+            ],
+            'GY' => [
                 'country_name' => 'Guyana',
                 'country_localized_name' => 'Guyana',
                 'phone_code' => '+592 ',
                 'language_iso' => 'en',
-            ),
-            'HT' => array(
+            ],
+            'HT' => [
                 'country_name' => 'Haiti',
                 'country_localized_name' => 'Haïti',
                 'phone_code' => '+509 ',
                 'language_iso' => 'ht',
-            ),
-            'HM' => array(
+            ],
+            'HM' => [
                 'country_name' => 'Heard Island and Mcdonald Islands',
                 'country_localized_name' => 'Heard Island and Mcdonald Islands',
                 'phone_code' => '+672',
                 'language_iso' => 'en',
-            ),
-            'VA' => array(
+            ],
+            'VA' => [
                 'country_name' => 'Holy See (Vatican City State)',
                 'country_localized_name' => 'Vaticanum',
                 'phone_code' => '+39 ',
                 'language_iso' => 'la',
-            ),
-            'HN' => array(
+            ],
+            'HN' => [
                 'country_name' => 'Honduras',
                 'country_localized_name' => 'Honduras',
                 'phone_code' => '+504 ',
                 'language_iso' => 'es',
-            ),
-            'HK' => array(
+            ],
+            'HK' => [
                 'country_name' => 'Hong Kong',
                 'country_localized_name' => '香港',
                 'phone_code' => '+852 ',
                 'language_iso' => 'zh',
-            ),
-            'HU' => array(
+            ],
+            'HU' => [
                 'country_name' => 'Hungary',
                 'country_localized_name' => 'Magyarország',
                 'phone_code' => '+36 ',
                 'language_iso' => 'hu',
-            ),
-            'IS' => array(
+            ],
+            'IS' => [
                 'country_name' => 'Iceland',
                 'country_localized_name' => 'Ísland',
                 'phone_code' => '+354 ',
                 'language_iso' => 'is',
-            ),
-            'IN' => array(
+            ],
+            'IN' => [
                 'country_name' => 'India',
                 'country_localized_name' => 'भारत',
                 'phone_code' => '+91 ',
                 'language_iso' => 'as',
-            ),
-            'ID' => array(
+            ],
+            'ID' => [
                 'country_name' => 'Indonesia',
                 'country_localized_name' => 'Indonesia',
                 'phone_code' => '+62 ',
                 'language_iso' => 'id',
-            ),
-            'IR' => array(
+            ],
+            'IR' => [
                 'country_name' => 'Iran, Islamic Republic of',
                 'country_localized_name' => 'ایران',
                 'phone_code' => '+98 ',
                 'language_iso' => 'fa',
-            ),
-            'IQ' => array(
+            ],
+            'IQ' => [
                 'country_name' => 'Iraq',
                 'country_localized_name' => 'العراق',
                 'phone_code' => '+964 ',
                 'language_iso' => 'ar',
-            ),
-            'IE' => array(
+            ],
+            'IE' => [
                 'country_name' => 'Ireland',
                 'country_localized_name' => 'Éire',
                 'phone_code' => '+353 ',
                 'language_iso' => 'en',
-            ),
-            'IM' => array(
+            ],
+            'IM' => [
                 'country_name' => 'Isle of Man',
                 'country_localized_name' => 'Isle of Man',
                 'phone_code' => '+44 ',
                 'language_iso' => 'en',
-            ),
-            'IL' => array(
+            ],
+            'IL' => [
                 'country_name' => 'Israel',
                 'country_localized_name' => 'إسرائيل',
                 'phone_code' => '+972 ',
                 'language_iso' => 'he',
-            ),
-            'JM' => array(
+            ],
+            'JM' => [
                 'country_name' => 'Jamaica',
                 'country_localized_name' => 'Jamaica',
                 'phone_code' => '+1 876',
                 'language_iso' => 'en',
-            ),
-            'JP' => array(
+            ],
+            'JP' => [
                 'country_name' => 'Japan',
                 'country_localized_name' => '日本',
                 'phone_code' => '+81 ',
                 'language_iso' => 'ja',
-            ),
-            'JE' => array(
+            ],
+            'JE' => [
                 'country_name' => 'Bailiwick of Jersey ',
                 'country_localized_name' => 'Bailiwick of Jersey ',
                 'phone_code' => '+626 ',
                 'language_iso' => 'en',
-            ),
-            'JO' => array(
+            ],
+            'JO' => [
                 'country_name' => 'Jordan',
                 'country_localized_name' => 'الأردن',
                 'phone_code' => '+962 ',
                 'language_iso' => 'ar',
-            ),
-            'KZ' => array(
+            ],
+            'KZ' => [
                 'country_name' => 'Kazakhstan',
                 'country_localized_name' => 'Қазақстан',
                 'phone_code' => '+7 ',
                 'language_iso' => 'kk',
-            ),
-            'KE' => array(
+            ],
+            'KE' => [
                 'country_name' => 'Kenya',
                 'country_localized_name' => 'Kenya',
                 'phone_code' => '+254 ',
                 'language_iso' => 'sw',
-            ),
-            'KI' => array(
+            ],
+            'KI' => [
                 'country_name' => 'Kiribati',
                 'country_localized_name' => 'Kiribati',
                 'phone_code' => '+686 ',
                 'language_iso' => 'en',
-            ),
-            'KR' => array(
+            ],
+            'KR' => [
                 'country_name' => 'Korea, Republic of',
                 'country_localized_name' => '대한민국',
                 'phone_code' => '+82 ',
                 'language_iso' => 'ko',
-            ),
-            'KW' => array(
+            ],
+            'KW' => [
                 'country_name' => 'Kuwait',
                 'country_localized_name' => 'الكويت',
                 'phone_code' => '+965 ',
                 'language_iso' => 'ar',
-            ),
-            'KG' => array(
+            ],
+            'KG' => [
                 'country_name' => 'Kyrgyzstan',
                 'country_localized_name' => 'Кыргызстан',
                 'phone_code' => '+996 ',
                 'language_iso' => 'ky',
-            ),
-            'LV' => array(
+            ],
+            'LV' => [
                 'country_name' => 'Latvia',
                 'country_localized_name' => 'Latvija',
                 'phone_code' => '+371 ',
                 'language_iso' => 'lv',
-            ),
-            'LB' => array(
+            ],
+            'LB' => [
                 'country_name' => 'Lebanon',
                 'country_localized_name' => 'لبنان',
                 'phone_code' => '+961 ',
                 'language_iso' => 'ar',
-            ),
-            'LS' => array(
+            ],
+            'LS' => [
                 'country_name' => 'Lesotho',
                 'country_localized_name' => 'Lesotho',
                 'phone_code' => '+266 ',
                 'language_iso' => 'st',
-            ),
-            'LR' => array(
+            ],
+            'LR' => [
                 'country_name' => 'Liberia',
                 'country_localized_name' => 'Liberia',
                 'phone_code' => '+231 ',
                 'language_iso' => 'en',
-            ),
-            'LY' => array(
+            ],
+            'LY' => [
                 'country_name' => 'Libyan Arab Jamahiriya',
                 'country_localized_name' => 'ليبيا',
                 'phone_code' => '+218 ',
                 'language_iso' => 'ar',
-            ),
-            'LI' => array(
+            ],
+            'LI' => [
                 'country_name' => 'Liechtenstein',
                 'country_localized_name' => 'Liechtenstein',
                 'phone_code' => '+423 ',
                 'language_iso' => 'de',
-            ),
-            'LT' => array(
+            ],
+            'LT' => [
                 'country_name' => 'Lithuania',
                 'country_localized_name' => 'Lietuva',
                 'phone_code' => '+370 ',
                 'language_iso' => 'lt',
-            ),
-            'LU' => array(
+            ],
+            'LU' => [
                 'country_name' => 'Luxembourg',
                 'country_localized_name' => 'Luxemburg',
                 'phone_code' => '+352 ',
                 'language_iso' => 'fr',
-            ),
-            'MO' => array(
+            ],
+            'MO' => [
                 'country_name' => 'Macao',
                 'country_localized_name' => '澳門',
                 'phone_code' => '+853 ',
                 'language_iso' => 'zh',
-            ),
-            'MK' => array(
+            ],
+            'MK' => [
                 'country_name' => 'Macedonia, the Former Yugoslav Republic ',
                 'country_localized_name' => 'Македонија',
                 'phone_code' => '+389 ',
                 'language_iso' => 'mk',
-            ),
-            'MG' => array(
+            ],
+            'MG' => [
                 'country_name' => 'Madagascar',
                 'country_localized_name' => 'Madagasikara',
                 'phone_code' => '+261 ',
                 'language_iso' => 'mg',
-            ),
-            'MW' => array(
+            ],
+            'MW' => [
                 'country_name' => 'Malawi',
                 'country_localized_name' => 'Malaŵi',
                 'phone_code' => '+265 ',
                 'language_iso' => 'en',
-            ),
-            'MY' => array(
+            ],
+            'MY' => [
                 'country_name' => 'Malaysia',
                 'country_localized_name' => 'Malaysia',
                 'phone_code' => '+60 ',
                 'language_iso' => 'en',
-            ),
-            'MV' => array(
+            ],
+            'MV' => [
                 'country_name' => 'Maldives',
                 'country_localized_name' => 'ދިވެހިރާއްޖެ',
                 'phone_code' => '+960 ',
                 'language_iso' => 'dv',
-            ),
-            'ML' => array(
+            ],
+            'ML' => [
                 'country_name' => 'Mali',
                 'country_localized_name' => 'Mali',
                 'phone_code' => '+223 ',
                 'language_iso' => 'fr',
-            ),
-            'MT' => array(
+            ],
+            'MT' => [
                 'country_name' => 'Malta',
                 'country_localized_name' => 'Malta',
                 'phone_code' => '+356 ',
                 'language_iso' => 'mt',
-            ),
-            'MH' => array(
+            ],
+            'MH' => [
                 'country_name' => 'Marshall Islands',
                 'country_localized_name' => 'Aelōn̄ in M̧ajeļ',
                 'phone_code' => '+692 ',
                 'language_iso' => 'mh',
-            ),
-            'MQ' => array(
+            ],
+            'MQ' => [
                 'country_name' => 'Martinique',
                 'country_localized_name' => 'Martinique',
                 'phone_code' => '+33',
                 'language_iso' => 'fr',
-            ),
-            'MR' => array(
+            ],
+            'MR' => [
                 'country_name' => 'Mauritania',
                 'country_localized_name' => 'موريتانيا',
                 'phone_code' => '+222 ',
                 'language_iso' => 'ar',
-            ),
-            'MU' => array(
+            ],
+            'MU' => [
                 'country_name' => 'Mauritius',
                 'country_localized_name' => 'Maurice',
                 'phone_code' => '+230 ',
                 'language_iso' => 'en',
-            ),
-            'YT' => array(
+            ],
+            'YT' => [
                 'country_name' => 'Mayotte',
                 'country_localized_name' => 'Mayotte',
                 'phone_code' => '+262 ',
                 'language_iso' => 'fr',
-            ),
-            'MX' => array(
+            ],
+            'MX' => [
                 'country_name' => 'Mexico',
                 'country_localized_name' => 'México',
                 'phone_code' => '+52 ',
                 'language_iso' => 'es',
-            ),
-            'FM' => array(
+            ],
+            'FM' => [
                 'country_name' => 'Micronesia, Federated States of',
                 'country_localized_name' => 'Micronesia',
                 'phone_code' => '+691 ',
                 'language_iso' => 'en',
-            ),
-            'MD' => array(
+            ],
+            'MD' => [
                 'country_name' => 'Moldova, Republic of',
                 'country_localized_name' => 'Moldova',
                 'phone_code' => '+373 ',
                 'language_iso' => 'ro',
-            ),
-            'MC' => array(
+            ],
+            'MC' => [
                 'country_name' => 'Monaco',
                 'country_localized_name' => 'Monaco',
                 'phone_code' => '+377 ',
                 'language_iso' => 'fr',
-            ),
-            'MN' => array(
+            ],
+            'MN' => [
                 'country_name' => 'Mongolia',
                 'country_localized_name' => 'Монгол улс',
                 'phone_code' => '+976 ',
                 'language_iso' => 'mn',
-            ),
-            'ME' => array(
+            ],
+            'ME' => [
                 'country_name' => 'Montenegro',
                 'country_localized_name' => 'Црна Гора',
                 'phone_code' => '+382 ',
                 'language_iso' => 'sr',
-            ),
-            'MS' => array(
+            ],
+            'MS' => [
                 'country_name' => 'Montserrat',
                 'country_localized_name' => 'Montserrat',
                 'phone_code' => '+1 664',
                 'language_iso' => 'en',
-            ),
-            'MA' => array(
+            ],
+            'MA' => [
                 'country_name' => 'Morocco',
                 'country_localized_name' => 'المغرب',
                 'phone_code' => '+212 ',
                 'language_iso' => 'ar',
-            ),
-            'MZ' => array(
+            ],
+            'MZ' => [
                 'country_name' => 'Mozambique',
                 'country_localized_name' => 'Moçambique',
                 'phone_code' => '+258 ',
                 'language_iso' => 'pt',
-            ),
-            'MM' => array(
+            ],
+            'MM' => [
                 'country_name' => 'Myanmar',
                 'country_localized_name' => 'မြန်မာ',
                 'phone_code' => '+95 ',
                 'language_iso' => 'my',
-            ),
-            'NA' => array(
+            ],
+            'NA' => [
                 'country_name' => 'Namibia',
                 'country_localized_name' => 'Namibia',
                 'phone_code' => '+264 ',
                 'language_iso' => 'en',
-            ),
-            'NR' => array(
+            ],
+            'NR' => [
                 'country_name' => 'Nauru',
                 'country_localized_name' => 'Naoero',
                 'phone_code' => '+674 ',
                 'language_iso' => 'na',
-            ),
-            'NP' => array(
+            ],
+            'NP' => [
                 'country_name' => 'Nepal',
                 'country_localized_name' => 'नेपाल',
                 'phone_code' => '+977 ',
                 'language_iso' => 'ne',
-            ),
-            'AN' => array(
+            ],
+            'AN' => [
                 'country_name' => 'Netherlands Antilles',
                 'country_localized_name' => 'Nederland',
                 'phone_code' => '+599 ',
                 'language_iso' => 'en',
-            ),
-            'NL' => array(
+            ],
+            'NL' => [
                 'country_name' => 'Netherlands',
                 'country_localized_name' => 'Nederland',
                 'phone_code' => '+31 ',
                 'language_iso' => 'nl',
-            ),
-            'NC' => array(
+            ],
+            'NC' => [
                 'country_name' => 'New Caledonia',
                 'country_localized_name' => 'Nouvelle-Calédonie',
                 'phone_code' => '+687 ',
                 'language_iso' => 'fr',
-            ),
-            'NZ' => array(
+            ],
+            'NZ' => [
                 'country_name' => 'New Zealand',
                 'country_localized_name' => 'New Zealand',
                 'phone_code' => '+64 ',
                 'language_iso' => 'en',
-            ),
-            'NI' => array(
+            ],
+            'NI' => [
                 'country_name' => 'Nicaragua',
                 'country_localized_name' => 'Nicaragua',
                 'phone_code' => '+505 ',
                 'language_iso' => 'es',
-            ),
-            'NE' => array(
+            ],
+            'NE' => [
                 'country_name' => 'Niger',
                 'country_localized_name' => 'Niger',
                 'phone_code' => '+227 ',
                 'language_iso' => 'en',
-            ),
-            'NG' => array(
+            ],
+            'NG' => [
                 'country_name' => 'Nigeria',
                 'country_localized_name' => 'Nigeria',
                 'phone_code' => '+234 ',
                 'language_iso' => 'ig',
-            ),
-            'NU' => array(
+            ],
+            'NU' => [
                 'country_name' => 'Niue',
                 'country_localized_name' => 'Niue',
                 'phone_code' => '+683 ',
                 'language_iso' => 'en',
-            ),
-            'NF' => array(
+            ],
+            'NF' => [
                 'country_name' => 'Norfolk Island',
                 'country_localized_name' => 'Norfolk Island',
                 'phone_code' => '+6723',
                 'language_iso' => 'en',
-            ),
-            'MP' => array(
+            ],
+            'MP' => [
                 'country_name' => 'Northern Mariana Islands',
                 'country_localized_name' => 'Northern Mariana Islands',
                 'phone_code' => '+1 670',
                 'language_iso' => 'en',
-            ),
-            'NO' => array(
+            ],
+            'NO' => [
                 'country_name' => 'Norway',
                 'country_localized_name' => 'Norge
 						/ Noreg',
                 'phone_code' => '+47 ',
                 'language_iso' => 'nb',
-            ),
-            'OM' => array(
+            ],
+            'OM' => [
                 'country_name' => 'Oman',
                 'country_localized_name' => 'عمان',
                 'phone_code' => '+968 ',
                 'language_iso' => 'ar',
-            ),
-            'PK' => array(
+            ],
+            'PK' => [
                 'country_name' => 'Pakistan',
                 'country_localized_name' => 'پاکستان',
                 'phone_code' => '+92 ',
                 'language_iso' => 'ur',
-            ),
-            'PW' => array(
+            ],
+            'PW' => [
                 'country_name' => 'Palau',
                 'country_localized_name' => 'Belau',
                 'phone_code' => '+680 ',
                 'language_iso' => 'en',
-            ),
-            'PS' => array(
+            ],
+            'PS' => [
                 'country_name' => 'Palestinian Territory, Occupied',
                 'country_localized_name' => 'الشعب الفلسطيني',
                 'phone_code' => '+970',
                 'language_iso' => 'ar',
-            ),
-            'PA' => array(
+            ],
+            'PA' => [
                 'country_name' => 'Panama',
                 'country_localized_name' => 'Panamá',
                 'phone_code' => '+507 ',
                 'language_iso' => 'es',
-            ),
-            'PG' => array(
+            ],
+            'PG' => [
                 'country_name' => 'Papua New Guinea',
                 'country_localized_name' => 'Guinée',
                 'phone_code' => '+675 ',
                 'language_iso' => 'en',
-            ),
-            'PY' => array(
+            ],
+            'PY' => [
                 'country_name' => 'Paraguay',
                 'country_localized_name' => 'Paraguái',
                 'phone_code' => '+595 ',
                 'language_iso' => 'es',
-            ),
-            'PE' => array(
+            ],
+            'PE' => [
                 'country_name' => 'Peru',
                 'country_localized_name' => 'Perú',
                 'phone_code' => '+51 ',
                 'language_iso' => 'es',
-            ),
-            'PH' => array(
+            ],
+            'PH' => [
                 'country_name' => 'Philippines',
                 'country_localized_name' => 'Pilipinas',
                 'phone_code' => '+63 ',
                 'language_iso' => 'en',
-            ),
-            'PN' => array(
+            ],
+            'PN' => [
                 'country_name' => 'Pitcairn',
                 'country_localized_name' => 'Pitcairn',
                 'phone_code' => '+870 ',
                 'language_iso' => 'en',
-            ),
-            'PL' => array(
+            ],
+            'PL' => [
                 'country_name' => 'Poland',
                 'country_localized_name' => 'Polska',
                 'phone_code' => '+48 ',
                 'language_iso' => 'pl',
-            ),
-            'PT' => array(
+            ],
+            'PT' => [
                 'country_name' => 'Portugal',
                 'country_localized_name' => 'Portugal',
                 'phone_code' => '+351 ',
                 'language_iso' => 'pt',
-            ),
-            'PR' => array(
+            ],
+            'PR' => [
                 'country_name' => 'Puerto Rico',
                 'country_localized_name' => 'Puerto Rico',
                 'phone_code' => '+1 ',
                 'language_iso' => 'es',
-            ),
-            'QA' => array(
+            ],
+            'QA' => [
                 'country_name' => 'Qatar',
                 'country_localized_name' => 'قطر',
                 'phone_code' => '+974 ',
                 'language_iso' => 'ar',
-            ),
-            'RE' => array(
+            ],
+            'RE' => [
                 'country_name' => 'Reunion',
                 'country_localized_name' => 'Reunion',
                 'phone_code' => '+262',
                 'language_iso' => 'en',
-            ),
-            'RO' => array(
+            ],
+            'RO' => [
                 'country_name' => 'Romania',
                 'country_localized_name' => 'România',
                 'phone_code' => '+40 ',
                 'language_iso' => 'ro',
-            ),
-            'RU' => array(
+            ],
+            'RU' => [
                 'country_name' => 'Russian Federation',
                 'country_localized_name' => 'Россия',
                 'phone_code' => '+7 ',
                 'language_iso' => 'ba',
-            ),
-            'RW' => array(
+            ],
+            'RW' => [
                 'country_name' => 'Rwanda',
                 'country_localized_name' => 'Rwanda',
                 'phone_code' => '+250 ',
                 'language_iso' => 'rw',
-            ),
-            'BL' => array(
+            ],
+            'BL' => [
                 'country_name' => 'Saint Barthelemy',
                 'country_localized_name' => 'Saint-Barthélemy',
                 'phone_code' => '+590 ',
                 'language_iso' => 'fr',
-            ),
-            'SH' => array(
+            ],
+            'SH' => [
                 'country_name' => 'Saint Helena',
                 'country_localized_name' => 'Saint Helena',
                 'phone_code' => '+290 ',
                 'language_iso' => 'en',
-            ),
-            'KN' => array(
+            ],
+            'KN' => [
                 'country_name' => 'Saint Kitts and Nevis',
                 'country_localized_name' => 'Saint Kitts and Nevis',
                 'phone_code' => '+1 869',
                 'language_iso' => 'en',
-            ),
-            'LC' => array(
+            ],
+            'LC' => [
                 'country_name' => 'Saint Lucia',
                 'country_localized_name' => 'Saint Lucia',
                 'phone_code' => '+1 758',
                 'language_iso' => 'en',
-            ),
-            'MF' => array(
+            ],
+            'MF' => [
                 'country_name' => 'Saint Martin',
                 'country_localized_name' => 'Sint Maarten',
                 'phone_code' => '+1 599',
                 'language_iso' => 'nl',
-            ),
-            'PM' => array(
+            ],
+            'PM' => [
                 'country_name' => 'Saint Pierre and Miquelon',
                 'country_localized_name' => 'Saint-Pierre-et-Miquelon',
                 'phone_code' => '+508 ',
                 'language_iso' => 'fr',
-            ),
-            'VC' => array(
+            ],
+            'VC' => [
                 'country_name' => 'Saint Vincent and the Grenadines',
                 'country_localized_name' => 'Saint Vincent and the Grenadines',
                 'phone_code' => '+1 784',
                 'language_iso' => 'en',
-            ),
-            'WS' => array(
+            ],
+            'WS' => [
                 'country_name' => 'Samoa',
                 'country_localized_name' => 'Sāmoa',
                 'phone_code' => '+685 ',
                 'language_iso' => 'en',
-            ),
-            'SM' => array(
+            ],
+            'SM' => [
                 'country_name' => 'San Marino',
                 'country_localized_name' => 'San Marino',
                 'phone_code' => '+378 ',
                 'language_iso' => 'it',
-            ),
-            'ST' => array(
+            ],
+            'ST' => [
                 'country_name' => 'Sao Tome and Principe',
                 'country_localized_name' => 'Sao Tome and Principe',
                 'phone_code' => '+239 ',
                 'language_iso' => 'en',
-            ),
-            'SA' => array(
+            ],
+            'SA' => [
                 'country_name' => 'Saudi Arabia',
                 'country_localized_name' => 'العربية السعودية',
                 'phone_code' => '+966 ',
                 'language_iso' => 'ar',
-            ),
-            'SN' => array(
+            ],
+            'SN' => [
                 'country_name' => 'Senegal',
                 'country_localized_name' => 'Sénégal',
                 'phone_code' => '+221 ',
                 'language_iso' => 'wo',
-            ),
-            'RS' => array(
+            ],
+            'RS' => [
                 'country_name' => 'Serbia',
                 'country_localized_name' => 'Србија',
                 'phone_code' => '+381 ',
                 'language_iso' => 'sr',
-            ),
-            'SC' => array(
+            ],
+            'SC' => [
                 'country_name' => 'Seychelles',
                 'country_localized_name' => 'Sesel',
                 'phone_code' => '+248 ',
                 'language_iso' => 'fr',
-            ),
-            'SL' => array(
+            ],
+            'SL' => [
                 'country_name' => 'Sierra Leone',
                 'country_localized_name' => 'Sierra Leone',
                 'phone_code' => '+232 ',
                 'language_iso' => 'en',
-            ),
-            'SG' => array(
+            ],
+            'SG' => [
                 'country_name' => 'Singapore',
                 'country_localized_name' => '新加坡',
                 'phone_code' => '+65 ',
                 'language_iso' => 'zh',
-            ),
-            'SK' => array(
+            ],
+            'SK' => [
                 'country_name' => 'Slovakia',
                 'country_localized_name' => 'Slovensko',
                 'phone_code' => '+421 ',
                 'language_iso' => 'sk',
-            ),
-            'SI' => array(
+            ],
+            'SI' => [
                 'country_name' => 'Slovenia',
                 'country_localized_name' => 'Slovenija',
                 'phone_code' => '+386 ',
                 'language_iso' => 'sl',
-            ),
-            'SB' => array(
+            ],
+            'SB' => [
                 'country_name' => 'Solomon Islands',
                 'country_localized_name' => 'Solomon Islands',
                 'phone_code' => '+677 ',
                 'language_iso' => 'en',
-            ),
-            'SO' => array(
+            ],
+            'SO' => [
                 'country_name' => 'Somalia',
                 'country_localized_name' => 'Soomaaliya',
                 'phone_code' => '+252 ',
                 'language_iso' => 'so',
-            ),
-            'ZA' => array(
+            ],
+            'ZA' => [
                 'country_name' => 'South Africa',
                 'country_localized_name' => 'Suid-Afrika',
                 'phone_code' => '+27 ',
                 'language_iso' => 'af',
-            ),
-            'GS' => array(
+            ],
+            'GS' => [
                 'country_name' => 'South Georgia and the South Sandwich Isl',
                 'country_localized_name' => 'საქართველო',
                 'phone_code' => '+995',
                 'language_iso' => 'ka',
-            ),
-            'LK' => array(
+            ],
+            'LK' => [
                 'country_name' => 'Sri Lanka',
                 'country_localized_name' => 'ශ්‍රී ලංකා',
                 'phone_code' => '+94 ',
                 'language_iso' => 'si',
-            ),
-            'SD' => array(
+            ],
+            'SD' => [
                 'country_name' => 'Sudan',
                 'country_localized_name' => 'السودان',
                 'phone_code' => '+249 ',
                 'language_iso' => 'ar',
-            ),
-            'SR' => array(
+            ],
+            'SR' => [
                 'country_name' => 'Suriname',
                 'country_localized_name' => 'Suriname',
                 'phone_code' => '+597 ',
                 'language_iso' => 'nl',
-            ),
-            'SJ' => array(
+            ],
+            'SJ' => [
                 'country_name' => 'Svalbard and Jan Mayen',
                 'country_localized_name' => 'Svalbard and Jan Mayen',
                 'phone_code' => '+116 ',
                 'language_iso' => 'no',
-            ),
-            'SZ' => array(
+            ],
+            'SZ' => [
                 'country_name' => 'Swaziland',
                 'country_localized_name' => 'eSwatini',
                 'phone_code' => '+268 ',
                 'language_iso' => 'en',
-            ),
-            'SE' => array(
+            ],
+            'SE' => [
                 'country_name' => 'Sweden',
                 'country_localized_name' => 'Sverige',
                 'phone_code' => '+46 ',
                 'language_iso' => 'sv',
-            ),
-            'SY' => array(
+            ],
+            'SY' => [
                 'country_name' => 'Syrian Arab Republic',
                 'country_localized_name' => 'سورية',
                 'phone_code' => '+963 ',
                 'language_iso' => 'ar',
-            ),
-            'CH' => array(
+            ],
+            'CH' => [
                 'country_name' => 'Switzerland',
                 'country_localized_name' => 'Switzerland',
                 'phone_code' => '+41 ',
                 'language_iso' => 'de',
-            ),
+            ],
 
-            'TW' => array(
+            'TW' => [
                 'country_name' => 'Taiwan, Province of China',
                 'country_localized_name' => '臺灣/台湾',
                 'phone_code' => '+886 ',
                 'language_iso' => 'zh',
-            ),
-            'TJ' => array(
+            ],
+            'TJ' => [
                 'country_name' => 'Tajikistan',
                 'country_localized_name' => 'Тоҷикистон',
                 'phone_code' => '+992 ',
                 'language_iso' => 'ru',
-            ),
-            'TZ' => array(
+            ],
+            'TZ' => [
                 'country_name' => 'Tanzania, United Republic of',
                 'country_localized_name' => 'Tanzania',
                 'phone_code' => '+255 ',
                 'language_iso' => 'en',
-            ),
-            'TH' => array(
+            ],
+            'TH' => [
                 'country_name' => 'Thailand',
                 'country_localized_name' => 'ประเทศไทย',
                 'phone_code' => '+66 ',
                 'language_iso' => 'th',
-            ),
-            'TL' => array(
+            ],
+            'TL' => [
                 'country_name' => 'Timor-Leste',
                 'country_localized_name' => 'Timór-Leste',
                 'phone_code' => '+670 ',
                 'language_iso' => 'pt',
-            ),
-            'TG' => array(
+            ],
+            'TG' => [
                 'country_name' => 'Togo',
                 'country_localized_name' => 'Togo',
                 'phone_code' => '+228 ',
                 'language_iso' => 'en',
-            ),
-            'TK' => array(
+            ],
+            'TK' => [
                 'country_name' => 'Tokelau',
                 'country_localized_name' => 'Tokelau',
                 'phone_code' => '+690 ',
                 'language_iso' => 'en',
-            ),
-            'TO' => array(
+            ],
+            'TO' => [
                 'country_name' => 'Tonga',
                 'country_localized_name' => 'Tonga',
                 'phone_code' => '+676 ',
                 'language_iso' => 'to',
-            ),
-            'TT' => array(
+            ],
+            'TT' => [
                 'country_name' => 'Trinidad and Tobago',
                 'country_localized_name' => 'Trinidad and Tobago',
                 'phone_code' => '+1 868',
                 'language_iso' => 'en',
-            ),
-            'TN' => array(
+            ],
+            'TN' => [
                 'country_name' => 'Tunisia',
                 'country_localized_name' => 'تونس',
                 'phone_code' => '+216 ',
                 'language_iso' => 'ar',
-            ),
-            'TR' => array(
+            ],
+            'TR' => [
                 'country_name' => 'Turkey',
                 'country_localized_name' => 'Türkiye',
                 'phone_code' => '+90 ',
                 'language_iso' => 'tr',
-            ),
-            'TM' => array(
+            ],
+            'TM' => [
                 'country_name' => 'Turkmenistan',
                 'country_localized_name' => 'Türkmenistan',
                 'phone_code' => '+993 ',
                 'language_iso' => 'tk',
-            ),
-            'TC' => array(
+            ],
+            'TC' => [
                 'country_name' => 'Turks and Caicos Islands',
                 'country_localized_name' => 'Turks and Caicos Islands',
                 'phone_code' => '+1 649',
                 'language_iso' => 'en',
-            ),
-            'TV' => array(
+            ],
+            'TV' => [
                 'country_name' => 'Tuvalu',
                 'country_localized_name' => 'Tuvalu',
                 'phone_code' => '+688 ',
                 'language_iso' => 'en',
-            ),
-            'UG' => array(
+            ],
+            'UG' => [
                 'country_name' => 'Uganda',
                 'country_localized_name' => 'Uganda',
                 'phone_code' => '+256 ',
                 'language_iso' => 'en',
-            ),
-            'UA' => array(
+            ],
+            'UA' => [
                 'country_name' => 'Ukraine',
                 'country_localized_name' => 'Україна',
                 'phone_code' => '+380 ',
                 'language_iso' => 'uk',
-            ),
-            'AE' => array(
+            ],
+            'AE' => [
                 'country_name' => 'United Arab Emirates',
                 'country_localized_name' => 'دولة الإمارات العربية المتحدة',
                 'phone_code' => '+971 ',
                 'language_iso' => 'ar',
-            ),
-            'GB' => array(
+            ],
+            'GB' => [
                 'country_name' => 'United Kingdom',
                 'country_localized_name' => 'United Kingdom',
                 'phone_code' => '+44 ',
                 'language_iso' => 'en',
-            ),
-            'UM' => array(
+            ],
+            'UM' => [
                 'country_name' => 'United States Minor Outlying Islands',
                 'country_localized_name' => 'United States',
                 'phone_code' => '+1',
                 'language_iso' => 'en',
-            ),
-            'VI' => array(
+            ],
+            'VI' => [
                 'country_name' => 'Virgin Islands, U.s.',
                 'country_localized_name' => 'Virgin Islands, U.s.',
                 'phone_code' => '+1 340',
                 'language_iso' => 'en',
-            ),
-            'UY' => array(
+            ],
+            'UY' => [
                 'country_name' => 'Uruguay',
                 'country_localized_name' => 'Uruguay',
                 'phone_code' => '+598 ',
                 'language_iso' => 'es',
-            ),
-            'UZ' => array(
+            ],
+            'UZ' => [
                 'country_name' => 'Uzbekistan',
                 'country_localized_name' => 'Oʻzbekiston',
                 'phone_code' => '+998 ',
                 'language_iso' => 'uz',
-            ),
-            'VU' => array(
+            ],
+            'VU' => [
                 'country_name' => 'Vanuatu',
                 'country_localized_name' => 'Vanuatu',
                 'phone_code' => '+678 ',
                 'language_iso' => 'bi',
-            ),
-            'VE' => array(
+            ],
+            'VE' => [
                 'country_name' => 'Venezuela',
                 'country_localized_name' => 'Venezuela',
                 'phone_code' => '+58 ',
                 'language_iso' => 'es',
-            ),
-            'VN' => array(
+            ],
+            'VN' => [
                 'country_name' => 'Viet Nam',
                 'country_localized_name' => 'Việt',
                 'phone_code' => '+84 ',
                 'language_iso' => 'vi',
-            ),
-            'WF' => array(
+            ],
+            'WF' => [
                 'country_name' => 'Wallis and Futuna',
                 'country_localized_name' => 'Wallis et Futuna',
                 'phone_code' => '+681 ',
                 'language_iso' => 'fr',
-            ),
-            'EH' => array(
+            ],
+            'EH' => [
                 'country_name' => 'Western Sahara',
                 'country_localized_name' => 'الصحراء الغربية',
                 'phone_code' => '+210 ',
                 'language_iso' => 'ar',
-            ),
-            'YE' => array(
+            ],
+            'YE' => [
                 'country_name' => 'Yemen',
                 'country_localized_name' => 'اليمن',
                 'phone_code' => '+967 ',
                 'language_iso' => 'ar',
-            ),
-            'ZM' => array(
+            ],
+            'ZM' => [
                 'country_name' => 'Zambia',
                 'country_localized_name' => 'Zambia',
                 'phone_code' => '+260 ',
                 'language_iso' => 'en',
-            ),
-            'ZW' => array(
+            ],
+            'ZW' => [
                 'country_name' => 'Zimbabwe',
                 'country_localized_name' => 'Zimbabwe',
                 'phone_code' => '+263 ',
                 'language_iso' => 'en',
-            ),
-        );
+            ],
+        ];
 
-        $countryCodeByCountryName = array(
+        $countryCodeByCountryName = [
             'Bulgaria' => 'BG',
             'United States' => 'US',
             'Spain' => 'ES',
@@ -1733,8 +1733,8 @@ class CountryHelper
             'Yemen' => 'YE',
             'Zambia' => 'ZM',
             'Zimbabwe' => 'ZW',
-        );
+        ];
 
-        return array($countryDataByCountryCode, $countryCodeByCountryName);
+        return [$countryDataByCountryCode, $countryCodeByCountryName];
     }
 }

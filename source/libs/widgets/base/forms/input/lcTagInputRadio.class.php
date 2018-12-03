@@ -45,7 +45,7 @@ class lcTagInputRadio extends lcTagInput
 
     public static function getRequiredAttributes()
     {
-        return implode(array('value'), parent::getRequiredAttributes());
+        return implode(['value'], parent::getRequiredAttributes());
     }
 
     public function getIsChecked()

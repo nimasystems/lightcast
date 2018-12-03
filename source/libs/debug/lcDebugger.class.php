@@ -47,7 +47,7 @@ class lcDebugger
     {
         $fulltrace = debug_backtrace();
 
-        $traces = array();
+        $traces = [];
         $i = 0;
 
         foreach ($fulltrace as $trace) {
@@ -86,7 +86,7 @@ class lcDebugger
 
             if (array_key_exists('args', $_trace)) {
                 if (count($_trace['args']) > 0) {
-                    $prep = array();
+                    $prep = [];
 
                     foreach ($_trace['args'] as $arg) {
                         $type = gettype($arg);

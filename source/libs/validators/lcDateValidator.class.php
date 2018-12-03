@@ -42,7 +42,7 @@ class lcDateValidator extends lcValidator
             return false;
         }
 
-        $match = array();
+        $match = [];
 
         if (preg_match('/^([\d]+){1,4}[-|\/]([\d]+){1,2}[-|\/]([\d]+){1,4}/', $str, $match)) {
             // check if we have year at the first position and swap it with the last

@@ -30,9 +30,9 @@ abstract class lcResponse extends lcResidentObj implements iProvidesCapabilities
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'response'
-        );
+        ];
     }
 
     abstract public function clear();

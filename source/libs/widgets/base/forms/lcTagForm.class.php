@@ -100,12 +100,12 @@ class lcTagForm extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('action');
+        return ['action'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('method', 'enctype', 'accept');
+        return ['method', 'enctype', 'accept'];
     }
 
     public function setName($name)

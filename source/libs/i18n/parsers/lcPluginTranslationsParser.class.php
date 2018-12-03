@@ -27,14 +27,14 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
 {
     public function getCategorizationMap()
     {
-        return array(
+        return [
             'models' => 'database_models'
-        );
+        ];
     }
 
     public function getDirsToParse()
     {
-        return array(
+        return [
             'lib',
             'components',
             'tasks',
@@ -42,6 +42,6 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
             'modules',
             'models',
             'ws'
-        );
+        ];
     }
 }

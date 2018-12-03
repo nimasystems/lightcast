@@ -26,28 +26,28 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array(
-            'routing' => array(
+        return [
+            'routing' => [
                 'module_prefix' => 'service',
                 'action_prefix' => 'method'
-            ),
-            'settings' => array('admin_email' => '',),
-            'controller' => array(
+            ],
+            'settings' => ['admin_email' => '',],
+            'controller' => [
                 'max_forwards' => 10,
-                'filters' => array()
-            ),
-            'view' => array(
-                'filters' => array(),
+                'filters' => []
+            ],
+            'view' => [
+                'filters' => [],
                 'content_type' => 'application/json',
                 'charset' => 'utf-8',
-            ),
-            'logger' => array(
+            ],
+            'logger' => [
                 'enabled' => true,
                 'email_to' => '',
                 'email_threshold' => 'crit',
-                'log_files' => array()
-            ),
-            'mailer' => array(
+                'log_files' => []
+            ],
+            'mailer' => [
                 'charset' => 'UTF-8',
                 'content_type' => 'text/html',
                 'encoding' => '8bit',
@@ -56,12 +56,12 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
                 'debug' => false,
                 'smtp_host' => '',
                 'smtp_port' => 25,
-                'security' => array(
+                'security' => [
                     'smtp_user' => '',
                     'smtp_pass' => ''
-                )
-            ),
-            'loaders' => array(
+                ]
+            ],
+            'loaders' => [
                 'logger' => 'lcFileLoggerNG',
                 'request' => 'lcWebRequest',
                 'response' => 'lcWebResponse',
@@ -74,7 +74,7 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
                 'user' => '',
                 'mailer' => 'lcPHPMailer',
                 'data_storage' => '',
-            )
-        );
+            ]
+        ];
     }
 }

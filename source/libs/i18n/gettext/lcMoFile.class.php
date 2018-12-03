@@ -30,8 +30,8 @@ class lcMoFile extends lcObj
 
     private $filename;
 
-    private $headers = array();
-    private $messages = array();
+    private $headers = [];
+    private $messages = [];
 
     public function __construct($filename = null)
     {
@@ -46,8 +46,8 @@ class lcMoFile extends lcObj
     {
         $this->filename = $filename;
         $this->fp = null;
-        $this->messages = array();
-        $this->headers = array();
+        $this->messages = [];
+        $this->headers = [];
 
         try {
             $this->fp = fopen($filename, 'rb');
@@ -89,26 +89,26 @@ class lcMoFile extends lcObj
 
             unset($offset_original);
 
-            $original = array();
+            $original = [];
 
             for ($i = 0; $i < $count; $i++) {
-                $original[$i] = array(
+                $original[$i] = [
                     'length' => $this->readInt($big_endian),
                     'offset' => $this->readInt($big_endian)
-                );
+                ];
             }
 
             fseek($this->fp, $offset_translat);
 
             unset($offset_translat);
 
-            $translat = array();
+            $translat = [];
 
             for ($i = 0; $i < $count; $i++) {
-                $translat[$i] = array(
+                $translat[$i] = [
                     'length' => $this->readInt($big_endian),
                     'offset' => $this->readInt($big_endian)
-                );
+                ];
             }
 
             for ($i = 0; $i < $count; $i++) {
@@ -162,7 +162,7 @@ class lcMoFile extends lcObj
 
     private function convertStrHeadersToArray($str)
     {
-        $tmp = array();
+        $tmp = [];
         $ex = explode("\n", $str);
 
         foreach ($ex as $item) {
@@ -277,7 +277,7 @@ class lcMoFile extends lcObj
                     unset($name, $value);
                 }
 
-                $messages = array('' => $headers) + $this->messages;
+                $messages = ['' => $headers] + $this->messages;
             } else {
                 $messages = $this->messages;
             }

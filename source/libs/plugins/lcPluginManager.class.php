@@ -76,9 +76,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         parent::initialize();
 
         $this->plugins =
-            array();
+            [];
 
-        $this->plugin_configurations = array();
+        $this->plugin_configurations = [];
 
         $this->plugin_webpath = $this->configuration['plugins.webpath'];
 
@@ -186,7 +186,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
 
         // then boot the plugins
-        $plugins_to_start = array();
+        $plugins_to_start = [];
 
         foreach ($available_plugins as $plugin_name => $plugin_details) {
             try {
@@ -213,11 +213,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 $this->plugin_configurations[$plugin_name] = $plugin_config;
 
                 // notify observers
-                $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugin_configuration_loaded', $this, array(
+                $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugin_configuration_loaded', $this, [
                     'name' => $plugin_name,
                     'is_enabled' => $is_plugin_enabled,
                     'configuration' => &$plugin_config
-                )));
+                ]));
 
                 // check if plugin should be started automatically, it should be if:
                 // - it's startup type is set to STARTUP_TYPE_AUTOMATIC
@@ -336,12 +336,12 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        $cls_names = array(
+        $cls_names = [
             lcInflector::camelize($plugin_name . '_plugin_configuration', false),
             lcInflector::camelize($plugin_name . '_config_configuration', false),
             lcInflector::camelize($plugin_name . '_config', false),
             lcfirst(lcInflector::camelize($plugin_name . '_config', false))
-        );
+        ];
 
         // cache this so we don't need to call subcamelize several times
         $this->included_plugin_classes[$plugin_name] = $cls_names;
@@ -432,9 +432,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     $plugin->shutdown();
 
                     // notify
-                    $plugin_params = array(
+                    $plugin_params = [
                         'name' => $name,
-                    );
+                    ];
 
                     $this->event_dispatcher->notify(new lcEvent('plugin.' . $name . '.shutdown', $this, $plugin_params));
 
@@ -476,7 +476,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     public function getDebugInfo()
     {
         // compile debug info
-        $dbg = array();
+        $dbg = [];
         $plugins = $this->plugins;
 
         if ($plugins) {
@@ -635,11 +635,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
 
             // add plugin to system
-            $plugin_params = array(
+            $plugin_params = [
                 'name' => $plugin_object->getPluginName(),
                 'path' => $plugin_object->getRootDir(),
                 'plugin_instance' => &$plugin_object
-            );
+            ];
 
             // notify before the initialization
             $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
@@ -682,7 +682,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $plugin_name = $plugin_object->getPluginName();
         $plugin_config = $plugin_object->getPluginConfiguration();
 
-        $requirements = array();
+        $requirements = [];
 
         if ($plugin_config instanceof iPluginRequirements) {
             $requirements = array_merge($requirements,
@@ -973,7 +973,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
 
             if ($apps) {
-                $apps = is_array($apps) ? $apps : array($apps);
+                $apps = is_array($apps) ? $apps : [$apps];
 
                 if ($apps && !in_array($current_app_name, $apps)) {
                     continue;
@@ -1040,11 +1040,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     {
         // we need to store them serialized and read them later on - when all classes are made available
         // otherwise when expanding them into objects - they won't be found!
-        $cached_data = array(
+        $cached_data = [
             'plugin_configurations' => ($this->plugin_configurations ? serialize($this->plugin_configurations) : null),
             'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null),
             'autoload_class_map_file_exists_map' => $this->autoload_class_map_file_exists_map,
-        );
+        ];
 
         return $cached_data;
     }

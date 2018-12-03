@@ -45,18 +45,18 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
 
     public function getListenerEvents()
     {
-        return array(
+        return [
             'router.detect_parameters' => 'onRouterDetectParameters'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'argv' => $this->argv,
             'argc' => $this->argc,
             'params' => $this->params
-        );
+        ];
 
         return $debug;
     }
@@ -72,8 +72,8 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
 
         $processed_event = $this->event_dispatcher->filter(
             new lcEvent('request.filter_parameters', $this,
-                array('context' => $this->getRequestContext(), 'parameters' => $request_params)
-            ), array());
+                ['context' => $this->getRequestContext(), 'parameters' => $request_params]
+            ), []);
 
         if ($processed_event->isProcessed()) {
             $request_params = (array)$processed_event->getReturnValue();
@@ -93,10 +93,10 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
 
     public function getRequestContext()
     {
-        return array(
+        return [
             'argc' => $this->argc,
             'argv' => $this->argv
-        );
+        ];
     }
 
     public function getArgv()

@@ -47,7 +47,7 @@ class lcFileLoggerNG extends lcLogger
     private $is_in_cli;
     private $buffered_logging = true;
     private $buffered_logging_threshold = self::DEFAULT_LOG_BUFFER_SIZE;
-    private $buffered_logs = array();
+    private $buffered_logs = [];
     private $bufferend_logs_count = 0;
 
     public function initialize()
@@ -145,18 +145,18 @@ class lcFileLoggerNG extends lcLogger
 
         $next = is_array($this->files) ? count($this->files) : null;
 
-        $this->files[$next] = array('channel' => $channel, 'filename' => $full_filename);
+        $this->files[$next] = ['channel' => $channel, 'filename' => $full_filename];
 
-        $logs = array(
-            self::LOG_ALERT => array(),
-            self::LOG_CRIT => array(),
-            self::LOG_DEBUG => array(),
-            self::LOG_EMERG => array(),
-            self::LOG_ERR => array(),
-            self::LOG_INFO => array(),
-            self::LOG_NOTICE => array(),
-            self::LOG_WARNING => array(),
-        );
+        $logs = [
+            self::LOG_ALERT => [],
+            self::LOG_CRIT => [],
+            self::LOG_DEBUG => [],
+            self::LOG_EMERG => [],
+            self::LOG_ERR => [],
+            self::LOG_INFO => [],
+            self::LOG_NOTICE => [],
+            self::LOG_WARNING => [],
+        ];
 
         foreach ($logs as $key => $val) {
             // check modifier
@@ -248,7 +248,7 @@ class lcFileLoggerNG extends lcLogger
 
         // wipe them out now
         $this->bufferend_logs_count = 0;
-        $this->buffered_logs = array();
+        $this->buffered_logs = [];
     }
 
     public function shutdown()
@@ -291,7 +291,7 @@ class lcFileLoggerNG extends lcLogger
             $request = $this->request;
 
             // initialize new log buffer
-            $buffer = array();
+            $buffer = [];
             $buffer[] = '';
             $buffer[] = '******************** REQUEST START [' . $this->getTimeTick() . ']';
             $buffer[] = '';
@@ -493,7 +493,7 @@ class lcFileLoggerNG extends lcLogger
             if (!isset($severity)) {
                 $files = $files1;
             } else {
-                $files = isset($logs1[$severity]) ? $logs1[$severity] : array();
+                $files = isset($logs1[$severity]) ? $logs1[$severity] : [];
                 $tofind = true;
             }
 

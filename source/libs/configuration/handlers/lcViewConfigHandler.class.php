@@ -26,11 +26,11 @@ class lcViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('view' => array(
-            'filters' => array(),
+        return ['view' => [
+            'filters' => [],
             'content_type' => 'text/html',
             'charset' => 'utf-8',
-            'metatags' => array('author' => 'Nimasystems Ltd (http://www.nimasystems.com)',),
+            'metatags' => ['author' => 'Nimasystems Ltd (http://www.nimasystems.com)',],
             'base' => null,
             'dir' => 'ltr',
             'htmlver' => '4',
@@ -44,6 +44,6 @@ class lcViewConfigHandler extends lcEnvConfigHandler
             'google_analytics' => null,
             'replacement_policy' => 'level',
             'clientside_js' => false,
-        ));
+        ]];
     }
 }

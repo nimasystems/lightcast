@@ -215,9 +215,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     public function getAllKeys()
     {
-        return array(
+        return [
             'my_webpath',
-        );
+        ];
     }
 
     public function getValueForKey($key)
@@ -301,17 +301,17 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                             $action = $found_route['params']['action'];
                             $params = $found_route['params'];
 
-                            $params = array(
+                            $params = [
                                 'request' => array_merge(
-                                    array(
+                                    [
                                         'module' => $module,
                                         'action' => $action,
                                         'type' => $action_type,
-                                    ),
+                                    ],
                                     (array)$params
                                 ),
                                 'type' => $action_type
-                            );
+                            ];
 
                             if (!$tag_name || !$route || !$module || !$action) {
                                 continue;
@@ -503,7 +503,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     protected function execute($action_name, array $action_params)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $action_params['request'] = isset($action_params['request']) ? (array)$action_params['request'] : array();
+        $action_params['request'] = isset($action_params['request']) ? (array)$action_params['request'] : [];
         $action_params['type'] = isset($action_params['type']) ? (string)$action_params['type'] : $action_type;
 
         $this->action_name = $action_name;
@@ -528,28 +528,28 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
 
         // run before execute
-        call_user_func_array(array($this, 'beforeExecute'), $action_params);
+        call_user_func_array([$this, 'beforeExecute'], $action_params);
 
         // call the action
         // unfortunately the way we are handling variables at the moment
         // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
         // so we fall back to the default way
         //$call_result = $this->__call($action, $params);
-        $this->action_result = call_user_func_array(array($this, $action), $action_params);
+        $this->action_result = call_user_func_array([$this, $action], $action_params);
 
         // run after execute
-        call_user_func_array(array($this, 'afterExecute'), $action_params);
+        call_user_func_array([$this, 'afterExecute'], $action_params);
 
         // notify after the action has been executed
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
-                array('controller_name' => $this->controller_name,
+                ['controller_name' => $this->controller_name,
                     'action_name' => $this->action_name,
                     'action_type' => $this->action_type,
                     'controller' => $this,
                     'action_params' => $this->action_params,
                     'action_result' => $this->action_result,
-                )
+                ]
             ));
         }
 
@@ -572,7 +572,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         *  in this tree - throws an exception!
         */
         $method_name = $this->classMethodForAction($action_name, $action_params);
-        $callable_check = is_callable(array($this, $method_name)) && method_exists($this, $method_name);
+        $callable_check = is_callable([$this, $method_name]) && method_exists($this, $method_name);
 
         return $callable_check;
     }
@@ -586,10 +586,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return;
         }
 
-        $view->setOptions(array(
+        $view->setOptions([
             'action_name' => $this->getActionName(),
             'action_params' => $this->getActionParams(),
-        ));
+        ]);
         $view->setConfiguration($this->getConfiguration());
         $view->setEventDispatcher($this->getEventDispatcher());
 

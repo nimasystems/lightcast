@@ -56,12 +56,12 @@ class lcOptGroup extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('label');
+        return ['label'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('disabled');
+        return ['disabled'];
     }
 
     public function addOption(lcTagOption $option)
@@ -101,7 +101,7 @@ class lcOptGroup extends lcHtmlTag
         $options_html = null;
 
         if (!$this->content && $this->options) {
-            $all_rendered = array();
+            $all_rendered = [];
 
             foreach ($this->options as $opt) {
                 $all_rendered[] = $opt->asHtml();

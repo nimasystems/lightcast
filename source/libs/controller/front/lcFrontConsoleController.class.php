@@ -39,7 +39,7 @@ class lcFrontConsoleController extends lcFrontController
     protected function prepareDispatchParams(lcRequest $request)
     {
         $params = $request->getParams();
-        $tmp = array();
+        $tmp = [];
 
         if ($params) {
             $params = $params->getArrayCopy();

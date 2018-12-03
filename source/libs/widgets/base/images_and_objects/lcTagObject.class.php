@@ -126,13 +126,13 @@ class lcTagObject extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('classid', 'data', 'codebase', 'declare', 'type', 'codetype', 'archive', 'standby',
-            'width', 'height', 'name', 'tabindex');
+        return ['classid', 'data', 'codebase', 'declare', 'type', 'codetype', 'archive', 'standby',
+            'width', 'height', 'name', 'tabindex'];
     }
 
     public function getClassId()

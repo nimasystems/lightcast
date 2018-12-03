@@ -63,8 +63,8 @@ register_shutdown_function(function () {
     if (defined('PROFILER_CALLBACK')) {
         $callback_func = PROFILER_CALLBACK;
         $callback_func = strstr(':', $callback_func) ? explode(':', $callback_func) : $callback_func;
-        $callback_func = is_array($callback_func) ? array($callback_func[0], $callback_func[1]) : $callback_func;
+        $callback_func = is_array($callback_func) ? [$callback_func[0], $callback_func[1]] : $callback_func;
 
-        call_user_func_array($callback_func, array($xhprof_data));
+        call_user_func_array($callback_func, [$xhprof_data]);
     }
 });

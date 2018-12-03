@@ -26,10 +26,10 @@ class lcPluginViewConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('view' => array(
-            'metatags' => array(),
-            'stylesheets' => array('all' => array()),
-            'javascripts' => array()
-        ));
+        return ['view' => [
+            'metatags' => [],
+            'stylesheets' => ['all' => []],
+            'javascripts' => []
+        ]];
     }
 }

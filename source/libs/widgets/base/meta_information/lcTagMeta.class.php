@@ -87,12 +87,12 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
 
     public static function getRequiredAttributes()
     {
-        return array('content');
+        return ['content'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('dir', 'lang', 'xml:lang', 'name', 'http-equiv', 'scheme');
+        return ['dir', 'lang', 'xml:lang', 'name', 'http-equiv', 'scheme'];
     }
 
     public function getDir()

@@ -93,7 +93,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         if ($repeats && count($repeats)) {
             $out_repeat = '';
-            $parses = array();
+            $parses = [];
 
             foreach ($repeats as $repeat) {
                 $node_name = $repeat->getNodeName();
@@ -300,7 +300,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             /** @var lcWebController $controller */
             $controller = $this->view->getController();
 
-            $loaders = array(
+            $loaders = [
                 'request' => $controller->getRequest(),
                 'response' => $controller->getResponse(),
                 'routing' => $controller->getRouting(),
@@ -309,7 +309,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
                 'data_storage' => $controller->getDataStorage(),
                 'cache' => $controller->getCache(),
                 'mailer' => $controller->getMailer()
-            );
+            ];
 
             $loader = isset($loaders[$category]) ? $loaders[$category] : null;
 

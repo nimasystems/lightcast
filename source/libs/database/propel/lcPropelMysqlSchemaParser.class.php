@@ -31,7 +31,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
         $stmt = $this->dbh->query("SHOW FULL TABLES");
 
         // First load the tables (important that this happen before filling out details of tables)
-        $tables = array();
+        $tables = [];
 
         if ($task) {
             $task->log("Reverse Engineering Tables", Project::MSG_VERBOSE);

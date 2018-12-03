@@ -59,9 +59,9 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         }
 
         // allow others to be notified when base routes have been loaded
-        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
+        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, [
             'routes' => $this->routes,
-            'context' => $this->context)));
+            'context' => $this->context]));
 
         // init detected params after all routes have been loaded
         $this->detectParameters();
@@ -132,13 +132,13 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $url = isset($this->context['path_info']) ? (string)$this->context['path_info'] : null;
 
         // allow others to filter and provider params before the router
-        $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, array(
+        $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, [
             'url' => $url,
             'context' => $this->context
-        ), false), array(
+        ], false), [
             'url' => $url,
             'context' => $this->context
-        ));
+        ]);
 
         if ($evn->isProcessed()) {
             $rv = $evn->getReturnValue();
@@ -244,13 +244,13 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
                 unset($route_options);
             }
 
-            $route = array(
+            $route = [
                 'name' => $route->getName(),
                 'pattern' => $route->getPattern(),
                 'params' => $params,
                 'options' => $route->getOptions(),
                 'route' => $route
-            );
+            ];
 
             return $route;
         }
@@ -328,7 +328,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
     protected function updateCurrentInternalUri($name, array $params = null)
     {
-        $p = array();
+        $p = [];
 
         assert(isset($this->current_route));
 
@@ -336,9 +336,9 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             $module = isset($params['module']) ? $params['module'] : null;
             $action = isset($params['action']) ? $params['action'] : null;
 
-            $internal_uri = array(
+            $internal_uri = [
                 '@@' . $this->current_route->getName(),
-            );
+            ];
 
             if ($module && $action) {
                 $internal_uri[] = $module . '/' . $action;
@@ -354,12 +354,12 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             // make unique
             sort($p);
         } else {
-            $internal_uri = array('@@' . $name, '');
+            $internal_uri = ['@@' . $name, ''];
         }
 
         $p = $p ? '?' . implode('&', $p) : '';
 
-        $uri = array($internal_uri[0] . $p, $internal_uri[1] . $p);
+        $uri = [$internal_uri[0] . $p, $internal_uri[1] . $p];
 
         $this->current_internal_uri = $uri;
     }
@@ -379,12 +379,12 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'routes_are_cached' => $this->routes_are_cached,
             'current_route' => ($this->current_route ? $this->current_route->getName() : null),
             'current_internal_uri' => (isset($this->current_internal_uri) ? $this->current_internal_uri[1] : null),
             'current_params' => $this->current_params
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -395,10 +395,10 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     {
         $debug_parent = (array)parent::getShortDebugInfo();
 
-        $debug = array(
+        $debug = [
             'current_route' => ($this->current_route ? $this->current_route->getName() : null),
             'current_internal_uri' => (isset($this->current_internal_uri) ? $this->current_internal_uri[1] : null),
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 
@@ -487,14 +487,14 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             $ret = $prefix . $ret;
         }
 
-        $evn = $this->event_dispatcher->filter(new lcEvent('router.generate_url', $this, array(
+        $evn = $this->event_dispatcher->filter(new lcEvent('router.generate_url', $this, [
             'url' => $ret,
             'params' => $params,
             'absolute' => $absolute,
             'route_name' => $name,
             'prefix' => $prefix,
             'context' => $this->context
-        ), false), $ret);
+        ], false), $ret);
 
         if ($evn->isProcessed()) {
             $ret = $evn->getReturnValue();
@@ -603,9 +603,9 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
     public function writeClassCache()
     {
-        $cached_data = array(
+        $cached_data = [
             'routes' => $this->routes
-        );
+        ];
 
         return $cached_data;
     }

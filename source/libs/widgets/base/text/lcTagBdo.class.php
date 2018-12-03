@@ -59,12 +59,12 @@ class lcTagBdo extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('dir');
+        return ['dir'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('xml:lang');
+        return ['xml:lang'];
     }
 
     public function getDir()

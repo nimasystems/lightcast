@@ -69,12 +69,12 @@ class lcTagLink extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('href');
+        return ['href'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('rel', 'type', 'media');
+        return ['rel', 'type', 'media'];
     }
 
     public function getHref()

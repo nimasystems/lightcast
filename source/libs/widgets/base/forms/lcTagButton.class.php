@@ -110,12 +110,12 @@ class lcTagButton extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('type', 'name', 'value', 'disabled', 'tabindex', 'accesskey');
+        return ['type', 'name', 'value', 'disabled', 'tabindex', 'accesskey'];
     }
 
     public function getType()

@@ -50,16 +50,16 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
     protected $connect_listeners;
     protected $connect_listeners_objects;
 
-    protected $max_filter_requests = array(
+    protected $max_filter_requests = [
         'response.send_response' => 1,
         'request.set_context' => 1,
         'request.filter_parameters' => 1,
-    );
+    ];
 
-    protected $max_filter_requests_actual = array();
+    protected $max_filter_requests_actual = [];
 
-    protected $filter_processors = array();
-    protected $notifications = array();
+    protected $filter_processors = [];
+    protected $notifications = [];
 
     protected $total_notifications_sent;
 
@@ -69,18 +69,18 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
         $this->total_notifications_sent = 0;
 
-        $this->filter_processors = array();
-        $this->notifications = array();
+        $this->filter_processors = [];
+        $this->notifications = [];
 
-        $this->listeners = array();
-        $this->listener_events = array();
-        $this->event_listeners = array();
+        $this->listeners = [];
+        $this->listener_events = [];
+        $this->event_listeners = [];
 
-        $this->object_listeners = array();
-        $this->object_listeners_objects = array();
+        $this->object_listeners = [];
+        $this->object_listeners_objects = [];
 
-        $this->connect_listeners = array();
-        $this->connect_listeners_objects = array();
+        $this->connect_listeners = [];
+        $this->connect_listeners_objects = [];
     }
 
     public function addObserver(iEventObserver $event_observer)
@@ -88,12 +88,12 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         $this->observers[] = $event_observer;
     }
 
-    public function removeObserver(iEventObserver $event_observer)
+    /*public function removeObserver(iEventObserver $event_observer)
     {
         if (isset($this->observers[$event_observer])) {
             unset($this->observers[$event_observer]);
         }
-    }
+    }*/
 
     public function shutdown()
     {
@@ -117,20 +117,20 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'notifications_sent' => $this->total_notifications_sent,
             'filter_processors' => $this->filter_processors,
             'notifications' => $this->notifications
-        );
+        ];
 
         return $debug;
     }
 
     public function getShortDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'notifications_sent' => $this->total_notifications_sent,
-        );
+        ];
 
         return $debug;
     }
@@ -158,7 +158,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             }
 
             if (DO_DEBUG) {
-                $this->notifications[] = array('event_name' => $event_name, 'subject' => get_class($notify_event->subject));
+                $this->notifications[] = ['event_name' => $event_name, 'subject' => get_class($notify_event->subject)];
             }
 
             if ($once) {
@@ -385,7 +385,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                 }
 
                 if (DO_DEBUG) {
-                    $this->notifications[] = array('event_name' => $event_name, 'subject' => get_class($event->subject));
+                    $this->notifications[] = ['event_name' => $event_name, 'subject' => get_class($event->subject)];
                 }
 
                 $this->total_notifications_sent++;
@@ -441,7 +441,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             $max = isset($this->max_filter_requests[$event_name]) ? (int)$this->max_filter_requests[$event_name] : null;
             $subject_name = get_class($event->subject);
 
-            $this->filter_processors[] = array('event_name' => $event_name, 'subject' => $subject_name);
+            $this->filter_processors[] = ['event_name' => $event_name, 'subject' => $subject_name];
 
             if ($max) {
                 if (!isset($this->max_filter_requests_actual[$event_name])) {
@@ -532,15 +532,15 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
             return null;
         }
 
-        $ret = array();
+        $ret = [];
 
         foreach ($event_listeners as $event_type => $data) {
-            $listeners = array();
+            $listeners = [];
 
             foreach ((array)$data as $idx) {
-                $listeners[] = array(
+                $listeners[] = [
                     'listener' => get_class($this->listeners[$idx]),
-                    'callback' => $this->listener_events[$idx][$event_type]);
+                    'callback' => $this->listener_events[$idx][$event_type]];
             }
 
             $ret[$event_type] = $listeners;
@@ -558,7 +558,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
     {
         $listener_name = get_class($listener);
 
-        $this->object_listeners[$object_name][] = array($listener_name, $callback_func);
+        $this->object_listeners[$object_name][] = [$listener_name, $callback_func];
         $this->object_listeners_objects[$listener_name] = &$listener;
     }
 
@@ -614,7 +614,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
     {
         $listener_name = get_class($listener);
 
-        $this->connect_listeners[$event_name][] = array($listener_name, $callback_func);
+        $this->connect_listeners[$event_name][] = [$listener_name, $callback_func];
         $this->connect_listeners_objects[$listener_name] = &$listener;
     }
 }

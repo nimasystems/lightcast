@@ -10,23 +10,23 @@
 /*
  * Search for the framework to boot
  */
-$framework_locations = array();
+$framework_locations = [];
 
 if (defined('FRAMEWORK_LOCATIONS'))
 {
 	$custom_locations = FRAMEWORK_LOCATIONS;
-	$custom_locations = is_string($custom_locations) ? array($custom_locations) : (array)$custom_locations;
+	$custom_locations = is_string($custom_locations) ? [$custom_locations] : (array)$custom_locations;
 	$framework_locations = array_filter($custom_locations);
 	unset($custom_locations);
 }
 
 $current_dir = realpath(dirname(__FILE__).'/../');
 
-$framework_locations = array_unique(array_merge($framework_locations, array(
+$framework_locations = array_unique(array_merge($framework_locations, [
 		$current_dir . '/framework',
 		$current_dir . '/lightcast',
 		'/opt/lightcast',
-		)));
+]));
 
 $framework_dir = null;
 
@@ -69,4 +69,4 @@ if (!include_once($bootstrap_file))
 // include project configuration
 require_once('../config/project_configuration.php');
 
-?>
+

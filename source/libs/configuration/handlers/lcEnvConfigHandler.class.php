@@ -30,8 +30,8 @@ abstract class lcEnvConfigHandler extends lcConfigHandler
 
     protected function preReadConfigData($environment, array $data)
     {
-        $env_data = ($environment && isset($data[$environment])) ? (array)$data[$environment] : array();
-        $all_data = isset($data[lcEnvConfigHandler::ENVIRONMENT_ALL]) ? (array)$data[lcEnvConfigHandler::ENVIRONMENT_ALL] : array();
+        $env_data = ($environment && isset($data[$environment])) ? (array)$data[$environment] : [];
+        $all_data = isset($data[lcEnvConfigHandler::ENVIRONMENT_ALL]) ? (array)$data[lcEnvConfigHandler::ENVIRONMENT_ALL] : [];
 
         if (!$env_data && !$all_data) {
             return $data;

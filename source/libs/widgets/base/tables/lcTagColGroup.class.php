@@ -87,12 +87,12 @@ class lcTagColGroup extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('span', 'align', 'valign', 'char', 'charoff');
+        return ['span', 'align', 'valign', 'char', 'charoff'];
     }
 
     public function getSpan()

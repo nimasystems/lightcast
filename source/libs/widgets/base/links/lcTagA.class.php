@@ -85,12 +85,12 @@ class lcTagA extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('href', 'target', 'charset', 'type', 'hreflang', 'rel', 'rev', 'accesskey', 'tabindex');
+        return ['href', 'target', 'charset', 'type', 'hreflang', 'rel', 'rev', 'accesskey', 'tabindex'];
     }
 
     public function getHref()

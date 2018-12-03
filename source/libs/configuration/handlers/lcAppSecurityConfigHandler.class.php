@@ -26,7 +26,7 @@ class lcAppSecurityConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array('security' => array(
+        return ['security' => [
             'is_secure' => false,
             'login_module' => 'members',
             'login_action' => 'login',
@@ -37,11 +37,11 @@ class lcAppSecurityConfigHandler extends lcEnvConfigHandler
             'credentials_module' => 'members',
             'credentials_action' => 'no_access',
             'secure_login' => false,
-            'password' => array(
+            'password' => [
                 'encryption' => 'sha1',
                 'salt' => ''
-            )
-        ));
+            ]
+        ]];
     }
 
 }

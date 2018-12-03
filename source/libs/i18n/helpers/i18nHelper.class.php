@@ -44,12 +44,12 @@ class i18nHelper
 
     public static function getAll()
     {
-        $defaultCountry = array();
+        $defaultCountry = [];
 
-        $supportedLanguages = array();
+        $supportedLanguages = [];
 
         /* Afrikaans (South Africa) */
-        $supportedLanguages['af']['ZA'] = array(
+        $supportedLanguages['af']['ZA'] = [
             'description' => 'Afrikaans (South Africa)',
             'title_en' => 'Afrikaans',
             'title' => 'Afrikaans',
@@ -58,11 +58,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0436,
-        );
+        ];
         $defaultCountry['af'] = 'ZA';
 
         /* Albanian (Albania) */
-        $supportedLanguages['sq']['AL'] = array(
+        $supportedLanguages['sq']['AL'] = [
             'description' => 'Albanian (Albania)',
             'title_en' => 'Albanian',
             'title' => 'shqipe',
@@ -71,11 +71,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x041C,
-        );
+        ];
         $defaultCountry['sq'] = 'AL';
 
         /* Alsatian (France) */
-        $supportedLanguages['gsw']['FR'] = array(
+        $supportedLanguages['gsw']['FR'] = [
             'description' => 'Alsatian (France)',
             'title_en' => 'Alsatian',
             'title' => 'Elsässisch',
@@ -84,11 +84,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0484,
-        );
+        ];
         $defaultCountry['gsw'] = 'FR';
 
         /* Amharic (Ethiopia) */
-        $supportedLanguages['am']['ET'] = array(
+        $supportedLanguages['am']['ET'] = [
             'description' => 'Amharic (Ethiopia)',
             'title_en' => 'Amharic',
             'title' => 'አማርኛ',
@@ -97,11 +97,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x045E,
-        );
+        ];
         $defaultCountry['am'] = 'ET';
 
         /* Arabic (Algeria)‎ */
-        $supportedLanguages['ar']['DZ'] = array(
+        $supportedLanguages['ar']['DZ'] = [
             'description' => 'Arabic (Algeria)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -110,11 +110,11 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x1401,
-        );
+        ];
         $defaultCountry['ar'] = 'SA';
 
         /* Arabic (Bahrain)‎ */
-        $supportedLanguages['ar']['BH'] = array(
+        $supportedLanguages['ar']['BH'] = [
             'description' => 'Arabic (Bahrain)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -123,10 +123,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x3C01,
-        );
+        ];
 
         /* Arabic (Egypt)‎ */
-        $supportedLanguages['ar']['EG'] = array(
+        $supportedLanguages['ar']['EG'] = [
             'description' => 'Arabic (Egypt)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -135,10 +135,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0C01,
-        );
+        ];
 
         /* Arabic (Iraq)‎ */
-        $supportedLanguages['ar']['IQ'] = array(
+        $supportedLanguages['ar']['IQ'] = [
             'description' => 'Arabic (Iraq)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -147,10 +147,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0801,
-        );
+        ];
 
         /* Arabic (Jordan)‎ */
-        $supportedLanguages['ar']['JO'] = array(
+        $supportedLanguages['ar']['JO'] = [
             'description' => 'Arabic (Jordan)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -159,10 +159,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x2C01,
-        );
+        ];
 
         /* Arabic (Kuwait)‎ */
-        $supportedLanguages['ar']['KW'] = array(
+        $supportedLanguages['ar']['KW'] = [
             'description' => 'Arabic (Kuwait)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -171,10 +171,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x3401,
-        );
+        ];
 
         /* Arabic (Lebanon)‎ */
-        $supportedLanguages['ar']['LB'] = array(
+        $supportedLanguages['ar']['LB'] = [
             'description' => 'Arabic (Lebanon)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -183,10 +183,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x3001,
-        );
+        ];
 
         /* Arabic (Libya)‎ */
-        $supportedLanguages['ar']['LY'] = array(
+        $supportedLanguages['ar']['LY'] = [
             'description' => 'Arabic (Libya)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -195,10 +195,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x1001,
-        );
+        ];
 
         /* Arabic (Morocco)‎ */
-        $supportedLanguages['ar']['MA'] = array(
+        $supportedLanguages['ar']['MA'] = [
             'description' => 'Arabic (Morocco)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -207,10 +207,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x1801,
-        );
+        ];
 
         /* Arabic (Oman)‎ */
-        $supportedLanguages['ar']['OM'] = array(
+        $supportedLanguages['ar']['OM'] = [
             'description' => 'Arabic (Oman)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -219,10 +219,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x2001,
-        );
+        ];
 
         /* Arabic (Qatar)‎ */
-        $supportedLanguages['ar']['QA'] = array(
+        $supportedLanguages['ar']['QA'] = [
             'description' => 'Arabic (Qatar)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -231,10 +231,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x4001,
-        );
+        ];
 
         /* Arabic (Saudi Arabia)‎ */
-        $supportedLanguages['ar']['SA'] = array(
+        $supportedLanguages['ar']['SA'] = [
             'description' => 'Arabic (Saudi Arabia)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -243,10 +243,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0401,
-        );
+        ];
 
         /* Arabic (Syria)‎ */
-        $supportedLanguages['ar']['SY'] = array(
+        $supportedLanguages['ar']['SY'] = [
             'description' => 'Arabic (Syria)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -255,10 +255,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x2801,
-        );
+        ];
 
         /* Arabic (Tunisia)‎ */
-        $supportedLanguages['ar']['TN'] = array(
+        $supportedLanguages['ar']['TN'] = [
             'description' => 'Arabic (Tunisia)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -267,10 +267,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x1C01,
-        );
+        ];
 
         /* Arabic (U.A.E.)‎ */
-        $supportedLanguages['ar']['AE'] = array(
+        $supportedLanguages['ar']['AE'] = [
             'description' => 'Arabic (U.A.E.)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -279,10 +279,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x3801,
-        );
+        ];
 
         /* Arabic (Yemen)‎ */
-        $supportedLanguages['ar']['YE'] = array(
+        $supportedLanguages['ar']['YE'] = [
             'description' => 'Arabic (Yemen)‎',
             'title_en' => 'Arabic',
             'title' => 'العربية',
@@ -291,10 +291,10 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x2401,
-        );
+        ];
 
         /* Armenian (Armenia) */
-        $supportedLanguages['hy']['AM'] = array(
+        $supportedLanguages['hy']['AM'] = [
             'description' => 'Armenian (Armenia)',
             'title_en' => 'Armenian',
             'title' => 'Հայերեն',
@@ -303,11 +303,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x042B,
-        );
+        ];
         $defaultCountry['hy'] = 'AM';
 
         /* Assamese (India) */
-        $supportedLanguages['as']['IN'] = array(
+        $supportedLanguages['as']['IN'] = [
             'description' => 'Assamese (India)',
             'title_en' => 'Assamese',
             'title' => 'অসমীয়া',
@@ -316,11 +316,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044D,
-        );
+        ];
         $defaultCountry['as'] = 'IN';
 
         /* Azeri (Cyrillic, Azerbaijan) */
-        $supportedLanguages['az']['Cyrl'] = array(
+        $supportedLanguages['az']['Cyrl'] = [
             'description' => 'Azeri (Cyrillic, Azerbaijan)',
             'title_en' => 'Azeri',
             'title' => 'Азәрбајҹан',
@@ -329,11 +329,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x082C,
-        );
+        ];
         $defaultCountry['az'] = 'Cyrl';
 
         /* Azeri (Latin, Azerbaijan) */
-        $supportedLanguages['az']['Latn'] = array(
+        $supportedLanguages['az']['Latn'] = [
             'description' => 'Azeri (Latin, Azerbaijan)',
             'title_en' => 'Azeri',
             'title' => 'Azərbaycan ılı',
@@ -342,10 +342,10 @@ class i18nHelper
             'ansi' => 1254,
             'oem' => 857,
             'lcid' => 0x042C,
-        );
+        ];
 
         /* Bashkir (Russia) */
-        $supportedLanguages['ba']['RU'] = array(
+        $supportedLanguages['ba']['RU'] = [
             'description' => 'Bashkir (Russia)',
             'title_en' => 'Bashkir',
             'title' => 'Башҡорт',
@@ -354,11 +354,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x046D,
-        );
+        ];
         $defaultCountry['ba'] = 'RU';
 
         /* Basque (Basque) */
-        $supportedLanguages['eu']['ES'] = array(
+        $supportedLanguages['eu']['ES'] = [
             'description' => 'Basque (Basque)',
             'title_en' => 'Basque',
             'title' => 'euskara',
@@ -367,11 +367,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x042D,
-        );
+        ];
         $defaultCountry['eu'] = 'ES';
 
         /* Belarusian (Belarus) */
-        $supportedLanguages['be']['BY'] = array(
+        $supportedLanguages['be']['BY'] = [
             'description' => 'Belarusian (Belarus)',
             'title_en' => 'Belarusian',
             'title' => 'Беларускі',
@@ -380,11 +380,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0423,
-        );
+        ];
         $defaultCountry['be'] = 'BY';
 
         /* Bengali (Bangladesh) */
-        $supportedLanguages['bn']['BD'] = array(
+        $supportedLanguages['bn']['BD'] = [
             'description' => 'Bengali (Bangladesh)',
             'title_en' => 'Bengali',
             'title' => 'বাংলা',
@@ -393,11 +393,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0845,
-        );
+        ];
         $defaultCountry['bn'] = 'BD';
 
         /* Bengali (India) */
-        $supportedLanguages['bn']['IN'] = array(
+        $supportedLanguages['bn']['IN'] = [
             'description' => 'Bengali (India)',
             'title_en' => 'Bengali',
             'title' => 'বাংলা',
@@ -406,10 +406,10 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0445,
-        );
+        ];
 
         /* Bosnian (Cyrillic, Bosnia and Herzegovina) */
-        $supportedLanguages['bs']['Cyrl'] = array(
+        $supportedLanguages['bs']['Cyrl'] = [
             'description' => 'Bosnian (Cyrillic, Bosnia and Herzegovina)',
             'title_en' => 'Bosnian',
             'title' => 'босански',
@@ -418,11 +418,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 855,
             'lcid' => 0x201A,
-        );
+        ];
         $defaultCountry['bs'] = 'Cyrl';
 
         /* Bosnian (Latin, Bosnia and Herzegovina) */
-        $supportedLanguages['bs']['Latn'] = array(
+        $supportedLanguages['bs']['Latn'] = [
             'description' => 'Bosnian (Latin, Bosnia and Herzegovina)',
             'title_en' => 'Bosnian',
             'title' => 'bosanski',
@@ -431,10 +431,10 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x141A,
-        );
+        ];
 
         /* Breton (France) */
-        $supportedLanguages['br']['FR'] = array(
+        $supportedLanguages['br']['FR'] = [
             'description' => 'Breton (France)',
             'title_en' => 'Breton',
             'title' => 'brezhoneg',
@@ -443,11 +443,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x047E,
-        );
+        ];
         $defaultCountry['br'] = 'FR';
 
         /* Bulgarian (Bulgaria) */
-        $supportedLanguages['bg']['BG'] = array(
+        $supportedLanguages['bg']['BG'] = [
             'description' => 'Bulgarian (Bulgaria)',
             'title_en' => 'Bulgarian',
             'title' => 'български',
@@ -456,11 +456,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0402,
-        );
+        ];
         $defaultCountry['bg'] = 'BG';
 
         /* Catalan (Catalan) */
-        $supportedLanguages['ca']['ES'] = array(
+        $supportedLanguages['ca']['ES'] = [
             'description' => 'Catalan (Catalan)',
             'title_en' => 'Catalan',
             'title' => 'català',
@@ -469,11 +469,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0403,
-        );
+        ];
         $defaultCountry['ca'] = 'ES';
 
         /* Chinese (Hong Kong S.A.R.) */
-        $supportedLanguages['zh']['HK'] = array(
+        $supportedLanguages['zh']['HK'] = [
             'description' => 'Chinese (Hong Kong S.A.R.)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -482,11 +482,11 @@ class i18nHelper
             'ansi' => 950,
             'oem' => 950,
             'lcid' => 0x0C04,
-        );
+        ];
         $defaultCountry['zh'] = 'CN';
 
         /* Chinese (Macao S.A.R.) */
-        $supportedLanguages['zh']['MO'] = array(
+        $supportedLanguages['zh']['MO'] = [
             'description' => 'Chinese (Macao S.A.R.)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -495,10 +495,10 @@ class i18nHelper
             'ansi' => 950,
             'oem' => 950,
             'lcid' => 0x1404,
-        );
+        ];
 
         /* Chinese (People's Republic of China) */
-        $supportedLanguages['zh']['CN'] = array(
+        $supportedLanguages['zh']['CN'] = [
             'description' => 'Chinese (People\'s Republic of China)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -507,10 +507,10 @@ class i18nHelper
             'ansi' => 936,
             'oem' => 936,
             'lcid' => 0x0804,
-        );
+        ];
 
         /* Chinese (Simplified) */
-        $supportedLanguages['zh']['Hans'] = array(
+        $supportedLanguages['zh']['Hans'] = [
             'description' => 'Chinese (Simplified)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -519,10 +519,10 @@ class i18nHelper
             'ansi' => 936,
             'oem' => 936,
             'lcid' => 0x0004,
-        );
+        ];
 
         /* Chinese (Singapore) */
-        $supportedLanguages['zh']['SG'] = array(
+        $supportedLanguages['zh']['SG'] = [
             'description' => 'Chinese (Singapore)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -531,10 +531,10 @@ class i18nHelper
             'ansi' => 936,
             'oem' => 936,
             'lcid' => 0x1004,
-        );
+        ];
 
         /* Chinese (Taiwan) */
-        $supportedLanguages['zh']['TW'] = array(
+        $supportedLanguages['zh']['TW'] = [
             'description' => 'Chinese (Taiwan)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -543,10 +543,10 @@ class i18nHelper
             'ansi' => 950,
             'oem' => 950,
             'lcid' => 0x0404,
-        );
+        ];
 
         /* Chinese (Traditional) */
-        $supportedLanguages['zh']['Hant'] = array(
+        $supportedLanguages['zh']['Hant'] = [
             'description' => 'Chinese (Traditional)',
             'title_en' => 'Chinese',
             'title' => '中文',
@@ -555,10 +555,10 @@ class i18nHelper
             'ansi' => 950,
             'oem' => 950,
             'lcid' => 0x7C04,
-        );
+        ];
 
         /* Corsican (France) */
-        $supportedLanguages['co']['FR'] = array(
+        $supportedLanguages['co']['FR'] = [
             'description' => 'Corsican (France)',
             'title_en' => 'Corsican',
             'title' => 'Corsu',
@@ -567,11 +567,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0483,
-        );
+        ];
         $defaultCountry['co'] = 'FR';
 
         /* Croatian (Croatia) */
-        $supportedLanguages['hr']['HR'] = array(
+        $supportedLanguages['hr']['HR'] = [
             'description' => 'Croatian (Croatia)',
             'title_en' => 'Croatian',
             'title' => 'hrvatski',
@@ -580,11 +580,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x041A,
-        );
+        ];
         $defaultCountry['hr'] = 'HR';
 
         /* Croatian (Latin, Bosnia and Herzegovina) */
-        $supportedLanguages['hr']['BA'] = array(
+        $supportedLanguages['hr']['BA'] = [
             'description' => 'Croatian (Latin, Bosnia and Herzegovina)',
             'title_en' => 'Croatian',
             'title' => 'hrvatski',
@@ -593,10 +593,10 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x101A,
-        );
+        ];
 
         /* Czech (Czech Republic) */
-        $supportedLanguages['cs']['CZ'] = array(
+        $supportedLanguages['cs']['CZ'] = [
             'description' => 'Czech (Czech Republic)',
             'title_en' => 'Czech',
             'title' => 'čeština',
@@ -605,11 +605,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x0405,
-        );
+        ];
         $defaultCountry['cs'] = 'CZ';
 
         /* Danish (Denmark) */
-        $supportedLanguages['da']['DK'] = array(
+        $supportedLanguages['da']['DK'] = [
             'description' => 'Danish (Denmark)',
             'title_en' => 'Danish',
             'title' => 'dansk',
@@ -618,11 +618,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0406,
-        );
+        ];
         $defaultCountry['da'] = 'DK';
 
         /* Dari (Afghanistan) */
-        $supportedLanguages['prs']['AF'] = array(
+        $supportedLanguages['prs']['AF'] = [
             'description' => 'Dari (Afghanistan)',
             'title_en' => 'Dari',
             'title' => 'درى',
@@ -631,11 +631,11 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x048C,
-        );
+        ];
         $defaultCountry['prs'] = 'AF';
 
         /* Divehi (Maldives)‎ */
-        $supportedLanguages['div']['MV'] = array(
+        $supportedLanguages['div']['MV'] = [
             'description' => 'Divehi (Maldives)‎',
             'title_en' => 'Divehi',
             'title' => 'ދިވެހިބަސް',
@@ -644,11 +644,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0465,
-        );
+        ];
         $defaultCountry['div'] = 'MV';
 
         /* Dutch (Belgium) */
-        $supportedLanguages['nl']['BE'] = array(
+        $supportedLanguages['nl']['BE'] = [
             'description' => 'Dutch (Belgium)',
             'title_en' => 'Dutch',
             'title' => 'Nederlands',
@@ -657,11 +657,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0813,
-        );
+        ];
         $defaultCountry['nl'] = 'NL';
 
         /* Dutch (Netherlands) */
-        $supportedLanguages['nl']['NL'] = array(
+        $supportedLanguages['nl']['NL'] = [
             'description' => 'Dutch (Netherlands)',
             'title_en' => 'Dutch',
             'title' => 'Nederlands',
@@ -670,10 +670,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0413,
-        );
+        ];
 
         /* English (Australia) */
-        $supportedLanguages['en']['AU'] = array(
+        $supportedLanguages['en']['AU'] = [
             'description' => 'English (Australia)',
             'title_en' => 'English',
             'title' => 'English',
@@ -682,11 +682,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C09,
-        );
+        ];
         $defaultCountry['en'] = 'US';
 
         /* English (Belize) */
-        $supportedLanguages['en']['BZ'] = array(
+        $supportedLanguages['en']['BZ'] = [
             'description' => 'English (Belize)',
             'title_en' => 'English',
             'title' => 'English',
@@ -695,10 +695,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x2809,
-        );
+        ];
 
         /* English (Canada) */
-        $supportedLanguages['en']['CA'] = array(
+        $supportedLanguages['en']['CA'] = [
             'description' => 'English (Canada)',
             'title_en' => 'English',
             'title' => 'English',
@@ -707,10 +707,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1009,
-        );
+        ];
 
         /* English (Caribbean) */
-        $supportedLanguages['en']['029'] = array(
+        $supportedLanguages['en']['029'] = [
             'description' => 'English (Caribbean)',
             'title_en' => 'English',
             'title' => 'English',
@@ -719,10 +719,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x2409,
-        );
+        ];
 
         /* English (India) */
-        $supportedLanguages['en']['IN'] = array(
+        $supportedLanguages['en']['IN'] = [
             'description' => 'English (India)',
             'title_en' => 'English',
             'title' => 'English',
@@ -731,10 +731,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x4009,
-        );
+        ];
 
         /* English (Ireland) */
-        $supportedLanguages['en']['IE'] = array(
+        $supportedLanguages['en']['IE'] = [
             'description' => 'English (Ireland)',
             'title_en' => 'English',
             'title' => 'English',
@@ -743,10 +743,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1809,
-        );
+        ];
 
         /* English (Jamaica) */
-        $supportedLanguages['en']['JM'] = array(
+        $supportedLanguages['en']['JM'] = [
             'description' => 'English (Jamaica)',
             'title_en' => 'English',
             'title' => 'English',
@@ -755,10 +755,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x2009,
-        );
+        ];
 
         /* English (Malaysia) */
-        $supportedLanguages['en']['MY'] = array(
+        $supportedLanguages['en']['MY'] = [
             'description' => 'English (Malaysia)',
             'title_en' => 'English',
             'title' => 'English',
@@ -767,10 +767,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x4409,
-        );
+        ];
 
         /* English (New Zealand) */
-        $supportedLanguages['en']['NZ'] = array(
+        $supportedLanguages['en']['NZ'] = [
             'description' => 'English (New Zealand)',
             'title_en' => 'English',
             'title' => 'English',
@@ -779,10 +779,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1409,
-        );
+        ];
 
         /* English (Republic of the Philippines) */
-        $supportedLanguages['en']['PH'] = array(
+        $supportedLanguages['en']['PH'] = [
             'description' => 'English (Republic of the Philippines)',
             'title_en' => 'English',
             'title' => 'English',
@@ -791,10 +791,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x3409,
-        );
+        ];
 
         /* English (Singapore) */
-        $supportedLanguages['en']['SG'] = array(
+        $supportedLanguages['en']['SG'] = [
             'description' => 'English (Singapore)',
             'title_en' => 'English',
             'title' => 'English',
@@ -803,10 +803,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x4809,
-        );
+        ];
 
         /* English (South Africa) */
-        $supportedLanguages['en']['ZA'] = array(
+        $supportedLanguages['en']['ZA'] = [
             'description' => 'English (South Africa)',
             'title_en' => 'English',
             'title' => 'English',
@@ -815,10 +815,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x1C09,
-        );
+        ];
 
         /* English (Trinidad and Tobago) */
-        $supportedLanguages['en']['TT'] = array(
+        $supportedLanguages['en']['TT'] = [
             'description' => 'English (Trinidad and Tobago)',
             'title_en' => 'English',
             'title' => 'English',
@@ -827,10 +827,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x2C09,
-        );
+        ];
 
         /* English (United Kingdom) */
-        $supportedLanguages['en']['GB'] = array(
+        $supportedLanguages['en']['GB'] = [
             'description' => 'English (United Kingdom)',
             'title_en' => 'English',
             'title' => 'English',
@@ -839,10 +839,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0809,
-        );
+        ];
 
         /* English (United States) */
-        $supportedLanguages['en']['US'] = array(
+        $supportedLanguages['en']['US'] = [
             'description' => 'English (United States)',
             'title_en' => 'English',
             'title' => 'English',
@@ -851,10 +851,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0409,
-        );
+        ];
 
         /* English (Zimbabwe) */
-        $supportedLanguages['en']['ZW'] = array(
+        $supportedLanguages['en']['ZW'] = [
             'description' => 'English (Zimbabwe)',
             'title_en' => 'English',
             'title' => 'English',
@@ -863,10 +863,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x3009,
-        );
+        ];
 
         /* Estonian (Estonia) */
-        $supportedLanguages['et']['EE'] = array(
+        $supportedLanguages['et']['EE'] = [
             'description' => 'Estonian (Estonia)',
             'title_en' => 'Estonian',
             'title' => 'eesti',
@@ -875,11 +875,11 @@ class i18nHelper
             'ansi' => 1257,
             'oem' => 775,
             'lcid' => 0x0425,
-        );
+        ];
         $defaultCountry['et'] = 'EE';
 
         /* Faroese (Faroe Islands) */
-        $supportedLanguages['fo']['FO'] = array(
+        $supportedLanguages['fo']['FO'] = [
             'description' => 'Faroese (Faroe Islands)',
             'title_en' => 'Faroese',
             'title' => 'føroyskt',
@@ -888,11 +888,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0438,
-        );
+        ];
         $defaultCountry['fo'] = 'FO';
 
         /* Filipino (Philippines) */
-        $supportedLanguages['fil']['PH'] = array(
+        $supportedLanguages['fil']['PH'] = [
             'description' => 'Filipino (Philippines)',
             'title_en' => 'Filipino',
             'title' => 'Filipino',
@@ -901,11 +901,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0464,
-        );
+        ];
         $defaultCountry['fil'] = 'PH';
 
         /* Finnish (Finland) */
-        $supportedLanguages['fi']['FI'] = array(
+        $supportedLanguages['fi']['FI'] = [
             'description' => 'Finnish (Finland)',
             'title_en' => 'Finnish',
             'title' => 'suomi',
@@ -914,11 +914,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x040B,
-        );
+        ];
         $defaultCountry['fi'] = 'FI';
 
         /* French (Belgium) */
-        $supportedLanguages['fr']['BE'] = array(
+        $supportedLanguages['fr']['BE'] = [
             'description' => 'French (Belgium)',
             'title_en' => 'French',
             'title' => 'français',
@@ -927,11 +927,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x080C,
-        );
+        ];
         $defaultCountry['fr'] = 'FR';
 
         /* French (Canada) */
-        $supportedLanguages['fr']['CA'] = array(
+        $supportedLanguages['fr']['CA'] = [
             'description' => 'French (Canada)',
             'title_en' => 'French',
             'title' => 'français',
@@ -940,10 +940,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C0C,
-        );
+        ];
 
         /* French (France) */
-        $supportedLanguages['fr']['FR'] = array(
+        $supportedLanguages['fr']['FR'] = [
             'description' => 'French (France)',
             'title_en' => 'French',
             'title' => 'français',
@@ -952,10 +952,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x040C,
-        );
+        ];
 
         /* French (Luxembourg) */
-        $supportedLanguages['fr']['LU'] = array(
+        $supportedLanguages['fr']['LU'] = [
             'description' => 'French (Luxembourg)',
             'title_en' => 'French',
             'title' => 'français',
@@ -964,10 +964,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x140C,
-        );
+        ];
 
         /* French (Principality of Monaco) */
-        $supportedLanguages['fr']['MC'] = array(
+        $supportedLanguages['fr']['MC'] = [
             'description' => 'French (Principality of Monaco)',
             'title_en' => 'French',
             'title' => 'français',
@@ -976,10 +976,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x180C,
-        );
+        ];
 
         /* French (Switzerland) */
-        $supportedLanguages['fr']['CH'] = array(
+        $supportedLanguages['fr']['CH'] = [
             'description' => 'French (Switzerland)',
             'title_en' => 'French',
             'title' => 'français',
@@ -988,10 +988,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x100C,
-        );
+        ];
 
         /* Frisian (Netherlands) */
-        $supportedLanguages['fy']['NL'] = array(
+        $supportedLanguages['fy']['NL'] = [
             'description' => 'Frisian (Netherlands)',
             'title_en' => 'Frisian',
             'title' => 'Frysk',
@@ -1000,11 +1000,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0462,
-        );
+        ];
         $defaultCountry['fy'] = 'NL';
 
         /* Galician (Galician) */
-        $supportedLanguages['gl']['ES'] = array(
+        $supportedLanguages['gl']['ES'] = [
             'description' => 'Galician (Galician)',
             'title_en' => 'Galician',
             'title' => 'galego',
@@ -1013,11 +1013,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0456,
-        );
+        ];
         $defaultCountry['gl'] = 'ES';
 
         /* Georgian (Georgia) */
-        $supportedLanguages['ka']['GE'] = array(
+        $supportedLanguages['ka']['GE'] = [
             'description' => 'Georgian (Georgia)',
             'title_en' => 'Georgian',
             'title' => 'ქართული',
@@ -1026,11 +1026,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0437,
-        );
+        ];
         $defaultCountry['ka'] = 'GE';
 
         /* German (Austria) */
-        $supportedLanguages['de']['AT'] = array(
+        $supportedLanguages['de']['AT'] = [
             'description' => 'German (Austria)',
             'title_en' => 'German',
             'title' => 'Deutsch',
@@ -1039,11 +1039,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C07,
-        );
+        ];
         $defaultCountry['de'] = 'DE';
 
         /* German (Germany) */
-        $supportedLanguages['de']['DE'] = array(
+        $supportedLanguages['de']['DE'] = [
             'description' => 'German (Germany)',
             'title_en' => 'German',
             'title' => 'Deutsch',
@@ -1052,10 +1052,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0407,
-        );
+        ];
 
         /* German (Liechtenstein) */
-        $supportedLanguages['de']['LI'] = array(
+        $supportedLanguages['de']['LI'] = [
             'description' => 'German (Liechtenstein)',
             'title_en' => 'German',
             'title' => 'Deutsch',
@@ -1064,10 +1064,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1407,
-        );
+        ];
 
         /* German (Luxembourg) */
-        $supportedLanguages['de']['LU'] = array(
+        $supportedLanguages['de']['LU'] = [
             'description' => 'German (Luxembourg)',
             'title_en' => 'German',
             'title' => 'Deutsch',
@@ -1076,10 +1076,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1007,
-        );
+        ];
 
         /* German (Switzerland) */
-        $supportedLanguages['de']['CH'] = array(
+        $supportedLanguages['de']['CH'] = [
             'description' => 'German (Switzerland)',
             'title_en' => 'German',
             'title' => 'Deutsch',
@@ -1088,10 +1088,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0807,
-        );
+        ];
 
         /* Greek (Greece) */
-        $supportedLanguages['el']['GR'] = array(
+        $supportedLanguages['el']['GR'] = [
             'description' => 'Greek (Greece)',
             'title_en' => 'Greek',
             'title' => 'ελληνικά',
@@ -1100,11 +1100,11 @@ class i18nHelper
             'ansi' => 1253,
             'oem' => 737,
             'lcid' => 0x0408,
-        );
+        ];
         $defaultCountry['el'] = 'GR';
 
         /* Greenlandic (Greenland) */
-        $supportedLanguages['kl']['GL'] = array(
+        $supportedLanguages['kl']['GL'] = [
             'description' => 'Greenlandic (Greenland)',
             'title_en' => 'Greenlandic',
             'title' => 'kalaallisut',
@@ -1113,11 +1113,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x046F,
-        );
+        ];
         $defaultCountry['kl'] = 'GL';
 
         /* Gujarati (India) */
-        $supportedLanguages['gu']['IN'] = array(
+        $supportedLanguages['gu']['IN'] = [
             'description' => 'Gujarati (India)',
             'title_en' => 'Gujarati',
             'title' => 'ગુજરાતી',
@@ -1126,11 +1126,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0447,
-        );
+        ];
         $defaultCountry['gu'] = 'IN';
 
         /* Hausa (Latin, Nigeria) */
-        $supportedLanguages['ha']['Latn'] = array(
+        $supportedLanguages['ha']['Latn'] = [
             'description' => 'Hausa (Latin, Nigeria)',
             'title_en' => 'Hausa',
             'title' => 'Hausa',
@@ -1139,11 +1139,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0468,
-        );
+        ];
         $defaultCountry['ha'] = 'Latn';
 
         /* Hebrew (Israel)‎ */
-        $supportedLanguages['he']['IL'] = array(
+        $supportedLanguages['he']['IL'] = [
             'description' => 'Hebrew (Israel)‎',
             'title_en' => 'Hebrew',
             'title' => 'עברית',
@@ -1152,11 +1152,11 @@ class i18nHelper
             'ansi' => 1255,
             'oem' => 862,
             'lcid' => 0x040D,
-        );
+        ];
         $defaultCountry['he'] = 'IL';
 
         /* Hindi (India) */
-        $supportedLanguages['hi']['IN'] = array(
+        $supportedLanguages['hi']['IN'] = [
             'description' => 'Hindi (India)',
             'title_en' => 'Hindi',
             'title' => 'हिंदी',
@@ -1165,11 +1165,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0439,
-        );
+        ];
         $defaultCountry['hi'] = 'IN';
 
         /* Hungarian (Hungary) */
-        $supportedLanguages['hu']['HU'] = array(
+        $supportedLanguages['hu']['HU'] = [
             'description' => 'Hungarian (Hungary)',
             'title_en' => 'Hungarian',
             'title' => 'magyar',
@@ -1178,11 +1178,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x040E,
-        );
+        ];
         $defaultCountry['hu'] = 'HU';
 
         /* Icelandic (Iceland) */
-        $supportedLanguages['is']['IS'] = array(
+        $supportedLanguages['is']['IS'] = [
             'description' => 'Icelandic (Iceland)',
             'title_en' => 'Icelandic',
             'title' => 'íslenska',
@@ -1191,11 +1191,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x040F,
-        );
+        ];
         $defaultCountry['is'] = 'IS';
 
         /* Igbo (Nigeria) */
-        $supportedLanguages['ig']['NG'] = array(
+        $supportedLanguages['ig']['NG'] = [
             'description' => 'Igbo (Nigeria)',
             'title_en' => 'Igbo',
             'title' => 'Igbo',
@@ -1204,11 +1204,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0470,
-        );
+        ];
         $defaultCountry['ig'] = 'NG';
 
         /* Indonesian (Indonesia) */
-        $supportedLanguages['id']['ID'] = array(
+        $supportedLanguages['id']['ID'] = [
             'description' => 'Indonesian (Indonesia)',
             'title_en' => 'Indonesian',
             'title' => 'Bahasa Indonesia',
@@ -1217,11 +1217,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0421,
-        );
+        ];
         $defaultCountry['id'] = 'ID';
 
         /* Inuktitut (Latin, Canada) */
-        $supportedLanguages['iu']['Latn'] = array(
+        $supportedLanguages['iu']['Latn'] = [
             'description' => 'Inuktitut (Latin, Canada)',
             'title_en' => 'Inuktitut',
             'title' => 'Inuktitut',
@@ -1230,11 +1230,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x085D,
-        );
+        ];
         $defaultCountry['iu'] = 'Latn';
 
         /* Inuktitut (Syllabics, Canada) */
-        $supportedLanguages['iu']['Cans'] = array(
+        $supportedLanguages['iu']['Cans'] = [
             'description' => 'Inuktitut (Syllabics, Canada)',
             'title_en' => 'Inuktitut',
             'title' => 'ᐃᓄᒃᑎᑐᑦ',
@@ -1243,10 +1243,10 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x045D,
-        );
+        ];
 
         /* Irish (Ireland) */
-        $supportedLanguages['ga']['IE'] = array(
+        $supportedLanguages['ga']['IE'] = [
             'description' => 'Irish (Ireland)',
             'title_en' => 'Irish',
             'title' => 'Gaeilge',
@@ -1255,11 +1255,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x083C,
-        );
+        ];
         $defaultCountry['ga'] = 'IE';
 
         /* isiXhosa (South Africa) */
-        $supportedLanguages['xh']['ZA'] = array(
+        $supportedLanguages['xh']['ZA'] = [
             'description' => 'isiXhosa (South Africa)',
             'title_en' => 'isiXhosa',
             'title' => 'isiXhosa',
@@ -1268,11 +1268,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0434,
-        );
+        ];
         $defaultCountry['xh'] = 'ZA';
 
         /* isiZulu (South Africa) */
-        $supportedLanguages['zu']['ZA'] = array(
+        $supportedLanguages['zu']['ZA'] = [
             'description' => 'isiZulu (South Africa)',
             'title_en' => 'isiZulu',
             'title' => 'isiZulu',
@@ -1281,11 +1281,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0435,
-        );
+        ];
         $defaultCountry['zu'] = 'ZA';
 
         /* Italian (Italy) */
-        $supportedLanguages['it']['IT'] = array(
+        $supportedLanguages['it']['IT'] = [
             'description' => 'Italian (Italy)',
             'title_en' => 'Italian',
             'title' => 'italiano',
@@ -1294,11 +1294,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0410,
-        );
+        ];
         $defaultCountry['it'] = 'IT';
 
         /* Italian (Switzerland) */
-        $supportedLanguages['it']['CH'] = array(
+        $supportedLanguages['it']['CH'] = [
             'description' => 'Italian (Switzerland)',
             'title_en' => 'Italian',
             'title' => 'italiano',
@@ -1307,10 +1307,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0810,
-        );
+        ];
 
         /* Japanese (Japan) */
-        $supportedLanguages['ja']['JP'] = array(
+        $supportedLanguages['ja']['JP'] = [
             'description' => 'Japanese (Japan)',
             'title_en' => 'Japanese',
             'title' => '日本語',
@@ -1319,11 +1319,11 @@ class i18nHelper
             'ansi' => 932,
             'oem' => 932,
             'lcid' => 0x0411,
-        );
+        ];
         $defaultCountry['ja'] = 'JP';
 
         /* Kannada (India) */
-        $supportedLanguages['kn']['IN'] = array(
+        $supportedLanguages['kn']['IN'] = [
             'description' => 'Kannada (India)',
             'title_en' => 'Kannada',
             'title' => 'ಕನ್ನಡ',
@@ -1332,11 +1332,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044B,
-        );
+        ];
         $defaultCountry['kn'] = 'IN';
 
         /* Kazakh (Kazakhstan) */
-        $supportedLanguages['kk']['KZ'] = array(
+        $supportedLanguages['kk']['KZ'] = [
             'description' => 'Kazakh (Kazakhstan)',
             'title_en' => 'Kazakh',
             'title' => 'Қазақ',
@@ -1345,11 +1345,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x043F,
-        );
+        ];
         $defaultCountry['kk'] = 'KZ';
 
         /* Khmer (Cambodia) */
-        $supportedLanguages['km']['KH'] = array(
+        $supportedLanguages['km']['KH'] = [
             'description' => 'Khmer (Cambodia)',
             'title_en' => 'Khmer',
             'title' => 'ខ្មែរ',
@@ -1358,11 +1358,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0453,
-        );
+        ];
         $defaultCountry['km'] = 'KH';
 
         /* K'iche (Guatemala) */
-        $supportedLanguages['qut']['GT'] = array(
+        $supportedLanguages['qut']['GT'] = [
             'description' => 'K\'iche (Guatemala)',
             'title_en' => 'K\'iche',
             'title' => 'K\'iche',
@@ -1371,11 +1371,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0486,
-        );
+        ];
         $defaultCountry['qut'] = 'GT';
 
         /* Kinyarwanda (Rwanda) */
-        $supportedLanguages['rw']['RW'] = array(
+        $supportedLanguages['rw']['RW'] = [
             'description' => 'Kinyarwanda (Rwanda)',
             'title_en' => 'Kinyarwanda',
             'title' => 'Kinyarwanda',
@@ -1384,11 +1384,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0487,
-        );
+        ];
         $defaultCountry['rw'] = 'RW';
 
         /* Kiswahili (Kenya) */
-        $supportedLanguages['sw']['KE'] = array(
+        $supportedLanguages['sw']['KE'] = [
             'description' => 'Kiswahili (Kenya)',
             'title_en' => 'Kiswahili',
             'title' => 'Kiswahili',
@@ -1397,11 +1397,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x0441,
-        );
+        ];
         $defaultCountry['sw'] = 'KE';
 
         /* Konkani (India) */
-        $supportedLanguages['kok']['IN'] = array(
+        $supportedLanguages['kok']['IN'] = [
             'description' => 'Konkani (India)',
             'title_en' => 'Konkani',
             'title' => 'कोंकणी',
@@ -1410,11 +1410,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0457,
-        );
+        ];
         $defaultCountry['kok'] = 'IN';
 
         /* Korean (Korea) */
-        $supportedLanguages['ko']['KR'] = array(
+        $supportedLanguages['ko']['KR'] = [
             'description' => 'Korean (Korea)',
             'title_en' => 'Korean',
             'title' => '한국어',
@@ -1423,11 +1423,11 @@ class i18nHelper
             'ansi' => 949,
             'oem' => 949,
             'lcid' => 0x0412,
-        );
+        ];
         $defaultCountry['ko'] = 'KR';
 
         /* Kyrgyz (Kyrgyzstan) */
-        $supportedLanguages['ky']['KG'] = array(
+        $supportedLanguages['ky']['KG'] = [
             'description' => 'Kyrgyz (Kyrgyzstan)',
             'title_en' => 'Kyrgyz',
             'title' => 'Кыргыз',
@@ -1436,11 +1436,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0440,
-        );
+        ];
         $defaultCountry['ky'] = 'KG';
 
         /* Lao (Lao P.D.R.) */
-        $supportedLanguages['lo']['LA'] = array(
+        $supportedLanguages['lo']['LA'] = [
             'description' => 'Lao (Lao P.D.R.)',
             'title_en' => 'Lao',
             'title' => 'ລາວ',
@@ -1449,11 +1449,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0454,
-        );
+        ];
         $defaultCountry['lo'] = 'LA';
 
         /* Latvian (Latvia) */
-        $supportedLanguages['lv']['LV'] = array(
+        $supportedLanguages['lv']['LV'] = [
             'description' => 'Latvian (Latvia)',
             'title_en' => 'Latvian',
             'title' => 'latviešu',
@@ -1462,11 +1462,11 @@ class i18nHelper
             'ansi' => 1257,
             'oem' => 775,
             'lcid' => 0x0426,
-        );
+        ];
         $defaultCountry['lv'] = 'LV';
 
         /* Lithuanian (Lithuania) */
-        $supportedLanguages['lt']['LT'] = array(
+        $supportedLanguages['lt']['LT'] = [
             'description' => 'Lithuanian (Lithuania)',
             'title_en' => 'Lithuanian',
             'title' => 'lietuvių',
@@ -1475,11 +1475,11 @@ class i18nHelper
             'ansi' => 1257,
             'oem' => 775,
             'lcid' => 0x0427,
-        );
+        ];
         $defaultCountry['lt'] = 'LT';
 
         /* Lower Sorbian (Germany) */
-        $supportedLanguages['wee']['DE'] = array(
+        $supportedLanguages['wee']['DE'] = [
             'description' => 'Lower Sorbian (Germany)',
             'title_en' => 'Lower Sorbian',
             'title' => 'dolnoserbšćina',
@@ -1488,11 +1488,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x082E,
-        );
+        ];
         $defaultCountry['wee'] = 'DE';
 
         /* Luxembourgish (Luxembourg) */
-        $supportedLanguages['lb']['LU'] = array(
+        $supportedLanguages['lb']['LU'] = [
             'description' => 'Luxembourgish (Luxembourg)',
             'title_en' => 'Luxembourgish',
             'title' => 'Lëtzebuergesch',
@@ -1501,11 +1501,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x046E,
-        );
+        ];
         $defaultCountry['lb'] = 'LU';
 
         /* Macedonian (Former Yugoslav Republic of Macedonia) */
-        $supportedLanguages['mk']['MK'] = array(
+        $supportedLanguages['mk']['MK'] = [
             'description' => 'Macedonian (Former Yugoslav Republic of Macedonia)',
             'title_en' => 'Macedonian',
             'title' => 'македонски јазик',
@@ -1514,11 +1514,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x042F,
-        );
+        ];
         $defaultCountry['mk'] = 'MK';
 
         /* Malay (Brunei Darussalam) */
-        $supportedLanguages['ms']['BN'] = array(
+        $supportedLanguages['ms']['BN'] = [
             'description' => 'Malay (Brunei Darussalam)',
             'title_en' => 'Malay',
             'title' => 'Bahasa Malaysia',
@@ -1527,11 +1527,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x083E,
-        );
+        ];
         $defaultCountry['ms'] = 'BN';
 
         /* Malay (Malaysia) */
-        $supportedLanguages['ms']['MY'] = array(
+        $supportedLanguages['ms']['MY'] = [
             'description' => 'Malay (Malaysia)',
             'title_en' => 'Malay',
             'title' => 'Bahasa Malaysia',
@@ -1540,10 +1540,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x043E,
-        );
+        ];
 
         /* Malayalam (India) */
-        $supportedLanguages['ml']['IN'] = array(
+        $supportedLanguages['ml']['IN'] = [
             'description' => 'Malayalam (India)',
             'title_en' => 'Malayalam',
             'title' => 'മലയാളം',
@@ -1552,11 +1552,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044C,
-        );
+        ];
         $defaultCountry['ml'] = 'IN';
 
         /* Maltese (Malta) */
-        $supportedLanguages['mt']['MT'] = array(
+        $supportedLanguages['mt']['MT'] = [
             'description' => 'Maltese (Malta)',
             'title_en' => 'Maltese',
             'title' => 'Malti',
@@ -1565,11 +1565,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x043A,
-        );
+        ];
         $defaultCountry['mt'] = 'MT';
 
         /* Maori (New Zealand) */
-        $supportedLanguages['mi']['NZ'] = array(
+        $supportedLanguages['mi']['NZ'] = [
             'description' => 'Maori (New Zealand)',
             'title_en' => 'Maori',
             'title' => 'Reo Māori',
@@ -1578,11 +1578,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0481,
-        );
+        ];
         $defaultCountry['mi'] = 'NZ';
 
         /* Mapudungun (Chile) */
-        $supportedLanguages['arn']['CL'] = array(
+        $supportedLanguages['arn']['CL'] = [
             'description' => 'Mapudungun (Chile)',
             'title_en' => 'Mapudungun',
             'title' => 'Mapudungun',
@@ -1591,11 +1591,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x047A,
-        );
+        ];
         $defaultCountry['arn'] = 'CL';
 
         /* Marathi (India) */
-        $supportedLanguages['mr']['IN'] = array(
+        $supportedLanguages['mr']['IN'] = [
             'description' => 'Marathi (India)',
             'title_en' => 'Marathi',
             'title' => 'मराठी',
@@ -1604,11 +1604,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044E,
-        );
+        ];
         $defaultCountry['mr'] = 'IN';
 
         /* Mohawk (Mohawk) */
-        $supportedLanguages['moh']['CA'] = array(
+        $supportedLanguages['moh']['CA'] = [
             'description' => 'Mohawk (Mohawk)',
             'title_en' => 'Mohawk',
             'title' => 'Kanien\'kéha',
@@ -1617,11 +1617,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x047C,
-        );
+        ];
         $defaultCountry['moh'] = 'CA';
 
         /* Mongolian (Cyrillic, Mongolia) */
-        $supportedLanguages['mn']['MN'] = array(
+        $supportedLanguages['mn']['MN'] = [
             'description' => 'Mongolian (Cyrillic, Mongolia)',
             'title_en' => 'Mongolian',
             'title' => 'Монгол хэл',
@@ -1630,11 +1630,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0450,
-        );
+        ];
         $defaultCountry['mn'] = 'MN';
 
         /* Mongolian (Traditional Mongolian, PRC) */
-        $supportedLanguages['mn']['Mong'] = array(
+        $supportedLanguages['mn']['Mong'] = [
             'description' => 'Mongolian (Traditional Mongolian, PRC)',
             'title_en' => 'Mongolian',
             'title' => 'ᠮᠣᠩᠭᠤᠯ ᠬᠡᠯᠡ',
@@ -1643,10 +1643,10 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0850,
-        );
+        ];
 
         /* Nepali (Nepal) */
-        $supportedLanguages['ne']['NP'] = array(
+        $supportedLanguages['ne']['NP'] = [
             'description' => 'Nepali (Nepal)',
             'title_en' => 'Nepali',
             'title' => 'नेपाली',
@@ -1655,11 +1655,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0461,
-        );
+        ];
         $defaultCountry['ne'] = 'NP';
 
         /* Norwegian, Bokmål (Norway) */
-        $supportedLanguages['nb']['NO'] = array(
+        $supportedLanguages['nb']['NO'] = [
             'description' => 'Norwegian, Bokmål (Norway)',
             'title_en' => 'Norwegian',
             'title' => 'norsk, bokmål',
@@ -1668,11 +1668,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0414,
-        );
+        ];
         $defaultCountry['nb'] = 'NO';
 
         /* Norwegian, Nynorsk (Norway) */
-        $supportedLanguages['nn']['NO'] = array(
+        $supportedLanguages['nn']['NO'] = [
             'description' => 'Norwegian, Nynorsk (Norway)',
             'title_en' => 'Norwegian',
             'title' => 'norsk, nynorsk',
@@ -1681,11 +1681,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0814,
-        );
+        ];
         $defaultCountry['nn'] = 'NO';
 
         /* Occitan (France) */
-        $supportedLanguages['oc']['FR'] = array(
+        $supportedLanguages['oc']['FR'] = [
             'description' => 'Occitan (France)',
             'title_en' => 'Occitan',
             'title' => 'Occitan',
@@ -1694,11 +1694,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0482,
-        );
+        ];
         $defaultCountry['oc'] = 'FR';
 
         /* Oriya (India) */
-        $supportedLanguages['or']['IN'] = array(
+        $supportedLanguages['or']['IN'] = [
             'description' => 'Oriya (India)',
             'title_en' => 'Oriya',
             'title' => 'ଓଡ଼ିଆ',
@@ -1707,11 +1707,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0448,
-        );
+        ];
         $defaultCountry['or'] = 'IN';
 
         /* Pashto (Afghanistan) */
-        $supportedLanguages['ps']['AF'] = array(
+        $supportedLanguages['ps']['AF'] = [
             'description' => 'Pashto (Afghanistan)',
             'title_en' => 'Pashto',
             'title' => 'پښتو',
@@ -1720,11 +1720,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0463,
-        );
+        ];
         $defaultCountry['ps'] = 'AF';
 
         /* Persian‎ */
-        $supportedLanguages['fa']['IR'] = array(
+        $supportedLanguages['fa']['IR'] = [
             'description' => 'Persian‎',
             'title_en' => 'Persian',
             'title' => 'فارسى',
@@ -1733,11 +1733,11 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0429,
-        );
+        ];
         $defaultCountry['fa'] = 'IR';
 
         /* Polish (Poland) */
-        $supportedLanguages['pl']['PL'] = array(
+        $supportedLanguages['pl']['PL'] = [
             'description' => 'Polish (Poland)',
             'title_en' => 'Polish',
             'title' => 'polski',
@@ -1746,11 +1746,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x0415,
-        );
+        ];
         $defaultCountry['pl'] = 'PL';
 
         /* Portuguese (Brazil) */
-        $supportedLanguages['pt']['BR'] = array(
+        $supportedLanguages['pt']['BR'] = [
             'description' => 'Portuguese (Brazil)',
             'title_en' => 'Portuguese',
             'title' => 'Português',
@@ -1759,11 +1759,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0416,
-        );
+        ];
         $defaultCountry['pt'] = 'BR';
 
         /* Portuguese (Portugal) */
-        $supportedLanguages['pt']['PT'] = array(
+        $supportedLanguages['pt']['PT'] = [
             'description' => 'Portuguese (Portugal)',
             'title_en' => 'Portuguese',
             'title' => 'português',
@@ -1772,10 +1772,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0816,
-        );
+        ];
 
         /* Punjabi (India) */
-        $supportedLanguages['pa']['IN'] = array(
+        $supportedLanguages['pa']['IN'] = [
             'description' => 'Punjabi (India)',
             'title_en' => 'Punjabi',
             'title' => 'ਪੰਜਾਬੀ',
@@ -1784,11 +1784,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0446,
-        );
+        ];
         $defaultCountry['pa'] = 'IN';
 
         /* Quechua (Bolivia) */
-        $supportedLanguages['quz']['BO'] = array(
+        $supportedLanguages['quz']['BO'] = [
             'description' => 'Quechua (Bolivia)',
             'title_en' => 'Quechua',
             'title' => 'runasimi',
@@ -1797,11 +1797,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x046B,
-        );
+        ];
         $defaultCountry['quz'] = 'BO';
 
         /* Quechua (Ecuador) */
-        $supportedLanguages['quz']['EC'] = array(
+        $supportedLanguages['quz']['EC'] = [
             'description' => 'Quechua (Ecuador)',
             'title_en' => 'Quechua',
             'title' => 'runasimi',
@@ -1810,10 +1810,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x086B,
-        );
+        ];
 
         /* Quechua (Peru) */
-        $supportedLanguages['quz']['PE'] = array(
+        $supportedLanguages['quz']['PE'] = [
             'description' => 'Quechua (Peru)',
             'title_en' => 'Quechua',
             'title' => 'runasimi',
@@ -1822,10 +1822,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C6B,
-        );
+        ];
 
         /* Romanian (Romania) */
-        $supportedLanguages['ro']['RO'] = array(
+        $supportedLanguages['ro']['RO'] = [
             'description' => 'Romanian (Romania)',
             'title_en' => 'Romanian',
             'title' => 'română',
@@ -1834,11 +1834,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x0418,
-        );
+        ];
         $defaultCountry['ro'] = 'RO';
 
         /* Romansh (Switzerland) */
-        $supportedLanguages['rm']['CH'] = array(
+        $supportedLanguages['rm']['CH'] = [
             'description' => 'Romansh (Switzerland)',
             'title_en' => 'Romansh',
             'title' => 'Rumantsch',
@@ -1847,11 +1847,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0417,
-        );
+        ];
         $defaultCountry['rm'] = 'CH';
 
         /* Russian (Russia) */
-        $supportedLanguages['ru']['RU'] = array(
+        $supportedLanguages['ru']['RU'] = [
             'description' => 'Russian (Russia)',
             'title_en' => 'Russian',
             'title' => 'русский',
@@ -1860,11 +1860,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0419,
-        );
+        ];
         $defaultCountry['ru'] = 'RU';
 
         /* Sami, Inari (Finland) */
-        $supportedLanguages['smn']['FI'] = array(
+        $supportedLanguages['smn']['FI'] = [
             'description' => 'Sami, Inari (Finland)',
             'title_en' => 'Sami',
             'title' => 'sämikielâ',
@@ -1873,11 +1873,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x243B,
-        );
+        ];
         $defaultCountry['smn'] = 'FI';
 
         /* Sami, Lule (Norway) */
-        $supportedLanguages['smj']['NO'] = array(
+        $supportedLanguages['smj']['NO'] = [
             'description' => 'Sami, Lule (Norway)',
             'title_en' => 'Sami',
             'title' => 'julevusámegiella',
@@ -1886,11 +1886,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x103B,
-        );
+        ];
         $defaultCountry['smj'] = 'NO';
 
         /* Sami, Lule (Sweden) */
-        $supportedLanguages['smj']['SE'] = array(
+        $supportedLanguages['smj']['SE'] = [
             'description' => 'Sami, Lule (Sweden)',
             'title_en' => 'Sami',
             'title' => 'julevusámegiella',
@@ -1899,10 +1899,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x143B,
-        );
+        ];
 
         /* Sami, Northern (Finland) */
-        $supportedLanguages['se']['FI'] = array(
+        $supportedLanguages['se']['FI'] = [
             'description' => 'Sami, Northern (Finland)',
             'title_en' => 'Sami',
             'title' => 'davvisámegiella',
@@ -1911,11 +1911,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C3B,
-        );
+        ];
         $defaultCountry['se'] = 'SE';
 
         /* Sami, Northern (Norway) */
-        $supportedLanguages['se']['NO'] = array(
+        $supportedLanguages['se']['NO'] = [
             'description' => 'Sami, Northern (Norway)',
             'title_en' => 'Sami',
             'title' => 'davvisámegiella',
@@ -1924,10 +1924,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x043B,
-        );
+        ];
 
         /* Sami, Northern (Sweden) */
-        $supportedLanguages['se']['SE'] = array(
+        $supportedLanguages['se']['SE'] = [
             'description' => 'Sami, Northern (Sweden)',
             'title_en' => 'Sami',
             'title' => 'davvisámegiella',
@@ -1936,10 +1936,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x083B,
-        );
+        ];
 
         /* Sami, Skolt (Finland) */
-        $supportedLanguages['sms']['FI'] = array(
+        $supportedLanguages['sms']['FI'] = [
             'description' => 'Sami, Skolt (Finland)',
             'title_en' => 'Sami',
             'title' => 'sääm´ǩiõll',
@@ -1948,11 +1948,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x203B,
-        );
+        ];
         $defaultCountry['sms'] = 'FI';
 
         /* Sami, Southern (Norway) */
-        $supportedLanguages['sma']['NO'] = array(
+        $supportedLanguages['sma']['NO'] = [
             'description' => 'Sami, Southern (Norway)',
             'title_en' => 'Sami',
             'title' => 'åarjelsaemiengiele',
@@ -1961,11 +1961,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x183B,
-        );
+        ];
         $defaultCountry['sma'] = 'NO';
 
         /* Sami, Southern (Sweden) */
-        $supportedLanguages['sma']['SE'] = array(
+        $supportedLanguages['sma']['SE'] = [
             'description' => 'Sami, Southern (Sweden)',
             'title_en' => 'Sami',
             'title' => 'åarjelsaemiengiele',
@@ -1974,10 +1974,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1C3B,
-        );
+        ];
 
         /* Sanskrit (India) */
-        $supportedLanguages['sa']['IN'] = array(
+        $supportedLanguages['sa']['IN'] = [
             'description' => 'Sanskrit (India)',
             'title_en' => 'Sanskrit',
             'title' => 'संस्कृत',
@@ -1986,11 +1986,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044F,
-        );
+        ];
         $defaultCountry['sa'] = 'IN';
 
         /* Serbian (Cyrillic, Bosnia and Herzegovina) */
-        $supportedLanguages['sr']['Cyrl'] = array(
+        $supportedLanguages['sr']['Cyrl'] = [
             'description' => 'Serbian (Cyrillic, Bosnia and Herzegovina)',
             'title_en' => 'Serbian',
             'title' => 'српски',
@@ -1999,11 +1999,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 855,
             'lcid' => 0x1C1A,
-        );
+        ];
         $defaultCountry['sr'] = 'Cyrl';
 
         /* Serbian (Cyrillic, Serbia) */
-        $supportedLanguages['sr']['Cyrl'] = array(
+        $supportedLanguages['sr']['Cyrl'] = [
             'description' => 'Serbian (Cyrillic, Serbia)',
             'title_en' => 'Serbian',
             'title' => 'српски',
@@ -2012,10 +2012,10 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 855,
             'lcid' => 0x0C1A,
-        );
+        ];
 
         /* Serbian (Latin, Bosnia and Herzegovina) */
-        $supportedLanguages['sr']['Latn'] = array(
+        $supportedLanguages['sr']['Latn'] = [
             'description' => 'Serbian (Latin, Bosnia and Herzegovina)',
             'title_en' => 'Serbian',
             'title' => 'srpski',
@@ -2024,10 +2024,10 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x181A,
-        );
+        ];
 
         /* Serbian (Latin, Serbia) */
-        $supportedLanguages['sr']['Latn'] = array(
+        $supportedLanguages['sr']['Latn'] = [
             'description' => 'Serbian (Latin, Serbia)',
             'title_en' => 'Serbian',
             'title' => 'srpski',
@@ -2036,10 +2036,10 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x081A,
-        );
+        ];
 
         /* Sesotho sa Leboa (South Africa) */
-        $supportedLanguages['nso']['ZA'] = array(
+        $supportedLanguages['nso']['ZA'] = [
             'description' => 'Sesotho sa Leboa (South Africa)',
             'title_en' => 'Sesotho sa Leboa',
             'title' => 'Sesotho sa Leboa',
@@ -2048,11 +2048,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x046C,
-        );
+        ];
         $defaultCountry['nso'] = 'ZA';
 
         /* Setswana (South Africa) */
-        $supportedLanguages['tn']['ZA'] = array(
+        $supportedLanguages['tn']['ZA'] = [
             'description' => 'Setswana (South Africa)',
             'title_en' => 'Setswana',
             'title' => 'Setswana',
@@ -2061,11 +2061,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0432,
-        );
+        ];
         $defaultCountry['tn'] = 'ZA';
 
         /* Sinhala (Sri Lanka) */
-        $supportedLanguages['si']['LK'] = array(
+        $supportedLanguages['si']['LK'] = [
             'description' => 'Sinhala (Sri Lanka)',
             'title_en' => 'Sinhala',
             'title' => 'සිංහ',
@@ -2074,11 +2074,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x045B,
-        );
+        ];
         $defaultCountry['si'] = 'LK';
 
         /* Slovak (Slovakia) */
-        $supportedLanguages['sk']['SK'] = array(
+        $supportedLanguages['sk']['SK'] = [
             'description' => 'Slovak (Slovakia)',
             'title_en' => 'Slovak',
             'title' => 'slovenčina',
@@ -2087,11 +2087,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x041B,
-        );
+        ];
         $defaultCountry['sk'] = 'SK';
 
         /* Slovenian (Slovenia) */
-        $supportedLanguages['sl']['SI'] = array(
+        $supportedLanguages['sl']['SI'] = [
             'description' => 'Slovenian (Slovenia)',
             'title_en' => 'Slovenian',
             'title' => 'slovenski',
@@ -2100,11 +2100,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x0424,
-        );
+        ];
         $defaultCountry['sl'] = 'SI';
 
         /* Spanish (Argentina) */
-        $supportedLanguages['es']['AR'] = array(
+        $supportedLanguages['es']['AR'] = [
             'description' => 'Spanish (Argentina)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2113,11 +2113,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x2C0A,
-        );
+        ];
         $defaultCountry['es'] = 'ES';
 
         /* Spanish (Bolivia) */
-        $supportedLanguages['es']['BO'] = array(
+        $supportedLanguages['es']['BO'] = [
             'description' => 'Spanish (Bolivia)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2126,10 +2126,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x400A,
-        );
+        ];
 
         /* Spanish (Chile) */
-        $supportedLanguages['es']['CL'] = array(
+        $supportedLanguages['es']['CL'] = [
             'description' => 'Spanish (Chile)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2138,10 +2138,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x340A,
-        );
+        ];
 
         /* Spanish (Colombia) */
-        $supportedLanguages['es']['CO'] = array(
+        $supportedLanguages['es']['CO'] = [
             'description' => 'Spanish (Colombia)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2150,10 +2150,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x240A,
-        );
+        ];
 
         /* Spanish (Costa Rica) */
-        $supportedLanguages['es']['CR'] = array(
+        $supportedLanguages['es']['CR'] = [
             'description' => 'Spanish (Costa Rica)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2162,10 +2162,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x140A,
-        );
+        ];
 
         /* Spanish (Dominican Republic) */
-        $supportedLanguages['es']['DO'] = array(
+        $supportedLanguages['es']['DO'] = [
             'description' => 'Spanish (Dominican Republic)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2174,10 +2174,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x1C0A,
-        );
+        ];
 
         /* Spanish (Ecuador) */
-        $supportedLanguages['es']['EC'] = array(
+        $supportedLanguages['es']['EC'] = [
             'description' => 'Spanish (Ecuador)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2186,10 +2186,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x300A,
-        );
+        ];
 
         /* Spanish (El Salvador) */
-        $supportedLanguages['es']['SV'] = array(
+        $supportedLanguages['es']['SV'] = [
             'description' => 'Spanish (El Salvador)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2198,10 +2198,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x440A,
-        );
+        ];
 
         /* Spanish (Guatemala) */
-        $supportedLanguages['es']['GT'] = array(
+        $supportedLanguages['es']['GT'] = [
             'description' => 'Spanish (Guatemala)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2210,10 +2210,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x100A,
-        );
+        ];
 
         /* Spanish (Honduras) */
-        $supportedLanguages['es']['HN'] = array(
+        $supportedLanguages['es']['HN'] = [
             'description' => 'Spanish (Honduras)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2222,10 +2222,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x480A,
-        );
+        ];
 
         /* Spanish (Mexico) */
-        $supportedLanguages['es']['MX'] = array(
+        $supportedLanguages['es']['MX'] = [
             'description' => 'Spanish (Mexico)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2234,10 +2234,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x080A,
-        );
+        ];
 
         /* Spanish (Nicaragua) */
-        $supportedLanguages['es']['NI'] = array(
+        $supportedLanguages['es']['NI'] = [
             'description' => 'Spanish (Nicaragua)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2246,10 +2246,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x4C0A,
-        );
+        ];
 
         /* Spanish (Panama) */
-        $supportedLanguages['es']['PA'] = array(
+        $supportedLanguages['es']['PA'] = [
             'description' => 'Spanish (Panama)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2258,10 +2258,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x180A,
-        );
+        ];
 
         /* Spanish (Paraguay) */
-        $supportedLanguages['es']['PY'] = array(
+        $supportedLanguages['es']['PY'] = [
             'description' => 'Spanish (Paraguay)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2270,10 +2270,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x3C0A,
-        );
+        ];
 
         /* Spanish (Peru) */
-        $supportedLanguages['es']['PE'] = array(
+        $supportedLanguages['es']['PE'] = [
             'description' => 'Spanish (Peru)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2282,10 +2282,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x280A,
-        );
+        ];
 
         /* Spanish (Puerto Rico) */
-        $supportedLanguages['es']['PR'] = array(
+        $supportedLanguages['es']['PR'] = [
             'description' => 'Spanish (Puerto Rico)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2294,10 +2294,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x500A,
-        );
+        ];
 
         /* Spanish (Spain) */
-        $supportedLanguages['es']['ES'] = array(
+        $supportedLanguages['es']['ES'] = [
             'description' => 'Spanish (Spain)',
             'title_en' => 'Spanish',
             'title' => 'español',
@@ -2306,10 +2306,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0C0A,
-        );
+        ];
 
         /* Spanish (United States) */
-        $supportedLanguages['es']['US'] = array(
+        $supportedLanguages['es']['US'] = [
             'description' => 'Spanish (United States)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2318,10 +2318,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x540A,
-        );
+        ];
 
         /* Spanish (Uruguay) */
-        $supportedLanguages['es']['UY'] = array(
+        $supportedLanguages['es']['UY'] = [
             'description' => 'Spanish (Uruguay)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2330,10 +2330,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x380A,
-        );
+        ];
 
         /* Spanish (Venezuela) */
-        $supportedLanguages['es']['VE'] = array(
+        $supportedLanguages['es']['VE'] = [
             'description' => 'Spanish (Venezuela)',
             'title_en' => 'Spanish',
             'title' => 'Español',
@@ -2342,10 +2342,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x200A,
-        );
+        ];
 
         /* Swedish (Finland) */
-        $supportedLanguages['sv']['FI'] = array(
+        $supportedLanguages['sv']['FI'] = [
             'description' => 'Swedish (Finland)',
             'title_en' => 'Swedish',
             'title' => 'svenska',
@@ -2354,11 +2354,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x081D,
-        );
+        ];
         $defaultCountry['sv'] = 'FI';
 
         /* Swedish (Sweden) */
-        $supportedLanguages['sv']['SE'] = array(
+        $supportedLanguages['sv']['SE'] = [
             'description' => 'Swedish (Sweden)',
             'title_en' => 'Swedish',
             'title' => 'svenska',
@@ -2367,10 +2367,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x041D,
-        );
+        ];
 
         /* Syriac (Syria)‎ */
-        $supportedLanguages['syr']['SY'] = array(
+        $supportedLanguages['syr']['SY'] = [
             'description' => 'Syriac (Syria)‎',
             'title_en' => 'Syriac',
             'title' => 'ܣܘܪܝܝܐ',
@@ -2379,11 +2379,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x045A,
-        );
+        ];
         $defaultCountry['syr'] = 'SY';
 
         /* Tajik (Cyrillic, Tajikistan) */
-        $supportedLanguages['tg']['Cyrl'] = array(
+        $supportedLanguages['tg']['Cyrl'] = [
             'description' => 'Tajik (Cyrillic, Tajikistan)',
             'title_en' => 'Tajik',
             'title' => 'Тоҷикӣ',
@@ -2392,11 +2392,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0428,
-        );
+        ];
         $defaultCountry['tg'] = 'Cyrl';
 
         /* Tamazight (Latin, Algeria) */
-        $supportedLanguages['tmz']['Latn'] = array(
+        $supportedLanguages['tmz']['Latn'] = [
             'description' => 'Tamazight (Latin, Algeria)',
             'title_en' => 'Tamazight',
             'title' => 'Tamazight',
@@ -2405,11 +2405,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x085F,
-        );
+        ];
         $defaultCountry['tmz'] = 'Latn';
 
         /* Tamil (India) */
-        $supportedLanguages['ta']['IN'] = array(
+        $supportedLanguages['ta']['IN'] = [
             'description' => 'Tamil (India)',
             'title_en' => 'Tamil',
             'title' => 'தமிழ்',
@@ -2418,11 +2418,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0449,
-        );
+        ];
         $defaultCountry['ta'] = 'IN';
 
         /* Tatar (Russia) */
-        $supportedLanguages['tt']['RU'] = array(
+        $supportedLanguages['tt']['RU'] = [
             'description' => 'Tatar (Russia)',
             'title_en' => 'Tatar',
             'title' => 'Татар',
@@ -2431,11 +2431,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0444,
-        );
+        ];
         $defaultCountry['tt'] = 'RU';
 
         /* Telugu (India) */
-        $supportedLanguages['te']['IN'] = array(
+        $supportedLanguages['te']['IN'] = [
             'description' => 'Telugu (India)',
             'title_en' => 'Telugu',
             'title' => 'తెలుగు',
@@ -2444,11 +2444,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x044A,
-        );
+        ];
         $defaultCountry['te'] = 'IN';
 
         /* Thai (Thailand) */
-        $supportedLanguages['th']['TH'] = array(
+        $supportedLanguages['th']['TH'] = [
             'description' => 'Thai (Thailand)',
             'title_en' => 'Thai',
             'title' => 'ไทย',
@@ -2457,11 +2457,11 @@ class i18nHelper
             'ansi' => 874,
             'oem' => 874,
             'lcid' => 0x041E,
-        );
+        ];
         $defaultCountry['th'] = 'TH';
 
         /* Tibetan (PRC) */
-        $supportedLanguages['bo']['CN'] = array(
+        $supportedLanguages['bo']['CN'] = [
             'description' => 'Tibetan (PRC)',
             'title_en' => 'Tibetan',
             'title' => 'བོད་ཡིག',
@@ -2470,11 +2470,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0451,
-        );
+        ];
         $defaultCountry['bo'] = 'CN';
 
         /* Turkish (Turkey) */
-        $supportedLanguages['tr']['TR'] = array(
+        $supportedLanguages['tr']['TR'] = [
             'description' => 'Turkish (Turkey)',
             'title_en' => 'Turkish',
             'title' => 'Türkçe',
@@ -2483,11 +2483,11 @@ class i18nHelper
             'ansi' => 1254,
             'oem' => 857,
             'lcid' => 0x041F,
-        );
+        ];
         $defaultCountry['tr'] = 'TR';
 
         /* Turkmen (Turkmenistan) */
-        $supportedLanguages['tk']['TM'] = array(
+        $supportedLanguages['tk']['TM'] = [
             'description' => 'Turkmen (Turkmenistan)',
             'title_en' => 'Turkmen',
             'title' => 'türkmençe',
@@ -2496,11 +2496,11 @@ class i18nHelper
             'ansi' => 1250,
             'oem' => 852,
             'lcid' => 0x0442,
-        );
+        ];
         $defaultCountry['tk'] = 'TM';
 
         /* Uighur (PRC) */
-        $supportedLanguages['ug']['CN'] = array(
+        $supportedLanguages['ug']['CN'] = [
             'description' => 'Uighur (PRC)',
             'title_en' => 'Uighur',
             'title' => 'ئۇيغۇر يېزىقى',
@@ -2509,11 +2509,11 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0480,
-        );
+        ];
         $defaultCountry['ug'] = 'CN';
 
         /* Ukrainian (Ukraine) */
-        $supportedLanguages['uk']['UA'] = array(
+        $supportedLanguages['uk']['UA'] = [
             'description' => 'Ukrainian (Ukraine)',
             'title_en' => 'Ukrainian',
             'title' => 'україньска',
@@ -2522,11 +2522,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0422,
-        );
+        ];
         $defaultCountry['uk'] = 'UA';
 
         /* Upper Sorbian (Germany) */
-        $supportedLanguages['wen']['DE'] = array(
+        $supportedLanguages['wen']['DE'] = [
             'description' => 'Upper Sorbian (Germany)',
             'title_en' => 'Upper Sorbian',
             'title' => 'hornjoserbšćina',
@@ -2535,11 +2535,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x042E,
-        );
+        ];
         $defaultCountry['wen'] = 'DE';
 
         /* Urdu (Islamic Republic of Pakistan)‎ */
-        $supportedLanguages['ur']['PK'] = array(
+        $supportedLanguages['ur']['PK'] = [
             'description' => 'Urdu (Islamic Republic of Pakistan)‎',
             'title_en' => 'Urdu',
             'title' => 'اُردو',
@@ -2548,11 +2548,11 @@ class i18nHelper
             'ansi' => 1256,
             'oem' => 720,
             'lcid' => 0x0420,
-        );
+        ];
         $defaultCountry['ur'] = 'PK';
 
         /* Uzbek (Cyrillic, Uzbekistan) */
-        $supportedLanguages['uz']['Cyrl'] = array(
+        $supportedLanguages['uz']['Cyrl'] = [
             'description' => 'Uzbek (Cyrillic, Uzbekistan)',
             'title_en' => 'Uzbek',
             'title' => 'Ўзбек',
@@ -2561,11 +2561,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0843,
-        );
+        ];
         $defaultCountry['uz'] = 'Cyrl';
 
         /* Uzbek (Latin, Uzbekistan) */
-        $supportedLanguages['uz']['Latn'] = array(
+        $supportedLanguages['uz']['Latn'] = [
             'description' => 'Uzbek (Latin, Uzbekistan)',
             'title_en' => 'Uzbek',
             'title' => 'U\'zbek',
@@ -2574,10 +2574,10 @@ class i18nHelper
             'ansi' => 1254,
             'oem' => 857,
             'lcid' => 0x0443,
-        );
+        ];
 
         /* Vietnamese (Vietnam) */
-        $supportedLanguages['vi']['VN'] = array(
+        $supportedLanguages['vi']['VN'] = [
             'description' => 'Vietnamese (Vietnam)',
             'title_en' => 'Vietnamese',
             'title' => 'Tiếng Việt',
@@ -2586,11 +2586,11 @@ class i18nHelper
             'ansi' => 1258,
             'oem' => 1258,
             'lcid' => 0x042A,
-        );
+        ];
         $defaultCountry['vi'] = 'VN';
 
         /* Welsh (United Kingdom) */
-        $supportedLanguages['cy']['GB'] = array(
+        $supportedLanguages['cy']['GB'] = [
             'description' => 'Welsh (United Kingdom)',
             'title_en' => 'Welsh',
             'title' => 'Cymraeg',
@@ -2599,11 +2599,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0452,
-        );
+        ];
         $defaultCountry['cy'] = 'GB';
 
         /* Wolof (Senegal) */
-        $supportedLanguages['wo']['SN'] = array(
+        $supportedLanguages['wo']['SN'] = [
             'description' => 'Wolof (Senegal)',
             'title_en' => 'Wolof',
             'title' => 'Wolof',
@@ -2612,11 +2612,11 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 850,
             'lcid' => 0x0488,
-        );
+        ];
         $defaultCountry['wo'] = 'SN';
 
         /* Yakut (Russia) */
-        $supportedLanguages['sah']['RU'] = array(
+        $supportedLanguages['sah']['RU'] = [
             'description' => 'Yakut (Russia)',
             'title_en' => 'Yakut',
             'title' => 'саха',
@@ -2625,11 +2625,11 @@ class i18nHelper
             'ansi' => 1251,
             'oem' => 866,
             'lcid' => 0x0485,
-        );
+        ];
         $defaultCountry['sah'] = 'RU';
 
         /* Yi (PRC) */
-        $supportedLanguages['ii']['CN'] = array(
+        $supportedLanguages['ii']['CN'] = [
             'description' => 'Yi (PRC)',
             'title_en' => 'Yi',
             'title' => 'ꆈꌠꁱꂷ',
@@ -2638,11 +2638,11 @@ class i18nHelper
             'ansi' => 0,
             'oem' => 1,
             'lcid' => 0x0478,
-        );
+        ];
         $defaultCountry['ii'] = 'CN';
 
         /* Yoruba (Nigeria) */
-        $supportedLanguages['yo']['NG'] = array(
+        $supportedLanguages['yo']['NG'] = [
             'description' => 'Yoruba (Nigeria)',
             'title_en' => 'Yoruba',
             'title' => 'Yoruba',
@@ -2651,10 +2651,10 @@ class i18nHelper
             'ansi' => 1252,
             'oem' => 437,
             'lcid' => 0x046A,
-        );
+        ];
         $defaultCountry['yo'] = 'NG';
 
-        return array($supportedLanguages, $defaultCountry);
+        return [$supportedLanguages, $defaultCountry];
     }
 
     public static function LangCountryLocalesToThreeLetterCode($locale)
@@ -2677,9 +2677,9 @@ class i18nHelper
             return false;
         }
 
-        return array(
+        return [
             $all[0][$spl[0]][$spl[1]]['langcode'],
             $all[0][$spl[0]][$spl[1]]['title_en']
-        );
+        ];
     }
 }

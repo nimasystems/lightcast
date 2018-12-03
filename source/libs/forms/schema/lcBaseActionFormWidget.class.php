@@ -98,8 +98,8 @@ abstract class lcBaseActionFormWidget extends lcObj
     {
         parent::__construct();
 
-        $this->validation_failures = array();
-        $this->validators = array();
+        $this->validation_failures = [];
+        $this->validators = [];
     }
 
     public function initialize()
@@ -130,7 +130,7 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function getFieldClassesMerged(array $additional_classes = null)
     {
-        $classes = implode(' ', array_filter(array_merge(array($this->getFieldClass(), $this->default_class), (array)$additional_classes)));
+        $classes = implode(' ', array_filter(array_merge([$this->getFieldClass(), $this->default_class], (array)$additional_classes)));
         return $classes;
     }
 
@@ -345,7 +345,7 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function getAttributes()
     {
         return array_merge((array)$this->additional_tag_attributes,
-            (isset($this->options['attributes']) ? (array)$this->options['attributes'] : array()));
+            (isset($this->options['attributes']) ? (array)$this->options['attributes'] : []));
     }
 
     protected function addAdditionalAttributesToTag(lcHtmlTag $tag)
@@ -624,7 +624,7 @@ abstract class lcBaseActionFormWidget extends lcObj
         $validators = $this->validators;
 
         $is_valid = true;
-        $validation_failures = array();
+        $validation_failures = [];
 
         if ($validators) {
             $data = $this->getData();
@@ -684,14 +684,14 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function removeValidators()
     {
-        $this->validators = array();
+        $this->validators = [];
         $this->clearValidationFailures();
         return $this;
     }
 
     public function clearValidationFailures()
     {
-        $this->validation_failures = array();
+        $this->validation_failures = [];
         $this->is_valid = false;
         $this->is_validated = false;
         return $this;

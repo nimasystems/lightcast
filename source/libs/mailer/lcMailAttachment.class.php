@@ -31,6 +31,8 @@ class lcMailAttachment extends lcObj
 
     public function __construct($filepath, $mimetype, $filename = null)
     {
+        parent::__construct();
+
         $this->filepath = $filepath;
         $this->mimetype = $mimetype;
         $this->filename = isset($filename) ? $filename : basename($filepath);

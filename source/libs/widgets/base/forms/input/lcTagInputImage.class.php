@@ -51,12 +51,12 @@ class lcTagInputImage extends lcTagInput
 
     public static function getRequiredAttributes()
     {
-        return implode(array('src'), parent::getRequiredAttributes());
+        return implode(['src'], parent::getRequiredAttributes());
     }
 
     public static function getOptionalAttributes()
     {
-        return implode(array('alt'), parent::getOptionalAttributes());
+        return implode(['alt'], parent::getOptionalAttributes());
     }
 
     public function getSrc()

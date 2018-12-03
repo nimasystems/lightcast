@@ -84,12 +84,12 @@ class lcTagStyle extends lcHtmlBaseTag implements iI18nAttributes
 
     public static function getRequiredAttributes()
     {
-        return array('type');
+        return ['type'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('dir', 'lang', 'xml:lang', 'media', 'title');
+        return ['dir', 'lang', 'xml:lang', 'media', 'title'];
     }
 
     public function getType()

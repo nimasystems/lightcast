@@ -13,4 +13,3 @@ class FrontendConfiguration extends lcWebConfiguration
 	}
 }
 
-?>

@@ -44,11 +44,11 @@ if (!function_exists('http_build_url')) {
     // @param	mixed			Same as the first argument
     // @param	int				A bitmask of binary or'ed HTTP_URL constants (Optional)HTTP_URL_REPLACE is the default
     // @param	array			If set, it will be filled with the parts of the composed url like parse_url() would return
-    function http_build_url($url, array $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = false)
+    function http_build_url($url, array $parts = [], $flags = HTTP_URL_REPLACE, &$new_url = false)
     {
-        $parts = !empty($parts) ? $parts : array();
+        $parts = !empty($parts) ? $parts : [];
 
-        $keys = array('user', 'pass', 'port', 'path', 'query', 'fragment');
+        $keys = ['user', 'pass', 'port', 'path', 'query', 'fragment'];
 
         // HTTP_URL_STRIP_ALL becomes all the HTTP_URL_STRIP_Xs
         if ($flags & HTTP_URL_STRIP_ALL) {
@@ -162,7 +162,7 @@ class lcHtmlUtils
             '(\?' . $xqueryfrag . ')?(#' . $xqueryfrag . ')?$';
 
 
-        $parts = array();
+        $parts = [];
 
         $m = null;
 
@@ -328,7 +328,7 @@ class lcHtmlUtils
         return $url;
     }
 
-    public static function httpBuildUrl($url, $parts = array(), $flags = HTTP_URL_REPLACE, &$new_url = false)
+    public static function httpBuildUrl($url, $parts = [], $flags = HTTP_URL_REPLACE, &$new_url = false)
     {
         return http_build_url($url, $parts, $flags, $new_url);
     }
@@ -349,7 +349,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[0]);
         array_push($res, count($patterns[0]));
@@ -366,7 +366,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[0]);
         array_push($res, count($patterns[0]));
@@ -383,7 +383,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -400,7 +400,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns);
         array_push($res, count($patterns[2]));
@@ -416,7 +416,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -433,7 +433,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -450,7 +450,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -467,7 +467,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -484,7 +484,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -501,7 +501,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -518,7 +518,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -535,7 +535,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -600,7 +600,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -617,7 +617,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -634,7 +634,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -651,7 +651,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -668,7 +668,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -685,7 +685,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -702,7 +702,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -719,7 +719,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -736,7 +736,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -753,7 +753,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -770,7 +770,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[2]);
         array_push($res, count($patterns[2]));
@@ -787,7 +787,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[3]);
         array_push($res, count($patterns[3]));
@@ -804,7 +804,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[3]);
         array_push($res, count($patterns[3]));
@@ -821,7 +821,7 @@ class lcHtmlUtils
             return false;
         }
 
-        $res = array();
+        $res = [];
 
         array_push($res, $patterns[0]);
         array_push($res, count($patterns[0]));
@@ -844,7 +844,7 @@ class lcHtmlUtils
     // retrieve internal site links
     public static function getInternalLinks($array)
     {
-        $result = array();
+        $result = [];
         $count = count($array);
 
         for ($i = 0; $i < $count; $i++) {
@@ -863,7 +863,7 @@ class lcHtmlUtils
     // retrieve external links
     public static function getExternalLinks($array)
     {
-        $result = array();
+        $result = [];
         $count = count($array);
 
         for ($i = 0; $i < $count; $i++) {

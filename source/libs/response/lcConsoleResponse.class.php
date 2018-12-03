@@ -32,13 +32,13 @@ class lcConsoleResponse extends lcResponse
 
     private $content;
 
-    private $output_formatters = array(
+    private $output_formatters = [
         'fgcolor' => '_outputFormatFgColor',
         'bgcolor' => '_outputFormatBgColor'
-    );
+    ];
 
-    private $compiled_output_modifiers = array();
-    private $compiled_output_modifier_methods = array();
+    private $compiled_output_modifiers = [];
+    private $compiled_output_modifier_methods = [];
 
     public function initialize()
     {
@@ -59,8 +59,8 @@ class lcConsoleResponse extends lcResponse
 
         $formatters = $this->output_formatters;
 
-        $modifiers = array();
-        $methods = array();
+        $modifiers = [];
+        $methods = [];
 
         foreach ($formatters as $key => $method) {
             $pr = preg_quote($key);

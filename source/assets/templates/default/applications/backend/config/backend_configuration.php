@@ -13,4 +13,3 @@ class BackendConfiguration extends lcWebManagementConfiguration
 	}
 }
 
-?>

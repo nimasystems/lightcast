@@ -105,10 +105,10 @@ class lcYamlFileParser extends lcFileParser
             try {
                 // trim all values to fix non-visual empty spaces which may cause
                 // problems later
-                if ($data && !array_walk_recursive($data, array(
+                if ($data && !array_walk_recursive($data, [
                         $this,
                         'trimYamlValue'
-                    ))
+                    ])
                 ) {
                     throw new lcSystemException('Could not walk YAML configuration');
                 }

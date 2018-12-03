@@ -38,6 +38,8 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
 
     public function __construct($tagname, $is_closed = false)
     {
+        parent::__construct();
+
         $this->tagname = $tagname;
         $this->is_closed = $is_closed;
 
@@ -280,10 +282,10 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
     public function asHtml()
     {
         return '<' . trim(implode(' ',
-                array(
+                [
                     $this->tagname,
                     $this->attributes->asHtml()
-                ))
+                ])
         ) .
         ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
     }

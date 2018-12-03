@@ -124,13 +124,13 @@ class lcTagTh extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
-            'align', 'valign', 'char', 'charoff');
+        return ['colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
+            'align', 'valign', 'char', 'charoff'];
     }
 
     public function getScope()

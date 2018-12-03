@@ -18,4 +18,3 @@ class ProjectConfiguration extends lcProjectConfiguration
 	}
 }
 
-?>

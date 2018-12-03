@@ -38,14 +38,14 @@ class lcPageIterateCounter
             throw new lcInvalidArgumentException('Invalid params');
         }
 
-        $default = array(
+        $default = [
             'rows_from' => 0,
             'rows_to' => 0,
             'total_rows' => 0,
             'total_pages' => 0,
             'previous_page' => 0,
             'next_page' => 0
-        );
+        ];
 
         if (!$numHits) {
             return $default;
@@ -72,7 +72,7 @@ class lcPageIterateCounter
             $cur_page = 1;
         }
 
-        $result = array();
+        $result = [];
 
         for ($i = $cur_page; $i <= $num_pages; $i++) {
 

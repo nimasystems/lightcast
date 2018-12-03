@@ -25,18 +25,18 @@ class lcProjectTranslationsParser extends lcTranslationsParser
 {
     public function getCategorizationMap()
     {
-        return array(
+        return [
             'models' => 'database_models',
-        );
+        ];
     }
 
     public function getDirsToParse()
     {
-        return array(
+        return [
             'extensions',
             'models',
             'tasks',
             'ws'
-        );
+        ];
     }
 }

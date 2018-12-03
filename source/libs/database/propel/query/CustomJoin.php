@@ -67,7 +67,7 @@ class CustomJoin extends Join
     public function getClause(&$params)
     {
         if (null === $this->joinCondition) {
-            $conditions = array();
+            $conditions = [];
             for ($i = 0; $i < $this->count; $i++) {
                 if ($this->value_conditions && in_array($i, $this->value_conditions)) {
                     $conditions [] = $this->getRightTableAliasOrName($i) . '.' . $this->left[$i] . $this->getOperator($i) . $this->right[$i];

@@ -123,7 +123,7 @@ class lcRouteCollection extends lcBaseCollection implements ArrayAccess
             return false;
         }
 
-        $str = array();
+        $str = [];
 
         foreach ($all as $route) {
             $str[] = $route->getName() . ' (' . $route->getRoute() . ')';

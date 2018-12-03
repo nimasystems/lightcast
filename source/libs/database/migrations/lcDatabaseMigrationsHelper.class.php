@@ -69,7 +69,6 @@ class lcDatabaseMigrationsHelper extends lcSysObj
     /**
      * @return bool
      * @throws Exception
-     * @throws lcInvalidArgumentException
      */
     protected function createSchemaTables()
     {

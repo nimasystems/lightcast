@@ -80,12 +80,12 @@ class lcTagThead extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('align', 'valign', 'char', 'charoff');
+        return ['align', 'valign', 'char', 'charoff'];
     }
 
     public function getAlign()

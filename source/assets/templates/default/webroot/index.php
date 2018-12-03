@@ -9,4 +9,3 @@ $configuration = new FrontendConfiguration(realpath(dirname(__FILE__) . '/../'),
 
 lcApp::bootstrap($configuration)->dispatch();
 
-?>

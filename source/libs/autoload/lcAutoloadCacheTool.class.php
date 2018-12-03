@@ -30,7 +30,7 @@ class lcAutoloadCacheTool extends lcObj
         $this->cache_filename = $cache_filename;
         $this->cache_var_name = $class_cache_var_name;
         $this->cache_version_var_name = $class_cache_version_var_name;
-        $this->class_file_endings = array('.php');
+        $this->class_file_endings = ['.php'];
         $this->follow_symlinks = false;
         $this->ignore_hidden_files = true;
     }
@@ -135,10 +135,10 @@ class lcAutoloadCacheTool extends lcObj
 
         assert($class_dirs);
 
-        $found_classes_all = array();
+        $found_classes_all = [];
 
         foreach ($class_dirs as $dir) {
-            $found_classes = array();
+            $found_classes = [];
 
             try {
                 $this->parseDir($dir, $dir, $found_classes);
@@ -206,7 +206,7 @@ class lcAutoloadCacheTool extends lcObj
 
                                     if ($size && $php_file = fopen($file_path, "r")) {
                                         if ($buf = fread($php_file, $size)) {
-                                            $result = array();
+                                            $result = [];
 
                                             if (preg_match_all('%(interface|class)\s+(\w+)\s+(extends\s+(\w+)\s+)?(implements\s+\w+\s*(,\s*\w+\s*)*)?{%', $buf, $result)) {
                                                 foreach ($result[2] as $class_name) {
@@ -257,7 +257,7 @@ class lcAutoloadCacheTool extends lcObj
 
         // prepare the new format
         $found_classes = $this->found_classes;
-        $class_array_data = array();
+        $class_array_data = [];
 
         if ($found_classes && is_array($found_classes)) {
             foreach ($found_classes as $path => $classes) {

@@ -29,7 +29,7 @@ class lcTagOption extends lcHtmlTag
     {
         parent::__construct('option', true);
 
-        $this->attributes->setAlwaysAddedAttribs(array('value'));
+        $this->attributes->setAlwaysAddedAttribs(['value']);
 
         $this->setContent($content);
         $this->setSelected($selected);
@@ -70,12 +70,12 @@ class lcTagOption extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('selected', 'value');
+        return ['selected', 'value'];
     }
 
     public function getSelected()

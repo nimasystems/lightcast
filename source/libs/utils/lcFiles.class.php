@@ -133,10 +133,10 @@ class lcFiles
         $ext = ($ext != '.') ? $ext : null;
 
         $ret =
-            array(
+            [
                 'name' => $fname,
                 'ext' => $ext
-            );
+            ];
 
         return $ret;
     }
@@ -287,7 +287,7 @@ class lcFiles
      */
     public static function sanitizeFilename($filename)
     {
-        $special_chars = array("?", "[", "]", "/", "\\", "=", "<", ">", ":", ";", ",", "'", "\"", "&", "$", "#", "*", "(", ")", "|", "~", "`", "!", "{", "}");
+        $special_chars = ["?", "[", "]", "/", "\\", "=", "<", ">", ":", ";", ",", "'", "\"", "&", "$", "#", "*", "(", ")", "|", "~", "`", "!", "{", "}"];
         $filename = str_replace($special_chars, '', $filename);
         $filename = preg_replace('/[\s-]+/', '-', $filename);
         $filename = trim($filename, '.-_');

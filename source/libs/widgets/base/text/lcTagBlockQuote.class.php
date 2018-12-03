@@ -46,12 +46,12 @@ class lcTagBlockQuote extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array();
+        return [];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('cite');
+        return ['cite'];
     }
 
     public function getCite()

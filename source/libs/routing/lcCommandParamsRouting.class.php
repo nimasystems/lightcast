@@ -49,9 +49,9 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         $this->context['default_action'] = $this->default_action;
 
         // allow others to be notified when base routes have been loaded
-        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, array(
+        $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, [
             'context' => $this->context
-        )));
+        ]));
 
         // try to detect the parameters from request
         $this->detectParameters();
@@ -70,7 +70,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         $argv = $context['argv'];
         $argc = (int)$context['argc'];
 
-        $compiled_params = array();
+        $compiled_params = [];
 
         // parse the params
         $value_next = false;
@@ -137,11 +137,11 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
 
         $this->detected_params = $compiled_params;
 
-        $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, array(
+        $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, [
             'params' => $compiled_params,
             'default_module' => $this->default_module,
             'default_action' => $this->default_action
-        )));
+        ]));
     }
 
     public function shutdown()
@@ -155,9 +155,9 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
     {
         $debug_parent = (array)parent::getDebugInfo();
 
-        $debug = array(
+        $debug = [
             'detected_params' => $this->detected_params
-        );
+        ];
 
         $debug = array_merge($debug_parent, $debug);
 

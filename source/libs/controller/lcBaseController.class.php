@@ -130,17 +130,17 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function getCapabilities()
     {
-        return array(
+        return [
             'controller'
-        );
+        ];
     }
 
     public function getDebugInfo()
     {
-        $debug = array(
+        $debug = [
             'translation_context_type' => $this->translation_context_type,
             'translation_context_name' => $this->translation_context_name,
-        );
+        ];
 
         return $debug;
     }
@@ -389,7 +389,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     protected function validateRequestDataAndThrow(array $config)
     {
-        $failures = array();
+        $failures = [];
         $is_valid = $this->validateData($config, $failures);
 
         if (!$is_valid) {
@@ -407,7 +407,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             return false;
         }
 
-        $failed_validations = array();
+        $failed_validations = [];
 
         $is_validated = true;
 
@@ -499,10 +499,10 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
                 $usage_count++;
 
-                $this->loaded_components[] = array(
+                $this->loaded_components[] = [
                     'name' => $component_name,
                     'instance' => $component_instance
-                );
+                ];
 
                 $this->loaded_components_usage[$component_name] = $usage_count;
             } else {
@@ -610,7 +610,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
         // plugin dependancies
         if ($this->plugin_manager) {
-            $plugins = array();
+            $plugins = [];
             $context_plugin_name = $this->context_name;
             $my_plugin = null;
 
@@ -674,8 +674,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $used_components = $this->getUsedComponents();
 
         if ($used_components && is_array($used_components)) {
-            $loaded_components = array();
-            $loaded_components_usage = array();
+            $loaded_components = [];
+            $loaded_components_usage = [];
 
             foreach ($used_components as $component_name) {
                 try {
@@ -688,10 +688,10 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                     // initialize it
                     $component_instance->initialize();
 
-                    $loaded_components[] = array(
+                    $loaded_components[] = [
                         'name' => $component_name,
                         'instance' => $component_instance
-                    );
+                    ];
                     $loaded_components_usage[$component_name] = 0;
                 } catch (Exception $e) {
                     throw new lcRequirementException('Component dependancy not available (' . $component_name . '): ' .

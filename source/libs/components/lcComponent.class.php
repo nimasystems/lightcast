@@ -87,25 +87,25 @@ abstract class lcComponent extends lcBaseController
             }
 
             // get the view's output
-            $this->event_dispatcher->notify(new lcEvent('view.will_render', $this, array(
+            $this->event_dispatcher->notify(new lcEvent('view.will_render', $this, [
                 'view' => $view,
                 'context_name' => $controller->getContextName(),
                 'context_type' => $controller->getContextType(),
                 'translation_context_name' => $controller->getTranslationContextName(),
                 'translation_context_type' => $controller->getTranslationContextType()
-            )));
+            ]));
 
             // render the view
             $output = $view->render();
 
             // send view render event
-            $event = $this->event_dispatcher->filter(new lcEvent('view.render', $this, array(
+            $event = $this->event_dispatcher->filter(new lcEvent('view.render', $this, [
                 'view' => $view,
                 'context_type' => $controller->getContextType(),
                 'context_name' => $controller->getContextName(),
                 'translation_context_name' => $controller->getTranslationContextName(),
                 'translation_context_type' => $controller->getTranslationContextType()
-            )), $output);
+            ]), $output);
 
             $output = $event->getReturnValue();
 
@@ -114,10 +114,10 @@ abstract class lcComponent extends lcBaseController
             throw new lcViewRenderException('Could not render view: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $ret = array(
+        $ret = [
             'content_type' => $content_type,
             'content' => $output
-        );
+        ];
 
         return $ret;
     }

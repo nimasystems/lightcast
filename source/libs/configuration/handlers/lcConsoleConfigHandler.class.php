@@ -26,24 +26,24 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
 {
     public function getDefaultValues()
     {
-        return array(
-            'settings' => array(
+        return [
+            'settings' => [
                 'time_limit' => 300,
                 'memory_limit' => '64M',
                 'admin_email' => ''
-            ),
-            'controller' => array(
+            ],
+            'controller' => [
                 'max_forwards' => 10,
-                'filters' => array()
-            ),
-            'console' => array('log_console' => false),
-            'logger' => array(
+                'filters' => []
+            ],
+            'console' => ['log_console' => false],
+            'logger' => [
                 'enabled' => true,
                 'email_to' => '',
                 'email_threshold' => 'crit',
-                'log_files' => array('console.log' => 'info')
-            ),
-            'mailer' => array(
+                'log_files' => ['console.log' => 'info']
+            ],
+            'mailer' => [
                 'charset' => 'UTF-8',
                 'content_type' => 'text/html',
                 'encoding' => '8bit',
@@ -52,12 +52,12 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
                 'debug' => false,
                 'smtp_host' => '',
                 'smtp_port' => 25,
-                'security' => array(
+                'security' => [
                     'smtp_user' => '',
                     'smtp_pass' => ''
-                )
-            ),
-            'loaders' => array(
+                ]
+            ],
+            'loaders' => [
                 'logger' => 'lcFileLoggerNG',
                 'request' => 'lcConsoleRequest',
                 'response' => 'lcConsoleResponse',
@@ -70,8 +70,8 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
                 'user' => '',
                 'mailer' => 'lcPHPMailer',
                 'data_storage' => '',
-            ),
-            'plugins' => array('enabled' => array())
-        );
+            ],
+            'plugins' => ['enabled' => []]
+        ];
     }
 }

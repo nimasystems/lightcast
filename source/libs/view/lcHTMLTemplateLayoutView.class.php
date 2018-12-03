@@ -44,7 +44,7 @@ class lcHTMLTemplateLayoutView extends lcHTMLTemplateView implements iSupportsLa
 
     public function getSupportedContentTypes()
     {
-        return array(self::DEFAULT_CONTENT_TYPE);
+        return [self::DEFAULT_CONTENT_TYPE];
     }
 
     public function getReplacementString()

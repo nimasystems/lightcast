@@ -73,12 +73,12 @@ class lcTagImg extends lcHtmlTag
 
     public static function getRequiredAttributes()
     {
-        return array('src', 'alt');
+        return ['src', 'alt'];
     }
 
     public static function getOptionalAttributes()
     {
-        return array('longdesc', 'height', 'width');
+        return ['longdesc', 'height', 'width'];
     }
 
     public function getSrc()
