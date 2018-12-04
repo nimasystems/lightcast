@@ -89,7 +89,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         // set vars
         $this->root_dir = ROOT;
-        $this->config_variation = self::DEFAULT_BASE_CONFIG_DIR;
         $this->config_environment = self::DEFAULT_CONFIG_ENV;
     }
 
@@ -366,7 +365,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getBaseConfigDir()
     {
-        $ret = $this->getConfigDir() . DS . $this->config_variation;
+        $ret = $this->getConfigDir() . DS . ($this->config_variation ?: 'config');
         return $ret;
     }
 
