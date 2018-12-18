@@ -134,10 +134,10 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         // allow others to filter and provider params before the router
         $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, [
             'url' => $url,
-            'context' => $this->context
+            'context' => $this->context,
         ], false), [
             'url' => $url,
-            'context' => $this->context
+            'context' => $this->context,
         ]);
 
         if ($evn->isProcessed()) {
@@ -229,16 +229,30 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
                 }
 
                 // method
-                if (isset($route_options['method']) && (string)$route_options['method']) {
-                    $checkfor = strtolower($route_options['method']);
+                $methods = isset($route_options['methods']) ? (array)$route_options['methods'] : [];
 
-                    if ($checkfor == 'get' && !$this->request->isGet()) {
+                if (isset($route_options['method']) && (string)$route_options['method']) {
+                    $methods[] = $route_options['method'];
+                }
+
+                foreach ($methods as $method) {
+                    $method = strtolower($method);
+
+                    if ($method == 'get' && !$this->request->isGet()) {
                         // not a get - continue
                         continue;
-                    } elseif ($checkfor == 'post' && !$this->request->isPost()) {
+                    } else if ($method == 'post' && !$this->request->isPost()) {
                         // not a post - continue
                         continue;
+                    } else if ($method == 'put' && !$this->request->isPut()) {
+                        // not a put - continue
+                        continue;
+                    } else if ($method == 'delete' && !$this->request->isDelete()) {
+                        // not a delete - continue
+                        continue;
                     }
+
+                    unset($method);
                 }
 
                 unset($route_options);
@@ -249,7 +263,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
                 'pattern' => $route->getPattern(),
                 'params' => $params,
                 'options' => $route->getOptions(),
-                'route' => $route
+                'route' => $route,
             ];
 
             return $route;
@@ -264,7 +278,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             'pattern' => $route->getPattern(),
             'params' => $route->getDefaultParams(),
             'options' => $route->getOptions(),
-            'route' => $route
+            'route' => $route,
         ] : null;
 
         return $route;
@@ -383,7 +397,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             'routes_are_cached' => $this->routes_are_cached,
             'current_route' => ($this->current_route ? $this->current_route->getName() : null),
             'current_internal_uri' => (isset($this->current_internal_uri) ? $this->current_internal_uri[1] : null),
-            'current_params' => $this->current_params
+            'current_params' => $this->current_params,
         ];
 
         $debug = array_merge($debug_parent, $debug);
@@ -493,7 +507,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             'absolute' => $absolute,
             'route_name' => $name,
             'prefix' => $prefix,
-            'context' => $this->context
+            'context' => $this->context,
         ], false), $ret);
 
         if ($evn->isProcessed()) {
@@ -604,7 +618,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
     public function writeClassCache()
     {
         $cached_data = [
-            'routes' => $this->routes
+            'routes' => $this->routes,
         ];
 
         return $cached_data;
