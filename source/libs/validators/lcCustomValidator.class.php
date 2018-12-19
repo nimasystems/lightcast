@@ -25,12 +25,8 @@ class lcCustomValidator extends lcValidator
 {
     public function validate($data)
     {
-        $validator_callback = $this->options['validator'];
-
-        if (!$validator_callback || !is_callable($validator_callback)) {
-            throw new lcConfigException('Callback not set');
-        }
-
+        $validator_callback = isset($this->options['validator']) ? $this->options['validator'] : function () {
+        };
         return $validator_callback($data);
     }
 }

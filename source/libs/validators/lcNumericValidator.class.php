@@ -25,6 +25,8 @@ class lcNumericValidator extends lcValidator
 {
     public function validate($data)
     {
-        return (bool)preg_match("/^[0-9]*$/", $data);
+        $data = str_replace(',', '.', $data);
+        return (bool)preg_match("/^-?(?:\d+|\d*\.\d+)$/", $data);
+        //return (bool)preg_match("/^[0-9]*$/", $data);
     }
 }

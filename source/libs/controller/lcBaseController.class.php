@@ -407,8 +407,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             return false;
         }
 
-        $failed_validations = [];
-
         $is_validated = true;
 
         foreach ($config as $data_name => $options) {
