@@ -31,10 +31,27 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     const HTTP_PROTO_HTTPS = 2;
     /** @var lcHttpFilesCollection */
     private $files;
-    /** @var lcArrayCollection */
-    private $post_params; // ANY, GET, PUT, POST, HEAD - httpMethods
-    /** @var lcArrayCollection */
+
+    /**
+     * @var lcArrayCollection
+     */
+    private $post_params;
+
+    /**
+     * @var lcArrayCollection
+     */
     private $get_params;
+
+    /**
+     * @var lcArrayCollection
+     */
+    private $put_params;
+
+    /**
+     * @var lcArrayCollection
+     */
+    private $delete_params;
+
     private $request_method;
     private $accept_mimetype;
     private $accept_language;
@@ -72,7 +89,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getListenerEvents()
     {
         return [
-            'router.detect_parameters' => 'onRouterDetectParameters'
+            'router.detect_parameters' => 'onRouterDetectParameters',
         ];
     }
 
@@ -110,6 +127,16 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function setPostVars(array $vars = null)
     {
         $this->post_params = new lcArrayCollection($vars);
+    }
+
+    public function setPutVars(array $vars = null)
+    {
+        $this->put_params = new lcArrayCollection($vars);
+    }
+
+    public function setDeleteVars(array $vars = null)
+    {
+        $this->delete_params = new lcArrayCollection($vars);
     }
 
     public function setParamVars(array $vars = null)
@@ -154,7 +181,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'uploaded_files_count' => (is_array($this->files) ? count($this->files) : null),
             'params' => ($this->params ? $this->params->getKeyValueArray() : null),
             'post_params' => ($this->post_params ? $this->post_params->getKeyValueArray() : null),
-            'get_params' => ($this->get_params ? $this->get_params->getKeyValueArray() : null)
+            'put_params' => ($this->put_params ? $this->put_params->getKeyValueArray() : null),
+            'delete_params' => ($this->delete_params ? $this->delete_params->getKeyValueArray() : null),
+            'get_params' => ($this->get_params ? $this->get_params->getKeyValueArray() : null),
         ];
 
         $debug = array_merge($debug_parent, $debug);
@@ -174,7 +203,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'url_prefix' => $this->prefix,
             'full_hostname' => $this->getFullHostname(),
             'base_url' => $this->getBaseUrl(),
-            'remote_addr' => $this->getRealRemoteAddr()
+            'remote_addr' => $this->getRealRemoteAddr(),
         ];
         return array_filter(array_merge($keys, $nk));
     }
@@ -193,7 +222,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     {
         if ($this->protocol == self::HTTP_PROTO_HTTP) {
             return 'http://';
-        } elseif ($this->protocol == self::HTTP_PROTO_HTTPS) {
+        } else if ($this->protocol == self::HTTP_PROTO_HTTPS) {
             return 'https://';
         } else {
             return null;
@@ -218,7 +247,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         if ($this->env('HTTP_CLIENT_IP')) {
             $ip = $this->env('HTTP_CLIENT_IP');
-        } elseif ($this->env('HTTP_X_FORWARDED_FOR')) {
+        } else if ($this->env('HTTP_X_FORWARDED_FOR')) {
             $ip = $this->env('HTTP_X_FORWARDED_FOR');
         } else {
             $ip = $this->env('REMOTE_ADDR');
@@ -239,11 +268,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         if ($key == 'url_prefix') {
             return $this->prefix;
-        } elseif ($key == 'full_hostname') {
+        } else if ($key == 'full_hostname') {
             return $this->getFullHostname();
-        } elseif ($key == 'base_url') {
+        } else if ($key == 'base_url') {
             return $this->getBaseUrl();
-        } elseif ($key == 'remote_addr') {
+        } else if ($key == 'remote_addr') {
             return $this->getRealRemoteAddr();
         } else {
             $ret = parent::getValueForKey($key);
@@ -256,6 +285,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return serialize([
             $this->files,
             $this->post_params,
+            $this->put_params,
+            $this->delete_params,
             $this->get_params,
             $this->env,
             $this->request_method,
@@ -264,7 +295,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $this->accept_encoding,
             $this->accept_charset,
             $this->cookies,
-            $this->context
+            $this->context,
         ]);
     }
 
@@ -273,6 +304,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         list(
             $this->files,
             $this->post_params,
+            $this->put_params,
+            $this->delete_params,
             $this->get_params,
             $this->env,
             $this->request_method,
@@ -609,7 +642,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         if ($cached_headers) {
             return $cached_headers;
-        } elseif (!function_exists('apache_request_headers')) {
+        } else if (!function_exists('apache_request_headers')) {
             $srv = $_SERVER;
 
             if ($srv) {
@@ -757,6 +790,16 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->post_params;
     }
 
+    public function getPutParams()
+    {
+        return $this->put_params;
+    }
+
+    public function getDeleteParams()
+    {
+        return $this->delete_params;
+    }
+
     /*
      * Checks if the current connection is running
     * under SSL - HTTPS
@@ -876,7 +919,16 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $_GET = $get;
         $_POST = $post;
 
-        $this->post_params = new lcArrayCollection((array)$post);
+        if ($this->isPut()) {
+            parse_str(file_get_contents('php://input'), $_PUT);
+            $this->put_params = new lcArrayCollection($_PUT);
+        } else if ($this->isDelete()) {
+            parse_str(file_get_contents('php://input'), $_PUT);
+            $this->delete_params = new lcArrayCollection($_PUT);
+        } else if ($this->isPost()) {
+            $this->post_params = new lcArrayCollection((array)$post);
+        }
+
         $this->get_params = new lcArrayCollection((array)$get);
 
         unset($get, $post);
@@ -999,7 +1051,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             }
 
             $uri = $uri[0];
-        } elseif (empty($uri) && is_string($this->env('QUERY_STRING'))) {
+        } else if (empty($uri) && is_string($this->env('QUERY_STRING'))) {
             $uri = $this->env('QUERY_STRING');
         }
 
@@ -1031,13 +1083,13 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     {
         if ($this->env('REQUEST_METHOD') == 'POST') {
             $this->request_method = lcHttpMethod::METHOD_POST;
-        } elseif ($this->env('REQUEST_METHOD') == 'GET') {
+        } else if ($this->env('REQUEST_METHOD') == 'GET') {
             $this->request_method = lcHttpMethod::METHOD_GET;
-        } elseif ($this->env('REQUEST_METHOD') == 'PUT') {
+        } else if ($this->env('REQUEST_METHOD') == 'PUT') {
             $this->request_method = lcHttpMethod::METHOD_PUT;
-        } elseif ($this->env('REQUEST_METHOD') == 'HEAD') {
+        } else if ($this->env('REQUEST_METHOD') == 'HEAD') {
             $this->request_method = lcHttpMethod::METHOD_HEAD;
-        } elseif ($this->env('REQUEST_METHOD') == 'DELETE') {
+        } else if ($this->env('REQUEST_METHOD') == 'DELETE') {
             $this->request_method = lcHttpMethod::METHOD_DELETE;
         } else {
             $this->request_method = null;
@@ -1077,6 +1129,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $this->context = [
             'path_info' => parent::getPathInfo(),
             'post_params' => $this->post_params,
+            'put_params' => $this->put_params,
+            'delete_params' => $this->delete_params,
             'get_params' => $this->get_params,
             'prefix' => $this->prefix,
             'method' => $this->getMethod(),
@@ -1085,7 +1139,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'is_secure' => $this->isSecure(),
             'is_xml_http_request' => $this->isXmlHttpRequest(),
             'request_uri' => parent::getRequestUri(),
-            'real_request_uri' => $this->generateRealRequestUri()
+            'real_request_uri' => $this->generateRealRequestUri(),
         ];
     }
 
@@ -1121,10 +1175,18 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $context_post_params = isset($context['post_params']) && ($context['post_params'] instanceof lcArrayCollection) ? $context['post_params'] :
             new lcArrayCollection();
 
+        $context_put_params = isset($context['put_params']) && ($context['put_params'] instanceof lcArrayCollection) ? $context['put_params'] :
+            new lcArrayCollection();
+
+        $context_delete_params = isset($context['delete_params']) && ($context['delete_params'] instanceof lcArrayCollection) ? $context['delete_params'] :
+            new lcArrayCollection();
+
         $context_get_params = isset($context['get_params']) && ($context['post_params'] instanceof lcArrayCollection) ? $context['get_params'] :
             new lcArrayCollection();
 
         $this->post_params = $context_post_params;
+        $this->put_params = $context_put_params;
+        $this->delete_params = $context_delete_params;
         $this->get_params = $context_get_params;
 
         // reset the context

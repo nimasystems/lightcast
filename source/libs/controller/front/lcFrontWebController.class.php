@@ -92,17 +92,47 @@ class lcFrontWebController extends lcFrontController
             }
         }
 
-        // parse post params
-        /** @var lcNameValuePair[] $post */
-        $post = $request->getPostParams()->getArrayCopy();
+        if ($request->isPost()) {
+            // parse post params
+            /** @var lcNameValuePair[] $post */
+            $post = $request->getPostParams()->getArrayCopy();
 
-        if ($post) {
-            foreach ($post as $obj) {
-                if (isset($params[$obj->getName()])) {
-                    continue;
+            if ($post) {
+                foreach ($post as $obj) {
+                    if (isset($params[$obj->getName()])) {
+                        continue;
+                    }
+
+                    $params[$obj->getName()] = $obj->getValue();
                 }
+            }
+        } else if ($request->isPut()) {
+            // parse put params
+            /** @var lcNameValuePair[] $put */
+            $put = $request->getPutParams()->getArrayCopy();
 
-                $params[$obj->getName()] = $obj->getValue();
+            if ($put) {
+                foreach ($put as $obj) {
+                    if (isset($params[$obj->getName()])) {
+                        continue;
+                    }
+
+                    $params[$obj->getName()] = $obj->getValue();
+                }
+            }
+        } else if ($request->isDelete()) {
+            // parse delete params
+            /** @var lcNameValuePair[] $delete */
+            $delete = $request->getDeleteParams()->getArrayCopy();
+
+            if ($delete) {
+                foreach ($delete as $obj) {
+                    if (isset($params[$obj->getName()])) {
+                        continue;
+                    }
+
+                    $params[$obj->getName()] = $obj->getValue();
+                }
             }
         }
 

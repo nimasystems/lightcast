@@ -235,24 +235,26 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
                     $methods[] = $route_options['method'];
                 }
 
-                $stop_processing = false;
+                $found_match = false;
 
                 foreach ($methods as $method) {
                     $method = strtolower($method);
 
-                    $stop_processing = ($method == 'get' && !$this->request->isGet()) ||
+                    $is_valid = !(($method == 'get' && !$this->request->isGet()) ||
                         ($method == 'post' && !$this->request->isPost()) ||
                         ($method == 'put' && !$this->request->isPut()) ||
-                        ($method == 'delete' && !$this->request->isDelete());
+                        ($method == 'delete' && !$this->request->isDelete()));
 
-                    if ($stop_processing) {
-                        break;
+                    if (!$is_valid) {
+                        continue;
                     }
+
+                    $found_match = true;
 
                     unset($method);
                 }
 
-                if ($stop_processing) {
+                if (!$found_match) {
                     continue;
                 }
 
