@@ -135,7 +135,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $evn = $this->event_dispatcher->filter(new lcEvent('router.before_parse_url', $this, [
             'url' => $url,
             'context' => $this->context,
-        ], false), [
+        ]), [
             'url' => $url,
             'context' => $this->context,
         ]);
@@ -235,24 +235,25 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
                     $methods[] = $route_options['method'];
                 }
 
+                $stop_processing = false;
+
                 foreach ($methods as $method) {
                     $method = strtolower($method);
 
-                    if ($method == 'get' && !$this->request->isGet()) {
-                        // not a get - continue
-                        continue;
-                    } else if ($method == 'post' && !$this->request->isPost()) {
-                        // not a post - continue
-                        continue;
-                    } else if ($method == 'put' && !$this->request->isPut()) {
-                        // not a put - continue
-                        continue;
-                    } else if ($method == 'delete' && !$this->request->isDelete()) {
-                        // not a delete - continue
-                        continue;
+                    $stop_processing = ($method == 'get' && !$this->request->isGet()) ||
+                        ($method == 'post' && !$this->request->isPost()) ||
+                        ($method == 'put' && !$this->request->isPut()) ||
+                        ($method == 'delete' && !$this->request->isDelete());
+
+                    if ($stop_processing) {
+                        break;
                     }
 
                     unset($method);
+                }
+
+                if ($stop_processing) {
+                    continue;
                 }
 
                 unset($route_options);
@@ -508,7 +509,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
             'route_name' => $name,
             'prefix' => $prefix,
             'context' => $this->context,
-        ], false), $ret);
+        ]), $ret);
 
         if ($evn->isProcessed()) {
             $ret = $evn->getReturnValue();
