@@ -66,7 +66,7 @@ abstract class lcRoute extends lcObj
     private $custom_param_validate = '\+';
     private $tokenizers = [
         '/',
-        '.'
+        '.',
     ];
 
     public function getRoute()
@@ -284,7 +284,7 @@ abstract class lcRoute extends lcObj
                 $compare_regex[] = '(?P<' . preg_quote($route_param) . '>' . $req . ')';
 
                 $new_route .= self::PARAM_MATCH . $route_param;
-            } elseif ($route_param == self::ANY_TOKEN) {
+            } else if ($route_param == self::ANY_TOKEN) {
                 // if it is a * any match token
 
                 // check if this is a * next to a *
@@ -298,7 +298,7 @@ abstract class lcRoute extends lcObj
                 $compare_regex[] = ".*";
 
                 $new_route .= self::ANY_TOKEN;
-            } elseif ($route_param{0} == '@') {
+            } else if ($route_param{0} == '@') {
                 // if it is a regular expression match
 
                 $type = self::SEP_TYPE_REGEX;
@@ -434,7 +434,7 @@ abstract class lcRoute extends lcObj
         $newparams = [];
 
         foreach ($matches as $key => $val) {
-            if (is_int($key) || !$val || !in_array($key, $params)) {
+            if (is_int($key) || is_null($val) || !in_array($key, $params)) {
                 continue;
             }
 
