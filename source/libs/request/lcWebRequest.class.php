@@ -78,6 +78,17 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     */
     private $real_remote_addr;
 
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->get_params = new lcArrayCollection();
+        $this->post_params = new lcArrayCollection();
+        $this->put_params = new lcArrayCollection();
+        $this->delete_params = new lcArrayCollection();
+        $this->params = new lcArrayCollection();
+    }
+
     /*
      * Initialization of the Request
     */

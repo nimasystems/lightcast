@@ -42,36 +42,52 @@ class lcDateValidator extends lcValidator
             return false;
         }
 
+        $date_only = isset($this->options['date_only']) && $this->options['date_only'];
+        $time_only = isset($this->options['time_only']) && $this->options['time_only'];
+
         $match = [];
 
-        if (preg_match('/^([\d]+){1,4}[-|\/]([\d]+){1,2}[-|\/]([\d]+){1,4}/', $str, $match)) {
-            // check if we have year at the first position and swap it with the last
-            if ($match[1] > 31) {
-                $tmp = $match[3];
-                $match[3] = $match[1];
-                $match[1] = $tmp;
+        $validate_date = !$time_only;
+        $validate_time = !$date_only;
+
+        $ret = true;
+
+        if ($validate_date) {
+            if (preg_match('/^([\d]+){1,4}[-|\/]([\d]+){1,2}[-|\/]([\d]+){1,4}/', $str, $match)) {
+                // check if we have year at the first position and swap it with the last
+                if ($match[1] > 31) {
+                    $tmp = $match[3];
+                    $match[3] = $match[1];
+                    $match[1] = $tmp;
+                }
+
+                // check if the first position is not a month - swap it with the second
+                if ($match[1] > 12) {
+                    $str = $match[2] . '/' . $match[1] . '/' . $match[3];
+                } else {
+                    $str = $match[1] . '/' . $match[2] . '/' . $match[3];
+                }
             }
 
-            // check if the first position is not a month - swap it with the second
-            if ($match[1] > 12) {
-                $str = $match[2] . '/' . $match[1] . '/' . $match[3];
-            } else {
-                $str = $match[1] . '/' . $match[2] . '/' . $match[3];
+            if (!$stamp = strtotime($str)) {
+                return false;
             }
-        } else {
+
+            $m = date('m', $stamp);
+            $d = date('d', $stamp);
+            $y = date('Y', $stamp);
+
+            $ret = (bool)checkdate($m, $d, $y);
+        }
+
+        if (!$ret) {
             return false;
         }
 
-        if (!$stamp = strtotime($str)) {
-            return false;
+        if ($validate_time) {
+            $ret = preg_match('/([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/', $str, $match);
         }
 
-        $m = date('m', $stamp);
-        $d = date('d', $stamp);
-        $y = date('Y', $stamp);
-
-        $res = (bool)checkdate($m, $d, $y);
-
-        return $res;
+        return $ret;
     }
 }
