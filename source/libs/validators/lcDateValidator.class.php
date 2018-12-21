@@ -48,7 +48,7 @@ class lcDateValidator extends lcValidator
         $match = [];
 
         $validate_date = !$time_only;
-        $validate_time = !$date_only;
+        $validate_time = !$date_only && count($tmp) >= 2;
 
         $ret = true;
 
