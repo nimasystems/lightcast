@@ -33,9 +33,11 @@ class lcDateValidator extends lcValidator
         $tmp = array_filter(explode(' ', $data));
 
         $str = null;
+        $time_str = $data;
 
         if (count($tmp)) {
             $str = $tmp[0];
+            $time_str = isset($tmp[1]) ? $tmp[1] : null;
         }
 
         if (!$str) {
@@ -85,7 +87,7 @@ class lcDateValidator extends lcValidator
         }
 
         if ($validate_time) {
-            $ret = preg_match('/([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/', $str, $match);
+            $ret = preg_match('/([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?/', $time_str, $match);
         }
 
         return $ret;
