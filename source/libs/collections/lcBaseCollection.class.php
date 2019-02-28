@@ -211,7 +211,7 @@ abstract class lcBaseCollection extends lcObj
         return $this->list->key();
     }
 
-    protected function clear()
+    public function clear()
     {
         $spl = self::SPL_OBJECT_NAME;
         $this->list = new $spl;

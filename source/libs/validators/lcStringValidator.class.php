@@ -29,6 +29,7 @@ class lcStringValidator extends lcValidator
             return false;
         }
 
+        $regex = isset($this->options['regex']) ? $this->options['regex'] : null;
         $max_length = isset($this->options['max_length']) ? (int)$this->options['max_length'] : 0;
         $min_length = isset($this->options['min_length']) ? (int)$this->options['min_length'] : 0;
         $alphanum_only = isset($this->options['alpha_numeric']) ? (int)$this->options['alpha_numeric'] : false;
@@ -52,6 +53,12 @@ class lcStringValidator extends lcValidator
         // alpha numeric only
         if ($alphanum_only) {
             return (bool)preg_match('/^[\w\d' . ($allow_whitespace ? '\s' : '') . ']+$/', $data);
+        }
+
+        if ($regex) {
+            if (!preg_match($regex, $data)) {
+                return false;
+            }
         }
 
         return true;

@@ -22,7 +22,7 @@
 */
 
 abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities, Serializable,
-    ArrayAccess, iKeyValueProvider, iDebuggable
+    ArrayAccess, iKeyValueProvider, iDebuggable, iArrayable
 {
     /**
      * @var lcArrayCollection
@@ -53,7 +53,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function getCapabilities()
     {
         return [
-            'request'
+            'request',
         ];
     }
 
@@ -62,7 +62,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         $debug = [
             'env' => $this->env,
             'sapi' => $this->sapi,
-            'in_cli' => $this->is_running_cli
+            'in_cli' => $this->is_running_cli,
         ];
 
         return $debug;
@@ -192,6 +192,11 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         } else {
             return $this->env($name);
         }
+    }
+
+    public function toArray()
+    {
+        return (array)$this->getRequestData();
     }
 
     /*
@@ -418,7 +423,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             } else {
                 return (strpos($this->_env('SCRIPT_URI'), 'https://') === 0);
             }
-        } elseif ($key == 'SCRIPT_NAME') {
+        } else if ($key == 'SCRIPT_NAME') {
             if ($this->_env('CGI_MODE') && isset($_ENV['SCRIPT_URL'])) {
                 $key = 'SCRIPT_URL';
             }
@@ -426,13 +431,13 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
         if (isset($_SERVER[$key])) {
             $val = $_SERVER[$key];
-        } elseif (isset($_ENV[$key])) {
+        } else if (isset($_ENV[$key])) {
             $val = $_ENV[$key];
         } /* not valid to merge it here! fixed in lc 1.4 - elseif (isset($_REQUEST[$key]))
 		{
 			$val = $_REQUEST[$key];
 		}*/
-        elseif (getenv($key) !== false) {
+        else if (getenv($key) !== false) {
             $val = getenv($key);
         }
 
@@ -444,10 +449,10 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             }
 
             unset($addr);
-        } elseif ($key == 'REMOTE_ADDR' /*&& $val == $this->_env('SERVER_ADDR')*/) {
+        } else if ($key == 'REMOTE_ADDR' /*&& $val == $this->_env('SERVER_ADDR')*/) {
             if ($forwarded_for = $this->_env('HTTP_X_FORWARDED_FOR')) {
                 $val = $forwarded_for;
-            } elseif ($addr = $this->_env('HTTP_PC_REMOTE_ADDR')) {
+            } else if ($addr = $this->_env('HTTP_PC_REMOTE_ADDR')) {
                 $val = $addr;
             }
 
@@ -488,9 +493,9 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
                     // separate params from url
                     if ($t = strpos($request_uri, '?')) {
                         $request_uri = substr($request_uri, 0, $t);
-                    } elseif ($t = strpos($request_uri, '&')) {
+                    } else if ($t = strpos($request_uri, '&')) {
                         $request_uri = substr($request_uri, 0, $t);
-                    } elseif ($t = strpos($request_uri, '#')) {
+                    } else if ($t = strpos($request_uri, '#')) {
                         $request_uri = substr($request_uri, 0, $t);
                     }
 

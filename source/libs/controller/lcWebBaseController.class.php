@@ -171,10 +171,6 @@ abstract class lcWebBaseController extends lcController
 
     protected function validateRequestAndThrow()
     {
-        if (DO_DEBUG) {
-            return;
-        }
-
         $args = func_get_args();
 
         if ($args) {

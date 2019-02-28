@@ -53,6 +53,11 @@ class lcDateTime
         return self::hoursToMinutes($hours) * 60;
     }
 
+    public static function isValidTimezone($timezone)
+    {
+        return in_array($timezone, timezone_identifiers_list());
+    }
+
     public static function hoursToMinutes($hours)
     {
         $minutes = 0;

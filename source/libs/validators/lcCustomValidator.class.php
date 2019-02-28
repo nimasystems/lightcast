@@ -21,12 +21,12 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcNumericValidator extends lcValidator
+class lcCustomValidator extends lcValidator
 {
     public function validate($data)
     {
-        $data = str_replace(',', '.', $data);
-        return (bool)preg_match("/^-?(?:\d+|\d*\.\d+)$/", $data);
-        //return (bool)preg_match("/^[0-9]*$/", $data);
+        $validator_callback = isset($this->options['validator']) ? $this->options['validator'] : function () {
+        };
+        return $validator_callback($data);
     }
 }

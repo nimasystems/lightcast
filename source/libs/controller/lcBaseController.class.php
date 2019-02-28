@@ -131,7 +131,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     public function getCapabilities()
     {
         return [
-            'controller'
+            'controller',
         ];
     }
 
@@ -407,8 +407,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             return false;
         }
 
-        $failed_validations = [];
-
         $is_validated = true;
 
         foreach ($config as $data_name => $options) {
@@ -416,6 +414,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $value = isset($options['value']) ? $options['value'] : null;
             $fail_msg = isset($options['fail']) ? $options['fail'] : null;
             $options_v = isset($options['options']) ? $options['options'] : null;
+
+            $data_name = isset($options['name']) ? $options['name'] : $data_name;
 
             if (!$validator_name || !$data_name) {
                 assert(false);
@@ -504,7 +504,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
                 $this->loaded_components[] = [
                     'name' => $component_name,
-                    'instance' => $component_instance
+                    'instance' => $component_instance,
                 ];
 
                 $this->loaded_components_usage[$component_name] = $usage_count;
@@ -693,7 +693,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
                     $loaded_components[] = [
                         'name' => $component_name,
-                        'instance' => $component_instance
+                        'instance' => $component_instance,
                     ];
                     $loaded_components_usage[$component_name] = 0;
                 } catch (Exception $e) {
