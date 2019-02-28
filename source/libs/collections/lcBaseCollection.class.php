@@ -23,6 +23,8 @@
 
 abstract class lcBaseCollection extends lcObj
 {
+    const MAX_LOGGED_VAR_VAL_LEN = 500;
+
     const SPL_OBJECT_NAME = 'ArrayIterator';
     /**
      * @var ArrayIterator
@@ -159,6 +161,9 @@ abstract class lcBaseCollection extends lcObj
 
             if ($list && is_array($list)) {
                 foreach ($list as $val) {
+                    $val = is_string($val) && strlen($val) > self::MAX_LOGGED_VAR_VAL_LEN ?
+                        substr($val, 0, self::MAX_LOGGED_VAR_VAL_LEN) : $val;
+
                     $a[] = (is_string($val) ? $val : var_export($val, true));
 
                     unset($val);
