@@ -165,6 +165,8 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
                 foreach ($all as $val) {
                     /** @var lcNameValuePair $val */
                     $value = $val->getValue();
+                    $value = is_string($value) && strlen($value) > self::MAX_LOGGED_VAR_VAL_LEN ?
+                        substr($value, 0, self::MAX_LOGGED_VAR_VAL_LEN) : $value;
                     $a[] = $val->getName() . '=' . (is_string($value) ? $value : var_export($value, true));
 
                     unset($val);
