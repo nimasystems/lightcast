@@ -29,7 +29,8 @@ class lcApplicationTranslationsParser extends lcProjectTranslationsParser
     {
         return [
             'layouts',
-            'modules'
+            'modules',
+            'ws'
         ];
     }
 }

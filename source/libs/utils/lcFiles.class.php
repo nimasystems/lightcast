@@ -135,7 +135,7 @@ class lcFiles
         $ret =
             [
                 'name' => $fname,
-                'ext' => $ext
+                'ext' => $ext,
             ];
 
         return $ret;
@@ -188,7 +188,7 @@ class lcFiles
         if ($path{strlen($path) - 1} == DS) {
             // recursively return a temporary file path
             return self::is_writable($path . uniqid(mt_rand()) . '.tmp');
-        } elseif (is_dir($path)) {
+        } else if (is_dir($path)) {
             return self::is_writable($path . DS . uniqid(mt_rand()) . '.tmp');
         }
 
