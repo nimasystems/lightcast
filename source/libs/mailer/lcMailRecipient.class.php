@@ -51,4 +51,18 @@ class lcMailRecipient extends lcObj
     {
         return $this->name;
     }
+
+    public function __toString()
+    {
+        $name = $this->getName();
+        $email = $this->getEmail();
+
+        if (!$email) {
+            return '';
+        }
+
+        return ($name ? $name . ' <' : '') .
+            $email .
+            ($name ? '>' : '');
+    }
 }
