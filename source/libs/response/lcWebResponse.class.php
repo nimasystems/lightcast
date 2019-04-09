@@ -63,6 +63,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $javascript_code;
     protected $javascript_code_before;
     protected $javascript_code_after;
+
+    protected $view_javascripts_enabled = true;
+    protected $view_stylesheets_enabled = true;
+
     /**
      * @var array
      */
@@ -237,7 +241,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     {
         $ret = [
             'page_title',
-            'page_description'
+            'page_description',
         ];
         return $ret;
     }
@@ -461,7 +465,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             new lcEvent('response.did_send_response', $this, [
                 'cookies' => $sent_cookies,
                 'headers' => $sent_headers,
-                'content' => $content
+                'content' => $content,
             ]));
     }
 
@@ -854,33 +858,35 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // stylesheets
         $stylesheet_path = $this->configuration->getStylesheetPath();
 
-        $stylesheets = (array)$this->configuration['view.stylesheets'];
+        if ($this->view_stylesheets_enabled) {
+            $stylesheets = (array)$this->configuration['view.stylesheets'];
 
-        if ($stylesheets) {
-            $config_stylesheets = (array)$this->configuration['view.stylesheets'];
+            if ($stylesheets) {
+                $config_stylesheets = (array)$this->configuration['view.stylesheets'];
 
-            foreach ($config_stylesheets as $type => $stylesheets) {
-                if (!$stylesheets || !is_array($stylesheets)) {
-                    continue;
+                foreach ($config_stylesheets as $type => $stylesheets) {
+                    if (!$stylesheets || !is_array($stylesheets)) {
+                        continue;
+                    }
+
+                    foreach ($stylesheets as $sheet) {
+                        // relative or absolute path
+                        $p = ($sheet && ($sheet{0} == '/' || lcStrings::startsWith($sheet, 'http'))) ? $sheet : $stylesheet_path . $sheet;
+
+                        $this->stylesheets[$sheet] = [
+                            'href' => $p,
+                            'type' => 'text/css',
+                            'media' => $type,
+                        ];
+
+                        unset($sheet, $p);
+                    }
+
+                    unset($name, $type);
                 }
 
-                foreach ($stylesheets as $sheet) {
-                    // relative or absolute path
-                    $p = ($sheet && ($sheet{0} == '/' || lcStrings::startsWith($sheet, 'http'))) ? $sheet : $stylesheet_path . $sheet;
-
-                    $this->stylesheets[$sheet] = [
-                        'href' => $p,
-                        'type' => 'text/css',
-                        'media' => $type
-                    ];
-
-                    unset($sheet, $p);
-                }
-
-                unset($name, $type);
+                unset($config_stylesheets);
             }
-
-            unset($config_stylesheets);
         }
 
         unset($stylesheet_path);
@@ -888,65 +894,77 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // javascripts
         $js_path = $this->configuration->getJavascriptPath();
 
-        // start javascripts
-        $javascripts = (array)$this->configuration['view.javascripts'];
+        if ($this->view_javascripts_enabled) {
+            // start javascripts
+            $javascripts = (array)$this->configuration['view.javascripts'];
 
-        if ($javascripts) {
-            foreach ($javascripts as $jsidx => $jss) {
-                $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
+            if ($javascripts) {
+                foreach ($javascripts as $jsidx => $jss) {
+                    $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
 
-                if (!$js) {
-                    continue;
+                    if (!$js) {
+                        continue;
+                    }
+
+                    $async = is_array($jss) && isset($jss['async']) && $jss['async'];
+
+                    // relative or absolute path
+                    $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
+
+                    $jd = [
+                        'src' => $p,
+                        'type' => 'text/javascript',
+                        'async' => $async,
+                    ];
+
+                    $this->javascripts[$js_path . $js] = $jd;
+
+                    unset($js, $p);
                 }
 
-                $async = is_array($jss) && isset($jss['async']) && $jss['async'];
-
-                // relative or absolute path
-                $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
-
-                $jd = [
-                    'src' => $p,
-                    'type' => 'text/javascript',
-                    'async' => $async
-                ];
-
-                $this->javascripts[$js_path . $js] = $jd;
-
-                unset($js, $p);
+                unset($config_js);
             }
 
-            unset($config_js);
-        }
+            // end javascripts
+            $javascripts = (array)$this->configuration['view.javascripts_end'];
 
-        // end javascripts
-        $javascripts = (array)$this->configuration['view.javascripts_end'];
+            if ($javascripts) {
+                foreach ($javascripts as $jsidx => $jss) {
+                    $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
 
-        if ($javascripts) {
-            foreach ($javascripts as $jsidx => $jss) {
-                $js = is_array($jss) ? (isset($jss['src']) ? $jss['src'] : null) : $jss;
+                    if (!$js) {
+                        continue;
+                    }
 
-                if (!$js) {
-                    continue;
+                    $async = is_array($jss) && isset($jss['async']) && $jss['async'];
+
+                    // relative or absolute path
+                    $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
+
+                    $jd = [
+                        'src' => $p,
+                        'type' => 'text/javascript',
+                        'async' => $async,
+                    ];
+
+                    $this->javascripts_end[$js_path . $js] = $jd;
+
+                    unset($jsidx, $js, $p);
                 }
 
-                $async = is_array($jss) && isset($jss['async']) && $jss['async'];
-
-                // relative or absolute path
-                $p = ($js && ($js{0} == '/' || lcStrings::startsWith($js, 'http'))) ? $js : $js_path . $js;
-
-                $jd = [
-                    'src' => $p,
-                    'type' => 'text/javascript',
-                    'async' => $async
-                ];
-
-                $this->javascripts_end[$js_path . $js] = $jd;
-
-                unset($jsidx, $js, $p);
+                unset($config_js);
             }
-
-            unset($config_js);
         }
+    }
+
+    public function setViewJavascriptsEnabled($enabled = true)
+    {
+        $this->view_javascripts_enabled = $enabled;
+    }
+
+    public function setViewStylesheetsEnabled($enabled = true)
+    {
+        $this->view_stylesheets_enabled = $enabled;
     }
 
     protected function sendCookies()
