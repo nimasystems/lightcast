@@ -38,6 +38,10 @@ class lcMailRecipient extends lcObj
 
     public static function create($email, $name = null)
     {
+        if (!$email) {
+            return null;
+        }
+
         $obj = new lcMailRecipient($email, $name);
         return $obj;
     }
