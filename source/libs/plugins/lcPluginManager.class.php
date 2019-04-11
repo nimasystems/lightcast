@@ -641,6 +641,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 'plugin_instance' => &$plugin_object
             ];
 
+            if ($plugin_object instanceof lcResidentObj) {
+                $plugin_object->attachRegisteredEvents();
+            }
+
             // notify before the initialization
             $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
 

@@ -120,7 +120,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         $debug = [
             'notifications_sent' => $this->total_notifications_sent,
             'filter_processors' => $this->filter_processors,
-            'notifications' => $this->notifications
+            'notifications' => $this->notifications,
         ];
 
         return $debug;
@@ -189,8 +189,10 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
                     $listener_ = $this->listeners[$d];
 
                     if ($listener_ === $listener) {
-                        throw new lcSystemException('Duplicate event connection detected (' .
-                            'event: ' . $event_name . ', object: ' . get_class($listener_) . ')');
+                        return true;
+
+                        // throw new lcSystemException('Duplicate event connection detected (' .
+                        //                            'event: ' . $event_name . ', object: ' . get_class($listener_) . ')');
                     }
 
                     unset($d);
