@@ -25,6 +25,19 @@ class lcStrings
         return true;
     }
 
+    /**
+     * Returns a v4 UUID.
+     *
+     * @return string
+     */
+    public static function uuid()
+    {
+        $arr = array_values(unpack('N1a/n4b/N1c', openssl_random_pseudo_bytes(16)));
+        $arr[2] = ($arr[2] & 0x0fff) | 0x4000;
+        $arr[3] = ($arr[3] & 0x3fff) | 0x8000;
+        return vsprintf('%08x-%04x-%04x-%04x-%04x%08x', $arr);
+    }
+
     public static function startsWith($haystack, $needle)
     {
         return ($haystack && $needle && $haystack{0} == $needle{0}) ? 0 === lcUnicode::strpos($haystack, $needle) : false;
@@ -87,7 +100,7 @@ class lcStrings
 
         return [
             'country' => $country_code,
-            'locale' => $locale_code
+            'locale' => $locale_code,
         ];
     }
 
@@ -179,7 +192,7 @@ class lcStrings
         $skipwords = [
             'and', 'the', 'is', 'of', 'from', 'to', 'an', 'a', 'with',
             'are', 'me', 'she', 'because', 'otherwise', 'without', 'select',
-            'selected', 'were', 'by', 'in', 'his', 'her', 'at', 'to'
+            'selected', 'were', 'by', 'in', 'his', 'her', 'at', 'to',
         ];
 
         if (!isset($min_word_len)) {
@@ -457,8 +470,8 @@ class lcStrings
     public static function sanitize($string, $force_lowercase = true, $anal = false)
     {
         $strip = ["~", "`", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "_", "=", "+", "[", "{", "]",
-            "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
-            "â€”", "â€“", ",", "<", ".", ">", "/", "?"];
+                  "}", "\\", "|", ";", ":", "\"", "'", "&#8216;", "&#8217;", "&#8220;", "&#8221;", "&#8211;", "&#8212;",
+                  "â€”", "â€“", ",", "<", ".", ">", "/", "?"];
         $clean = trim(str_replace($strip, "", strip_tags($string)));
         $clean = preg_replace('/\s+/', "-", $clean);
         $clean = ($anal) ? preg_replace("/[^a-zA-Z0-9]/", "", $clean) : $clean;
@@ -646,7 +659,7 @@ class lcStrings
             'Ā' => 'A', 'Č' => 'C', 'Ē' => 'E', 'Ģ' => 'G', 'Ī' => 'i', 'Ķ' => 'k', 'Ļ' => 'L', 'Ņ' => 'N',
             'Š' => 'S', 'Ū' => 'u', 'Ž' => 'Z',
             'ā' => 'a', 'č' => 'c', 'ē' => 'e', 'ģ' => 'g', 'ī' => 'i', 'ķ' => 'k', 'ļ' => 'l', 'ņ' => 'n',
-            'š' => 's', 'ū' => 'u', 'ž' => 'z'
+            'š' => 's', 'ū' => 'u', 'ž' => 'z',
         ];
 
         // Make custom replacements
