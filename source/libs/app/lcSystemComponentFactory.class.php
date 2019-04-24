@@ -733,7 +733,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->class_autoloader->addClass($class_name, $filename);
 
         if (!class_exists($class_name)) {
-            throw new lcSystemException('Controller class not available');
+            throw new lcSystemException('Controller class not available (' . $class_name . ')');
         }
 
         $instance = new $class_name();
