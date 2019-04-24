@@ -106,12 +106,26 @@ class lcStrings
 
     public static function splitEmail($str)
     {
-        $str .= " ";
-        $sPattern = '/([\w\s\'\"]+[\s]+)?(<)?(([\w-\.]+)@((?:[\w]+\.)+)([a-zA-Z]{2,4}))?(>)?/';
-        preg_match($sPattern, $str, $aMatch);
-        $name = (isset($aMatch[1])) ? $aMatch[1] : '';
-        $email = (isset($aMatch[3])) ? $aMatch[3] : '';
-        return ['name' => trim($name), 'email' => trim($email)];
+        $regex = '/(("([^"]*)"|[^",]*)\\s*<(.*?)>|[^",\\s]+)(?=(,|$))/';
+        preg_match_all($regex, $str, $matches, PREG_SET_ORDER);
+
+        if (!$matches) {
+            return null;
+        }
+
+        $match = $matches[0];
+
+        $out = [
+            'name' => $match[3] ?: trim($match[2]),
+            'email' => trim($match[4]) ?: $match[1],
+        ];
+
+        foreach ($matches as $match) $out = [
+            'name' => $match[3] ?: trim($match[2]),
+            'email' => trim($match[4]) ?: $match[1],
+        ];
+
+        return $out;
     }
 
     public static function permaLink(array $key_cols, array $keywords, $prefix = null)
