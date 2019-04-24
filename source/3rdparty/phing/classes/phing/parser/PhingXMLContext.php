@@ -49,6 +49,11 @@ class PhingXMLContext
      * @var Target[]
      */
     private $currentTargets = null;
+    /** The project to configure. */
+    private $project;
+    private $configurators = [];
+    /** Impoerted files */
+    private $importStack = [];
 
     /**
      * Constructor
@@ -61,11 +66,6 @@ class PhingXMLContext
         $this->implicitTarget->setName("");
         $this->implicitTarget->setHidden(true);
     }
-
-    /** The project to configure. */
-    private $project;
-
-    private $configurators = array();
 
     /**
      * @param $cfg
@@ -92,9 +92,6 @@ class PhingXMLContext
             return $this->configurators[$l - 1];
         }
     }
-
-    /** Impoerted files */
-    private $importStack = array();
 
     /**
      * @param $file

@@ -68,76 +68,6 @@ class HttpGetTask extends HttpTask
     protected $proxy = null;
 
     /**
-     * @return HTTP_Request2
-     * @throws BuildException
-     * @throws HTTP_Request2_LogicException
-     */
-    protected function createRequest()
-    {
-        if (!isset($this->dir)) {
-            throw new BuildException("Required attribute 'dir' is missing");
-        }
-
-        $config = array(
-            'ssl_verify_peer' => $this->sslVerifyPeer
-        );
-        if (isset($this->proxy)) {
-            $config['proxy'] = $this->proxy;
-        }
-        if (null !== $this->followRedirects) {
-            $config['follow_redirects'] = $this->followRedirects;
-        }
-
-        $request = parent::createRequest();
-        $request->setConfig($config);
-
-        $this->log("Fetching " . $this->url);
-
-        return $request;
-    }
-
-    /**
-     * Saves the response body to a specified directory
-     *
-     * @param  HTTP_Request2_Response $response
-     * @return void
-     * @throws BuildException
-     */
-    protected function processResponse(HTTP_Request2_Response $response)
-    {
-        if ($response->getStatus() != 200) {
-            throw new BuildException(
-                "Request unsuccessful. Response from server: " . $response->getStatus()
-                . " " . $response->getReasonPhrase()
-            );
-        }
-
-        $content = $response->getBody();
-        $disposition = $response->getHeader('content-disposition');
-
-        if ($this->filename) {
-            $filename = $this->filename;
-
-        } elseif ($disposition && 0 == strpos($disposition, 'attachment')
-            && preg_match('/filename="([^"]+)"/', $disposition, $m)
-        ) {
-            $filename = basename($m[1]);
-
-        } else {
-            $filename = basename(parse_url($this->url, PHP_URL_PATH));
-        }
-
-        if (!is_writable($this->dir)) {
-            throw new BuildException("Cannot write to directory: " . $this->dir);
-        }
-
-        $filename = $this->dir . "/" . $filename;
-        file_put_contents($filename, $content);
-
-        $this->log("Contents from " . $this->url . " saved to $filename");
-    }
-
-    /**
      * Sets the filename to store the output in
      *
      * @param string $filename
@@ -185,5 +115,75 @@ class HttpGetTask extends HttpTask
     public function setProxy($proxy)
     {
         $this->proxy = $proxy;
+    }
+
+    /**
+     * @return HTTP_Request2
+     * @throws BuildException
+     * @throws HTTP_Request2_LogicException
+     */
+    protected function createRequest()
+    {
+        if (!isset($this->dir)) {
+            throw new BuildException("Required attribute 'dir' is missing");
+        }
+
+        $config = [
+            'ssl_verify_peer' => $this->sslVerifyPeer,
+        ];
+        if (isset($this->proxy)) {
+            $config['proxy'] = $this->proxy;
+        }
+        if (null !== $this->followRedirects) {
+            $config['follow_redirects'] = $this->followRedirects;
+        }
+
+        $request = parent::createRequest();
+        $request->setConfig($config);
+
+        $this->log("Fetching " . $this->url);
+
+        return $request;
+    }
+
+    /**
+     * Saves the response body to a specified directory
+     *
+     * @param HTTP_Request2_Response $response
+     * @return void
+     * @throws BuildException
+     */
+    protected function processResponse(HTTP_Request2_Response $response)
+    {
+        if ($response->getStatus() != 200) {
+            throw new BuildException(
+                "Request unsuccessful. Response from server: " . $response->getStatus()
+                . " " . $response->getReasonPhrase()
+            );
+        }
+
+        $content = $response->getBody();
+        $disposition = $response->getHeader('content-disposition');
+
+        if ($this->filename) {
+            $filename = $this->filename;
+
+        } else if ($disposition && 0 == strpos($disposition, 'attachment')
+            && preg_match('/filename="([^"]+)"/', $disposition, $m)
+        ) {
+            $filename = basename($m[1]);
+
+        } else {
+            $filename = basename(parse_url($this->url, PHP_URL_PATH));
+        }
+
+        if (!is_writable($this->dir)) {
+            throw new BuildException("Cannot write to directory: " . $this->dir);
+        }
+
+        $filename = $this->dir . "/" . $filename;
+        file_put_contents($filename, $content);
+
+        $this->log("Contents from " . $this->url . " saved to $filename");
     }
 }

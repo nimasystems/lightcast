@@ -46,8 +46,8 @@ class ApplyTask extends Task
      * File Set/List of files.
      * @var array
      */
-    protected $filesets = array();
-    protected $filelists = array();
+    protected $filesets = [];
+    protected $filelists = [];
 
     /**
      * Commandline managing object
@@ -218,7 +218,7 @@ class ApplyTask extends Task
      */
     public function setExecutable($executable)
     {
-        $this->commandline->setExecutable((string) $executable);
+        $this->commandline->setExecutable((string)$executable);
     }
 
 
@@ -244,7 +244,7 @@ class ApplyTask extends Task
      */
     public function setEscape($escape)
     {
-        $this->escape = (bool) $escape;
+        $this->escape = (bool)$escape;
     }
 
 
@@ -265,13 +265,13 @@ class ApplyTask extends Task
      * File to which output should be written
      *
      * @param $append
+     * @return void
      * @internal param PhingFile $outputfile Output log file
      *
-     * @return void
      */
     public function setAppend($append)
     {
-        $this->appendoutput = (bool) $append;
+        $this->appendoutput = (bool)$append;
     }
 
 
@@ -284,7 +284,7 @@ class ApplyTask extends Task
      */
     public function setParallel($parallel)
     {
-        $this->parallel = (bool) $parallel;
+        $this->parallel = (bool)$parallel;
     }
 
 
@@ -297,7 +297,7 @@ class ApplyTask extends Task
      */
     public function setAddsourcefile($addsourcefile)
     {
-        $this->addsourcefile = (bool) $addsourcefile;
+        $this->addsourcefile = (bool)$addsourcefile;
     }
 
 
@@ -323,7 +323,7 @@ class ApplyTask extends Task
      */
     public function setSpawn($spawn)
     {
-        $this->spawn = (bool) $spawn;
+        $this->spawn = (bool)$spawn;
     }
 
 
@@ -336,7 +336,7 @@ class ApplyTask extends Task
      */
     public function setReturnProperty($propertyname)
     {
-        $this->returnProperty = (string) $propertyname;
+        $this->returnProperty = (string)$propertyname;
     }
 
 
@@ -349,7 +349,7 @@ class ApplyTask extends Task
      */
     public function setOutputProperty($propertyname)
     {
-        $this->outputProperty = (string) $propertyname;
+        $this->outputProperty = (string)$propertyname;
     }
 
 
@@ -358,13 +358,13 @@ class ApplyTask extends Task
      * pathnames (relative to the base directory of the corresponding fileset/list)
      *
      * @param $relative
+     * @return void
      * @internal param bool $escape Escape command before execution
      *
-     * @return void
      */
     public function setRelative($relative)
     {
-        $this->relative = (bool) $relative;
+        $this->relative = (bool)$relative;
     }
 
 
@@ -377,7 +377,7 @@ class ApplyTask extends Task
      */
     public function setOs($os)
     {
-        $this->os = (string) $os;
+        $this->os = (string)$os;
     }
 
 
@@ -390,19 +390,7 @@ class ApplyTask extends Task
      */
     public function setPassthru($passthru)
     {
-        $this->passthru = (bool) $passthru;
-    }
-
-    /**
-     * Fail on command exits with a returncode other than zero
-     *
-     * @param boolean $failonerror Indicator to fail on error
-     *
-     * @return void
-     */
-    public function setFailonerror($failonerror)
-    {
-        $this->failonerror = (bool) $failonerror;
+        $this->passthru = (bool)$passthru;
     }
 
     /**
@@ -414,6 +402,18 @@ class ApplyTask extends Task
     }
 
     /**
+     * Fail on command exits with a returncode other than zero
+     *
+     * @param boolean $failonerror Indicator to fail on error
+     *
+     * @return void
+     */
+    public function setFailonerror($failonerror)
+    {
+        $this->failonerror = (bool)$failonerror;
+    }
+
+    /**
      * Whether to use forward-slash as file-separator on the file names
      *
      * @param boolean $forwardslash Indicator to use forward-slash
@@ -422,20 +422,20 @@ class ApplyTask extends Task
      */
     public function setForwardslash($forwardslash)
     {
-        $this->forwardslash = (bool) $forwardslash;
+        $this->forwardslash = (bool)$forwardslash;
     }
 
     /**
      * Limit the amount of parallelism by passing at most this many sourcefiles at once
      *
      * @param $max
+     * @return void
      * @internal param bool $forwardslash Indicator to use forward-slash
      *
-     * @return void
      */
     public function setMaxparallel($max)
     {
-        $this->maxparallel = (int) $max;
+        $this->maxparallel = (int)$max;
     }
 
     /** [TBA]
@@ -454,7 +454,7 @@ class ApplyTask extends Task
      */
     public function createSrcfile()
     {
-        return $this->commandline->addArguments(array(self::SOURCEFILE_ID));
+        return $this->commandline->addArguments([self::SOURCEFILE_ID]);
     }
 
     /**
@@ -532,43 +532,11 @@ class ApplyTask extends Task
     /**********************************************************************************/
 
     /**
-     * Checks whether the current O.S. should be supported
-     *
-     * @return boolean False if the exec command shall not be run
-     */
-    protected function validateOS()
-    {
-
-        // Log
-        $this->log('Validating Operating System information ', $this->loglevel);
-
-        // Checking whether'os' information is specified
-        if (empty($this->os)) {
-
-            // Log
-            $this->log("Operating system information not specified. Skipped checking. ", $this->loglevel);
-
-            return true;
-        }
-
-        // Validating the operating system information
-        $matched = (strpos(strtolower($this->os), strtolower($this->currentos)) !== false) ? true : false;
-
-        // Log
-        $this->log(
-            "Operating system '" . $this->currentos . "' " . ($matched ? '' : 'not ') . "found in " . $this->os,
-            $this->loglevel
-        );
-
-        return $matched;
-    }
-
-    /**
      * Initializes the task operations, i.e.
      * - Required information validation
      * - Working directory
      *
-     * @param  none
+     * @param none
      *
      * @return void
      */
@@ -601,8 +569,7 @@ class ApplyTask extends Task
 
             // Log
             $this->log(
-                'Working directory change ' . ($dirchangestatus ? 'successful' : 'failed') . ' to ' . $this->dir->getPath(
-                ),
+                'Working directory change ' . ($dirchangestatus ? 'successful' : 'failed') . ' to ' . $this->dir->getPath(),
                 $this->loglevel
             );
 
@@ -635,6 +602,51 @@ class ApplyTask extends Task
     }
 
     /**
+     * Throws the exception with specified information
+     *
+     * @param  $information Exception information
+     *
+     * @return void
+     * @throws BuildException
+     */
+    private function throwBuildException($information)
+    {
+        throw new BuildException('ApplyTask: ' . (string)$information);
+    }
+
+    /**
+     * Checks whether the current O.S. should be supported
+     *
+     * @return boolean False if the exec command shall not be run
+     */
+    protected function validateOS()
+    {
+
+        // Log
+        $this->log('Validating Operating System information ', $this->loglevel);
+
+        // Checking whether'os' information is specified
+        if (empty($this->os)) {
+
+            // Log
+            $this->log("Operating system information not specified. Skipped checking. ", $this->loglevel);
+
+            return true;
+        }
+
+        // Validating the operating system information
+        $matched = (strpos(strtolower($this->os), strtolower($this->currentos)) !== false) ? true : false;
+
+        // Log
+        $this->log(
+            "Operating system '" . $this->currentos . "' " . ($matched ? '' : 'not ') . "found in " . $this->os,
+            $this->loglevel
+        );
+
+        return $matched;
+    }
+
+    /**
      * Builds the full command to execute and stores it in $realCommand.
      *
      * @return void
@@ -661,7 +673,7 @@ class ApplyTask extends Task
             $this->realCommand .= ($this->appendoutput ? '>' : ''); // Append output
             $this->realCommand .= ' ' . escapeshellarg($this->output->getPath());
 
-        } elseif ($this->spawn) { // Validating the 'spawn' configuration, and redirecting the output to 'null'
+        } else if ($this->spawn) { // Validating the 'spawn' configuration, and redirecting the output to 'null'
 
             // Validating the O.S. variant
             if ('WIN' == $this->osvariant) {
@@ -743,7 +755,7 @@ class ApplyTask extends Task
             }
 
             // Preparing the command to be executed
-            $filecommand = str_replace(array(self::SOURCEFILE_ID), array($absolutefilename), $this->realCommand);
+            $filecommand = str_replace([self::SOURCEFILE_ID], [$absolutefilename], $this->realCommand);
 
             // Command execution
             list($returncode, $output) = $this->executeCommand($filecommand);
@@ -761,7 +773,7 @@ class ApplyTask extends Task
             // Sets the output property
             if ($this->outputProperty) {
                 $previousValue = $this->project->getProperty($this->outputProperty);
-                if (! empty($previousValue)) {
+                if (!empty($previousValue)) {
                     $previousValue .= "\n";
                 }
                 $this->project->setProperty($this->outputProperty, $previousValue . implode("\n", $output));
@@ -784,6 +796,34 @@ class ApplyTask extends Task
     }
 
     /**
+     * Prepares the filename per base directory and relative path information
+     *
+     * @param $filename
+     * @param $basedir
+     * @param $relative
+     *
+     * @return mixed processed filenames
+     */
+    public function getFilePath($filename, $basedir, $relative)
+    {
+
+        // Var(s)
+        $files = [];
+
+        // Validating the 'file' information
+        $files = (is_array($filename)) ? $filename : [$filename];
+
+        // Processing the file information
+        foreach ($files as $index => $file) {
+            $absolutefilename = (($relative === false) ? ($basedir . DIRECTORY_SEPARATOR) : '');
+            $absolutefilename .= $file;
+            $files[$index] = $absolutefilename;
+        }
+
+        return (is_array($filename) ? $files : $files[0]);
+    }
+
+    /**
      * Executes the specified command and returns the return code & output.
      *
      * @param string $command
@@ -794,7 +834,7 @@ class ApplyTask extends Task
     {
 
         // Var(s)
-        $output = array();
+        $output = [];
         $return = null;
 
         // Validating the command executor container
@@ -806,7 +846,7 @@ class ApplyTask extends Task
             $this->loglevel
         );
 
-        return array($return, $output);
+        return [$return, $output];
     }
 
     /**
@@ -824,47 +864,6 @@ class ApplyTask extends Task
         }
 
         return;
-    }
-
-    /**
-     * Prepares the filename per base directory and relative path information
-     *
-     * @param $filename
-     * @param $basedir
-     * @param $relative
-     *
-     * @return mixed processed filenames
-     */
-    public function getFilePath($filename, $basedir, $relative)
-    {
-
-        // Var(s)
-        $files = array();
-
-        // Validating the 'file' information
-        $files = (is_array($filename)) ? $filename : array($filename);
-
-        // Processing the file information
-        foreach ($files as $index => $file) {
-            $absolutefilename = (($relative === false) ? ($basedir . DIRECTORY_SEPARATOR) : '');
-            $absolutefilename .= $file;
-            $files[$index] = $absolutefilename;
-        }
-
-        return (is_array($filename) ? $files : $files[0]);
-    }
-
-    /**
-     * Throws the exception with specified information
-     *
-     * @param  $information Exception information
-     *
-     * @throws BuildException
-     * @return void
-     */
-    private function throwBuildException($information)
-    {
-        throw new BuildException('ApplyTask: ' . (string) $information);
     }
 
 }

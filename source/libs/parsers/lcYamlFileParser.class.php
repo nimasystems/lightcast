@@ -44,7 +44,7 @@ class lcYamlFileParser extends lcFileParser
                 }
 
                 $data = yaml_parse($contents);
-            } elseif (function_exists('syck_load')) {
+            } else if (function_exists('syck_load')) {
                 $contents = @file_get_contents($filename);
 
                 if (!$contents) {
@@ -52,7 +52,7 @@ class lcYamlFileParser extends lcFileParser
                 }
 
                 $data = syck_load($contents);
-            } elseif (class_exists('Spyc')) {
+            } else if (class_exists('Spyc')) {
                 // manually load the configuration and parse it
                 // Spyc does not strictly adhere to YAML 1.1 so if there is no
                 // space
@@ -107,7 +107,7 @@ class lcYamlFileParser extends lcFileParser
                 // problems later
                 if ($data && !array_walk_recursive($data, [
                         $this,
-                        'trimYamlValue'
+                        'trimYamlValue',
                     ])
                 ) {
                     throw new lcSystemException('Could not walk YAML configuration');
@@ -116,9 +116,9 @@ class lcYamlFileParser extends lcFileParser
                 // syck / yaml are MUCH FASTER!
                 if (function_exists('yaml_emit')) {
                     $data = yaml_emit($data);
-                } elseif (function_exists('syck_dump')) {
+                } else if (function_exists('syck_dump')) {
                     $data = syck_dump($data);
-                } elseif (class_exists('Spyc')) {
+                } else if (class_exists('Spyc')) {
                     $data = Spyc::YAMLDump($data, $indent, $word_wrap);
                 } else {
                     throw new lcSystemException('YAML Parser missing');

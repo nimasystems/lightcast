@@ -23,16 +23,6 @@
 
 class tIntegration extends lcTaskController
 {
-    public function getHelpInfo()
-    {
-        return
-            'Possible commands:' . "\n\n" .
-            'Validation:' . "\n\n" .
-            lcConsolePainter::formatConsoleText('validate-php-files', 'info') . ' - Validates the syntax of all PHP files ' . "\n" .
-            "\t- directory - specify the directory which should be checked (recursively)\n" .
-            "\n";
-    }
-
     public function executeTask()
     {
         switch ($this->getRequest()->getParam('action')) {
@@ -40,28 +30,6 @@ class tIntegration extends lcTaskController
                 return $this->validatePhpFiles();
             default:
                 return $this->displayHelp();
-        }
-    }
-
-    private function displayHelp()
-    {
-        $this->consoleDisplay($this->getHelpInfo(), false);
-        return true;
-    }
-
-    public function _validatePhpFiles($filename)
-    {
-        if (lcFiles::getFileExt($filename) != '.php') {
-            return;
-        }
-
-        $result = null;
-        $ret = lcSys::execCmd('php -l ' . escapeshellarg($filename), $result);
-
-        if ($result !== 0) {
-            $this->displayError('Validation error (' . $filename . '): ' . $ret);
-        } else {
-            $this->display('OK: ' . $filename);
         }
     }
 
@@ -85,5 +53,37 @@ class tIntegration extends lcTaskController
         lcDirs::recursiveFilesCallback($root_dir, [$this, '_validatePhpFiles'], [], true);
 
         return true;
+    }
+
+    private function displayHelp()
+    {
+        $this->consoleDisplay($this->getHelpInfo(), false);
+        return true;
+    }
+
+    public function getHelpInfo()
+    {
+        return
+            'Possible commands:' . "\n\n" .
+            'Validation:' . "\n\n" .
+            lcConsolePainter::formatConsoleText('validate-php-files', 'info') . ' - Validates the syntax of all PHP files ' . "\n" .
+            "\t- directory - specify the directory which should be checked (recursively)\n" .
+            "\n";
+    }
+
+    public function _validatePhpFiles($filename)
+    {
+        if (lcFiles::getFileExt($filename) != '.php') {
+            return;
+        }
+
+        $result = null;
+        $ret = lcSys::execCmd('php -l ' . escapeshellarg($filename), $result);
+
+        if ($result !== 0) {
+            $this->displayError('Validation error (' . $filename . '): ' . $ret);
+        } else {
+            $this->display('OK: ' . $filename);
+        }
     }
 }

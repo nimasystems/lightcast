@@ -36,11 +36,6 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
-    public static function create()
-    {
-        return new lcTagHead();
-    }
-
     public function setProfile($value = null)
     {
         $this->setAttribute('profile', $value);
@@ -63,6 +58,11 @@ class lcTagHead extends lcHtmlBaseTag implements iI18nAttributes
     {
         $this->setAttribute('lang', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagHead();
     }
 
     public static function getRequiredAttributes()

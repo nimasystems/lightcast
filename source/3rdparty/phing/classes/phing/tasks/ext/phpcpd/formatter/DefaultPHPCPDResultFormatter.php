@@ -33,9 +33,9 @@ class DefaultPHPCPDResultFormatter extends PHPCPDResultFormatter
     /**
      * Processes a list of clones.
      *
-     * @param CodeCloneMap   $clones
-     * @param Project        $project
-     * @param boolean        $useFile
+     * @param CodeCloneMap $clones
+     * @param Project $project
+     * @param boolean $useFile
      * @param PhingFile|null $outFile
      */
     public function processClones($clones, Project $project, $useFile = false, $outFile = null)
@@ -68,8 +68,8 @@ class DefaultPHPCPDResultFormatter extends PHPCPDResultFormatter
     /**
      * Wrapper for PHPCPD 2.0
      *
-     * @param CodeCloneMap   $clones
-     * @param boolean        $useFile
+     * @param CodeCloneMap $clones
+     * @param boolean $useFile
      * @param PhingFile|null $outFile
      */
     private function processClonesNew($clones, $useFile = false, $outFile = null)

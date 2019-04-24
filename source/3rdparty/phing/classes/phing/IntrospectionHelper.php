@@ -45,31 +45,32 @@ class IntrospectionHelper
 {
 
     /**
+     * The cache of IntrospectionHelper classes instantiated by getHelper().
+     * @var array IntrospectionHelpers[]
+     */
+    private static $helpers = [];
+    /**
      * Holds the attribute setter methods.
      *
      * @var array string[]
      */
-    private $attributeSetters = array();
-
+    private $attributeSetters = [];
     /**
      * Holds methods to create nested elements.
      *
      * @var array string[]
      */
-    private $nestedCreators = array();
-
+    private $nestedCreators = [];
     /**
      * Holds methods to store configured nested elements.
      *
      * @var array string[]
      */
-    private $nestedStorers = array();
-
+    private $nestedStorers = [];
     /**
      * Map from attribute names to nested types.
      */
-    private $nestedTypes = array();
-
+    private $nestedTypes = [];
     /**
      * New idea in phing: any class can register certain
      * keys -- e.g. "task.current_file" -- which can be used in
@@ -80,41 +81,19 @@ class IntrospectionHelper
      *         function setListeningReplace($slot) {}
      * @var array string[]
      */
-    private $slotListeners = array();
-
+    private $slotListeners = [];
     /**
      * The method to add PCDATA stuff.
      *
      * @var string Method name of the addText (redundant?) method, if class supports it :)
      */
     private $methodAddText = null;
-
     /**
      * The Class that's been introspected.
      *
      * @var     object
      */
     private $bean;
-
-    /**
-     * The cache of IntrospectionHelper classes instantiated by getHelper().
-     * @var array IntrospectionHelpers[]
-     */
-    private static $helpers = array();
-
-    /**
-     * Factory method for helper objects.
-     *
-     * @param string $class The class to create a Helper for
-     */
-    public static function getHelper($class)
-    {
-        if (!isset(self::$helpers[$class])) {
-            self::$helpers[$class] = new IntrospectionHelper($class);
-        }
-
-        return self::$helpers[$class];
-    }
 
     /**
      * This function constructs a new introspection helper for a specific class.
@@ -153,7 +132,7 @@ class IntrospectionHelper
 
                     $this->methodAddText = $method;
 
-                } elseif (strpos($name, "setlistening") === 0) {
+                } else if (strpos($name, "setlistening") === 0) {
 
                     // Phing supports something unique called "RegisterSlots"
                     // These are dynamic values that use a basic slot system so that
@@ -164,28 +143,25 @@ class IntrospectionHelper
                     // slot, which can be ready by the XSLTParam type.)
 
                     if (count($method->getParameters()) !== 1) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() must take exactly one parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() must take exactly one parameter.");
                     }
 
                     $this->slotListeners[$name] = $method;
 
-                } elseif (strpos($name, "set") === 0) {
+                } else if (strpos($name, "set") === 0) {
 
                     // A standard attribute setter.
 
                     if (count($method->getParameters()) !== 1) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() must take exactly one parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() must take exactly one parameter.");
                     }
 
                     $this->attributeSetters[$name] = $method;
 
-                } elseif (strpos($name, "create") === 0) {
+                } else if (strpos($name, "create") === 0) {
 
                     if ($method->getNumberOfRequiredParameters() > 0) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() may not take any parameters.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() may not take any parameters.");
                     }
 
                     // Because PHP doesn't support return types, we are going to do
@@ -210,7 +186,7 @@ class IntrospectionHelper
 
                     $this->nestedCreators[$name] = $method;
 
-                } elseif (strpos($name, "addconfigured") === 0) {
+                } else if (strpos($name, "addconfigured") === 0) {
 
                     // *must* use class hints if using addConfigured ...
 
@@ -218,14 +194,12 @@ class IntrospectionHelper
                     $params = $method->getParameters();
 
                     if (count($params) < 1) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() must take at least one parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() must take at least one parameter.");
                     }
 
                     if (count($params) > 1) {
                         $this->warn(
-                            $method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() takes more than one parameter. (IH only uses the first)"
+                            $method->getDeclaringClass()->getName() . "::" . $method->getName() . "() takes more than one parameter. (IH only uses the first)"
                         );
                     }
 
@@ -236,29 +210,26 @@ class IntrospectionHelper
                     }
 
                     if ($classname === null) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() method MUST use a class hint to indicate the class type of parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() method MUST use a class hint to indicate the class type of parameter.");
                     }
 
                     $this->nestedTypes[$name] = $classname;
 
                     $this->nestedStorers[$name] = $method;
 
-                } elseif (strpos($name, "add") === 0) {
+                } else if (strpos($name, "add") === 0) {
 
                     // *must* use class hints if using add ...
 
                     // 1 param only
                     $params = $method->getParameters();
                     if (count($params) < 1) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() must take at least one parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() must take at least one parameter.");
                     }
 
                     if (count($params) > 1) {
                         $this->warn(
-                            $method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() takes more than one parameter. (IH only uses the first)"
+                            $method->getDeclaringClass()->getName() . "::" . $method->getName() . "() takes more than one parameter. (IH only uses the first)"
                         );
                     }
 
@@ -271,14 +242,52 @@ class IntrospectionHelper
                     // we don't use the classname here, but we need to make sure it exists before
                     // we later try to instantiate a non-existent class
                     if ($classname === null) {
-                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName(
-                            ) . "() method MUST use a class hint to indicate the class type of parameter.");
+                        throw new BuildException($method->getDeclaringClass()->getName() . "::" . $method->getName() . "() method MUST use a class hint to indicate the class type of parameter.");
                     }
 
                     $this->nestedCreators[$name] = $method;
                 }
             } // if $method->isPublic()
         } // foreach
+    }
+
+    /**
+     * Extract the name of a property from a method name - subtracting  a given prefix.
+     *
+     * @param string $methodName
+     * @param string $prefix
+     * @return string
+     */
+    public function getPropertyName($methodName, $prefix)
+    {
+        $start = strlen($prefix);
+
+        return strtolower(substr($methodName, $start));
+    }
+
+    /**
+     * Prints warning message to screen if -debug was used.
+     * @param string $msg
+     */
+    public function warn($msg)
+    {
+        if (Phing::getMsgOutputLevel() === Project::MSG_DEBUG) {
+            print("[IntrospectionHelper] " . $msg . "\n");
+        }
+    }
+
+    /**
+     * Factory method for helper objects.
+     *
+     * @param string $class The class to create a Helper for
+     */
+    public static function getHelper($class)
+    {
+        if (!isset(self::$helpers[$class])) {
+            self::$helpers[$class] = new IntrospectionHelper($class);
+        }
+
+        return self::$helpers[$class];
     }
 
     /**
@@ -388,6 +397,49 @@ class IntrospectionHelper
     }
 
     /**
+     * Get the name for an element.
+     * When possible the full classnam (phing.tasks.system.PropertyTask) will
+     * be returned.  If not available (loaded in taskdefs or typedefs) then the
+     * XML element name will be returned.
+     *
+     * @param Project $project
+     * @param object $element The Task or type element.
+     * @return string  Fully qualified class name of element when possible.
+     */
+    public function getElementName(Project $project, $element)
+    {
+
+        $taskdefs = $project->getTaskDefinitions();
+        $typedefs = $project->getDataTypeDefinitions();
+
+        // check if class of element is registered with project (tasks & types)
+        // most element types don't have a getTag() method
+        $elClass = get_class($element);
+
+        if (!in_array('getTag', get_class_methods($elClass))) {
+            // loop through taskdefs and typesdefs and see if the class name
+            // matches (case-insensitive) any of the classes in there
+            foreach (array_merge($taskdefs, $typedefs) as $elName => $class) {
+                if (0 === strcasecmp($elClass, StringHelper::unqualify($class))) {
+                    return $class;
+                }
+            }
+
+            return "$elClass (unknown)";
+        } else {
+            // ->getTag() method does exist, so use it
+            $elName = $element->getTag();
+            if (isset($taskdefs[$elName])) {
+                return $taskdefs[$elName];
+            } else if (isset($typedefs[$elName])) {
+                return $typedefs[$elName];
+            } else {
+                return "$elName (unknown)";
+            }
+        }
+    }
+
+    /**
      * Adds PCDATA areas.
      *
      * @param Project $project
@@ -414,10 +466,10 @@ class IntrospectionHelper
      *
      * Valid creators can be in the form createFoo() or addFoo(Bar).
      *
-     * @param  Project        $project
-     * @param  object         $element     Object the XML tag is child of.
+     * @param Project $project
+     * @param object $element Object the XML tag is child of.
      *                                     Often a task object.
-     * @param  string         $elementName XML tag name
+     * @param string $elementName XML tag name
      * @return object         Returns the nested element.
      * @throws BuildException
      */
@@ -433,8 +485,7 @@ class IntrospectionHelper
             $method = $this->nestedCreators[$createMethod];
             try { // try to invoke the creator method on object
                 $project->log(
-                    "    -calling creator " . $method->getDeclaringClass()->getName() . "::" . $method->getName(
-                    ) . "()",
+                    "    -calling creator " . $method->getDeclaringClass()->getName() . "::" . $method->getName() . "()",
                     Project::MSG_DEBUG
                 );
                 $nestedElement = $method->invoke($element);
@@ -442,7 +493,7 @@ class IntrospectionHelper
                 throw new BuildException($exc);
             }
 
-        } elseif (isset($this->nestedCreators[$addMethod])) {
+        } else if (isset($this->nestedCreators[$addMethod])) {
 
             $method = $this->nestedCreators[$addMethod];
 
@@ -477,7 +528,7 @@ class IntrospectionHelper
             } catch (Exception $exc) {
                 throw new BuildException($exc);
             }
-        } elseif ($this->bean->implementsInterface("CustomChildCreator")) {
+        } else if ($this->bean->implementsInterface("CustomChildCreator")) {
             $method = $this->bean->getMethod('customChildCreator');
 
             try {
@@ -524,10 +575,10 @@ class IntrospectionHelper
     /**
      * Creates a named nested element.
      *
-     * @param  Project        $project
-     * @param  string         $element
-     * @param  string         $child
-     * @param  string|null    $elementName
+     * @param Project $project
+     * @param string $element
+     * @param string $child
+     * @param string|null $elementName
      * @return void
      * @throws BuildException
      */
@@ -572,7 +623,7 @@ class IntrospectionHelper
      */
     public function getAttributes()
     {
-        $attribs = array();
+        $attribs = [];
         foreach (array_keys($this->attributeSetters) as $setter) {
             $attribs[] = $this->getPropertyName($setter, "set");
         }
@@ -587,74 +638,6 @@ class IntrospectionHelper
     public function getNestedElements()
     {
         return $this->nestedTypes;
-    }
-
-    /**
-     * Get the name for an element.
-     * When possible the full classnam (phing.tasks.system.PropertyTask) will
-     * be returned.  If not available (loaded in taskdefs or typedefs) then the
-     * XML element name will be returned.
-     *
-     * @param  Project $project
-     * @param  object  $element The Task or type element.
-     * @return string  Fully qualified class name of element when possible.
-     */
-    public function getElementName(Project $project, $element)
-    {
-
-        $taskdefs = $project->getTaskDefinitions();
-        $typedefs = $project->getDataTypeDefinitions();
-
-        // check if class of element is registered with project (tasks & types)
-        // most element types don't have a getTag() method
-        $elClass = get_class($element);
-
-        if (!in_array('getTag', get_class_methods($elClass))) {
-            // loop through taskdefs and typesdefs and see if the class name
-            // matches (case-insensitive) any of the classes in there
-            foreach (array_merge($taskdefs, $typedefs) as $elName => $class) {
-                if (0 === strcasecmp($elClass, StringHelper::unqualify($class))) {
-                    return $class;
-                }
-            }
-
-            return "$elClass (unknown)";
-        } else {
-            // ->getTag() method does exist, so use it
-            $elName = $element->getTag();
-            if (isset($taskdefs[$elName])) {
-                return $taskdefs[$elName];
-            } elseif (isset($typedefs[$elName])) {
-                return $typedefs[$elName];
-            } else {
-                return "$elName (unknown)";
-            }
-        }
-    }
-
-    /**
-     * Extract the name of a property from a method name - subtracting  a given prefix.
-     *
-     * @param  string $methodName
-     * @param  string $prefix
-     * @return string
-     */
-    public function getPropertyName($methodName, $prefix)
-    {
-        $start = strlen($prefix);
-
-        return strtolower(substr($methodName, $start));
-    }
-
-    /**
-     * Prints warning message to screen if -debug was used.
-     * @param string $msg
-     */
-    public function warn($msg)
-    {
-        if (Phing::getMsgOutputLevel() === Project::MSG_DEBUG) {
-            print("[IntrospectionHelper] " . $msg . "\n");
-        }
     }
 
 }

@@ -133,6 +133,48 @@ class SortFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
+     * Scans the parameters list
+     */
+    private function initialize()
+    {
+        // get parameters
+        $params = $this->getParameters();
+
+        foreach ($params as $param) {
+            $paramName = $param->getName();
+            if (self::$REVERSE_KEY === $paramName) {
+                $this->setReverse(StringHelper::booleanValue($param->getValue()));
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Sets the sorting process will be in ascendant (<code>reverse=false</code>)
+     * or to descendant (<code>reverse=true</code>).
+     *
+     * @param boolean $reverse
+     *            Boolean representing reverse ordering process.
+     */
+    public function setReverse($reverse)
+    {
+        $this->reverse = $reverse;
+    }
+
+    /**
+     * Sorts the read lines (<code>$this->lines</code>) according to the sorting
+     * criteria defined by the user.
+     */
+    private function sort()
+    {
+        if ($this->reverse) {
+            rsort($this->lines);
+        } else {
+            sort($this->lines);
+        }
+    }
+
+    /**
      * Creates a new SortReader using the passed in Reader for instantiation.
      *
      * @param Reader $rdr
@@ -160,47 +202,5 @@ class SortFilter extends BaseParamFilterReader implements ChainableReader
     public function isReverse()
     {
         return $this->reverse;
-    }
-
-    /**
-     * Sets the sorting process will be in ascendant (<code>reverse=false</code>)
-     * or to descendant (<code>reverse=true</code>).
-     *
-     * @param boolean $reverse
-     *            Boolean representing reverse ordering process.
-     */
-    public function setReverse($reverse)
-    {
-        $this->reverse = $reverse;
-    }
-
-    /**
-     * Scans the parameters list
-     */
-    private function initialize()
-    {
-        // get parameters
-        $params = $this->getParameters();
-
-        foreach ($params as $param) {
-            $paramName = $param->getName();
-            if (self::$REVERSE_KEY === $paramName) {
-                $this->setReverse(StringHelper::booleanValue($param->getValue()));
-                continue;
-            }
-        }
-    }
-
-    /**
-     * Sorts the read lines (<code>$this->lines</code>) according to the sorting
-     * criteria defined by the user.
-     */
-    private function sort()
-    {
-        if ($this->reverse) {
-            rsort($this->lines);
-        } else {
-            sort($this->lines);
-        }
     }
 }

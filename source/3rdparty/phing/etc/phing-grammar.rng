@@ -29,8 +29,8 @@
     ==================================================================================
 -->
 <grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0"
-    xmlns="http://relaxng.org/ns/structure/1.0"
-    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+         xmlns="http://relaxng.org/ns/structure/1.0"
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
     <start>
         <ref name="project"/>
@@ -3120,7 +3120,7 @@
                     <attribute name="tofile"/>
                 </optional>
             </interleave>
-       </element>
+        </element>
     </define>
 
     <!--
@@ -4032,7 +4032,7 @@
                 </optional>
                 <optional>
                     <attribute name="countTests">
-                      <data type="boolean"/>
+                        <data type="boolean"/>
                     </attribute>
                 </optional>
                 <optional>
@@ -4059,7 +4059,7 @@
                 <choice>
                     <attribute name="file"/>
                     <oneOrMore>
-                         <ref name="fileset"/>
+                        <ref name="fileset"/>
                     </oneOrMore>
                 </choice>
                 <optional>
@@ -5627,7 +5627,6 @@
             </interleave>
         </element>
     </define>
-
 
 
     <!--

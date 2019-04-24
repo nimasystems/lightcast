@@ -21,6 +21,7 @@
 
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
+
 /**
  * Wrapper around git-gc
  *
@@ -109,14 +110,6 @@ class GitGcTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
-     */
-    public function setAggressive($flag)
-    {
-        $this->isAggressive = (bool) $flag;
-    }
-
-    /**
      * @see getAuto()
      */
     public function isAuto()
@@ -133,38 +126,6 @@ class GitGcTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
-     */
-    public function setAuto($flag)
-    {
-        $this->isAuto = (bool) $flag;
-    }
-
-    /**
-     * @see NoPrune()
-     */
-    public function isNoPrune()
-    {
-        return $this->getNoPrune();
-    }
-
-    /**
-     * @return bool
-     */
-    public function getNoPrune()
-    {
-        return $this->noPrune;
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setNoPrune($flag)
-    {
-        $this->noPrune = (bool) $flag;
-    }
-
-    /**
      * @return string
      */
     public function getPrune()
@@ -178,6 +139,46 @@ class GitGcTask extends GitBaseTask
     public function setPrune($date)
     {
         $this->prune = $date;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setAggressive($flag)
+    {
+        $this->isAggressive = (bool)$flag;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setAuto($flag)
+    {
+        $this->isAuto = (bool)$flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNoPrune()
+    {
+        return $this->noPrune;
+    }
+
+    /**
+     * @see NoPrune()
+     */
+    public function isNoPrune()
+    {
+        return $this->getNoPrune();
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setNoPrune($flag)
+    {
+        $this->noPrune = (bool)$flag;
     }
 
 }

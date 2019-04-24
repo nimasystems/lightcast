@@ -119,29 +119,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->config_system_plugins = $plugins;
     }
 
-    private function initConfigActionForms()
-    {
-        assert(!$this->config_controller_action_forms);
-
-        $forms = [];
-
-        $locations = $this->configuration->getActionFormLocations();
-
-        if ($locations) {
-            foreach ($locations as $location) {
-                $path = $location['path'];
-
-                $found = lcComponentLocator::getActionFormsInPath($path, $location);
-
-                $forms = array_merge($forms, (array)$found);
-
-                unset($location, $found, $path);
-            }
-        }
-
-        $this->config_controller_action_forms = $forms;
-    }
-
     private function initConfigControllerModules()
     {
         assert(!$this->config_controller_modules);
@@ -232,6 +209,29 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         }
 
         $this->config_controller_components = $controllers;
+    }
+
+    private function initConfigActionForms()
+    {
+        assert(!$this->config_controller_action_forms);
+
+        $forms = [];
+
+        $locations = $this->configuration->getActionFormLocations();
+
+        if ($locations) {
+            foreach ($locations as $location) {
+                $path = $location['path'];
+
+                $found = lcComponentLocator::getActionFormsInPath($path, $location);
+
+                $forms = array_merge($forms, (array)$found);
+
+                unset($location, $found, $path);
+            }
+        }
+
+        $this->config_controller_action_forms = $forms;
     }
 
     public function shutdown()
@@ -346,7 +346,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
                 // notify to anyone who is able to register models
                 $this->event_dispatcher->filter(new lcEvent('database_model_manager.register_models', $this, [
-                    'path_to_models' => $path_to_models
+                    'path_to_models' => $path_to_models,
                 ]), $models);
 
                 unset($path_to_models);
@@ -501,16 +501,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->config_system_loaders[$loader_name] = $details;
     }
 
-    public function addActionForm($form_name, array $details)
-    {
-        if (isset($this->action_forms[$form_name])) {
-            assert(false);
-            return;
-        }
-
-        $this->action_forms[$form_name] = $details;
-    }
-
     public function addControllerModule($controller_name, array $details)
     {
         if (isset($this->controllers[$controller_name])) {
@@ -548,13 +538,23 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->web_services[$controller_name] = $details;
     }
 
+    public function addActionForm($form_name, array $details)
+    {
+        if (isset($this->action_forms[$form_name])) {
+            assert(false);
+            return;
+        }
+
+        $this->action_forms[$form_name] = $details;
+    }
+
     public function getProjectContext()
     {
         $contexts = [
             lcSysObj::CONTEXT_PROJECT => [],
             lcSysObj::CONTEXT_APP => [],
             lcSysObj::CONTEXT_PLUGIN => [],
-            lcSysObj::CONTEXT_FRAMEWORK => []
+            lcSysObj::CONTEXT_FRAMEWORK => [],
         ];
 
         $project_dir = $this->configuration->getProjectDir();
@@ -714,6 +714,46 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         return $instance;
     }
 
+    protected function getController(array $details)
+    {
+        // include / validate component
+        $filename = $details['path'] . DS . $details['filename'];
+        $class_name = $details['class'];
+        $controller_name = $details['name'];
+        $assets_path = isset($details['assets_path']) ? $details['assets_path'] : null;
+        $assets_webpath = isset($details['assets_webpath']) ? $details['assets_webpath'] : null;
+        $context_type = isset($details['context_type']) ? $details['context_type'] : null;
+        $context_name = isset($details['context_name']) ? $details['context_name'] : null;
+
+        // add to class autoloader
+        if (!$this->class_autoloader) {
+            throw new lcNotAvailableException('Class autoloader not available');
+        }
+
+        $this->class_autoloader->addClass($class_name, $filename);
+
+        if (!class_exists($class_name)) {
+            throw new lcSystemException('Controller class not available');
+        }
+
+        $instance = new $class_name();
+
+        // check type
+        if (!($instance instanceof lcBaseController)) {
+            throw new lcSystemException('Invalid controller');
+        }
+
+        // set vars
+        $instance->setControllerName($controller_name);
+        $instance->setControllerFilename($filename);
+        $instance->setContextType($context_type);
+        $instance->setContextName($context_name);
+        $instance->setAssetsPath($assets_path);
+        $instance->setAssetsWebpath($assets_webpath);
+
+        return $instance;
+    }
+
     /**
      * @param $form_name
      * @return lcBaseActionForm
@@ -767,46 +807,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
         // set vars
         $instance->setTranslationContext($context_type, $context_name);
-
-        return $instance;
-    }
-
-    protected function getController(array $details)
-    {
-        // include / validate component
-        $filename = $details['path'] . DS . $details['filename'];
-        $class_name = $details['class'];
-        $controller_name = $details['name'];
-        $assets_path = isset($details['assets_path']) ? $details['assets_path'] : null;
-        $assets_webpath = isset($details['assets_webpath']) ? $details['assets_webpath'] : null;
-        $context_type = isset($details['context_type']) ? $details['context_type'] : null;
-        $context_name = isset($details['context_name']) ? $details['context_name'] : null;
-
-        // add to class autoloader
-        if (!$this->class_autoloader) {
-            throw new lcNotAvailableException('Class autoloader not available');
-        }
-
-        $this->class_autoloader->addClass($class_name, $filename);
-
-        if (!class_exists($class_name)) {
-            throw new lcSystemException('Controller class not available');
-        }
-
-        $instance = new $class_name();
-
-        // check type
-        if (!($instance instanceof lcBaseController)) {
-            throw new lcSystemException('Invalid controller');
-        }
-
-        // set vars
-        $instance->setControllerName($controller_name);
-        $instance->setControllerFilename($filename);
-        $instance->setContextType($context_type);
-        $instance->setContextName($context_name);
-        $instance->setAssetsPath($assets_path);
-        $instance->setAssetsWebpath($assets_webpath);
 
         return $instance;
     }
@@ -1014,7 +1014,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             'config_controller_web_services' => $this->config_controller_web_services,
             'config_controller_tasks' => $this->config_controller_tasks,
             'config_controller_components' => $this->config_controller_components,
-            'config_system_plugins' => $this->config_system_plugins
+            'config_system_plugins' => $this->config_system_plugins,
         ];
 
         return $cached_data;

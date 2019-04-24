@@ -33,97 +33,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask
      */
     private $database;
 
-    /**
-     * Set the sqldbmap.
-     *
-     * @param PhingFile $sqldbmap The db map.
-     */
-    public function setSqlDbMap(PhingFile $sqldbmap)
-    {
-        $this->sqldbmap = $sqldbmap;
-    }
-
-    /**
-     * Get the sqldbmap.
-     *
-     * @return PhingFile $sqldbmap.
-     */
-    public function getSqlDbMap()
-    {
-        return $this->sqldbmap;
-    }
-
-    /**
-     * Set the database name.
-     *
-     * @param string $database
-     */
-    public function setDatabase($database)
-    {
-        $this->database = $database;
-    }
-
-    /**
-     * Get the database name.
-     *
-     * @return string
-     */
-    public function getDatabase()
-    {
-        return $this->database;
-    }
-
-    /**
-     * Create the sql -> database map.
-     *
-     * @throws IOException - if unable to store properties
-     */
-    protected function createSqlDbMap()
-    {
-        if ($this->getSqlDbMap() === null) {
-            return;
-        }
-
-        // Produce the sql -> database map
-        $sqldbmap = new Properties();
-
-        // Check to see if the sqldbmap has already been created.
-        if ($this->getSqlDbMap()->exists()) {
-            $sqldbmap->load($this->getSqlDbMap());
-        }
-
-        if ($this->packageObjectModel) {
-            // in this case we'll get the sql file name from the package attribute
-            $dataModels = $this->packageDataModels();
-            foreach ($dataModels as $package => $dataModel) {
-                foreach ($dataModel->getDatabases() as $database) {
-                    $name = ($package ? $package . '.' : '') . 'schema.xml';
-                    $sqlFile = $this->getMappedFile($name);
-                    $sqldbmap->setProperty($sqlFile->getName(), $database->getName());
-                }
-            }
-        } else {
-            // the traditional way is to map the schema.xml filenames
-            $dmMap = $this->getDataModelDbMap();
-            foreach (array_keys($dmMap) as $dataModelName) {
-                $sqlFile = $this->getMappedFile($dataModelName);
-                if ($this->getDatabase() === null) {
-                    $databaseName = $dmMap[$dataModelName];
-                } else {
-                    $databaseName = $this->getDatabase();
-                }
-                $sqldbmap->setProperty($sqlFile->getName(), $databaseName);
-            }
-        }
-
-        try {
-            $sqldbmap->store($this->getSqlDbMap(), "Sqlfile -> Database map");
-        } catch (IOException $e) {
-            throw new IOException("Unable to store properties: " . $e->getMessage());
-        }
-    }
-
-    public function main()
+public function main()
     {
         $this->validate();
 
@@ -177,44 +87,6 @@ class PropelSQLTask extends AbstractPropelDataModelTask
             } // foreach database
         } //foreach datamodels
 
-    } // main()
-
-    public function getWarnings(Database $database, PropelPLatformInterface $platform)
-    {
-        foreach ($database->getTablesForSql() as $table) {
-            foreach ($table->getForeignKeys() as $fk) {
-
-                if ($platform instanceof MssqlPlatform && $fk->hasOnUpdate() && $fk->getOnUpdate() == ForeignKey::SETNULL) {
-                    // there may be others that also won't work
-                    // we have to skip this because it's unsupported.
-                        $this->log(sprintf(
-                            'Ignoring the "ON UPDATE SET NULL" option for "%s" fk on "%s" table (unsupported by MSSQL).',
-                            $fk->getLocalColumnNames(),
-                            $table->getName()
-                        ), Project::MSG_WARN);
-                }
-
-                if ($platform instanceof MssqlPlatform && $fk->hasOnDelete() && $fk->getOnDelete() == ForeignKey::SETNULL) {
-                    // there may be others that also won't work
-                    // we have to skip this because it's unsupported.
-                    $this->log(sprintf(
-                        'Ignoring the "ON DELETE SET NULL" option for "%s" fk on "%s" table (unsupported by MSSQL).',
-                        $fk->getLocalColumnNames(),
-                        $table->getName()
-                    ), Project::MSG_WARN);
-                }
-
-                if ($platform instanceof OraclePlatform && $fk->hasOnUpdate()) {
-                    // there may be others that also won't work
-                    // we have to skip this because it's unsupported.
-                    $this->log(sprintf(
-                        'Ignoring the "ON UPDATE" option for "%s" fk on "%s" table (unsupported by current Oracle adapter).',
-                        $fk->getLocalColumnNames(),
-                        $table->getName()
-                    ), Project::MSG_WARN);
-                }
-            }
-        }
     }
 
     /**
@@ -234,7 +106,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask
 
             $dataModels = $this->getDataModels();
             $dataModel = array_shift($dataModels);
-            $packagedDataModels = array();
+            $packagedDataModels = [];
 
             $platform = $this->getGeneratorConfig()->getConfiguredPlatform();
 
@@ -260,7 +132,7 @@ class PropelSQLTask extends AbstractPropelDataModelTask
 
     protected function cloneDatabase($db)
     {
-        $attributes = array (
+        $attributes = [
             'name' => $db->getName(),
             'baseClass' => $db->getBaseClass(),
             'basePeer' => $db->getBasePeer(),
@@ -268,11 +140,139 @@ class PropelSQLTask extends AbstractPropelDataModelTask
             'defaultPhpNamingMethod' => $db->getDefaultPhpNamingMethod(),
             'defaultTranslateMethod' => $db->getDefaultTranslateMethod(),
             'heavyIndexing' => $db->getHeavyIndexing(),
-        );
+        ];
 
         $clone = new Database();
         $clone->loadFromXML($attributes);
 
         return $clone;
+    }
+
+    /**
+     * Create the sql -> database map.
+     *
+     * @throws IOException - if unable to store properties
+     */
+    protected function createSqlDbMap()
+    {
+        if ($this->getSqlDbMap() === null) {
+            return;
+        }
+
+        // Produce the sql -> database map
+        $sqldbmap = new Properties();
+
+        // Check to see if the sqldbmap has already been created.
+        if ($this->getSqlDbMap()->exists()) {
+            $sqldbmap->load($this->getSqlDbMap());
+        }
+
+        if ($this->packageObjectModel) {
+            // in this case we'll get the sql file name from the package attribute
+            $dataModels = $this->packageDataModels();
+            foreach ($dataModels as $package => $dataModel) {
+                foreach ($dataModel->getDatabases() as $database) {
+                    $name = ($package ? $package . '.' : '') . 'schema.xml';
+                    $sqlFile = $this->getMappedFile($name);
+                    $sqldbmap->setProperty($sqlFile->getName(), $database->getName());
+                }
+            }
+        } else {
+            // the traditional way is to map the schema.xml filenames
+            $dmMap = $this->getDataModelDbMap();
+            foreach (array_keys($dmMap) as $dataModelName) {
+                $sqlFile = $this->getMappedFile($dataModelName);
+                if ($this->getDatabase() === null) {
+                    $databaseName = $dmMap[$dataModelName];
+                } else {
+                    $databaseName = $this->getDatabase();
+                }
+                $sqldbmap->setProperty($sqlFile->getName(), $databaseName);
+            }
+        }
+
+        try {
+            $sqldbmap->store($this->getSqlDbMap(), "Sqlfile -> Database map");
+        } catch (IOException $e) {
+            throw new IOException("Unable to store properties: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get the sqldbmap.
+     *
+     * @return PhingFile $sqldbmap.
+     */
+    public function getSqlDbMap()
+    {
+        return $this->sqldbmap;
+    }
+
+        /**
+     * Set the sqldbmap.
+     *
+     * @param PhingFile $sqldbmap The db map.
+     */
+    public function setSqlDbMap(PhingFile $sqldbmap)
+    {
+        $this->sqldbmap = $sqldbmap;
+    } // main()
+
+    /**
+     * Get the database name.
+     *
+     * @return string
+     */
+    public function getDatabase()
+    {
+        return $this->database;
+    }
+
+    /**
+     * Set the database name.
+     *
+     * @param string $database
+     */
+    public function setDatabase($database)
+    {
+        $this->database = $database;
+    }
+
+    public function getWarnings(Database $database, PropelPLatformInterface $platform)
+    {
+        foreach ($database->getTablesForSql() as $table) {
+            foreach ($table->getForeignKeys() as $fk) {
+
+                if ($platform instanceof MssqlPlatform && $fk->hasOnUpdate() && $fk->getOnUpdate() == ForeignKey::SETNULL) {
+                    // there may be others that also won't work
+                    // we have to skip this because it's unsupported.
+                    $this->log(sprintf(
+                        'Ignoring the "ON UPDATE SET NULL" option for "%s" fk on "%s" table (unsupported by MSSQL).',
+                        $fk->getLocalColumnNames(),
+                        $table->getName()
+                    ), Project::MSG_WARN);
+                }
+
+                if ($platform instanceof MssqlPlatform && $fk->hasOnDelete() && $fk->getOnDelete() == ForeignKey::SETNULL) {
+                    // there may be others that also won't work
+                    // we have to skip this because it's unsupported.
+                    $this->log(sprintf(
+                        'Ignoring the "ON DELETE SET NULL" option for "%s" fk on "%s" table (unsupported by MSSQL).',
+                        $fk->getLocalColumnNames(),
+                        $table->getName()
+                    ), Project::MSG_WARN);
+                }
+
+                if ($platform instanceof OraclePlatform && $fk->hasOnUpdate()) {
+                    // there may be others that also won't work
+                    // we have to skip this because it's unsupported.
+                    $this->log(sprintf(
+                        'Ignoring the "ON UPDATE" option for "%s" fk on "%s" table (unsupported by current Oracle adapter).',
+                        $fk->getLocalColumnNames(),
+                        $table->getName()
+                    ), Project::MSG_WARN);
+                }
+            }
+        }
     }
 }

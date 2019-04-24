@@ -32,7 +32,7 @@ require_once 'phing/types/selectors/BaseSelector.php';
 abstract class BaseSelectorContainer extends BaseSelector implements SelectorContainer
 {
 
-    private $selectorsList = array();
+    private $selectorsList = [];
 
     /**
      * Indicates whether there are any selectors here.
@@ -57,20 +57,12 @@ abstract class BaseSelectorContainer extends BaseSelector implements SelectorCon
      */
     public function getSelectors(Project $p)
     {
-        $result = array();
+        $result = [];
         for ($i = 0, $size = count($this->selectorsList); $i < $size; $i++) {
             $result[] = clone $this->selectorsList[$i];
         }
 
         return $result;
-    }
-
-    /**
-     * Returns an array for accessing the set of selectors (not a copy).
-     */
-    public function selectorElements()
-    {
-        return $this->selectorsList;
     }
 
     /**
@@ -92,15 +84,11 @@ abstract class BaseSelectorContainer extends BaseSelector implements SelectorCon
     }
 
     /**
-     * Add a new selector into this container.
-     *
-     * @param FileSelector|the $selector
-     * @internal param the $selector new selector to add
-     * @return the selector that was added
+     * Returns an array for accessing the set of selectors (not a copy).
      */
-    public function appendSelector(FileSelector $selector)
+    public function selectorElements()
     {
-        $this->selectorsList[] = $selector;
+        return $this->selectorsList;
     }
 
     /**
@@ -133,8 +121,6 @@ abstract class BaseSelectorContainer extends BaseSelector implements SelectorCon
         }
     }
 
-    /* Methods below all add specific selectors */
-
     /**
      * add a "Select" selector entry on the selector list
      */
@@ -144,6 +130,20 @@ abstract class BaseSelectorContainer extends BaseSelector implements SelectorCon
         $this->appendSelector($o);
 
         return $o;
+    }
+
+    /* Methods below all add specific selectors */
+
+    /**
+     * Add a new selector into this container.
+     *
+     * @param FileSelector|the $selector
+     * @return the selector that was added
+     * @internal param the $selector new selector to add
+     */
+    public function appendSelector(FileSelector $selector)
+    {
+        $this->selectorsList[] = $selector;
     }
 
     /**

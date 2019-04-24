@@ -38,7 +38,7 @@ abstract class lcDataStorage extends lcResidentObj implements iProvidesCapabilit
     public function getCapabilities()
     {
         return [
-            'data_storage'
+            'data_storage',
         ];
     }
 

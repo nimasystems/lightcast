@@ -59,8 +59,8 @@ abstract class MatchingTask extends Task implements SelectorContainer
     }
 
     /**
-     * @see ProjectComponent::setProject()
      * @param Project $project
+     * @see ProjectComponent::setProject()
      */
     public function setProject($project)
     {
@@ -117,7 +117,7 @@ abstract class MatchingTask extends Task implements SelectorContainer
      * Sets the set of include patterns. Patterns may be separated by a comma
      * or a space.
      *
-     * @param  string $includes the string containing the include patterns
+     * @param string $includes the string containing the include patterns
      * @return void
      */
     public function setIncludes($includes)
@@ -145,27 +145,13 @@ abstract class MatchingTask extends Task implements SelectorContainer
      */
     public function setDefaultexcludes($useDefaultExcludes)
     {
-        $this->useDefaultExcludes = (boolean) $useDefaultExcludes;
-    }
-
-    /**
-     * Returns the directory scanner needed to access the files to process.
-     * @param PhingFile $baseDir
-     * @throws BuildException
-     * @return DirectoryScanner
-     */
-    protected function getDirectoryScanner(PhingFile $baseDir)
-    {
-        $this->fileset->setDir($baseDir);
-        $this->fileset->setDefaultexcludes($this->useDefaultExcludes);
-
-        return $this->fileset->getDirectoryScanner($this->project);
+        $this->useDefaultExcludes = (boolean)$useDefaultExcludes;
     }
 
     /**
      * Sets the name of the file containing the includes patterns.
      *
-     * @param  PhingFile $includesfile A string containing the filename to fetch
+     * @param PhingFile $includesfile A string containing the filename to fetch
      *                                 the include patterns from.
      * @return void
      */
@@ -177,7 +163,7 @@ abstract class MatchingTask extends Task implements SelectorContainer
     /**
      * Sets the name of the file containing the includes patterns.
      *
-     * @param  PhingFile $excludesfile A string containing the filename to fetch
+     * @param PhingFile $excludesfile A string containing the filename to fetch
      *                                 the include patterns from.
      * @return void
      */
@@ -189,7 +175,7 @@ abstract class MatchingTask extends Task implements SelectorContainer
     /**
      * Sets case sensitivity of the file system
      *
-     * @param  boolean $isCaseSensitive "true"|"on"|"yes" if file system is case
+     * @param boolean $isCaseSensitive "true"|"on"|"yes" if file system is case
      *                                  sensitive, "false"|"off"|"no" when not.
      * @return void
      */
@@ -201,7 +187,7 @@ abstract class MatchingTask extends Task implements SelectorContainer
     /**
      * Sets whether or not symbolic links should be followed.
      *
-     * @param  boolean $followSymlinks whether or not symbolic links should be followed
+     * @param boolean $followSymlinks whether or not symbolic links should be followed
      * @return void
      */
     public function setFollowSymlinks($followSymlinks)
@@ -253,15 +239,13 @@ abstract class MatchingTask extends Task implements SelectorContainer
     /**
      * Add a new selector into this container.
      *
-     * @param  FileSelector $selector the new selector to add
+     * @param FileSelector $selector the new selector to add
      * @return void
      */
     public function appendSelector(FileSelector $selector)
     {
         $this->fileset->appendSelector($selector);
     }
-
-    /* Methods below all add specific selectors */
 
     /**
      * add a "Select" selector entry on the selector list
@@ -271,6 +255,8 @@ abstract class MatchingTask extends Task implements SelectorContainer
     {
         return $this->fileset->createSelector();
     }
+
+    /* Methods below all add specific selectors */
 
     /**
      * add an "And" selector entry on the selector list
@@ -405,6 +391,20 @@ abstract class MatchingTask extends Task implements SelectorContainer
     public function createWritable()
     {
         return $this->fileset->createWritable();
+    }
+
+    /**
+     * Returns the directory scanner needed to access the files to process.
+     * @param PhingFile $baseDir
+     * @return DirectoryScanner
+     * @throws BuildException
+     */
+    protected function getDirectoryScanner(PhingFile $baseDir)
+    {
+        $this->fileset->setDir($baseDir);
+        $this->fileset->setDefaultexcludes($this->useDefaultExcludes);
+
+        return $this->fileset->getDirectoryScanner($this->project);
     }
 
     /**

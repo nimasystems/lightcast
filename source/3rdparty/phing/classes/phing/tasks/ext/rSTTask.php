@@ -30,10 +30,37 @@ require_once 'phing/util/FileUtils.php';
 class rSTTask extends Task
 {
     /**
+     * Array of supported output formats
+     *
+     * @var array
+     * @see $format
+     * @see $targetExt
+     */
+    protected static $supportedFormats = [
+        'html',
+        'latex',
+        'man',
+        'odt',
+        's5',
+        'xml',
+    ];
+    /**
+     * Maps formats to file extensions
+     *
+     * @var array
+     */
+    protected static $targetExt = [
+        'html' => 'html',
+        'latex' => 'tex',
+        'man' => '3',
+        'odt' => 'odt',
+        's5' => 'html',
+        'xml' => 'xml',
+    ];
+    /**
      * @var string Taskname for logger
      */
     protected $taskName = 'rST';
-
     /**
      * Result format, defaults to "html".
      * @see $supportedFormats for all possible options
@@ -41,37 +68,6 @@ class rSTTask extends Task
      * @var string
      */
     protected $format = 'html';
-
-    /**
-     * Array of supported output formats
-     *
-     * @var array
-     * @see $format
-     * @see $targetExt
-     */
-    protected static $supportedFormats = array(
-        'html',
-        'latex',
-        'man',
-        'odt',
-        's5',
-        'xml'
-    );
-
-    /**
-     * Maps formats to file extensions
-     *
-     * @var array
-     */
-    protected static $targetExt = array(
-        'html' => 'html',
-        'latex' => 'tex',
-        'man' => '3',
-        'odt' => 'odt',
-        's5' => 'html',
-        'xml' => 'xml',
-    );
-
     /**
      * Input file in rST format.
      * Required
@@ -102,7 +98,7 @@ class rSTTask extends Task
      */
     protected $destination = null;
 
-    protected $filesets = array(); // all fileset objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
     protected $mapperElement = null;
 
     /**
@@ -110,7 +106,7 @@ class rSTTask extends Task
      *
      * @var array
      */
-    protected $filterChains = array();
+    protected $filterChains = [];
 
     /**
      * mode to create directories with
@@ -146,8 +142,8 @@ class rSTTask extends Task
     /**
      * The main entry point method.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {
@@ -204,10 +200,94 @@ class rSTTask extends Task
     }
 
     /**
+     * Finds the rst2* binary path
+     *
+     * @param string $format Output format
+     *
+     * @return string Full path to rst2$format
+     *
+     * @throws BuildException When the tool cannot be found
+     */
+    protected function getToolPath($format)
+    {
+        if ($this->toolPath !== null) {
+            return $this->toolPath;
+        }
+
+        $tool = 'rst2' . $format;
+        $path = System::which($tool);
+        if (!$path) {
+            throw new BuildException(
+                sprintf('"%s" not found. Install python-docutils.', $tool)
+            );
+        }
+
+        return $path;
+    }
+
+    /**
+     * The setter for the attribute "toolpath"
+     *
+     * @param $path
+     * @return void
+     *
+     * @throws BuildException
+     * @internal param string $param Full path to tool path, i.e. /usr/local/bin/rst2html
+     *
+     */
+    public function setToolpath($path)
+    {
+        if (!file_exists($path)) {
+            $fullpath = System::which($path);
+            if ($fullpath === false) {
+                throw new BuildException(
+                    'Tool does not exist. Path: ' . $path
+                );
+            }
+            $path = $fullpath;
+        }
+        if (!is_executable($path)) {
+            throw new BuildException(
+                'Tool not executable. Path: ' . $path
+            );
+        }
+        $this->toolPath = $path;
+    }
+
+    /**
+     * Determines and returns the target file name from the
+     * input file and the configured destination name.
+     *
+     * @param string $file Input file
+     * @param string $destination Destination file or directory name,
+     *                            may be null
+     *
+     * @return string Target file name
+     *
+     * @uses $format
+     * @uses $targetExt
+     */
+    public function getTargetFile($file, $destination = null)
+    {
+        if ($destination != ''
+            && substr($destination, -1) !== '/'
+            && substr($destination, -1) !== '\\'
+        ) {
+            return $destination;
+        }
+
+        if (strtolower(substr($file, -4)) == '.rst') {
+            $file = substr($file, 0, -4);
+        }
+
+        return $destination . $file . '.' . self::$targetExt[$this->format];
+    }
+
+    /**
      * Renders a single file and applies filters on it
      *
-     * @param string $tool       conversion tool to use
-     * @param string $source     rST source file
+     * @param string $tool conversion tool to use
+     * @param string $source rST source file
      * @param string $targetFile target file name
      *
      * @return void
@@ -236,8 +316,8 @@ class rSTTask extends Task
     /**
      * Renders a single file with the rST tool.
      *
-     * @param string $tool       conversion tool to use
-     * @param string $source     rST source file
+     * @param string $tool conversion tool to use
+     * @param string $source rST source file
      * @param string $targetFile target file name
      *
      * @return void
@@ -273,61 +353,6 @@ class rSTTask extends Task
             throw new BuildException('Rendering rST failed');
         }
         $this->log(implode("\n", $arOutput), Project::MSG_DEBUG);
-    }
-
-    /**
-     * Finds the rst2* binary path
-     *
-     * @param string $format Output format
-     *
-     * @return string Full path to rst2$format
-     *
-     * @throws BuildException When the tool cannot be found
-     */
-    protected function getToolPath($format)
-    {
-        if ($this->toolPath !== null) {
-            return $this->toolPath;
-        }
-
-        $tool = 'rst2' . $format;
-        $path = System::which($tool);
-        if (!$path) {
-            throw new BuildException(
-                sprintf('"%s" not found. Install python-docutils.', $tool)
-            );
-        }
-
-        return $path;
-    }
-
-    /**
-     * Determines and returns the target file name from the
-     * input file and the configured destination name.
-     *
-     * @param string $file        Input file
-     * @param string $destination Destination file or directory name,
-     *                            may be null
-     *
-     * @return string Target file name
-     *
-     * @uses $format
-     * @uses $targetExt
-     */
-    public function getTargetFile($file, $destination = null)
-    {
-        if ($destination != ''
-            && substr($destination, -1) !== '/'
-            && substr($destination, -1) !== '\\'
-        ) {
-            return $destination;
-        }
-
-        if (strtolower(substr($file, -4)) == '.rst') {
-            $file = substr($file, 0, -4);
-        }
-
-        return $destination . $file . '.' . self::$targetExt[$this->format];
     }
 
     /**
@@ -391,35 +416,6 @@ class rSTTask extends Task
     }
 
     /**
-     * The setter for the attribute "toolpath"
-     *
-     * @param $path
-     * @throws BuildException
-     * @internal param string $param Full path to tool path, i.e. /usr/local/bin/rst2html
-     *
-     * @return void
-     *
-     */
-    public function setToolpath($path)
-    {
-        if (!file_exists($path)) {
-            $fullpath = System::which($path);
-            if ($fullpath === false) {
-                throw new BuildException(
-                    'Tool does not exist. Path: ' . $path
-                );
-            }
-            $path = $fullpath;
-        }
-        if (!is_executable($path)) {
-            throw new BuildException(
-                'Tool not executable. Path: ' . $path
-            );
-        }
-        $this->toolPath = $path;
-    }
-
-    /**
      * The setter for the attribute "uptodate"
      *
      * @param string $uptodate True/false
@@ -428,7 +424,7 @@ class rSTTask extends Task
      */
     public function setUptodate($uptodate)
     {
-        $this->uptodate = (boolean) $uptodate;
+        $this->uptodate = (boolean)$uptodate;
     }
 
     /**

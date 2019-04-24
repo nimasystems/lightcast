@@ -65,8 +65,8 @@ class ConditionTask extends ConditionBase
 
     /**
      * See whether our nested condition holds and set the property.
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {

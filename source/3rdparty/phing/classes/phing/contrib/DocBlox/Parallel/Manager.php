@@ -36,15 +36,16 @@ class DocBlox_Parallel_Manager extends ArrayObject
      * Tries to autodetect the optimal number of process by counting the number
      * of processors.
      *
-     * @param array  $input          Input for the array object.
-     * @param int    $flags          flags for the array object.
+     * @param array $input Input for the array object.
+     * @param int $flags flags for the array object.
      * @param string $iterator_class Iterator class for this array object.
      */
     public function __construct(
-        $input = array(),
+        $input = [],
         $flags = 0,
         $iterator_class = "ArrayIterator"
-    ) {
+    )
+    {
         parent::__construct($input, $flags, $iterator_class);
 
         if (is_readable('/proc/cpuinfo')) {
@@ -73,17 +74,17 @@ class DocBlox_Parallel_Manager extends ArrayObject
      *        ->addWorker(new DocBlox_Parallel_Worker($cb2))
      *        ->execute();
      *
-     * @param int                     $index  The key for this worker.
+     * @param int $index The key for this worker.
      * @param DocBlox_Parallel_Worker $newval The worker to add onto the queue.
      *
-     * @see DocBlox_Parallel_Manager::execute()
-     *
-     * @throws RuntimeException         if this method is invoked while the
-     *                                  manager is busy executing tasks.
+     * @return void
      * @throws InvalidArgumentException if the provided element is not of type
      *                                  DocBlox_Parallel_Worker.
      *
-     * @return void
+     * @throws RuntimeException         if this method is invoked while the
+     *                                  manager is busy executing tasks.
+     * @see DocBlox_Parallel_Manager::execute()
+     *
      */
     public function offsetSet($index, $newval)
     {
@@ -102,6 +103,16 @@ class DocBlox_Parallel_Manager extends ArrayObject
     }
 
     /**
+     * Returns whether the manager is executing the workers.
+     *
+     * @return boolean
+     */
+    public function isRunning()
+    {
+        return $this->is_running;
+    }
+
+    /**
      * Convenience method to make the addition of workers explicit and allow a
      * fluent interface.
      *
@@ -114,52 +125,6 @@ class DocBlox_Parallel_Manager extends ArrayObject
         $this[] = $worker;
 
         return $this;
-    }
-
-    /**
-     * Sets how many processes at most to execute at the same time.
-     *
-     * A fluent interface is provided so that you can chain multiple workers
-     * in one call.
-     *
-     * @param int $process_limit The limit, minimum of 1
-     *
-     * @see DocBlox_Parallel_Manager::addWorker() for an example
-     *
-     * @return self
-     */
-    public function setProcessLimit($process_limit)
-    {
-        if ($process_limit < 1) {
-            throw new InvalidArgumentException(
-                'Number of simultaneous processes may not be less than 1'
-            );
-        }
-
-        $this->process_limit = $process_limit;
-
-        return $this;
-    }
-
-    /**
-     * Returns the current limit on the amount of processes that can be
-     * executed at the same time.
-     *
-     * @return int
-     */
-    public function getProcessLimit()
-    {
-        return $this->process_limit;
-    }
-
-    /**
-     * Returns whether the manager is executing the workers.
-     *
-     * @return boolean
-     */
-    public function isRunning()
-    {
-        return $this->is_running;
     }
 
     /**
@@ -213,31 +178,17 @@ class DocBlox_Parallel_Manager extends ArrayObject
             );
         }
 
-        return array();
+        return [];
     }
 
     /**
-     * Waits for all processes to have finished and notifies the manager that
-     * execution has stopped.
+     * Returns true when all requirements are met.
      *
-     * @param int[] &$processes List of running processes.
-     *
-     * @return void
+     * @return bool
      */
-    protected function stopExecution(array &$processes)
+    protected function checkRequirements()
     {
-        // starting of processes has ended but some processes might still be
-        // running wait for them to finish
-        while (!empty($processes)) {
-            pcntl_waitpid(array_shift($processes), $status);
-        }
-
-        /** @var DocBlox_Parallel_Worker $worker */
-        foreach ($this as $worker) {
-            $worker->pipe->push();
-        }
-
-        $this->is_running = false;
+        return (bool)(extension_loaded('pcntl'));
     }
 
     /**
@@ -257,17 +208,18 @@ class DocBlox_Parallel_Manager extends ArrayObject
      * If there are more workers than may be ran simultaneously then this method
      * will wait until a slot becomes available and then starts the next worker.
      *
-     * @param DocBlox_Parallel_Worker $worker     The worker to process.
+     * @param DocBlox_Parallel_Worker $worker The worker to process.
      * @param int[]                   &$processes The list of running processes.
      *
+     * @return void
      * @throws RuntimeException if we are unable to fork.
      *
-     * @return void
      */
     protected function forkAndRun(
         DocBlox_Parallel_Worker $worker,
         array &$processes
-    ) {
+    )
+    {
         $worker->pipe = new DocBlox_Parallel_WorkerPipe($worker);
 
         // fork the process and register the PID
@@ -296,12 +248,62 @@ class DocBlox_Parallel_Manager extends ArrayObject
     }
 
     /**
-     * Returns true when all requirements are met.
+     * Returns the current limit on the amount of processes that can be
+     * executed at the same time.
      *
-     * @return bool
+     * @return int
      */
-    protected function checkRequirements()
+    public function getProcessLimit()
     {
-        return (bool) (extension_loaded('pcntl'));
+        return $this->process_limit;
+    }
+
+    /**
+     * Sets how many processes at most to execute at the same time.
+     *
+     * A fluent interface is provided so that you can chain multiple workers
+     * in one call.
+     *
+     * @param int $process_limit The limit, minimum of 1
+     *
+     * @return self
+     * @see DocBlox_Parallel_Manager::addWorker() for an example
+     *
+     */
+    public function setProcessLimit($process_limit)
+    {
+        if ($process_limit < 1) {
+            throw new InvalidArgumentException(
+                'Number of simultaneous processes may not be less than 1'
+            );
+        }
+
+        $this->process_limit = $process_limit;
+
+        return $this;
+    }
+
+    /**
+     * Waits for all processes to have finished and notifies the manager that
+     * execution has stopped.
+     *
+     * @param int[] &$processes List of running processes.
+     *
+     * @return void
+     */
+    protected function stopExecution(array &$processes)
+    {
+        // starting of processes has ended but some processes might still be
+        // running wait for them to finish
+        while (!empty($processes)) {
+            pcntl_waitpid(array_shift($processes), $status);
+        }
+
+        /** @var DocBlox_Parallel_Worker $worker */
+        foreach ($this as $worker) {
+            $worker->pipe->push();
+        }
+
+        $this->is_running = false;
     }
 }

@@ -51,6 +51,9 @@ class CustomJoin extends Join
      * Get the join clause for this Join.
      * If the join condition needs binding, uses the passed params array.
      *
+     * @param array &$params
+     *
+     * @return string SQL join clause with join condition
      * @example
      * <code>
      * $join = new Join();
@@ -60,9 +63,6 @@ class CustomJoin extends Join
      * // 'LEFT JOIN author ON (book.AUTHOR_ID=author.ID)'
      * </code>
      *
-     * @param array &$params
-     *
-     * @return string SQL join clause with join condition
      */
     public function getClause(&$params)
     {

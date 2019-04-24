@@ -40,23 +40,13 @@ class ExcludesNameEntry
      * An alias for the setName() method.
      * Set the name of a file pattern.
      *
+     * @param string $pattern The file pattern
      * @see setName()
      *
-     * @param string $pattern The file pattern
      */
     public function addText($pattern)
     {
         $this->setName($pattern);
-    }
-
-    /**
-     * Set the name of a file, class or method
-     *
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = (string) $name;
     }
 
     /**
@@ -67,6 +57,16 @@ class ExcludesNameEntry
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set the name of a file, class or method
+     *
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = (string)$name;
     }
 
     /**

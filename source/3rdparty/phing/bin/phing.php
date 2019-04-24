@@ -10,7 +10,7 @@
 // Use composers autoload.php if available
 if (file_exists(dirname(__FILE__) . '/../vendor/autoload.php')) {
     require_once dirname(__FILE__) . '/../vendor/autoload.php';
-} elseif (file_exists(dirname(__FILE__) . '/../../../autoload.php')) {
+} else if (file_exists(dirname(__FILE__) . '/../../../autoload.php')) {
     require_once dirname(__FILE__) . '/../../../autoload.php';
 }
 
@@ -19,16 +19,16 @@ if (file_exists(dirname(__FILE__) . '/../vendor/autoload.php')) {
 
 /* set include paths */
 set_include_path(
-            dirname(__FILE__) . '/../classes' .
-            PATH_SEPARATOR .
-            get_include_path()
-        );
+    dirname(__FILE__) . '/../classes' .
+    PATH_SEPARATOR .
+    get_include_path()
+);
 
 require_once 'phing/Phing.php';
 
 /**
-* Code from Symfony/Component/Console/Output/StreamOutput.php
-*/
+ * Code from Symfony/Component/Console/Output/StreamOutput.php
+ */
 function hasColorSupport()
 {
     if (DIRECTORY_SEPARATOR == '\\') {
@@ -39,7 +39,7 @@ function hasColorSupport()
 
 // default logger
 if (!in_array('-logger', $argv) && hasColorSupport()) {
-    array_splice($argv, 1, 0, array('-logger', 'phing.listener.AnsiColorLogger'));
+    array_splice($argv, 1, 0, ['-logger', 'phing.listener.AnsiColorLogger']);
 }
 
 try {

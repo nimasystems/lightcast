@@ -68,7 +68,7 @@ class DependSelector extends BaseSelector
         if ($this->map !== null) {
             $buf .= " mapper: ";
             $buf .= $this->map->toString();
-        } elseif ($this->mapperElement !== null) {
+        } else if ($this->mapperElement !== null) {
             $buf .= " mapper: ";
             $buf .= $this->mapperElement->toString();
         }
@@ -96,7 +96,7 @@ class DependSelector extends BaseSelector
      */
     public function setGranularity($granularity)
     {
-        $this->granularity = (int) $granularity;
+        $this->granularity = (int)$granularity;
     }
 
     /**
@@ -140,9 +140,9 @@ class DependSelector extends BaseSelector
      * @param string $filename the name of the file to check
      * @param PhingFile $file a PhingFile object the selector can use
      *
+     * @return bool whether the file should be selected or not
      * @throws BuildException
      *
-     * @return bool whether the file should be selected or not
      */
     public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
     {

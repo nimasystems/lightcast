@@ -40,7 +40,7 @@ abstract class ConditionBase extends ProjectComponent
     implements IteratorAggregate, CustomChildCreator
 {
 
-    public $conditions = array(); // needs to be public for "inner" class access
+    public $conditions = []; // needs to be public for "inner" class access
 
     /**
      * @return int
@@ -217,7 +217,7 @@ abstract class ConditionBase extends ProjectComponent
 
         return $this->conditions[$num - 1];
     }
-    
+
     public function createVersionCompare()
     {
         include_once 'phing/tasks/system/condition/VersionCompareCondition.php';
@@ -275,10 +275,10 @@ abstract class ConditionBase extends ProjectComponent
     }
 
     /**
-     * @param  string         $elementName
-     * @param  Project        $project
-     * @throws BuildException
+     * @param string $elementName
+     * @param Project $project
      * @return Condition
+     * @throws BuildException
      */
     public function customChildCreator($elementName, Project $project)
     {

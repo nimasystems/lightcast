@@ -136,7 +136,7 @@ class EchoProperties extends Task
      * If true, the task will fail if an error occurs writing the properties
      * file, otherwise errors are just logged.
      *
-     * @param  failonerror <tt>true</tt> if IO exceptions are reported as build
+     * @param failonerror <tt>true</tt> if IO exceptions are reported as build
      *      exceptions, or <tt>false</tt> if IO exceptions are ignored.
      */
     public function setFailOnError($failonerror)
@@ -206,13 +206,13 @@ class EchoProperties extends Task
         }
 
         //copy the properties file
-        $allProps = array();
+        $allProps = [];
 
         /* load properties from file if specified, otherwise use Phing's properties */
         if ($this->inFile == null) {
             // add phing properties
             $allProps = $this->getProject()->getProperties();
-        } elseif ($this->inFile != null) {
+        } else if ($this->inFile != null) {
             if ($this->inFile->exists() && $this->inFile->isDirectory()) {
                 $message = "srcfile is a directory!";
                 $this->failOnErrorAction(null, $message, Project::MSG_ERR);
@@ -291,8 +291,8 @@ class EchoProperties extends Task
      *  sent to the output stream.
      *  The output stream will be closed when this method returns.
      *
-     * @param  array $allProps propfile to save
-     * @param  OutputStream $os output stream
+     * @param array $allProps propfile to save
+     * @param OutputStream $os output stream
      * @throws IOException      on output errors
      * @throws BuildException   on other errors
      */
@@ -323,8 +323,23 @@ class EchoProperties extends Task
 
         if ($this->format === "text") {
             $this->textSaveProperties($props, $os, "Phing properties");
-        } elseif ($this->format === "xml") {
+        } else if ($this->format === "xml") {
             $this->xmlSaveProperties($props, $os);
+        }
+    }
+
+    /**
+     * @param Properties $props the properties to record
+     * @param OutputStream $os record the properties to this output stream
+     * @param string $header prepend this header to the property output
+     * @throws BuildException on an I/O error during a write.
+     */
+    protected function textSaveProperties(Properties $props, OutputStream $os, $header)
+    {
+        try {
+            $props->storeOutputStream($os, $header);
+        } catch (IOException $ioe) {
+            throw new BuildException($ioe, $this->getLocation());
         }
     }
 
@@ -354,21 +369,6 @@ class EchoProperties extends Task
             $os->write($doc->saveXML());
         } catch (IOException $ioe) {
             throw new BuildException("Unable to write XML file", $ioe);
-        }
-    }
-
-    /**
-     * @param Properties $props the properties to record
-     * @param OutputStream $os record the properties to this output stream
-     * @param string $header prepend this header to the property output
-     * @throws BuildException on an I/O error during a write.
-     */
-    protected function textSaveProperties(Properties $props, OutputStream $os, $header)
-    {
-        try {
-            $props->storeOutputStream($os, $header);
-        } catch (IOException $ioe) {
-            throw new BuildException($ioe, $this->getLocation());
         }
     }
 }

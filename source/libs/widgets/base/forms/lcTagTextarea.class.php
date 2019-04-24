@@ -40,11 +40,6 @@ class lcTagTextarea extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function create()
-    {
-        return new lcTagTextarea();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -91,6 +86,11 @@ class lcTagTextarea extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagTextarea();
     }
 
     public static function getRequiredAttributes()

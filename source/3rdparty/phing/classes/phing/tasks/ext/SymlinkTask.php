@@ -76,7 +76,7 @@ class SymlinkTask extends Task
      *
      * @var array
      */
-    private $_filesets = array();
+    private $_filesets = [];
 
     /**
      * Whether to override the symlink if it exists but points
@@ -89,28 +89,6 @@ class SymlinkTask extends Task
     private $_overwrite = false;
 
     /**
-     * setter for _target
-     *
-     * @param  string $target
-     * @return void
-     */
-    public function setTarget($target)
-    {
-        $this->_target = $target;
-    }
-
-    /**
-     * setter for _link
-     *
-     * @param  string $link
-     * @return void
-     */
-    public function setLink($link)
-    {
-        $this->_link = $link;
-    }
-
-    /**
      * creator for _filesets
      *
      * @return FileSet
@@ -120,124 +98,6 @@ class SymlinkTask extends Task
         $num = array_push($this->_filesets, new FileSet());
 
         return $this->_filesets[$num - 1];
-    }
-
-    /**
-     * setter for _overwrite
-     *
-     * @param  boolean $overwrite
-     * @return void
-     */
-    public function setOverwrite($overwrite)
-    {
-        $this->_overwrite = $overwrite;
-    }
-
-    /**
-     * getter for _target
-     *
-     * @throws BuildException
-     * @return string
-     */
-    public function getTarget()
-    {
-        if ($this->_target === null) {
-            throw new BuildException('Target not set');
-        }
-
-        return $this->_target;
-    }
-
-    /**
-     * getter for _link
-     *
-     * @throws BuildException
-     * @return string
-     */
-    public function getLink()
-    {
-        if ($this->_link === null) {
-            throw new BuildException('Link not set');
-        }
-
-        return $this->_link;
-    }
-
-    /**
-     * getter for _filesets
-     *
-     * @return array
-     */
-    public function getFilesets()
-    {
-        return $this->_filesets;
-    }
-
-    /**
-     * getter for _overwrite
-     *
-     * @return boolean
-     */
-    public function getOverwrite()
-    {
-        return $this->_overwrite;
-    }
-
-    /**
-     * Generates an array of directories / files to be linked
-     * If _filesets is empty, returns getTarget()
-     *
-     * @throws BuildException
-     * @return array|string
-     */
-    protected function getMap()
-    {
-        $fileSets = $this->getFilesets();
-
-        // No filesets set
-        // We're assuming single file / directory
-        if (empty($fileSets)) {
-            return $this->getTarget();
-        }
-
-        $targets = array();
-
-        foreach ($fileSets as $fs) {
-            if (!($fs instanceof FileSet)) {
-                continue;
-            }
-
-            // We need a directory to store the links
-            if (!is_dir($this->getLink())) {
-                throw new BuildException('Link must be an existing directory when using fileset');
-            }
-
-            $fromDir = $fs->getDir($this->getProject())->getAbsolutePath();
-
-            if (!is_dir($fromDir)) {
-                $this->log('Directory doesn\'t exist: ' . $fromDir, Project::MSG_WARN);
-                continue;
-            }
-
-            $fsTargets = array();
-
-            $ds = $fs->getDirectoryScanner($this->getProject());
-
-            $fsTargets = array_merge(
-                $fsTargets,
-                $ds->getIncludedDirectories(),
-                $ds->getIncludedFiles()
-            );
-
-            // Add each target to the map
-            foreach ($fsTargets as $target) {
-                if (!empty($target)) {
-                    $targets[$target] = $fromDir . DIRECTORY_SEPARATOR . $target;
-                }
-            }
-        }
-
-        return $targets;
     }
 
     /**
@@ -263,10 +123,129 @@ class SymlinkTask extends Task
     }
 
     /**
+     * Generates an array of directories / files to be linked
+     * If _filesets is empty, returns getTarget()
+     *
+     * @return array|string
+     * @throws BuildException
+     */
+    protected function getMap()
+    {
+        $fileSets = $this->getFilesets();
+
+        // No filesets set
+        // We're assuming single file / directory
+        if (empty($fileSets)) {
+            return $this->getTarget();
+        }
+
+        $targets = [];
+
+        foreach ($fileSets as $fs) {
+            if (!($fs instanceof FileSet)) {
+                continue;
+            }
+
+            // We need a directory to store the links
+            if (!is_dir($this->getLink())) {
+                throw new BuildException('Link must be an existing directory when using fileset');
+            }
+
+            $fromDir = $fs->getDir($this->getProject())->getAbsolutePath();
+
+            if (!is_dir($fromDir)) {
+                $this->log('Directory doesn\'t exist: ' . $fromDir, Project::MSG_WARN);
+                continue;
+            }
+
+            $fsTargets = [];
+
+            $ds = $fs->getDirectoryScanner($this->getProject());
+
+            $fsTargets = array_merge(
+                $fsTargets,
+                $ds->getIncludedDirectories(),
+                $ds->getIncludedFiles()
+            );
+
+            // Add each target to the map
+            foreach ($fsTargets as $target) {
+                if (!empty($target)) {
+                    $targets[$target] = $fromDir . DIRECTORY_SEPARATOR . $target;
+                }
+            }
+        }
+
+        return $targets;
+    }
+
+    /**
+     * getter for _filesets
+     *
+     * @return array
+     */
+    public function getFilesets()
+    {
+        return $this->_filesets;
+    }
+
+    /**
+     * getter for _target
+     *
+     * @return string
+     * @throws BuildException
+     */
+    public function getTarget()
+    {
+        if ($this->_target === null) {
+            throw new BuildException('Target not set');
+        }
+
+        return $this->_target;
+    }
+
+    /**
+     * setter for _target
+     *
+     * @param string $target
+     * @return void
+     */
+    public function setTarget($target)
+    {
+        $this->_target = $target;
+    }
+
+    /**
+     * getter for _link
+     *
+     * @return string
+     * @throws BuildException
+     */
+    public function getLink()
+    {
+        if ($this->_link === null) {
+            throw new BuildException('Link not set');
+        }
+
+        return $this->_link;
+    }
+
+    /**
+     * setter for _link
+     *
+     * @param string $link
+     * @return void
+     */
+    public function setLink($link)
+    {
+        $this->_link = $link;
+    }
+
+    /**
      * Create the actual link
      *
-     * @param  string $target
-     * @param  string $link
+     * @param string $target
+     * @param string $link
      * @return bool
      */
     protected function symlink($target, $link)
@@ -298,5 +277,26 @@ class SymlinkTask extends Task
         $this->log('Linking: ' . $target . ' to ' . $link, Project::MSG_INFO);
 
         return $fs->symlink($target, $link);
+    }
+
+    /**
+     * getter for _overwrite
+     *
+     * @return boolean
+     */
+    public function getOverwrite()
+    {
+        return $this->_overwrite;
+    }
+
+    /**
+     * setter for _overwrite
+     *
+     * @param boolean $overwrite
+     * @return void
+     */
+    public function setOverwrite($overwrite)
+    {
+        $this->_overwrite = $overwrite;
     }
 }

@@ -138,11 +138,11 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return bool
      */
-    public function setAll($flag)
+    public function isAll()
     {
-        $this->all = (bool) $flag;
+        return $this->getAll();
     }
 
     /**
@@ -154,27 +154,11 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @return bool
-     */
-    public function isAll()
-    {
-        return $this->getAll();
-    }
-
-    /**
      * @param $flag
      */
-    public function setTags($flag)
+    public function setAll($flag)
     {
-        $this->tags = (bool) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getTags()
-    {
-        return $this->tags;
+        $this->all = (bool)$flag;
     }
 
     /**
@@ -186,19 +170,19 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return bool
      */
-    public function setContains($flag)
+    public function getTags()
     {
-        $this->contains = (bool) $flag;
+        return $this->tags;
     }
 
     /**
-     * @return bool
+     * @param $flag
      */
-    public function getContains()
+    public function setTags($flag)
     {
-        return $this->contains;
+        $this->tags = (bool)$flag;
     }
 
     /**
@@ -210,43 +194,27 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @param $length
+     * @return bool
      */
-    public function setAbbrev($length)
+    public function getContains()
     {
-        $this->abbrev = (int) $length;
-    }
-
-    /**
-     * @return int
-     */
-    public function getAbbrev()
-    {
-        return $this->abbrev;
-    }
-
-    /**
-     * @param $count
-     */
-    public function setCandidates($count)
-    {
-        $this->candidates = (int) $count;
-    }
-
-    /**
-     * @return int
-     */
-    public function getCandidates()
-    {
-        return $this->candidates;
+        return $this->contains;
     }
 
     /**
      * @param $flag
      */
-    public function setLong($flag)
+    public function setContains($flag)
     {
-        $this->long = (bool) $flag;
+        $this->contains = (bool)$flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLong()
+    {
+        return $this->getLong();
     }
 
     /**
@@ -258,11 +226,51 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @return bool
+     * @param $flag
      */
-    public function isLong()
+    public function setLong($flag)
     {
-        return $this->getLong();
+        $this->long = (bool)$flag;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAbbrev()
+    {
+        return $this->abbrev;
+    }
+
+    /**
+     * @param $length
+     */
+    public function setAbbrev($length)
+    {
+        $this->abbrev = (int)$length;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCandidates()
+    {
+        return $this->candidates;
+    }
+
+    /**
+     * @param $count
+     */
+    public function setCandidates($count)
+    {
+        $this->candidates = (int)$count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMatch()
+    {
+        return $this->match;
     }
 
     /**
@@ -276,17 +284,17 @@ class GitDescribeTask extends GitBaseTask
     /**
      * @return string
      */
-    public function getMatch()
+    public function getCommittish()
     {
-        return $this->match;
+        return $this->committish;
     }
 
     /**
-     * @param $flag
+     * @param $object
      */
-    public function setAlways($flag)
+    public function setCommittish($object)
     {
-        $this->always = (bool) $flag;
+        $this->committish = $object;
     }
 
     /**
@@ -306,19 +314,11 @@ class GitDescribeTask extends GitBaseTask
     }
 
     /**
-     * @param $object
+     * @param $flag
      */
-    public function setCommittish($object)
+    public function setAlways($flag)
     {
-        $this->committish = $object;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCommittish()
-    {
-        return $this->committish;
+        $this->always = (bool)$flag;
     }
 
     /**

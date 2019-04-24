@@ -28,62 +28,20 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     /** @var lcLogger */
     protected $propel_logger;
     protected $propel_config;
-    /** @var array lcDatabase[] */
-    private $dbs = [];
-    private $default_database = self::DEFAULT_DB;
-    private $propel_initialized;
-
     /**
      * @var lcDatabaseMigrationsHelper
      */
     protected $migration_helper;
+    /** @var array lcDatabase[] */
+    private $dbs = [];
+    private $default_database = self::DEFAULT_DB;
+    private $propel_initialized;
 
     public function initialize()
     {
         parent::initialize();
 
         $this->loadDatabaseConfiguration();
-    }
-
-    public function getMigrationsHelper()
-    {
-        if (!$this->migration_helper) {
-
-            $cfg = $this->configuration;
-            $clname = (string)$cfg['db.migrations.helper_class'];
-
-            if (!$clname) {
-                throw new lcConfigException('No migrations helper set in configuration');
-            }
-
-            if (!class_exists($clname)) {
-                throw new lcSystemException('Migrations helper class does not exist');
-            }
-
-            // init it
-            $manager = new $clname();
-
-            if (!$manager || !($manager instanceof lcSysObj)) {
-                throw new lcSystemException('Migrations helper is not a valid object');
-            }
-
-            if ($manager instanceof lcDatabaseMigrationsHelper) {
-                /** @noinspection PhpParamsInspection */
-                $manager->setDatabaseConnection($this->getConnection());
-            }
-
-            $manager->setLogger($this->logger);
-            $manager->setI18n($this->i18n);
-            $manager->setConfiguration($this->configuration);
-            $manager->setEventDispatcher($this->event_dispatcher);
-
-            // start it up
-            $manager->initialize();
-
-            $this->migration_helper = $manager;
-        }
-
-        return $this->migration_helper;
     }
 
     private function loadDatabaseConfiguration()
@@ -153,7 +111,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                         $res = [
                             'is_default' => $db['is_default'],
                             'name' => $db['name'],
-                            'connection' => $db_object->getConnection()
+                            'connection' => $db_object->getConnection(),
                         ];
 
                         $connection = $this->dbs[$name];
@@ -348,12 +306,77 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                     'classname' => $propel_class,
                     'options' => $options,
                     'attributes' => $attributes,
-                    'settings' => ['charset' => ['value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET]]
-                ]
-            ]
+                    'settings' => ['charset' => ['value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET]],
+                ],
+            ],
         ];
 
         return $ret;
+    }
+
+    public function getMigrationsHelper()
+    {
+        if (!$this->migration_helper) {
+
+            $cfg = $this->configuration;
+            $clname = (string)$cfg['db.migrations.helper_class'];
+
+            if (!$clname) {
+                throw new lcConfigException('No migrations helper set in configuration');
+            }
+
+            if (!class_exists($clname)) {
+                throw new lcSystemException('Migrations helper class does not exist');
+            }
+
+            // init it
+            $manager = new $clname();
+
+            if (!$manager || !($manager instanceof lcSysObj)) {
+                throw new lcSystemException('Migrations helper is not a valid object');
+            }
+
+            if ($manager instanceof lcDatabaseMigrationsHelper) {
+                /** @noinspection PhpParamsInspection */
+                $manager->setDatabaseConnection($this->getConnection());
+            }
+
+            $manager->setLogger($this->logger);
+            $manager->setI18n($this->i18n);
+            $manager->setConfiguration($this->configuration);
+            $manager->setEventDispatcher($this->event_dispatcher);
+
+            // start it up
+            $manager->initialize();
+
+            $this->migration_helper = $manager;
+        }
+
+        return $this->migration_helper;
+    }
+
+    public function getConnection($name = null)
+    {
+        $db = $this->getDatabase($name);
+
+        if (!isset($db)) {
+            return null;
+        }
+
+        return $db->getConnection();
+    }
+
+    /**
+     * @param null $name
+     * @return lcDatabase
+     */
+    public function getDatabase($name = null)
+    {
+        if (!isset($name)) {
+            $name = $this->default_database;
+        }
+
+        return isset($this->dbs[$name]) ? $this->dbs[$name] : null;
     }
 
     public function shutdown()
@@ -389,6 +412,8 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         parent::shutdown();
     }
 
+    #pragma mark - Propel
+
     public function getCapabilities()
     {
         return ['database'];
@@ -398,13 +423,11 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
     {
         $debug = [
             'databases' => array_keys($this->dbs),
-            'primary' => self::DEFAULT_DB
+            'primary' => self::DEFAULT_DB,
         ];
 
         return $debug;
     }
-
-    #pragma mark - Propel
 
     public function getShortDebugInfo()
     {
@@ -435,30 +458,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         }
 
         return $debug_info;
-    }
-
-    /**
-     * @param null $name
-     * @return lcDatabase
-     */
-    public function getDatabase($name = null)
-    {
-        if (!isset($name)) {
-            $name = $this->default_database;
-        }
-
-        return isset($this->dbs[$name]) ? $this->dbs[$name] : null;
-    }
-
-    public function getConnection($name = null)
-    {
-        $db = $this->getDatabase($name);
-
-        if (!isset($db)) {
-            return null;
-        }
-
-        return $db->getConnection();
     }
 
     public function getNames()

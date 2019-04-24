@@ -60,9 +60,9 @@ class GitInitTask extends GitBaseTask
     }
 
     /**
-     * Alias @see getBare()
+     * Alias @return string
+     * @see getBare()
      *
-     * @return string
      */
     public function isBare()
     {
@@ -82,6 +82,6 @@ class GitInitTask extends GitBaseTask
      */
     public function setBare($flag)
     {
-        $this->isBare = (bool) $flag;
+        $this->isBare = (bool)$flag;
     }
 }

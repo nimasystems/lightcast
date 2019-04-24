@@ -80,7 +80,7 @@ class ManifestTask extends Task
      *
      * @var array An Array of objects
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Enable/Disable checksuming or/and select algorithm
@@ -105,7 +105,7 @@ class ManifestTask extends Task
      *
      * @var array
      */
-    private $meta = array('totalFileCount' => 0, 'totalFileSize' => 0);
+    private $meta = ['totalFileCount' => 0, 'totalFileSize' => 0];
 
     /**
      * The setter for the attribute "file".
@@ -123,14 +123,14 @@ class ManifestTask extends Task
     /**
      * The setter for the attribute "checksum"
      *
-     * @param  mixed $mixed
+     * @param mixed $mixed
      *
      * @return void
      */
     public function setChecksum($mixed)
     {
         if (is_string($mixed)) {
-            $data = array(strtolower($mixed));
+            $data = [strtolower($mixed)];
 
             if (strpos($data[0], ',')) {
                 $data = explode(',', $mixed);
@@ -138,15 +138,15 @@ class ManifestTask extends Task
 
             $this->checksum = $data;
 
-        } elseif ($mixed === true) {
-            $this->checksum = array('md5');
+        } else if ($mixed === true) {
+            $this->checksum = ['md5'];
         }
     }
 
     /**
      * The setter for the optional attribute "salt"
      *
-     * @param  string $string
+     * @param string $string
      *
      * @return void
      */
@@ -190,9 +190,35 @@ class ManifestTask extends Task
         if ($this->action == 'w') {
             $this->write();
 
-        } elseif ($this->action == 'r') {
+        } else if ($this->action == 'r') {
             $this->read();
 
+        }
+    }
+
+    /**
+     * Validates attributes coming in from XML
+     *
+     * @return void
+     *
+     * @throws BuildException
+     */
+    protected function validateAttributes()
+    {
+        if ($this->action != 'r' && $this->action != 'w') {
+            throw new BuildException("'action' attribute has non valid value. Use 'r' or 'w'");
+        }
+
+        if (empty($this->salt)) {
+            $this->log("No salt provided. Specify one with the 'salt' attribute.", Project::MSG_WARN);
+        }
+
+        if (is_null($this->file) && count($this->filesets) === 0) {
+            throw new BuildException("Specify at least sources and destination - a file or a fileset.");
+        }
+
+        if (!is_null($this->file) && $this->file->exists() && $this->file->isDirectory()) {
+            throw new BuildException("Destination file cannot be a directory.");
         }
     }
 
@@ -254,11 +280,22 @@ class ManifestTask extends Task
     }
 
     /**
-     * @todo implement
+     * Hash a file's contents
+     *
+     * @param string $file
+     * @param string $algo
+     *
+     * @return mixed  String on success, false if $algo is not available
      */
-    private function read()
+    private function hashFile($file, $algo)
     {
-        throw new BuildException("Checking against manifest not yet supported.");
+        if (!file_exists($file)) {
+            return false;
+        }
+
+        $msg = file_get_contents($file);
+
+        return $this->hash($msg, $algo);
     }
 
     /**
@@ -269,8 +306,8 @@ class ManifestTask extends Task
      * @link  http://www.php.net/mhash
      * @link  http://www.php.net/hash
      *
-     * @param  string $msg  The string that should be hashed
-     * @param  string $algo Algorithm
+     * @param string $msg The string that should be hashed
+     * @param string $algo Algorithm
      *
      * @return mixed  String on success, false if $algo is not available
      */
@@ -305,47 +342,10 @@ class ManifestTask extends Task
     }
 
     /**
-     * Hash a file's contents
-     *
-     * @param  string $file
-     * @param  string $algo
-     *
-     * @return mixed  String on success, false if $algo is not available
+     * @todo implement
      */
-    private function hashFile($file, $algo)
+    private function read()
     {
-        if (!file_exists($file)) {
-            return false;
-        }
-
-        $msg = file_get_contents($file);
-
-        return $this->hash($msg, $algo);
-    }
-
-    /**
-     * Validates attributes coming in from XML
-     *
-     * @return void
-     *
-     * @throws BuildException
-     */
-    protected function validateAttributes()
-    {
-        if ($this->action != 'r' && $this->action != 'w') {
-            throw new BuildException("'action' attribute has non valid value. Use 'r' or 'w'");
-        }
-
-        if (empty($this->salt)) {
-            $this->log("No salt provided. Specify one with the 'salt' attribute.", Project::MSG_WARN);
-        }
-
-        if (is_null($this->file) && count($this->filesets) === 0) {
-            throw new BuildException("Specify at least sources and destination - a file or a fileset.");
-        }
-
-        if (!is_null($this->file) && $this->file->exists() && $this->file->isDirectory()) {
-            throw new BuildException("Destination file cannot be a directory.");
-        }
+        throw new BuildException("Checking against manifest not yet supported.");
     }
 }

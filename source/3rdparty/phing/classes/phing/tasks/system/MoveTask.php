@@ -145,7 +145,7 @@ class MoveTask extends CopyTask
         if ($this->includeEmpty) {
             $count = 0;
             foreach ($this->dirCopyMap as $srcDir => $destDir) {
-                $d = new PhingFile((string) $destDir);
+                $d = new PhingFile((string)$destDir);
                 if (!$d->exists()) {
                     if (!$d->mkdirs()) {
                         $this->logError("Unable to create directory " . $d->getAbsolutePath());
@@ -156,8 +156,7 @@ class MoveTask extends CopyTask
             }
             if ($count > 0) {
                 $this->log(
-                    "moved $count empty director" . ($count == 1 ? "y" : "ies") . " to " . $this->destDir->getAbsolutePath(
-                    )
+                    "moved $count empty director" . ($count == 1 ? "y" : "ies") . " to " . $this->destDir->getAbsolutePath()
                 );
             }
         }
@@ -178,9 +177,9 @@ class MoveTask extends CopyTask
      *
      * @param $d
      *
+     * @return bool
      * @throws IOException
      *
-     * @return bool
      */
     private function okToDelete($d)
     {

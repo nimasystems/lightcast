@@ -194,13 +194,46 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         }
     }
 
+    public function env($name = false)
+    {
+        $res = isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
+
+        return $res;
+    }
+
+    /*
+     * Gets the Request parameters
+    */
+
     public function toArray()
     {
         return (array)$this->getRequestData();
     }
 
     /*
-     * Gets the Request parameters
+     * Gets a single Request parameter by name
+    */
+
+    /**
+     * @return mixed
+     */
+    public function getRequestData()
+    {
+        return $this->request_data;
+    }
+
+    /**
+     * @param mixed $request_data
+     * @return lcRequest
+     */
+    public function setRequestData($request_data)
+    {
+        $this->request_data = $request_data;
+        return $this;
+    }
+
+    /*
+     * Checks if Request has a parameter by its name
     */
 
     public function offsetSet($name, $value)
@@ -209,7 +242,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     /*
-     * Gets a single Request parameter by name
+     * sets the default request vars - before clearing globals
     */
 
     public function offsetUnset($name)
@@ -217,13 +250,17 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         throw new lcUnsupportedException('Changing env variables is not supported');
     }
 
+    /*
+     * Get the whole environment
+    */
+
     public function hasParam($name)
     {
         return $this->params->get($name) ? true : false;
     }
 
     /*
-     * Checks if Request has a parameter by its name
+     * PHP Value: SAPI
     */
 
     public function getEnv()
@@ -231,18 +268,10 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return $this->env;
     }
 
-    /*
-     * sets the default request vars - before clearing globals
-    */
-
     public function getSapi()
     {
         return $this->sapi;
     }
-
-    /*
-     * Get the whole environment
-    */
 
     public function isInCli()
     {
@@ -250,7 +279,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     /*
-     * PHP Value: SAPI
+     * PHP Value: PHP CLI Path
     */
 
     public function isRunningCli()
@@ -269,13 +298,19 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     /*
-     * PHP Value: PHP CLI Path
+     * PHP Header: SystemRoot
+    * Platform-Specific (Windows)
     */
 
     public function getPHPPath()
     {
         return $this->getPath();
     }
+
+    /*
+     * PHP Header: PATHEXT
+    * Platform-Specific (Windows)
+    */
 
     public function getSystemRoot()
     {
@@ -288,7 +323,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     /*
-     * PHP Header: SystemRoot
+     * PHP Header: WINDIR
     * Platform-Specific (Windows)
     */
 
@@ -299,8 +334,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     }
 
     /*
-     * PHP Header: PATHEXT
-    * Platform-Specific (Windows)
+     * PHP Header: PHP_SELF
     */
 
     public function getWinDir()
@@ -313,18 +347,14 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         return $this->getPhpSelf();
     }
 
-    /*
-     * PHP Header: WINDIR
-    * Platform-Specific (Windows)
-    */
-
     public function serialize()
     {
         return serialize([$this->env]);
     }
 
     /*
-     * PHP Header: PHP_SELF
+     * Provides access to Request
+    * Environment.
     */
 
     public function unserialize($serialized)
@@ -332,27 +362,10 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         list($this->env) = unserialize($serialized);
     }
 
-    /**
-     * @param mixed $request_data
-     * @return lcRequest
-     */
-    public function setRequestData($request_data)
-    {
-        $this->request_data = $request_data;
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getRequestData()
-    {
-        return $this->request_data;
-    }
-
     /*
-     * Provides access to Request
-    * Environment.
+     * Emulation for various vars -
+    * before running the clear of global vars
+    *
     */
 
     protected function beforeAttachRegisteredEvents()
@@ -369,12 +382,6 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         // initialize default environment
         $this->initializeEnvironment();
     }
-
-    /*
-     * Emulation for various vars -
-    * before running the clear of global vars
-    *
-    */
 
     private function initializeEnvironment()
     {
@@ -510,12 +517,5 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         }
 
         return $val;
-    }
-
-    public function env($name = false)
-    {
-        $res = isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
-
-        return $res;
     }
 }

@@ -71,18 +71,18 @@ abstract class lcBaseActionForm extends lcSysObj
         $this->controller->getEventDispatcher()->notify(new lcEvent('action_form.iniitialize', $this));
     }
 
-    public function setController(lcBaseController $controller)
-    {
-        $this->controller = $controller;
-        return $this;
-    }
-
     /**
      * @return lcWebController
      */
     public function getController()
     {
         return $this->controller;
+    }
+
+    public function setController(lcBaseController $controller)
+    {
+        $this->controller = $controller;
+        return $this;
     }
 
     public function initializeFormWidgets()

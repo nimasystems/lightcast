@@ -43,7 +43,7 @@ class AdhocTask extends Task
      */
     protected $script;
 
-    protected $newClasses = array();
+    protected $newClasses = [];
 
     /**
      * Main entry point
@@ -58,15 +58,6 @@ class AdhocTask extends Task
         } else {
             $this->log("Adhoc task executed but did not result in any new classes.", Project::MSG_VERBOSE);
         }
-    }
-
-    /**
-     * Get array of names of newly defined classes.
-     * @return array
-     */
-    protected function getNewClasses()
-    {
-        return $this->newClasses;
     }
 
     /**
@@ -88,6 +79,15 @@ class AdhocTask extends Task
     public function addText($script)
     {
         $this->script = $script;
+    }
+
+    /**
+     * Get array of names of newly defined classes.
+     * @return array
+     */
+    protected function getNewClasses()
+    {
+        return $this->newClasses;
     }
 
 }

@@ -22,7 +22,7 @@ class DBSQLite extends DBAdapter
      * For SQLite this method has no effect, since SQLite doesn't support specifying a character
      * set (or, another way to look at it, it doesn't require a single character set per DB).
      *
-     * @param PDO    $con     A PDO connection instance.
+     * @param PDO $con A PDO connection instance.
      * @param string $charset The charset encoding.
      *
      * @throws PropelException If the specified charset doesn't match sqlite_libencoding()
@@ -71,7 +71,7 @@ class DBSQLite extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -95,11 +95,11 @@ class DBSQLite extends DBAdapter
     }
 
     /**
-     * @see        DBAdapter::quoteIdentifier()
-     *
      * @param string $text
      *
      * @return string
+     * @see        DBAdapter::quoteIdentifier()
+     *
      */
     public function quoteIdentifier($text)
     {
@@ -107,17 +107,17 @@ class DBSQLite extends DBAdapter
     }
 
     /**
-     * @see        DBAdapter::applyLimit()
-     *
-     * @param string  $sql
+     * @param string $sql
      * @param integer $offset
      * @param integer $limit
+     * @see        DBAdapter::applyLimit()
+     *
      */
     public function applyLimit(&$sql, $offset, $limit)
     {
         if ($limit > 0) {
             $sql .= " LIMIT " . $limit . ($offset > 0 ? " OFFSET " . $offset : "");
-        } elseif ($offset > 0) {
+        } else if ($offset > 0) {
             $sql .= " LIMIT -1 OFFSET " . $offset;
         }
     }

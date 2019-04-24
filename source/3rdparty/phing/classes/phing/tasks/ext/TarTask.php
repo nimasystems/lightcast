@@ -47,8 +47,8 @@ class TarTask extends MatchingTask
 
     private $longFileMode = "warn";
 
-    private $filesets = array();
-    private $fileSetFiles = array();
+    private $filesets = [];
+    private $fileSetFiles = [];
 
     /**
      * Indicates whether the user has been warned about long files already.
@@ -124,13 +124,13 @@ class TarTask extends MatchingTask
     /**
      * Set the include empty dirs flag.
      *
-     * @param  boolean $bool Flag if empty dirs should be tarred too
+     * @param boolean $bool Flag if empty dirs should be tarred too
      *
      * @return void
      */
     public function setIncludeEmptyDirs($bool)
     {
-        $this->includeEmpty = (boolean) $bool;
+        $this->includeEmpty = (boolean)$bool;
     }
 
     /**
@@ -217,8 +217,7 @@ class TarTask extends MatchingTask
         try {
             if ($this->baseDir !== null) {
                 if (!$this->baseDir->exists()) {
-                    throw new BuildException("basedir '" . (string) $this->baseDir . "' does not exist!", $this->getLocation(
-                        ));
+                    throw new BuildException("basedir '" . (string)$this->baseDir . "' does not exist!", $this->getLocation());
                 }
                 if (empty($this->filesets)) { // if there weren't any explicit filesets specivied, then
                     // create a default, all-inclusive fileset using the specified basedir.
@@ -258,7 +257,7 @@ class TarTask extends MatchingTask
                         . "single file.");
                 }
                 $fsBasedir = $fs->getDir($this->project);
-                $filesToTar = array();
+                $filesToTar = [];
                 for ($i = 0, $fcount = count($files); $i < $fcount; $i++) {
                     $f = new PhingFile($fsBasedir, $files[$i]);
                     $filesToTar[] = $f->getAbsolutePath();
@@ -282,21 +281,6 @@ class TarTask extends MatchingTask
     }
 
     /**
-     * @param  array     $files array of filenames
-     * @param  PhingFile $dir
-     *
-     * @return boolean
-     */
-    protected function areFilesUpToDate($files, $dir)
-    {
-        $sfs = new SourceFileScanner($this);
-        $mm = new MergeMapper();
-        $mm->setTo($this->tarFile->getAbsolutePath());
-
-        return count($sfs->restrict($files, $dir, null, $mm)) == 0;
-    }
-
-    /**
      * @return array
      * @throws BuildException
      */
@@ -314,6 +298,21 @@ class TarTask extends MatchingTask
             }
         }
         return true;
+    }
+
+    /**
+     * @param array $files array of filenames
+     * @param PhingFile $dir
+     *
+     * @return boolean
+     */
+    protected function areFilesUpToDate($files, $dir)
+    {
+        $sfs = new SourceFileScanner($this);
+        $mm = new MergeMapper();
+        $mm->setTo($this->tarFile->getAbsolutePath());
+
+        return count($sfs->restrict($files, $dir, null, $mm)) == 0;
     }
 }
 
@@ -345,10 +344,10 @@ class TarFileSet extends FileSet
      * @param Project $p
      * @param bool $includeEmpty
      *
-     * @throws BuildException
-     *
      * @return array a list of file and directory names, relative to
      *               the baseDir for the project.
+     * @throws BuildException
+     *
      */
     public function getFiles(Project $p, $includeEmpty = true)
     {
@@ -361,7 +360,7 @@ class TarFileSet extends FileSet
             if ($includeEmpty) {
 
                 // first any empty directories that will not be implicitly added by any of the files
-                $implicitDirs = array();
+                $implicitDirs = [];
                 foreach ($this->files as $file) {
                     $implicitDirs[] = dirname($file);
                 }
@@ -398,6 +397,14 @@ class TarFileSet extends FileSet
     }
 
     /**
+     * @return int
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
+
+    /**
      * A 3 digit octal string, specify the user, group and
      * other modes in the standard Unix fashion;
      * optional, default=0644
@@ -405,16 +412,16 @@ class TarFileSet extends FileSet
      */
     public function setMode($octalString)
     {
-        $octal = (int) $octalString;
+        $octal = (int)$octalString;
         $this->mode = 0100000 | $octal;
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getMode()
+    public function getUserName()
     {
-        return $this->mode;
+        return $this->userName;
     }
 
     /**
@@ -426,14 +433,6 @@ class TarFileSet extends FileSet
     public function setUserName($userName)
     {
         $this->userName = $userName;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUserName()
-    {
-        return $this->userName;
     }
 
     /**
@@ -456,6 +455,14 @@ class TarFileSet extends FileSet
     }
 
     /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
      * If the prefix attribute is set, all files in the fileset
      * are prefixed with that path in the archive.
      * optional.
@@ -469,9 +476,9 @@ class TarFileSet extends FileSet
     /**
      * @return string
      */
-    public function getPrefix()
+    public function getFullpath()
     {
-        return $this->prefix;
+        return $this->fullpath;
     }
 
     /**
@@ -487,11 +494,11 @@ class TarFileSet extends FileSet
     }
 
     /**
-     * @return string
+     * @return bool
      */
-    public function getFullpath()
+    public function getPreserveLeadingSlashes()
     {
-        return $this->fullpath;
+        return $this->preserveLeadingSlashes;
     }
 
     /**
@@ -505,14 +512,6 @@ class TarFileSet extends FileSet
      */
     public function setPreserveLeadingSlashes($b)
     {
-        $this->preserveLeadingSlashes = (boolean) $b;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getPreserveLeadingSlashes()
-    {
-        return $this->preserveLeadingSlashes;
+        $this->preserveLeadingSlashes = (boolean)$b;
     }
 }

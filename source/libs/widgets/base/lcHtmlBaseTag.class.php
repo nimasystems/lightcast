@@ -56,14 +56,39 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
         //
     }
 
+    public function __get($property)
+    {
+        return $this->attr($property);
+    }
+
     public function __set($property, $value = null)
     {
         $this->attr($property, $value);
     }
 
-    public function __get($property)
+    /**
+     * @param $name
+     * @param null $value
+     * @return $this
+     */
+    public function attr($name, $value = null)
     {
-        return $this->attr($property);
+        return $this->setAttribute($name, $value);
+    }
+
+    /**
+     * @param $name
+     * @param null $value
+     * @return $this
+     */
+    public function setAttribute($name, $value = null)
+    {
+        if (!isset($value)) {
+            $this->attributes->remove($name);
+        } else {
+            $this->attributes->set($name, $value);
+        }
+        return $this;
     }
 
     public function __call($method, array $params = null)
@@ -96,51 +121,6 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
     }
 
     /**
-     * @return bool
-     */
-    public function getIsClosed()
-    {
-        return $this->is_closed;
-    }
-
-    /**
-     * @param $name
-     * @param null $value
-     * @return $this
-     */
-    public function attr($name, $value = null)
-    {
-        return $this->setAttribute($name, $value);
-    }
-
-    /**
-     * @param $name
-     * @param null $value
-     * @return $this
-     */
-    public function setAttribute($name, $value = null)
-    {
-        if (!isset($value)) {
-            $this->attributes->remove($name);
-        } else {
-            $this->attributes->set($name, $value);
-        }
-        return $this;
-    }
-
-    /**
-     * @param lcHtmlBaseTag $child
-     * @param null $tag
-     * @return $this
-     */
-    public function addChild(lcHtmlBaseTag $child, $tag = null)
-    {
-        $tag = $tag ? $tag : 'gen_' . lcStrings::randomString(10, true);
-        $this->children[$tag] = $child;
-        return $this;
-    }
-
-    /**
      * @param $tag
      * @return $this
      */
@@ -157,29 +137,6 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
     {
         $this->children = null;
         return $this;
-    }
-
-    /**
-     * @param bool $compiled
-     * @return lcHtmlBaseTag[]|null|string
-     */
-    public function getChildren($compiled = false)
-    {
-        if (!$compiled) {
-            return $this->children;
-        } else {
-            $children = $this->children;
-            $out = null;
-
-            if ($children) {
-                foreach ($children as $child) {
-                    $out .= $child->toString();
-                    unset($child);
-                }
-            }
-
-            return $out;
-        }
     }
 
     /**
@@ -227,11 +184,6 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
         return $this->tagname;
     }
 
-    public function getContent()
-    {
-        return ($this->content ? $this->content : $this->getChildren(true));
-    }
-
     /**
      * @param array|string|lcHtmlBaseTag $fields
      * @return lcHtmlBaseTag
@@ -244,13 +196,30 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
                 $this->append($data);
                 unset($data);
             }
-        } elseif ($fields instanceof lcHtmlBaseTag) {
+        } else if ($fields instanceof lcHtmlBaseTag) {
             $this->addChild($fields);
-        } elseif ($fields) {
+        } else if ($fields) {
             $this->setContent($this->getContent() . $fields);
         }
 
         return $this;
+    }
+
+    /**
+     * @param lcHtmlBaseTag $child
+     * @param null $tag
+     * @return $this
+     */
+    public function addChild(lcHtmlBaseTag $child, $tag = null)
+    {
+        $tag = $tag ? $tag : 'gen_' . lcStrings::randomString(10, true);
+        $this->children[$tag] = $child;
+        return $this;
+    }
+
+    public function getContent()
+    {
+        return ($this->content ? $this->content : $this->getChildren(true));
     }
 
     public function setContent($content)
@@ -260,6 +229,62 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
         }
 
         $this->content = $content;
+        return $this;
+    }
+
+    /**
+     * @param bool $compiled
+     * @return lcHtmlBaseTag[]|null|string
+     */
+    public function getChildren($compiled = false)
+    {
+        if (!$compiled) {
+            return $this->children;
+        } else {
+            $children = $this->children;
+            $out = null;
+
+            if ($children) {
+                foreach ($children as $child) {
+                    $out .= $child->toString();
+                    unset($child);
+                }
+            }
+
+            return $out;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function toString()
+    {
+        return $this->asHtml();
+    }
+
+    public function asHtml()
+    {
+        return '<' . trim(implode(' ',
+                    [
+                        $this->tagname,
+                        $this->attributes->asHtml(),
+                    ])
+            ) .
+            ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIsClosed()
+    {
+        return $this->is_closed;
+    }
+
+    protected function setIsClosed($is_closed = true)
+    {
+        $this->is_closed = $is_closed;
         return $this;
     }
 
@@ -277,30 +302,5 @@ abstract class lcHtmlBaseTag extends lcObj implements iAsHTML
             $ret = 'error: ' . $e->getMessage();
         }
         return $ret;
-    }
-
-    public function asHtml()
-    {
-        return '<' . trim(implode(' ',
-                [
-                    $this->tagname,
-                    $this->attributes->asHtml()
-                ])
-        ) .
-        ($this->getIsClosed() ? '>' . $this->getContent() . '</' . $this->tagname . '>' : ' />');
-    }
-
-    protected function setIsClosed($is_closed = true)
-    {
-        $this->is_closed = $is_closed;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function toString()
-    {
-        return $this->asHtml();
     }
 }

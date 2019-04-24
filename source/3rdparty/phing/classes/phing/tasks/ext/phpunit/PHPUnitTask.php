@@ -37,8 +37,8 @@ require_once 'phing/tasks/ext/phpunit/FormatterElement.php';
  */
 class PHPUnitTask extends Task
 {
-    private $batchtests = array();
-    private $formatters = array();
+    private $batchtests = [];
+    private $formatters = [];
     private $bootstrap = "";
     private $haltonerror = false;
     private $haltonfailure = false;
@@ -52,11 +52,11 @@ class PHPUnitTask extends Task
     private $testfailed = false;
     private $testfailuremessage = "";
     private $codecoverage = null;
-    private $groups = array();
-    private $excludeGroups = array();
+    private $groups = [];
+    private $excludeGroups = [];
     private $processIsolation = false;
     private $usecustomerrorhandler = true;
-    private $listeners = array();
+    private $listeners = [];
 
     /**
      * @var string
@@ -76,58 +76,6 @@ class PHPUnitTask extends Task
      */
     public function init()
     {
-    }
-
-    private function loadPHPUnit()
-    {
-        /**
-         * Determine PHPUnit version number, try
-         * PEAR old-style, then composer, then PHAR
-         */
-        @include_once 'PHPUnit/Runner/Version.php';
-        if (!class_exists('PHPUnit_Runner_Version')) {
-            @include_once 'phpunit/Runner/Version.php';
-        }
-        if (!empty($this->pharLocation)) {
-            $GLOBALS['_SERVER']['SCRIPT_NAME'] = '-';
-            ob_start();
-            @include $this->pharLocation;
-            ob_end_clean();
-        }
-        @include_once 'PHPUnit/Autoload.php';
-
-        if (!class_exists('PHPUnit_Runner_Version')) {
-            throw new BuildException("PHPUnitTask requires PHPUnit to be installed", $this->getLocation());
-        }
-
-        $version = PHPUnit_Runner_Version::id();
-
-        if (version_compare($version, '3.6.0') < 0) {
-            throw new BuildException("PHPUnitTask requires PHPUnit version >= 3.6.0", $this->getLocation());
-        }
-
-        /**
-         * Other dependencies that should only be loaded when class is actually used.
-         */
-        require_once 'phing/tasks/ext/phpunit/PHPUnitTestRunner.php';
-
-        /**
-         * point PHPUnit_MAIN_METHOD define to non-existing method
-         */
-        if (!defined('PHPUnit_MAIN_METHOD')) {
-            define('PHPUnit_MAIN_METHOD', 'PHPUnitTask::undefined');
-        }
-    }
-
-    /**
-     * Sets the name of a bootstrap file that is run before
-     * executing the tests
-     *
-     * @param string $bootstrap the name of the bootstrap file
-     */
-    public function setBootstrap($bootstrap)
-    {
-        $this->bootstrap = $bootstrap;
     }
 
     /**
@@ -163,11 +111,11 @@ class PHPUnitTask extends Task
     }
 
     /**
-     * @param $value
+     * @return bool
      */
-    public function setHaltonerror($value)
+    public function getHaltonfailure()
     {
-        $this->haltonerror = $value;
+        return $this->haltonfailure;
     }
 
     /**
@@ -181,9 +129,9 @@ class PHPUnitTask extends Task
     /**
      * @return bool
      */
-    public function getHaltonfailure()
+    public function getHaltonincomplete()
     {
-        return $this->haltonfailure;
+        return $this->haltonincomplete;
     }
 
     /**
@@ -197,9 +145,9 @@ class PHPUnitTask extends Task
     /**
      * @return bool
      */
-    public function getHaltonincomplete()
+    public function getHaltonskipped()
     {
-        return $this->haltonincomplete;
+        return $this->haltonskipped;
     }
 
     /**
@@ -208,14 +156,6 @@ class PHPUnitTask extends Task
     public function setHaltonskipped($value)
     {
         $this->haltonskipped = $value;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getHaltonskipped()
-    {
-        return $this->haltonskipped;
     }
 
     /**
@@ -235,14 +175,6 @@ class PHPUnitTask extends Task
     }
 
     /**
-     * @param $processIsolation
-     */
-    public function setProcessIsolation($processIsolation)
-    {
-        $this->processIsolation = $processIsolation;
-    }
-
-    /**
      * @param $usecustomerrorhandler
      */
     public function setUseCustomErrorHandler($usecustomerrorhandler)
@@ -256,7 +188,7 @@ class PHPUnitTask extends Task
     public function setGroups($groups)
     {
         $token = ' ,;';
-        $this->groups = array();
+        $this->groups = [];
         $tok = strtok($groups, $token);
         while ($tok !== false) {
             $this->groups[] = $tok;
@@ -270,7 +202,7 @@ class PHPUnitTask extends Task
     public function setExcludeGroups($excludeGroups)
     {
         $token = ' ,;';
-        $this->excludeGroups = array();
+        $this->excludeGroups = [];
         $tok = strtok($excludeGroups, $token);
         while ($tok !== false) {
             $this->excludeGroups[] = $tok;
@@ -290,16 +222,6 @@ class PHPUnitTask extends Task
     }
 
     /**
-     * Add a new listener to all tests of this taks
-     *
-     * @param $listener
-     */
-    private function addListener($listener)
-    {
-        $this->listeners[] = $listener;
-    }
-
-    /**
      * @param PhingFile $configuration
      */
     public function setConfiguration(PhingFile $configuration)
@@ -313,93 +235,6 @@ class PHPUnitTask extends Task
     public function setPharLocation($pharLocation)
     {
         $this->pharLocation = $pharLocation;
-    }
-
-    /**
-     * Load and processes the PHPUnit configuration
-     * @param $configuration
-     * @throws BuildException
-     * @return array
-     */
-    protected function handlePHPUnitConfiguration($configuration)
-    {
-        if (!$configuration->exists()) {
-            throw new BuildException("Unable to find PHPUnit configuration file '" . (string) $configuration . "'");
-        }
-
-        $config = PHPUnit_Util_Configuration::getInstance($configuration->getAbsolutePath());
-
-        if (empty($config)) {
-            return;
-        }
-
-        $phpunit = $config->getPHPUnitConfiguration();
-
-        if (empty($phpunit)) {
-            return;
-        }
-
-        $config->handlePHPConfiguration();
-
-        if (isset($phpunit['bootstrap'])) {
-            $this->setBootstrap($phpunit['bootstrap']);
-        }
-
-        if (isset($phpunit['stopOnFailure'])) {
-            $this->setHaltonfailure($phpunit['stopOnFailure']);
-        }
-
-        if (isset($phpunit['stopOnError'])) {
-            $this->setHaltonerror($phpunit['stopOnError']);
-        }
-
-        if (isset($phpunit['stopOnSkipped'])) {
-            $this->setHaltonskipped($phpunit['stopOnSkipped']);
-        }
-
-        if (isset($phpunit['stopOnIncomplete'])) {
-            $this->setHaltonincomplete($phpunit['stopOnIncomplete']);
-        }
-
-        if (isset($phpunit['processIsolation'])) {
-            $this->setProcessIsolation($phpunit['processIsolation']);
-        }
-
-        foreach ($config->getListenerConfiguration() as $listener) {
-            if (!class_exists($listener['class'], false) &&
-                $listener['file'] !== '') {
-                require_once $listener['file'];
-            }
-
-            if (class_exists($listener['class'])) {
-                if (count($listener['arguments']) == 0) {
-                    $listener = new $listener['class'];
-                } else {
-                    $listenerClass = new ReflectionClass(
-                                       $listener['class']
-                                     );
-                    $listener      = $listenerClass->newInstanceArgs(
-                                       $listener['arguments']
-                                     );
-                }
-
-                if ($listener instanceof PHPUnit_Framework_TestListener) {
-                    $this->addListener($listener);
-                }
-            }
-        }
-
-        if (method_exists($config, 'getSeleniumBrowserConfiguration')) {
-            $browsers = $config->getSeleniumBrowserConfiguration();
-
-            if (!empty($browsers) &&
-                class_exists('PHPUnit_Extensions_SeleniumTestCase')
-            ) {
-                PHPUnit_Extensions_SeleniumTestCase::$browsers = $browsers;
-            }
-        }
-
-        return $phpunit;
     }
 
     /**
@@ -454,16 +289,198 @@ class PHPUnitTask extends Task
         }
 
         $autoloadNew = spl_autoload_functions();
-        if(is_array($autoloadNew)) {
+        if (is_array($autoloadNew)) {
             foreach ($autoloadNew as $autoload) {
                 spl_autoload_unregister($autoload);
             }
         }
 
-        if(is_array($autoloadSave)) {
+        if (is_array($autoloadSave)) {
             foreach ($autoloadSave as $autoload) {
                 spl_autoload_register($autoload);
             }
+        }
+    }
+
+    private function loadPHPUnit()
+    {
+        /**
+         * Determine PHPUnit version number, try
+         * PEAR old-style, then composer, then PHAR
+         */
+        @include_once 'PHPUnit/Runner/Version.php';
+        if (!class_exists('PHPUnit_Runner_Version')) {
+            @include_once 'phpunit/Runner/Version.php';
+        }
+        if (!empty($this->pharLocation)) {
+            $GLOBALS['_SERVER']['SCRIPT_NAME'] = '-';
+            ob_start();
+            @include $this->pharLocation;
+            ob_end_clean();
+        }
+        @include_once 'PHPUnit/Autoload.php';
+
+        if (!class_exists('PHPUnit_Runner_Version')) {
+            throw new BuildException("PHPUnitTask requires PHPUnit to be installed", $this->getLocation());
+        }
+
+        $version = PHPUnit_Runner_Version::id();
+
+        if (version_compare($version, '3.6.0') < 0) {
+            throw new BuildException("PHPUnitTask requires PHPUnit version >= 3.6.0", $this->getLocation());
+        }
+
+        /**
+         * Other dependencies that should only be loaded when class is actually used.
+         */
+        require_once 'phing/tasks/ext/phpunit/PHPUnitTestRunner.php';
+
+        /**
+         * point PHPUnit_MAIN_METHOD define to non-existing method
+         */
+        if (!defined('PHPUnit_MAIN_METHOD')) {
+            define('PHPUnit_MAIN_METHOD', 'PHPUnitTask::undefined');
+        }
+    }
+
+    /**
+     * Load and processes the PHPUnit configuration
+     * @param $configuration
+     * @return array
+     * @throws BuildException
+     */
+    protected function handlePHPUnitConfiguration($configuration)
+    {
+        if (!$configuration->exists()) {
+            throw new BuildException("Unable to find PHPUnit configuration file '" . (string)$configuration . "'");
+        }
+
+        $config = PHPUnit_Util_Configuration::getInstance($configuration->getAbsolutePath());
+
+        if (empty($config)) {
+            return;
+        }
+
+        $phpunit = $config->getPHPUnitConfiguration();
+
+        if (empty($phpunit)) {
+            return;
+        }
+
+        $config->handlePHPConfiguration();
+
+        if (isset($phpunit['bootstrap'])) {
+            $this->setBootstrap($phpunit['bootstrap']);
+        }
+
+        if (isset($phpunit['stopOnFailure'])) {
+            $this->setHaltonfailure($phpunit['stopOnFailure']);
+        }
+
+        if (isset($phpunit['stopOnError'])) {
+            $this->setHaltonerror($phpunit['stopOnError']);
+        }
+
+        if (isset($phpunit['stopOnSkipped'])) {
+            $this->setHaltonskipped($phpunit['stopOnSkipped']);
+        }
+
+        if (isset($phpunit['stopOnIncomplete'])) {
+            $this->setHaltonincomplete($phpunit['stopOnIncomplete']);
+        }
+
+        if (isset($phpunit['processIsolation'])) {
+            $this->setProcessIsolation($phpunit['processIsolation']);
+        }
+
+        foreach ($config->getListenerConfiguration() as $listener) {
+            if (!class_exists($listener['class'], false) &&
+                $listener['file'] !== '') {
+                require_once $listener['file'];
+            }
+
+            if (class_exists($listener['class'])) {
+                if (count($listener['arguments']) == 0) {
+                    $listener = new $listener['class'];
+                } else {
+                    $listenerClass = new ReflectionClass(
+                        $listener['class']
+                    );
+                    $listener = $listenerClass->newInstanceArgs(
+                        $listener['arguments']
+                    );
+                }
+
+                if ($listener instanceof PHPUnit_Framework_TestListener) {
+                    $this->addListener($listener);
+                }
+            }
+        }
+
+        if (method_exists($config, 'getSeleniumBrowserConfiguration')) {
+            $browsers = $config->getSeleniumBrowserConfiguration();
+
+            if (!empty($browsers) &&
+                class_exists('PHPUnit_Extensions_SeleniumTestCase')
+            ) {
+                PHPUnit_Extensions_SeleniumTestCase::$browsers = $browsers;
+            }
+        }
+
+        return $phpunit;
+    }
+
+    /**
+     * Sets the name of a bootstrap file that is run before
+     * executing the tests
+     *
+     * @param string $bootstrap the name of the bootstrap file
+     */
+    public function setBootstrap($bootstrap)
+    {
+        $this->bootstrap = $bootstrap;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setHaltonerror($value)
+    {
+        $this->haltonerror = $value;
+    }
+
+    /**
+     * @param $processIsolation
+     */
+    public function setProcessIsolation($processIsolation)
+    {
+        $this->processIsolation = $processIsolation;
+    }
+
+    /**
+     * Add a new listener to all tests of this taks
+     *
+     * @param $listener
+     */
+    private function addListener($listener)
+    {
+        $this->listeners[] = $listener;
+    }
+
+    /**
+     * Add the tests in this batchtest to a test suite
+     *
+     * @param BatchTest $batchTest
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
+    protected function appendBatchTestToTestSuite(BatchTest $batchTest, PHPUnit_Framework_TestSuite $suite)
+    {
+        foreach ($batchTest->elements() as $element) {
+            $testClass = new $element();
+            if (!($testClass instanceof PHPUnit_Framework_TestSuite)) {
+                $testClass = new ReflectionClass($element);
+            }
+            $suite->addTestSuite($testClass);
         }
     }
 
@@ -560,23 +577,6 @@ class PHPUnitTask extends Task
                 $this->testfailed = true;
                 $this->testfailuremessage = $runner->getLastSkippedMessage();
             }
-        }
-    }
-
-    /**
-     * Add the tests in this batchtest to a test suite
-     *
-     * @param BatchTest                   $batchTest
-     * @param PHPUnit_Framework_TestSuite $suite
-     */
-    protected function appendBatchTestToTestSuite(BatchTest $batchTest, PHPUnit_Framework_TestSuite $suite)
-    {
-        foreach ($batchTest->elements() as $element) {
-            $testClass = new $element();
-            if (!($testClass instanceof PHPUnit_Framework_TestSuite)) {
-                $testClass = new ReflectionClass($element);
-            }
-            $suite->addTestSuite($testClass);
         }
     }
 

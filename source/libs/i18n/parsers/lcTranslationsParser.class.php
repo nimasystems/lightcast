@@ -35,8 +35,8 @@ abstract class lcTranslationsParser extends lcObj
         ],
         'php' => [
             ["/this-\>(t|translate)\(('|\")(.*?)('|\")(\)?)/i" => '3'],
-            ["/__\(('|\")(.*?)('|\")\)/i" => '2']
-        ]
+            ["/__\(('|\")(.*?)('|\")\)/i" => '2'],
+        ],
     ];
 
     protected $results;
@@ -76,7 +76,7 @@ abstract class lcTranslationsParser extends lcObj
 
         $this->results[$category_name][] = [
             'filename' => $filename,
-            'strings' => $parsed
+            'strings' => $parsed,
         ];
 
         return true;
@@ -182,7 +182,7 @@ abstract class lcTranslationsParser extends lcObj
         if ($dirs) {
             if ($dirs == self::ALL_SUBDIRS) {
                 lcDirs::recursiveFilesCallback($base_dir, [$this, 'internalParseFile']);
-            } elseif (is_array($dirs)) {
+            } else if (is_array($dirs)) {
                 // parse the base dir first
                 lcDirs::recursiveFilesCallback($base_dir, [$this, 'internalParseFile'], [self::DEFAULT_CATEGORY_NAME], false);
 

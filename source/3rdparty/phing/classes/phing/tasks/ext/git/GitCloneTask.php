@@ -21,6 +21,7 @@
 
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
+
 /**
  * Wrapper around git-clone
  *
@@ -98,6 +99,35 @@ class GitCloneTask extends GitBaseTask
     }
 
     /**
+     * Get path to target direcotry repo
+     *
+     * @return string
+     */
+    public function getTargetPath()
+    {
+        return $this->targetPath;
+    }
+
+    /**
+     * Set path to source repo
+     *
+     * @param string $targetPath Path to repository used as source
+     * @return void
+     */
+    public function setTargetPath($targetPath)
+    {
+        $this->targetPath = $targetPath;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasDepth()
+    {
+        return (bool)$this->depth;
+    }
+
+    /**
      * Create a shallow clone with a history truncated to the specified number of revisions.
      *
      * @param VersionControl_Git $client
@@ -148,38 +178,9 @@ class GitCloneTask extends GitBaseTask
     }
 
     /**
-     * @return bool
-     */
-    public function hasDepth()
-    {
-        return (bool) $this->depth;
-    }
-
-    /**
-     * Get path to target direcotry repo
+     * Alias @return string
+     * @see getBare()
      *
-     * @return string
-     */
-    public function getTargetPath()
-    {
-        return $this->targetPath;
-    }
-
-    /**
-     * Set path to source repo
-     *
-     * @param  string $targetPath Path to repository used as source
-     * @return void
-     */
-    public function setTargetPath($targetPath)
-    {
-        $this->targetPath = $targetPath;
-    }
-
-    /**
-     * Alias @see getBare()
-     *
-     * @return string
      */
     public function isBare()
     {
@@ -199,7 +200,7 @@ class GitCloneTask extends GitBaseTask
      */
     public function setBare($flag)
     {
-        $this->isBare = (bool) $flag;
+        $this->isBare = (bool)$flag;
     }
 
 }

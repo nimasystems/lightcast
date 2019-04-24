@@ -85,7 +85,7 @@
  *
  *
  * @author     Rob Halff <info@rhalff.com>
- * @author	   Niklas Närhinen <niklas@narhinen.net>
+ * @author       Niklas Närhinen <niklas@narhinen.net>
  * @version    $Revision$
  * @copyright  Copyright (c) 2004 Rob Halff: LGPL - See LICENCE
  * @package    propel.runtime.util
@@ -93,6 +93,10 @@
 class PropelPager implements Countable, Iterator
 {
 
+    /** @var        int Start row (offset) */
+    protected $start = 0;
+    /** @var        int Max rows to return (0 means all) */
+    protected $max = 0;
     private $recordCount;
     private $pages;
     private $peerClass;
@@ -100,26 +104,20 @@ class PropelPager implements Countable, Iterator
     private $peerCountMethod;
     private $criteria;
     private $countCriteria;
-    private $page;
-    private $rs = null;
 
     //Iterator vars
+    private $page;
+    private $rs = null;
     private $currentKey = 0;
-
-    /** @var        int Start row (offset) */
-    protected $start = 0;
-
-    /** @var        int Max rows to return (0 means all) */
-    protected $max = 0;
 
     /**
      * Create a new Propel Pager.
      *
      * @param Criteria $c
-     * @param string   $peerClass        The name of the static Peer class.
-     * @param string   $peerSelectMethod The name of the static method for selecting content from the Peer class.
-     * @param int      $page             The current page (1-based).
-     * @param int      $rowsPerPage      The number of rows that should be displayed per page.
+     * @param string $peerClass The name of the static Peer class.
+     * @param string $peerSelectMethod The name of the static method for selecting content from the Peer class.
+     * @param int $page The current page (1-based).
+     * @param int $rowsPerPage The number of rows that should be displayed per page.
      */
     public function __construct($c = null, $peerClass = null, $peerSelectMethod = null, $page = 1, $rowsPerPage = 25)
     {
@@ -135,15 +133,66 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
-     * Set the criteria for this pager.
+     * Guesses the Peer count method based on the select method.
+     */
+    private function guessPeerCountMethod()
+    {
+        $selectMethod = $this->getPeerSelectMethod();
+        if ($selectMethod == 'doSelect') {
+            $countMethod = 'doCount';
+        } else if (($pos = stripos($selectMethod, 'doSelectJoin')) === 0) {
+            $countMethod = 'doCount' . substr($selectMethod, strlen('doSelect'));
+        } else {
+            // we will fall back to doCount() if we don't understand the join
+            // method; however, it probably won't be accurate.  Maybe triggering an error would
+            // be appropriate ...
+            $countMethod = 'doCount';
+        }
+        $this->setPeerCountMethod($countMethod);
+    }
+
+    /**
+     * Return the Peer select method.
      *
-     * @param Criteria $c
+     * @return string
+     */
+    public function getPeerSelectMethod()
+    {
+        return $this->peerSelectMethod;
+    }
+
+    /**
+     * Set the Peer select method.
+     *
+     * @param string $method The name of the static method to call on the Peer class.
      *
      * @return void
      */
-    public function setCriteria(Criteria $c)
+    public function setPeerSelectMethod($method)
     {
-        $this->criteria = $c;
+        $this->peerSelectMethod = $method;
+    }
+
+    /**
+     * Set the number of rows per page.
+     *
+     * @param int $r
+     */
+    public function setRowsPerPage($r)
+    {
+        $this->max = $r;
+        // (re-)calculate start rec
+        $this->calculateStart();
+    }
+
+    /**
+     * Calculate startrow / max rows based on current page and rows-per-page.
+     *
+     * @return void
+     */
+    private function calculateStart()
+    {
+        $this->start = (($this->page - 1) * $this->max);
     }
 
     /**
@@ -157,25 +206,15 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
-     * Set the Peer Classname
+     * Set the criteria for this pager.
      *
-     * @param string $class
+     * @param Criteria $c
      *
      * @return void
      */
-    public function setPeerClass($class)
+    public function setCriteria(Criteria $c)
     {
-        $this->peerClass = $class;
-    }
-
-    /**
-     * Return the Peer Classname.
-     *
-     * @return string
-     */
-    public function getPeerClass()
-    {
-        return $this->peerClass;
+        $this->criteria = $c;
     }
 
     /**
@@ -207,92 +246,37 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
-     * Set the Peer select method.
+     * Convenience method to indicate whether current page is the first page.
      *
-     * @param string $method The name of the static method to call on the Peer class.
+     * @return boolean
+     */
+    public function atFirstPage()
+    {
+        return $this->getPage() == $this->getFirstPage();
+    }
+
+    /**
+     * Get current page.
+     *
+     * @return int
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Set the current page number (First page is 1).
+     *
+     * @param int $page
      *
      * @return void
      */
-    public function setPeerSelectMethod($method)
+    public function setPage($page)
     {
-        $this->peerSelectMethod = $method;
-    }
-
-    /**
-     * Return the Peer select method.
-     *
-     * @return string
-     */
-    public function getPeerSelectMethod()
-    {
-        return $this->peerSelectMethod;
-    }
-
-    /**
-     * Sets the Count method.
-     * This is set based on the Peer method, for example if Peer method is doSelectJoin*() then the
-     * count method will be doCountJoin*().
-     *
-     * @param string $method The name of the static method to call on the Peer class.
-     */
-    public function setPeerCountMethod($method)
-    {
-        $this->peerCountMethod = $method;
-    }
-
-    /**
-     * Return the Peer count method.
-     */
-    public function getPeerCountMethod()
-    {
-        return $this->peerCountMethod;
-    }
-
-    /**
-     * Guesses the Peer count method based on the select method.
-     */
-    private function guessPeerCountMethod()
-    {
-        $selectMethod = $this->getPeerSelectMethod();
-        if ($selectMethod == 'doSelect') {
-            $countMethod = 'doCount';
-        } elseif (($pos = stripos($selectMethod, 'doSelectJoin')) === 0) {
-            $countMethod = 'doCount' . substr($selectMethod, strlen('doSelect'));
-        } else {
-            // we will fall back to doCount() if we don't understand the join
-            // method; however, it probably won't be accurate.  Maybe triggering an error would
-            // be appropriate ...
-            $countMethod = 'doCount';
-        }
-        $this->setPeerCountMethod($countMethod);
-    }
-
-    /**
-     * Get the paged resultset
-     *
-     * @return mixed $rs
-     */
-    public function getResult()
-    {
-        if (!isset($this->rs)) {
-            $this->doRs();
-        }
-
-        return $this->rs;
-    }
-
-    /**
-     * Get the paged resultset
-     *
-     * Main method which creates a paged result set based on the criteria
-     * and the requested peer select method.
-     *
-     */
-    private function doRs()
-    {
-        $this->criteria->setOffset($this->start);
-        $this->criteria->setLimit($this->max);
-        $this->rs = call_user_func(array($this->getPeerClass(), $this->getPeerSelectMethod()), $this->criteria);
+        $this->page = $page;
+        // (re-)calculate start rec
+        $this->calculateStart();
     }
 
     /**
@@ -309,13 +293,13 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
-     * Convenience method to indicate whether current page is the first page.
+     * Convenience method to indicate whether current page is the last page.
      *
      * @return boolean
      */
-    public function atFirstPage()
+    public function atLastPage()
     {
-        return $this->getPage() == $this->getFirstPage();
+        return $this->getPage() == $this->getLastPage();
     }
 
     /**
@@ -331,16 +315,6 @@ class PropelPager implements Countable, Iterator
         } else {
             return $totalPages;
         }
-    }
-
-    /**
-     * Convenience method to indicate whether current page is the last page.
-     *
-     * @return boolean
-     */
-    public function atLastPage()
-    {
-        return $this->getPage() == $this->getLastPage();
     }
 
     /**
@@ -363,6 +337,87 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
+     * Gets the total number of (un-LIMITed) records.
+     *
+     * This method will perform a query that executes un-LIMITed query.
+     *
+     * @return int Total number of records - disregarding page, maxrows, etc.
+     */
+    public function getTotalRecordCount()
+    {
+
+        if (!isset($this->rs)) {
+            $this->doRs();
+        }
+
+        if (empty($this->recordCount)) {
+            $this->countCriteria = clone $this->criteria;
+            $this->countCriteria->setLimit(0);
+            $this->countCriteria->setOffset(0);
+
+            $this->recordCount = call_user_func([$this->getPeerClass(), $this->getPeerCountMethod()], $this->countCriteria);
+        }
+
+        return $this->recordCount;
+    }
+
+    /**
+     * Get the paged resultset
+     *
+     * Main method which creates a paged result set based on the criteria
+     * and the requested peer select method.
+     *
+     */
+    private function doRs()
+    {
+        $this->criteria->setOffset($this->start);
+        $this->criteria->setLimit($this->max);
+        $this->rs = call_user_func([$this->getPeerClass(), $this->getPeerSelectMethod()], $this->criteria);
+    }
+
+    /**
+     * Return the Peer Classname.
+     *
+     * @return string
+     */
+    public function getPeerClass()
+    {
+        return $this->peerClass;
+    }
+
+    /**
+     * Set the Peer Classname
+     *
+     * @param string $class
+     *
+     * @return void
+     */
+    public function setPeerClass($class)
+    {
+        $this->peerClass = $class;
+    }
+
+    /**
+     * Return the Peer count method.
+     */
+    public function getPeerCountMethod()
+    {
+        return $this->peerCountMethod;
+    }
+
+    /**
+     * Sets the Count method.
+     * This is set based on the Peer method, for example if Peer method is doSelectJoin*() then the
+     * count method will be doCountJoin*().
+     *
+     * @param string $method The name of the static method to call on the Peer class.
+     */
+    public function setPeerCountMethod($method)
+    {
+        $this->peerCountMethod = $method;
+    }
+
+    /**
      * get an array of previous id's
      *
      * @param int $range
@@ -375,7 +430,7 @@ class PropelPager implements Countable, Iterator
         $start = $this->getPage() - 1;
         $end = $this->getPage() - $range;
         $first = $this->getFirstPage();
-        $links = array();
+        $links = [];
         for ($i = $start; $i > $end; $i--) {
             if ($i < $first) {
                 break;
@@ -399,7 +454,7 @@ class PropelPager implements Countable, Iterator
         $start = $this->getPage() + 1;
         $end = $this->getPage() + $range;
         $last = $this->getLastPage();
-        $links = array();
+        $links = [];
         for ($i = $start; $i < $end; $i++) {
             if ($i > $last) {
                 break;
@@ -453,42 +508,6 @@ class PropelPager implements Countable, Iterator
     }
 
     /**
-     * Set the current page number (First page is 1).
-     *
-     * @param int $page
-     *
-     * @return void
-     */
-    public function setPage($page)
-    {
-        $this->page = $page;
-        // (re-)calculate start rec
-        $this->calculateStart();
-    }
-
-    /**
-     * Get current page.
-     *
-     * @return int
-     */
-    public function getPage()
-    {
-        return $this->page;
-    }
-
-    /**
-     * Set the number of rows per page.
-     *
-     * @param int $r
-     */
-    public function setRowsPerPage($r)
-    {
-        $this->max = $r;
-        // (re-)calculate start rec
-        $this->calculateStart();
-    }
-
-    /**
      * Get number of rows per page.
      *
      * @return int
@@ -496,41 +515,6 @@ class PropelPager implements Countable, Iterator
     public function getRowsPerPage()
     {
         return $this->max;
-    }
-
-    /**
-     * Calculate startrow / max rows based on current page and rows-per-page.
-     *
-     * @return void
-     */
-    private function calculateStart()
-    {
-        $this->start = (($this->page - 1) * $this->max);
-    }
-
-    /**
-     * Gets the total number of (un-LIMITed) records.
-     *
-     * This method will perform a query that executes un-LIMITed query.
-     *
-     * @return int Total number of records - disregarding page, maxrows, etc.
-     */
-    public function getTotalRecordCount()
-    {
-
-        if (!isset($this->rs)) {
-            $this->doRs();
-        }
-
-        if (empty($this->recordCount)) {
-            $this->countCriteria = clone $this->criteria;
-            $this->countCriteria->setLimit(0);
-            $this->countCriteria->setOffset(0);
-
-            $this->recordCount = call_user_func(array($this->getPeerClass(), $this->getPeerCountMethod()), $this->countCriteria);
-        }
-
-        return $this->recordCount;
     }
 
     /**
@@ -563,6 +547,20 @@ class PropelPager implements Countable, Iterator
     public function count()
     {
         return count($this->getResult());
+    }
+
+    /**
+     * Get the paged resultset
+     *
+     * @return mixed $rs
+     */
+    public function getResult()
+    {
+        if (!isset($this->rs)) {
+            $this->doRs();
+        }
+
+        return $this->rs;
     }
 
     /**

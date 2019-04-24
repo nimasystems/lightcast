@@ -37,11 +37,6 @@ class lcTagOption extends lcHtmlTag
         $this->setClass($class);
     }
 
-    public static function create()
-    {
-        return new lcTagOption();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -66,6 +61,11 @@ class lcTagOption extends lcHtmlTag
     {
         $this->setAttribute('value', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagOption();
     }
 
     public static function getRequiredAttributes()

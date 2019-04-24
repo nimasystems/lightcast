@@ -81,7 +81,7 @@ class PropelObjectCollection extends PropelCollection
      */
     public function getPrimaryKeys($usePrefix = true)
     {
-        $ret = array();
+        $ret = [];
 
         /** @var $obj BaseObject */
         foreach ($this as $key => $obj) {
@@ -143,7 +143,7 @@ class PropelObjectCollection extends PropelCollection
         if (null === $keyColumn && false === $usePrefix) {
             return parent::getArrayCopy();
         }
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyColumn;
         foreach ($this as $key => $obj) {
             $key = null === $keyColumn ? $key : $obj->$keyGetterMethod();
@@ -166,18 +166,18 @@ class PropelObjectCollection extends PropelCollection
      *   $res = $coll->toKeyValue(array('RelatedModel', 'Name'), 'Name');
      * </code>
      *
-     * @param string|array $keyColumn   The name of the column, or a list of columns to call.
-     * @param string       $valueColumn
+     * @param string|array $keyColumn The name of the column, or a list of columns to call.
+     * @param string $valueColumn
      *
      * @return array
      */
     public function toKeyValue($keyColumn = 'PrimaryKey', $valueColumn = null)
     {
-        $ret = array();
+        $ret = [];
         $valueGetterMethod = (null === $valueColumn) ? '__toString' : ('get' . $valueColumn);
 
         if (!is_array($keyColumn)) {
-            $keyColumn = array($keyColumn);
+            $keyColumn = [$keyColumn];
         }
 
         foreach ($this as $obj) {
@@ -192,8 +192,8 @@ class PropelObjectCollection extends PropelCollection
      *
      * Each column will be resolved on the value returned by the previous one.
      *
-     * @param object $object  The object to start with.
-     * @param array  $columns The sequence of key columns.
+     * @param object $object The object to start with.
+     * @param array $columns The sequence of key columns.
      *
      * @return mixed
      */
@@ -213,9 +213,9 @@ class PropelObjectCollection extends PropelCollection
      * Makes an additional query to populate the objects related to the collection objects
      * by a certain relation
      *
-     * @param string    $relation Relation name (e.g. 'Book')
-     * @param Criteria  $criteria Optional Criteria object to filter the related object collection
-     * @param PropelPDO $con      Optional connection object
+     * @param string $relation Relation name (e.g. 'Book')
+     * @param Criteria $criteria Optional Criteria object to filter the related object collection
+     * @param PropelPDO $con Optional connection object
      *
      * @return PropelObjectCollection The list of related objects
      *
@@ -259,7 +259,7 @@ class PropelObjectCollection extends PropelCollection
                 $mainObj->$addMethod($object);
             }
             $relatedObjects->clearIterator();
-        } elseif ($relationMap->getType() == RelationMap::MANY_TO_ONE) {
+        } else if ($relationMap->getType() == RelationMap::MANY_TO_ONE) {
             // nothing to do; the instance pool will catch all calls to getRelatedObject()
             // and return the object in memory
         } else {
@@ -283,20 +283,6 @@ class PropelObjectCollection extends PropelCollection
         return parent::search($element);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function contains($element)
-    {
-        if ($element instanceof BaseObject) {
-            if (null !== $elt = $this->getIdenticalObject($element)) {
-                $element = $elt;
-            }
-        }
-
-        return parent::contains($element);
-    }
-
     private function getIdenticalObject(BaseObject $object)
     {
         $objectHashCode = null;
@@ -313,5 +299,19 @@ class PropelObjectCollection extends PropelCollection
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function contains($element)
+    {
+        if ($element instanceof BaseObject) {
+            if (null !== $elt = $this->getIdenticalObject($element)) {
+                $element = $elt;
+            }
+        }
+
+        return parent::contains($element);
     }
 }

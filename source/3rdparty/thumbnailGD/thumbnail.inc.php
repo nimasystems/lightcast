@@ -112,10 +112,10 @@ class Thumbnail
         //initialize variables
         $this->errmsg = '';
         $this->error = false;
-        $this->currentDimensions = array();
-        $this->newDimensions = array();
+        $this->currentDimensions = [];
+        $this->newDimensions = [];
         $this->fileName = $fileName;
-        $this->imageMeta = array();
+        $this->imageMeta = [];
         $this->percent = 100;
         $this->maxWidth = 0;
         $this->maxHeight = 0;
@@ -125,7 +125,7 @@ class Thumbnail
             $this->errmsg = 'File not found';
             $this->error = true;
         } //check to see if file is readable
-        elseif (!is_readable($this->fileName)) {
+        else if (!is_readable($this->fileName)) {
             $this->errmsg = 'File is not readable';
             $this->error = true;
         }
@@ -135,9 +135,9 @@ class Thumbnail
             //check if gif
             if (stristr(strtolower($this->fileName), '.gif')) $this->format = 'GIF';
             //check if jpg
-            elseif (stristr(strtolower($this->fileName), '.jpg') || stristr(strtolower($this->fileName), '.jpeg')) $this->format = 'JPG';
+            else if (stristr(strtolower($this->fileName), '.jpg') || stristr(strtolower($this->fileName), '.jpeg')) $this->format = 'JPG';
             //check if png
-            elseif (stristr(strtolower($this->fileName), '.png')) $this->format = 'PNG';
+            else if (stristr(strtolower($this->fileName), '.png')) $this->format = 'PNG';
             //unknown file format
             else {
                 $this->errmsg = 'Unknown file format';
@@ -161,7 +161,7 @@ class Thumbnail
 
 
             $size = GetImageSize($this->fileName);
-            $this->currentDimensions = array('width' => $size[0], 'height' => $size[1]);
+            $this->currentDimensions = ['width' => $size[0], 'height' => $size[1]];
             $this->newImage = $this->oldImage;
             $this->gatherImageMeta();
         }
@@ -172,124 +172,44 @@ class Thumbnail
     }
 
     /**
-     * Class destructor
+     * Reads selected exif meta data from jpg images and populates $this->imageMeta with appropriate values if found
      *
      */
-    public function __destruct()
+    private function gatherImageMeta()
     {
-        if (is_resource($this->newImage)) @ImageDestroy($this->newImage);
-        if (is_resource($this->oldImage)) @ImageDestroy($this->oldImage);
-        if (is_resource($this->workingImage)) @ImageDestroy($this->workingImage);
-    }
-
-    /**
-     * Returns the current width of the image
-     *
-     * @return int
-     */
-    protected function getCurrentWidth()
-    {
-        return $this->currentDimensions['width'];
-    }
-
-    /**
-     * Returns the current height of the image
-     *
-     * @return int
-     */
-    protected function getCurrentHeight()
-    {
-        return $this->currentDimensions['height'];
-    }
-
-    /**
-     * Calculates new image width
-     *
-     * @param int $width
-     * @param int $height
-     * @return array
-     */
-    protected function calcWidth($width, $height)
-    {
-        $newWp = (100 * $this->maxWidth) / $width;
-        $newHeight = ($height * $newWp) / 100;
-        return array('newWidth' => intval($this->maxWidth), 'newHeight' => intval($newHeight));
-    }
-
-    /**
-     * Calculates new image height
-     *
-     * @param int $width
-     * @param int $height
-     * @return array
-     */
-    protected function calcHeight($width, $height)
-    {
-        $newHp = (100 * $this->maxHeight) / $height;
-        $newWidth = ($width * $newHp) / 100;
-        return array('newWidth' => intval($newWidth), 'newHeight' => intval($this->maxHeight));
-    }
-
-    /**
-     * Calculates new image size based on percentage
-     *
-     * @param int $width
-     * @param int $height
-     * @return array
-     */
-    protected function calcPercent($width, $height)
-    {
-        $newWidth = ($width * $this->percent) / 100;
-        $newHeight = ($height * $this->percent) / 100;
-        return array('newWidth' => intval($newWidth), 'newHeight' => intval($newHeight));
-    }
-
-    /**
-     * Calculates new image size based on width and height, while constraining to maxWidth and maxHeight
-     *
-     * @param int $width
-     * @param int $height
-     */
-    protected function calcImageSize($width, $height)
-    {
-        $newSize = array('newWidth' => $width, 'newHeight' => $height);
-
-        if ($this->maxWidth > 0) {
-
-            $newSize = $this->calcWidth($width, $height);
-
-            if ($this->maxHeight > 0 && $newSize['newHeight'] > $this->maxHeight) {
-                $newSize = $this->calcHeight($newSize['newWidth'], $newSize['newHeight']);
+        //only attempt to retrieve info if exif exists
+        if (function_exists("exif_read_data") && $this->format == 'JPG') {
+            $imageData = exif_read_data($this->fileName);
+            if (isset($imageData['Make']))
+                $this->imageMeta['make'] = ucwords(strtolower($imageData['Make']));
+            if (isset($imageData['Model']))
+                $this->imageMeta['model'] = $imageData['Model'];
+            if (isset($imageData['COMPUTED']['ApertureFNumber'])) {
+                $this->imageMeta['aperture'] = $imageData['COMPUTED']['ApertureFNumber'];
+                $this->imageMeta['aperture'] = str_replace('/', '', $this->imageMeta['aperture']);
             }
-
-            //$this->newDimensions = $newSize;
-        }
-
-        if ($this->maxHeight > 0) {
-            $newSize = $this->calcHeight($width, $height);
-
-            if ($this->maxWidth > 0 && $newSize['newWidth'] > $this->maxWidth) {
-                $newSize = $this->calcWidth($newSize['newWidth'], $newSize['newHeight']);
+            if (isset($imageData['ExposureTime'])) {
+                $exposure = explode('/', $imageData['ExposureTime']);
+                $exposure = round($exposure[1] / $exposure[0], -1);
+                $this->imageMeta['exposure'] = '1/' . $exposure . ' second';
             }
-
-            //$this->newDimensions = $newSize;
-        }
-
-        $this->newDimensions = $newSize;
-
-        return $newSize;
-    }
-
-    /**
-     * Calculates new image size based percentage
-     *
-     * @param int $width
-     * @param int $height
-     */
-    private function calcImageSizePercent($width, $height)
-    {
-        if ($this->percent > 0) {
-            $this->newDimensions = $this->calcPercent($width, $height);
+            if (isset($imageData['Flash'])) {
+                if ($imageData['Flash'] > 0) {
+                    $this->imageMeta['flash'] = 'Yes';
+                } else {
+                    $this->imageMeta['flash'] = 'No';
+                }
+            }
+            if (isset($imageData['FocalLength'])) {
+                $focus = explode('/', $imageData['FocalLength']);
+                $this->imageMeta['focalLength'] = round($focus[0] / $focus[1], 2) . ' mm';
+            }
+            if (isset($imageData['DateTime'])) {
+                $date = $imageData['DateTime'];
+                $date = explode(' ', $date);
+                $date = str_replace(':', '-', $date[0]) . ' ' . $date[1];
+                $this->imageMeta['dateTaken'] = date('m/d/Y g:i A', strtotime($date));
+            }
         }
     }
 
@@ -308,6 +228,17 @@ class Thumbnail
         imagestring($errImg, 3, 55, 6, $this->errmsg, $fgColor1);
         imagepng($errImg);
         imagedestroy($errImg);
+    }
+
+    /**
+     * Class destructor
+     *
+     */
+    public function __destruct()
+    {
+        if (is_resource($this->newImage)) @ImageDestroy($this->newImage);
+        if (is_resource($this->oldImage)) @ImageDestroy($this->oldImage);
+        if (is_resource($this->workingImage)) @ImageDestroy($this->workingImage);
     }
 
     /**
@@ -363,6 +294,70 @@ class Thumbnail
     }
 
     /**
+     * Calculates new image size based on width and height, while constraining to maxWidth and maxHeight
+     *
+     * @param int $width
+     * @param int $height
+     */
+    protected function calcImageSize($width, $height)
+    {
+        $newSize = ['newWidth' => $width, 'newHeight' => $height];
+
+        if ($this->maxWidth > 0) {
+
+            $newSize = $this->calcWidth($width, $height);
+
+            if ($this->maxHeight > 0 && $newSize['newHeight'] > $this->maxHeight) {
+                $newSize = $this->calcHeight($newSize['newWidth'], $newSize['newHeight']);
+            }
+
+            //$this->newDimensions = $newSize;
+        }
+
+        if ($this->maxHeight > 0) {
+            $newSize = $this->calcHeight($width, $height);
+
+            if ($this->maxWidth > 0 && $newSize['newWidth'] > $this->maxWidth) {
+                $newSize = $this->calcWidth($newSize['newWidth'], $newSize['newHeight']);
+            }
+
+            //$this->newDimensions = $newSize;
+        }
+
+        $this->newDimensions = $newSize;
+
+        return $newSize;
+    }
+
+    /**
+     * Calculates new image width
+     *
+     * @param int $width
+     * @param int $height
+     * @return array
+     */
+    protected function calcWidth($width, $height)
+    {
+        $newWp = (100 * $this->maxWidth) / $width;
+        $newHeight = ($height * $newWp) / 100;
+        return ['newWidth' => intval($this->maxWidth), 'newHeight' => intval($newHeight)];
+    }
+
+    /**
+     * Calculates new image height
+     *
+     * @param int $width
+     * @param int $height
+     * @return array
+     */
+    protected function calcHeight($width, $height)
+    {
+        $newHp = (100 * $this->maxHeight) / $height;
+        $newWidth = ($width * $newHp) / 100;
+        return ['newWidth' => intval($newWidth), 'newHeight' => intval($this->maxHeight)];
+    }
+
+    /**
      * Resizes the image by $percent percent
      *
      * @param int $percent
@@ -401,6 +396,33 @@ class Thumbnail
         $this->currentDimensions['height'] = $this->newDimensions['newHeight'];
 
         return true;
+    }
+
+    /**
+     * Calculates new image size based percentage
+     *
+     * @param int $width
+     * @param int $height
+     */
+    private function calcImageSizePercent($width, $height)
+    {
+        if ($this->percent > 0) {
+            $this->newDimensions = $this->calcPercent($width, $height);
+        }
+    }
+
+    /**
+     * Calculates new image size based on percentage
+     *
+     * @param int $width
+     * @param int $height
+     * @return array
+     */
+    protected function calcPercent($width, $height)
+    {
+        $newWidth = ($width * $this->percent) / 100;
+        $newHeight = ($height * $this->percent) / 100;
+        return ['newWidth' => intval($newWidth), 'newHeight' => intval($newHeight)];
     }
 
     /**
@@ -486,6 +508,17 @@ class Thumbnail
     }
 
     /**
+     * Saves image as $name (can include file path), with quality of # percent if file is a jpeg
+     *
+     * @param string $name
+     * @param int $quality
+     */
+    public function save($name, $quality = 100)
+    {
+        $this->show($quality, $name);
+    }
+
+    /**
      * Outputs the image to the screen, or saves to $name if supplied.  Quality of JPEG images can be controlled with the $quality variable
      *
      * @param int $quality
@@ -519,17 +552,6 @@ class Thumbnail
                 }
                 break;
         }
-    }
-
-    /**
-     * Saves image as $name (can include file path), with quality of # percent if file is a jpeg
-     *
-     * @param string $name
-     * @param int $quality
-     */
-    public function save($name, $quality = 100)
-    {
-        $this->show($quality, $name);
     }
 
     /**
@@ -639,48 +661,6 @@ class Thumbnail
     }
 
     /**
-     * Reads selected exif meta data from jpg images and populates $this->imageMeta with appropriate values if found
-     *
-     */
-    private function gatherImageMeta()
-    {
-        //only attempt to retrieve info if exif exists
-        if (function_exists("exif_read_data") && $this->format == 'JPG') {
-            $imageData = exif_read_data($this->fileName);
-            if (isset($imageData['Make']))
-                $this->imageMeta['make'] = ucwords(strtolower($imageData['Make']));
-            if (isset($imageData['Model']))
-                $this->imageMeta['model'] = $imageData['Model'];
-            if (isset($imageData['COMPUTED']['ApertureFNumber'])) {
-                $this->imageMeta['aperture'] = $imageData['COMPUTED']['ApertureFNumber'];
-                $this->imageMeta['aperture'] = str_replace('/', '', $this->imageMeta['aperture']);
-            }
-            if (isset($imageData['ExposureTime'])) {
-                $exposure = explode('/', $imageData['ExposureTime']);
-                $exposure = round($exposure[1] / $exposure[0], -1);
-                $this->imageMeta['exposure'] = '1/' . $exposure . ' second';
-            }
-            if (isset($imageData['Flash'])) {
-                if ($imageData['Flash'] > 0) {
-                    $this->imageMeta['flash'] = 'Yes';
-                } else {
-                    $this->imageMeta['flash'] = 'No';
-                }
-            }
-            if (isset($imageData['FocalLength'])) {
-                $focus = explode('/', $imageData['FocalLength']);
-                $this->imageMeta['focalLength'] = round($focus[0] / $focus[1], 2) . ' mm';
-            }
-            if (isset($imageData['DateTime'])) {
-                $date = $imageData['DateTime'];
-                $date = explode(' ', $date);
-                $date = str_replace(':', '-', $date[0]) . ' ' . $date[1];
-                $this->imageMeta['dateTaken'] = date('m/d/Y g:i A', strtotime($date));
-            }
-        }
-    }
-
-    /**
      * Rotates image either 90 degrees clockwise or counter-clockwise
      *
      * @param string $direction
@@ -698,6 +678,26 @@ class Thumbnail
         $this->newImage = $this->workingImage;
         $this->currentDimensions['width'] = $newWidth;
         $this->currentDimensions['height'] = $newHeight;
+    }
+
+    /**
+     * Returns the current width of the image
+     *
+     * @return int
+     */
+    protected function getCurrentWidth()
+    {
+        return $this->currentDimensions['width'];
+    }
+
+    /**
+     * Returns the current height of the image
+     *
+     * @return int
+     */
+    protected function getCurrentHeight()
+    {
+        return $this->currentDimensions['height'];
     }
 }
 

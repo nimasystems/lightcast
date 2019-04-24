@@ -34,7 +34,7 @@ require_once 'phing/util/LogWriter.php';
  */
 class SimpleTestTask extends Task
 {
-    private $formatters = array();
+    private $formatters = [];
     private $haltonerror = false;
     private $haltonfailure = false;
     private $failureproperty;
@@ -54,8 +54,7 @@ class SimpleTestTask extends Task
         @include_once 'simpletest/scorer.php';
 
         if (!class_exists('SimpleReporter')) {
-            throw new BuildException("SimpleTestTask depends on SimpleTest package being installed.", $this->getLocation(
-            ));
+            throw new BuildException("SimpleTestTask depends on SimpleTest package being installed.", $this->getLocation());
         }
 
         require_once 'simpletest/reporter.php';
@@ -107,19 +106,19 @@ class SimpleTestTask extends Task
     }
 
     /**
-     * @param $debug
-     */
-    public function setDebug($debug)
-    {
-        $this->debug = $debug;
-    }
-
-    /**
      * @return bool
      */
     public function getDebug()
     {
         return $this->debug;
+    }
+
+    /**
+     * @param $debug
+     */
+    public function setDebug($debug)
+    {
+        $this->debug = $debug;
     }
 
     /**
@@ -140,32 +139,6 @@ class SimpleTestTask extends Task
     public function addFileSet(FileSet $fileset)
     {
         $this->filesets[] = $fileset;
-    }
-
-    /**
-     * Iterate over all filesets and return the filename of all files
-     * that end with .php.
-     *
-     * @return array an array of filenames
-     */
-    private function getFilenames()
-    {
-        $filenames = array();
-
-        foreach ($this->filesets as $fileset) {
-            $ds = $fileset->getDirectoryScanner($this->project);
-            $ds->scan();
-
-            $files = $ds->getIncludedFiles();
-
-            foreach ($files as $file) {
-                if (strstr($file, ".php")) {
-                    $filenames[] = $ds->getBaseDir() . "/" . $file;
-                }
-            }
-        }
-
-        return $filenames;
     }
 
     /**
@@ -225,6 +198,40 @@ class SimpleTestTask extends Task
     }
 
     /**
+     * Iterate over all filesets and return the filename of all files
+     * that end with .php.
+     *
+     * @return array an array of filenames
+     */
+    private function getFilenames()
+    {
+        $filenames = [];
+
+        foreach ($this->filesets as $fileset) {
+            $ds = $fileset->getDirectoryScanner($this->project);
+            $ds->scan();
+
+            $files = $ds->getIncludedFiles();
+
+            foreach ($files as $file) {
+                if (strstr($file, ".php")) {
+                    $filenames[] = $ds->getBaseDir() . "/" . $file;
+                }
+            }
+        }
+
+        return $filenames;
+    }
+
+    /**
+     * @return LogWriter
+     */
+    private function getDefaultOutput()
+    {
+        return new LogWriter($this);
+    }
+
+    /**
      * @param $suite
      */
     private function execute($suite)
@@ -252,7 +259,7 @@ class SimpleTestTask extends Task
             if ($this->haltonerror) {
                 $this->testfailed = true;
             }
-        } elseif ($retcode == SimpleTestCountResultFormatter::FAILURES) {
+        } else if ($retcode == SimpleTestCountResultFormatter::FAILURES) {
             if ($this->failureproperty) {
                 $this->project->setNewProperty($this->failureproperty, true);
             }
@@ -261,13 +268,5 @@ class SimpleTestTask extends Task
                 $this->testfailed = true;
             }
         }
-    }
-
-    /**
-     * @return LogWriter
-     */
-    private function getDefaultOutput()
-    {
-        return new LogWriter($this);
     }
 }

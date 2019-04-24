@@ -19,7 +19,7 @@
 class PropelArrayFormatter extends PropelFormatter
 {
     protected $collectionName = 'PropelArrayCollection';
-    protected $alreadyHydratedObjects = array();
+    protected $alreadyHydratedObjects = [];
     protected $emptyVariable;
 
     public function format(PDOStatement $stmt)
@@ -30,7 +30,7 @@ class PropelArrayFormatter extends PropelFormatter
             $collection->setModel($this->class);
             $collection->setFormatter($this);
         } else {
-            $collection = array();
+            $collection = [];
         }
         if ($this->isWithOneToMany() && $this->hasLimit) {
             throw new PropelException('Cannot use limit() in conjunction with with() on a one-to-many relationship. Please remove the with() call, or the limit() call.');
@@ -40,44 +40,11 @@ class PropelArrayFormatter extends PropelFormatter
                 $collection[] = $object;
             }
         }
-        $this->currentObjects = array();
-        $this->alreadyHydratedObjects = array();
+        $this->currentObjects = [];
+        $this->alreadyHydratedObjects = [];
         $stmt->closeCursor();
 
         return $collection;
-    }
-
-    public function formatOne(PDOStatement $stmt)
-    {
-        $this->checkInit();
-        $result = null;
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            if ($object = &$this->getStructuredArrayFromRow($row)) {
-                $result = &$object;
-            }
-        }
-        $this->currentObjects = array();
-        $this->alreadyHydratedObjects = array();
-        $stmt->closeCursor();
-
-        return $result;
-    }
-
-    /**
-     * Formats an ActiveRecord object
-     *
-     * @param BaseObject $record the object to format
-     *
-     * @return array The original record turned into an array
-     */
-    public function formatRecord($record = null)
-    {
-        return $record ? $record->toArray() : array();
-    }
-
-    public function isObjectFormatter()
-    {
-        return false;
     }
 
     /**
@@ -96,7 +63,7 @@ class PropelArrayFormatter extends PropelFormatter
 
         // hydrate main object or take it from registry
         $mainObjectIsNew = false;
-        $mainKey = call_user_func(array($this->peer, 'getPrimaryKeyHashFromRow'), $row);
+        $mainKey = call_user_func([$this->peer, 'getPrimaryKeyHashFromRow'], $row);
         // we hydrate the main object even in case of a one-to-many relationship
         // in order to get the $col variable increased anyway
         $obj = $this->getSingleObjectFromRow($row, $this->class, $col);
@@ -105,14 +72,14 @@ class PropelArrayFormatter extends PropelFormatter
             $mainObjectIsNew = true;
         }
 
-        $hydrationChain = array();
+        $hydrationChain = [];
 
         // related objects added using with()
         foreach ($this->getWith() as $relAlias => $modelWith) {
 
             // determine class to use
             if ($modelWith->isSingleTableInheritance()) {
-                $class = call_user_func(array($modelWith->getModelPeerName(), 'getOMClass'), $row, $col);
+                $class = call_user_func([$modelWith->getModelPeerName(), 'getOMClass'], $row, $col);
                 $refl = new ReflectionClass($class);
                 if ($refl->isAbstract()) {
                     $col += constant($class . 'Peer::NUM_COLUMNS');
@@ -123,14 +90,14 @@ class PropelArrayFormatter extends PropelFormatter
             }
 
             // hydrate related object or take it from registry
-            $key = call_user_func(array($modelWith->getModelPeerName(), 'getPrimaryKeyHashFromRow'), $row, $col);
+            $key = call_user_func([$modelWith->getModelPeerName(), 'getPrimaryKeyHashFromRow'], $row, $col);
             // we hydrate the main object even in case of a one-to-many relationship
             // in order to get the $col variable increased anyway
             $secondaryObject = $this->getSingleObjectFromRow($row, $class, $col);
             if (!isset($this->alreadyHydratedObjects[$relAlias][$key])) {
 
                 if ($secondaryObject->isPrimaryKeyNull()) {
-                    $this->alreadyHydratedObjects[$relAlias][$key] = array();
+                    $this->alreadyHydratedObjects[$relAlias][$key] = [];
                 } else {
                     $this->alreadyHydratedObjects[$relAlias][$key] = $secondaryObject->toArray();
                 }
@@ -165,5 +132,38 @@ class PropelArrayFormatter extends PropelFormatter
             // we still need to return a reference to something to avoid a warning
             return $emptyVariable;
         }
+    }
+
+    public function formatOne(PDOStatement $stmt)
+    {
+        $this->checkInit();
+        $result = null;
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            if ($object = &$this->getStructuredArrayFromRow($row)) {
+                $result = &$object;
+            }
+        }
+        $this->currentObjects = [];
+        $this->alreadyHydratedObjects = [];
+        $stmt->closeCursor();
+
+        return $result;
+    }
+
+    /**
+     * Formats an ActiveRecord object
+     *
+     * @param BaseObject $record the object to format
+     *
+     * @return array The original record turned into an array
+     */
+    public function formatRecord($record = null)
+    {
+        return $record ? $record->toArray() : [];
+    }
+
+    public function isObjectFormatter()
+    {
+        return false;
     }
 }

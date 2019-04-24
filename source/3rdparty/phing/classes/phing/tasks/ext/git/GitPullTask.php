@@ -120,13 +120,13 @@ class GitPullTask extends GitBaseTask
      * Valid merge strategies
      * @var array
      */
-    private $validStrategies = array(
+    private $validStrategies = [
         'octopus',
         'ours',
         'recursive',
         'resolve',
-        'subtree'
-    );
+        'subtree',
+    ];
 
     /**
      * The main entry point for the task
@@ -176,7 +176,7 @@ class GitPullTask extends GitBaseTask
         if ($this->isAllRemotes()) { // --all
             $command->setOption('all', true);
             $this->log('git-pull: fetching from all remotes', Project::MSG_INFO);
-        } elseif ($this->getSource()) { // <repository> [<refspec>]
+        } else if ($this->getSource()) { // <repository> [<refspec>]
             $command->addArgument($this->getSource());
             if ($this->getRefspec()) {
                 $command->addArgument($this->getRefspec());
@@ -207,11 +207,27 @@ class GitPullTask extends GitBaseTask
     }
 
     /**
-     * @param $strategy
+     * @return bool
      */
-    public function setStrategy($strategy)
+    public function isNoRebase()
     {
-        $this->strategy = $strategy;
+        return $this->getNoRebase();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getNoRebase()
+    {
+        return $this->noRebase;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setNoRebase($flag)
+    {
+        $this->noRebase = (boolean)$flag;
     }
 
     /**
@@ -223,11 +239,11 @@ class GitPullTask extends GitBaseTask
     }
 
     /**
-     * @param $strategyOption
+     * @param $strategy
      */
-    public function setStrategyOption($strategyOption)
+    public function setStrategy($strategy)
     {
-        $this->strategyOption = $strategyOption;
+        $this->strategy = $strategy;
     }
 
     /**
@@ -239,107 +255,27 @@ class GitPullTask extends GitBaseTask
     }
 
     /**
-     * @param $source
+     * @param $strategyOption
      */
-    public function setSource($source)
+    public function setStrategyOption($strategyOption)
     {
-        $this->source = $source;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSource()
-    {
-        return $this->source;
-    }
-
-    /**
-     * @param $spec
-     */
-    public function setRefspec($spec)
-    {
-        $this->refspec = $spec;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRefspec()
-    {
-        return $this->refspec;
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setAll($flag)
-    {
-        $this->allRemotes = $flag;
+        $this->strategyOption = $strategyOption;
     }
 
     /**
      * @return bool
      */
-    public function getAll()
+    public function isNoTags()
     {
-        return $this->allRemotes;
+        return $this->getNoTags();
     }
 
     /**
      * @return bool
      */
-    public function isAllRemotes()
+    public function getNoTags()
     {
-        return $this->getAll();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setAppend($flag)
-    {
-        $this->append = (boolean) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getAppend()
-    {
-        return $this->append;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAppend()
-    {
-        return $this->getAppend();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setKeep($flag)
-    {
-        $this->keepFiles = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getKeep()
-    {
-        return $this->keepFiles;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isKeepFiles()
-    {
-        return $this->getKeep();
+        return $this->noTags;
     }
 
     /**
@@ -353,25 +289,129 @@ class GitPullTask extends GitBaseTask
     /**
      * @return bool
      */
-    public function getNoTags()
+    public function isKeepFiles()
     {
-        return $this->noTags;
+        return $this->getKeep();
     }
 
     /**
      * @return bool
      */
-    public function isNoTags()
+    public function getKeep()
     {
-        return $this->getNoTags();
+        return $this->keepFiles;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAppend()
+    {
+        return $this->getAppend();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAppend()
+    {
+        return $this->append;
     }
 
     /**
      * @param $flag
      */
-    public function setTags($flag)
+    public function setAppend($flag)
     {
-        $this->tags = $flag;
+        $this->append = (boolean)$flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuiet()
+    {
+        return $this->getQuiet();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getQuiet()
+    {
+        return $this->quiet;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setQuiet($flag)
+    {
+        $this->quiet = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllRemotes()
+    {
+        return $this->getAll();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAll()
+    {
+        return $this->allRemotes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * @param $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefspec()
+    {
+        return $this->refspec;
+    }
+
+    /**
+     * @param $spec
+     */
+    public function setRefspec($spec)
+    {
+        $this->refspec = $spec;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setAll($flag)
+    {
+        $this->allRemotes = $flag;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setKeep($flag)
+    {
+        $this->keepFiles = $flag;
     }
 
     /**
@@ -393,33 +433,9 @@ class GitPullTask extends GitBaseTask
     /**
      * @param $flag
      */
-    public function setQuiet($flag)
+    public function setTags($flag)
     {
-        $this->quiet = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getQuiet()
-    {
-        return $this->quiet;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isQuiet()
-    {
-        return $this->getQuiet();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setRebase($flag)
-    {
-        $this->rebase = (boolean) $flag;
+        $this->tags = $flag;
     }
 
     /**
@@ -441,33 +457,9 @@ class GitPullTask extends GitBaseTask
     /**
      * @param $flag
      */
-    public function setNoRebase($flag)
+    public function setRebase($flag)
     {
-        $this->noRebase = (boolean) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getNoRebase()
-    {
-        return $this->noRebase;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNoRebase()
-    {
-        return $this->getNoRebase();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setForce($flag)
-    {
-        $this->force = $flag;
+        $this->rebase = (boolean)$flag;
     }
 
     /**
@@ -484,6 +476,14 @@ class GitPullTask extends GitBaseTask
     public function isForce()
     {
         return $this->getForce();
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setForce($flag)
+    {
+        $this->force = $flag;
     }
 
 }

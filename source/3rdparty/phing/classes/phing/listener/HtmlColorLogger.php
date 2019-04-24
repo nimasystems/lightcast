@@ -85,6 +85,60 @@ class HtmlColorLogger extends DefaultLogger
     }
 
     /**
+     * @see DefaultLogger#printMessage
+     * @param string $message
+     * @param OutputStream $stream
+     * @param int $priority
+     */
+    final protected function printMessage($message, OutputStream $stream, $priority)
+    {
+        if ($message !== null) {
+
+            if (!$this->colorsSet) {
+                $this->setColors();
+                $this->colorsSet = true;
+            }
+
+            $search = ['<', '>'];
+            $replace = ['&lt;', '&gt;'];
+            $message = str_replace($search, $replace, $message);
+
+            $search = ["\t", "\n", "\r"];
+            $replace = ['&nbsp;&nbsp;&nbsp;', '<br>', ''];
+            $message = str_replace($search, $replace, $message);
+
+            if (preg_match('@^( +)([^ ].+)@', $message, $matches)) {
+                $len = strlen($matches[1]);
+                $space = '&nbsp;';
+                for ($i = 1; $i < $len; $i++) {
+                    $space .= '&nbsp;';
+                }
+                $message = $space . $matches[2];
+            }
+
+            switch ($priority) {
+                case Project::MSG_ERR:
+                    $message = $this->errColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_WARN:
+                    $message = $this->warnColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_INFO:
+                    $message = $this->infoColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_VERBOSE:
+                    $message = $this->verboseColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_DEBUG:
+                    $message = $this->debugColor . $message . self::END_COLOR;
+                    break;
+            }
+
+            $stream->write($message . '<br/>');
+        }
+    }
+
+    /**
      * Set the colors to use from a property file specified in the
      * special phing property file "phing/listener/defaults.properties".
      */
@@ -120,60 +174,6 @@ class HtmlColorLogger extends DefaultLogger
             }
         } catch (IOException $ioe) {
             //Ignore exception - we will use the defaults.
-        }
-    }
-
-    /**
-     * @see DefaultLogger#printMessage
-     * @param string       $message
-     * @param OutputStream $stream
-     * @param int          $priority
-     */
-    final protected function printMessage($message, OutputStream $stream, $priority)
-    {
-        if ($message !== null) {
-
-            if (!$this->colorsSet) {
-                $this->setColors();
-                $this->colorsSet = true;
-            }
-
-            $search = array('<', '>');
-            $replace = array('&lt;', '&gt;');
-            $message = str_replace($search, $replace, $message);
-
-            $search = array("\t", "\n", "\r");
-            $replace = array('&nbsp;&nbsp;&nbsp;', '<br>', '');
-            $message = str_replace($search, $replace, $message);
-
-            if (preg_match('@^( +)([^ ].+)@', $message, $matches)) {
-                $len = strlen($matches[1]);
-                $space = '&nbsp;';
-                for ($i = 1; $i < $len; $i++) {
-                    $space .= '&nbsp;';
-                }
-                $message = $space . $matches[2];
-            }
-
-            switch ($priority) {
-                case Project::MSG_ERR:
-                    $message = $this->errColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_WARN:
-                    $message = $this->warnColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_INFO:
-                    $message = $this->infoColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_VERBOSE:
-                    $message = $this->verboseColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_DEBUG:
-                    $message = $this->debugColor . $message . self::END_COLOR;
-                    break;
-            }
-
-            $stream->write($message . '<br/>');
         }
     }
 }

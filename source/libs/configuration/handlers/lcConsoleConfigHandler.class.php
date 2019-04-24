@@ -30,18 +30,18 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
             'settings' => [
                 'time_limit' => 300,
                 'memory_limit' => '64M',
-                'admin_email' => ''
+                'admin_email' => '',
             ],
             'controller' => [
                 'max_forwards' => 10,
-                'filters' => []
+                'filters' => [],
             ],
             'console' => ['log_console' => false],
             'logger' => [
                 'enabled' => true,
                 'email_to' => '',
                 'email_threshold' => 'crit',
-                'log_files' => ['console.log' => 'info']
+                'log_files' => ['console.log' => 'info'],
             ],
             'mailer' => [
                 'charset' => 'UTF-8',
@@ -54,8 +54,8 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
                 'smtp_port' => 25,
                 'security' => [
                     'smtp_user' => '',
-                    'smtp_pass' => ''
-                ]
+                    'smtp_pass' => '',
+                ],
             ],
             'loaders' => [
                 'logger' => 'lcFileLoggerNG',
@@ -71,7 +71,7 @@ class lcConsoleConfigHandler extends lcEnvConfigHandler
                 'mailer' => 'lcPHPMailer',
                 'data_storage' => '',
             ],
-            'plugins' => ['enabled' => []]
+            'plugins' => ['enabled' => []],
         ];
     }
 }

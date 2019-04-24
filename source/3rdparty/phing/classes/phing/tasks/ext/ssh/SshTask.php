@@ -57,6 +57,14 @@ class SshTask extends Task
     private $display = true;
 
     /**
+     * @return string
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
      * @param $host
      */
     public function setHost($host)
@@ -65,11 +73,11 @@ class SshTask extends Task
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getHost()
+    public function getPort()
     {
-        return $this->host;
+        return $this->port;
     }
 
     /**
@@ -81,11 +89,11 @@ class SshTask extends Task
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getPort()
+    public function getUsername()
     {
-        return $this->port;
+        return $this->username;
     }
 
     /**
@@ -99,9 +107,9 @@ class SshTask extends Task
     /**
      * @return string
      */
-    public function getUsername()
+    public function getPassword()
     {
-        return $this->username;
+        return $this->password;
     }
 
     /**
@@ -113,11 +121,11 @@ class SshTask extends Task
     }
 
     /**
-     * @return string
+     * Returns the pubkeyfile
      */
-    public function getPassword()
+    public function getPubkeyfile()
     {
-        return $this->password;
+        return $this->pubkeyfile;
     }
 
     /**
@@ -130,11 +138,11 @@ class SshTask extends Task
     }
 
     /**
-     * Returns the pubkeyfile
+     * Returns the private keyfile
      */
-    public function getPubkeyfile()
+    public function getPrivkeyfile()
     {
-        return $this->pubkeyfile;
+        return $this->privkeyfile;
     }
 
     /**
@@ -144,23 +152,6 @@ class SshTask extends Task
     public function setPrivkeyfile($privkeyfile)
     {
         $this->privkeyfile = $privkeyfile;
-    }
-
-    /**
-     * Returns the private keyfile
-     */
-    public function getPrivkeyfile()
-    {
-        return $this->privkeyfile;
-    }
-
-    /**
-     * Sets the private key file passphrase of the user to scp
-     * @param $privkeyfilepassphrase
-     */
-    public function setPrivkeyfilepassphrase($privkeyfilepassphrase)
-    {
-        $this->privkeyfilepassphrase = $privkeyfilepassphrase;
     }
 
     /**
@@ -174,11 +165,12 @@ class SshTask extends Task
     }
 
     /**
-     * @param $command
+     * Sets the private key file passphrase of the user to scp
+     * @param $privkeyfilepassphrase
      */
-    public function setCommand($command)
+    public function setPrivkeyfilepassphrase($privkeyfilepassphrase)
     {
-        $this->command = $command;
+        $this->privkeyfilepassphrase = $privkeyfilepassphrase;
     }
 
     /**
@@ -190,11 +182,11 @@ class SshTask extends Task
     }
 
     /**
-     * @param $pty
+     * @param $command
      */
-    public function setPty($pty)
+    public function setCommand($command)
     {
-        $this->pty = $pty;
+        $this->command = $command;
     }
 
     /**
@@ -203,6 +195,14 @@ class SshTask extends Task
     public function getPty()
     {
         return $this->pty;
+    }
+
+    /**
+     * @param $pty
+     */
+    public function setPty($pty)
+    {
+        $this->pty = $pty;
     }
 
     /**
@@ -220,7 +220,7 @@ class SshTask extends Task
      */
     public function setDisplay($display)
     {
-        $this->display = (boolean) $display;
+        $this->display = (boolean)$display;
     }
 
     /**
@@ -230,7 +230,7 @@ class SshTask extends Task
      */
     public function setFailonerror($failonerror)
     {
-        $this->failonerror = (boolean) $failonerror;
+        $this->failonerror = (boolean)$failonerror;
     }
 
     /**
@@ -248,6 +248,19 @@ class SshTask extends Task
     {
     }
 
+    public function main()
+    {
+        $this->setupConnection();
+
+        if ($this->pty != '') {
+            $stream = ssh2_exec($this->connection, $this->command, $this->pty);
+        } else {
+            $stream = ssh2_exec($this->connection, $this->command);
+        }
+
+        $this->handleStream($stream);
+    }
+
     /**
      * Initiates a ssh connection and stores
      * it in $this->connection
@@ -260,7 +273,7 @@ class SshTask extends Task
             throw new BuildException("To use SshTask, you need to install the PHP SSH2 extension.");
         }
 
-        $methods = !empty($this->methods) ? $this->methods->toArray($p) : array();
+        $methods = !empty($this->methods) ? $this->methods->toArray($p) : [];
         $this->connection = ssh2_connect($this->host, $this->port, $methods);
         if (!$this->connection) {
             throw new BuildException("Could not establish connection to " . $this->host . ":" . $this->port . "!");
@@ -281,19 +294,6 @@ class SshTask extends Task
         if (!$could_auth) {
             throw new BuildException("Could not authenticate connection!");
         }
-    }
-
-    public function main()
-    {
-        $this->setupConnection();
-
-        if ($this->pty != '') {
-            $stream = ssh2_exec($this->connection, $this->command, $this->pty);
-        } else {
-            $stream = ssh2_exec($this->connection, $this->command);
-        }
-
-        $this->handleStream($stream);
     }
 
     /**

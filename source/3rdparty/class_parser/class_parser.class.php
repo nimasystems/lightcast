@@ -4,12 +4,11 @@
 
 class ClassParser
 {
-    private $classes = array();
-    private $extends = array();
-    private $implements = array();
-
     const STATE_CLASS_HEAD = 100001;
     const STATE_FUNCTION_HEAD = 100002;
+    private $classes = [];
+    private $extends = [];
+    private $implements = [];
 
     public function getClasses()
     {
@@ -18,7 +17,7 @@ class ClassParser
 
     public function getClassesImplementing($interface)
     {
-        $implementers = array();
+        $implementers = [];
         if (isset($this->implements[$interface])) {
             foreach ($this->implements[$interface] as $name) {
                 $implementers[$name] = $this->classes[$name];
@@ -29,7 +28,7 @@ class ClassParser
 
     public function getClassesExtending($class)
     {
-        $extenders = array();
+        $extenders = [];
         if (isset($this->extends[$class])) {
             foreach ($this->extends[$class] as $name) {
                 $extenders[$name] = $this->classes[$name];
@@ -42,13 +41,13 @@ class ClassParser
     {
         $file = realpath($file);
         $tokens = token_get_all(file_get_contents($file));
-        $classes = array();
+        $classes = [];
 
-        $si = NULL;
+        $si = null;
         $depth = 0;
-        $mod = array();
-        $doc = NULL;
-        $state = NULL;
+        $mod = [];
+        $doc = null;
+        $state = null;
 
         foreach ($tokens as $idx => &$token) {
             if (is_array($token)) {
@@ -80,13 +79,13 @@ class ClassParser
                             case T_CLASS:
                                 $state = self::STATE_CLASS_HEAD;
                                 $si = $token[1];
-                                $classes[] = array('name' => $token[1], 'modifiers' => $mod, 'doc' => $doc);
+                                $classes[] = ['name' => $token[1], 'modifiers' => $mod, 'doc' => $doc];
                                 break;
                             case T_FUNCTION:
                                 $state = self::STATE_FUNCTION_HEAD;
                                 $clsc = count($classes);
                                 if ($depth > 0 && $clsc) {
-                                    $classes[$clsc - 1]['functions'][$token[1]] = array('modifiers' => $mod, 'doc' => $doc);
+                                    $classes[$clsc - 1]['functions'][$token[1]] = ['modifiers' => $mod, 'doc' => $doc];
                                 }
                                 break;
                             case T_IMPLEMENTS:
@@ -112,8 +111,8 @@ class ClassParser
                     case '}':
                     case ';':
                         $state = 0;
-                        $doc = NULL;
-                        $mod = array();
+                        $doc = null;
+                        $mod = [];
                         break;
                 }
             }

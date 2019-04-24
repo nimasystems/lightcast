@@ -143,6 +143,11 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $this->post_params = new lcArrayCollection($vars);
     }
 
+    public function setParamVars(array $vars = null)
+    {
+        $this->params = new lcArrayCollection($vars);
+    }
+
     public function setPutVars(array $vars = null)
     {
         $this->put_params = new lcArrayCollection($vars);
@@ -151,11 +156,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function setDeleteVars(array $vars = null)
     {
         $this->delete_params = new lcArrayCollection($vars);
-    }
-
-    public function setParamVars(array $vars = null)
-    {
-        $this->params = new lcArrayCollection($vars);
     }
 
     #pragma mark - iKeyValueProvider
@@ -398,21 +398,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $this->request_method = (int)$request_method;
     }
 
-    protected function generateRealRequestUri()
-    {
-        $real_request_uri = $this->env('REQUEST_URI');
-
-        if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && isset($_SERVER['REDIRECT_URL'])) {
-
-            $scrf = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
-
-            $real_request_uri = str_replace($scrf, '', $_SERVER['REDIRECT_URL']);
-
-        }
-
-        return $real_request_uri;
-    }
-
     public function getXForwardedFor()
     {
         return $this->getForwardedFor();
@@ -422,8 +407,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     {
         return $this->env('HTTP_X_FORWARDED_FOR');
     }
-
-    // TODO: Deprecated - remove in 1.5
 
     public function getHttpXForwardedFor()
     {
@@ -436,6 +419,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     {
         return $this->env('HTTP_REFERER');
     }
+
+    // TODO: Deprecated - remove in 1.5
 
     /**
      * @return mixed
@@ -471,18 +456,13 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->env('HTTP_IF_MODIFIED_SINCE');
     }
 
-    /*
-     * Gets the actual client remote address /skipping proxies/
-    */
-
     public function getCacheControl()
     {
         return $this->env('HTTP_CACHE_CONTROL');
     }
 
     /*
-     * Returns the a combined string of proto +
-    * hostname
+     * Gets the actual client remote address /skipping proxies/
     */
 
     public function getHttpConnection()
@@ -491,7 +471,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Get a custom header
+     * Returns the a combined string of proto +
+    * hostname
     */
 
     public function getTransferEncoding()
@@ -500,7 +481,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: IF_MODIFIED_SINCE
+     * Get a custom header
     */
 
     public function getVia()
@@ -509,7 +490,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CACHE_CONTROL
+     * HTTP Header: IF_MODIFIED_SINCE
     */
 
     public function getContentLength()
@@ -518,7 +499,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CONNECTION
+     * HTTP Header: HTTP_CACHE_CONTROL
     */
 
     public function getContentType()
@@ -527,7 +508,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_TRANSFER_ENCODING
+     * HTTP Header: HTTP_CONNECTION
     */
 
     public function getContentEncoding()
@@ -536,7 +517,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_VIA
+     * HTTP Header: HTTP_TRANSFER_ENCODING
     */
 
     public function getContentLanguage()
@@ -545,7 +526,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CONTENT_LENGTH
+     * HTTP Header: HTTP_VIA
     */
 
     public function getExpires()
@@ -554,7 +535,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CONTENT_TYPE
+     * HTTP Header: HTTP_CONTENT_LENGTH
     */
 
     public function getUserAgent()
@@ -563,7 +544,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CONTENT_ENCODING
+     * HTTP Header: HTTP_CONTENT_TYPE
     */
 
     public function getLastModified()
@@ -572,7 +553,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_CONTENT_LANGUAGE
+     * HTTP Header: HTTP_CONTENT_ENCODING
     */
 
     public function getProtocol($string = false)
@@ -581,13 +562,17 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * HTTP Header: HTTP_EXPIRES
+     * HTTP Header: HTTP_CONTENT_LANGUAGE
     */
 
     public function getProtocolVer()
     {
         return $this->protocol_ver;
     }
+
+    /*
+     * HTTP Header: HTTP_EXPIRES
+    */
 
     public function getAcceptMimetype()
     {
@@ -598,10 +583,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         return $this->accept_mimetype;
     }
-
-    /*
-     * HTTP Header: HTTP_LAST_MODIFIED
-    */
 
     public function getAcceptLanguage()
     {
@@ -614,8 +595,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets the REQUEST_METHOD after proper
-    * Request initialization
+     * HTTP Header: HTTP_LAST_MODIFIED
     */
 
     public function getAcceptEncoding()
@@ -629,7 +609,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets the Server Protocol after proper
+     * Gets the REQUEST_METHOD after proper
     * Request initialization
     */
 
@@ -644,8 +624,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets the Server Protocol Version after
-    * proper Request initialization
+     * Gets the Server Protocol after proper
+    * Request initialization
     */
 
     public function getApacheHeaders()
@@ -698,18 +678,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets a parser object for
-    * ACCEPT_MIMETYPE
-    */
-
-    public function isPost()
-    {
-        return ($this->request_method == lcHttpMethod::METHOD_POST);
-    }
-
-    /*
-     * Gets a parser object for
-    * ACCEPT_LANGUAGE
+     * Gets the Server Protocol Version after
+    * proper Request initialization
     */
 
     public function isGet()
@@ -717,24 +687,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return ($this->request_method == lcHttpMethod::METHOD_GET);
     }
 
-    public function isDelete()
-    {
-        return ($this->request_method == lcHttpMethod::METHOD_DELETE);
-    }
-
     /*
      * Gets a parser object for
-    * ACCEPT_ENCODING
-    */
-
-    public function isPut()
-    {
-        return ($this->request_method == lcHttpMethod::METHOD_PUT);
-    }
-
-    /*
-     * Gets a parser object for
-    * ACCEPT_CHARSET
+    * ACCEPT_MIMETYPE
     */
 
     public function isAjaxRequest()
@@ -743,9 +698,14 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Raw apache request headers
-    * Platform-Specific
+     * Gets a parser object for
+    * ACCEPT_LANGUAGE
     */
+
+    public function isXmlHttpRequest()
+    {
+        return ($this->env('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest');
+    }
 
     public function isAjax()
     {
@@ -753,7 +713,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Checks if the request method is POST
+     * Gets a parser object for
+    * ACCEPT_ENCODING
     */
 
     public function getCookies()
@@ -762,7 +723,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Checks if the request method is GET
+     * Gets a parser object for
+    * ACCEPT_CHARSET
     */
 
     public function getCookie($name)
@@ -771,7 +733,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Checks if the request method is PUT
+     * Raw apache request headers
+    * Platform-Specific
     */
 
     public function getCookieValue($name)
@@ -782,7 +745,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Checks if the request is a XMLHttpRequest
+     * Checks if the request method is POST
     */
 
     public function hasFiles()
@@ -794,15 +757,27 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->files->count() ? true : false;
     }
 
+    /*
+     * Checks if the request method is GET
+    */
+
     public function getFiles()
     {
         return $this->files;
     }
 
+    /*
+     * Checks if the request method is PUT
+    */
+
     public function getPostParams()
     {
         return $this->post_params;
     }
+
+    /*
+     * Checks if the request is a XMLHttpRequest
+    */
 
     public function getPutParams()
     {
@@ -814,52 +789,15 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $this->delete_params;
     }
 
-    /*
-     * Checks if the current connection is running
-    * under SSL - HTTPS
-    */
-
     public function getGetParams()
     {
         return $this->get_params;
     }
 
-    /*
-     * Gets a cookies object after
-    * Request initialization
-    */
-
     public function getUriPath()
     {
         return $this->uri_as_path;
     }
-
-    protected function setUrlPrefix()
-    {
-        // set / fix prefix
-        $prefix = $this->configuration->getPathInfoPrefix();
-
-        if (!$prefix) {
-            // try to autodetect the prefix - find diff between REQUEST_URI / PATH_INFO
-            $prefix = @parse_url(str_replace($this->env['PATH_INFO'], '', $this->env['REQUEST_URI']), PHP_URL_PATH);
-        }
-
-        $len = strlen($prefix);
-        $prefix = substr($prefix, $len - 1, $len) == '/' ? substr($prefix, 0, $len - 1) : $prefix;
-
-        // send a filter event to allow others to change the context
-        $evn = $this->event_dispatcher->filter(new lcEvent('request.set_url_prefix', $this), $prefix);
-
-        if ($evn->isProcessed()) {
-            $prefix = $evn->getReturnValue();
-        }
-
-        $this->prefix = $prefix;
-    }
-
-    /*
-     * Gets a single cookie object
-    */
 
     protected function beforeAttachRegisteredEvents()
     {
@@ -964,7 +902,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets the value of a cookie
+     * Checks if the current connection is running
+    * under SSL - HTTPS
     */
 
     protected function resetPHPRequestGlobals()
@@ -985,8 +924,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Checks if the Request has files
-    * uploaded
+     * Gets a cookies object after
+    * Request initialization
     */
 
     protected function verifyEnv()
@@ -1010,11 +949,6 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             throw new lcSystemException('Invalid request environment');
         }
     }
-
-    /*
-     * Gets the files object after
-    * Request initialization
-    */
 
     private function _set_request_uri($in_url = null)
     {
@@ -1089,8 +1023,34 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     }
 
     /*
-     * Gets the POST params object after
-    * Request initialization
+     * Gets a single cookie object
+    */
+
+    protected function setUrlPrefix()
+    {
+        // set / fix prefix
+        $prefix = $this->configuration->getPathInfoPrefix();
+
+        if (!$prefix) {
+            // try to autodetect the prefix - find diff between REQUEST_URI / PATH_INFO
+            $prefix = @parse_url(str_replace($this->env['PATH_INFO'], '', $this->env['REQUEST_URI']), PHP_URL_PATH);
+        }
+
+        $len = strlen($prefix);
+        $prefix = substr($prefix, $len - 1, $len) == '/' ? substr($prefix, 0, $len - 1) : $prefix;
+
+        // send a filter event to allow others to change the context
+        $evn = $this->event_dispatcher->filter(new lcEvent('request.set_url_prefix', $this), $prefix);
+
+        if ($evn->isProcessed()) {
+            $prefix = $evn->getReturnValue();
+        }
+
+        $this->prefix = $prefix;
+    }
+
+    /*
+     * Gets the value of a cookie
     */
 
     private function initHttpMethod()
@@ -1108,6 +1068,36 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         } else {
             $this->request_method = null;
         }
+    }
+
+    /*
+     * Checks if the Request has files
+    * uploaded
+    */
+
+    public function isPut()
+    {
+        return ($this->request_method == lcHttpMethod::METHOD_PUT);
+    }
+
+    /*
+     * Gets the files object after
+    * Request initialization
+    */
+
+    public function isDelete()
+    {
+        return ($this->request_method == lcHttpMethod::METHOD_DELETE);
+    }
+
+    /*
+     * Gets the POST params object after
+    * Request initialization
+    */
+
+    public function isPost()
+    {
+        return ($this->request_method == lcHttpMethod::METHOD_POST);
     }
 
     /*
@@ -1175,9 +1165,19 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
      * Sets the correct HTTP_METHOD
     */
 
-    public function isXmlHttpRequest()
+    protected function generateRealRequestUri()
     {
-        return ($this->env('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest');
+        $real_request_uri = $this->env('REQUEST_URI');
+
+        if (isset($_SERVER['DOCUMENT_ROOT']) && isset($_SERVER['SCRIPT_FILENAME']) && isset($_SERVER['REDIRECT_URL'])) {
+
+            $scrf = str_replace($_SERVER['DOCUMENT_ROOT'], '', dirname($_SERVER['SCRIPT_FILENAME']));
+
+            $real_request_uri = str_replace($scrf, '', $_SERVER['REDIRECT_URL']);
+
+        }
+
+        return $real_request_uri;
     }
 
     /*

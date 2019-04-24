@@ -38,7 +38,7 @@ class PropelPHPParser
     /**
      * Parser constructor
      *
-     * @param string  $code     PHP code to parse
+     * @param string $code PHP code to parse
      * @param boolean $isAddPhp Whether the supplied code needs a supplementary '<?php '
      *                          to be seen as code by the tokenizer.
      */
@@ -46,6 +46,11 @@ class PropelPHPParser
     {
         $this->code = $isAddPhp ? $this->addPhp($code) : $code;
         $this->isAddPhp = $isAddPhp;
+    }
+
+    protected function addPhp($code)
+    {
+        return '<?php ' . $code;
     }
 
     /**
@@ -58,14 +63,27 @@ class PropelPHPParser
         return $this->isAddPhp ? $this->removePhp($this->code) : $this->code;
     }
 
-    protected function addPhp($code)
-    {
-        return '<?php ' . $code;
-    }
-
     protected function removePhp($code)
     {
         return substr($code, 6);
+    }
+
+    /**
+     * Parse the code looking for a method definition, and removes the code if found
+     *
+     * @param string $methodName The name of the method to find, e.g. 'getAuthor'
+     *
+     * @return mixed false if not found, or the method code string if found
+     */
+    public function removeMethod($methodName)
+    {
+        if ($methodCode = $this->findMethod($methodName)) {
+            $this->code = str_replace($methodCode, '', $this->code);
+
+            return $methodCode;
+        }
+
+        return false;
     }
 
     /**
@@ -146,28 +164,10 @@ class PropelPHPParser
     }
 
     /**
-     * Parse the code looking for a method definition, and removes the code if found
-     *
-     * @param string $methodName The name of the method to find, e.g. 'getAuthor'
-     *
-     * @return mixed false if not found, or the method code string if found
-     */
-    public function removeMethod($methodName)
-    {
-        if ($methodCode = $this->findMethod($methodName)) {
-            $this->code = str_replace($methodCode, '', $this->code);
-
-            return $methodCode;
-        }
-
-        return false;
-    }
-
-    /**
      * Parse the code looking for a method definition, and replaces the code if found
      *
      * @param string $methodName The name of the method to find, e.g. 'getAuthor'
-     * @param string $newCode    The code to use in place of the old method definition
+     * @param string $newCode The code to use in place of the old method definition
      *
      * @return mixed false if not found, or the method code string if found
      */
@@ -186,7 +186,7 @@ class PropelPHPParser
      * Parse the code looking for a method definition, and adds the code after if found
      *
      * @param string $methodName The name of the method to find, e.g. 'getAuthor'
-     * @param string $newCode    The code to add to the class
+     * @param string $newCode The code to add to the class
      *
      * @return mixed false if not found, or the method code string if found
      */
@@ -205,7 +205,7 @@ class PropelPHPParser
      * Parse the code looking for a method definition, and adds the code before if found
      *
      * @param string $methodName The name of the method to find, e.g. 'getAuthor'
-     * @param string $newCode    The code to add to the class
+     * @param string $newCode The code to add to the class
      *
      * @return mixed false if not found, or the method code string if found
      */

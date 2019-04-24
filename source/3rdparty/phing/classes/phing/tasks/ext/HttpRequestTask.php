@@ -52,14 +52,14 @@ class HttpRequestTask extends HttpTask
      *
      * @var array<string>
      */
-    protected $observerEvents = array(
+    protected $observerEvents = [
         'connect',
         'sentHeaders',
         'sentBodyPart',
         'receivedHeaders',
         'receivedBody',
         'disconnect',
-    );
+    ];
 
     /**
      * Holds the request method
@@ -73,7 +73,7 @@ class HttpRequestTask extends HttpTask
      *
      * @var Parameter[]
      */
-    protected $postParameters = array();
+    protected $postParameters = [];
 
     /**
      * Sets the response regex
@@ -102,7 +102,7 @@ class HttpRequestTask extends HttpTask
      */
     public function setObserverEvents($observerEvents)
     {
-        $this->observerEvents = array();
+        $this->observerEvents = [];
 
         $token = ' ,;';
         $ext = strtok($observerEvents, $token);
@@ -181,14 +181,14 @@ class HttpRequestTask extends HttpTask
     /**
      * Checks whether response body matches the given regexp
      *
-     * @param  HTTP_Request2_Response $response
+     * @param HTTP_Request2_Response $response
      * @return void
      * @throws BuildException
      */
     protected function processResponse(HTTP_Request2_Response $response)
     {
         if ($this->responseRegex !== '') {
-            $matches = array();
+            $matches = [];
             preg_match($this->responseRegex, $response->getBody(), $matches);
 
             if (count($matches) === 0) {

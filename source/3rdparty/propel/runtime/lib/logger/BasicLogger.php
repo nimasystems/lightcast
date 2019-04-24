@@ -76,8 +76,8 @@ interface BasicLogger
     /**
      * Primary method to handle logging.
      *
-     * @param mixed $message  String or Exception object containing the message to log.
-     * @param int   $severity The numeric severity.  Defaults to null so that no
+     * @param mixed $message String or Exception object containing the message to log.
+     * @param int $severity The numeric severity.  Defaults to null so that no
      *                              assumptions are made about the logging backend.
      */
     public function log($message, $severity = null);

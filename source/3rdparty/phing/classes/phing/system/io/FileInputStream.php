@@ -39,8 +39,8 @@ class FileInputStream extends InputStream
     /**
      * Construct a new FileInputStream.
      *
-     * @param  PhingFile|string $file   Path to the file
-     * @param  boolean          $append Whether to append (ignored)
+     * @param PhingFile|string $file Path to the file
+     * @param boolean $append Whether to append (ignored)
      * @throws Exception        - if invalid argument specified.
      * @throws IOException      - if unable to open file.
      */
@@ -48,7 +48,7 @@ class FileInputStream extends InputStream
     {
         if ($file instanceof PhingFile) {
             $this->file = $file;
-        } elseif (is_string($file)) {
+        } else if (is_string($file)) {
             $this->file = new PhingFile($file);
         } else {
             throw new Exception("Invalid argument type for \$file.");

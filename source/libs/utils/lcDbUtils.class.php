@@ -49,7 +49,7 @@ class lcDbUtils
         }
 
         $errors = [
-            23000 => 'Duplicate Record Name'
+            23000 => 'Duplicate Record Name',
         ];
 
         if (!array_key_exists($e->getCause()->getCode(), $errors)) {

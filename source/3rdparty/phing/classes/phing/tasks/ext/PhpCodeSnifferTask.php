@@ -43,21 +43,21 @@ class PhpCodeSnifferTask extends Task
      *
      * @var FileSet[]
      */
-    protected $filesets = array(); // all fileset objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
 
     // parameters for php code sniffer
-    protected $standards = array('Generic');
-    protected $sniffs = array();
+    protected $standards = ['Generic'];
+    protected $sniffs = [];
     protected $showWarnings = true;
     protected $showSources = false;
     protected $reportWidth = 80;
     protected $verbosity = 0;
     protected $tabWidth = 0;
-    protected $allowedFileExtensions = array('php', 'inc', 'js', 'css');
-    protected $allowedTypes = array();
+    protected $allowedFileExtensions = ['php', 'inc', 'js', 'css'];
+    protected $allowedTypes = [];
     protected $ignorePatterns = false;
     protected $noSubdirectories = false;
-    protected $configData = array();
+    protected $configData = [];
     protected $encoding = 'iso-8859-1';
 
     // parameters to customize output
@@ -67,7 +67,7 @@ class PhpCodeSnifferTask extends Task
     /**
      * @var PhpCodeSnifferTask_FormatterElement[]
      */
-    protected $formatters = array();
+    protected $formatters = [];
 
     /**
      * Holds the type of the doc generator
@@ -82,17 +82,15 @@ class PhpCodeSnifferTask extends Task
      * @var PhingFile
      */
     protected $docFile = null;
-
-    private $haltonerror = false;
-    private $haltonwarning = false;
-    private $skipversioncheck = false;
-    private $propertyName = null;
-
     /**
      * Cache data storage
      * @var DataStore
      */
     protected $cache;
+    private $haltonerror = false;
+    private $haltonwarning = false;
+    private $skipversioncheck = false;
+    private $propertyName = null;
 
     /**
      * Load the necessary environment for running PHP_CodeSniffer.
@@ -132,7 +130,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setStandard($standards)
     {
-        $this->standards = array();
+        $this->standards = [];
         $token = ' ,;';
         $ext = strtok($standards, $token);
         while ($ext !== false) {
@@ -209,7 +207,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setReportWidth($width)
     {
-        $this->reportWidth = (int) $width;
+        $this->reportWidth = (int)$width;
     }
 
     /**
@@ -218,7 +216,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setVerbosity($level)
     {
-        $this->verbosity = (int) $level;
+        $this->verbosity = (int)$level;
     }
 
     /**
@@ -227,7 +225,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setTabWidth($width)
     {
-        $this->tabWidth = (int) $width;
+        $this->tabWidth = (int)$width;
     }
 
     /**
@@ -245,7 +243,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setAllowedFileExtensions($extensions)
     {
-        $this->allowedFileExtensions = array();
+        $this->allowedFileExtensions = [];
         $token = ' ,;';
         $ext = strtok($extensions, $token);
         while ($ext !== false) {
@@ -260,7 +258,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setAllowedTypes($types)
     {
-        $this->allowedTypes = array();
+        $this->allowedTypes = [];
         $token = ' ,;';
         $type = strtok($types, $token);
         while ($type !== false) {
@@ -276,7 +274,7 @@ class PhpCodeSnifferTask extends Task
      */
     public function setIgnorePatterns($patterns)
     {
-        $this->ignorePatterns = array();
+        $this->ignorePatterns = [];
         $token = ' ,;';
         $pattern = strtok($patterns, $token);
         while ($pattern !== false) {
@@ -366,23 +364,6 @@ class PhpCodeSnifferTask extends Task
     }
 
     /**
-     * Sets the name of the property to use
-     * @param $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * Whether to store last-modified times in cache
      *
      * @param PhingFile $file
@@ -390,39 +371,6 @@ class PhpCodeSnifferTask extends Task
     public function setCacheFile(PhingFile $file)
     {
         $this->cache = new DataStore($file);
-    }
-
-    /**
-     * Return the list of files to parse
-     *
-     * @return string[] list of absolute files to parse
-     */
-    protected function getFilesToParse()
-    {
-        $filesToParse = array();
-
-        if ($this->file instanceof PhingFile) {
-            $filesToParse[] = $this->file->getPath();
-        } else {
-            // append any files in filesets
-            foreach ($this->filesets as $fs) {
-                $dir = $fs->getDir($this->project)->getAbsolutePath();
-                foreach ($fs->getDirectoryScanner($this->project)->getIncludedFiles() as $filename) {
-                    $fileAbsolutePath = $dir . DIRECTORY_SEPARATOR . $filename;
-                    if ($this->cache) {
-                        $lastMTime = $this->cache->get($fileAbsolutePath);
-                        $currentMTime = filemtime($fileAbsolutePath);
-                        if ($lastMTime >= $currentMTime) {
-                            continue;
-                        } else {
-                            $this->cache->put($fileAbsolutePath, $currentMTime);
-                        }
-                    }
-                    $filesToParse[] = $fileAbsolutePath;
-                }
-            }
-        }
-        return $filesToParse;
     }
 
     /**
@@ -434,8 +382,7 @@ class PhpCodeSnifferTask extends Task
             @include_once 'PHP/CodeSniffer.php';
 
             if (!class_exists('PHP_CodeSniffer')) {
-                throw new BuildException("This task requires the PHP_CodeSniffer package installed and available on the include path", $this->getLocation(
-                ));
+                throw new BuildException("This task requires the PHP_CodeSniffer package installed and available on the include path", $this->getLocation());
             }
         }
 
@@ -475,7 +422,7 @@ class PhpCodeSnifferTask extends Task
 
         // Save command line arguments because it confuses PHPCS (version 1.3.0)
         $oldArgs = $_SERVER['argv'];
-        $_SERVER['argv'] = array();
+        $_SERVER['argv'] = [];
         $_SERVER['argc'] = 0;
 
         include_once 'phing/tasks/ext/phpcs/PhpCodeSnifferTask_Wrapper.php';
@@ -496,7 +443,7 @@ class PhpCodeSnifferTask extends Task
          * Verifying if standard is installed only after setting config data.
          * Custom standard paths could be provided via installed_paths config parameter.
          */
-        foreach($this->standards as $standard) {
+        foreach ($this->standards as $standard) {
             if (PHP_CodeSniffer::isInstalledStandard($standard) === false) {
                 // They didn't select a valid coding standard, so help them
                 // out by letting them know which standards are installed.
@@ -531,7 +478,7 @@ class PhpCodeSnifferTask extends Task
 
         // nasty integration hack
         $values = $codeSniffer->cli->getDefaults();
-        $_SERVER['argv'] = array('t');
+        $_SERVER['argv'] = ['t'];
         $_SERVER['argc'] = 1;
         foreach ($this->formatters as $fe) {
             if ($fe->getUseFile()) {
@@ -552,7 +499,7 @@ class PhpCodeSnifferTask extends Task
         }
 
         $codeSniffer->process($fileList, $this->standards, $this->sniffs, $this->noSubdirectories);
-        $_SERVER['argv'] = array();
+        $_SERVER['argv'] = [];
         $_SERVER['argc'] = 0;
 
         if ($this->cache) {
@@ -578,7 +525,7 @@ class PhpCodeSnifferTask extends Task
             if ($check === false) {
                 throw new BuildException('Error writing doc to ' . $outputFile);
             }
-        } elseif ($this->docGenerator !== '' && $this->docFile === null) {
+        } else if ($this->docGenerator !== '' && $this->docFile === null) {
             $codeSniffer->generateDocs($this->standards, $this->sniffs, $this->docGenerator);
         }
 
@@ -593,6 +540,39 @@ class PhpCodeSnifferTask extends Task
         $_SERVER['argv'] = $oldArgs;
         $_SERVER['argc'] = count($oldArgs);
         chdir($cwd);
+    }
+
+    /**
+     * Return the list of files to parse
+     *
+     * @return string[] list of absolute files to parse
+     */
+    protected function getFilesToParse()
+    {
+        $filesToParse = [];
+
+        if ($this->file instanceof PhingFile) {
+            $filesToParse[] = $this->file->getPath();
+        } else {
+            // append any files in filesets
+            foreach ($this->filesets as $fs) {
+                $dir = $fs->getDir($this->project)->getAbsolutePath();
+                foreach ($fs->getDirectoryScanner($this->project)->getIncludedFiles() as $filename) {
+                    $fileAbsolutePath = $dir . DIRECTORY_SEPARATOR . $filename;
+                    if ($this->cache) {
+                        $lastMTime = $this->cache->get($fileAbsolutePath);
+                        $currentMTime = filemtime($fileAbsolutePath);
+                        if ($lastMTime >= $currentMTime) {
+                            continue;
+                        } else {
+                            $this->cache->put($fileAbsolutePath, $currentMTime);
+                        }
+                    }
+                    $filesToParse[] = $fileAbsolutePath;
+                }
+            }
+        }
+        return $filesToParse;
     }
 
     /**
@@ -612,7 +592,7 @@ class PhpCodeSnifferTask extends Task
                 $sniffStr .= '- ' . get_class($sniff) . PHP_EOL;
             }
         }
-        $this->project->setProperty($this->getPropertyName(), (string) $sniffStr);
+        $this->project->setProperty($this->getPropertyName(), (string)$sniffStr);
 
         if ($this->showSniffs) {
             $this->log('The list of used sniffs (#' . count($sniffs) . '): ' . PHP_EOL . $sniffStr, Project::MSG_INFO);
@@ -631,17 +611,17 @@ class PhpCodeSnifferTask extends Task
             // Crude check, but they broke backwards compatibility
             // with a minor version release.
             if (PHP_CodeSniffer::VERSION >= '2.2.0') {
-                $cliValues = array('colors' => false);
+                $cliValues = ['colors' => false];
                 $reporting->printReport($fe->getType(),
-                                        $this->showSources,
-                                        $cliValues,
-                                        $reportFile,
-                                        $this->reportWidth);
+                    $this->showSources,
+                    $cliValues,
+                    $reportFile,
+                    $this->reportWidth);
             } else {
                 $reporting->printReport($fe->getType(),
-                                        $this->showSources,
-                                        $reportFile,
-                                        $this->reportWidth);
+                    $this->showSources,
+                    $reportFile,
+                    $this->reportWidth);
             }
 
             // reporting class uses ob_end_flush(), but we don't want
@@ -650,6 +630,23 @@ class PhpCodeSnifferTask extends Task
                 //ob_end_clean();
             }
         }
+    }
+
+    /**
+     * Returns the name of the property to use
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use
+     * @param $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 
     /**
@@ -697,7 +694,7 @@ class PhpCodeSnifferTask extends Task
 
     /**
      * Outputs the messages of a specific type for one file
-     * @param array  $messages
+     * @param array $messages
      * @param string $type
      */
     protected function outputCustomFormatMessages($messages, $type)
@@ -765,14 +762,6 @@ class PhpCodeSnifferTask_FormatterElement extends DataType
     }
 
     /**
-     * @param $type
-     */
-    public function setType($type)
-    {
-        $this->type = $type;
-    }
-
-    /**
      * @return string
      */
     public function getType()
@@ -781,11 +770,11 @@ class PhpCodeSnifferTask_FormatterElement extends DataType
     }
 
     /**
-     * @param $useFile
+     * @param $type
      */
-    public function setUseFile($useFile)
+    public function setType($type)
     {
-        $this->useFile = $useFile;
+        $this->type = $type;
     }
 
     /**
@@ -797,11 +786,11 @@ class PhpCodeSnifferTask_FormatterElement extends DataType
     }
 
     /**
-     * @param $outfile
+     * @param $useFile
      */
-    public function setOutfile($outfile)
+    public function setUseFile($useFile)
     {
-        $this->outfile = $outfile;
+        $this->useFile = $useFile;
     }
 
     /**
@@ -810,6 +799,14 @@ class PhpCodeSnifferTask_FormatterElement extends DataType
     public function getOutfile()
     {
         return $this->outfile;
+    }
+
+    /**
+     * @param $outfile
+     */
+    public function setOutfile($outfile)
+    {
+        $this->outfile = $outfile;
     }
 
 } //end FormatterElement

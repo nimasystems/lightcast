@@ -33,7 +33,7 @@ class SimpleTestDebugResultFormatter extends SimpleTestResultFormatter
 {
     protected $current_case = "";
     protected $current_test = "";
-    private $failingTests = array();
+    private $failingTests = [];
 
     public function printFailingTests()
     {
@@ -53,18 +53,6 @@ class SimpleTestDebugResultFormatter extends SimpleTestResultFormatter
     }
 
     /**
-     * @param string $test_name
-     */
-    public function paintMethodStart($test_name)
-    {
-        parent::paintMethodStart($test_name);
-        $this->current_test = $test_name;
-        //$msg = "{$this->current_case} :: $test_name\n";
-        $msg = "    TestCase: $test_name";
-        $this->paint($msg);
-    }
-
-    /**
      * @param $msg
      */
     public function paint($msg)
@@ -74,6 +62,18 @@ class SimpleTestDebugResultFormatter extends SimpleTestResultFormatter
         } else {
             $this->out->write($msg);
         }
+    }
+
+    /**
+     * @param string $test_name
+     */
+    public function paintMethodStart($test_name)
+    {
+        parent::paintMethodStart($test_name);
+        $this->current_test = $test_name;
+        //$msg = "{$this->current_case} :: $test_name\n";
+        $msg = "    TestCase: $test_name";
+        $this->paint($msg);
     }
 
     /**
@@ -117,6 +117,15 @@ class SimpleTestDebugResultFormatter extends SimpleTestResultFormatter
     }
 
     /**
+     * @param $type
+     * @param $message
+     */
+    private function formatError($type, $message)
+    {
+        $this->paint("ERROR: $type: $message");
+    }
+
+    /**
      * @param string $message
      */
     public function paintFail($message)
@@ -134,15 +143,6 @@ class SimpleTestDebugResultFormatter extends SimpleTestResultFormatter
         parent::paintException($message);
         $this->failingTests[] = $this->current_case . "->" . $this->current_test;
         $this->formatError("Exception", $message);
-    }
-
-    /**
-     * @param $type
-     * @param $message
-     */
-    private function formatError($type, $message)
-    {
-        $this->paint("ERROR: $type: $message");
     }
 
 }

@@ -38,28 +38,6 @@ class Diagnostics
     }
 
     /**
-     * return the list of files existing in PHING_HOME/vendor
-     *
-     * @param string $type
-     *
-     * @return array the list of jar files existing in ant.home/lib or
-     *               <tt>null</tt> if an error occurs.
-     */
-    public static function listLibraries($type)
-    {
-        $home = Phing::getProperty(Phing::PHING_HOME);
-        if ($home == null) {
-            return null;
-        }
-        $currentWorkingDir = getcwd();
-        chdir($home);
-        exec('composer show --' . $type, $packages, $code);
-        chdir($currentWorkingDir);
-
-        return $packages;
-    }
-
-    /**
      * Print a report to the given stream.
      *
      * @param PrintStream $out the stream to print the report to.
@@ -98,22 +76,6 @@ class Diagnostics
     }
 
     /**
-     * Report a listing of system properties existing in the current phing.
-     *
-     * @param PrintStream $out the stream to print the properties to.
-     */
-    private static function doReportSystemProperties(PrintStream $out)
-    {
-        $phing = new Phing();
-
-        $phingprops = $phing->getProperties();
-
-        foreach ($phingprops as $key => $value) {
-            $out->println($key . " : " . $value);
-        }
-    }
-
-    /**
      * Report a listing of project properties.
      *
      * @param PrintStream $out the stream to print the properties to.
@@ -131,6 +93,22 @@ class Diagnostics
     }
 
     /**
+     * Report a listing of system properties existing in the current phing.
+     *
+     * @param PrintStream $out the stream to print the properties to.
+     */
+    private static function doReportSystemProperties(PrintStream $out)
+    {
+        $phing = new Phing();
+
+        $phingprops = $phing->getProperties();
+
+        foreach ($phingprops as $key => $value) {
+            $out->println($key . " : " . $value);
+        }
+    }
+
+    /**
      * Report the content of PHING_HOME/vendor directory
      *
      * @param PrintStream $out the stream to print the content to
@@ -142,14 +120,25 @@ class Diagnostics
     }
 
     /**
-     * Report the content of the global composer library directory
+     * return the list of files existing in PHING_HOME/vendor
      *
-     * @param PrintStream $out the stream to print the content to
+     * @param string $type
+     *
+     * @return array the list of jar files existing in ant.home/lib or
+     *               <tt>null</tt> if an error occurs.
      */
-    private static function doReportComposerSystemLibraries(PrintStream $out)
+    public static function listLibraries($type)
     {
-        $libs = self::listLibraries('platform');
-        self::printLibraries($libs, $out);
+        $home = Phing::getProperty(Phing::PHING_HOME);
+        if ($home == null) {
+            return null;
+        }
+        $currentWorkingDir = getcwd();
+        chdir($home);
+        exec('composer show --' . $type, $packages, $code);
+        chdir($currentWorkingDir);
+
+        return $packages;
     }
 
     /**
@@ -168,6 +157,17 @@ class Diagnostics
         foreach ($libs as $lib) {
             $out->println($lib);
         }
+    }
+
+    /**
+     * Report the content of the global composer library directory
+     *
+     * @param PrintStream $out the stream to print the content to
+     */
+    private static function doReportComposerSystemLibraries(PrintStream $out)
+    {
+        $libs = self::listLibraries('platform');
+        self::printLibraries($libs, $out);
     }
 
     /**

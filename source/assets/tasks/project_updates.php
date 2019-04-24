@@ -2,16 +2,6 @@
 
 class tProjectUpdates extends lcTaskController
 {
-    public function getHelpInfo()
-    {
-        $help =
-            lcConsolePainter::formatColoredConsoleText('System Updates', 'green') . "\n" .
-            lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
-            'update_core_config - Updates all core config declarations to the new deep style.' . "\n";
-
-        return $help;
-    }
-
     public function executeTask()
     {
         $action = $this->getRequest()->getParam('action');
@@ -31,5 +21,15 @@ class tProjectUpdates extends lcTaskController
 
 
         return true;
+    }
+
+    public function getHelpInfo()
+    {
+        $help =
+            lcConsolePainter::formatColoredConsoleText('System Updates', 'green') . "\n" .
+            lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
+            'update_core_config - Updates all core config declarations to the new deep style.' . "\n";
+
+        return $help;
     }
 }

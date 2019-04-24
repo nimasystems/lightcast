@@ -18,6 +18,30 @@
 abstract class PropelParser
 {
     /**
+     * Factory for getting an instance of a subclass of PropelParser
+     *
+     * @param string $type Parser type, amon 'XML', 'YAML', 'JSON', and 'CSV'
+     *
+     * @return PropelParser A PropelParser subclass instance
+     *
+     * @throws PropelException
+     */
+    public static function getParser($type = 'XML')
+    {
+        $class = sprintf('Propel%sParser', $type);
+        if (!class_exists($class)) {
+            throw new PropelException(sprintf('Unknown parser class "%s"', $class));
+        }
+
+        return new $class;
+    }
+
+    public function listFromArray($data)
+    {
+        return $this->fromArray($data);
+    }
+
+    /**
      * Converts data from an associative array to the parser format.
      *
      * Override in the parser driver.
@@ -27,6 +51,11 @@ abstract class PropelParser
      * @return mixed Converted data, depending on the parser format
      */
     abstract public function fromArray($array);
+
+    public function listToArray($data)
+    {
+        return $this->toArray($data);
+    }
 
     /**
      * Converts data from the parser format to an associative array.
@@ -38,16 +67,6 @@ abstract class PropelParser
      * @return array Converted data
      */
     abstract public function toArray($data);
-
-    public function listFromArray($data)
-    {
-        return $this->fromArray($data);
-    }
-
-    public function listToArray($data)
-    {
-        return $this->toArray($data);
-    }
 
     /**
      * Loads data from a file. Executes PHP code blocks in the file.
@@ -85,24 +104,5 @@ abstract class PropelParser
         } else {
             echo $data;
         }
-    }
-
-    /**
-     * Factory for getting an instance of a subclass of PropelParser
-     *
-     * @param string $type Parser type, amon 'XML', 'YAML', 'JSON', and 'CSV'
-     *
-     * @return PropelParser A PropelParser subclass instance
-     *
-     * @throws PropelException
-     */
-    public static function getParser($type = 'XML')
-    {
-        $class = sprintf('Propel%sParser', $type);
-        if (!class_exists($class)) {
-            throw new PropelException(sprintf('Unknown parser class "%s"', $class));
-        }
-
-        return new $class;
     }
 }

@@ -39,11 +39,11 @@ class ExitStatusException extends BuildException
         $methodArgsNum = func_num_args();
         if ($methodArgsNum === 1) {
             parent::__construct();
-            $this->code = (int) $arg1;
-        } elseif ($methodArgsNum === 2 && is_string($arg1) && is_int($arg2)) {
+            $this->code = (int)$arg1;
+        } else if ($methodArgsNum === 2 && is_string($arg1) && is_int($arg2)) {
             parent::__construct($arg1);
             $this->code = $arg2;
-        } elseif ($methodArgsNum === 3 && is_string($arg1) && is_int($arg2)) {
+        } else if ($methodArgsNum === 3 && is_string($arg1) && is_int($arg2)) {
             parent::__construct($arg1, $arg3);
             $this->code = $arg2;
         }

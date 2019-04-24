@@ -128,7 +128,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
     public function getCapabilities()
     {
         return [
-            'cache'
+            'cache',
         ];
     }
 
@@ -136,7 +136,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
     {
         $debug = [
             'cache_type' => ($this->cache ? get_class($this->cache) : null),
-            'cacheable_objects' => (is_array($this->cacheable_objects) ? array_keys($this->cacheable_objects) : null)
+            'cacheable_objects' => (is_array($this->cacheable_objects) ? array_keys($this->cacheable_objects) : null),
         ];
 
         return $debug;

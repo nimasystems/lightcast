@@ -44,11 +44,6 @@ class PreOrderNodeIterator implements Iterator
         $this->curNode = $this->topNode;
     }
 
-    public function valid()
-    {
-        return ($this->curNode !== null);
-    }
-
     public function current()
     {
         return $this->curNode;
@@ -80,5 +75,10 @@ class PreOrderNodeIterator implements Iterator
         }
 
         return $this->curNode;
+    }
+
+    public function valid()
+    {
+        return ($this->curNode !== null);
     }
 }

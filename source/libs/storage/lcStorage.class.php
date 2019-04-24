@@ -66,7 +66,7 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
     public function getCapabilities()
     {
         return [
-            'storage'
+            'storage',
         ];
     }
 
@@ -108,7 +108,7 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         }
 
         $debug = [
-            'items' => $out
+            'items' => $out,
         ];
 
         return $debug;

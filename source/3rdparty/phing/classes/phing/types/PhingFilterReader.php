@@ -35,42 +35,22 @@ class PhingFilterReader extends DataType
 {
 
     private $className;
-    private $parameters = array();
+    private $parameters = [];
     private $classPath;
 
     /**
-     * @param $className
-     */
-    public function setClassName($className)
-    {
-        $this->className = $className;
-    }
-
-    public function getClassName()
-    {
-        return $this->className;
-    }
-
-    /**
-     * Set the classpath to load the FilterReader through (attribute).
-     * @param Path $classpath
+     * @param Reference $r
      * @throws BuildException
      */
-    public function setClasspath(Path $classpath)
+    public function setClasspathRef(Reference $r)
     {
         if ($this->isReference()) {
             throw $this->tooManyAttributes();
         }
-        if ($this->classPath === null) {
-            $this->classPath = $classpath;
-        } else {
-            $this->classPath->append($classpath);
-        }
+        $o = $this->createClasspath();
+        $o->setRefid($r);
     }
 
-    /*
-     * Set the classpath to load the FilterReader through (nested element).
-    */
     /**
      * @return Path
      * @throws BuildException
@@ -87,32 +67,6 @@ class PhingFilterReader extends DataType
         return $this->classPath->createPath();
     }
 
-    public function getClasspath()
-    {
-        return $this->classPath;
-    }
-
-    /**
-     * @param Reference $r
-     * @throws BuildException
-     */
-    public function setClasspathRef(Reference $r)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        $o = $this->createClasspath();
-        $o->setRefid($r);
-    }
-
-    /**
-     * @param Parameter $param
-     */
-    public function addParam(Parameter $param)
-    {
-        $this->parameters[] = $param;
-    }
-
     public function createParam()
     {
         $num = array_push($this->parameters, new Parameter());
@@ -120,30 +74,10 @@ class PhingFilterReader extends DataType
         return $this->parameters[$num - 1];
     }
 
-    /**
-     * @return array
-     */
-    public function getParams()
-    {
-        // We return a COPY
-        $ret = array();
-        for ($i = 0, $size = count($this->parameters); $i < $size; $i++) {
-            $ret[] = clone $this->parameters[$i];
-        }
-
-        return $ret;
-    }
-
     /*
-     * Makes this instance in effect a reference to another PhingFilterReader
-     * instance.
-     *
-     * <p>You must not set another attribute or nest elements inside
-     * this element if you make it a reference.</p>
-     *
-     * @param Reference $r the reference to which this instance is associated
-     * @exception BuildException if this instance already has been configured.
+     * Set the classpath to load the FilterReader through (nested element).
     */
+
     /**
      * @param Reference $r
      * @throws BuildException
@@ -166,5 +100,73 @@ class PhingFilterReader extends DataType
         }
 
         parent::setRefid($r);
+    }
+
+    public function getClassName()
+    {
+        return $this->className;
+    }
+
+    /**
+     * @param $className
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
+    }
+
+    public function getClasspath()
+    {
+        return $this->classPath;
+    }
+
+    /**
+     * Set the classpath to load the FilterReader through (attribute).
+     * @param Path $classpath
+     * @throws BuildException
+     */
+    public function setClasspath(Path $classpath)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        if ($this->classPath === null) {
+            $this->classPath = $classpath;
+        } else {
+            $this->classPath->append($classpath);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getParams()
+    {
+        // We return a COPY
+        $ret = [];
+        for ($i = 0, $size = count($this->parameters); $i < $size; $i++) {
+            $ret[] = clone $this->parameters[$i];
+        }
+
+        return $ret;
+    }
+
+    /*
+     * Makes this instance in effect a reference to another PhingFilterReader
+     * instance.
+     *
+     * <p>You must not set another attribute or nest elements inside
+     * this element if you make it a reference.</p>
+     *
+     * @param Reference $r the reference to which this instance is associated
+     * @exception BuildException if this instance already has been configured.
+    */
+
+    /**
+     * @param Parameter $param
+     */
+    public function addParam(Parameter $param)
+    {
+        $this->parameters[] = $param;
     }
 }

@@ -46,35 +46,28 @@ class CvsTask extends Task
      * setCompression( true ).
      */
     const DEFAULT_COMPRESSION_LEVEL = 3;
-
-    private $cmd;
-
-    /**
-     * List of Commandline children
-     * @var array Commandline[]
-     */
-    private $commandlines = array();
-
-    /**
-     * the CVSROOT variable.
-     */
-    private $cvsRoot;
-
-    /**
-     * the CVS_RSH variable.
-     */
-    private $cvsRsh;
-
-    /**
-     * the package/module to check out.
-     */
-    private $cvsModule;
-
     /**
      * the default command.
      */
     private static $default_command = "checkout";
-
+    private $cmd;
+    /**
+     * List of Commandline children
+     * @var array Commandline[]
+     */
+    private $commandlines = [];
+    /**
+     * the CVSROOT variable.
+     */
+    private $cvsRoot;
+    /**
+     * the CVS_RSH variable.
+     */
+    private $cvsRsh;
+    /**
+     * the package/module to check out.
+     */
+    private $cvsModule;
     /**
      * the CVS command to execute.
      */
@@ -129,8 +122,117 @@ class CvsTask extends Task
     }
 
     /**
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function main()
+    {
+
+        $savedCommand = $this->getCommand();
+
+        if ($this->getCommand() === null && empty($this->commandlines)) {
+            // re-implement legacy behaviour:
+            $this->setCommand(self::$default_command);
+        }
+
+        $c = $this->getCommand();
+        $cloned = null;
+        if ($c !== null) {
+            $cloned = $this->cmd->__copy();
+            $cloned->createArgument(true)->setLine($c);
+            $this->addConfiguredCommandline($cloned, true);
+        }
+
+        try {
+            for ($i = 0, $vecsize = count($this->commandlines); $i < $vecsize; $i++) {
+                $this->runCommand($this->commandlines[$i]);
+            }
+
+            // finally    {
+            if ($cloned !== null) {
+                $this->removeCommandline($cloned);
+            }
+            $this->setCommand($savedCommand);
+
+        } catch (Exception $e) {
+            // finally {
+            if ($cloned !== null) {
+                $this->removeCommandline($cloned);
+            }
+            $this->setCommand($savedCommand);
+            throw $e;
+        }
+    }
+
+    /**
+     * @return null
+     */
+    public function getCommand()
+    {
+        return $this->command;
+    }
+
+    /**
+     * The CVS command to execute.
+     * @param string $c
+     */
+    public function setCommand($c)
+    {
+        $this->command = $c;
+    }
+
+    /**
+     * Configures and adds the given Commandline.
+     * @param Commandline $c
+     * @param bool|If $insertAtStart
+     * @internal param If $insertAtStart true, c is
+     */
+    public function addConfiguredCommandline(Commandline $c, $insertAtStart = false)
+    {
+        if ($c === null) {
+            return;
+        }
+        $this->configureCommandline($c);
+        if ($insertAtStart) {
+            array_unshift($this->commandlines, $c);
+        } else {
+            array_push($this->commandlines, $c);
+        }
+    }
+
+    /**
+     * Configure a commandline element for things like cvsRoot, quiet, etc.
+     * @param $c
+     * @return string
+     */
+    protected function configureCommandline($c)
+    {
+        if ($c === null) {
+            return;
+        }
+        $c->setExecutable("cvs");
+
+        if ($this->cvsModule !== null) {
+            $c->createArgument()->setLine($this->cvsModule);
+        }
+        if ($this->compression > 0 && $this->compression < 10) {
+            $c->createArgument(true)->setValue("-z" . $this->compression);
+        }
+        if ($this->quiet) {
+            $c->createArgument(true)->setValue("-q");
+        }
+        if ($this->noexec) {
+            $c->createArgument(true)->setValue("-n");
+        }
+        if ($this->cvsRoot !== null) {
+            $c->createArgument(true)->setLine("-d" . $this->cvsRoot);
+        }
+    }
+
+    /**
      * Sets up the environment for toExecute and then runs it.
-     * @param  Commandline    $toExecute
+     * @param Commandline $toExecute
      * @throws BuildException
      */
     protected function runCommand(Commandline $toExecute)
@@ -159,7 +261,7 @@ class CvsTask extends Task
             if ($this->passFile->isFile() && $this->passFile->canRead()) {
                 putenv("CVS_PASSFILE=" . $this->passFile->__toString());
                 $this->log("Using cvs passfile: " . $this->passFile->__toString(), Project::MSG_INFO);
-            } elseif (!$this->passFile->canRead()) {
+            } else if (!$this->passFile->canRead()) {
                 $this->log(
                     "cvs passfile: " . $this->passFile->__toString()
                     . " ignored as it is not readable",
@@ -246,47 +348,23 @@ class CvsTask extends Task
     }
 
     /**
-     *
-     * @throws Exception
-     * @return void
+     * @param Commandline $c
+     * @return bool
      */
-    public function main()
+    protected function removeCommandline(Commandline $c)
     {
-
-        $savedCommand = $this->getCommand();
-
-        if ($this->getCommand() === null && empty($this->commandlines)) {
-            // re-implement legacy behaviour:
-            $this->setCommand(self::$default_command);
+        $idx = array_search($c, $this->commandlines, true);
+        if ($idx === false) {
+            return false;
         }
+        $this->commandlines = array_splice($this->commandlines, $idx, 1);
 
-        $c = $this->getCommand();
-        $cloned = null;
-        if ($c !== null) {
-            $cloned = $this->cmd->__copy();
-            $cloned->createArgument(true)->setLine($c);
-            $this->addConfiguredCommandline($cloned, true);
-        }
+        return true;
+    }
 
-        try {
-            for ($i = 0, $vecsize = count($this->commandlines); $i < $vecsize; $i++) {
-                $this->runCommand($this->commandlines[$i]);
-            }
-
-            // finally    {
-            if ($cloned !== null) {
-                $this->removeCommandline($cloned);
-            }
-            $this->setCommand($savedCommand);
-
-        } catch (Exception $e) {
-            // finally {
-            if ($cloned !== null) {
-                $this->removeCommandline($cloned);
-            }
-            $this->setCommand($savedCommand);
-            throw $e;
-        }
+    public function getCvsRoot()
+    {
+        return $this->cvsRoot;
     }
 
     /**
@@ -307,9 +385,9 @@ class CvsTask extends Task
         $this->cvsRoot = $root;
     }
 
-    public function getCvsRoot()
+    public function getCvsRsh()
     {
-        return $this->cvsRoot;
+        return $this->cvsRsh;
     }
 
     /**
@@ -329,9 +407,12 @@ class CvsTask extends Task
         $this->cvsRsh = $rsh;
     }
 
-    public function getCvsRsh()
+    /**
+     * @return int
+     */
+    public function getPort()
     {
-        return $this->cvsRsh;
+        return $this->port;
     }
 
     /**
@@ -345,11 +426,11 @@ class CvsTask extends Task
     }
 
     /**
-     * @return int
+     * @return File
      */
-    public function getPort()
+    public function getPassFile()
     {
-        return $this->port;
+        return $this->passFile;
     }
 
     /**
@@ -366,9 +447,9 @@ class CvsTask extends Task
     /**
      * @return File
      */
-    public function getPassFile()
+    public function getDest()
     {
-        return $this->passFile;
+        return $this->dest;
     }
 
     /**
@@ -379,14 +460,6 @@ class CvsTask extends Task
     public function setDest(PhingFile $dest)
     {
         $this->dest = $dest;
-    }
-
-    /**
-     * @return File
-     */
-    public function getDest()
-    {
-        return $this->dest;
     }
 
     /**
@@ -441,23 +514,6 @@ class CvsTask extends Task
     }
 
     /**
-     * The CVS command to execute.
-     * @param string $c
-     */
-    public function setCommand($c)
-    {
-        $this->command = $c;
-    }
-
-    /**
-     * @return null
-     */
-    public function getCommand()
-    {
-        return $this->command;
-    }
-
-    /**
      * If true, suppress informational messages.
      * @param boolean $q
      */
@@ -473,7 +529,7 @@ class CvsTask extends Task
      */
     public function setNoexec($ne)
     {
-        $this->noexec = (boolean) $ne;
+        $this->noexec = (boolean)$ne;
     }
 
     /**
@@ -484,80 +540,7 @@ class CvsTask extends Task
      */
     public function setFailOnError($failOnError)
     {
-        $this->failOnError = (boolean) $failOnError;
-    }
-
-    /**
-     * Configure a commandline element for things like cvsRoot, quiet, etc.
-     * @param $c
-     * @return string
-     */
-    protected function configureCommandline($c)
-    {
-        if ($c === null) {
-            return;
-        }
-        $c->setExecutable("cvs");
-
-        if ($this->cvsModule !== null) {
-            $c->createArgument()->setLine($this->cvsModule);
-        }
-        if ($this->compression > 0 && $this->compression < 10) {
-            $c->createArgument(true)->setValue("-z" . $this->compression);
-        }
-        if ($this->quiet) {
-            $c->createArgument(true)->setValue("-q");
-        }
-        if ($this->noexec) {
-            $c->createArgument(true)->setValue("-n");
-        }
-        if ($this->cvsRoot !== null) {
-            $c->createArgument(true)->setLine("-d" . $this->cvsRoot);
-        }
-    }
-
-    /**
-     * @param Commandline $c
-     * @return bool
-     */
-    protected function removeCommandline(Commandline $c)
-    {
-        $idx = array_search($c, $this->commandlines, true);
-        if ($idx === false) {
-            return false;
-        }
-        $this->commandlines = array_splice($this->commandlines, $idx, 1);
-
-        return true;
-    }
-
-    /**
-     * Configures and adds the given Commandline.
-     * @param Commandline $c
-     * @param bool|If $insertAtStart
-     * @internal param If $insertAtStart true, c is
-     */
-    public function addConfiguredCommandline(Commandline $c, $insertAtStart = false)
-    {
-        if ($c === null) {
-            return;
-        }
-        $this->configureCommandline($c);
-        if ($insertAtStart) {
-            array_unshift($this->commandlines, $c);
-        } else {
-            array_push($this->commandlines, $c);
-        }
-    }
-
-    /**
-     * If set to a value 1-9 it adds -zN to the cvs command line, else
-     * it disables compression.
-     * @param int $level
-     */
-    public function setCompressionLevel($level)
-    {
-        $this->compression = $level;
+        $this->failOnError = (boolean)$failOnError;
     }
 
     /**
@@ -572,6 +555,16 @@ class CvsTask extends Task
             $usecomp ?
                 self::DEFAULT_COMPRESSION_LEVEL : 0
         );
+    }
+
+    /**
+     * If set to a value 1-9 it adds -zN to the cvs command line, else
+     * it disables compression.
+     * @param int $level
+     */
+    public function setCompressionLevel($level)
+    {
+        $this->compression = $level;
     }
 
     /**

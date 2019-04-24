@@ -29,8 +29,8 @@ interface NodePeer
     /**
      * Returns the root node for a given scope id
      *
-     * @param int       $scopeId Scope id to determine which root node to return
-     * @param PropelPDO $con     Connection to use.
+     * @param int $scopeId Scope id to determine which root node to return
+     * @param PropelPDO $con Connection to use.
      *
      * @return object Propel object for root node
      */
@@ -39,9 +39,9 @@ interface NodePeer
     /**
      * Inserts $child as first child of destination node $parent
      *
-     * @param object    $child  Propel object for child node
-     * @param object    $parent Propel object for parent node
-     * @param PropelPDO $con    Connection to use.
+     * @param object $child Propel object for child node
+     * @param object $parent Propel object for parent node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -50,9 +50,9 @@ interface NodePeer
     /**
      * Inserts $child as last child of destination node $parent
      *
-     * @param object    $child  Propel object for child node
-     * @param object    $parent Propel object for parent node
-     * @param PropelPDO $con    Connection to use.
+     * @param object $child Propel object for child node
+     * @param object $parent Propel object for parent node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -61,9 +61,9 @@ interface NodePeer
     /**
      * Inserts $sibling as previous sibling to destination node $node
      *
-     * @param object    $node    Propel object for destination node
-     * @param object    $sibling Propel object for source node
-     * @param PropelPDO $con     Connection to use.
+     * @param object $node Propel object for destination node
+     * @param object $sibling Propel object for source node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -72,9 +72,9 @@ interface NodePeer
     /**
      * Inserts $sibling as next sibling to destination node $node
      *
-     * @param object    $node    Propel object for destination node
-     * @param object    $sibling Propel object for source node
-     * @param PropelPDO $con     Connection to use.
+     * @param object $node Propel object for destination node
+     * @param object $sibling Propel object for source node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -83,9 +83,9 @@ interface NodePeer
     /**
      * Inserts $parent as parent of given $node.
      *
-     * @param object    $parent Propel object for given parent node
-     * @param object    $node   Propel object for given destination node
-     * @param PropelPDO $con    Connection to use.
+     * @param object $parent Propel object for given parent node
+     * @param object $node Propel object for given destination node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      * @throws Exception When trying to insert node as parent of a root node
@@ -95,8 +95,8 @@ interface NodePeer
     /**
      * Inserts $node as root node
      *
-     * @param object    $node Propel object as root node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object as root node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -105,8 +105,8 @@ interface NodePeer
     /**
      * Delete root node
      *
-     * @param int       $scopeId Scope id to determine which root node to delete
-     * @param PropelPDO $con     Connection to use.
+     * @param int $scopeId Scope id to determine which root node to delete
+     * @param PropelPDO $con Connection to use.
      *
      * @return boolean Deletion status
      */
@@ -115,8 +115,8 @@ interface NodePeer
     /**
      * Delete $dest node
      *
-     * @param object    $dest Propel object node to delete
-     * @param PropelPDO $con  Connection to use.
+     * @param object $dest Propel object node to delete
+     * @param PropelPDO $con Connection to use.
      *
      * @return boolean Deletion status
      */
@@ -125,9 +125,9 @@ interface NodePeer
     /**
      * Moves $child to be first child of $parent
      *
-     * @param object    $parent Propel object for parent node
-     * @param object    $child  Propel object for child node
-     * @param PropelPDO $con    Connection to use.
+     * @param object $parent Propel object for parent node
+     * @param object $child Propel object for child node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -136,9 +136,9 @@ interface NodePeer
     /**
      * Moves $node to be last child of $dest
      *
-     * @param object    $dest Propel object for destination node
-     * @param object    $node Propel object for source node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $dest Propel object for destination node
+     * @param object $node Propel object for source node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -147,9 +147,9 @@ interface NodePeer
     /**
      * Moves $node to be prev sibling to $dest
      *
-     * @param object    $dest Propel object for destination node
-     * @param object    $node Propel object for source node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $dest Propel object for destination node
+     * @param object $node Propel object for source node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -158,9 +158,9 @@ interface NodePeer
     /**
      * Moves $node to be next sibling to $dest
      *
-     * @param object    $dest Propel object for destination node
-     * @param object    $node Propel object for source node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $dest Propel object for destination node
+     * @param object $node Propel object for source node
+     * @param PropelPDO $con Connection to use.
      *
      * @return void
      */
@@ -169,8 +169,8 @@ interface NodePeer
     /**
      * Gets first child for the given node if it exists
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return mixed Propel object if exists else false
      */
@@ -179,8 +179,8 @@ interface NodePeer
     /**
      * Gets last child for the given node if it exists
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return mixed Propel object if exists else false
      */
@@ -189,8 +189,8 @@ interface NodePeer
     /**
      * Gets prev sibling for the given node if it exists
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return mixed Propel object if exists else false
      */
@@ -199,8 +199,8 @@ interface NodePeer
     /**
      * Gets next sibling for the given node if it exists
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return mixed Propel object if exists else false
      */
@@ -209,8 +209,8 @@ interface NodePeer
     /**
      * Retrieves the entire tree from root
      *
-     * @param int       $scopeId Scope id to determine which scope tree to return
-     * @param PropelPDO $con     Connection to use.
+     * @param int $scopeId Scope id to determine which scope tree to return
+     * @param PropelPDO $con Connection to use.
      */
     public static function retrieveTree($scopeId = 1, PropelPDO $con = null);
 
@@ -224,32 +224,32 @@ interface NodePeer
     /**
      * Gets direct children for the node
      *
-     * @param object    $node Propel object for parent node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for parent node
+     * @param PropelPDO $con Connection to use.
      */
     public static function retrieveChildren(NodeObject $node, PropelPDO $con = null);
 
     /**
      * Gets all descendants for the node
      *
-     * @param object    $node Propel object for parent node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for parent node
+     * @param PropelPDO $con Connection to use.
      */
     public static function retrieveDescendants(NodeObject $node, PropelPDO $con = null);
 
     /**
      * Gets all siblings for the node
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      */
     public static function retrieveSiblings(NodeObject $node, PropelPDO $con = null);
 
     /**
      * Gets ancestor for the given node if it exists
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return mixed Propel object if exists else false
      */
@@ -258,8 +258,8 @@ interface NodePeer
     /**
      * Gets level for the given node
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return int Level for the given node
      */
@@ -268,8 +268,8 @@ interface NodePeer
     /**
      * Gets number of direct children for given node
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return int Level for the given node
      */
@@ -278,8 +278,8 @@ interface NodePeer
     /**
      * Gets number of descendants for given node
      *
-     * @param object    $node Propel object for src node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for src node
+     * @param PropelPDO $con Connection to use.
      *
      * @return int Level for the given node
      */
@@ -288,8 +288,8 @@ interface NodePeer
     /**
      * Returns path to a specific node as an array, useful to create breadcrumbs
      *
-     * @param object    $node Propel object of node to create path to
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object of node to create path to
+     * @param PropelPDO $con Connection to use.
      *
      * @return array Array in order of hierarchy
      */
@@ -325,7 +325,7 @@ interface NodePeer
     /**
      * Tests if $child is a child of $parent
      *
-     * @param object $child  Propel object for node
+     * @param object $child Propel object for node
      * @param object $parent Propel object for node
      *
      * @return bool
@@ -345,8 +345,8 @@ interface NodePeer
     /**
      * Tests if $node has an ancestor
      *
-     * @param object    $node Propel object for node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for node
+     * @param PropelPDO $con Connection to use.
      *
      * @return bool
      */
@@ -355,8 +355,8 @@ interface NodePeer
     /**
      * Tests if $node has prev sibling
      *
-     * @param object    $node Propel object for node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for node
+     * @param PropelPDO $con Connection to use.
      *
      * @return bool
      */
@@ -365,8 +365,8 @@ interface NodePeer
     /**
      * Tests if $node has next sibling
      *
-     * @param object    $node Propel object for node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for node
+     * @param PropelPDO $con Connection to use.
      *
      * @return bool
      */
@@ -384,8 +384,8 @@ interface NodePeer
     /**
      * Deletes $node and all of its descendants
      *
-     * @param object    $node Propel object for source node
-     * @param PropelPDO $con  Connection to use.
+     * @param object $node Propel object for source node
+     * @param PropelPDO $con Connection to use.
      */
     public static function deleteDescendants(NodeObject $node, PropelPDO $con = null);
 
@@ -393,7 +393,7 @@ interface NodePeer
      * Returns a node given its primary key or the node itself
      *
      * @param int/object $node Primary key/instance of required node
-     * @param PropelPDO  $con  Connection to use.
+     * @param PropelPDO $con Connection to use.
      *
      * @return object Propel object for model
      */

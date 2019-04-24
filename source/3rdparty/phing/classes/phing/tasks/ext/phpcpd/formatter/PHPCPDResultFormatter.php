@@ -31,9 +31,9 @@ abstract class PHPCPDResultFormatter
     /**
      * Processes a list of clones.
      *
-     * @param object         $clones
-     * @param Project        $project
-     * @param boolean        $useFile
+     * @param object $clones
+     * @param Project $project
+     * @param boolean $useFile
      * @param PhingFile|null $outFile
      */
     abstract public function processClones($clones, Project $project, $useFile = false, $outFile = null);

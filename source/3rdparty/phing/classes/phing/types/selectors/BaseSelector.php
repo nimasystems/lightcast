@@ -52,6 +52,22 @@ abstract class BaseSelector extends DataType implements FileSelector
     }
 
     /**
+     * Subclasses can use this to throw the requisite exception
+     * in isSelected() in the case of an error condition.
+     *
+     * @throws BuildException
+     */
+    public function validate()
+    {
+        if ($this->getError() === null) {
+            $this->verifySettings();
+        }
+        if ($this->getError() !== null) {
+            throw new BuildException($this->errmsg);
+        }
+    }
+
+    /**
      * Returns any error messages that have been set.
      *
      * @return string the error condition
@@ -70,21 +86,5 @@ abstract class BaseSelector extends DataType implements FileSelector
      */
     public function verifySettings()
     {
-    }
-
-    /**
-     * Subclasses can use this to throw the requisite exception
-     * in isSelected() in the case of an error condition.
-     *
-     * @throws BuildException
-     */
-    public function validate()
-    {
-        if ($this->getError() === null) {
-            $this->verifySettings();
-        }
-        if ($this->getError() !== null) {
-            throw new BuildException($this->errmsg);
-        }
     }
 }

@@ -87,78 +87,6 @@ class PgsqlPDOQuerySplitter extends PDOQuerySplitter
     protected $inputIndex;
 
     /**
-     * Gets next symbol from the input, false if at end
-     *
-     * @return string|bool
-     */
-    public function getc()
-    {
-        if (!strlen($this->line) || $this->inputIndex >= strlen($this->line)) {
-            if (null === ($line = $this->sqlReader->readLine())) {
-                return false;
-            }
-            $project = $this->parent->getOwningTarget()->getProject();
-            $this->line = ProjectConfigurator::replaceProperties(
-                    $project,
-                    $line,
-                    $project->getProperties()
-                ) . "\n";
-            $this->inputIndex = 0;
-        }
-
-        return $this->line[$this->inputIndex++];
-    }
-
-    /**
-     * Bactracks one symbol on the input
-     *
-     * NB: we don't need ungetc() at the start of the line, so this case is
-     * not handled.
-     */
-    public function ungetc()
-    {
-        $this->inputIndex--;
-    }
-
-    /**
-     * Checks whether symbols after $ are a valid dollar-quoting tag
-     *
-     * @return string|bool Dollar-quoting "tag" if it is present, false otherwise
-     */
-    protected function checkDollarQuote()
-    {
-        $ch = $this->getc();
-        if ('$' == $ch) {
-            // empty tag
-            return '';
-
-        } elseif (!ctype_alpha($ch) && '_' != $ch) {
-            // not a delimiter
-            $this->ungetc();
-
-            return false;
-
-        } else {
-            $tag = $ch;
-            while (false !== ($ch = $this->getc())) {
-                if ('$' == $ch) {
-                    return $tag;
-
-                } elseif (ctype_alnum($ch) || '_' == $ch) {
-                    $tag .= $ch;
-
-                } else {
-                    for ($i = 0; $i < strlen($tag); $i++) {
-                        $this->ungetc();
-                    }
-
-                    return false;
-                }
-            }
-        }
-    }
-
-    /**
      * @return null|string
      */
     public function nextQuery()
@@ -296,5 +224,77 @@ class PgsqlPDOQuerySplitter extends PDOQuerySplitter
         }
 
         return null;
+    }
+
+    /**
+     * Gets next symbol from the input, false if at end
+     *
+     * @return string|bool
+     */
+    public function getc()
+    {
+        if (!strlen($this->line) || $this->inputIndex >= strlen($this->line)) {
+            if (null === ($line = $this->sqlReader->readLine())) {
+                return false;
+            }
+            $project = $this->parent->getOwningTarget()->getProject();
+            $this->line = ProjectConfigurator::replaceProperties(
+                    $project,
+                    $line,
+                    $project->getProperties()
+                ) . "\n";
+            $this->inputIndex = 0;
+        }
+
+        return $this->line[$this->inputIndex++];
+    }
+
+    /**
+     * Bactracks one symbol on the input
+     *
+     * NB: we don't need ungetc() at the start of the line, so this case is
+     * not handled.
+     */
+    public function ungetc()
+    {
+        $this->inputIndex--;
+    }
+
+    /**
+     * Checks whether symbols after $ are a valid dollar-quoting tag
+     *
+     * @return string|bool Dollar-quoting "tag" if it is present, false otherwise
+     */
+    protected function checkDollarQuote()
+    {
+        $ch = $this->getc();
+        if ('$' == $ch) {
+            // empty tag
+            return '';
+
+        } else if (!ctype_alpha($ch) && '_' != $ch) {
+            // not a delimiter
+            $this->ungetc();
+
+            return false;
+
+        } else {
+            $tag = $ch;
+            while (false !== ($ch = $this->getc())) {
+                if ('$' == $ch) {
+                    return $tag;
+
+                } else if (ctype_alnum($ch) || '_' == $ch) {
+                    $tag .= $ch;
+
+                } else {
+                    for ($i = 0; $i < strlen($tag); $i++) {
+                        $this->ungetc();
+                    }
+
+                    return false;
+                }
+            }
+        }
     }
 }

@@ -18,11 +18,25 @@ class PropelXMLParser extends PropelParser
 {
 
     /**
+     * Alias for PropelXMLParser::fromArray()
+     *
+     * @param array $array Source data to convert
+     * @param string $rootElementName Name of the root element of the XML document
+     * @param string $charset Character set of the input data. Defaults to UTF-8.
+     *
+     * @return string Converted data, as an XML string
+     */
+    public function toXML($array, $rootElementName = 'data', $charset = null)
+    {
+        return $this->fromArray($array, $rootElementName, $charset);
+    }
+
+    /**
      * Converts data from an associative array to XML.
      *
-     * @param array  $array           Source data to convert
+     * @param array $array Source data to convert
      * @param string $rootElementName Name of the root element of the XML document
-     * @param string $charset         Character set of the input data. Defaults to UTF-8.
+     * @param string $charset Character set of the input data. Defaults to UTF-8.
      *
      * @return string Converted data, as an XML string
      */
@@ -30,14 +44,6 @@ class PropelXMLParser extends PropelParser
     {
         $rootNode = $this->getRootNode($rootElementName);
         $this->arrayToDOM($array, $rootNode, $charset, false);
-
-        return $rootNode->ownerDocument->saveXML();
-    }
-
-    public function listFromArray($array, $rootElementName = 'data', $charset = null)
-    {
-        $rootNode = $this->getRootNode($rootElementName);
-        $this->arrayToDOM($array, $rootNode, $charset, true);
 
         return $rootNode->ownerDocument->saveXML();
     }
@@ -61,38 +67,10 @@ class PropelXMLParser extends PropelParser
     }
 
     /**
-     * Alias for PropelXMLParser::fromArray()
-     *
-     * @param array  $array           Source data to convert
-     * @param string $rootElementName Name of the root element of the XML document
-     * @param string $charset         Character set of the input data. Defaults to UTF-8.
-     *
-     * @return string Converted data, as an XML string
-     */
-    public function toXML($array, $rootElementName = 'data', $charset = null)
-    {
-        return $this->fromArray($array, $rootElementName, $charset);
-    }
-
-    /**
-     * Alias for PropelXMLParser::listFromArray()
-     *
-     * @param array  $array           Source data to convert
-     * @param string $rootElementName Name of the root element of the XML document
-     * @param string $charset         Character set of the input data. Defaults to UTF-8.
-     *
-     * @return string Converted data, as an XML string
-     */
-    public function listToXML($array, $rootElementName = 'data', $charset = null)
-    {
-        return $this->listFromArray($array, $rootElementName, $charset);
-    }
-
-    /**
-     * @param array      $array
+     * @param array $array
      * @param DOMElement $rootElement
-     * @param string     $charset
-     * @param boolean    $removeNumbersFromKeys
+     * @param string $charset
+     * @param boolean $removeNumbersFromKeys
      *
      * @return DOMElement
      */
@@ -107,7 +85,7 @@ class PropelXMLParser extends PropelParser
                 if (!empty($value)) {
                     $element = $this->arrayToDOM($value, $element, $charset);
                 }
-            } elseif (is_string($value)) {
+            } else if (is_string($value)) {
                 $charset = $charset ? $charset : 'utf-8';
                 if (function_exists('iconv') && strcasecmp($charset, 'utf-8') !== 0 && strcasecmp($charset, 'utf8') !== 0) {
                     $value = iconv($charset, 'UTF-8', $value);
@@ -123,6 +101,40 @@ class PropelXMLParser extends PropelParser
         }
 
         return $rootElement;
+    }
+
+    /**
+     * Alias for PropelXMLParser::listFromArray()
+     *
+     * @param array $array Source data to convert
+     * @param string $rootElementName Name of the root element of the XML document
+     * @param string $charset Character set of the input data. Defaults to UTF-8.
+     *
+     * @return string Converted data, as an XML string
+     */
+    public function listToXML($array, $rootElementName = 'data', $charset = null)
+    {
+        return $this->listFromArray($array, $rootElementName, $charset);
+    }
+
+    public function listFromArray($array, $rootElementName = 'data', $charset = null)
+    {
+        $rootNode = $this->getRootNode($rootElementName);
+        $this->arrayToDOM($array, $rootNode, $charset, true);
+
+        return $rootNode->ownerDocument->saveXML();
+    }
+
+    /**
+     * Alias for PropelXMLParser::toArray()
+     *
+     * @param string $data Source data to convert, as an XML string
+     *
+     * @return array Converted data
+     */
+    public function fromXML($data)
+    {
+        return $this->toArray($data);
     }
 
     /**
@@ -142,26 +154,14 @@ class PropelXMLParser extends PropelParser
     }
 
     /**
-     * Alias for PropelXMLParser::toArray()
-     *
-     * @param string $data Source data to convert, as an XML string
-     *
-     * @return array Converted data
-     */
-    public function fromXML($data)
-    {
-        return $this->toArray($data);
-    }
-
-    /**
      * @param DOMNode $data
      *
      * @return array
      */
     protected function convertDOMElementToArray(DOMNode $data)
     {
-        $array = array();
-        $elementNames = array();
+        $array = [];
+        $elementNames = [];
         foreach ($data->childNodes as $element) {
             if ($element->nodeType == XML_TEXT_NODE) {
                 continue;
@@ -181,9 +181,9 @@ class PropelXMLParser extends PropelParser
             }
             if ($element->hasChildNodes() && !$this->hasOnlyTextNodes($element)) {
                 $array[$index] = $this->convertDOMElementToArray($element);
-            } elseif ($element->hasChildNodes() && $element->firstChild->nodeType == XML_CDATA_SECTION_NODE) {
+            } else if ($element->hasChildNodes() && $element->firstChild->nodeType == XML_CDATA_SECTION_NODE) {
                 $array[$index] = htmlspecialchars_decode($element->firstChild->textContent);
-            } elseif (!$element->hasChildNodes()) {
+            } else if (!$element->hasChildNodes()) {
                 $array[$index] = null;
             } else {
                 $array[$index] = $element->textContent;

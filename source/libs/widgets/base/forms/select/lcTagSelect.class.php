@@ -45,32 +45,11 @@ class lcTagSelect extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    /**
-     * @return lcTagSelect
-     */
-    public static function create()
-    {
-        return new lcTagSelect();
-    }
-
     public function setName($value = null)
     {
         $this->setAttribute('name', $value);
         return $this;
     }
-
-    /**
-     * @param string $placeholder
-     * @return $this
-     */
-    public function setPlaceholder($placeholder = null)
-    {
-        return $this->attr('placeholder', $placeholder);
-    }
-
-    /*
-     * Can be option or option group
-    */
 
     public function setSize($value = null)
     {
@@ -84,6 +63,10 @@ class lcTagSelect extends lcHtmlTag
         return $this;
     }
 
+    /*
+     * Can be option or option group
+    */
+
     public function setIsDisabled($value = false)
     {
         $this->setAttribute('disabled', $value ? 'disabled' : null);
@@ -96,6 +79,14 @@ class lcTagSelect extends lcHtmlTag
         return $this;
     }
 
+    /**
+     * @return lcTagSelect
+     */
+    public static function create()
+    {
+        return new lcTagSelect();
+    }
+
     public static function getRequiredAttributes()
     {
         return [];
@@ -104,6 +95,20 @@ class lcTagSelect extends lcHtmlTag
     public static function getOptionalAttributes()
     {
         return ['name', 'size', 'multiply', 'disabled', 'tabindex'];
+    }
+
+    /**
+     * @param string $placeholder
+     * @return $this
+     */
+    public function setPlaceholder($placeholder = null)
+    {
+        return $this->attr('placeholder', $placeholder);
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     /**
@@ -121,7 +126,7 @@ class lcTagSelect extends lcHtmlTag
                 $option instanceof lcOptGroup
             ) {
                 $this->addOption($option);
-            } elseif (is_array($option)) {
+            } else if (is_array($option)) {
                 if (isset($option[$key_identifier]) &&
                     isset($option[$value_identifier])
                 ) {
@@ -150,11 +155,6 @@ class lcTagSelect extends lcHtmlTag
 
         $this->options[] = $option;
         return $this;
-    }
-
-    public function getOptions()
-    {
-        return $this->options;
     }
 
     public function getOption($id)

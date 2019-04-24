@@ -24,24 +24,6 @@ class NestedSetBehaviorQueryBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
-    protected function getColumn($name)
-    {
-        return $this->behavior->getColumnForParameter($name);
-    }
-
-    protected function setBuilder($builder)
-    {
-        $this->builder = $builder;
-        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
-        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
-        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
-    }
-
     public function queryMethods($builder)
     {
         $this->setBuilder($builder);
@@ -69,6 +51,14 @@ class NestedSetBehaviorQueryBuilderModifier
         $this->addFindTree($script);
 
         return $script;
+    }
+
+    protected function setBuilder($builder)
+    {
+        $this->builder = $builder;
+        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
+        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
+        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
     }
 
     protected function addTreeRoots(&$script)
@@ -375,5 +365,15 @@ public function findTree(" . ($useScope ? "\$scope = null, " : "") . "\$con = nu
         ->find(\$con);
 }
 ";
+    }
+
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
+    }
+
+    protected function getColumn($name)
+    {
+        return $this->behavior->getColumnForParameter($name);
     }
 }

@@ -27,8 +27,8 @@ class lcAppPluginsConfigHandler extends lcEnvConfigHandler
     {
         return [
             'plugins' => [
-                'enabled' => []
-            ]
+                'enabled' => [],
+            ],
         ];
     }
 }

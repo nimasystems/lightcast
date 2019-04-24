@@ -66,12 +66,12 @@ include_once 'phing/types/FileSet.php';
 class Path extends DataType
 {
 
-    private $elements = array();
+    private $elements = [];
 
     /**
      * Constructor for internally instantiated objects sets project.
      * @param Project $project
-     * @param string  $path    (for use by IntrospectionHelper)
+     * @param string $path (for use by IntrospectionHelper)
      */
     public function __construct($project = null, $path = null)
     {
@@ -84,21 +84,121 @@ class Path extends DataType
     }
 
     /**
-     * Adds a element definition to the path.
-     *
-     * @param PhingFile $location the location of the element to add (must not be
-     *                            <code>null</code> nor empty.
+     * Creates the nested <code>&lt;pathelement&gt;</code> element.
      *
      * @return void
      *
      * @throws BuildException
      */
-    public function setDir(PhingFile $location)
+    public function createPathElement()
     {
         if ($this->isReference()) {
-            throw $this->tooManyAttributes();
+            throw $this->noChildrenAllowed();
         }
-        $this->createPathElement()->setDir($location);
+        $pe = new PathElement($this);
+        $this->elements[] = $pe;
+
+        return $pe;
+    }
+
+    /**
+     * Splits a PATH (with : or ; as separators) into its parts.
+     *
+     * @param Project $project
+     * @param string $source
+     *
+     * @return array
+     */
+    public static function translatePath(Project $project, $source)
+    {
+        $result = [];
+        if ($source == null) {
+            return "";
+        }
+
+        $tok = new PathTokenizer($source);
+        while ($tok->hasMoreTokens()) {
+            $pathElement = $tok->nextToken();
+            try {
+                $element = self::resolveFile($project, $pathElement);
+                for ($i = 0, $_i = strlen($element); $i < $_i; $i++) {
+                    self::translateFileSep($element, $i);
+                }
+                $result[] = $element;
+            } catch (BuildException $e) {
+                $project->log(
+                    "Dropping path element " . $pathElement
+                    . " as it is not valid relative to the project",
+                    Project::MSG_VERBOSE
+                );
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Resolve a filename with Project's help - if we know one that is.
+     *
+     * <p>Assume the filename is absolute if project is null.</p>
+     *
+     * @param Project $project
+     * @param $relativeName
+     *
+     * @return string
+     */
+    private static function resolveFile(Project $project, $relativeName)
+    {
+        if ($project !== null) {
+            $f = $project->resolveFile($relativeName);
+
+            return $f->getAbsolutePath();
+        }
+
+        return $relativeName;
+    }
+
+    /**
+     * Translates all occurrences of / or \ to correct separator of the
+     * current platform and returns whether it had to do any
+     * replacements.
+     *
+     * @param string $buffer
+     * @param int $pos
+     *
+     * @return bool
+     */
+    protected static function translateFileSep(&$buffer, $pos)
+    {
+        if ($buffer{$pos} == '/' || $buffer{$pos} == '\\') {
+            $buffer{$pos} = DIRECTORY_SEPARATOR;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns its argument with all file separator characters
+     * replaced so that they match the local OS conventions.
+     *
+     * @param string $source
+     *
+     * @return string
+     */
+    public static function translateFile($source)
+    {
+        if ($source == null) {
+            return "";
+        }
+
+        $result = $source;
+        for ($i = 0, $_i = strlen($source); $i < $_i; $i++) {
+            self::translateFileSep($result, $i);
+        }
+
+        return $result;
     }
 
     /**
@@ -135,24 +235,6 @@ class Path extends DataType
         }
         $this->elements[] = $r;
         parent::setRefid($r);
-    }
-
-    /**
-     * Creates the nested <code>&lt;pathelement&gt;</code> element.
-     *
-     * @return void
-     *
-     * @throws BuildException
-     */
-    public function createPathElement()
-    {
-        if ($this->isReference()) {
-            throw $this->noChildrenAllowed();
-        }
-        $pe = new PathElement($this);
-        $this->elements[] = $pe;
-
-        return $pe;
     }
 
     /**
@@ -211,28 +293,6 @@ class Path extends DataType
     }
 
     /**
-     * Append the contents of the other Path instance to this.
-     *
-     * @param Path $other
-     *
-     * @return void
-     *
-     * @throws BuildException
-     */
-    public function append(Path $other)
-    {
-        if ($other === null) {
-            return;
-        }
-        $l = $other->listPaths();
-        foreach ($l as $path) {
-            if (!in_array($path, $this->elements, true)) {
-                $this->elements[] = $path;
-            }
-        }
-    }
-
-    /**
      * Adds the components on the given path which exist to this
      * Path. Components that don't exist, aren't added.
      *
@@ -265,20 +325,20 @@ class Path extends DataType
     /**
      * Returns all path elements defined by this and nested path objects.
      *
+     * @return array List of path elements.
      * @throws BuildException
      *
-     * @return array List of path elements.
      */
     public function listPaths()
     {
         if (!$this->checked) {
             // make sure we don't have a circular reference here
-            $stk = array();
+            $stk = [];
             array_push($stk, $this);
             $this->dieOnCircularReference($stk, $this->project);
         }
 
-        $result = array();
+        $result = [];
         for ($i = 0, $elSize = count($this->elements); $i < $elSize; $i++) {
             $o = $this->elements[$i];
             if ($o instanceof Reference) {
@@ -293,7 +353,7 @@ class Path extends DataType
 
             if (is_string($o)) {
                 $result[] = $o;
-            } elseif ($o instanceof PathElement) {
+            } else if ($o instanceof PathElement) {
                 $parts = $o->getParts();
                 if ($parts === null) {
                     throw new BuildException("You must either set location or"
@@ -302,7 +362,7 @@ class Path extends DataType
                 foreach ($parts as $part) {
                     $result[] = $part;
                 }
-            } elseif ($o instanceof Path) {
+            } else if ($o instanceof Path) {
                 $p = $o;
                 if ($p->getProject() === null) {
                     $p->setProject($this->getProject());
@@ -311,7 +371,7 @@ class Path extends DataType
                 foreach ($parts as $part) {
                     $result[] = $part;
                 }
-            } elseif ($o instanceof DirSet) {
+            } else if ($o instanceof DirSet) {
                 $dset = $o;
                 $ds = $dset->getDirectoryScanner($this->project);
                 $dirstrs = $ds->getIncludedDirectories();
@@ -320,7 +380,7 @@ class Path extends DataType
                     $d = new PhingFile($dir, $dstr);
                     $result[] = $d->getAbsolutePath();
                 }
-            } elseif ($o instanceof FileList) {
+            } else if ($o instanceof FileList) {
                 $fl = $o;
                 $dirstrs = $fl->getFiles($this->project);
                 $dir = $fl->getDir($this->project);
@@ -332,130 +392,6 @@ class Path extends DataType
         }
 
         return array_unique($result);
-    }
-
-
-    /**
-     * Returns a textual representation of the path, which can be used as
-     * CLASSPATH or PATH environment variable definition.
-     *
-     * @return string A textual representation of the path.
-     */
-    public function __toString()
-    {
-
-        $list = $this->listPaths();
-
-        // empty path return empty string
-        if (empty($list)) {
-            return "";
-        }
-
-        return implode(PATH_SEPARATOR, $list);
-    }
-
-    /**
-     * Splits a PATH (with : or ; as separators) into its parts.
-     *
-     * @param Project $project
-     * @param string $source
-     *
-     * @return array
-     */
-    public static function translatePath(Project $project, $source)
-    {
-        $result = array();
-        if ($source == null) {
-            return "";
-        }
-
-        $tok = new PathTokenizer($source);
-        while ($tok->hasMoreTokens()) {
-            $pathElement = $tok->nextToken();
-            try {
-                $element = self::resolveFile($project, $pathElement);
-                for ($i = 0, $_i = strlen($element); $i < $_i; $i++) {
-                    self::translateFileSep($element, $i);
-                }
-                $result[] = $element;
-            } catch (BuildException $e) {
-                $project->log(
-                    "Dropping path element " . $pathElement
-                    . " as it is not valid relative to the project",
-                    Project::MSG_VERBOSE
-                );
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Returns its argument with all file separator characters
-     * replaced so that they match the local OS conventions.
-     *
-     * @param string $source
-     *
-     * @return string
-     */
-    public static function translateFile($source)
-    {
-        if ($source == null) {
-            return "";
-        }
-
-        $result = $source;
-        for ($i = 0, $_i = strlen($source); $i < $_i; $i++) {
-            self::translateFileSep($result, $i);
-        }
-
-        return $result;
-    }
-
-    /**
-     * Translates all occurrences of / or \ to correct separator of the
-     * current platform and returns whether it had to do any
-     * replacements.
-     *
-     * @param string $buffer
-     * @param int $pos
-     *
-     * @return bool
-     */
-    protected static function translateFileSep(&$buffer, $pos)
-    {
-        if ($buffer{$pos} == '/' || $buffer{$pos} == '\\') {
-            $buffer{$pos} = DIRECTORY_SEPARATOR;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * How many parts does this Path instance consist of.
-     * DEV NOTE: expensive call! list is generated, counted, and then
-     * discareded.
-     *
-     * @return int
-     */
-    public function size()
-    {
-        return count($this->listPaths());
-    }
-
-    /**
-     * Return a Path that holds the same elements as this instance.
-     *
-     * @return Path
-     */
-    public function __clone()
-    {
-        $p = new Path($this->project);
-        $p->append($this);
-
-        return $p;
     }
 
     /**
@@ -498,24 +434,87 @@ class Path extends DataType
     }
 
     /**
-     * Resolve a filename with Project's help - if we know one that is.
+     * Adds a element definition to the path.
      *
-     * <p>Assume the filename is absolute if project is null.</p>
+     * @param PhingFile $location the location of the element to add (must not be
+     *                            <code>null</code> nor empty.
      *
-     * @param Project $project
-     * @param $relativeName
+     * @return void
      *
-     * @return string
+     * @throws BuildException
      */
-    private static function resolveFile(Project $project, $relativeName)
+    public function setDir(PhingFile $location)
     {
-        if ($project !== null) {
-            $f = $project->resolveFile($relativeName);
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        $this->createPathElement()->setDir($location);
+    }
 
-            return $f->getAbsolutePath();
+    /**
+     * Returns a textual representation of the path, which can be used as
+     * CLASSPATH or PATH environment variable definition.
+     *
+     * @return string A textual representation of the path.
+     */
+    public function __toString()
+    {
+
+        $list = $this->listPaths();
+
+        // empty path return empty string
+        if (empty($list)) {
+            return "";
         }
 
-        return $relativeName;
+        return implode(PATH_SEPARATOR, $list);
+    }
+
+    /**
+     * How many parts does this Path instance consist of.
+     * DEV NOTE: expensive call! list is generated, counted, and then
+     * discareded.
+     *
+     * @return int
+     */
+    public function size()
+    {
+        return count($this->listPaths());
+    }
+
+    /**
+     * Return a Path that holds the same elements as this instance.
+     *
+     * @return Path
+     */
+    public function __clone()
+    {
+        $p = new Path($this->project);
+        $p->append($this);
+
+        return $p;
+    }
+
+    /**
+     * Append the contents of the other Path instance to this.
+     *
+     * @param Path $other
+     *
+     * @return void
+     *
+     * @throws BuildException
+     */
+    public function append(Path $other)
+    {
+        if ($other === null) {
+            return;
+        }
+        $l = $other->listPaths();
+        foreach ($l as $path) {
+            if (!in_array($path, $this->elements, true)) {
+                $this->elements[] = $path;
+            }
+        }
     }
 }
 
@@ -527,7 +526,7 @@ class Path extends DataType
 class PathElement
 {
     /** @var array $parts */
-    private $parts = array();
+    private $parts = [];
 
     /** @var Path $outer */
     private $outer;
@@ -547,7 +546,7 @@ class PathElement
      */
     public function setDir(PhingFile $loc)
     {
-        $this->parts = array(Path::translateFile($loc->getAbsolutePath()));
+        $this->parts = [Path::translateFile($loc->getAbsolutePath())];
     }
 
     /**

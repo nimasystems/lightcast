@@ -36,11 +36,6 @@ class lcTagImg extends lcHtmlTag
         $this->setLongDesc($longdesc);
     }
 
-    public static function create()
-    {
-        return new lcTagImg();
-    }
-
     public function setSrc($value)
     {
         $this->setAttribute('src', $value);
@@ -69,6 +64,11 @@ class lcTagImg extends lcHtmlTag
     {
         $this->setAttribute('longdesc', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagImg();
     }
 
     public static function getRequiredAttributes()

@@ -68,7 +68,7 @@ class PropelForeignKeyComparator
          *
          * "RESTRICT" and its synonym "NO ACTION" is default and is not being reported explicitly.
          */
-        $equalBehavior = array('', 'RESTRICT', 'NO ACTION');
+        $equalBehavior = ['', 'RESTRICT', 'NO ACTION'];
 
         $fromOnUpdate = strtoupper($fromFk->normalizeFKey($fromFk->getOnUpdate()));
         $toOnUpdate = strtoupper($toFk->normalizeFKey($toFk->getOnUpdate()));

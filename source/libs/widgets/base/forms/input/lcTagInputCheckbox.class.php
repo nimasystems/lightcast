@@ -32,15 +32,15 @@ class lcTagInputCheckbox extends lcTagInput
         $this->setIsChecked($checked);
     }
 
-    public static function create()
-    {
-        return new lcTagInputCheckbox();
-    }
-
     public function setIsChecked($value = false)
     {
         $this->setAttribute('checked', $value ? 'checked' : null);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagInputCheckbox();
     }
 
     public static function getRequiredAttributes()

@@ -50,8 +50,8 @@ class ZipTask extends MatchingTask
      */
     private $includeEmpty = true;
 
-    private $filesets = array();
-    
+    private $filesets = [];
+
     private $ignoreLinks = false;
 
     /**
@@ -112,22 +112,22 @@ class ZipTask extends MatchingTask
 
     /**
      * Set the include empty dirs flag.
-     * @param  boolean  Flag if empty dirs should be tarred too
+     * @param boolean  Flag if empty dirs should be tarred too
      * @return void
      */
     public function setIncludeEmptyDirs($bool)
     {
-        $this->includeEmpty = (boolean) $bool;
+        $this->includeEmpty = (boolean)$bool;
     }
 
     /**
      * Set the ignore symlinks flag.
-     * @param  boolean $bool Flag if symlinks should be ignored
+     * @param boolean $bool Flag if symlinks should be ignored
      * @return void
      */
     public function setIgnoreLinks($bool)
     {
-        $this->ignoreLinks = (boolean) $bool;
+        $this->ignoreLinks = (boolean)$bool;
     }
 
     /**
@@ -167,7 +167,7 @@ class ZipTask extends MatchingTask
         try {
             if ($this->baseDir !== null) {
                 if (!$this->baseDir->exists()) {
-                    throw new BuildException("basedir '" . (string) $this->baseDir . "' does not exist!", $this->getLocation());
+                    throw new BuildException("basedir '" . (string)$this->baseDir . "' does not exist!", $this->getLocation());
                 }
 
                 if (empty($this->filesets)) {
@@ -218,20 +218,6 @@ class ZipTask extends MatchingTask
     }
 
     /**
-     * @param  array     $files array of filenames
-     * @param  PhingFile $dir
-     * @return boolean
-     */
-    private function archiveIsUpToDate($files, $dir)
-    {
-        $sfs = new SourceFileScanner($this);
-        $mm = new MergeMapper();
-        $mm->setTo($this->zipFile->getAbsolutePath());
-
-        return count($sfs->restrict($files, $dir, null, $mm)) == 0;
-    }
-
-    /**
      * @return array
      * @throws BuildException
      */
@@ -249,6 +235,20 @@ class ZipTask extends MatchingTask
             }
         }
         return true;
+    }
+
+    /**
+     * @param array $files array of filenames
+     * @param PhingFile $dir
+     * @return boolean
+     */
+    private function archiveIsUpToDate($files, $dir)
+    {
+        $sfs = new SourceFileScanner($this);
+        $mm = new MergeMapper();
+        $mm->setTo($this->zipFile->getAbsolutePath());
+
+        return count($sfs->restrict($files, $dir, null, $mm)) == 0;
     }
 
     /**
@@ -272,7 +272,7 @@ class ZipTask extends MatchingTask
 
                 if ($this->ignoreLinks && $f->isLink()) {
                     continue;
-                } elseif ($f->isDirectory()) {
+                } else if ($f->isDirectory()) {
                     if ($pathInZip != '.') {
                         $zip->addEmptyDir($pathInZip);
                     }
@@ -303,9 +303,9 @@ class ZipFileSet extends FileSet
      *  Get a list of files and directories specified in the fileset.
      * @param Project $p
      * @param bool $includeEmpty
-     * @throws BuildException
      * @return array a list of file and directory names, relative to
      *               the baseDir for the project.
+     * @throws BuildException
      */
     public function getFiles(Project $p, $includeEmpty = true)
     {
@@ -316,7 +316,7 @@ class ZipFileSet extends FileSet
             $this->files = $ds->getIncludedFiles();
 
             // build a list of directories implicitly added by any of the files
-            $implicitDirs = array();
+            $implicitDirs = [];
             foreach ($this->files as $file) {
                 $implicitDirs[] = dirname($file);
             }
@@ -336,7 +336,7 @@ class ZipFileSet extends FileSet
 
             $implicitDirs = array_unique($implicitDirs);
 
-            $emptyDirectories = array();
+            $emptyDirectories = [];
 
             if ($includeEmpty) {
                 // Now add any empty dirs (dirs not covered by the implicit dirs)

@@ -27,7 +27,6 @@
  * @version   $Id: feed38557f156bd1c61593a048f37c2e246faf87 $
  * @package   phing.parser
  */
-
 class Location
 {
 
@@ -38,15 +37,23 @@ class Location
     /**
      * Constructs the location consisting of a file name and line number
      *
-     * @param  string  the filename
-     * @param  integer the line number
-     * @param  integer the column number
+     * @param string  the filename
+     * @param integer the line number
+     * @param integer the column number
      */
     public function __construct($fileName = null, $lineNumber = null, $columnNumber = null)
     {
         $this->fileName = $fileName;
         $this->lineNumber = $lineNumber;
         $this->columnNumber = $columnNumber;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toString();
     }
 
     /**
@@ -68,14 +75,6 @@ class Location
             $buf .= ":" . $this->columnNumber;
         }
 
-        return (string) $buf;
-    }
-
-    /**
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toString();
+        return (string)$buf;
     }
 }

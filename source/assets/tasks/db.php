@@ -23,23 +23,6 @@
 
 class tDb extends lcTaskController
 {
-    public function getHelpInfo()
-    {
-        $help =
-            lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
-            lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
-            lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
-            'schema:upgrade_encoding - Upgrade the database and all tables to another encoding/collation (for example: UTF8MB4 / UT8MB4_UNICODE_CI)
-                --db - database name
-                --hostname=localhost
-                --user=root
-                --pass
-                --encoding=utf8m4
-                --collation=utf8mb4_unicode_ci';
-
-        return $help;
-    }
-
     public function executeTask()
     {
         $action = $this->getRequest()->getParam('action');
@@ -74,7 +57,7 @@ class tDb extends lcTaskController
 
         $dsn = 'mysql:host=' . $hostname . ';dbname=' . $db_name;
         $db = new PDO($dsn, $user, $pass, [
-            PDO::ERRMODE_EXCEPTION
+            PDO::ERRMODE_EXCEPTION,
         ]);
         $db->exec('SET NAMES ' . $encoding . ' COLLATE ' . $collation);
 
@@ -138,5 +121,22 @@ class tDb extends lcTaskController
         $db->exec('ALTER DATABASE ' . $db_name . ' CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci');
 
         return true;
+    }
+
+    public function getHelpInfo()
+    {
+        $help =
+            lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
+            lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
+            lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
+            'schema:upgrade_encoding - Upgrade the database and all tables to another encoding/collation (for example: UTF8MB4 / UT8MB4_UNICODE_CI)
+                --db - database name
+                --hostname=localhost
+                --user=root
+                --pass
+                --encoding=utf8m4
+                --collation=utf8mb4_unicode_ci';
+
+        return $help;
     }
 }

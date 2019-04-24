@@ -47,7 +47,7 @@ class lcValidatorFailure implements Serializable, JsonSerializable
         return serialize([
             'name' => $this->name,
             'message' => $this->message,
-            'extra_data' => $this->extra_data
+            'extra_data' => $this->extra_data,
         ]);
     }
 
@@ -66,7 +66,7 @@ class lcValidatorFailure implements Serializable, JsonSerializable
         return json_encode([
             'name' => $this->name,
             'message' => $this->message,
-            'extra_data' => $this->extra_data
+            'extra_data' => $this->extra_data,
         ]);
     }
 }

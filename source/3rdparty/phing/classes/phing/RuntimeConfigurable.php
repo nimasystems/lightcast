@@ -36,13 +36,13 @@ class RuntimeConfigurable
     private $elementTag = null;
 
     /** @var array $children */
-    private $children = array();
+    private $children = [];
 
     /** @var object|Task $wrappedObject */
     private $wrappedObject = null;
 
     /** @var array $attributes */
-    private $attributes = array();
+    private $attributes = [];
 
     /** @var string $characters */
     private $characters = "";
@@ -84,6 +84,16 @@ class RuntimeConfigurable
     }
 
     /**
+     * Returns the AttributeList of the wrapped element.
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
      * Set's the attributes for the wrapped element.
      *
      * @param array $attributes
@@ -93,16 +103,6 @@ class RuntimeConfigurable
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
-    }
-
-    /**
-     * Returns the AttributeList of the wrapped element.
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
     }
 
     /**
@@ -126,7 +126,7 @@ class RuntimeConfigurable
      */
     public function getChild($index)
     {
-        return $this->children[(int) $index];
+        return $this->children[(int)$index];
     }
 
     /**
@@ -138,7 +138,7 @@ class RuntimeConfigurable
      */
     public function addText($data)
     {
-        $this->characters .= (string) $data;
+        $this->characters .= (string)$data;
     }
 
     public function getElementTag()
@@ -176,7 +176,7 @@ class RuntimeConfigurable
             }
 
             if (isset($this->characters) && $this->characters != '') {
-                ProjectConfigurator::addText($project, $this->wrappedObject, (string) $this->characters);
+                ProjectConfigurator::addText($project, $this->wrappedObject, (string)$this->characters);
             }
             if ($id !== null) {
                 $project->addReference($id, $this->wrappedObject);

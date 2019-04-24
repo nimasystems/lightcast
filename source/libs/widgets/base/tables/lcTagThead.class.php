@@ -36,11 +36,6 @@ class lcTagThead extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function create()
-    {
-        return new lcTagThead();
-    }
-
     public function setAlign($value = null)
     {
         if (isset($value) &&
@@ -76,6 +71,11 @@ class lcTagThead extends lcHtmlTag
     {
         $this->setAttribute('charoff', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagThead();
     }
 
     public static function getRequiredAttributes()

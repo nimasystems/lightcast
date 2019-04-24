@@ -45,7 +45,13 @@ class LiquibaseTask extends AbstractLiquibaseTask
      */
     public function setCommand($command)
     {
-        $this->command = (string) $command;
+        $this->command = (string)$command;
+    }
+
+    public function main()
+    {
+        $this->checkParams();
+        $this->execute($this->command, '');
     }
 
     protected function checkParams()
@@ -55,12 +61,6 @@ class LiquibaseTask extends AbstractLiquibaseTask
         if (null === $this->command) {
             throw new BuildException('Please provide a liquibase command.');
         }
-    }
-
-    public function main()
-    {
-        $this->checkParams();
-        $this->execute($this->command, '');
     }
 
 }

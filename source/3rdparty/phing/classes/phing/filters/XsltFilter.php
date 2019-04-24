@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 include_once 'phing/filters/BaseParamFilterReader.php';
 include_once 'phing/filters/ChainableReader.php';
@@ -51,7 +51,7 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
      * XSLT Params.
      * @var array
      */
-    private $xsltParams = array();
+    private $xsltParams = [];
 
     /**
      * Whether to use loadHTML() to parse the input XML file.
@@ -90,60 +90,13 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the XSLT params for this class.
-     * This is used to "clone" this class, in the chain() method.
-     * @param array $params
+     * @return bool
+     *
+     * @since 2.4
      */
-    public function setParams($params)
+    public function getResolveDocumentExternals()
     {
-        $this->xsltParams = $params;
-    }
-
-    /**
-     * Returns the XSLT params set for this class.
-     * This is used to "clone" this class, in the chain() method.
-     * @return array
-     */
-    public function getParams()
-    {
-        return $this->xsltParams;
-    }
-
-    /**
-     * Set the XSLT stylesheet.
-     * @param mixed $file PhingFile object or path.
-     */
-    public function setStyle(PhingFile $file)
-    {
-        $this->xslFile = $file;
-    }
-
-    /**
-     * Whether to use HTML parser for the XML.
-     * This is supported in libxml2 -- Yay!
-     * @return boolean
-     */
-    public function getHtml()
-    {
-        return $this->html;
-    }
-
-    /**
-     * Whether to use HTML parser for XML.
-     * @param boolean $b
-     */
-    public function setHtml($b)
-    {
-        $this->html = (boolean) $b;
-    }
-
-    /**
-     * Get the path to XSLT stylesheet.
-     * @return mixed XSLT stylesheet path.
-     */
-    public function getStyle()
-    {
-        return $this->xslFile;
+        return $this->resolveDocumentExternals;
     }
 
     /**
@@ -155,29 +108,7 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
      */
     public function setResolveDocumentExternals($resolveExternals)
     {
-        $this->resolveDocumentExternals = (bool) $resolveExternals;
-    }
-
-    /**
-     * @return bool
-     *
-     * @since 2.4
-     */
-    public function getResolveDocumentExternals()
-    {
-        return $this->resolveDocumentExternals;
-    }
-
-    /**
-     * Whether to resolve entities in stylesheet.
-     *
-     * @param bool $resolveExternals
-     *
-     * @since 2.4
-     */
-    public function setResolveStylesheetExternals($resolveExternals)
-    {
-        $this->resolveStylesheetExternals = (bool) $resolveExternals;
+        $this->resolveDocumentExternals = (bool)$resolveExternals;
     }
 
     /**
@@ -191,10 +122,22 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
+     * Whether to resolve entities in stylesheet.
+     *
+     * @param bool $resolveExternals
+     *
+     * @since 2.4
+     */
+    public function setResolveStylesheetExternals($resolveExternals)
+    {
+        $this->resolveStylesheetExternals = (bool)$resolveExternals;
+    }
+
+    /**
      * Reads stream, applies XSLT and returns resulting stream.
      * @param null $len
-     * @throws BuildException
      * @return string         transformed buffer.
+     * @throws BuildException
      */
     public function read($len = null)
     {
@@ -250,7 +193,37 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
         return $out;
     }
 
-    // {{{ method _ProcessXsltTransformation($xml, $xslt) throws BuildException
+    /**
+     * Parses the parameters to get stylesheet path.
+     */
+    private function _initialize()
+    {
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
+                if ($params[$i]->getType() === null) {
+                    if ($params[$i]->getName() === "style") {
+                        $this->setStyle($params[$i]->getValue());
+                    }
+                } else if ($params[$i]->getType() == "param") {
+                    $xp = new XSLTParam();
+                    $xp->setName($params[$i]->getName());
+                    $xp->setExpression($params[$i]->getValue());
+                    $this->xsltParams[] = $xp;
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the XSLT stylesheet.
+     * @param mixed $file PhingFile object or path.
+     */
+    public function setStyle(PhingFile $file)
+    {
+        $this->xslFile = $file;
+    }
+
     /**
      * Try to process the XSLT transformation
      *
@@ -335,25 +308,53 @@ class XsltFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Parses the parameters to get stylesheet path.
+     * Get the path to XSLT stylesheet.
+     * @return mixed XSLT stylesheet path.
      */
-    private function _initialize()
+    public function getStyle()
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
-                if ($params[$i]->getType() === null) {
-                    if ($params[$i]->getName() === "style") {
-                        $this->setStyle($params[$i]->getValue());
-                    }
-                } elseif ($params[$i]->getType() == "param") {
-                    $xp = new XSLTParam();
-                    $xp->setName($params[$i]->getName());
-                    $xp->setExpression($params[$i]->getValue());
-                    $this->xsltParams[] = $xp;
-                }
-            }
-        }
+        return $this->xslFile;
+    }
+
+    /**
+     * Sets the XSLT params for this class.
+     * This is used to "clone" this class, in the chain() method.
+     * @param array $params
+     */
+    public function setParams($params)
+    {
+        $this->xsltParams = $params;
+    }
+
+    // {{{ method _ProcessXsltTransformation($xml, $xslt) throws BuildException
+
+    /**
+     * Returns the XSLT params set for this class.
+     * This is used to "clone" this class, in the chain() method.
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->xsltParams;
+    }
+
+    /**
+     * Whether to use HTML parser for the XML.
+     * This is supported in libxml2 -- Yay!
+     * @return boolean
+     */
+    public function getHtml()
+    {
+        return $this->html;
+    }
+
+    /**
+     * Whether to use HTML parser for XML.
+     * @param boolean $b
+     */
+    public function setHtml($b)
+    {
+        $this->html = (boolean)$b;
     }
 }
 
@@ -371,21 +372,21 @@ class XSLTParam
     private $expr;
 
     /**
-     * Sets param name.
-     * @param string $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
      * Get param name.
      * @return string
      */
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Sets param name.
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -400,17 +401,6 @@ class XSLTParam
     }
 
     /**
-     * Gets expression value (alias to the getExpression()) method.
-     *
-     * @return string
-     * @see getExpression()
-     */
-    public function getValue()
-    {
-        return $this->getExpression();
-    }
-
-    /**
      * Sets expression value.
      * @param string $expr
      */
@@ -420,12 +410,14 @@ class XSLTParam
     }
 
     /**
-     * Sets expression to dynamic register slot.
-     * @param RegisterSlot $expr
+     * Gets expression value (alias to the getExpression()) method.
+     *
+     * @return string
+     * @see getExpression()
      */
-    public function setListeningExpression(RegisterSlot $expr)
+    public function getValue()
     {
-        $this->expr = $expr;
+        return $this->getExpression();
     }
 
     /**
@@ -440,5 +432,14 @@ class XSLTParam
         } else {
             return $this->expr;
         }
+    }
+
+    /**
+     * Sets expression to dynamic register slot.
+     * @param RegisterSlot $expr
+     */
+    public function setListeningExpression(RegisterSlot $expr)
+    {
+        $this->expr = $expr;
     }
 }

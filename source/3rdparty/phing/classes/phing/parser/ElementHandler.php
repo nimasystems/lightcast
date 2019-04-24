@@ -72,12 +72,12 @@ class ElementHandler extends AbstractHandler
     /**
      *  Constructs a new NestedElement handler and sets up everything.
      *
-     * @param  object  the ExpatParser object
-     * @param  object  the parent handler that invoked this handler
-     * @param  object  the ProjectConfigurator object
-     * @param  object  the parent object this element is contained in
-     * @param  object  the parent wrapper object
-     * @param  object  the target object this task is contained in
+     * @param object  the ExpatParser object
+     * @param object  the parent handler that invoked this handler
+     * @param object  the ProjectConfigurator object
+     * @param object  the parent object this element is contained in
+     * @param object  the parent wrapper object
+     * @param object  the target object this task is contained in
      */
     public function __construct(
         $parser,
@@ -86,7 +86,8 @@ class ElementHandler extends AbstractHandler
         $parent = null,
         $parentWrapper = null,
         $target = null
-    ) {
+    )
+    {
         parent::__construct($parser, $parentHandler);
         $this->configurator = $configurator;
         if ($parentWrapper != null) {
@@ -96,6 +97,33 @@ class ElementHandler extends AbstractHandler
         }
         $this->parentWrapper = $parentWrapper;
         $this->target = $target;
+    }
+
+    /**
+     * Handles character data.
+     *
+     * @param string  the CDATA that comes in
+     * @throws ExpatParseException if the CDATA could not be set-up properly
+     */
+    public function characters($data)
+    {
+        $configurator = $this->configurator;
+        $project = $this->configurator->project;
+
+        $this->childWrapper->addText($data);
+    }
+
+    /**
+     * Checks for nested tags within the current one. Creates and calls
+     * handlers respectively.
+     *
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
+     */
+    public function startElement($name, $attrs)
+    {
+        $eh = new ElementHandler($this->parser, $this, $this->configurator, $this->child, $this->childWrapper, $this->target);
+        $eh->init($name, $attrs);
     }
 
     /**
@@ -110,8 +138,8 @@ class ElementHandler extends AbstractHandler
      * <li>adding a reference to the element (if id attribute is given)</li>
      * </ul>
      *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
      * @throws ExpatParseException if the setup process fails
      */
     public function init($propType, $attrs)
@@ -132,7 +160,7 @@ class ElementHandler extends AbstractHandler
 
             if ($this->parent !== null) {
                 $this->parent->addChild($this->child);
-            } elseif ($this->target !== null) {
+            } else if ($this->target !== null) {
                 $this->target->addTask($this->child);
             }
 
@@ -145,35 +173,7 @@ class ElementHandler extends AbstractHandler
                 $this->parentWrapper->addChild($this->childWrapper);
             }
         } catch (BuildException $exc) {
-            throw new ExpatParseException("Error initializing nested element <$propType>", $exc, $this->parser->getLocation(
-            ));
+            throw new ExpatParseException("Error initializing nested element <$propType>", $exc, $this->parser->getLocation());
         }
-    }
-
-    /**
-     * Handles character data.
-     *
-     * @param  string  the CDATA that comes in
-     * @throws ExpatParseException if the CDATA could not be set-up properly
-     */
-    public function characters($data)
-    {
-        $configurator = $this->configurator;
-        $project = $this->configurator->project;
-
-        $this->childWrapper->addText($data);
-    }
-
-    /**
-     * Checks for nested tags within the current one. Creates and calls
-     * handlers respectively.
-     *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
-     */
-    public function startElement($name, $attrs)
-    {
-        $eh = new ElementHandler($this->parser, $this, $this->configurator, $this->child, $this->childWrapper, $this->target);
-        $eh->init($name, $attrs);
     }
 }

@@ -35,7 +35,7 @@ class JslLintTask extends Task
     protected $file; // the source file (from xml attribute)
 
     /** @var array */
-    protected $filesets = array(); // all fileset objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
 
     /** @var bool $showWarnings */
     protected $showWarnings = true;
@@ -57,21 +57,16 @@ class JslLintTask extends Task
      * @var bool
      */
     protected $hasWarnings = false;
-
-    /** @var array $badFiles */
-    private $badFiles = array();
-
-    /** @var DataStore */
-    private $cache = null;
-
-    /** @var PhingFile */
-    private $conf = null;
-
-    /** @var string */
-    private $executable = "jsl";
-
     /** @var PhingFile */
     protected $tofile = null;
+    /** @var array $badFiles */
+    private $badFiles = [];
+    /** @var DataStore */
+    private $cache = null;
+    /** @var PhingFile */
+    private $conf = null;
+    /** @var string */
+    private $executable = "jsl";
 
     /**
      * Sets the flag if warnings should be shown
@@ -134,6 +129,14 @@ class JslLintTask extends Task
     }
 
     /**
+     * @return string
+     */
+    public function getExecutable()
+    {
+        return $this->executable;
+    }
+
+    /**
      * @param string $path
      *
      * @throws BuildException
@@ -145,14 +148,6 @@ class JslLintTask extends Task
         if (!@file_exists($path)) {
             throw new BuildException("JavaScript Lint executable '{$path}' not found");
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getExecutable()
-    {
-        return $this->executable;
     }
 
     /**
@@ -234,11 +229,11 @@ class JslLintTask extends Task
     /**
      * Performs the actual syntax check
      *
-     * @param  string $file
-     *
-     * @throws BuildException
+     * @param string $file
      *
      * @return bool|void
+     * @throws BuildException
+     *
      */
     protected function lint($file)
     {
@@ -264,7 +259,7 @@ class JslLintTask extends Task
                     }
                 }
 
-                $messages = array();
+                $messages = [];
                 exec($command . '"' . $file . '"', $messages, $return);
 
                 if ($return > 100) {
@@ -279,12 +274,12 @@ class JslLintTask extends Task
                 preg_match('/(\d+)\swarning/', $summary, $matches);
                 $warningCount = (count($matches) > 1 ? $matches[1] : 0);
 
-                $errors = array();
-                $warnings = array();
+                $errors = [];
+                $warnings = [];
                 if ($errorCount > 0 || $warningCount > 0) {
                     $last = false;
                     foreach ($messages as $message) {
-                        $matches = array();
+                        $matches = [];
                         if (preg_match('/^(\.*)\^$/', $message)) {
                             $column = strlen($message);
                             if ($last == 'error') {
@@ -300,7 +295,7 @@ class JslLintTask extends Task
                             continue;
                         }
                         $msg = $matches[3];
-                        $data = array('filename' => $matches[1], 'line' => $matches[2], 'message' => $msg);
+                        $data = ['filename' => $matches[1], 'line' => $matches[2], 'message' => $msg];
                         if (preg_match('/^.*error:.+$/i', $msg)) {
                             $errors[] = $data;
                             $last = 'error';
@@ -327,7 +322,7 @@ class JslLintTask extends Task
                 if ($errorCount > 0) {
                     $this->log($file . ': ' . $errorCount . ' errors detected', Project::MSG_ERR);
                     if (!isset($this->badFiles[$file])) {
-                        $this->badFiles[$file] = array();
+                        $this->badFiles[$file] = [];
                     }
 
                     foreach ($errors as $error) {

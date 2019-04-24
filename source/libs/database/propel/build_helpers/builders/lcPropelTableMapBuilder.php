@@ -193,7 +193,7 @@ class " . $this->getClassname() . " extends " . self::LC_TABLE_MAP_CLASS_NAME . 
             $imp = $params[0];
             $script .= "
         \$this->setPrimaryKeyMethodInfo('" . $imp->getValue() . "');";
-        } elseif ($table->getIdMethod() == IDMethod::NATIVE && ($platform->getNativeIdMethod() == PropelPlatformInterface::SEQUENCE || $platform->getNativeIdMethod() == PropelPlatformInterface::SERIAL)) {
+        } else if ($table->getIdMethod() == IDMethod::NATIVE && ($platform->getNativeIdMethod() == PropelPlatformInterface::SEQUENCE || $platform->getNativeIdMethod() == PropelPlatformInterface::SERIAL)) {
             $script .= "
         \$this->setPrimaryKeyMethodInfo('" . $platform->getSequenceName($table) . "');";
         }

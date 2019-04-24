@@ -123,6 +123,14 @@ class lcException extends Exception implements iDomainException
     }
 
     /**
+     * @return int
+     */
+    public function getSeverity()
+    {
+        return $this->severity;
+    }
+
+    /**
      * @param int $severity
      * @return lcException
      */
@@ -130,13 +138,5 @@ class lcException extends Exception implements iDomainException
     {
         $this->severity = $severity;
         return $this;
-    }
-
-    /**
-     * @return int
-     */
-    public function getSeverity()
-    {
-        return $this->severity;
     }
 }

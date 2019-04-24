@@ -99,7 +99,7 @@ class lcDebugger
                             } else {
                                 $str .= 'false';
                             }
-                        } elseif ($type == 'integer' || $type == 'double') {
+                        } else if ($type == 'integer' || $type == 'double') {
                             if (settype($value, 'string')) {
                                 $str .= $value;
                             } else {
@@ -109,17 +109,17 @@ class lcDebugger
                                     $str .= '? double or float ?';
                                 }
                             }
-                        } elseif ($type == 'string') {
+                        } else if ($type == 'string') {
                             $str .= "'" . (strlen($value) > 50 ? substr($value, 0, 50) : $value) . "'";
-                        } elseif ($type == 'array') {
+                        } else if ($type == 'array') {
                             $str .= 'Array';
-                        } elseif ($type == 'object') {
+                        } else if ($type == 'object') {
                             $str .= 'Object';
-                        } elseif ($type == 'resource') {
+                        } else if ($type == 'resource') {
                             $str .= 'Resource';
-                        } elseif ($type == 'NULL') {
+                        } else if ($type == 'NULL') {
                             $str .= 'null';
-                        } elseif ($type == 'unknown type') {
+                        } else if ($type == 'unknown type') {
                             $str .= '? unknown type ?';
                         }
 

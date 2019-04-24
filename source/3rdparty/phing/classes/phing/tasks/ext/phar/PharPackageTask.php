@@ -87,7 +87,7 @@ class PharPackageTask
     /**
      * @var array
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * @var PharMetadata
@@ -98,14 +98,6 @@ class PharPackageTask
      * @var string
      */
     private $alias;
-
-    /**
-     * @return PharMetadata
-     */
-    public function createMetadata()
-    {
-        return ($this->metadata = new PharMetadata());
-    }
 
     /**
      * @return FileSet
@@ -360,15 +352,13 @@ class PharPackageTask
         }
         if (!is_null($this->baseDirectory)) {
             if (!$this->baseDirectory->exists()) {
-                throw new BuildException("basedir '" . (string) $this->baseDirectory . "' does not exist!", $this->getLocation(
-                    ));
+                throw new BuildException("basedir '" . (string)$this->baseDirectory . "' does not exist!", $this->getLocation());
             }
         }
         if ($this->signatureAlgorithm == Phar::OPENSSL) {
 
             if (!extension_loaded('openssl')) {
-                throw new BuildException("PHP OpenSSL extension is required for OpenSSL signing of Phars!", $this->getLocation(
-                ));
+                throw new BuildException("PHP OpenSSL extension is required for OpenSSL signing of Phars!", $this->getLocation());
             }
 
             if (is_null($this->key)) {
@@ -376,11 +366,11 @@ class PharPackageTask
             }
 
             if (!$this->key->exists()) {
-                throw new BuildException("key '" . (string) $this->key . "' does not exist!", $this->getLocation());
+                throw new BuildException("key '" . (string)$this->key . "' does not exist!", $this->getLocation());
             }
 
             if (!$this->key->canRead()) {
-                throw new BuildException("key '" . (string) $this->key . "' cannot be read!", $this->getLocation());
+                throw new BuildException("key '" . (string)$this->key . "' cannot be read!", $this->getLocation());
             }
         }
     }
@@ -425,5 +415,13 @@ class PharPackageTask
         }
 
         return $phar;
+    }
+
+    /**
+     * @return PharMetadata
+     */
+    public function createMetadata()
+    {
+        return ($this->metadata = new PharMetadata());
     }
 }

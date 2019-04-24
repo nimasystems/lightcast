@@ -22,7 +22,23 @@ class PropelAutoloader
 
     protected static $instance = null;
 
-    protected $classes = array();
+    protected $classes = [];
+
+    /**
+     * Register PropelAutoloader in spl autoloader.
+     *
+     * @return void
+     *
+     * @throws Exception
+     */
+    public static function register()
+    {
+        ini_set('unserialize_callback_func', 'spl_autoload_call');
+
+        if (false === spl_autoload_register([self::getInstance(), 'autoload'])) {
+            throw new Exception(sprintf('Unable to register %s::autoload as an autoloading method.', get_class(self::getInstance())));
+        }
+    }
 
     /**
      * Retrieves the singleton instance of this class.
@@ -39,29 +55,13 @@ class PropelAutoloader
     }
 
     /**
-     * Register PropelAutoloader in spl autoloader.
-     *
-     * @return void
-     *
-     * @throws Exception
-     */
-    public static function register()
-    {
-        ini_set('unserialize_callback_func', 'spl_autoload_call');
-
-        if (false === spl_autoload_register(array(self::getInstance(), 'autoload'))) {
-            throw new Exception(sprintf('Unable to register %s::autoload as an autoloading method.', get_class(self::getInstance())));
-        }
-    }
-
-    /**
      * Unregister PropelAutoloader from spl autoloader.
      *
      * @return void
      */
     public static function unregister()
     {
-        spl_autoload_unregister(array(self::getInstance(), 'autoload'));
+        spl_autoload_unregister([self::getInstance(), 'autoload']);
     }
 
     /**
@@ -78,7 +78,7 @@ class PropelAutoloader
      * Sets the path for a particular class.
      *
      * @param string $class A PHP class name
-     * @param string $path  A path (absolute or relative to the include path)
+     * @param string $path A path (absolute or relative to the include path)
      */
     public function addClassPath($class, $path)
     {

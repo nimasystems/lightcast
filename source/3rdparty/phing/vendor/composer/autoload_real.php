@@ -19,9 +19,9 @@ class ComposerAutoloaderInit314612bf54e52d3d053799b2daa8c7b6
             return self::$loader;
         }
 
-        spl_autoload_register(array('ComposerAutoloaderInit314612bf54e52d3d053799b2daa8c7b6', 'loadClassLoader'), true, true);
+        spl_autoload_register(['ComposerAutoloaderInit314612bf54e52d3d053799b2daa8c7b6', 'loadClassLoader'], true, true);
         self::$loader = $loader = new \Composer\Autoload\ClassLoader();
-        spl_autoload_unregister(array('ComposerAutoloaderInit314612bf54e52d3d053799b2daa8c7b6', 'loadClassLoader'));
+        spl_autoload_unregister(['ComposerAutoloaderInit314612bf54e52d3d053799b2daa8c7b6', 'loadClassLoader']);
 
         $includePaths = require __DIR__ . '/include_paths.php';
         array_push($includePaths, get_include_path());

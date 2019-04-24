@@ -26,8 +26,6 @@ abstract class lcActionFilter extends lcSysObj
     /** @var lcActionFilter|null */
     protected $next;
 
-    abstract public function getFilterCategory();
-
     public function shutdown()
     {
         if ($this->next) {
@@ -62,7 +60,7 @@ abstract class lcActionFilter extends lcSysObj
                 if ($filter_result) {
                     return [
                         'filter' => &$this,
-                        'result' => $filter_result
+                        'result' => $filter_result,
                     ];
                 }
             } catch (Exception $e) {
@@ -83,6 +81,8 @@ abstract class lcActionFilter extends lcSysObj
         // no filter has taken responsibility - take no further action
         return false;
     }
+
+    abstract public function getFilterCategory();
 
     abstract protected function getShouldApplyFilter();
 

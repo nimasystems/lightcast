@@ -48,7 +48,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
     public function getCapabilities()
     {
         return [
-            'user'
+            'user',
         ];
     }
 
@@ -80,7 +80,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         }
 
         $debug = [
-            'attributes' => $out
+            'attributes' => $out,
         ];
 
         return $debug;

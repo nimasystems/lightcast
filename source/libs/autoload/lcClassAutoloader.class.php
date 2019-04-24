@@ -77,16 +77,6 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
         return $this->spl_registered;
     }
 
-    public function addClass($class_name, $filename)
-    {
-        // do not allow overwriting existing class registrations for security reasons
-        if (isset($this->registered_classes[$class_name])) {
-            return;
-        }
-
-        $this->registered_classes[$class_name] = $filename;
-    }
-
     public function addClasses(array $classes)
     {
         $current_classes = (array)$this->registered_classes;
@@ -105,6 +95,16 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
                 unset($class_name, $filename);
             }
         }
+    }
+
+    public function addClass($class_name, $filename)
+    {
+        // do not allow overwriting existing class registrations for security reasons
+        if (isset($this->registered_classes[$class_name])) {
+            return;
+        }
+
+        $this->registered_classes[$class_name] = $filename;
     }
 
     public function hasClass($class_name)

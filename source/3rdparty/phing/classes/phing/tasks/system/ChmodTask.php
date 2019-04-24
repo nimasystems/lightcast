@@ -37,7 +37,7 @@ class ChmodTask extends Task
 
     private $mode;
 
-    private $filesets = array();
+    private $filesets = [];
 
     private $filesystem;
 
@@ -47,8 +47,8 @@ class ChmodTask extends Task
 
     /**
      * This flag means 'note errors to the output, but keep going'
-     * @see setQuiet()
      * @param $bool
+     * @see setQuiet()
      */
     public function setFailonerror($bool)
     {
@@ -57,8 +57,8 @@ class ChmodTask extends Task
 
     /**
      * Set quiet mode, which suppresses warnings if chmod() fails.
-     * @see setFailonerror()
      * @param $bool
+     * @see setFailonerror()
      */
     public function setQuiet($bool)
     {
@@ -75,7 +75,7 @@ class ChmodTask extends Task
      */
     public function setVerbose($bool)
     {
-        $this->verbose = (bool) $bool;
+        $this->verbose = (bool)$bool;
     }
 
     /**
@@ -120,8 +120,8 @@ class ChmodTask extends Task
 
     /**
      * Ensure that correct parameters were passed in.
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     private function checkParams()
     {

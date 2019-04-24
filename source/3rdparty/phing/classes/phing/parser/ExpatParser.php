@@ -39,7 +39,6 @@ include_once 'phing/system/io/FileReader.php';
  * @version   $Id: 0e78856d8464d655550baa5a20b235b4049625f8 $
  * @package   phing.parser
  */
-
 class ExpatParser extends AbstractSAXParser
 {
 
@@ -67,8 +66,8 @@ class ExpatParser extends AbstractSAXParser
      * for the file to be parsed. It sets up php's internal expat parser
      * and options.
      *
-     * @param  Reader    $reader   The Reader Object that is to be read from.
-     * @param  string    $filename Filename to read.
+     * @param Reader $reader The Reader Object that is to be read from.
+     * @param string $filename Filename to read.
      * @throws Exception if the given argument is not a PhingFile object
      */
     public function __construct(Reader $reader, $filename = null)
@@ -82,8 +81,8 @@ class ExpatParser extends AbstractSAXParser
         $this->buffer = 4096;
         $this->location = new Location();
         xml_set_object($this->parser, $this);
-        xml_set_element_handler($this->parser, array($this, "startElement"), array($this, "endElement"));
-        xml_set_character_data_handler($this->parser, array($this, "characters"));
+        xml_set_element_handler($this->parser, [$this, "startElement"], [$this, "endElement"]);
+        xml_set_character_data_handler($this->parser, [$this, "characters"]);
     }
 
     /**
@@ -91,12 +90,36 @@ class ExpatParser extends AbstractSAXParser
      *
      * @param $opt
      * @param $val
-     * @internal param the $string option to set
      * @return boolean true if the option could be set, otherwise false
+     * @internal param the $string option to set
      */
     public function parserSetOption($opt, $val)
     {
         return xml_parser_set_option($this->parser, $opt, $val);
+    }
+
+    /**
+     * Starts the parsing process.
+     *
+     * @param string  the option to set
+     * @return int                 1 if the parsing succeeded
+     * @throws ExpatParseException if something gone wrong during parsing
+     * @throws IOException         if XML file can not be accessed
+     */
+    public function parse()
+    {
+
+        while (($data = $this->reader->read()) !== -1) {
+            if (!xml_parse($this->parser, $data, $this->reader->eof())) {
+                $error = xml_error_string(xml_get_error_code($this->parser));
+                $e = new ExpatParseException($error, $this->getLocation());
+                xml_parser_free($this->parser);
+                throw $e;
+            }
+        }
+        xml_parser_free($this->parser);
+
+        return 1;
     }
 
     /**
@@ -117,29 +140,5 @@ class ExpatParser extends AbstractSAXParser
         ));
 
         return $this->location;
-    }
-
-    /**
-     * Starts the parsing process.
-     *
-     * @param  string  the option to set
-     * @return int                 1 if the parsing succeeded
-     * @throws ExpatParseException if something gone wrong during parsing
-     * @throws IOException         if XML file can not be accessed
-     */
-    public function parse()
-    {
-
-        while (($data = $this->reader->read()) !== -1) {
-            if (!xml_parse($this->parser, $data, $this->reader->eof())) {
-                $error = xml_error_string(xml_get_error_code($this->parser));
-                $e = new ExpatParseException($error, $this->getLocation());
-                xml_parser_free($this->parser);
-                throw $e;
-            }
-        }
-        xml_parser_free($this->parser);
-
-        return 1;
     }
 }

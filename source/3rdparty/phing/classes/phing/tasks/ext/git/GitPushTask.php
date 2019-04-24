@@ -108,10 +108,10 @@ class GitPushTask extends GitBaseTask
         if ($this->isAllRemotes()) { // --all
             $command->setOption('all', true);
             $this->log('git-push: push to all refs', Project::MSG_INFO);
-        } elseif ($this->isMirror()) { // <repository> [<refspec>]
+        } else if ($this->isMirror()) { // <repository> [<refspec>]
             $command->setOption('mirror', true);
             $this->log('git-push: mirror all refs', Project::MSG_INFO);
-        } elseif ($this->getDestination()) { // <repository> [<refspec>]
+        } else if ($this->getDestination()) { // <repository> [<refspec>]
             $command->addArgument($this->getDestination());
             if ($this->getRefspec()) {
                 $command->addArgument($this->getRefspec());
@@ -144,75 +144,19 @@ class GitPushTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return bool
      */
-    public function setAll($flag)
+    public function isTags()
     {
-        $this->allRemotes = $flag;
+        return $this->getTags();
     }
 
     /**
      * @return bool
      */
-    public function getAll()
+    public function getTags()
     {
-        return $this->allRemotes;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAllRemotes()
-    {
-        return $this->getAll();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setMirror($flag)
-    {
-        $this->mirror = (boolean) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getMirror()
-    {
-        return $this->mirror;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isMirror()
-    {
-        return $this->getMirror();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setDelete($flag)
-    {
-        $this->delete = (boolean) $flag;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDelete()
-    {
-        return $this->delete;
-    }
-
-    /**
-     * @return string
-     */
-    public function isDelete()
-    {
-        return $this->getDelete();
+        return $this->tags;
     }
 
     /**
@@ -226,17 +170,73 @@ class GitPushTask extends GitBaseTask
     /**
      * @return bool
      */
-    public function getTags()
+    public function isMirror()
     {
-        return $this->tags;
+        return $this->getMirror();
     }
 
     /**
      * @return bool
      */
-    public function isTags()
+    public function getMirror()
     {
-        return $this->getTags();
+        return $this->mirror;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setMirror($flag)
+    {
+        $this->mirror = (boolean)$flag;
+    }
+
+    /**
+     * @return string
+     */
+    public function isDelete()
+    {
+        return $this->getDelete();
+    }
+
+    /**
+     * @return string
+     */
+    public function getDelete()
+    {
+        return $this->delete;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setDelete($flag)
+    {
+        $this->delete = (boolean)$flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllRemotes()
+    {
+        return $this->getAll();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAll()
+    {
+        return $this->allRemotes;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDestination()
+    {
+        return $this->destination;
     }
 
     /**
@@ -250,9 +250,9 @@ class GitPushTask extends GitBaseTask
     /**
      * @return string
      */
-    public function getDestination()
+    public function getRefspec()
     {
-        return $this->destination;
+        return $this->refspec;
     }
 
     /**
@@ -264,19 +264,11 @@ class GitPushTask extends GitBaseTask
     }
 
     /**
-     * @return string
-     */
-    public function getRefspec()
-    {
-        return $this->refspec;
-    }
-
-    /**
      * @param $flag
      */
-    public function setForce($flag)
+    public function setAll($flag)
     {
-        $this->force = $flag;
+        $this->allRemotes = $flag;
     }
 
     /**
@@ -298,9 +290,9 @@ class GitPushTask extends GitBaseTask
     /**
      * @param $flag
      */
-    public function setQuiet($flag)
+    public function setForce($flag)
     {
-        $this->quiet = $flag;
+        $this->force = $flag;
     }
 
     /**
@@ -317,6 +309,14 @@ class GitPushTask extends GitBaseTask
     public function isQuiet()
     {
         return $this->getQuiet();
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setQuiet($flag)
+    {
+        $this->quiet = $flag;
     }
 
 }

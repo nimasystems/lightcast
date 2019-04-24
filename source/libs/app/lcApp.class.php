@@ -97,6 +97,7 @@ class lcApp extends lcObj
     protected $platform_capabilities;
 
     private $initialized;
+    private $no_shutdown;
 
     public static function bootstrap(lcApplicationConfiguration $configuration)
     {
@@ -111,17 +112,6 @@ class lcApp extends lcObj
             self::$app = new lcApp();
         }
         return self::$app;
-    }
-
-    public function translateInContext($string, $context_type, $context_name, $translation_domain = null)
-    {
-        if (!$context_type || !$context_name || !$string) {
-            return $string;
-        }
-
-        /** @var lcI18n $i18n */
-        $i18n = lcApp::getInstance()->getI18n();
-        return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
     }
 
     public function initialize(lcApplicationConfiguration $configuration)
@@ -419,7 +409,7 @@ class lcApp extends lcObj
 
         $dirs = [
             ROOT . DS . 'source' . DS . 'libs',
-            ROOT . DS . 'source' . DS . '3rdparty' . DS . 'propel' . DS . 'runtime' . DS . 'lib'
+            ROOT . DS . 'source' . DS . '3rdparty' . DS . 'propel' . DS . 'runtime' . DS . 'lib',
         ];
 
         $tool = new lcAutoloadCacheTool($dirs, $fname, self::FRAMEWORK_CACHE_VAR_NAME, self::FRAMEWORK_CACHE_VERSION_VAR_NAME);
@@ -979,6 +969,17 @@ class lcApp extends lcObj
         $plugin_manager->initializePluginsForAppStartup();
     }
 
+    public function translateInContext($string, $context_type, $context_name, $translation_domain = null)
+    {
+        if (!$context_type || !$context_name || !$string) {
+            return $string;
+        }
+
+        /** @var lcI18n $i18n */
+        $i18n = lcApp::getInstance()->getI18n();
+        return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
+    }
+
     public function getDelegate()
     {
         return $this->delegate;
@@ -1028,8 +1029,6 @@ class lcApp extends lcObj
     {
         return $this->configuration->isDebugging();
     }
-
-    private $no_shutdown;
 
     public function setNoShutdown($no_sh)
     {
@@ -1223,7 +1222,7 @@ class lcApp extends lcObj
                     'code' => $exception->getCode(),
                     'cause' => $exception->getPrevious(),
                     'trace' => $exception->getTraceAsString(),
-                    'system_snapshot' => $this->getDebugSnapshot()
+                    'system_snapshot' => $this->getDebugSnapshot(),
                 ]), $should_be_handled);
         } catch (Exception $e) {
             // an exception should not be thrown in the exception handlers
@@ -1257,7 +1256,7 @@ class lcApp extends lcObj
             'app_version' => APP_VER,
             'memory_usage' => lcSys::getMemoryUsage(true),
             'php_ver' => lcSys::getPhpVer(),
-            'php_api' => lcSys::get_sapi()
+            'php_api' => lcSys::get_sapi(),
         ];
 
         $local_cache = $this->configuration->getCache();

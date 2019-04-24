@@ -52,31 +52,31 @@ class lcHttpMethod
 
         if ($string == 'any') {
             return self::METHOD_ANY;
-        } elseif ($string == 'get') {
+        } else if ($string == 'get') {
             return self::METHOD_GET;
-        } elseif ($string == 'delete') {
+        } else if ($string == 'delete') {
             return self::METHOD_DELETE;
-        } elseif ($string == 'put') {
+        } else if ($string == 'put') {
             return self::METHOD_PUT;
-        } elseif ($string == 'post') {
+        } else if ($string == 'post') {
             return self::METHOD_POST;
-        } elseif ($string == 'head') {
+        } else if ($string == 'head') {
             return self::METHOD_HEAD;
-        } elseif ($string == 'checkout') {
+        } else if ($string == 'checkout') {
             return self::METHOD_CHECKOUT;
-        } elseif ($string == 'showmethod') {
+        } else if ($string == 'showmethod') {
             return self::METHOD_SHOWMETHOD;
-        } elseif ($string == 'link') {
+        } else if ($string == 'link') {
             return self::METHOD_LINK;
-        } elseif ($string == 'unlink') {
+        } else if ($string == 'unlink') {
             return self::METHOD_UNLINK;
-        } elseif ($string == 'checkin') {
+        } else if ($string == 'checkin') {
             return self::METHOD_CHECKIN;
-        } elseif ($string == 'textsearch') {
+        } else if ($string == 'textsearch') {
             return self::METHOD_TEXTSEARCH;
-        } elseif ($string == 'spacejump') {
+        } else if ($string == 'spacejump') {
             return self::METHOD_SPACEJUMP;
-        } elseif ($string == 'search') {
+        } else if ($string == 'search') {
             return self::METHOD_SEARCH;
         } else {
             return false;

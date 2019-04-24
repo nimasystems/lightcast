@@ -169,7 +169,7 @@ abstract class FileSystem
 
     /**
      * canonicalize filename by checking on disk
-     * @param  string $strPath
+     * @param string $strPath
      * @return mixed  Canonical path or false if the file doesn't exist.
      */
     public function canonicalize($strPath)
@@ -214,7 +214,7 @@ abstract class FileSystem
         // Shouldn't this be $f->GetAbsolutePath() ?
         // And why doesn't GetAbsolutePath() work?
 
-        $strPath = (string) $f->getPath();
+        $strPath = (string)$f->getPath();
 
         // FIXME
         // if file object does denote a file that yet not existst
@@ -228,15 +228,15 @@ abstract class FileSystem
         }
 
         if (!$write) {
-            return (boolean) @is_readable($strPath);
+            return (boolean)@is_readable($strPath);
         } else {
-            return (boolean) @is_writable($strPath);
+            return (boolean)@is_writable($strPath);
         }
     }
 
     /**
      * Whether file can be deleted.
-     * @param  PhingFile $f
+     * @param PhingFile $f
      * @return boolean
      */
     public function canDelete(PhingFile $f)
@@ -244,7 +244,7 @@ abstract class FileSystem
         clearstatcache();
         $dir = dirname($f->getAbsolutePath());
 
-        return (bool) @is_writable($dir);
+        return (bool)@is_writable($dir);
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class FileSystem
      * abstract pathname was last modified, or zero if it does not exist or
      * some other I/O error occurs.
      *
-     * @param  PhingFile   $f
+     * @param PhingFile $f
      * @return int
      * @throws IOException
      */
@@ -264,7 +264,7 @@ abstract class FileSystem
         }
 
         @clearstatcache();
-        $strPath = (string) $f->getPath();
+        $strPath = (string)$f->getPath();
 
         if (@is_link($strPath)) {
             $stats = @lstat($strPath);
@@ -283,7 +283,7 @@ abstract class FileSystem
             throw new IOException($msg);
         }
 
-        return (int) $mtime;
+        return (int)$mtime;
     }
 
     /**
@@ -291,14 +291,14 @@ abstract class FileSystem
      * pathname, or zero if it does not exist, is a directory, or some other
      * I/O error occurs.
      *
-     * @param  PhingFile   $f
-     * @throws IOException
+     * @param PhingFile $f
      * @return int
+     * @throws IOException
      */
     public function getLength(PhingFile $f)
     {
-        $strPath = (string) $f->getAbsolutePath();
-        $fs = filesize((string) $strPath);
+        $strPath = (string)$f->getAbsolutePath();
+        $fs = filesize((string)$strPath);
         if ($fs !== false) {
             return $fs;
         } else {
@@ -315,9 +315,9 @@ abstract class FileSystem
      * file or directory with the given pathname already exists.  Throw an
      * IOException if an I/O error occurs.
      *
-     * @param  string      $strPathname Path of the file to be created.
-     * @throws IOException
+     * @param string $strPathname Path of the file to be created.
      * @return boolean
+     * @throws IOException
      */
     public function createNewFile($strPathname)
     {
@@ -339,8 +339,8 @@ abstract class FileSystem
      * Delete the file or directory denoted by the given abstract pathname,
      * returning true if and only if the operation succeeds.
      *
-     * @param  PhingFile $f
-     * @param  boolean   $recursive
+     * @param PhingFile $f
+     * @param boolean $recursive
      * @return void
      */
     public function delete(PhingFile $f, $recursive = false)
@@ -353,387 +353,15 @@ abstract class FileSystem
     }
 
     /**
-     * Arrange for the file or directory denoted by the given abstract
-     * pathname to be deleted when Phing::shutdown is called, returning
-     * true if and only if the operation succeeds.
-     *
-     * @param  PhingFile   $f
-     * @throws IOException
-     */
-    public function deleteOnExit($f)
-    {
-        throw new IOException("deleteOnExit() not implemented by local fs driver");
-    }
-
-    /**
-     * List the elements of the directory denoted by the given abstract
-     * pathname.  Return an array of strings naming the elements of the
-     * directory if successful; otherwise, return <code>null</code>.
-     *
-     * @param PhingFile $f
-     * @return array
-     */
-    public function listDir(PhingFile $f)
-    {
-        $strPath = (string) $f->getAbsolutePath();
-        $d = @dir($strPath);
-        if (!$d) {
-            return null;
-        }
-        $list = array();
-        while ($entry = $d->read()) {
-            if ($entry != "." && $entry != "..") {
-                array_push($list, $entry);
-            }
-        }
-        $d->close();
-        unset($d);
-
-        return $list;
-    }
-
-    /**
-     * Create a new directory denoted by the given abstract pathname,
-     * returning true if and only if the operation succeeds.
-     *
-     * NOTE: umask() is reset to 0 while executing mkdir(), and restored afterwards
-     *
-     * @param  PhingFile $f
-     * @param  int       $mode
-     * @return boolean
-     */
-    public function createDirectory(&$f, $mode = 0755)
-    {
-        $old_umask = umask(0);
-        $return = @mkdir($f->getAbsolutePath(), $mode);
-        umask($old_umask);
-
-        return $return;
-    }
-
-    /**
-     * Rename the file or directory denoted by the first abstract pathname to
-     * the second abstract pathname, returning true if and only if
-     * the operation succeeds.
-     *
-     * @param  PhingFile   $f1 abstract source file
-     * @param  PhingFile   $f2 abstract destination file
-     * @return void
-     * @throws IOException if rename cannot be performed
-     */
-    public function rename(PhingFile $f1, PhingFile $f2)
-    {
-        // get the canonical paths of the file to rename
-        $src = $f1->getAbsolutePath();
-        $dest = $f2->getAbsolutePath();
-        if (false === @rename($src, $dest)) {
-            $msg = "Rename FAILED. Cannot rename $src to $dest. $php_errormsg";
-            throw new IOException($msg);
-        }
-    }
-
-    /**
-     * Set the last-modified time of the file or directory denoted by the
-     * given abstract pathname returning true if and only if the
-     * operation succeeds.
-     *
-     * @param  PhingFile   $f
-     * @param  int         $time
-     * @return void
-     * @throws IOException
-     */
-    public function setLastModifiedTime(PhingFile $f, $time)
-    {
-        $path = $f->getPath();
-        $success = @touch($path, $time);
-        if (!$success) {
-            throw new IOException("Could not touch '" . $path . "' due to: $php_errormsg");
-        }
-    }
-
-    /**
-     * Mark the file or directory denoted by the given abstract pathname as
-     * read-only, returning <code>true</code> if and only if the operation
-     * succeeds.
-     *
-     * @param  PhingFile   $f
-     * @throws IOException
-     */
-    public function setReadOnly($f)
-    {
-        throw new IOException("setReadonly() not implemented by local fs driver");
-    }
-
-    /* -- Filesystem interface -- */
-
-    /**
-     * List the available filesystem roots, return array of PhingFile objects
-     * @throws IOException
-     */
-    public function listRoots()
-    {
-        throw new IOException("listRoots() not implemented by local fs driver");
-    }
-
-    /* -- Basic infrastructure -- */
-
-    /**
-     * Compare two abstract pathnames lexicographically.
-     *
-     * @param PhingFile $f1
-     * @param PhingFile $f2
-     * @throws IOException
-     */
-    public function compare(PhingFile $f1, PhingFile $f2)
-    {
-        throw new IOException("compare() not implemented by local fs driver");
-    }
-
-    /**
-     * Copy a file.
-     *
-     * @param PhingFile $src  Source path and name file to copy.
-     * @param PhingFile $dest Destination path and name of new file.
-     *
-     * @return void
-     *
-     * @throws IOException if file cannot be copied.
-     */
-    public function copy(PhingFile $src, PhingFile $dest)
-    {
-        global $php_errormsg;
-
-        // Recursively copy a directory
-        if ($src->isDirectory()) {
-            return $this->copyr($src->getAbsolutePath(), $dest->getAbsolutePath());
-        }
-
-        $srcPath = $src->getAbsolutePath();
-        $destPath = $dest->getAbsolutePath();
-
-        if (false === @copy($srcPath, $destPath)) { // Copy FAILED. Log and return err.
-            // Add error from php to end of log message. $php_errormsg.
-            $msg = "FileSystem::copy() FAILED. Cannot copy $srcPath to $destPath. $php_errormsg";
-            throw new IOException($msg);
-        }
-
-        $dest->setMode($src->getMode());
-    }
-
-    /**
-     * Copy a file, or recursively copy a folder and its contents
-     *
-     * @author      Aidan Lister <aidan@php.net>
-     * @version     1.0.1
-     * @link        http://aidanlister.com/repos/v/function.copyr.php
-     *
-     * @param  string $source Source path
-     * @param  string $dest   Destination path
-     *
-     * @return bool   Returns TRUE on success, FALSE on failure
-     */
-    public function copyr($source, $dest)
-    {
-        // Check for symlinks
-        if (is_link($source)) {
-            return symlink(readlink($source), $dest);
-        }
-
-        // Simple copy for a file
-        if (is_file($source)) {
-            return copy($source, $dest);
-        }
-
-        // Make destination directory
-        if (!is_dir($dest)) {
-            mkdir($dest);
-        }
-
-        // Loop through the folder
-        $dir = dir($source);
-        while (false !== $entry = $dir->read()) {
-            // Skip pointers
-            if ($entry == '.' || $entry == '..') {
-                continue;
-            }
-
-            // Deep copy directories
-            $this->copyr("$source/$entry", "$dest/$entry");
-        }
-
-        // Clean up
-        $dir->close();
-
-        return true;
-    }
-
-    /**
-     * Change the ownership on a file or directory.
-     *
-     * @param string $pathname Path and name of file or directory.
-     * @param string $user     The user name or number of the file or directory. See http://us.php.net/chown
-     *
-     * @return void
-     *
-     * @throws IOException if operation failed.
-     */
-    public function chown($pathname, $user)
-    {
-        if (false === @chown($pathname, $user)) { // FAILED.
-            $msg = "FileSystem::chown() FAILED. Cannot chown $pathname. User $user." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
-            throw new IOException($msg);
-        }
-    }
-
-    /**
-     * Change the group on a file or directory.
-     *
-     * @param string $pathname Path and name of file or directory.
-     * @param string $group    The group of the file or directory. See http://us.php.net/chgrp
-     *
-     * @return void
-     * @throws IOException if operation failed.
-     */
-    public function chgrp($pathname, $group)
-    {
-        if (false === @chgrp($pathname, $group)) { // FAILED.
-            $msg = "FileSystem::chgrp() FAILED. Cannot chown $pathname. Group $group." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
-            throw new IOException($msg);
-        }
-    }
-
-    /**
-     * Change the permissions on a file or directory.
-     *
-     * @param string $pathname Path and name of file or directory.
-     * @param int    $mode     The mode (permissions) of the file or
-     *                         directory. If using octal add leading 0. eg. 0777.
-     *                         Mode is affected by the umask system setting.
-     *
-     * @return void
-     * @throws IOException if operation failed.
-     */
-    public function chmod($pathname, $mode)
-    {
-        $str_mode = decoct($mode); // Show octal in messages.
-        if (false === @chmod($pathname, $mode)) { // FAILED.
-            $msg = "FileSystem::chmod() FAILED. Cannot chmod $pathname. Mode $str_mode." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
-            throw new IOException($msg);
-        }
-    }
-
-    /**
-     * Locks a file and throws an Exception if this is not possible.
-     *
-     * @param  PhingFile $f
-     * @return void
-     * @throws IOException
-     */
-    public function lock(PhingFile $f)
-    {
-        $filename = $f->getPath();
-        $fp = @fopen($filename, "w");
-        $result = @flock($fp, LOCK_EX);
-        @fclose($fp);
-        if (!$result) {
-            throw new IOException("Could not lock file '$filename'");
-        }
-    }
-
-    /**
-     * Unlocks a file and throws an IO Error if this is not possible.
-     *
-     * @param  PhingFile $f
-     * @throws IOException
-     * @return void
-     */
-    public function unlock(PhingFile $f)
-    {
-        $filename = $f->getPath();
-        $fp = @fopen($filename, "w");
-        $result = @flock($fp, LOCK_UN);
-        fclose($fp);
-        if (!$result) {
-            throw new IOException("Could not unlock file '$filename'");
-        }
-    }
-
-    /**
-     * Delete a file.
-     *
-     * @param string $file Path and/or name of file to delete.
-     *
-     * @return void
-     * @throws IOException - if an error is encountered.
-     */
-    public function unlink($file)
-    {
-        global $php_errormsg;
-        if (false === @unlink($file)) {
-            $msg = "FileSystem::unlink() FAILED. Cannot unlink '$file'. $php_errormsg";
-            throw new IOException($msg);
-        }
-    }
-
-    /**
-     * Symbolically link a file to another name.
-     *
-     * Currently symlink is not implemented on Windows. Don't use if the application is to be portable.
-     *
-     * @param  string $target Path and/or name of file to link.
-     * @param  string $link Path and/or name of link to be created.
-     * @throws IOException
-     * @return void
-     */
-    public function symlink($target, $link)
-    {
-
-        // If Windows OS then symlink() will report it is not supported in
-        // the build. Use this error instead of checking for Windows as the OS.
-
-        if (false === @symlink($target, $link)) {
-            // Add error from php to end of log message. $php_errormsg.
-            $msg = "FileSystem::Symlink() FAILED. Cannot symlink '$target' to '$link'. $php_errormsg";
-            throw new IOException($msg);
-        }
-
-    }
-
-    /**
-     * Set the modification and access time on a file to the present time.
-     *
-     * @param  string $file Path and/or name of file to touch.
-     * @param  int $time
-     * @throws Exception
-     * @return void
-     */
-    public function touch($file, $time = null)
-    {
-        global $php_errormsg;
-
-        if (null === $time) {
-            $error = @touch($file);
-        } else {
-            $error = @touch($file, $time);
-        }
-
-        if (false === $error) { // FAILED.
-            // Add error from php to end of log message. $php_errormsg.
-            $msg = "FileSystem::touch() FAILED. Cannot touch '$file'. $php_errormsg";
-            throw new Exception($msg);
-        }
-    }
-
-    /**
      * Delete an empty directory OR a directory and all of its contents.
      *
      * @param string $dir Path and/or name of directory to delete.
-     * @param bool $children     False: don't delete directory contents.
+     * @param bool $children False: don't delete directory contents.
      *                           True: delete directory contents.
      *
+     * @return void
      * @throws Exception
      *
-     * @return void
      */
     public function rmdir($dir, $children = false)
     {
@@ -783,8 +411,7 @@ abstract class FileSystem
                             try {
                                 self::unlink($next_entry); // Delete.
                             } catch (Exception $e) {
-                                $msg = "FileSystem::Rmdir() FAILED. Cannot FileSystem::Unlink() $next_entry. " . $e->getMessage(
-                                    );
+                                $msg = "FileSystem::Rmdir() FAILED. Cannot FileSystem::Unlink() $next_entry. " . $e->getMessage();
                                 throw new Exception($msg);
                             }
 
@@ -793,8 +420,7 @@ abstract class FileSystem
                             try {
                                 self::rmdir($next_entry, true); // Delete
                             } catch (Exception $e) {
-                                $msg = "FileSystem::rmdir() FAILED. Cannot FileSystem::rmdir() $next_entry. " . $e->getMessage(
-                                    );
+                                $msg = "FileSystem::rmdir() FAILED. Cannot FileSystem::rmdir() $next_entry. " . $e->getMessage();
                                 throw new Exception($msg);
                             }
 
@@ -817,14 +443,386 @@ abstract class FileSystem
     }
 
     /**
+     * Delete a file.
+     *
+     * @param string $file Path and/or name of file to delete.
+     *
+     * @return void
+     * @throws IOException - if an error is encountered.
+     */
+    public function unlink($file)
+    {
+        global $php_errormsg;
+        if (false === @unlink($file)) {
+            $msg = "FileSystem::unlink() FAILED. Cannot unlink '$file'. $php_errormsg";
+            throw new IOException($msg);
+        }
+    }
+
+    /**
+     * Arrange for the file or directory denoted by the given abstract
+     * pathname to be deleted when Phing::shutdown is called, returning
+     * true if and only if the operation succeeds.
+     *
+     * @param PhingFile $f
+     * @throws IOException
+     */
+    public function deleteOnExit($f)
+    {
+        throw new IOException("deleteOnExit() not implemented by local fs driver");
+    }
+
+    /**
+     * List the elements of the directory denoted by the given abstract
+     * pathname.  Return an array of strings naming the elements of the
+     * directory if successful; otherwise, return <code>null</code>.
+     *
+     * @param PhingFile $f
+     * @return array
+     */
+    public function listDir(PhingFile $f)
+    {
+        $strPath = (string)$f->getAbsolutePath();
+        $d = @dir($strPath);
+        if (!$d) {
+            return null;
+        }
+        $list = [];
+        while ($entry = $d->read()) {
+            if ($entry != "." && $entry != "..") {
+                array_push($list, $entry);
+            }
+        }
+        $d->close();
+        unset($d);
+
+        return $list;
+    }
+
+    /**
+     * Create a new directory denoted by the given abstract pathname,
+     * returning true if and only if the operation succeeds.
+     *
+     * NOTE: umask() is reset to 0 while executing mkdir(), and restored afterwards
+     *
+     * @param PhingFile $f
+     * @param int $mode
+     * @return boolean
+     */
+    public function createDirectory(&$f, $mode = 0755)
+    {
+        $old_umask = umask(0);
+        $return = @mkdir($f->getAbsolutePath(), $mode);
+        umask($old_umask);
+
+        return $return;
+    }
+
+    /**
+     * Rename the file or directory denoted by the first abstract pathname to
+     * the second abstract pathname, returning true if and only if
+     * the operation succeeds.
+     *
+     * @param PhingFile $f1 abstract source file
+     * @param PhingFile $f2 abstract destination file
+     * @return void
+     * @throws IOException if rename cannot be performed
+     */
+    public function rename(PhingFile $f1, PhingFile $f2)
+    {
+        // get the canonical paths of the file to rename
+        $src = $f1->getAbsolutePath();
+        $dest = $f2->getAbsolutePath();
+        if (false === @rename($src, $dest)) {
+            $msg = "Rename FAILED. Cannot rename $src to $dest. $php_errormsg";
+            throw new IOException($msg);
+        }
+    }
+
+    /* -- Filesystem interface -- */
+
+    /**
+     * Set the last-modified time of the file or directory denoted by the
+     * given abstract pathname returning true if and only if the
+     * operation succeeds.
+     *
+     * @param PhingFile $f
+     * @param int $time
+     * @return void
+     * @throws IOException
+     */
+    public function setLastModifiedTime(PhingFile $f, $time)
+    {
+        $path = $f->getPath();
+        $success = @touch($path, $time);
+        if (!$success) {
+            throw new IOException("Could not touch '" . $path . "' due to: $php_errormsg");
+        }
+    }
+
+    /* -- Basic infrastructure -- */
+
+    /**
+     * Mark the file or directory denoted by the given abstract pathname as
+     * read-only, returning <code>true</code> if and only if the operation
+     * succeeds.
+     *
+     * @param PhingFile $f
+     * @throws IOException
+     */
+    public function setReadOnly($f)
+    {
+        throw new IOException("setReadonly() not implemented by local fs driver");
+    }
+
+    /**
+     * List the available filesystem roots, return array of PhingFile objects
+     * @throws IOException
+     */
+    public function listRoots()
+    {
+        throw new IOException("listRoots() not implemented by local fs driver");
+    }
+
+    /**
+     * Compare two abstract pathnames lexicographically.
+     *
+     * @param PhingFile $f1
+     * @param PhingFile $f2
+     * @throws IOException
+     */
+    public function compare(PhingFile $f1, PhingFile $f2)
+    {
+        throw new IOException("compare() not implemented by local fs driver");
+    }
+
+    /**
+     * Copy a file.
+     *
+     * @param PhingFile $src Source path and name file to copy.
+     * @param PhingFile $dest Destination path and name of new file.
+     *
+     * @return void
+     *
+     * @throws IOException if file cannot be copied.
+     */
+    public function copy(PhingFile $src, PhingFile $dest)
+    {
+        global $php_errormsg;
+
+        // Recursively copy a directory
+        if ($src->isDirectory()) {
+            return $this->copyr($src->getAbsolutePath(), $dest->getAbsolutePath());
+        }
+
+        $srcPath = $src->getAbsolutePath();
+        $destPath = $dest->getAbsolutePath();
+
+        if (false === @copy($srcPath, $destPath)) { // Copy FAILED. Log and return err.
+            // Add error from php to end of log message. $php_errormsg.
+            $msg = "FileSystem::copy() FAILED. Cannot copy $srcPath to $destPath. $php_errormsg";
+            throw new IOException($msg);
+        }
+
+        $dest->setMode($src->getMode());
+    }
+
+    /**
+     * Copy a file, or recursively copy a folder and its contents
+     *
+     * @param string $source Source path
+     * @param string $dest Destination path
+     *
+     * @return bool   Returns TRUE on success, FALSE on failure
+     * @author      Aidan Lister <aidan@php.net>
+     * @version     1.0.1
+     * @link        http://aidanlister.com/repos/v/function.copyr.php
+     *
+     */
+    public function copyr($source, $dest)
+    {
+        // Check for symlinks
+        if (is_link($source)) {
+            return symlink(readlink($source), $dest);
+        }
+
+        // Simple copy for a file
+        if (is_file($source)) {
+            return copy($source, $dest);
+        }
+
+        // Make destination directory
+        if (!is_dir($dest)) {
+            mkdir($dest);
+        }
+
+        // Loop through the folder
+        $dir = dir($source);
+        while (false !== $entry = $dir->read()) {
+            // Skip pointers
+            if ($entry == '.' || $entry == '..') {
+                continue;
+            }
+
+            // Deep copy directories
+            $this->copyr("$source/$entry", "$dest/$entry");
+        }
+
+        // Clean up
+        $dir->close();
+
+        return true;
+    }
+
+    /**
+     * Change the ownership on a file or directory.
+     *
+     * @param string $pathname Path and name of file or directory.
+     * @param string $user The user name or number of the file or directory. See http://us.php.net/chown
+     *
+     * @return void
+     *
+     * @throws IOException if operation failed.
+     */
+    public function chown($pathname, $user)
+    {
+        if (false === @chown($pathname, $user)) { // FAILED.
+            $msg = "FileSystem::chown() FAILED. Cannot chown $pathname. User $user." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
+            throw new IOException($msg);
+        }
+    }
+
+    /**
+     * Change the group on a file or directory.
+     *
+     * @param string $pathname Path and name of file or directory.
+     * @param string $group The group of the file or directory. See http://us.php.net/chgrp
+     *
+     * @return void
+     * @throws IOException if operation failed.
+     */
+    public function chgrp($pathname, $group)
+    {
+        if (false === @chgrp($pathname, $group)) { // FAILED.
+            $msg = "FileSystem::chgrp() FAILED. Cannot chown $pathname. Group $group." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
+            throw new IOException($msg);
+        }
+    }
+
+    /**
+     * Change the permissions on a file or directory.
+     *
+     * @param string $pathname Path and name of file or directory.
+     * @param int $mode The mode (permissions) of the file or
+     *                         directory. If using octal add leading 0. eg. 0777.
+     *                         Mode is affected by the umask system setting.
+     *
+     * @return void
+     * @throws IOException if operation failed.
+     */
+    public function chmod($pathname, $mode)
+    {
+        $str_mode = decoct($mode); // Show octal in messages.
+        if (false === @chmod($pathname, $mode)) { // FAILED.
+            $msg = "FileSystem::chmod() FAILED. Cannot chmod $pathname. Mode $str_mode." . (isset($php_errormsg) ? ' ' . $php_errormsg : "");
+            throw new IOException($msg);
+        }
+    }
+
+    /**
+     * Locks a file and throws an Exception if this is not possible.
+     *
+     * @param PhingFile $f
+     * @return void
+     * @throws IOException
+     */
+    public function lock(PhingFile $f)
+    {
+        $filename = $f->getPath();
+        $fp = @fopen($filename, "w");
+        $result = @flock($fp, LOCK_EX);
+        @fclose($fp);
+        if (!$result) {
+            throw new IOException("Could not lock file '$filename'");
+        }
+    }
+
+    /**
+     * Unlocks a file and throws an IO Error if this is not possible.
+     *
+     * @param PhingFile $f
+     * @return void
+     * @throws IOException
+     */
+    public function unlock(PhingFile $f)
+    {
+        $filename = $f->getPath();
+        $fp = @fopen($filename, "w");
+        $result = @flock($fp, LOCK_UN);
+        fclose($fp);
+        if (!$result) {
+            throw new IOException("Could not unlock file '$filename'");
+        }
+    }
+
+    /**
+     * Symbolically link a file to another name.
+     *
+     * Currently symlink is not implemented on Windows. Don't use if the application is to be portable.
+     *
+     * @param string $target Path and/or name of file to link.
+     * @param string $link Path and/or name of link to be created.
+     * @return void
+     * @throws IOException
+     */
+    public function symlink($target, $link)
+    {
+
+        // If Windows OS then symlink() will report it is not supported in
+        // the build. Use this error instead of checking for Windows as the OS.
+
+        if (false === @symlink($target, $link)) {
+            // Add error from php to end of log message. $php_errormsg.
+            $msg = "FileSystem::Symlink() FAILED. Cannot symlink '$target' to '$link'. $php_errormsg";
+            throw new IOException($msg);
+        }
+
+    }
+
+    /**
+     * Set the modification and access time on a file to the present time.
+     *
+     * @param string $file Path and/or name of file to touch.
+     * @param int $time
+     * @return void
+     * @throws Exception
+     */
+    public function touch($file, $time = null)
+    {
+        global $php_errormsg;
+
+        if (null === $time) {
+            $error = @touch($file);
+        } else {
+            $error = @touch($file, $time);
+        }
+
+        if (false === $error) { // FAILED.
+            // Add error from php to end of log message. $php_errormsg.
+            $msg = "FileSystem::touch() FAILED. Cannot touch '$file'. $php_errormsg";
+            throw new Exception($msg);
+        }
+    }
+
+    /**
      * Set the umask for file and directory creation.
      *
      * @param Int $mode
+     * @return void
      * @throws Exception
      * @internal param Int $mode . Permissions usually in ocatal. Use leading 0 for
      *                    octal. Number between 0 and 0777.
      *
-     * @return void
      */
     public function umask($mode)
     {
@@ -866,7 +864,7 @@ abstract class FileSystem
             // Add error from php to end of log message. $php_errormsg.
             $msg = "FileSystem::compareMTimes() FAILED. Cannot can not get modified time of $file1.";
             throw new Exception($msg);
-        } elseif ($mtime2 === false) { // FAILED. Log and return err.
+        } else if ($mtime2 === false) { // FAILED. Log and return err.
             // Add error from php to end of log message. $php_errormsg.
             $msg = "FileSystem::compareMTimes() FAILED. Cannot can not get modified time of $file2.";
             throw new Exception($msg);

@@ -54,8 +54,8 @@ class IniFileTokenReader extends TokenReader
     /**
      * Reads the next token from the INI file
      *
-     * @throws BuildException
      * @return Token
+     * @throws BuildException
      */
     public function readToken()
     {
@@ -135,7 +135,7 @@ class IniFileTokenReader extends TokenReader
             return;
         }
 
-        throw new BuildException("Unsupported value " . (string) $file);
+        throw new BuildException("Unsupported value " . (string)$file);
     }
 
     /**
@@ -143,6 +143,6 @@ class IniFileTokenReader extends TokenReader
      */
     public function setSection($str)
     {
-        $this->section = (string) $str;
+        $this->section = (string)$str;
     }
 }

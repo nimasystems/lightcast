@@ -48,33 +48,6 @@ abstract class lcWebBaseController extends lcController
         return $url;
     }
 
-    protected function renderJson($content)
-    {
-        $this->renderRaw(lcVm::json_encode($content, true), 'application/json');
-    }
-
-    protected function renderRaw($content, $content_type = 'text/html', $decorated = false)
-    {
-        if (!$decorated) {
-            // unset the decorator first
-            $this->unsetDecoratorView();
-        }
-
-        $view = new lcRawContentView();
-        $view->setController($this);
-        $view->setConfiguration($this->configuration);
-        $view->setEventDispatcher($this->event_dispatcher);
-        $view->setContent($content);
-        $view->setContentType($content_type);
-        $view->initialize();
-
-        // unset the previous view
-        $this->unsetView();
-
-        // assign the new view
-        $this->view = $view;
-    }
-
     public function render404($message = 'Page not found')
     {
         $this->renderHttpError(404, $message);
@@ -101,11 +74,6 @@ abstract class lcWebBaseController extends lcController
         }
 
         $this->redirect($request_uri);
-    }
-
-    public function permanentRedirect($url)
-    {
-        $this->redirect($url, 301);
     }
 
     public function redirect($url, $http_code = 302)
@@ -150,6 +118,11 @@ abstract class lcWebBaseController extends lcController
         $this->response->redirect($url, $http_code);
     }
 
+    public function permanentRedirect($url)
+    {
+        $this->redirect($url, 301);
+    }
+
     public function getLastRedirectUrl()
     {
         return $this->last_redirect_url;
@@ -167,6 +140,33 @@ abstract class lcWebBaseController extends lcController
         if ($condition) {
             $this->redirect($url, $http_code);
         }
+    }
+
+    protected function renderJson($content)
+    {
+        $this->renderRaw(lcVm::json_encode($content, true), 'application/json');
+    }
+
+    protected function renderRaw($content, $content_type = 'text/html', $decorated = false)
+    {
+        if (!$decorated) {
+            // unset the decorator first
+            $this->unsetDecoratorView();
+        }
+
+        $view = new lcRawContentView();
+        $view->setController($this);
+        $view->setConfiguration($this->configuration);
+        $view->setEventDispatcher($this->event_dispatcher);
+        $view->setContent($content);
+        $view->setContentType($content_type);
+        $view->initialize();
+
+        // unset the previous view
+        $this->unsetView();
+
+        // assign the new view
+        $this->view = $view;
     }
 
     protected function validateRequestAndThrow()

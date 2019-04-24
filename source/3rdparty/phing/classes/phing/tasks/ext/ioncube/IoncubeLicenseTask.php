@@ -39,7 +39,15 @@ class IoncubeLicenseTask extends Task
     private $allowedServer = "";
     private $expireOn = "";
     private $expireIn = "";
-    private $comments = array();
+    private $comments = [];
+
+    /**
+     * Returns the path to the ionCube encoder
+     */
+    public function getIoncubePath()
+    {
+        return $this->ioncubePath;
+    }
 
     /**
      * Sets the path to the ionCube encoder
@@ -51,11 +59,11 @@ class IoncubeLicenseTask extends Task
     }
 
     /**
-     * Returns the path to the ionCube encoder
+     * Returns the path to the license file to use
      */
-    public function getIoncubePath()
+    public function getLicensePath()
     {
-        return $this->ioncubePath;
+        return $this->licensePath;
     }
 
     /**
@@ -68,11 +76,11 @@ class IoncubeLicenseTask extends Task
     }
 
     /**
-     * Returns the path to the license file to use
+     * Returns the passphrase to use when encoding files
      */
-    public function getLicensePath()
+    public function getPassPhrase()
     {
-        return $this->licensePath;
+        return $this->passPhrase;
     }
 
     /**
@@ -85,20 +93,20 @@ class IoncubeLicenseTask extends Task
     }
 
     /**
-     * Returns the passphrase to use when encoding files
-     */
-    public function getPassPhrase()
-    {
-        return $this->passPhrase;
-    }
-
-    /**
      * Adds a comment to be used in encoded files
      * @param IoncubeComment $comment
      */
     public function addComment(IoncubeComment $comment)
     {
         $this->comments[] = $comment;
+    }
+
+    /**
+     * Returns the --allowed-server option
+     */
+    public function getAllowedServer()
+    {
+        return $this->allowedServer;
     }
 
     /**
@@ -111,11 +119,11 @@ class IoncubeLicenseTask extends Task
     }
 
     /**
-     * Returns the --allowed-server option
+     * Returns the --expire-on option
      */
-    public function getAllowedServer()
+    public function getExpireOn()
     {
-        return $this->allowedServer;
+        return $this->expireOn;
     }
 
     /**
@@ -128,11 +136,11 @@ class IoncubeLicenseTask extends Task
     }
 
     /**
-     * Returns the --expire-on option
+     * Returns the --expire-in option
      */
-    public function getExpireOn()
+    public function getExpireIn()
     {
-        return $this->expireOn;
+        return $this->expireIn;
     }
 
     /**
@@ -142,14 +150,6 @@ class IoncubeLicenseTask extends Task
     public function setExpireIn($expireIn)
     {
         $this->expireIn = $expireIn;
-    }
-
-    /**
-     * Returns the --expire-in option
-     */
-    public function getExpireIn()
-    {
-        return $this->expireIn;
     }
 
     /**

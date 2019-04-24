@@ -47,7 +47,7 @@ class BuildPropelGenPEARPackageTask extends MatchingTask
     private $state = 'stable';
     private $notes;
 
-    private $filesets = array();
+    private $filesets = [];
 
     /** Package file */
     private $packageFile;
@@ -58,51 +58,6 @@ class BuildPropelGenPEARPackageTask extends MatchingTask
         if (!class_exists('PEAR_PackageFileManager2')) {
             throw new BuildException("You must have installed PEAR_PackageFileManager2 (PEAR_PackageFileManager >= 1.6.0) in order to create a PEAR package.xml file.");
         }
-    }
-
-    private function setOptions($pkg)
-    {
-        $options['baseinstalldir'] = 'propel';
-        $options['packagedirectory'] = $this->dir->getAbsolutePath();
-
-        if (empty($this->filesets)) {
-            throw new BuildException("You must use a <fileset> tag to specify the files to include in the package.xml");
-        }
-
-        $options['filelistgenerator'] = 'Fileset';
-
-        // Some PHING-specific options needed by our Fileset reader
-        $options['phing_project'] = $this->getProject();
-        $options['phing_filesets'] = $this->filesets;
-
-        if ($this->packageFile !== null) {
-            // create one w/ full path
-            $f = new PhingFile($this->packageFile->getAbsolutePath());
-            $options['packagefile'] = $f->getName();
-            // must end in trailing slash
-            $options['outputdirectory'] = $f->getParent() . DIRECTORY_SEPARATOR;
-            $this->log("Creating package file: " . $f->getPath(), Project::MSG_INFO);
-        } else {
-            $this->log("Creating [default] package.xml file in base directory.", Project::MSG_INFO);
-        }
-
-        // add baseinstalldir exceptions
-        $options['installexceptions'] = array(
-            'pear-propel-gen' => '/',
-            'pear-propel-gen.bat' => '/',
-        );
-
-        $options['dir_roles'] = array(
-            'lib' => 'data',
-            'resources' => 'data'
-        );
-
-        $options['exceptions'] = array(
-            'pear-propel-gen.bat' => 'script',
-            'pear-propel-gen' => 'script',
-        );
-
-        $pkg->setOptions($options);
     }
 
     /**
@@ -183,6 +138,51 @@ class BuildPropelGenPEARPackageTask extends MatchingTask
         if (PEAR::isError($e)) {
             throw new BuildException("Unable to write package file.", new Exception($e->getMessage()));
         }
+    }
+
+    private function setOptions($pkg)
+    {
+        $options['baseinstalldir'] = 'propel';
+        $options['packagedirectory'] = $this->dir->getAbsolutePath();
+
+        if (empty($this->filesets)) {
+            throw new BuildException("You must use a <fileset> tag to specify the files to include in the package.xml");
+        }
+
+        $options['filelistgenerator'] = 'Fileset';
+
+        // Some PHING-specific options needed by our Fileset reader
+        $options['phing_project'] = $this->getProject();
+        $options['phing_filesets'] = $this->filesets;
+
+        if ($this->packageFile !== null) {
+            // create one w/ full path
+            $f = new PhingFile($this->packageFile->getAbsolutePath());
+            $options['packagefile'] = $f->getName();
+            // must end in trailing slash
+            $options['outputdirectory'] = $f->getParent() . DIRECTORY_SEPARATOR;
+            $this->log("Creating package file: " . $f->getPath(), Project::MSG_INFO);
+        } else {
+            $this->log("Creating [default] package.xml file in base directory.", Project::MSG_INFO);
+        }
+
+        // add baseinstalldir exceptions
+        $options['installexceptions'] = [
+            'pear-propel-gen' => '/',
+            'pear-propel-gen.bat' => '/',
+        ];
+
+        $options['dir_roles'] = [
+            'lib' => 'data',
+            'resources' => 'data',
+        ];
+
+        $options['exceptions'] = [
+            'pear-propel-gen.bat' => 'script',
+            'pear-propel-gen' => 'script',
+        ];
+
+        $pkg->setOptions($options);
     }
 
     /**

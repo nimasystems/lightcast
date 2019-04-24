@@ -77,7 +77,7 @@ if (!function_exists('http_build_url')) {
             $flags |= HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS
                 | HTTP_URL_STRIP_PORT | HTTP_URL_STRIP_PATH
                 | HTTP_URL_STRIP_QUERY | HTTP_URL_STRIP_FRAGMENT;
-        } elseif ($flags & HTTP_URL_STRIP_AUTH) {
+        } else if ($flags & HTTP_URL_STRIP_AUTH) {
             $flags |= HTTP_URL_STRIP_USER | HTTP_URL_STRIP_PASS;
         }
 

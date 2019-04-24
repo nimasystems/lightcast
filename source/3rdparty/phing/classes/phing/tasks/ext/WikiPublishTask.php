@@ -75,11 +75,11 @@ class WikiPublishTask extends Task
      * Publish modes map
      * @var array
      */
-    private $modeMap = array(
+    private $modeMap = [
         'overwrite' => 'text',
         'append' => 'appendtext',
         'prepend' => 'prependtext',
-    );
+    ];
     /**
      * Curl handler
      *
@@ -100,6 +100,14 @@ class WikiPublishTask extends Task
     private $cookiesFile;
 
     /**
+     * @return string
+     */
+    public function getApiPassword()
+    {
+        return $this->apiPassword;
+    }
+
+    /**
      * @param string $apiPassword
      */
     public function setApiPassword($apiPassword)
@@ -110,9 +118,9 @@ class WikiPublishTask extends Task
     /**
      * @return string
      */
-    public function getApiPassword()
+    public function getApiUrl()
     {
-        return $this->apiPassword;
+        return $this->apiUrl;
     }
 
     /**
@@ -126,9 +134,9 @@ class WikiPublishTask extends Task
     /**
      * @return string
      */
-    public function getApiUrl()
+    public function getApiUser()
     {
-        return $this->apiUrl;
+        return $this->apiUser;
     }
 
     /**
@@ -140,11 +148,11 @@ class WikiPublishTask extends Task
     }
 
     /**
-     * @return string
+     * @return int
      */
-    public function getApiUser()
+    public function getId()
     {
-        return $this->apiUser;
+        return $this->id;
     }
 
     /**
@@ -156,11 +164,11 @@ class WikiPublishTask extends Task
     }
 
     /**
-     * @return int
+     * @return string
      */
-    public function getId()
+    public function getMode()
     {
-        return $this->id;
+        return $this->mode;
     }
 
     /**
@@ -181,9 +189,9 @@ class WikiPublishTask extends Task
     /**
      * @return string
      */
-    public function getMode()
+    public function getTitle()
     {
-        return $this->mode;
+        return $this->title;
     }
 
     /**
@@ -197,9 +205,9 @@ class WikiPublishTask extends Task
     /**
      * @return string
      */
-    public function getTitle()
+    public function getContent()
     {
-        return $this->title;
+        return $this->content;
     }
 
     /**
@@ -208,14 +216,6 @@ class WikiPublishTask extends Task
     public function setContent($content)
     {
         $this->content = $content;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent()
-    {
-        return $this->content;
     }
 
     /**
@@ -248,19 +248,6 @@ class WikiPublishTask extends Task
     }
 
     /**
-     * Close curl connection and clean up
-     */
-    public function __destruct()
-    {
-        if (null !== $this->curl && is_resource($this->curl)) {
-            curl_close($this->curl);
-        }
-        if (null !== $this->cookiesFile && file_exists($this->cookiesFile)) {
-            unlink($this->cookiesFile);
-        }
-    }
-
-    /**
      * Validates attributes coming in from XML
      *
      * @throws BuildException
@@ -287,7 +274,7 @@ class WikiPublishTask extends Task
      */
     private function callApiLogin($token = null)
     {
-        $postData = array('lgname' => $this->apiUser, 'lgpassword' => $this->apiPassword);
+        $postData = ['lgname' => $this->apiUser, 'lgpassword' => $this->apiPassword];
         if (null !== $token) {
             $postData['lgtoken'] = $token;
         }
@@ -310,55 +297,9 @@ class WikiPublishTask extends Task
     }
 
     /**
-     * Call Wiki webapi edit action
-     */
-    private function callApiEdit()
-    {
-        $this->callApiTokens();
-        $result = $this->callApi('action=edit&token=' . urlencode($this->apiEditToken), $this->getApiEditData());
-        $this->checkApiResponseResult('edit', $result);
-    }
-
-    /**
-     * Return prepared data for Wiki webapi edit action
-     *
-     * @return array
-     */
-    private function getApiEditData()
-    {
-        $result = array(
-            'minor' => '',
-        );
-        if (null !== $this->title) {
-            $result['title'] = $this->title;
-        }
-        if (null !== $this->id) {
-            $result['pageid'] = $this->id;
-        }
-        $result[$this->modeMap[$this->mode]] = $this->content;
-
-        return $result;
-    }
-
-    /**
-     * Call Wiki webapi tokens action
-     *
-     * @throws BuildException
-     */
-    private function callApiTokens()
-    {
-        $result = $this->callApi('action=tokens&type=edit');
-        if (false == isset($result['tokens']) || false == isset($result['tokens']['edittoken'])) {
-            throw new BuildException('Wiki token not found');
-        }
-
-        $this->apiEditToken = $result['tokens']['edittoken'];
-    }
-
-    /**
      * Call Wiki webapi
      *
-     * @param string     $queryString
+     * @param string $queryString
      * @param array|null $postData
      *
      * @return array
@@ -413,7 +354,7 @@ class WikiPublishTask extends Task
      * Validate Wiki webapi response
      *
      * @param string $action
-     * @param array  $response
+     * @param array $response
      * @param string $expect
      *
      * @throws BuildException
@@ -430,6 +371,65 @@ class WikiPublishTask extends Task
         if ($response[$action]['result'] !== $expect) {
             throw new BuildException(
                 'Unexpected Wiki response result ' . $response[$action]['result'] . ' (expected: ' . $expect . ')');
+        }
+    }
+
+    /**
+     * Call Wiki webapi edit action
+     */
+    private function callApiEdit()
+    {
+        $this->callApiTokens();
+        $result = $this->callApi('action=edit&token=' . urlencode($this->apiEditToken), $this->getApiEditData());
+        $this->checkApiResponseResult('edit', $result);
+    }
+
+    /**
+     * Call Wiki webapi tokens action
+     *
+     * @throws BuildException
+     */
+    private function callApiTokens()
+    {
+        $result = $this->callApi('action=tokens&type=edit');
+        if (false == isset($result['tokens']) || false == isset($result['tokens']['edittoken'])) {
+            throw new BuildException('Wiki token not found');
+        }
+
+        $this->apiEditToken = $result['tokens']['edittoken'];
+    }
+
+    /**
+     * Return prepared data for Wiki webapi edit action
+     *
+     * @return array
+     */
+    private function getApiEditData()
+    {
+        $result = [
+            'minor' => '',
+        ];
+        if (null !== $this->title) {
+            $result['title'] = $this->title;
+        }
+        if (null !== $this->id) {
+            $result['pageid'] = $this->id;
+        }
+        $result[$this->modeMap[$this->mode]] = $this->content;
+
+        return $result;
+    }
+
+    /**
+     * Close curl connection and clean up
+     */
+    public function __destruct()
+    {
+        if (null !== $this->curl && is_resource($this->curl)) {
+            curl_close($this->curl);
+        }
+        if (null !== $this->cookiesFile && file_exists($this->cookiesFile)) {
+            unlink($this->cookiesFile);
         }
     }
 }

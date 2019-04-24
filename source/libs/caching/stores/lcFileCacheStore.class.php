@@ -170,7 +170,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
                     'total_entries' => (int)$line[1],
                     'next_dir' => (int)$line[2],
                     'next_subdir' => (int)$line[3],
-                    'next_file' => (int)$line[4]
+                    'next_file' => (int)$line[4],
                 ];
             }
 
@@ -226,11 +226,11 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
                 'status' => $data[0],
                 'key' => $data[1],
                 'timestamp' => $data[2],
-                'cache_filename' => $data[3]
+                'cache_filename' => $data[3],
             ];
-        } elseif ($get_type == self::READ_FILENAME) {
+        } else if ($get_type == self::READ_FILENAME) {
             return $data[3];
-        } elseif ($get_type == self::READ_TIMESTAMP) {
+        } else if ($get_type == self::READ_TIMESTAMP) {
             return $data[2];
         }
 
@@ -297,7 +297,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
     {
         $debug = [
             'cache_folder' => $this->cache_folder,
-            'total_entries' => $this->total_entries
+            'total_entries' => $this->total_entries,
         ];
 
         return $debug;
@@ -306,7 +306,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
     public function getShortDebugInfo()
     {
         $debug = [
-            'total_entries' => $this->total_entries
+            'total_entries' => $this->total_entries,
         ];
 
         return $debug;
@@ -465,7 +465,7 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
 
                     $cache_filename = $data[3];
                 }
-            } elseif ($write_type == self::WRITE_REMOVE_DATA) {
+            } else if ($write_type == self::WRITE_REMOVE_DATA) {
                 if ($data) {
                     // remove the actual cache
                     $filename = $this->cache_folder . DS . $data[3];

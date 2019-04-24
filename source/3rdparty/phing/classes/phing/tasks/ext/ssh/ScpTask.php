@@ -29,11 +29,10 @@ require_once 'phing/Task.php';
  * @version   $Id: 34d699a555092a5473d0636c5e45232dc2019c1d $
  * @package   phing.tasks.ext
  */
-
 class ScpTask extends Task
 {
     protected $file = "";
-    protected $filesets = array(); // all fileset objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
     protected $todir = "";
     protected $mode = null;
 
@@ -78,6 +77,14 @@ class ScpTask extends Task
     protected $heuristicScpSftp = 0;
 
     /**
+     * Returns the remote host
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
      * Sets the remote host
      * @param $h
      */
@@ -87,11 +94,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the remote host
+     * Returns the remote host port
      */
-    public function getHost()
+    public function getPort()
     {
-        return $this->host;
+        return $this->port;
     }
 
     /**
@@ -104,11 +111,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the remote host port
+     * Returns the mode value
      */
-    public function getPort()
+    public function getMode()
     {
-        return $this->port;
+        return $this->mode;
     }
 
     /**
@@ -121,11 +128,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the mode value
+     * Returns the username
      */
-    public function getMode()
+    public function getUsername()
     {
-        return $this->mode;
+        return $this->username;
     }
 
     /**
@@ -138,11 +145,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the username
+     * Returns the password
      */
-    public function getUsername()
+    public function getPassword()
     {
-        return $this->username;
+        return $this->password;
     }
 
     /**
@@ -155,11 +162,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the password
+     * Returns the pubkeyfile
      */
-    public function getPassword()
+    public function getPubkeyfile()
     {
-        return $this->password;
+        return $this->pubkeyfile;
     }
 
     /**
@@ -172,11 +179,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the pubkeyfile
+     * Returns the private keyfile
      */
-    public function getPubkeyfile()
+    public function getPrivkeyfile()
     {
-        return $this->pubkeyfile;
+        return $this->privkeyfile;
     }
 
     /**
@@ -186,23 +193,6 @@ class ScpTask extends Task
     public function setPrivkeyfile($privkeyfile)
     {
         $this->privkeyfile = $privkeyfile;
-    }
-
-    /**
-     * Returns the private keyfile
-     */
-    public function getPrivkeyfile()
-    {
-        return $this->privkeyfile;
-    }
-
-    /**
-     * Sets the private key file passphrase of the user to scp
-     * @param $privkeyfilepassphrase
-     */
-    public function setPrivkeyfilepassphrase($privkeyfilepassphrase)
-    {
-        $this->privkeyfilepassphrase = $privkeyfilepassphrase;
     }
 
     /**
@@ -216,12 +206,12 @@ class ScpTask extends Task
     }
 
     /**
-     * Sets whether to autocreate remote directories
-     * @param $autocreate
+     * Sets the private key file passphrase of the user to scp
+     * @param $privkeyfilepassphrase
      */
-    public function setAutocreate($autocreate)
+    public function setPrivkeyfilepassphrase($privkeyfilepassphrase)
     {
-        $this->autocreate = (bool) $autocreate;
+        $this->privkeyfilepassphrase = $privkeyfilepassphrase;
     }
 
     /**
@@ -230,6 +220,23 @@ class ScpTask extends Task
     public function getAutocreate()
     {
         return $this->autocreate;
+    }
+
+    /**
+     * Sets whether to autocreate remote directories
+     * @param $autocreate
+     */
+    public function setAutocreate($autocreate)
+    {
+        $this->autocreate = (bool)$autocreate;
+    }
+
+    /**
+     * Returns the destination directory
+     */
+    public function getTodir()
+    {
+        return $this->todir;
     }
 
     /**
@@ -242,11 +249,11 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns the destination directory
+     * Returns local filename
      */
-    public function getTodir()
+    public function getFile()
     {
-        return $this->todir;
+        return $this->file;
     }
 
     /**
@@ -259,23 +266,6 @@ class ScpTask extends Task
     }
 
     /**
-     * Returns local filename
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * Sets whether to send (default) or fetch files
-     * @param $fetch
-     */
-    public function setFetch($fetch)
-    {
-        $this->fetch = (bool) $fetch;
-    }
-
-    /**
      * Returns whether to send (default) or fetch files
      */
     public function getFetch()
@@ -284,13 +274,12 @@ class ScpTask extends Task
     }
 
     /**
-     * Declare number of successful operations above which "sftp" will be chosen over "scp".
-     *
-     * @param int $heuristicDecision Number
+     * Sets whether to send (default) or fetch files
+     * @param $fetch
      */
-    public function setHeuristicDecision($heuristicDecision)
+    public function setFetch($fetch)
     {
-        $this->heuristicDecision = (int) $heuristicDecision;
+        $this->fetch = (bool)$fetch;
     }
 
     /**
@@ -301,6 +290,16 @@ class ScpTask extends Task
     public function getHeuristicDecision()
     {
         return $this->heuristicDecision;
+    }
+
+    /**
+     * Declare number of successful operations above which "sftp" will be chosen over "scp".
+     *
+     * @param int $heuristicDecision Number
+     */
+    public function setHeuristicDecision($heuristicDecision)
+    {
+        $this->heuristicDecision = (int)$heuristicDecision;
     }
 
     /**
@@ -370,7 +369,7 @@ class ScpTask extends Task
             throw new BuildException("Attribute 'host' and 'username' must be set");
         }
 
-        $methods = !empty($this->methods) ? $this->methods->toArray($p) : array();
+        $methods = !empty($this->methods) ? $this->methods->toArray($p) : [];
         $this->connection = ssh2_connect($this->host, $this->port, $methods);
         if (!$this->connection) {
             throw new BuildException("Could not establish connection to " . $this->host . ":" . $this->port . "!");

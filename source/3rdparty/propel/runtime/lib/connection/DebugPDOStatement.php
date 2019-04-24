@@ -21,31 +21,29 @@
 class DebugPDOStatement extends PDOStatement
 {
     /**
-     * The PDO connection from which this instance was created.
-     *
-     * @var       PropelPDO
-     */
-    protected $pdo;
-
-    /**
      * Hashmap for resolving the PDO::PARAM_* class constants to their human-readable names.
      * This is only used in logging the binding of variables.
      *
      * @see       self::bindValue()
      * @var       array
      */
-    protected static $typeMap = array(
+    protected static $typeMap = [
         PDO::PARAM_BOOL => "PDO::PARAM_BOOL",
         PDO::PARAM_INT => "PDO::PARAM_INT",
         PDO::PARAM_STR => "PDO::PARAM_STR",
         PDO::PARAM_LOB => "PDO::PARAM_LOB",
         PDO::PARAM_NULL => "PDO::PARAM_NULL",
-    );
-
+    ];
+    /**
+     * The PDO connection from which this instance was created.
+     *
+     * @var       PropelPDO
+     */
+    protected $pdo;
     /**
      * @var       array  The values that have been bound
      */
-    protected $boundValues = array();
+    protected $boundValues = [];
 
     /**
      * Construct a new statement class with reference to main DebugPDO object from
@@ -61,15 +59,36 @@ class DebugPDOStatement extends PDOStatement
     }
 
     /**
+     * Executes a prepared statement.  Returns a boolean value indicating success.
+     * Overridden for query counting and logging.
+     *
+     * @param string $input_parameters
+     *
+     * @return boolean
+     */
+    public function execute($input_parameters = null)
+    {
+        $debug = $this->pdo->getDebugSnapshot();
+        $return = parent::execute($input_parameters);
+
+        $sql = $this->getExecutedQueryString($input_parameters ? $input_parameters : []);
+        $this->pdo->log($sql, null, __METHOD__, $debug);
+        $this->pdo->setLastExecutedQuery($sql);
+        $this->pdo->incrementQueryCount();
+
+        return $return;
+    }
+
+    /**
      * @param array $values Parameters which were passed to execute(), if any. Default: bound parameters.
      *
      * @return string
      */
-    public function getExecutedQueryString(array $values = array())
+    public function getExecutedQueryString(array $values = [])
     {
         $sql = $this->queryString;
         $boundValues = empty($values) ? $this->boundValues : $values;
-        $matches = array();
+        $matches = [];
         if (preg_match_all('/(:p[0-9]+\b)/', $sql, $matches)) {
             $size = count($matches[1]);
             for ($i = $size - 1; $i >= 0; $i--) {
@@ -86,27 +105,6 @@ class DebugPDOStatement extends PDOStatement
         }
 
         return $sql;
-    }
-
-    /**
-     * Executes a prepared statement.  Returns a boolean value indicating success.
-     * Overridden for query counting and logging.
-     *
-     * @param string $input_parameters
-     *
-     * @return boolean
-     */
-    public function execute($input_parameters = null)
-    {
-        $debug = $this->pdo->getDebugSnapshot();
-        $return = parent::execute($input_parameters);
-
-        $sql = $this->getExecutedQueryString($input_parameters ? $input_parameters : array());
-        $this->pdo->log($sql, null, __METHOD__, $debug);
-        $this->pdo->setLastExecutedQuery($sql);
-        $this->pdo->incrementQueryCount();
-
-        return $return;
     }
 
     /**

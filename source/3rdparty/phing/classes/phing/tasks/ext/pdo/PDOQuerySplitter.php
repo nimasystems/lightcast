@@ -46,7 +46,7 @@ abstract class PDOQuerySplitter
      * Constructor, sets the parent task and reader with SQL source
      *
      * @param PDOSQLExecTask $parent
-     * @param Reader         $reader
+     * @param Reader $reader
      */
     public function __construct(PDOSQLExecTask $parent, Reader $reader)
     {

@@ -82,7 +82,7 @@ class PhingCallTask extends Task
      */
     public function setInheritAll($inherit)
     {
-        $this->inheritAll = (boolean) $inherit;
+        $this->inheritAll = (boolean)$inherit;
     }
 
     /**
@@ -93,7 +93,7 @@ class PhingCallTask extends Task
      */
     public function setInheritRefs($inheritRefs)
     {
-        $this->inheritRefs = (boolean) $inheritRefs;
+        $this->inheritRefs = (boolean)$inheritRefs;
     }
 
     /**
@@ -107,6 +107,20 @@ class PhingCallTask extends Task
         }
 
         return $this->callee->createProperty();
+    }
+
+    /**
+     *  init this task by creating new instance of the phing task and
+     *  configuring it's by calling its own init method.
+     */
+    public function init()
+    {
+        $this->callee = $this->project->createTask("phing");
+        $this->callee->setOwningTarget($this->getOwningTarget());
+        $this->callee->setTaskName($this->getTaskName());
+        $this->callee->setHaltOnFailure(true);
+        $this->callee->setLocation($this->getLocation());
+        $this->callee->init();
     }
 
     /**
@@ -127,21 +141,7 @@ class PhingCallTask extends Task
      */
     public function setTarget($target)
     {
-        $this->subTarget = (string) $target;
-    }
-
-    /**
-     *  init this task by creating new instance of the phing task and
-     *  configuring it's by calling its own init method.
-     */
-    public function init()
-    {
-        $this->callee = $this->project->createTask("phing");
-        $this->callee->setOwningTarget($this->getOwningTarget());
-        $this->callee->setTaskName($this->getTaskName());
-        $this->callee->setHaltOnFailure(true);
-        $this->callee->setLocation($this->getLocation());
-        $this->callee->init();
+        $this->subTarget = (string)$target;
     }
 
     /**

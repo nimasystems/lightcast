@@ -60,7 +60,7 @@ class DBMySQL extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -86,7 +86,7 @@ class DBMySQL extends DBAdapter
     /**
      * Locks the specified table.
      *
-     * @param PDO    $con   The Propel connection to use.
+     * @param PDO $con The Propel connection to use.
      * @param string $table The name of the table to lock.
      *
      * @throws PDOException No Statement could be created or executed.
@@ -99,7 +99,7 @@ class DBMySQL extends DBAdapter
     /**
      * Unlocks the specified table.
      *
-     * @param PDO    $con   The PDO connection to use.
+     * @param PDO $con The PDO connection to use.
      * @param string $table The name of the table to unlock.
      *
      * @throws PDOException No Statement could be created or executed.
@@ -110,11 +110,11 @@ class DBMySQL extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::quoteIdentifier()
-     *
      * @param string $text
      *
      * @return string
+     * @see       DBAdapter::quoteIdentifier()
+     *
      */
     public function quoteIdentifier($text)
     {
@@ -122,22 +122,22 @@ class DBMySQL extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::quoteIdentifierTable()
-     *
      * @param string $table
      *
      * @return string
+     * @see       DBAdapter::quoteIdentifierTable()
+     *
      */
     public function quoteIdentifierTable($table)
     {
         // e.g. 'database.table alias' should be escaped as '`database`.`table` `alias`'
-        return '`' . strtr($table, array('.' => '`.`', ' ' => '` `')) . '`';
+        return '`' . strtr($table, ['.' => '`.`', ' ' => '` `']) . '`';
     }
 
     /**
+     * @return boolean
      * @see       DBAdapter::useQuoteIdentifier()
      *
-     * @return boolean
      */
     public function useQuoteIdentifier()
     {
@@ -145,43 +145,43 @@ class DBMySQL extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::applyLimit()
-     *
-     * @param string  $sql
+     * @param string $sql
      * @param integer $offset
      * @param integer $limit
+     * @see       DBAdapter::applyLimit()
+     *
      */
     public function applyLimit(&$sql, $offset, $limit)
     {
         if ($limit > 0) {
             $sql .= " LIMIT " . ($offset > 0 ? $offset . ", " : "") . $limit;
-        } elseif ($offset > 0) {
+        } else if ($offset > 0) {
             $sql .= " LIMIT " . $offset . ", 18446744073709551615";
         }
     }
 
     /**
-     * @see       DBAdapter::random()
-     *
      * @param string $seed
      *
      * @return string
+     * @see       DBAdapter::random()
+     *
      */
     public function random($seed = null)
     {
-        return 'rand(' . ((int) $seed) . ')';
+        return 'rand(' . ((int)$seed) . ')';
     }
 
     /**
-     * @see       DBAdapter::bindValue()
-     *
      * @param PDOStatement $stmt
-     * @param string       $parameter
-     * @param mixed        $value
-     * @param ColumnMap    $cMap
+     * @param string $parameter
+     * @param mixed $value
+     * @param ColumnMap $cMap
      * @param null|integer $position
      *
      * @return boolean
+     * @see       DBAdapter::bindValue()
+     *
      */
     public function bindValue(PDOStatement $stmt, $parameter, $value, ColumnMap $cMap, $position = null)
     {
@@ -189,13 +189,13 @@ class DBMySQL extends DBAdapter
         // FIXME - This is a temporary hack to get around apparent bugs w/ PDO+MYSQL
         // See http://pecl.php.net/bugs/bug.php?id=9919
         if ($pdoType == PDO::PARAM_BOOL) {
-            $value = (int) $value;
+            $value = (int)$value;
             $pdoType = PDO::PARAM_INT;
 
             return $stmt->bindValue($parameter, $value, $pdoType);
-        } elseif ($cMap->isTemporal()) {
+        } else if ($cMap->isTemporal()) {
             $value = $this->formatTemporalValue($value, $cMap);
-        } elseif (is_resource($value) && $cMap->isLob()) {
+        } else if (is_resource($value) && $cMap->isLob()) {
             // we always need to make sure that the stream is rewound, otherwise nothing will
             // get written to database.
             rewind($value);
@@ -219,7 +219,7 @@ class DBMySQL extends DBAdapter
         $params = parent::prepareParams($params);
         // Whitelist based on https://bugs.php.net/bug.php?id=47802
         // And https://bugs.php.net/bug.php?id=47802
-        $whitelist = array(
+        $whitelist = [
             'ASCII',
             'CP1250',
             'CP1251',
@@ -235,7 +235,7 @@ class DBMySQL extends DBAdapter
             'SWE7',
             'UTF8',
             'UTF-8',
-        );
+        ];
 
         if (isset($params['settings']['charset']['value'])) {
             if (version_compare(PHP_VERSION, '5.3.6', '<')) {
@@ -247,7 +247,7 @@ Connection option "charset" cannot be used for MySQL connections in PHP versions
     Please refer to http://www.propelorm.org/ticket/1360 for instructions and details about the implications of
     using a SET NAMES statement in the "queries" setting.
 EXCEPTION
-                );
+                    );
                 }
             } else {
                 if (strpos($params['dsn'], ';charset=') === false) {
@@ -263,16 +263,16 @@ EXCEPTION
     /**
      * Do Explain Plan for query object or query string
      *
-     * @param PropelPDO            $con   propel connection
+     * @param PropelPDO $con propel connection
      * @param ModelCriteria|string $query query the criteria or the query string
      *
-     * @throws PropelException
      * @return PDOStatement    A PDO statement executed using the connection, ready to be fetched
+     * @throws PropelException
      */
     public function doExplainPlan(PropelPDO $con, $query)
     {
         if ($query instanceof ModelCriteria) {
-            $params = array();
+            $params = [];
             $dbMap = Propel::getDatabaseMap($query->getDbName());
             $sql = BasePeer::createSelectSql($query, $params);
             $sql = 'EXPLAIN ' . $sql;

@@ -34,11 +34,6 @@ class lcTagDel extends lcHtmlTag
         $this->setDateTime($datetime);
     }
 
-    public static function create()
-    {
-        return new lcTagDel();
-    }
-
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);
@@ -49,6 +44,11 @@ class lcTagDel extends lcHtmlTag
     {
         $this->setAttribute('datetime', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagDel();
     }
 
     public static function getRequiredAttributes()

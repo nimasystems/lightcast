@@ -45,7 +45,7 @@ class ReplaceRegexp extends BaseFilterReader implements ChainableReader
     /**
      * @var array RegularExpression[]
      */
-    private $regexps = array();
+    private $regexps = [];
 
     /**
      * Creator method handles nested <regexp> tags.
@@ -56,26 +56,6 @@ class ReplaceRegexp extends BaseFilterReader implements ChainableReader
         $num = array_push($this->regexps, new RegularExpression());
 
         return $this->regexps[$num - 1];
-    }
-
-    /**
-     * Sets the current regexps.
-     * (Used when, e.g., cloning/chaining the method.)
-     * @param array RegularExpression[]
-     */
-    public function setRegexps($regexps)
-    {
-        $this->regexps = $regexps;
-    }
-
-    /**
-     * Gets the current regexps.
-     * (Used when, e.g., cloning/chaining the method.)
-     * @return array RegularExpression[]
-     */
-    public function getRegexps()
-    {
-        return $this->regexps;
     }
 
     /**
@@ -104,8 +84,7 @@ class ReplaceRegexp extends BaseFilterReader implements ChainableReader
             try {
                 $buffer = $regexp->replace($buffer);
                 $this->log(
-                    "Performing regexp replace: /" . $regexp->getPattern() . "/" . $regexp->getReplace(
-                    ) . "/g" . $regexp->getModifiers(),
+                    "Performing regexp replace: /" . $regexp->getPattern() . "/" . $regexp->getReplace() . "/g" . $regexp->getModifiers(),
                     Project::MSG_VERBOSE
                 );
             } catch (Exception $e) {
@@ -134,6 +113,26 @@ class ReplaceRegexp extends BaseFilterReader implements ChainableReader
         $newFilter->setRegexps($this->getRegexps());
 
         return $newFilter;
+    }
+
+    /**
+     * Gets the current regexps.
+     * (Used when, e.g., cloning/chaining the method.)
+     * @return array RegularExpression[]
+     */
+    public function getRegexps()
+    {
+        return $this->regexps;
+    }
+
+    /**
+     * Sets the current regexps.
+     * (Used when, e.g., cloning/chaining the method.)
+     * @param array RegularExpression[]
+     */
+    public function setRegexps($regexps)
+    {
+        $this->regexps = $regexps;
     }
 
 }

@@ -97,6 +97,25 @@ class PlainPHPUnitResultFormatter extends PHPUnitResultFormatter
     }
 
     /**
+     * @param $type
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     */
+    private function formatError($type, PHPUnit_Framework_Test $test, Exception $e = null)
+    {
+        if ($test != null) {
+            $this->endTest($test, time());
+        }
+
+        $this->inner .= $test->getName() . " " . $type . "\n";
+
+        if ($e !== null) {
+            $this->inner .= $e->getMessage() . "\n";
+            // $this->inner.= PHPUnit_Util_Filter::getFilteredStackTrace($e, true) . "\n";
+        }
+    }
+
+    /**
      * @param PHPUnit_Framework_Test $test
      * @param PHPUnit_Framework_AssertionFailedError $e
      * @param float $time
@@ -128,25 +147,6 @@ class PlainPHPUnitResultFormatter extends PHPUnitResultFormatter
     {
         parent::addSkippedTest($test, $e, $time);
         $this->formatError("SKIPPED", $test);
-    }
-
-    /**
-     * @param $type
-     * @param PHPUnit_Framework_Test $test
-     * @param Exception $e
-     */
-    private function formatError($type, PHPUnit_Framework_Test $test, Exception $e = null)
-    {
-        if ($test != null) {
-            $this->endTest($test, time());
-        }
-
-        $this->inner .= $test->getName() . " " . $type . "\n";
-
-        if ($e !== null) {
-            $this->inner .= $e->getMessage() . "\n";
-            // $this->inner.= PHPUnit_Util_Filter::getFilteredStackTrace($e, true) . "\n";
-        }
     }
 
     public function endTestRun()

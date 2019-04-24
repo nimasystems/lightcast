@@ -79,6 +79,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     protected $tmp_dir;
 
     protected $debugging;
+    private $is_lc15_targeting;
+    private $_is_lc15_targeting_checked;
 
     public function __construct()
     {
@@ -229,10 +231,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         if ($in_cli && !$skip_cli_check) {
             return null;
-        } elseif (function_exists('xcache_get')) {
+        } else if (function_exists('xcache_get')) {
             // xcache
             $object = new lcXCache();
-        } elseif (function_exists('apc_fetch')) {
+        } else if (function_exists('apc_fetch')) {
             // apc
             $object = new lcAPC();
         }
@@ -384,9 +386,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->config_version = (int)$config_version;
         assert($this->config_version);
     }
-
-    private $is_lc15_targeting;
-    private $_is_lc15_targeting_checked;
 
     public function isTargetingLC15()
     {
@@ -624,8 +623,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
-                'path' => $this->getProjectDir() . DS . 'applications'
-            ]
+                'path' => $this->getProjectDir() . DS . 'applications',
+            ],
         ];
 
         return $locations;
@@ -650,7 +649,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $path,
-                'web_path' => '/addons/plugins/'
+                'web_path' => '/addons/plugins/',
             ];
 
             unset($path);
@@ -664,20 +663,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $locations = [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'path' => $this->getAssetsDir() . DS . 'forms'
-            ],
-            /* app modules to be overriden in the inherited app config class */
-        ];
-
-        return $locations;
-    }
-
-    public function getControllerModuleLocations()
-    {
-        $locations = [
-            [
-                'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'path' => $this->getAssetsDir() . DS . 'modules'
+                'path' => $this->getAssetsDir() . DS . 'forms',
             ],
             /* app modules to be overriden in the inherited app config class */
         ];
@@ -705,18 +691,31 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->root_dir = $root_dir;
     }
 
+    public function getControllerModuleLocations()
+    {
+        $locations = [
+            [
+                'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'path' => $this->getAssetsDir() . DS . 'modules',
+            ],
+            /* app modules to be overriden in the inherited app config class */
+        ];
+
+        return $locations;
+    }
+
     public function getControllerComponentLocations()
     {
         $locations = [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'path' => $this->getAssetsDir() . DS . 'components'
+                'path' => $this->getAssetsDir() . DS . 'components',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
-                'path' => $this->getAddonsDir() . DS . 'components'
-            ]
+                'path' => $this->getAddonsDir() . DS . 'components',
+            ],
         ];
 
         return $locations;
@@ -732,12 +731,12 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $locations = [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'path' => $this->getAssetsDir() . DS . 'tasks'
+                'path' => $this->getAssetsDir() . DS . 'tasks',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
-                'path' => $this->getProjectDir() . DS . 'tasks'
+                'path' => $this->getProjectDir() . DS . 'tasks',
             ],
         ];
 
@@ -749,12 +748,12 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $locations = [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'path' => $this->getAssetsDir() . DS . 'ws'
+                'path' => $this->getAssetsDir() . DS . 'ws',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
-                'path' => $this->getProjectDir() . DS . 'ws'
+                'path' => $this->getProjectDir() . DS . 'ws',
             ],
         ];
 
@@ -799,14 +798,14 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->tmp_dir = $temp_dir;
     }
 
-    public function getDataDir()
-    {
-        return $this->getProjectDir() . DS . 'data';
-    }
-
     public function getMediaDir()
     {
         return $this->getDataDir() . DS . 'media';
+    }
+
+    public function getDataDir()
+    {
+        return $this->getProjectDir() . DS . 'data';
     }
 
     public function getGenDir()
@@ -987,7 +986,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         $parent_cache = (array)parent::writeClassCache();
         $project_cache = [
-            'project_db_models' => $this->project_db_models
+            'project_db_models' => $this->project_db_models,
         ];
         $cache = array_merge($parent_cache, $project_cache);
         return $cache;

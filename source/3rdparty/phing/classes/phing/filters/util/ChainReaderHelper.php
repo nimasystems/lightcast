@@ -74,7 +74,7 @@ class ChainReaderHelper
     private $bufferSize = 8192;
 
     /** Chain of filters */
-    private $filterChains = array();
+    private $filterChains = [];
 
     /** The Phing project */
     private $project;
@@ -93,26 +93,7 @@ class ChainReaderHelper
     /*
      * Set the project to work with
     */
-    /**
-     * @param Project $project
-     */
-    public function setProject(Project $project)
-    {
-        $this->project = $project;
-    }
 
-    /*
-     * Get the project
-    */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /*
-     * Sets the buffer size to be used.  Defaults to 8192,
-     * if this method is not invoked.
-    */
     /**
      * @param $size
      */
@@ -122,19 +103,22 @@ class ChainReaderHelper
     }
 
     /*
-     * Sets the collection of filter reader sets
+     * Get the project
     */
+
     /**
      * @param $fchain
      */
     public function setFilterChains(&$fchain)
     {
-        $this->filterChains = & $fchain;
+        $this->filterChains = &$fchain;
     }
 
     /*
-     * Assemble the reader
+     * Sets the buffer size to be used.  Defaults to 8192,
+     * if this method is not invoked.
     */
+
     /**
      * @return FilterReader|null|Parameterizable|Reader
      * @throws Exception
@@ -144,11 +128,11 @@ class ChainReaderHelper
 
         $instream = $this->primaryReader;
         $filterReadersCount = count($this->filterChains);
-        $finalFilters = array();
+        $finalFilters = [];
 
         // Collect all filter readers of all filter chains used ...
         for ($i = 0; $i < $filterReadersCount; $i++) {
-            $filterchain = & $this->filterChains[$i];
+            $filterchain = &$this->filterChains[$i];
             $filterReaders = $filterchain->getFilterReaders();
             $readerCount = count($filterReaders);
             for ($j = 0; $j < $readerCount; $j++) {
@@ -187,7 +171,7 @@ class ChainReaderHelper
 
                     $instream = $impl; // now that it's been chained
 
-                } elseif (($filter instanceof ChainableReader) && ($filter instanceof Reader)) {
+                } else if (($filter instanceof ChainableReader) && ($filter instanceof Reader)) {
                     if ($this->getProject() !== null && ($filter instanceof BaseFilterReader)) {
                         $filter->setProject($this->getProject());
                     }
@@ -199,6 +183,27 @@ class ChainReaderHelper
         }
 
         return $instream;
+    }
+
+    /*
+     * Sets the collection of filter reader sets
+    */
+
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /*
+     * Assemble the reader
+    */
+
+    /**
+     * @param Project $project
+     */
+    public function setProject(Project $project)
+    {
+        $this->project = $project;
     }
 
 }

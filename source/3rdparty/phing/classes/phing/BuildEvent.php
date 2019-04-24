@@ -97,39 +97,17 @@ class BuildEvent extends EventObject
             $this->project = $source;
             $this->target = null;
             $this->task = null;
-        } elseif ($source instanceof Target) {
+        } else if ($source instanceof Target) {
             $this->project = $source->getProject();
             $this->target = $source;
             $this->task = null;
-        } elseif ($source instanceof Task) {
+        } else if ($source instanceof Task) {
             $this->project = $source->getProject();
             $this->target = $source->getOwningTarget();
             $this->task = $source;
         } else {
             throw new Exception("Can not construct BuildEvent, unknown source given.");
         }
-    }
-
-    /**
-     * Sets the message with details and the message priority for this event.
-     *
-     * @param  string   The string message of the event
-     * @param  integer  The priority this message should have
-     */
-    public function setMessage($message, $priority)
-    {
-        $this->message = (string) $message;
-        $this->priority = (int) $priority;
-    }
-
-    /**
-     * Set the exception that was the cause of this event.
-     *
-     * @param  Exception The exception that caused the event
-     */
-    public function setException($exception)
-    {
-        $this->exception = $exception;
     }
 
     /**
@@ -183,6 +161,18 @@ class BuildEvent extends EventObject
     }
 
     /**
+     * Sets the message with details and the message priority for this event.
+     *
+     * @param string   The string message of the event
+     * @param integer  The priority this message should have
+     */
+    public function setMessage($message, $priority)
+    {
+        $this->message = (string)$message;
+        $this->priority = (int)$priority;
+    }
+
+    /**
      * Returns the priority of the logging message. This field will only
      * be set for "messageLogged" events.
      *
@@ -198,13 +188,23 @@ class BuildEvent extends EventObject
      * This field will only be set for "taskFinished", "targetFinished", and
      * "buildFinished" events.
      *
-     * @see BuildListener::taskFinished()
+     * @return Exception
      * @see BuildListener::targetFinished()
      * @see BuildListener::buildFinished()
-     * @return Exception
+     * @see BuildListener::taskFinished()
      */
     public function getException()
     {
         return $this->exception;
+    }
+
+    /**
+     * Set the exception that was the cause of this event.
+     *
+     * @param Exception The exception that caused the event
+     */
+    public function setException($exception)
+    {
+        $this->exception = $exception;
     }
 }

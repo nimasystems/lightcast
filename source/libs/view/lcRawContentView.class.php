@@ -47,7 +47,7 @@ class lcRawContentView extends lcView implements iDebuggable
 
         $debug = [
             'content_type' => $this->content_type,
-            'content_length' => strlen((string)$this->content)
+            'content_length' => strlen((string)$this->content),
         ];
 
         $debug = array_merge($debug_parent, $debug);

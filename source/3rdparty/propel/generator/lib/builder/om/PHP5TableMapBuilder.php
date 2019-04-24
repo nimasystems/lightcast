@@ -19,16 +19,6 @@ require_once dirname(__FILE__) . '/OMBuilder.php';
 class PHP5TableMapBuilder extends OMBuilder
 {
 
-    /**
-     * Gets the package for the map builder classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . '.map';
-    }
-
     public function getNamespace()
     {
         if ($namespace = parent::getNamespace()) {
@@ -48,6 +38,18 @@ class PHP5TableMapBuilder extends OMBuilder
     public function getUnprefixedClassname()
     {
         return $this->getTable()->getPhpName() . 'TableMap';
+    }
+
+    /**
+     * Checks whether any registered behavior on that table has a modifier for a hook
+     *
+     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
+     *
+     * @return boolean
+     */
+    public function hasBehaviorModifier($hookName, $modifier = null)
+    {
+        return parent::hasBehaviorModifier($hookName, 'TableMapBuilderModifier');
     }
 
     /**
@@ -96,6 +98,16 @@ class " . $this->getClassname() . " extends TableMap
     }
 
     /**
+     * Gets the package for the map builder classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . '.map';
+    }
+
+    /**
      * Specifies the methods that are added as part of the map builder class.
      * This can be overridden by subclasses that wish to add more methods.
      *
@@ -133,19 +145,6 @@ class " . $this->getClassname() . " extends TableMap
      */
     protected function addAttributes(&$script)
     {
-    }
-
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
-";
-        $this->applyBehaviorModifier('tableMapFilter', $script, "");
     }
 
     /**
@@ -187,7 +186,7 @@ class " . $this->getClassname() . " extends TableMap
             $imp = $params[0];
             $script .= "
         \$this->setPrimaryKeyMethodInfo('" . $imp->getValue() . "');";
-        } elseif ($table->getIdMethod() == IDMethod::NATIVE && ($platform->getNativeIdMethod() == PropelPlatformInterface::SEQUENCE || $platform->getNativeIdMethod() == PropelPlatformInterface::SERIAL)) {
+        } else if ($table->getIdMethod() == IDMethod::NATIVE && ($platform->getNativeIdMethod() == PropelPlatformInterface::SEQUENCE || $platform->getNativeIdMethod() == PropelPlatformInterface::SERIAL)) {
             $script .= "
         \$this->setPrimaryKeyMethodInfo('" . $platform->getSequenceName($table) . "');";
         }
@@ -352,22 +351,23 @@ class " . $this->getClassname() . " extends TableMap
     }
 
     /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
+     * Closes class.
      *
-     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     *
-     * @return boolean
+     * @param string &$script The script will be modified in this method.
      */
-    public function hasBehaviorModifier($hookName, $modifier = null)
+    protected function addClassClose(&$script)
     {
-        return parent::hasBehaviorModifier($hookName, 'TableMapBuilderModifier');
+        $script .= "
+} // " . $this->getClassname() . "
+";
+        $this->applyBehaviorModifier('tableMapFilter', $script, "");
     }
 
     /**
      * Checks whether any registered behavior on that table has a modifier for a hook
      *
      * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     * @param string &$script  The script will be modified in this method.
+     * @param string &$script The script will be modified in this method.
      */
     public function applyBehaviorModifier($hookName, &$script, $tab = "		")
     {

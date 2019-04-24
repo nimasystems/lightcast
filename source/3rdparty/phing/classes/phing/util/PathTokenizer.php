@@ -37,7 +37,7 @@ class PathTokenizer
     /**
      * A array of tokens, created by preg_split().
      */
-    private $tokens = array();
+    private $tokens = [];
 
     /**
      * A string which stores any path components which have been read ahead
@@ -154,7 +154,7 @@ class PathTokenizer
      * Non StringTokenizer function, that indicates whether the specified path is contained in loaded tokens.
      * We can do this easily because in PHP implimentation we're using arrays.
      *
-     * @param  string  $path path to search for.
+     * @param string $path path to search for.
      *
      * @return boolean
      */

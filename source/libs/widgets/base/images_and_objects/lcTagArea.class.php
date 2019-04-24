@@ -40,11 +40,6 @@ class lcTagArea extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    public static function create()
-    {
-        return new lcTagArea();
-    }
-
     public function setAlt($value)
     {
         $this->setAttribute('alt', $value);
@@ -93,6 +88,11 @@ class lcTagArea extends lcHtmlTag
     {
         $this->setAttribute('tabindex', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagArea();
     }
 
     public static function getRequiredAttributes()

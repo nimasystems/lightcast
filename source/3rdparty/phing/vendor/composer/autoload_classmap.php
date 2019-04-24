@@ -5,7 +5,7 @@
 $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
-return array(
+return [
     'AbstractFileSet' => $baseDir . '/classes/phing/types/AbstractFileSet.php',
     'AbstractHandler' => $baseDir . '/classes/phing/parser/AbstractHandler.php',
     'AbstractLiquibaseTask' => $baseDir . '/classes/phing/tasks/ext/liquibase/AbstractLiquibaseTask.php',
@@ -480,4 +480,4 @@ return array(
     'zsdtBaseTask' => $baseDir . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtBaseTask.php',
     'zsdtPackTask' => $baseDir . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtPackTask.php',
     'zsdtValidateTask' => $baseDir . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtValidateTask.php',
-);
+];

@@ -36,7 +36,7 @@ require_once 'phing/tasks/ext/coverage/CoverageMerger.php';
 class CoverageMergerTask extends Task
 {
     /** the list of filesets containing the .php filename rules */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Add a new fileset containing the .php files to process
@@ -48,6 +48,19 @@ class CoverageMergerTask extends Task
         $this->filesets[] = $fileset;
     }
 
+    public function main()
+    {
+        $files = $this->getFilenames();
+
+        $this->log("Merging " . count($files) . " coverage files");
+
+        foreach ($files as $file) {
+            $coverageInformation = unserialize(file_get_contents($file));
+
+            CoverageMerger::merge($this->project, [$coverageInformation]);
+        }
+    }
+
     /**
      * Iterate over all filesets and return all the filenames.
      *
@@ -55,7 +68,7 @@ class CoverageMergerTask extends Task
      */
     private function getFilenames()
     {
-        $files = array();
+        $files = [];
 
         foreach ($this->filesets as $fileset) {
             $ds = $fileset->getDirectoryScanner($this->project);
@@ -71,18 +84,5 @@ class CoverageMergerTask extends Task
         }
 
         return $files;
-    }
-
-    public function main()
-    {
-        $files = $this->getFilenames();
-
-        $this->log("Merging " . count($files) . " coverage files");
-
-        foreach ($files as $file) {
-            $coverageInformation = unserialize(file_get_contents($file));
-
-            CoverageMerger::merge($this->project, array($coverageInformation));
-        }
     }
 }

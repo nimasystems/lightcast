@@ -44,13 +44,13 @@ class Target implements TaskContainer
      * Dependencies
      * @var array
      */
-    private $dependencies = array();
+    private $dependencies = [];
 
     /**
      * Holds objects of children of this target
      * @var array
      */
-    private $children = array();
+    private $children = [];
 
     /**
      * The if condition from xml
@@ -89,29 +89,9 @@ class Target implements TaskContainer
     private $project;
 
     /**
-     * References the project to the current component.
-     *
-     * @param Project $project The reference to the current project
-     */
-    public function setProject(Project $project)
-    {
-        $this->project = $project;
-    }
-
-    /**
-     * Returns reference to current project
-     *
-     * @return Project Reference to current porject object
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /**
      * Sets the target dependencies from xml
      *
-     * @param  string         $depends Comma separated list of targetnames that depend on
+     * @param string $depends Comma separated list of targetnames that depend on
      *                                 this target
      * @throws BuildException
      */
@@ -122,11 +102,30 @@ class Target implements TaskContainer
         for ($i = 0, $size = count($deps); $i < $size; $i++) {
             $trimmed = trim($deps[$i]);
             if ($trimmed === "") {
-                throw new BuildException("Syntax Error: Depend attribute for target " . $this->getName(
-                    ) . " is malformed.");
+                throw new BuildException("Syntax Error: Depend attribute for target " . $this->getName() . " is malformed.");
             }
             $this->addDependency($trimmed);
         }
+    }
+
+    /**
+     * Returns name of this target.
+     *
+     * @return string The name of the target
+     */
+    public function getName()
+    {
+        return (string)$this->name;
+    }
+
+    /**
+     * Sets the name of the target
+     *
+     * @param string $name Name of this target
+     */
+    public function setName($name)
+    {
+        $this->name = (string)$name;
     }
 
     /**
@@ -136,7 +135,7 @@ class Target implements TaskContainer
      */
     public function addDependency($dependency)
     {
-        $this->dependencies[] = (string) $dependency;
+        $this->dependencies[] = (string)$dependency;
     }
 
     /**
@@ -147,39 +146,6 @@ class Target implements TaskContainer
     public function getDependencies()
     {
         return $this->dependencies;
-    }
-
-    /**
-     * Sets the name of the target
-     *
-     * @param string $name Name of this target
-     */
-    public function setName($name)
-    {
-        $this->name = (string) $name;
-    }
-
-    /**
-     * Returns name of this target.
-     *
-     * @return string The name of the target
-     */
-    public function getName()
-    {
-        return (string) $this->name;
-    }
-
-    /**
-     * Set target status. If true, target does not come in phing -list
-     *
-     * @param  boolean $flag
-     * @return Target
-     */
-    public function setHidden($flag)
-    {
-        $this->hidden = (boolean) $flag;
-
-        return $this;
     }
 
     /**
@@ -200,6 +166,19 @@ class Target implements TaskContainer
     public function isHidden()
     {
         return $this->getHidden();
+    }
+
+    /**
+     * Set target status. If true, target does not come in phing -list
+     *
+     * @param boolean $flag
+     * @return Target
+     */
+    public function setHidden($flag)
+    {
+        $this->hidden = (boolean)$flag;
+
+        return $this;
     }
 
     /**
@@ -233,7 +212,7 @@ class Target implements TaskContainer
      */
     public function getTasks()
     {
-        $tasks = array();
+        $tasks = [];
         for ($i = 0, $size = count($this->children); $i < $size; $i++) {
             $tsk = $this->children[$i];
             if ($tsk instanceof Task) {
@@ -269,20 +248,6 @@ class Target implements TaskContainer
     }
 
     /**
-     * Sets a textual description of this target.
-     *
-     * @param string $description The description text
-     */
-    public function setDescription($description)
-    {
-        if ($description !== null && strcmp($description, "") !== 0) {
-            $this->description = (string) $description;
-        } else {
-            $this->description = null;
-        }
-    }
-
-    /**
      * Returns the description of this target.
      *
      * @return string The description text of this target
@@ -293,23 +258,17 @@ class Target implements TaskContainer
     }
 
     /**
-     * @param $log
+     * Sets a textual description of this target.
+     *
+     * @param string $description The description text
      */
-    public function setLogSkipped($log)
+    public function setDescription($description)
     {
-        $this->logSkipped = (bool) $log;
-    }
-
-    /**
-     * @return bool|null
-     */
-    public function getLogSkipped()
-    {
-        if ($this->logSkipped === null) {
-            $this->setLogSkipped(false);
+        if ($description !== null && strcmp($description, "") !== 0) {
+            $this->description = (string)$description;
+        } else {
+            $this->description = null;
         }
-
-        return $this->logSkipped;
     }
 
     /**
@@ -320,36 +279,7 @@ class Target implements TaskContainer
      */
     public function toString()
     {
-        return (string) $this->name;
-    }
-
-    /**
-     * The entry point for this class. Does some checking, then processes and
-     * performs the tasks for this target.
-     */
-    public function main()
-    {
-        if ($this->testIfCondition() && $this->testUnlessCondition()) {
-            foreach ($this->children as $o) {
-                if ($o instanceof Task) {
-                    // child is a task
-                    $o->perform();
-                } else {
-                    // child is a RuntimeConfigurable
-                    $o->maybeConfigure($this->project);
-                }
-            }
-        } elseif (!$this->testIfCondition()) {
-            $this->project->log(
-                "Skipped target '" . $this->name . "' because property '" . $this->ifCondition . "' not set.",
-                $this->getLogSkipped() ? Project::MSG_INFO : Project::MSG_VERBOSE
-            );
-        } else {
-            $this->project->log(
-                "Skipped target '" . $this->name . "' because property '" . $this->unlessCondition . "' set.",
-                $this->getLogSkipped() ? Project::MSG_INFO : Project::MSG_VERBOSE
-            );
-        }
+        return (string)$this->name;
     }
 
     /**
@@ -369,6 +299,35 @@ class Target implements TaskContainer
             // log here and rethrow
             $this->project->fireTargetFinished($this, $exc);
             throw $exc;
+        }
+    }
+
+    /**
+     * The entry point for this class. Does some checking, then processes and
+     * performs the tasks for this target.
+     */
+    public function main()
+    {
+        if ($this->testIfCondition() && $this->testUnlessCondition()) {
+            foreach ($this->children as $o) {
+                if ($o instanceof Task) {
+                    // child is a task
+                    $o->perform();
+                } else {
+                    // child is a RuntimeConfigurable
+                    $o->maybeConfigure($this->project);
+                }
+            }
+        } else if (!$this->testIfCondition()) {
+            $this->project->log(
+                "Skipped target '" . $this->name . "' because property '" . $this->ifCondition . "' not set.",
+                $this->getLogSkipped() ? Project::MSG_INFO : Project::MSG_VERBOSE
+            );
+        } else {
+            $this->project->log(
+                "Skipped target '" . $this->name . "' because property '" . $this->unlessCondition . "' set.",
+                $this->getLogSkipped() ? Project::MSG_INFO : Project::MSG_VERBOSE
+            );
         }
     }
 
@@ -401,6 +360,26 @@ class Target implements TaskContainer
     }
 
     /**
+     * Returns reference to current project
+     *
+     * @return Project Reference to current porject object
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
+     * References the project to the current component.
+     *
+     * @param Project $project The reference to the current project
+     */
+    public function setProject(Project $project)
+    {
+        $this->project = $project;
+    }
+
+    /**
      * Tests if the property set in unlessCondition exists.
      *
      * @return boolean <code>true</code> if the property specified
@@ -426,6 +405,26 @@ class Target implements TaskContainer
         }
 
         return $result;
+    }
+
+    /**
+     * @return bool|null
+     */
+    public function getLogSkipped()
+    {
+        if ($this->logSkipped === null) {
+            $this->setLogSkipped(false);
+        }
+
+        return $this->logSkipped;
+    }
+
+    /**
+     * @param $log
+     */
+    public function setLogSkipped($log)
+    {
+        $this->logSkipped = (bool)$log;
     }
 
 }

@@ -56,7 +56,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
         $this->idx[$namespace . '.' . $name] = [
             $namespace,
-            $name
+            $name,
         ];
 
         return true;
@@ -70,7 +70,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
             foreach ($values as $key => $val) {
                 $this->idx[$namespace . '.' . $key] = [
                     $namespace,
-                    $key
+                    $key,
                 ];
 
                 unset($key, $val);
@@ -131,7 +131,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
     {
         $tmp = [
             $this->config_namespaces,
-            $this->idx
+            $this->idx,
         ];
 
         return serialize($tmp);

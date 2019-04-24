@@ -68,19 +68,14 @@ class ModelWith
 
     // DataObject getters & setters
 
-    public function setModelName($modelName)
-    {
-        $this->modelName = $modelName;
-    }
-
     public function getModelName()
     {
         return $this->modelName;
     }
 
-    public function setModelPeerName($modelPeerName)
+    public function setModelName($modelName)
     {
-        $this->modelPeerName = $modelPeerName;
+        $this->modelName = $modelName;
     }
 
     public function getModelPeerName()
@@ -88,9 +83,9 @@ class ModelWith
         return $this->modelPeerName;
     }
 
-    public function setIsSingleTableInheritance($isSingleTableInheritance)
+    public function setModelPeerName($modelPeerName)
     {
-        $this->isSingleTableInheritance = $isSingleTableInheritance;
+        $this->modelPeerName = $modelPeerName;
     }
 
     public function isSingleTableInheritance()
@@ -98,9 +93,9 @@ class ModelWith
         return $this->isSingleTableInheritance;
     }
 
-    public function setIsAdd($isAdd)
+    public function setIsSingleTableInheritance($isSingleTableInheritance)
     {
-        $this->isAdd = $isAdd;
+        $this->isSingleTableInheritance = $isSingleTableInheritance;
     }
 
     public function isAdd()
@@ -108,9 +103,9 @@ class ModelWith
         return $this->isAdd;
     }
 
-    public function setIsWithOneToMany($isWithOneToMany)
+    public function setIsAdd($isAdd)
     {
-        $this->isWithOneToMany = $isWithOneToMany;
+        $this->isAdd = $isAdd;
     }
 
     public function isWithOneToMany()
@@ -118,9 +113,9 @@ class ModelWith
         return $this->isWithOneToMany;
     }
 
-    public function setRelationName($relationName)
+    public function setIsWithOneToMany($isWithOneToMany)
     {
-        $this->relationName = $relationName;
+        $this->isWithOneToMany = $isWithOneToMany;
     }
 
     public function getRelationName()
@@ -128,9 +123,9 @@ class ModelWith
         return $this->relationName;
     }
 
-    public function setRelationMethod($relationMethod)
+    public function setRelationName($relationName)
     {
-        $this->relationMethod = $relationMethod;
+        $this->relationName = $relationName;
     }
 
     public function getRelationMethod()
@@ -138,9 +133,9 @@ class ModelWith
         return $this->relationMethod;
     }
 
-    public function setInitMethod($initMethod)
+    public function setRelationMethod($relationMethod)
     {
-        $this->initMethod = $initMethod;
+        $this->relationMethod = $relationMethod;
     }
 
     public function getInitMethod()
@@ -148,9 +143,9 @@ class ModelWith
         return $this->initMethod;
     }
 
-    public function setResetPartialMethod($resetPartialMethod)
+    public function setInitMethod($initMethod)
     {
-        $this->resetPartialMethod = $resetPartialMethod;
+        $this->initMethod = $initMethod;
     }
 
     public function getResetPartialMethod()
@@ -158,9 +153,9 @@ class ModelWith
         return $this->resetPartialMethod;
     }
 
-    public function setLeftPhpName($leftPhpName)
+    public function setResetPartialMethod($resetPartialMethod)
     {
-        $this->leftPhpName = $leftPhpName;
+        $this->resetPartialMethod = $resetPartialMethod;
     }
 
     public function getLeftPhpName()
@@ -168,14 +163,19 @@ class ModelWith
         return $this->leftPhpName;
     }
 
-    public function setRightPhpName($rightPhpName)
+    public function setLeftPhpName($leftPhpName)
     {
-        $this->rightPhpName = $rightPhpName;
+        $this->leftPhpName = $leftPhpName;
     }
 
     public function getRightPhpName()
     {
         return $this->rightPhpName;
+    }
+
+    public function setRightPhpName($rightPhpName)
+    {
+        $this->rightPhpName = $rightPhpName;
     }
 
     // Utility methods

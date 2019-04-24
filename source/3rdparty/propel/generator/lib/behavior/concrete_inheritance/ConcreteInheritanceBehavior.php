@@ -24,13 +24,13 @@ require_once 'ConcreteInheritanceParentBehavior.php';
 class ConcreteInheritanceBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = array(
-        'extends'             => '',
-        'descendant_column'   => 'descendant_class',
+    protected $parameters = [
+        'extends' => '',
+        'descendant_column' => 'descendant_class',
         'copy_data_to_parent' => 'true',
-        'schema'              => '',
+        'schema' => '',
         'excluded_parent_behavior' => 'nested_set',
-    );
+    ];
 
     public function modifyTable()
     {
@@ -43,7 +43,7 @@ class ConcreteInheritanceBehavior extends Behavior
             if (!$parentTable->hasBehavior('concrete_inheritance_parent')) {
                 $parentBehavior = new ConcreteInheritanceParentBehavior();
                 $parentBehavior->setName('concrete_inheritance_parent');
-                $parentBehavior->addParameter(array('name' => 'descendant_column', 'value' => $this->getParameter('descendant_column')));
+                $parentBehavior->addParameter(['name' => 'descendant_column', 'value' => $this->getParameter('descendant_column')]);
                 $parentTable->addBehavior($parentBehavior);
                 // The parent table's behavior modifyTable() must be executed before this one
                 $parentBehavior->getTableModifier()->modifyTable();

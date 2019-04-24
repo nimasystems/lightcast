@@ -42,11 +42,11 @@ class RelationMap
     /**
      * @var ColumnMap[]
      */
-    protected $localColumns = array();
+    protected $localColumns = [];
     /**
      * @var ColumnMap[]
      */
-    protected $foreignColumns = array();
+    protected $foreignColumns = [];
     protected $onUpdate;
     protected $onDelete;
 
@@ -70,11 +70,6 @@ class RelationMap
         return $this->name;
     }
 
-    public function setPluralName($pluralName)
-    {
-        $this->pluralName = $pluralName;
-    }
-
     /**
      * Get the plural name of this relation.
      *
@@ -85,64 +80,9 @@ class RelationMap
         return null !== $this->pluralName ? $this->pluralName : ($this->name . 's');
     }
 
-    /**
-     * Set the type
-     *
-     * @param integer $type The relation type (either self::MANY_TO_ONE, self::ONE_TO_MANY, or self::ONE_TO_ONE)
-     */
-    public function setType($type)
+    public function setPluralName($pluralName)
     {
-        $this->type = $type;
-    }
-
-    /**
-     * Get the type
-     *
-     * @return integer the relation type
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set the local table
-     *
-     * @param TableMap $table The local table for this relationship
-     */
-    public function setLocalTable($table)
-    {
-        $this->localTable = $table;
-    }
-
-    /**
-     * Get the local table
-     *
-     * @return TableMap The local table for this relationship
-     */
-    public function getLocalTable()
-    {
-        return $this->localTable;
-    }
-
-    /**
-     * Set the foreign table
-     *
-     * @param TableMap $table The foreign table for this relationship
-     */
-    public function setForeignTable($table)
-    {
-        $this->foreignTable = $table;
-    }
-
-    /**
-     * Get the foreign table
-     *
-     * @return TableMap The foreign table for this relationship
-     */
-    public function getForeignTable()
-    {
-        return $this->foreignTable;
+        $this->pluralName = $pluralName;
     }
 
     /**
@@ -156,19 +96,69 @@ class RelationMap
     }
 
     /**
-     * Get the right table of the relation
+     * Get the type
      *
-     * @return TableMap The right table for this relationship
+     * @return integer the relation type
      */
-    public function getRightTable()
+    public function getType()
     {
-        return ($this->getType() == RelationMap::MANY_TO_ONE) ? $this->getForeignTable() : $this->getLocalTable();
+        return $this->type;
+    }
+
+    /**
+     * Set the type
+     *
+     * @param integer $type The relation type (either self::MANY_TO_ONE, self::ONE_TO_MANY, or self::ONE_TO_ONE)
+     */
+    public function setType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * Get the local table
+     *
+     * @return TableMap The local table for this relationship
+     */
+    public function getLocalTable()
+    {
+        return $this->localTable;
+    }
+
+    /**
+     * Set the local table
+     *
+     * @param TableMap $table The local table for this relationship
+     */
+    public function setLocalTable($table)
+    {
+        $this->localTable = $table;
+    }
+
+    /**
+     * Get the foreign table
+     *
+     * @return TableMap The foreign table for this relationship
+     */
+    public function getForeignTable()
+    {
+        return $this->foreignTable;
+    }
+
+    /**
+     * Set the foreign table
+     *
+     * @param TableMap $table The foreign table for this relationship
+     */
+    public function setForeignTable($table)
+    {
+        $this->foreignTable = $table;
     }
 
     /**
      * Add a column mapping
      *
-     * @param ColumnMap $local   The local column
+     * @param ColumnMap $local The local column
      * @param ColumnMap $foreign The foreign column
      */
     public function addColumnMapping(ColumnMap $local, ColumnMap $foreign)
@@ -189,7 +179,7 @@ class RelationMap
      */
     public function getColumnMappings($direction = RelationMap::LOCAL_TO_FOREIGN)
     {
-        $h = array();
+        $h = [];
         if ($direction == RelationMap::LEFT_TO_RIGHT && $this->getType() == RelationMap::MANY_TO_ONE) {
             $direction = RelationMap::LOCAL_TO_FOREIGN;
         }
@@ -225,6 +215,75 @@ class RelationMap
     }
 
     /**
+     * Get the onUpdate behavior
+     *
+     * @return integer the relation type
+     */
+    public function getOnUpdate()
+    {
+        return $this->onUpdate;
+    }
+
+    /**
+     * Set the onUpdate behavior
+     *
+     * @param string $onUpdate
+     */
+    public function setOnUpdate($onUpdate)
+    {
+        $this->onUpdate = $onUpdate;
+    }
+
+    /**
+     * Get the onDelete behavior
+     *
+     * @return integer the relation type
+     */
+    public function getOnDelete()
+    {
+        return $this->onDelete;
+    }
+
+    /**
+     * Set the onDelete behavior
+     *
+     * @param string $onDelete
+     */
+    public function setOnDelete($onDelete)
+    {
+        $this->onDelete = $onDelete;
+    }
+
+    /**
+     * Gets the symmetrical relation
+     *
+     * @return RelationMap
+     *
+     * @throws PropelException
+     */
+    public function getSymmetricalRelation()
+    {
+        $localMapping = [$this->getLeftColumns(), $this->getRightColumns()];
+        foreach ($this->getRightTable()->getRelations() as $relation) {
+            if ($localMapping == [$relation->getRightColumns(), $relation->getLeftColumns()]) {
+                return $relation;
+            }
+        }
+
+        throw new PropelException('The relation could not be resolved.');
+    }
+
+    /**
+     * Get the left columns of the relation
+     *
+     * @return ColumnMap[]
+     */
+    public function getLeftColumns()
+    {
+        return ($this->getType() == RelationMap::MANY_TO_ONE) ? $this->getLocalColumns() : $this->getForeignColumns();
+    }
+
+    /**
      * Get the local columns
      *
      * @return Array list of ColumnMap objects
@@ -245,16 +304,6 @@ class RelationMap
     }
 
     /**
-     * Get the left columns of the relation
-     *
-     * @return ColumnMap[]
-     */
-    public function getLeftColumns()
-    {
-        return ($this->getType() == RelationMap::MANY_TO_ONE) ? $this->getLocalColumns() : $this->getForeignColumns();
-    }
-
-    /**
      * Get the right columns of the relation
      *
      * @return ColumnMap[]
@@ -265,61 +314,12 @@ class RelationMap
     }
 
     /**
-     * Set the onUpdate behavior
+     * Get the right table of the relation
      *
-     * @param string $onUpdate
+     * @return TableMap The right table for this relationship
      */
-    public function setOnUpdate($onUpdate)
+    public function getRightTable()
     {
-        $this->onUpdate = $onUpdate;
-    }
-
-    /**
-     * Get the onUpdate behavior
-     *
-     * @return integer the relation type
-     */
-    public function getOnUpdate()
-    {
-        return $this->onUpdate;
-    }
-
-    /**
-     * Set the onDelete behavior
-     *
-     * @param string $onDelete
-     */
-    public function setOnDelete($onDelete)
-    {
-        $this->onDelete = $onDelete;
-    }
-
-    /**
-     * Get the onDelete behavior
-     *
-     * @return integer the relation type
-     */
-    public function getOnDelete()
-    {
-        return $this->onDelete;
-    }
-
-    /**
-     * Gets the symmetrical relation
-     *
-     * @return RelationMap
-     *
-     * @throws PropelException
-     */
-    public function getSymmetricalRelation()
-    {
-        $localMapping = array($this->getLeftColumns(), $this->getRightColumns());
-        foreach ($this->getRightTable()->getRelations() as $relation) {
-            if ($localMapping == array($relation->getRightColumns(), $relation->getLeftColumns())) {
-                return $relation;
-            }
-        }
-
-        throw new PropelException('The relation could not be resolved.');
+        return ($this->getType() == RelationMap::MANY_TO_ONE) ? $this->getForeignTable() : $this->getLocalTable();
     }
 }

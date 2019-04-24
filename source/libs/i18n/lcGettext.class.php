@@ -80,7 +80,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
             'charset' => $this->charset,
             'category' => $this->category,
             'domain_path' => $this->domain_path,
-            'domain' => $this->domain
+            'domain' => $this->domain,
         ];
 
         $debug = array_merge($debug_parent, $debug);
@@ -245,9 +245,9 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         * require a format with hyphen (eg. Gentoo) and others without (eg. FreeBSD).
         */
         $charsets = ['UTF-8', 'UTF8', 'utf8', 'utf-8',
-            'ISO8859-1', 'ISO8859-2', 'ISO8859-5', 'ISO8859-7', 'ISO8859-9',
-            'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-5', 'ISO-8859-7', 'ISO-8859-9',
-            'EUC', 'Big5'];
+                     'ISO8859-1', 'ISO8859-2', 'ISO8859-5', 'ISO8859-7', 'ISO8859-9',
+                     'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-5', 'ISO-8859-7', 'ISO-8859-9',
+                     'EUC', 'Big5'];
 
         foreach ($charsets as $charset) {
             $ret = false;

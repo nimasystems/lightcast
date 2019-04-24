@@ -64,7 +64,7 @@ class LineContains extends BaseParamFilterReader implements ChainableReader
      * Array of Contains objects.
      * @var array
      */
-    private $_contains = array();
+    private $_contains = [];
 
     /**
      * [Deprecated]
@@ -91,7 +91,7 @@ class LineContains extends BaseParamFilterReader implements ChainableReader
         }
 
         $lines = explode("\n", $buffer);
-        $matched = array();
+        $matched = [];
         $containsSize = count($this->_contains);
 
         foreach ($lines as $line) {
@@ -109,6 +109,24 @@ class LineContains extends BaseParamFilterReader implements ChainableReader
         $filtered_buffer = implode("\n", $matched);
 
         return $filtered_buffer;
+    }
+
+    /**
+     * Parses the parameters to add user-defined contains strings.
+     */
+    private function _initialize()
+    {
+        $params = $this->getParameters();
+        if ($params !== null) {
+            foreach ($params as $param) {
+                if (self::CONTAINS_KEY == $param->getType()) {
+                    $cont = new Contains();
+                    $cont->setValue($param->getValue());
+                    array_push($this->_contains, $cont);
+                    break; // because we only support a single contains
+                }
+            }
+        }
     }
 
     /**
@@ -173,39 +191,6 @@ class LineContains extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the array of words which must be contained within a line read
-     * from the original stream in order for it to match this filter.
-     *
-     * @param array $contains An array of words which must be contained
-     *                        within a line in order for it to match in this filter.
-     *                        Must not be <code>null</code>.
-     * @throws Exception
-     */
-    public function setContains($contains)
-    {
-        // type check, error must never occur, bad code of it does
-        if (!is_array($contains)) {
-            throw new Exception("Excpected array got something else");
-        }
-
-        $this->_contains = $contains;
-    }
-
-    /**
-     * Returns the vector of words which must be contained within a line read
-     * from the original stream in order for it to match this filter.
-     *
-     * @return array The array of words which must be contained within a line read
-     *               from the original stream in order for it to match this filter. The
-     *               returned object is "live" - in other words, changes made to the
-     *               returned object are mirrored in the filter.
-     */
-    public function getContains()
-    {
-        return $this->_contains;
-    }
-
-    /**
      * Creates a new LineContains using the passed in
      * Reader for instantiation.
      *
@@ -226,21 +211,36 @@ class LineContains extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Parses the parameters to add user-defined contains strings.
+     * Returns the vector of words which must be contained within a line read
+     * from the original stream in order for it to match this filter.
+     *
+     * @return array The array of words which must be contained within a line read
+     *               from the original stream in order for it to match this filter. The
+     *               returned object is "live" - in other words, changes made to the
+     *               returned object are mirrored in the filter.
      */
-    private function _initialize()
+    public function getContains()
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            foreach ($params as $param) {
-                if (self::CONTAINS_KEY == $param->getType()) {
-                    $cont = new Contains();
-                    $cont->setValue($param->getValue());
-                    array_push($this->_contains, $cont);
-                    break; // because we only support a single contains
-                }
-            }
+        return $this->_contains;
+    }
+
+    /**
+     * Sets the array of words which must be contained within a line read
+     * from the original stream in order for it to match this filter.
+     *
+     * @param array $contains An array of words which must be contained
+     *                        within a line in order for it to match in this filter.
+     *                        Must not be <code>null</code>.
+     * @throws Exception
+     */
+    public function setContains($contains)
+    {
+        // type check, error must never occur, bad code of it does
+        if (!is_array($contains)) {
+            throw new Exception("Excpected array got something else");
         }
+
+        $this->_contains = $contains;
     }
 }
 
@@ -258,20 +258,20 @@ class Contains
     private $_value;
 
     /**
-     * Set 'contains' value.
-     * @param string $contains
-     */
-    public function setValue($contains)
-    {
-        $this->_value = (string) $contains;
-    }
-
-    /**
      * Returns 'contains' value.
      * @return string
      */
     public function getValue()
     {
         return $this->_value;
+    }
+
+    /**
+     * Set 'contains' value.
+     * @param string $contains
+     */
+    public function setValue($contains)
+    {
+        $this->_value = (string)$contains;
     }
 }

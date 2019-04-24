@@ -38,7 +38,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     private $environments = [
         lcEnvConfigHandler::ENVIRONMENT_DEBUG,
         lcEnvConfigHandler::ENVIRONMENT_RELEASE,
-        lcEnvConfigHandler::ENVIRONMENT_TESTING
+        lcEnvConfigHandler::ENVIRONMENT_TESTING,
     ];
 
     public function initialize()
@@ -106,7 +106,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             // merge some additional configuration based options
             $nd = array_filter([
                 $project_config_key_dir,
-                $this->getConfigDir()
+                $this->getConfigDir(),
             ]);
             $dirs = isset($options['dirs']) && is_array($options['dirs']) ? array_merge(array_values($options['dirs']), array_values($nd)) : $nd;
             $options['dirs'] = $dirs;

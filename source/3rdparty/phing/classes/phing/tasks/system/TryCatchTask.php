@@ -43,8 +43,8 @@ class TryCatchTask extends Task
     /**
      * Main method
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {
@@ -89,7 +89,7 @@ class TryCatchTask extends Task
      */
     public function setProperty($property)
     {
-        $this->propertyName = (string) $property;
+        $this->propertyName = (string)$property;
     }
 
     /**

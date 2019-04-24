@@ -59,7 +59,7 @@ class XmlPropertyTask extends PropertyTask
     /**
      * Prefix to apply to properties loaded using <code>file</code>.
      * A "." is appended to the prefix if not specified.
-     * @param  string $prefix prefix string
+     * @param string $prefix prefix string
      * @return void
      * @since 2.0
      */
@@ -81,21 +81,21 @@ class XmlPropertyTask extends PropertyTask
     }
 
     /**
+     * @return bool
+     */
+    public function getKeepRoot()
+    {
+        return $this->_keepRoot;
+    }
+
+    /**
      * Keep the xml root tag as the first value in the property name
      *
      * @param bool $yesNo
      */
     public function setKeepRoot($yesNo)
     {
-        $this->_keepRoot = (bool) $yesNo;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getKeepRoot()
-    {
-        return $this->_keepRoot;
+        $this->_keepRoot = (bool)$yesNo;
     }
 
     /**
@@ -105,7 +105,7 @@ class XmlPropertyTask extends PropertyTask
      */
     public function setCollapseAttributes($yesNo)
     {
-        $this->_collapseAttr = (bool) $yesNo;
+        $this->_collapseAttr = (bool)$yesNo;
     }
 
     /**
@@ -117,16 +117,6 @@ class XmlPropertyTask extends PropertyTask
     }
 
     /**
-     * Delimiter for splitting multiple values.
-     *
-     * @param string $d
-     */
-    public function setDelimiter($d)
-    {
-        $this->_delimiter = $d;
-    }
-
-    /**
      * @return string
      */
     public function getDelimiter()
@@ -135,21 +125,13 @@ class XmlPropertyTask extends PropertyTask
     }
 
     /**
-     * File required or not.
+     * Delimiter for splitting multiple values.
      *
      * @param string $d
      */
-    public function setRequired($d)
+    public function setDelimiter($d)
     {
-        $this->_required = $d;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRequired()
-    {
-        return $this->_required;
+        $this->_delimiter = $d;
     }
 
     /**
@@ -171,8 +153,8 @@ class XmlPropertyTask extends PropertyTask
     /**
      * load properties from an XML file.
      * @param PhingFile $file
-     * @throws BuildException
      * @return Properties
+     * @throws BuildException
      */
     protected function loadFile(PhingFile $file)
     {
@@ -202,8 +184,8 @@ class XmlPropertyTask extends PropertyTask
      *
      * @param string $filePath
      *
-     * @throws IOException
      * @return Properties
+     * @throws IOException
      */
     protected function _getProperties($filePath)
     {
@@ -224,7 +206,7 @@ class XmlPropertyTask extends PropertyTask
             throw new IOException("Unable to parse XML file $filePath");
         }
 
-        $path = array();
+        $path = [];
 
         if ($this->_keepRoot) {
             $path[] = dom_import_simplexml($xml)->tagName;
@@ -238,9 +220,9 @@ class XmlPropertyTask extends PropertyTask
             // Check for attributes
             foreach ($xml->attributes() as $attribute => $val) {
                 if ($this->_collapseAttr) {
-                    $prop->setProperty($prefix . "$attribute", (string) $val);
+                    $prop->setProperty($prefix . "$attribute", (string)$val);
                 } else {
-                    $prop->setProperty($prefix . "($attribute)", (string) $val);
+                    $prop->setProperty($prefix . "($attribute)", (string)$val);
                 }
             }
         }
@@ -254,8 +236,8 @@ class XmlPropertyTask extends PropertyTask
      * Adds an XML node
      *
      * @param SimpleXMLElement $node
-     * @param array            $path Path to this node
-     * @param Properties       $prop Properties will be added as they are found (by reference here)
+     * @param array $path Path to this node
+     * @param Properties $prop Properties will be added as they are found (by reference here)
      *
      * @return void
      */
@@ -272,17 +254,17 @@ class XmlPropertyTask extends PropertyTask
             // Check for attributes
             foreach ($value->attributes() as $attribute => $val) {
                 if ($this->_collapseAttr) {
-                    $prop->setProperty($prefix . "$tag.$attribute", (string) $val);
+                    $prop->setProperty($prefix . "$tag.$attribute", (string)$val);
                 } else {
-                    $prop->setProperty($prefix . "$tag($attribute)", (string) $val);
+                    $prop->setProperty($prefix . "$tag($attribute)", (string)$val);
                 }
             }
 
             // Add tag
             if (count($value->children())) {
-                $this->_addNode($value, array_merge($path, array($tag)), $prop);
+                $this->_addNode($value, array_merge($path, [$tag]), $prop);
             } else {
-                $val = (string) $value;
+                $val = (string)$value;
 
                 /* Check for * and ** on 'exclude' and 'include' tag / ant seems to do this? could use FileSet here
                 if ($tag == 'exclude') {
@@ -296,8 +278,26 @@ class XmlPropertyTask extends PropertyTask
                 //
                 // Would be come project.exclude = file/a.php,file/a.php
                 $p = empty($prefix) ? $tag : $prefix . $tag;
-                $prop->append($p, (string) $val, $this->_delimiter);
+                $prop->append($p, (string)$val, $this->_delimiter);
             }
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getRequired()
+    {
+        return $this->_required;
+    }
+
+    /**
+     * File required or not.
+     *
+     * @param string $d
+     */
+    public function setRequired($d)
+    {
+        $this->_required = $d;
     }
 }

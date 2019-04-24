@@ -49,7 +49,7 @@ class ApiGenTask extends Task
      *
      * @var string
      */
-    private $options = array();
+    private $options = [];
 
     /**
      * Sets the ApiGen executable name.
@@ -58,7 +58,7 @@ class ApiGenTask extends Task
      */
     public function setExecutable($executable)
     {
-        $this->executable = (string) $executable;
+        $this->executable = (string)$executable;
     }
 
     /**
@@ -68,7 +68,7 @@ class ApiGenTask extends Task
      */
     public function setAction($action)
     {
-        $this->action = (string) $action;
+        $this->action = (string)$action;
     }
 
     /**
@@ -78,7 +78,7 @@ class ApiGenTask extends Task
      */
     public function setConfig($config)
     {
-        $this->options['config'] = (string) $config;
+        $this->options['config'] = (string)$config;
     }
 
     /**
@@ -98,7 +98,7 @@ class ApiGenTask extends Task
      */
     public function setDestination($destination)
     {
-        $this->options['destination'] = (string) $destination;
+        $this->options['destination'] = (string)$destination;
     }
 
     /**
@@ -148,7 +148,7 @@ class ApiGenTask extends Task
      */
     public function setMain($main)
     {
-        $this->options['main'] = (string) $main;
+        $this->options['main'] = (string)$main;
     }
 
     /**
@@ -158,7 +158,7 @@ class ApiGenTask extends Task
      */
     public function setTitle($title)
     {
-        $this->options['title'] = (string) $title;
+        $this->options['title'] = (string)$title;
     }
 
     /**
@@ -168,7 +168,7 @@ class ApiGenTask extends Task
      */
     public function setBaseUrl($baseUrl)
     {
-        $this->options['base-url'] = (string) $baseUrl;
+        $this->options['base-url'] = (string)$baseUrl;
     }
 
     /**
@@ -178,7 +178,7 @@ class ApiGenTask extends Task
      */
     public function setGoogleCseId($googleCseId)
     {
-        $this->options['google-cse-id'] = (string) $googleCseId;
+        $this->options['google-cse-id'] = (string)$googleCseId;
     }
 
     /**
@@ -188,7 +188,7 @@ class ApiGenTask extends Task
      */
     public function setGoogleCseLabel($googleCseLabel)
     {
-        $this->options['google-cse-label'] = (string) $googleCseLabel;
+        $this->options['google-cse-label'] = (string)$googleCseLabel;
     }
 
     /**
@@ -198,7 +198,7 @@ class ApiGenTask extends Task
      */
     public function setGoogleAnalytics($googleAnalytics)
     {
-        $this->options['google-analytics'] = (string) $googleAnalytics;
+        $this->options['google-analytics'] = (string)$googleAnalytics;
     }
 
     /**
@@ -208,7 +208,7 @@ class ApiGenTask extends Task
      */
     public function setTemplateConfig($templateConfig)
     {
-        $this->options['template-config'] = (string) $templateConfig;
+        $this->options['template-config'] = (string)$templateConfig;
     }
 
     /**
@@ -218,7 +218,7 @@ class ApiGenTask extends Task
      */
     public function setTemplateTheme($templateTheme)
     {
-        $this->options['template-theme'] = (string) $templateTheme;
+        $this->options['template-theme'] = (string)$templateTheme;
     }
 
     /**
@@ -228,7 +228,7 @@ class ApiGenTask extends Task
      */
     public function setGroups($groups)
     {
-        $this->options['groups'] = (string) $groups;
+        $this->options['groups'] = (string)$groups;
     }
 
     /**
@@ -240,7 +240,7 @@ class ApiGenTask extends Task
      */
     public function setAccessLevels($accessLevels)
     {
-        $this->options['access-levels'] = (string) $accessLevels;
+        $this->options['access-levels'] = (string)$accessLevels;
     }
 
     /**
@@ -252,7 +252,7 @@ class ApiGenTask extends Task
      */
     public function setAnnotationGroups($annotationGroups)
     {
-        $this->options['annotation-groups'] = (string) $annotationGroups;
+        $this->options['annotation-groups'] = (string)$annotationGroups;
     }
 
     /**
@@ -262,7 +262,7 @@ class ApiGenTask extends Task
      */
     public function setInternal($internal)
     {
-        if((bool) $internal) {
+        if ((bool)$internal) {
             $this->options['internal'] = null;
         }
     }
@@ -274,7 +274,7 @@ class ApiGenTask extends Task
      */
     public function setPhp($php)
     {
-        if((bool) $php) {
+        if ((bool)$php) {
             $this->options['php'] = null;
         }
     }
@@ -286,7 +286,7 @@ class ApiGenTask extends Task
      */
     public function setTree($tree)
     {
-        if((bool) $tree) {
+        if ((bool)$tree) {
             $this->options['tree'] = null;
         }
     }
@@ -298,7 +298,7 @@ class ApiGenTask extends Task
      */
     public function setDeprecated($deprecated)
     {
-        if((bool) $deprecated) {
+        if ((bool)$deprecated) {
             $this->options['deprecated'] = null;
         }
     }
@@ -310,7 +310,7 @@ class ApiGenTask extends Task
      */
     public function setTodo($todo)
     {
-        if((bool) $todo) {
+        if ((bool)$todo) {
             $this->options['todo'] = null;
         }
     }
@@ -322,7 +322,7 @@ class ApiGenTask extends Task
      */
     public function setNoSourceCode($noSourceCode)
     {
-        if((bool) $noSourceCode) {
+        if ((bool)$noSourceCode) {
             $this->options['no-source-code'] = null;
         }
     }
@@ -334,7 +334,7 @@ class ApiGenTask extends Task
      */
     public function setDownload($download)
     {
-        if((bool) $download) {
+        if ((bool)$download) {
             $this->options['download'] = null;
         }
     }
@@ -346,7 +346,7 @@ class ApiGenTask extends Task
      */
     public function setDebug($debug)
     {
-        if((bool) $debug) {
+        if ((bool)$debug) {
             $this->options['debug'] = null;
         }
     }
@@ -407,11 +407,11 @@ class ApiGenTask extends Task
      */
     protected function constructArguments()
     {
-        $args = array();
+        $args = [];
         foreach ($this->options as $option => $value) {
             if (is_bool($value)) {
                 $args[] = '--' . $option . '=' . ($value ? 'yes' : 'no');
-            } elseif (is_array($value)) {
+            } else if (is_array($value)) {
                 foreach ($value as $v) {
                     $args[] = '--' . $option . '=' . escapeshellarg($v);
                 }

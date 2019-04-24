@@ -40,6 +40,11 @@ include_once 'phing/tasks/system/RecorderEntry.php';
  */
 class RecorderTask extends Task implements SubBuildListener
 {
+    /**
+     * The list of recorder entries.
+     * @var RecorderEntry[]
+     */
+    private static $recorderEntries = [];
     /** The name of the file to record to. */
     private $filename = null;
     /**
@@ -55,20 +60,13 @@ class RecorderTask extends Task implements SubBuildListener
     private $loglevel = -1;
     /** Strip task banners if true.  */
     private $emacsMode = false;
-
-    private $logLevelChoices = array(
-        'error'   => 0,
-        'warn'    => 1,
-        'info'    => 2,
+    private $logLevelChoices = [
+        'error' => 0,
+        'warn' => 1,
+        'info' => 2,
         'verbose' => 3,
-        'debug'   => 4
-    );
-
-    /**
-     * The list of recorder entries.
-     * @var RecorderEntry[]
-     */
-    private static $recorderEntries = array();
+        'debug' => 4,
+    ];
 
     /**
      * Overridden so we can add the task as build listener.
@@ -106,7 +104,7 @@ class RecorderTask extends Task implements SubBuildListener
      */
     public function setAppend($append)
     {
-        $this->append = (bool) $append;
+        $this->append = (bool)$append;
     }
 
 
@@ -145,7 +143,7 @@ class RecorderTask extends Task implements SubBuildListener
         // set the values on the recorder
         if ($this->loglevel === -1) {
             $recorder->setMessageOutputLevel($this->loglevel);
-        } elseif (isset($this->logLevelChoices[$this->loglevel])) {
+        } else if (isset($this->logLevelChoices[$this->loglevel])) {
             $recorder->setMessageOutputLevel($this->logLevelChoices[$this->loglevel]);
         } else {
             throw new BuildException('Loglevel should be one of (error|warn|info|verbose|debug).');
@@ -173,16 +171,16 @@ class RecorderTask extends Task implements SubBuildListener
      */
     protected function getRecorder($name, Project $proj)
     {
-            // create a recorder entry
-            $entry = isset(self::$recorderEntries[$name]) ? self::$recorderEntries[$name] : new RecorderEntry($name);
+        // create a recorder entry
+        $entry = isset(self::$recorderEntries[$name]) ? self::$recorderEntries[$name] : new RecorderEntry($name);
 
-            if ($this->append == null) {
-                $entry->openFile(false);
-            } else {
-                $entry->openFile(StringHelper::booleanValue($this->append));
-            }
-            $entry->setProject($proj);
-            self::$recorderEntries[$name] = $entry;
+        if ($this->append == null) {
+            $entry->openFile(false);
+        } else {
+            $entry->openFile(StringHelper::booleanValue($this->append));
+        }
+        $entry->setProject($proj);
+        self::$recorderEntries[$name] = $entry;
 
         return $entry;
     }
@@ -253,18 +251,6 @@ class RecorderTask extends Task implements SubBuildListener
     }
 
     /**
-     * Cleans recorder registry, if this is the subbuild the task has
-     * been created in.
-     * @param BuildEvent $event ignored.
-     */
-    public function subBuildFinished(BuildEvent $event)
-    {
-        if ($event->getProject() == $this->getProject()) {
-            $this->cleanup();
-        }
-    }
-
-    /**
      * cleans recorder registry and removes itself from BuildListener list.
      */
     private function cleanup()
@@ -276,5 +262,17 @@ class RecorderTask extends Task implements SubBuildListener
             }
         }
         $this->getProject()->removeBuildListener($this);
+    }
+
+    /**
+     * Cleans recorder registry, if this is the subbuild the task has
+     * been created in.
+     * @param BuildEvent $event ignored.
+     */
+    public function subBuildFinished(BuildEvent $event)
+    {
+        if ($event->getProject() == $this->getProject()) {
+            $this->cleanup();
+        }
     }
 }

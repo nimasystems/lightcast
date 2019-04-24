@@ -23,27 +23,6 @@ class QueryBuilder extends OMBuilder
 {
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    public function getNamespace()
-    {
-        if ($namespace = parent::getNamespace()) {
-            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
-                return $namespace . '\\' . $omns;
-            } else {
-                return $namespace;
-            }
-        }
-    }
-
-    /**
      * Returns the name of the current class being built.
      *
      * @return string
@@ -51,6 +30,18 @@ class QueryBuilder extends OMBuilder
     public function getUnprefixedClassname()
     {
         return $this->getBuildProperty('basePrefix') . $this->getStubQueryBuilder()->getUnprefixedClassname();
+    }
+
+    /**
+     * Checks whether any registered behavior on that table has a modifier for a hook
+     *
+     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
+     *
+     * @return boolean
+     */
+    public function hasBehaviorModifier($hookName, $modifier = null)
+    {
+        return parent::hasBehaviorModifier($hookName, 'QueryBuilderModifier');
     }
 
     /**
@@ -175,6 +166,26 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
     }
 
     /**
+     * Checks whether any registered behavior content creator on that table exists a contentName
+     *
+     * @param string $contentName The name of the content as called from one of this class methods, e.g. "parentClassname"
+     */
+    public function getBehaviorContent($contentName)
+    {
+        return $this->getBehaviorContentBase($contentName, 'QueryBuilderModifier');
+    }
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
+    }
+
+    /**
      * Specifies the methods that are added as part of the stub object class.
      *
      * By default there are no methods for the empty stub classes; override this method
@@ -231,16 +242,14 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
     }
 
     /**
-     * Closes class.
+     * Checks whether any registered behavior on that table has a modifier for a hook
      *
+     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
      * @param string &$script The script will be modified in this method.
      */
-    protected function addClassClose(&$script)
+    public function applyBehaviorModifier($hookName, &$script, $tab = "		")
     {
-        $script .= "
-}
-";
-        $this->applyBehaviorModifier('queryFilter', $script, "");
+        return $this->applyBehaviorModifierBase($hookName, 'QueryBuilderModifier', $script, $tab);
     }
 
     /**
@@ -408,8 +417,8 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      *";
         if ($table->hasCompositePrimaryKey()) {
             $pks = $table->getPrimaryKey();
-            $examplePk = array_slice(array(12, 34, 56, 78, 91), 0, count($pks));
-            $colNames = array();
+            $examplePk = array_slice([12, 34, 56, 78, 91], 0, count($pks));
+            $colNames = [];
             foreach ($pks as $col) {
                 $colNames[] = '$' . $col->getName();
             }
@@ -439,7 +448,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
             return null;
         }";
         if ($table->hasCompositePrimaryKey()) {
-            $pks = array();
+            $pks = [];
             foreach ($table->getPrimaryKey() as $index => $column) {
                 $pks [] = "\$key[$index]";
             }
@@ -503,18 +512,18 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
         $ARClassname = $this->getObjectClassname();
         $this->declareClassFromBuilder($this->getStubObjectBuilder());
         $this->declareClasses('PDO', 'PropelException', 'PropelObjectCollection');
-        $selectColumns = array();
+        $selectColumns = [];
         foreach ($table->getColumns() as $column) {
             if (!$column->isLazyLoad()) {
                 $selectColumns [] = $platform->quoteIdentifier($column->getName());
             }
         }
-        $conditions = array();
+        $conditions = [];
         foreach ($table->getPrimaryKey() as $index => $column) {
             $conditions [] = sprintf('%s = :p%d', $platform->quoteIdentifier($column->getName()), $index);
         }
         $query = sprintf('SELECT %s FROM %s WHERE %s', implode(', ', $selectColumns), $platform->quoteIdentifier($table->getName()), implode(' AND ', $conditions));
-        $pks = array();
+        $pks = [];
         if ($table->hasCompositePrimaryKey()) {
             foreach ($table->getPrimaryKey() as $index => $column) {
                 $pks [] = "\$key[$index]";
@@ -792,7 +801,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => \$minValue, 'max' => \$maxValue) for intervals.";
-        } elseif ($col->isTemporalType()) {
+        } else if ($col->isTemporalType()) {
             $script .= "
      * Example usage:
      * <code>
@@ -807,10 +816,10 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => \$minValue, 'max' => \$maxValue) for intervals.";
-        } elseif ($col->getType() == PropelTypes::PHP_ARRAY) {
+        } else if ($col->getType() == PropelTypes::PHP_ARRAY) {
             $script .= "
      * @param     array \$$variableName The values to use as filter.";
-        } elseif ($col->isTextType()) {
+        } else if ($col->isTextType()) {
             $script .= "
      * Example usage:
      * <code>
@@ -820,7 +829,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
      *
      * @param     string \$$variableName The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)";
-        } elseif ($col->isBooleanType()) {
+        } else if ($col->isBooleanType()) {
             $script .= "
      * Example usage:
      * <code>
@@ -870,12 +879,12 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
                 \$comparison = Criteria::IN;
             }
         }";
-        } elseif ($col->getType() == PropelTypes::OBJECT) {
+        } else if ($col->getType() == PropelTypes::OBJECT) {
             $script .= "
         if (is_object(\$$variableName)) {
             \$$variableName = serialize(\$$variableName);
         }";
-        } elseif ($col->getType() == PropelTypes::PHP_ARRAY) {
+        } else if ($col->getType() == PropelTypes::PHP_ARRAY) {
             $script .= "
         \$key = \$this->getAliasedColName($qualifiedName);
         if (null === \$comparison || \$comparison == Criteria::CONTAINS_ALL) {
@@ -913,7 +922,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
 
             return \$this;
         }";
-        } elseif ($col->getType() == PropelTypes::ENUM) {
+        } else if ($col->getType() == PropelTypes::ENUM) {
             $script .= "
         if (is_scalar(\$$variableName)) {
             \$$variableName = {$this->getPeerClassname()}::getSqlValueForEnum({$this->getColumnConstant($col)}, \$$variableName);
@@ -927,7 +936,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
                 \$comparison = Criteria::IN;
             }
         }";
-        } elseif ($col->isTextType()) {
+        } else if ($col->isTextType()) {
             $script .= "
         if (null === \$comparison) {
             if (is_array(\$$variableName)) {
@@ -937,7 +946,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
                 \$comparison = Criteria::LIKE;
             }
         }";
-        } elseif ($col->isBooleanType()) {
+        } else if ($col->isBooleanType()) {
             $script .= "
         if (is_string(\$$variableName)) {
             \$$variableName = in_array(strtolower(\$$variableName), array('false', 'off', '-', 'no', 'n', '0', '')) ? false : true;
@@ -1069,66 +1078,6 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
     }
 
     /**
-     * Adds the filterByRefFk method for this object.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addFilterByRefFk(&$script, $fk)
-    {
-        $this->declareClasses('PropelObjectCollection', 'PropelCollection', 'PropelException');
-        $table = $this->getTable();
-        $queryClass = $this->getStubQueryBuilder()->getClassname();
-        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
-        $fkStubObjectBuilder = $this->getNewStubObjectBuilder($fkTable);
-        $this->declareClassFromBuilder($fkStubObjectBuilder);
-        $fkPhpName = $fkStubObjectBuilder->getClassname();
-        $relationName = $this->getRefFKPhpNameAffix($fk);
-        $objectName = '$' . $fkTable->getStudlyPhpName();
-        $script .= "
-    /**
-     * Filter the query by a related $fkPhpName object
-     *
-     * @param   $fkPhpName|PropelObjectCollection $objectName  the related object to use as filter
-     * @param     string \$comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return                 $queryClass The current query, for fluid interface
-     * @throws PropelException - if the provided filter is invalid.
-     */
-    public function filterBy$relationName($objectName, \$comparison = null)
-    {
-        if ($objectName instanceof $fkPhpName) {
-            return \$this";
-        foreach ($fk->getForeignLocalMapping() as $localColumn => $foreignColumn) {
-            $localColumnObject = $table->getColumn($localColumn);
-            $foreignColumnObject = $fkTable->getColumn($foreignColumn);
-            $script .= "
-                ->addUsingAlias(" . $this->getColumnConstant($localColumnObject) . ", " . $objectName . "->get" . $foreignColumnObject->getPhpName() . "(), \$comparison)";
-        }
-        $script .= ";";
-        if (!$fk->isComposite()) {
-            $script .= "
-        } elseif ($objectName instanceof PropelObjectCollection) {
-            return \$this
-                ->use{$relationName}Query()
-                ->filterByPrimaryKeys({$objectName}->getPrimaryKeys())
-                ->endUse();";
-        }
-        $script .= "
-        } else {";
-        if ($fk->isComposite()) {
-            $script .= "
-            throw new PropelException('filterBy$relationName() only accepts arguments of type $fkPhpName');";
-        } else {
-            $script .= "
-            throw new PropelException('filterBy$relationName() only accepts arguments of type $fkPhpName or PropelCollection');";
-        }
-        $script .= "
-        }
-    }
-";
-    }
-
-    /**
      * Adds the joinFk method for this object.
      *
      * @param string &$script The script will be modified in this method.
@@ -1139,21 +1088,6 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
         $queryClass = $this->getStubQueryBuilder()->getClassname();
         $fkTable = $this->getForeignTable($fk);
         $relationName = $this->getFKPhpNameAffix($fk);
-        $joinType = $this->getJoinType($fk);
-        $this->addJoinRelated($script, $fkTable, $queryClass, $relationName, $joinType);
-    }
-
-    /**
-     * Adds the joinRefFk method for this object.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addJoinRefFk(&$script, $fk)
-    {
-        $table = $this->getTable();
-        $queryClass = $this->getStubQueryBuilder()->getClassname();
-        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
-        $relationName = $this->getRefFKPhpNameAffix($fk);
         $joinType = $this->getJoinType($fk);
         $this->addJoinRelated($script, $fkTable, $queryClass, $relationName, $joinType);
     }
@@ -1219,23 +1153,15 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
         $this->addUseRelatedQuery($script, $fkTable, $queryClass, $relationName, $joinType);
     }
 
-    /**
-     * Adds the useFkQuery method for this object.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addUseRefFkQuery(&$script, $fk)
+    public function getNamespace()
     {
-        $table = $this->getTable();
-        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
-        $fkQueryBuilder = $this->getNewStubQueryBuilder($fkTable);
-        $queryClass = $fkQueryBuilder->getClassname();
-        if ($namespace = $fkQueryBuilder->getNamespace()) {
-            $queryClass = '\\' . $namespace . '\\' . $queryClass;
+        if ($namespace = parent::getNamespace()) {
+            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
+                return $namespace . '\\' . $omns;
+            } else {
+                return $namespace;
+            }
         }
-        $relationName = $this->getRefFKPhpNameAffix($fk);
-        $joinType = $this->getJoinType($fk);
-        $this->addUseRelatedQuery($script, $fkTable, $queryClass, $relationName, $joinType);
     }
 
     /**
@@ -1264,6 +1190,100 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
             ->useQuery(\$relationAlias ? \$relationAlias : '$relationName', '$queryClass');
     }
 ";
+    }
+
+    /**
+     * Adds the filterByRefFk method for this object.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addFilterByRefFk(&$script, $fk)
+    {
+        $this->declareClasses('PropelObjectCollection', 'PropelCollection', 'PropelException');
+        $table = $this->getTable();
+        $queryClass = $this->getStubQueryBuilder()->getClassname();
+        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
+        $fkStubObjectBuilder = $this->getNewStubObjectBuilder($fkTable);
+        $this->declareClassFromBuilder($fkStubObjectBuilder);
+        $fkPhpName = $fkStubObjectBuilder->getClassname();
+        $relationName = $this->getRefFKPhpNameAffix($fk);
+        $objectName = '$' . $fkTable->getStudlyPhpName();
+        $script .= "
+    /**
+     * Filter the query by a related $fkPhpName object
+     *
+     * @param   $fkPhpName|PropelObjectCollection $objectName  the related object to use as filter
+     * @param     string \$comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return                 $queryClass The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
+     */
+    public function filterBy$relationName($objectName, \$comparison = null)
+    {
+        if ($objectName instanceof $fkPhpName) {
+            return \$this";
+        foreach ($fk->getForeignLocalMapping() as $localColumn => $foreignColumn) {
+            $localColumnObject = $table->getColumn($localColumn);
+            $foreignColumnObject = $fkTable->getColumn($foreignColumn);
+            $script .= "
+                ->addUsingAlias(" . $this->getColumnConstant($localColumnObject) . ", " . $objectName . "->get" . $foreignColumnObject->getPhpName() . "(), \$comparison)";
+        }
+        $script .= ";";
+        if (!$fk->isComposite()) {
+            $script .= "
+        } elseif ($objectName instanceof PropelObjectCollection) {
+            return \$this
+                ->use{$relationName}Query()
+                ->filterByPrimaryKeys({$objectName}->getPrimaryKeys())
+                ->endUse();";
+        }
+        $script .= "
+        } else {";
+        if ($fk->isComposite()) {
+            $script .= "
+            throw new PropelException('filterBy$relationName() only accepts arguments of type $fkPhpName');";
+        } else {
+            $script .= "
+            throw new PropelException('filterBy$relationName() only accepts arguments of type $fkPhpName or PropelCollection');";
+        }
+        $script .= "
+        }
+    }
+";
+    }
+
+    /**
+     * Adds the joinRefFk method for this object.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addJoinRefFk(&$script, $fk)
+    {
+        $table = $this->getTable();
+        $queryClass = $this->getStubQueryBuilder()->getClassname();
+        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
+        $relationName = $this->getRefFKPhpNameAffix($fk);
+        $joinType = $this->getJoinType($fk);
+        $this->addJoinRelated($script, $fkTable, $queryClass, $relationName, $joinType);
+    }
+
+    /**
+     * Adds the useFkQuery method for this object.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addUseRefFkQuery(&$script, $fk)
+    {
+        $table = $this->getTable();
+        $fkTable = $this->getTable()->getDatabase()->getTable($fk->getTableName());
+        $fkQueryBuilder = $this->getNewStubQueryBuilder($fkTable);
+        $queryClass = $fkQueryBuilder->getClassname();
+        if ($namespace = $fkQueryBuilder->getNamespace()) {
+            $queryClass = '\\' . $namespace . '\\' . $queryClass;
+        }
+        $relationName = $this->getRefFKPhpNameAffix($fk);
+        $joinType = $this->getJoinType($fk);
+        $this->addUseRelatedQuery($script, $fkTable, $queryClass, $relationName, $joinType);
     }
 
     protected function addFilterByCrossFK(&$script, $refFK, $crossFK)
@@ -1321,7 +1341,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
         $pks = $table->getPrimaryKey();
         if (count($pks) > 1) {
             $i = 0;
-            $conditions = array();
+            $conditions = [];
             foreach ($pks as $col) {
                 $const = $this->getColumnConstant($col);
                 $condName = "'pruneCond" . $i . "'";
@@ -1482,35 +1502,15 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
     }
 
     /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
+     * Closes class.
      *
-     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     *
-     * @return boolean
+     * @param string &$script The script will be modified in this method.
      */
-    public function hasBehaviorModifier($hookName, $modifier = null)
+    protected function addClassClose(&$script)
     {
-        return parent::hasBehaviorModifier($hookName, 'QueryBuilderModifier');
-    }
-
-    /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
-     *
-     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     * @param string &$script  The script will be modified in this method.
-     */
-    public function applyBehaviorModifier($hookName, &$script, $tab = "		")
-    {
-        return $this->applyBehaviorModifierBase($hookName, 'QueryBuilderModifier', $script, $tab);
-    }
-
-    /**
-     * Checks whether any registered behavior content creator on that table exists a contentName
-     *
-     * @param string $contentName The name of the content as called from one of this class methods, e.g. "parentClassname"
-     */
-    public function getBehaviorContent($contentName)
-    {
-        return $this->getBehaviorContentBase($contentName, 'QueryBuilderModifier');
+        $script .= "
+}
+";
+        $this->applyBehaviorModifier('queryFilter', $script, "");
     }
 }

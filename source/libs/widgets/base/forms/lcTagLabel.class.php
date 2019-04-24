@@ -34,11 +34,6 @@ class lcTagLabel extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function create()
-    {
-        return new lcTagLabel();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -55,6 +50,11 @@ class lcTagLabel extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagLabel();
     }
 
     public static function getRequiredAttributes()

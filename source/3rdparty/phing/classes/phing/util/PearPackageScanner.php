@@ -50,8 +50,8 @@ class PearPackageScanner extends DirectoryScanner
      *
      * @param string $descfile Name of package xml file
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function setDescFile($descfile)
     {
@@ -93,8 +93,8 @@ class PearPackageScanner extends DirectoryScanner
      *
      * @param string $config Configuration file
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function setConfig($config)
     {
@@ -127,9 +127,9 @@ class PearPackageScanner extends DirectoryScanner
      *
      * @param string $role PEAR file role
      *
-     * @throws BuildException
      * @return void
      *
+     * @throws BuildException
      * @internal
      * We do not verify the role against a hardcoded list since that
      * would break packages with additional roles.
@@ -141,58 +141,6 @@ class PearPackageScanner extends DirectoryScanner
         }
 
         $this->role = $role;
-    }
-
-    /**
-     * Loads the package information.
-     *
-     * @return void
-     *
-     * @uses $packageInfo
-     */
-    protected function init()
-    {
-        if (!$this->packageInfo) {
-            $this->packageInfo = $this->loadPackageInfo();
-        }
-    }
-
-    /**
-     * Loads and returns the PEAR package information.
-     *
-     * @return PEAR_PackageFile_v2 Package information object
-     *
-     * @throws BuildException When the package does not exist
-     */
-    protected function loadPackageInfo()
-    {
-        $config = PEAR_Config::singleton($this->config);
-
-        if (empty($this->packageFile)) {
-            // loads informations from PEAR package installed
-            $reg = $config->getRegistry();
-            if (!$reg->packageExists($this->package, $this->channel)) {
-                throw new BuildException(
-                    sprintf(
-                        'PEAR package %s/%s does not exist',
-                        $this->channel,
-                        $this->package
-                    )
-                );
-            }
-            $packageInfo = $reg->getPackage($this->package, $this->channel);
-        } else {
-            // loads informations from PEAR package XML description file
-            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
-            $pkg = new PEAR_PackageFile($config);
-            $packageInfo = $pkg->fromPackageFile($this->packageFile, PEAR_VALIDATE_NORMAL);
-            PEAR::staticPopErrorHandling();
-            if (PEAR::isError($packageInfo)) {
-                throw new BuildException("Errors in package file: " . $packageInfo->getMessage());
-            }
-        }
-
-        return $packageInfo;
     }
 
     /**
@@ -217,21 +165,21 @@ class PearPackageScanner extends DirectoryScanner
 
         if ($this->includes === null) {
             // No includes supplied, so set it to 'matches all'
-            $this->includes = array("**");
+            $this->includes = ["**"];
         }
         if ($this->excludes === null) {
-            $this->excludes = array();
+            $this->excludes = [];
         }
 
-        $this->filesIncluded = array();
-        $this->filesNotIncluded = array();
-        $this->filesExcluded = array();
-        $this->filesDeselected = array();
+        $this->filesIncluded = [];
+        $this->filesNotIncluded = [];
+        $this->filesExcluded = [];
+        $this->filesDeselected = [];
 
-        $this->dirsIncluded = array();
-        $this->dirsNotIncluded = array();
-        $this->dirsExcluded = array();
-        $this->dirsDeselected = array();
+        $this->dirsIncluded = [];
+        $this->dirsNotIncluded = [];
+        $this->dirsExcluded = [];
+        $this->dirsDeselected = [];
         $origFirstFile = null;
 
         foreach ($list as $file => $att) {
@@ -292,6 +240,58 @@ class PearPackageScanner extends DirectoryScanner
         }
 
         return true;
+    }
+
+    /**
+     * Loads the package information.
+     *
+     * @return void
+     *
+     * @uses $packageInfo
+     */
+    protected function init()
+    {
+        if (!$this->packageInfo) {
+            $this->packageInfo = $this->loadPackageInfo();
+        }
+    }
+
+    /**
+     * Loads and returns the PEAR package information.
+     *
+     * @return PEAR_PackageFile_v2 Package information object
+     *
+     * @throws BuildException When the package does not exist
+     */
+    protected function loadPackageInfo()
+    {
+        $config = PEAR_Config::singleton($this->config);
+
+        if (empty($this->packageFile)) {
+            // loads informations from PEAR package installed
+            $reg = $config->getRegistry();
+            if (!$reg->packageExists($this->package, $this->channel)) {
+                throw new BuildException(
+                    sprintf(
+                        'PEAR package %s/%s does not exist',
+                        $this->channel,
+                        $this->package
+                    )
+                );
+            }
+            $packageInfo = $reg->getPackage($this->package, $this->channel);
+        } else {
+            // loads informations from PEAR package XML description file
+            PEAR::staticPushErrorHandling(PEAR_ERROR_RETURN);
+            $pkg = new PEAR_PackageFile($config);
+            $packageInfo = $pkg->fromPackageFile($this->packageFile, PEAR_VALIDATE_NORMAL);
+            PEAR::staticPopErrorHandling();
+            if (PEAR::isError($packageInfo)) {
+                throw new BuildException("Errors in package file: " . $packageInfo->getMessage());
+            }
+        }
+
+        return $packageInfo;
     }
 
 }

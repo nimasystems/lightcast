@@ -2,18 +2,18 @@
 all:
   plugins:
     enabled:
-    - app_security
-    - cache
-    - ajax_rpc
-    - languages
-    - admin_layout
-    - live_search_form
-    - jquery
-    - countries
-    - fck_edit
-    - forms
-    - plupload
-    - mogilefs
-    - storage
-    - simple_cms
+      - app_security
+      - cache
+      - ajax_rpc
+      - languages
+      - admin_layout
+      - live_search_form
+      - jquery
+      - countries
+      - fck_edit
+      - forms
+      - plupload
+      - mogilefs
+      - storage
+      - simple_cms
 ...

@@ -60,7 +60,7 @@ class EqualsCondition implements Condition
      */
     public function setTrim($b)
     {
-        $this->trim = (boolean) $b;
+        $this->trim = (boolean)$b;
     }
 
     /**
@@ -69,7 +69,7 @@ class EqualsCondition implements Condition
      */
     public function setCaseSensitive($b)
     {
-        $this->caseSensitive = (boolean) $b;
+        $this->caseSensitive = (boolean)$b;
     }
 
     /**

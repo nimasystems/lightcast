@@ -103,7 +103,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
          * 'log' section and 'propel' sections. To maintain backward compatibility
          * we need to put 'log' back into the 'propel' section.
          */
-        $log = array();
+        $log = [];
         if (isset($phpconf['log'])) {
             $phpconf['propel']['log'] = $phpconf['log'];
             unset($phpconf['log']);
@@ -188,25 +188,18 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
         }
     } // main()
 
-    protected function logClassMap($classMap)
-    {
-        foreach ($classMap as $className => $classPath) {
-            $this->log(sprintf('  %-15s => %s', $className, $classPath), Project::MSG_VERBOSE);
-        }
-    }
-
     /**
      * Recursive function that converts an SimpleXML object into an array.
      *
-     * @author     Christophe VG (based on code form php.net manual comment)
-     *
-     * @param      object SimpleXML object.
+     * @param object SimpleXML object.
      *
      * @return array Array representation of SimpleXML object.
+     * @author     Christophe VG (based on code form php.net manual comment)
+     *
      */
     protected static function simpleXmlToArray($xml)
     {
-        $ar = array();
+        $ar = [];
 
         foreach ($xml->children() as $k => $v) {
 
@@ -225,7 +218,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
 
                 // if the child is not an array, transform it into one
                 if (!is_array($child)) {
-                    $child = array("value" => $child);
+                    $child = ["value" => $child];
                 }
 
                 if ($ak == 'id') {
@@ -251,7 +244,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
                 // nested element data.
 
                 if (!is_array($ar[$k]) || !isset($ar[$k][0])) {
-                    $ar[$k] = array($ar[$k]);
+                    $ar[$k] = [$ar[$k]];
                 }
                 $ar[$k][] = $child;
             }
@@ -263,18 +256,18 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
     /**
      * Process XML value, handling boolean, if appropriate.
      *
-     * @param      object The simplexml value object.
+     * @param object The simplexml value object.
      *
      * @return mixed
      */
     private static function getConvertedXmlValue($value)
     {
-        $value = (string) $value; // convert from simplexml to string
+        $value = (string)$value; // convert from simplexml to string
         // handle booleans specially
         $lwr = strtolower($value);
         if ($lwr === "false") {
             $value = false;
-        } elseif ($lwr === "true") {
+        } else if ($lwr === "true") {
             $value = true;
         }
 
@@ -289,7 +282,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
      */
     protected function getClassMap()
     {
-        $phpconfClassmap = array();
+        $phpconfClassmap = [];
 
         $generatorConfig = $this->getGeneratorConfig();
 
@@ -297,7 +290,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
 
             foreach ($dataModel->getDatabases() as $database) {
 
-                $classMap = array();
+                $classMap = [];
 
                 foreach ($database->getTables() as $table) {
 
@@ -310,7 +303,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
                         // -----------------------------------------------------
                         // (this code is based on PropelOMTask)
 
-                        foreach (array('tablemap', 'peerstub', 'objectstub', 'querystub', 'peer', 'object', 'query') as $target) {
+                        foreach (['tablemap', 'peerstub', 'objectstub', 'querystub', 'peer', 'object', 'query'] as $target) {
                             $builder = $generatorConfig->getConfiguredBuilder($table, $target);
                             $classMap[$builder->getFullyQualifiedClassname()] = $builder->getClassFilePath();
                         }
@@ -324,7 +317,7 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
                         if ($col = $table->getChildrenColumn()) {
                             if ($col->isEnumeratedClasses()) {
                                 foreach ($col->getChildren() as $child) {
-                                    foreach (array('objectmultiextend', 'queryinheritance', 'queryinheritancestub') as $target) {
+                                    foreach (['objectmultiextend', 'queryinheritance', 'queryinheritancestub'] as $target) {
                                         $builder = $generatorConfig->getConfiguredBuilder($table, $target);
                                         $builder->setChild($child);
                                         $classMap[$builder->getFullyQualifiedClassname()] = $builder->getClassFilePath();
@@ -369,13 +362,13 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
                         // ----------------------------------------------
 
                         if ($table->treeMode() == 'MaterializedPath') {
-                            foreach (array('nodepeerstub', 'nodestub', 'nodepeer', 'node') as $target) {
+                            foreach (['nodepeerstub', 'nodestub', 'nodepeer', 'node'] as $target) {
                                 $builder = $generatorConfig->getConfiguredBuilder($table, $target);
                                 $classMap[$builder->getFullyQualifiedClassname()] = $builder->getClassFilePath();
                             }
                         }
                         if ($table->treeMode() == 'NestedSet') {
-                            foreach (array('nestedset', 'nestedsetpeer') as $target) {
+                            foreach (['nestedset', 'nestedsetpeer'] as $target) {
                                 $builder = $generatorConfig->getConfiguredBuilder($table, $target);
                                 $classMap[$builder->getFullyQualifiedClassname()] = $builder->getClassFilePath();
                             }
@@ -402,5 +395,12 @@ class PropelConvertConfTask extends AbstractPropelDataModelTask
         ksort($phpconfClassmap);
 
         return $phpconfClassmap;
+    }
+
+    protected function logClassMap($classMap)
+    {
+        foreach ($classMap as $className => $classPath) {
+            $this->log(sprintf('  %-15s => %s', $className, $classPath), Project::MSG_VERBOSE);
+        }
     }
 }

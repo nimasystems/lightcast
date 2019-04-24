@@ -188,17 +188,6 @@ class CoverageThresholdTask extends Task
     }
 
     /**
-     * Filter covered statements
-     *
-     * @param  integer $var Coverage CODE/count
-     * @return boolean
-     */
-    protected function filterCovered($var)
-    {
-        return ($var >= 0 || $var === -2);
-    }
-
-    /**
      * Create excludes object
      *
      * @return Excludes
@@ -208,6 +197,73 @@ class CoverageThresholdTask extends Task
         $this->_excludes = new Excludes($this->project);
 
         return $this->_excludes;
+    }
+
+    public function main()
+    {
+        if ($this->_database === null) {
+            $coverageDatabase = $this->project
+                ->getProperty('coverage.database');
+
+            if (!$coverageDatabase) {
+                throw new BuildException(
+                    'Either include coverage-setup in your build file or set '
+                    . 'the "database" attribute'
+                );
+            }
+
+            $database = new PhingFile($coverageDatabase);
+        } else {
+            $database = $this->_database;
+        }
+
+        $this->log(
+            'Calculating coverage threshold: min. '
+            . $this->_perProject . '% per project, '
+            . $this->_perClass . '% per class and '
+            . $this->_perMethod . '% per method is required'
+        );
+
+        $props = new Properties();
+        $props->load($database);
+
+        foreach ($props->keys() as $filename) {
+            $file = unserialize($props->getProperty($filename));
+
+            // Skip file if excluded from coverage threshold validation
+            if ($this->_excludes !== null) {
+                if (in_array($file['fullname'], $this->_excludes->getExcludedFiles())) {
+                    continue;
+                }
+            }
+
+            $this->calculateCoverageThreshold(
+                $file['fullname'],
+                $file['coverage']
+            );
+        }
+
+        if ($this->_projectStatementCount > 0) {
+            $coverage = ($this->_projectStatementsCovered
+                    / $this->_projectStatementCount) * 100;
+        } else {
+            $coverage = 0;
+        }
+
+        if ($coverage < $this->_perProject) {
+            throw new BuildException(
+                'The coverage (' . round($coverage, 2) . '%) for the entire project '
+                . 'is lower than the specified threshold ('
+                . $this->_perProject . '%)'
+            );
+        }
+
+        $this->log(
+            'Passed coverage threshold. Minimum found coverage values are: '
+            . round($coverage, 2) . '% per project, '
+            . round($this->_minClassCoverageFound, 2) . '% per class and '
+            . round($this->_minMethodCoverageFound, 2) . '% per method'
+        );
     }
 
     /**
@@ -323,7 +379,7 @@ class CoverageThresholdTask extends Task
                             . $this->_perMethod . '%), see file: "'
                             . $filename . '"'
                         );
-                    } elseif ($methodCoverage < $this->_perMethod
+                    } else if ($methodCoverage < $this->_perMethod
                         && $method->isAbstract()
                         && $this->_verbose === true
                     ) {
@@ -347,7 +403,7 @@ class CoverageThresholdTask extends Task
                 $classStatementsCovered = count(
                     array_filter(
                         $coverageInformation,
-                        array($this, 'filterCovered')
+                        [$this, 'filterCovered']
                     )
                 );
 
@@ -367,7 +423,7 @@ class CoverageThresholdTask extends Task
                         . 'specified threshold (' . $this->_perClass . '%), '
                         . 'see file: "' . $filename . '"'
                     );
-                } elseif ($classCoverage < $this->_perClass
+                } else if ($classCoverage < $this->_perClass
                     && $reflection->isAbstract()
                     && $this->_verbose === true
                 ) {
@@ -392,70 +448,14 @@ class CoverageThresholdTask extends Task
         }
     }
 
-    public function main()
+    /**
+     * Filter covered statements
+     *
+     * @param integer $var Coverage CODE/count
+     * @return boolean
+     */
+    protected function filterCovered($var)
     {
-        if ($this->_database === null) {
-            $coverageDatabase = $this->project
-                ->getProperty('coverage.database');
-
-            if (!$coverageDatabase) {
-                throw new BuildException(
-                    'Either include coverage-setup in your build file or set '
-                    . 'the "database" attribute'
-                );
-            }
-
-            $database = new PhingFile($coverageDatabase);
-        } else {
-            $database = $this->_database;
-        }
-
-        $this->log(
-            'Calculating coverage threshold: min. '
-            . $this->_perProject . '% per project, '
-            . $this->_perClass . '% per class and '
-            . $this->_perMethod . '% per method is required'
-        );
-
-        $props = new Properties();
-        $props->load($database);
-
-        foreach ($props->keys() as $filename) {
-            $file = unserialize($props->getProperty($filename));
-
-            // Skip file if excluded from coverage threshold validation
-            if ($this->_excludes !== null) {
-                if (in_array($file['fullname'], $this->_excludes->getExcludedFiles())) {
-                    continue;
-                }
-            }
-
-            $this->calculateCoverageThreshold(
-                $file['fullname'],
-                $file['coverage']
-            );
-        }
-
-        if ($this->_projectStatementCount > 0) {
-            $coverage = ($this->_projectStatementsCovered
-                    / $this->_projectStatementCount) * 100;
-        } else {
-            $coverage = 0;
-        }
-
-        if ($coverage < $this->_perProject) {
-            throw new BuildException(
-                'The coverage (' . round($coverage, 2) . '%) for the entire project '
-                . 'is lower than the specified threshold ('
-                . $this->_perProject . '%)'
-            );
-        }
-
-        $this->log(
-            'Passed coverage threshold. Minimum found coverage values are: '
-            . round($coverage, 2) . '% per project, '
-            . round($this->_minClassCoverageFound, 2) . '% per class and '
-            . round($this->_minMethodCoverageFound, 2) . '% per method'
-        );
+        return ($var >= 0 || $var === -2);
     }
 }

@@ -46,16 +46,6 @@ class lcMailRecipient extends lcObj
         return $obj;
     }
 
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function getName()
-    {
-        return $this->name;
-    }
-
     public function __toString()
     {
         $name = $this->getName();
@@ -68,5 +58,15 @@ class lcMailRecipient extends lcObj
         return ($name ? $name . ' <' : '') .
             $email .
             ($name ? '>' : '');
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
     }
 }

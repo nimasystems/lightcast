@@ -61,21 +61,25 @@ class lcImages
         }
 
         switch ($gis[2]) {
-            case "1": {
-                $imorig = imagecreatefromgif($tmpname);
-                break;
-            }
-            case "2": {
-                $imorig = imagecreatefromjpeg($tmpname);
-                break;
-            }
-            case "3": {
-                $imorig = imagecreatefrompng($tmpname);
-                break;
-            }
-            default: {
-                $imorig = imagecreatefromjpeg($tmpname);
-            }
+            case "1":
+                {
+                    $imorig = imagecreatefromgif($tmpname);
+                    break;
+                }
+            case "2":
+                {
+                    $imorig = imagecreatefromjpeg($tmpname);
+                    break;
+                }
+            case "3":
+                {
+                    $imorig = imagecreatefrompng($tmpname);
+                    break;
+                }
+            default:
+                {
+                    $imorig = imagecreatefromjpeg($tmpname);
+                }
         }
 
         if (!$imorig) {

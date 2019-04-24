@@ -42,11 +42,6 @@ class lcTagScript extends lcHtmlBaseTag
         $this->setCharset($charset);
     }
 
-    public static function create()
-    {
-        return new lcTagScript();
-    }
-
     public function setType($type = self::DEFAULT_TYPE)
     {
         $this->setAttribute('type', $type);
@@ -56,12 +51,6 @@ class lcTagScript extends lcHtmlBaseTag
     public function setSrc($value = null)
     {
         $this->setAttribute('src', $value);
-        return $this;
-    }
-
-    public function setAsync($value = true)
-    {
-        $this->setAttribute('async', $value ? 'async' : null);
         return $this;
     }
 
@@ -77,9 +66,20 @@ class lcTagScript extends lcHtmlBaseTag
         return $this;
     }
 
+    public static function create()
+    {
+        return new lcTagScript();
+    }
+
     public static function getOptionalAttributes()
     {
         return ['type', 'src', 'charset', 'defer', 'async'];
+    }
+
+    public function setAsync($value = true)
+    {
+        $this->setAttribute('async', $value ? 'async' : null);
+        return $this;
     }
 
     public function getType()

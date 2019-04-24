@@ -54,11 +54,25 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     protected $view_render_type;
 
-    protected $use_models;
-    protected $use_components;
-    protected $use_plugins;
+    /**
+     * @var array
+     */
+    protected $use_models = [];
 
-    protected $dependancies_loaded;
+    /**
+     * @var array
+     */
+    protected $use_components = [];
+
+    /**
+     * @var array
+     */
+    protected $use_plugins = [];
+
+    /**
+     * @var array
+     */
+    protected $dependancies_loaded = [];
 
     /**
      * @var lcPlugin[]
@@ -68,12 +82,17 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     /**
      * @var array
      */
-    protected $loaded_components;
+    protected $loaded_components = [];
+
     protected $controller_name;
     protected $controller_filename;
     protected $assets_path;
     protected $assets_webpath;
-    private $loaded_components_usage;
+
+    /**
+     * @var array
+     */
+    private $loaded_components_usage = [];
 
     abstract public function getProfilingData();
 
@@ -98,13 +117,14 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->plugin_manager =
         $this->database_model_manager =
         $this->view =
+            null;
+
         $this->use_plugins =
         $this->use_models =
         $this->use_components =
         $this->plugins =
         $this->loaded_components =
-        $this->loaded_components_usage =
-            null;
+        $this->loaded_components_usage = [];
 
         parent::shutdown();
     }
@@ -125,7 +145,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         }
 
         $this->loaded_components =
-        $this->loaded_components_usage = null;
+        $this->loaded_components_usage = [];
     }
 
     public function getCapabilities()
@@ -387,6 +407,11 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         // subclassers may override this to read their caches
     }
 
+    public function getLoadedComponents()
+    {
+        return $this->loaded_components;
+    }
+
     protected function validateRequestDataAndThrow(array $config)
     {
         $failures = [];
@@ -460,11 +485,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         return $this->getComponent($component_name);
     }
 
-    public function getLoadedComponents()
-    {
-        return $this->loaded_components;
-    }
-
     /**
      * @param $component_name
      * @return lcComponent|null
@@ -480,7 +500,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $component_instance = null;
 
         try {
-            $usage_count = isset($this->loaded_components_usage[$component_name]) ? (int)count($this->loaded_components_usage[$component_name]) : null;
+            $usage_count = isset($this->loaded_components_usage[$component_name]) ? (int)$this->loaded_components_usage[$component_name] : null;
 
             // check if component is loaded and has been initialized once (dependancies)
             if (is_null($usage_count)) {
@@ -729,6 +749,11 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->dependancies_loaded = true;
     }
 
+    public function getUsedPlugins()
+    {
+        return $this->use_plugins;
+    }
+
     private function internalLoadPlugin($plugin_name, $throw_if_missing = true)
     {
         if (isset($this->plugins[$plugin_name])) {
@@ -744,11 +769,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->plugins[$plugin_name] = &$plugin;
 
         return $plugin;
-    }
-
-    public function getUsedPlugins()
-    {
-        return $this->use_plugins;
     }
 
     public function getUsedComponents()

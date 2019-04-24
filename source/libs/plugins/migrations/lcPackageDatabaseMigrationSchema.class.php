@@ -50,14 +50,6 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
     }
 
     /**
-     * @return string
-     */
-    public function getSchemaIdentifier()
-    {
-        return $this->plugin_configuration->getName() . '_' . $this->plugin_configuration->getIdentifier();
-    }
-
-    /**
      * @param lcPropelConnection $db
      * @param int $from_version
      * @param int $to_version
@@ -156,5 +148,13 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
     public function __toString()
     {
         return (string)$this->getSchemaIdentifier();
+    }
+
+    /**
+     * @return string
+     */
+    public function getSchemaIdentifier()
+    {
+        return $this->plugin_configuration->getName() . '_' . $this->plugin_configuration->getIdentifier();
     }
 }

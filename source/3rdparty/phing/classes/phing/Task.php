@@ -93,36 +93,6 @@ abstract class Task extends ProjectComponent
     }
 
     /**
-     * Returns the name of task, used only for log messages
-     *
-     * @return string Name of this task
-     */
-    public function getTaskName()
-    {
-        if ($this->taskName === null) {
-            // if no task name is set, then it's possible
-            // this task was created from within another task.  We don't
-            // therefore know the XML tag name for this task, so we'll just
-            // use the class name stripped of "task" suffix.  This is only
-            // for log messages, so we don't have to worry much about accuracy.
-            return preg_replace('/task$/i', '', get_class($this));
-        }
-
-        return $this->taskName;
-    }
-
-    /**
-     * Sets the name of this task for log messages
-     *
-     * @param  string $name
-     * @return string A string representing the name of this task for log
-     */
-    public function setTaskName($name)
-    {
-        $this->taskName = (string) $name;
-    }
-
-    /**
      * Returns the name of the task under which it was invoked,
      * usually the XML tagname
      *
@@ -140,17 +110,7 @@ abstract class Task extends ProjectComponent
      */
     public function setTaskType($name)
     {
-        $this->taskType = (string) $name;
-    }
-
-    /**
-     * Returns a name
-     * @param string $slotName
-     * @return \RegisterSlot
-     */
-    protected function getRegisterSlot($slotName)
-    {
-        return Register::getSlot('task.' . $this->getTaskName() . '.' . $slotName);
+        $this->taskType = (string)$name;
     }
 
     /**
@@ -167,16 +127,6 @@ abstract class Task extends ProjectComponent
     }
 
     /**
-     * Sets a textual description of the task
-     *
-     * @param string $desc The text describing the task
-     */
-    public function setDescription($desc)
-    {
-        $this->description = $desc;
-    }
-
-    /**
      * Returns the textual description of the task
      *
      * @return string The text description of the task
@@ -184,6 +134,16 @@ abstract class Task extends ProjectComponent
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Sets a textual description of the task
+     *
+     * @param string $desc The text describing the task
+     */
+    public function setDescription($desc)
+    {
+        $this->description = $desc;
     }
 
     /**
@@ -196,6 +156,65 @@ abstract class Task extends ProjectComponent
      */
     public function init()
     {
+    }
+
+    /**
+     * Returns the wrapper object for runtime configuration
+     *
+     * @return RuntimeConfigurable The wrapper object used by this task
+     */
+    public function getRuntimeConfigurableWrapper()
+    {
+        if ($this->wrapper === null) {
+            $this->wrapper = new RuntimeConfigurable($this, $this->getTaskName());
+        }
+
+        return $this->wrapper;
+    }
+
+    /**
+     *  Sets the wrapper object this task should use for runtime
+     *  configurable elements.
+     *
+     * @param RuntimeConfigurable $wrapper The wrapper object this task should use
+     */
+    public function setRuntimeConfigurableWrapper(RuntimeConfigurable $wrapper)
+    {
+        $this->wrapper = $wrapper;
+    }
+
+    /**
+     * Perfrom this task
+     *
+     * @throws BuildException
+     */
+    public function perform()
+    {
+
+        try { // try executing task
+            $this->project->fireTaskStarted($this);
+            $this->maybeConfigure();
+            $this->main();
+            $this->project->fireTaskFinished($this, $null = null);
+        } catch (Exception $exc) {
+            if ($exc instanceof BuildException) {
+                if ($this->getLocation() !== null) {
+                    $exc->setLocation($this->getLocation());
+                }
+            }
+            $this->project->fireTaskFinished($this, $exc);
+            throw $exc;
+        }
+    }
+
+    /**
+     *  Configure this task if it hasn't been done already.
+     */
+    public function maybeConfigure()
+    {
+        if ($this->wrapper !== null) {
+            $this->wrapper->maybeConfigure($this->project);
+        }
     }
 
     /**
@@ -235,61 +254,42 @@ abstract class Task extends ProjectComponent
     }
 
     /**
-     * Returns the wrapper object for runtime configuration
-     *
-     * @return RuntimeConfigurable The wrapper object used by this task
+     * Returns a name
+     * @param string $slotName
+     * @return \RegisterSlot
      */
-    public function getRuntimeConfigurableWrapper()
+    protected function getRegisterSlot($slotName)
     {
-        if ($this->wrapper === null) {
-            $this->wrapper = new RuntimeConfigurable($this, $this->getTaskName());
-        }
-
-        return $this->wrapper;
+        return Register::getSlot('task.' . $this->getTaskName() . '.' . $slotName);
     }
 
     /**
-     *  Sets the wrapper object this task should use for runtime
-     *  configurable elements.
+     * Returns the name of task, used only for log messages
      *
-     * @param RuntimeConfigurable $wrapper The wrapper object this task should use
+     * @return string Name of this task
      */
-    public function setRuntimeConfigurableWrapper(RuntimeConfigurable $wrapper)
+    public function getTaskName()
     {
-        $this->wrapper = $wrapper;
+        if ($this->taskName === null) {
+            // if no task name is set, then it's possible
+            // this task was created from within another task.  We don't
+            // therefore know the XML tag name for this task, so we'll just
+            // use the class name stripped of "task" suffix.  This is only
+            // for log messages, so we don't have to worry much about accuracy.
+            return preg_replace('/task$/i', '', get_class($this));
+        }
+
+        return $this->taskName;
     }
 
     /**
-     *  Configure this task if it hasn't been done already.
-     */
-    public function maybeConfigure()
-    {
-        if ($this->wrapper !== null) {
-            $this->wrapper->maybeConfigure($this->project);
-        }
-    }
-
-    /**
-     * Perfrom this task
+     * Sets the name of this task for log messages
      *
-     * @throws BuildException
+     * @param string $name
+     * @return string A string representing the name of this task for log
      */
-    public function perform()
+    public function setTaskName($name)
     {
-
-        try { // try executing task
-            $this->project->fireTaskStarted($this);
-            $this->maybeConfigure();
-            $this->main();
-            $this->project->fireTaskFinished($this, $null = null);
-        } catch (Exception $exc) {
-            if ($exc instanceof BuildException) {
-                if ($this->getLocation() !== null) {
-                    $exc->setLocation($this->getLocation());
-                }
-            }
-            $this->project->fireTaskFinished($this, $exc);
-            throw $exc;
-        }
+        $this->taskName = (string)$name;
     }
 }

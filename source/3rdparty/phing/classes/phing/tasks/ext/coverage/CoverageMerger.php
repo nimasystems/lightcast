@@ -32,54 +32,25 @@ require_once 'phing/system/util/Properties.php';
 class CoverageMerger
 {
     /**
-     * @param $left
-     * @param $right
+     * @param $project
      * @return array
+     * @throws BuildException
      */
-    private static function mergeCodeCoverage($left, $right)
+    public static function getWhiteList($project)
     {
-        $coverageMerged = array();
+        $whitelist = [];
+        $props = self::_getDatabase($project);
 
-        reset($left);
-        reset($right);
-
-        while (current($left) !== false && current($right) !== false) {
-            $linenr_left = key($left);
-            $linenr_right = key($right);
-
-            if ($linenr_left < $linenr_right) {
-                $coverageMerged[$linenr_left] = current($left);
-                next($left);
-            } elseif ($linenr_right < $linenr_left) {
-                $coverageMerged[$linenr_right] = current($right);
-                next($right);
-            } else {
-                if ((current($left) < 0) || (current($right) < 0)) {
-                    $coverageMerged[$linenr_right] = current($right);
-                } else {
-                    $coverageMerged[$linenr_right] = current($left) + current($right);
-                }
-
-                next($left);
-                next($right);
-            }
+        foreach ($props->getProperties() as $property) {
+            $data = unserialize($property);
+            $whitelist[] = $data['fullname'];
         }
 
-        while (current($left) !== false) {
-            $coverageMerged[key($left)] = current($left);
-            next($left);
-        }
-
-        while (current($right) !== false) {
-            $coverageMerged[key($right)] = current($right);
-            next($right);
-        }
-
-        return $coverageMerged;
+        return $whitelist;
     }
 
     /**
-     * @param  Project        $project
+     * @param Project $project
      * @return Properties
      * @throws BuildException
      */
@@ -101,24 +72,6 @@ class CoverageMerger
 
     /**
      * @param $project
-     * @return array
-     * @throws BuildException
-     */
-    public static function getWhiteList($project)
-    {
-        $whitelist = array();
-        $props = self::_getDatabase($project);
-
-        foreach ($props->getProperties() as $property) {
-            $data = unserialize($property);
-            $whitelist[] = $data['fullname'];
-        }
-
-        return $whitelist;
-    }
-
-    /**
-     * @param $project
      * @param $codeCoverageInformation
      * @throws BuildException
      * @throws IOException
@@ -130,7 +83,7 @@ class CoverageMerger
         $coverageTotal = $codeCoverageInformation;
 
         foreach ($coverageTotal as $filename => $data) {
-            $lines = array();
+            $lines = [];
             $filename = strtolower($filename);
 
             if ($props->getProperty($filename) != null) {
@@ -172,5 +125,52 @@ class CoverageMerger
         }
 
         $props->store();
+    }
+
+    /**
+     * @param $left
+     * @param $right
+     * @return array
+     */
+    private static function mergeCodeCoverage($left, $right)
+    {
+        $coverageMerged = [];
+
+        reset($left);
+        reset($right);
+
+        while (current($left) !== false && current($right) !== false) {
+            $linenr_left = key($left);
+            $linenr_right = key($right);
+
+            if ($linenr_left < $linenr_right) {
+                $coverageMerged[$linenr_left] = current($left);
+                next($left);
+            } else if ($linenr_right < $linenr_left) {
+                $coverageMerged[$linenr_right] = current($right);
+                next($right);
+            } else {
+                if ((current($left) < 0) || (current($right) < 0)) {
+                    $coverageMerged[$linenr_right] = current($right);
+                } else {
+                    $coverageMerged[$linenr_right] = current($left) + current($right);
+                }
+
+                next($left);
+                next($right);
+            }
+        }
+
+        while (current($left) !== false) {
+            $coverageMerged[key($left)] = current($left);
+            next($left);
+        }
+
+        while (current($right) !== false) {
+            $coverageMerged[key($right)] = current($right);
+            next($right);
+        }
+
+        return $coverageMerged;
     }
 }

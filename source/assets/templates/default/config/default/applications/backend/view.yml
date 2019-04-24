@@ -2,8 +2,8 @@
 all:
   view:
     filters:
-    - lcHTMLTemplateViewFilter
-    - languagesI18nViewFilter
+      - lcHTMLTemplateViewFilter
+      - languagesI18nViewFilter
     content_type: text/html
     charset: utf-8
     metatags:
@@ -14,11 +14,11 @@ all:
     has_layout: true
     decorator: index
     javascripts:
-    - generic.js
-    - backend2.js
+      - generic.js
+      - backend2.js
     stylesheets:
       all:
-      - backend.css
+        - backend.css
     extension: htm
     google_analytics: ~
     replacement_policy: level

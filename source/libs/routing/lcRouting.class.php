@@ -56,7 +56,7 @@ abstract class lcRouting extends lcResidentObj implements iProvidesCapabilities,
     public function getCapabilities()
     {
         return [
-            'routing'
+            'routing',
         ];
     }
 
@@ -64,7 +64,7 @@ abstract class lcRouting extends lcResidentObj implements iProvidesCapabilities,
     {
         $debug = [
             'default_module' => $this->default_module,
-            'default_action' => $this->default_action
+            'default_action' => $this->default_action,
         ];
 
         return $debug;

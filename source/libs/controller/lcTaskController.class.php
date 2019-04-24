@@ -64,6 +64,15 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $this->response->consoleDisplay($data, $prefixed, $return);
     }
 
+    public function displayException(Exception $exception, $prefixed = true, $return = false)
+    {
+        $data = lcConsolePainter::formatColoredConsoleText($exception->getMessage(), 'red');
+        $data .= "\n\n";
+        $data .= lcConsolePainter::formatColoredConsoleText($exception->getTraceAsString(), 'yellow');
+        $data .= "\n\n";
+        $this->consoleDisplay($data, $prefixed, $return);
+    }
+
     /**
      * @return lcView
      */
@@ -126,15 +135,6 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $response->setExitCode($execute_status);
         $response->setContent($content);
         $response->sendResponse();
-    }
-
-    public function displayException(Exception $exception, $prefixed = true, $return = false)
-    {
-        $data = lcConsolePainter::formatColoredConsoleText($exception->getMessage(), 'red');
-        $data .= "\n\n";
-        $data .= lcConsolePainter::formatColoredConsoleText($exception->getTraceAsString(), 'yellow');
-        $data .= "\n\n";
-        $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function displayError($data, $prefixed = true, $return = false)

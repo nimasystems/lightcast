@@ -78,7 +78,7 @@ class RegexTask extends AbstractPropertySetterTask
 
     /** @var int $limit */
     private $limit = -1;
-    
+
     public function init()
     {
         $this->reg = new Regexp();
@@ -91,7 +91,7 @@ class RegexTask extends AbstractPropertySetterTask
     {
         $this->limit = $limit;
     }
-    
+
     /**
      * @param string $subject
      */
@@ -111,7 +111,7 @@ class RegexTask extends AbstractPropertySetterTask
     }
 
     /**
-     * @param  string $pattern
+     * @param string $pattern
      * @throws BuildException
      */
     public function setPattern($pattern)
@@ -178,6 +178,41 @@ class RegexTask extends AbstractPropertySetterTask
     }
 
     /**
+     * @throws BuildException
+     */
+    public function main()
+    {
+        $this->validate();
+
+        $output = $this->match;
+
+        if ($this->replace !== null) {
+            $output = $this->doReplace();
+        } else {
+            $output = $this->doSelect();
+        }
+
+        if ($output !== null) {
+            $this->setPropertyValue($output);
+        }
+    }
+
+    /**
+     * @throws BuildException
+     */
+    protected function validate()
+    {
+        if ($this->pattern === null) {
+            throw new BuildException('No match expression specified.');
+        }
+        if ($this->replace === null && $this->match === null) {
+            throw new BuildException(
+                'You must specify either a preg_replace or preg_match pattern'
+            );
+        }
+    }
+
+    /**
      * @return mixed|string
      * @throws BuildException
      */
@@ -216,47 +251,12 @@ class RegexTask extends AbstractPropertySetterTask
 
         try {
             if ($this->reg->matches($this->subject)) {
-                $output = $this->reg->getGroup((int) ltrim($this->match, '$'));
+                $output = $this->reg->getGroup((int)ltrim($this->match, '$'));
             }
         } catch (Exception $e) {
             throw new BuildException($e);
         }
 
         return $output;
-    }
-
-    /**
-     * @throws BuildException
-     */
-    protected function validate()
-    {
-        if ($this->pattern === null) {
-            throw new BuildException('No match expression specified.');
-        }
-        if ($this->replace === null && $this->match === null) {
-            throw new BuildException(
-                'You must specify either a preg_replace or preg_match pattern'
-            );
-        }
-    }
-
-    /**
-     * @throws BuildException
-     */
-    public function main()
-    {
-        $this->validate();
-
-        $output = $this->match;
-
-        if ($this->replace !== null) {
-            $output = $this->doReplace();
-        } else {
-            $output = $this->doSelect();
-        }
-
-        if ($output !== null) {
-            $this->setPropertyValue($output);
-        }
     }
 }

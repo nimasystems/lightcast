@@ -42,69 +42,63 @@ class PropelPDO extends PDO
 
     const DEFAULT_SLOW_THRESHOLD = 0.1;
     const DEFAULT_ONLYSLOW_ENABLED = false;
-
     /**
-     * The current transaction depth.
+     * The default value for runtime config item "debugpdo.logging.methods".
      *
-     * @var       integer
+     * @var       array
      */
-    protected $nestedTransactionCount = 0;
-
-    /**
-     * Cache of prepared statements (PDOStatement) keyed by md5 of SQL.
-     *
-     * @var       array  [md5(sql) => PDOStatement]
-     */
-    protected $preparedStatements = array();
-
-    /**
-     * Whether to cache prepared statements.
-     *
-     * @var       boolean
-     */
-    protected $cachePreparedStatements = false;
-
-    /**
-     * Whether the final commit is possible
-     * Is false if a nested transaction is rolled back
-     */
-    protected $isUncommitable = false;
-
-    /**
-     * Count of queries performed.
-     *
-     * @var       integer
-     */
-    protected $queryCount = 0;
-
-    /**
-     * SQL code of the latest performed query.
-     *
-     * @var       string
-     */
-    protected $lastExecutedQuery;
-
+    protected static $defaultLogMethods = [
+        'PropelPDO::exec',
+        'PropelPDO::query',
+        'DebugPDOStatement::execute',
+    ];
     /**
      * Whether or not the debug is enabled
      *
      * @var       boolean
      */
     public $useDebug = false;
-
+    /**
+     * The current transaction depth.
+     *
+     * @var       integer
+     */
+    protected $nestedTransactionCount = 0;
+    /**
+     * Cache of prepared statements (PDOStatement) keyed by md5 of SQL.
+     *
+     * @var       array  [md5(sql) => PDOStatement]
+     */
+    protected $preparedStatements = [];
+    /**
+     * Whether to cache prepared statements.
+     *
+     * @var       boolean
+     */
+    protected $cachePreparedStatements = false;
+    /**
+     * Whether the final commit is possible
+     * Is false if a nested transaction is rolled back
+     */
+    protected $isUncommitable = false;
+    /**
+     * Count of queries performed.
+     *
+     * @var       integer
+     */
+    protected $queryCount = 0;
+    /**
+     * SQL code of the latest performed query.
+     *
+     * @var       string
+     */
+    protected $lastExecutedQuery;
     /**
      * Configured BasicLogger (or compatible) logger.
      *
      * @var       BasicLogger
      */
     protected $logger;
-
-    /**
-     * The log level to use for logging.
-     *
-     * @var       integer
-     */
-    private $logLevel = Propel::LOG_DEBUG;
-
     /**
      * The runtime configuration
      *
@@ -118,17 +112,12 @@ class PropelPDO extends PDO
      * @var string
      */
     protected $connectionName;
-
     /**
-     * The default value for runtime config item "debugpdo.logging.methods".
+     * The log level to use for logging.
      *
-     * @var       array
+     * @var       integer
      */
-    protected static $defaultLogMethods = array(
-        'PropelPDO::exec',
-        'PropelPDO::query',
-        'DebugPDOStatement::execute',
-    );
+    private $logLevel = Propel::LOG_DEBUG;
 
     /**
      * Creates a PropelPDO instance representing a connection to a database.
@@ -137,14 +126,14 @@ class PropelPDO extends PDO
      * to the log with the state of this object just after its initialization.
      * Add PropelPDO::__construct to $defaultLogMethods to see this message
      *
-     * @param string $dsn            Connection DSN.
-     * @param string $username       The user name for the DSN string.
-     * @param string $password       The password for the DSN string.
-     * @param array  $driver_options A key=>value array of driver-specific connection options.
+     * @param string $dsn Connection DSN.
+     * @param string $username The user name for the DSN string.
+     * @param string $password The password for the DSN string.
+     * @param array $driver_options A key=>value array of driver-specific connection options.
      *
      * @throws PDOException if there is an error during connection initialization.
      */
-    public function __construct($dsn, $username = null, $password = null, $driver_options = array())
+    public function __construct($dsn, $username = null, $password = null, $driver_options = [])
     {
         if ($this->useDebug) {
             $debug = $this->getDebugSnapshot();
@@ -159,13 +148,38 @@ class PropelPDO extends PDO
     }
 
     /**
-     * Inject the runtime configuration
+     * Returns a snapshot of the current values of some functions useful in debugging.
      *
-     * @param PropelConfiguration $configuration
+     * @return array
+     *
+     * @throws PropelException
      */
-    public function setConfiguration($configuration)
+    public function getDebugSnapshot()
     {
-        $this->configuration = $configuration;
+        if ($this->useDebug) {
+            return [
+                'microtime' => microtime(true),
+                'memory_get_usage' => memory_get_usage($this->getLoggingConfig('realmemoryusage', false)),
+                'memory_get_peak_usage' => memory_get_peak_usage($this->getLoggingConfig('realmemoryusage', false)),
+            ];
+        } else {
+            throw new PropelException('Should not get debug snapshot when not debugging');
+        }
+    }
+
+    /**
+     * Returns a named configuration item from the Propel runtime configuration, from under the
+     * 'debugpdo.logging' prefix.  If such a configuration setting hasn't been set, the given default
+     * value will be returned.
+     *
+     * @param string $key Key for which to return the value.
+     * @param mixed $defaultValue Default value to apply if config item hasn't been set.
+     *
+     * @return mixed
+     */
+    protected function getLoggingConfig($key, $defaultValue)
+    {
+        return $this->getConfiguration()->getParameter("debugpdo.logging.$key", $defaultValue);
     }
 
     /**
@@ -180,6 +194,279 @@ class PropelPDO extends PDO
         }
 
         return $this->configuration;
+    }
+
+    /**
+     * Inject the runtime configuration
+     *
+     * @param PropelConfiguration $configuration
+     */
+    public function setConfiguration($configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
+    /**
+     * Configures the PDOStatement class for this connection.
+     *
+     * @param string $class
+     * @param boolean $suppressError Whether to suppress an exception if the statement class cannot be set.
+     *
+     * @throws PropelException if the statement class cannot be set (and $suppressError is false).
+     */
+    protected function configureStatementClass($class = 'PDOStatement', $suppressError = true)
+    {
+        // extending PDOStatement is only supported with non-persistent connections
+        if (!$this->getAttribute(PDO::ATTR_PERSISTENT)) {
+            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, [$class, [$this]]);
+        } else if (!$suppressError) {
+            throw new PropelException('Extending PDOStatement is not supported with persistent connections.');
+        }
+    }
+
+    /**
+     * Gets a connection attribute.
+     *
+     * This is overridden here to provide support for setting Propel-specific attributes too.
+     *
+     * @param integer $attribute The attribute to get (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
+     *
+     * @return mixed
+     */
+    public function getAttribute($attribute)
+    {
+        switch ($attribute) {
+            case self::PROPEL_ATTR_CACHE_PREPARES:
+                return $this->cachePreparedStatements;
+                break;
+            case self::PROPEL_ATTR_CONNECTION_NAME:
+                return $this->connectionName;
+                break;
+            default:
+                return parent::getAttribute($attribute);
+        }
+    }
+
+    /**
+     * Sets a connection attribute.
+     *
+     * This is overridden here to provide support for setting Propel-specific attributes too.
+     *
+     * @param integer $attribute The attribute to set (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
+     * @param mixed $value The attribute value.
+     *
+     * @return void
+     */
+    public function setAttribute($attribute, $value)
+    {
+        switch ($attribute) {
+            case self::PROPEL_ATTR_CACHE_PREPARES:
+                $this->cachePreparedStatements = $value;
+                break;
+            case self::PROPEL_ATTR_CONNECTION_NAME:
+                $this->connectionName = $value;
+                break;
+            default:
+                parent::setAttribute($attribute, $value);
+        }
+    }
+
+    /**
+     * Logs the method call or SQL using the Propel::log() method or a registered logger class.
+     *
+     * @param string $msg Message to log.
+     * @param integer $level Log level to use; will use self::setLogLevel() specified level by default.
+     * @param string $methodName Name of the method whose execution is being logged.
+     * @param array $debugSnapshot Previous return value from self::getDebugSnapshot().
+     * @uses      self::getLogPrefix()
+     * @see       self::setLogger()
+     *
+     */
+    public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
+    {
+        // If logging has been specifically disabled, this method won't do anything
+        if (!$this->getLoggingConfig('enabled', true)) {
+            return;
+        }
+
+        // If the method being logged isn't one of the ones to be logged, bail
+        if (!in_array($methodName, $this->getLoggingConfig('methods', self::$defaultLogMethods))) {
+            return;
+        }
+
+        // If a logging level wasn't provided, use the default one
+        if ($level === null) {
+            $level = $this->logLevel;
+        }
+
+        // Determine if this query is slow enough to warrant logging
+        if ($this->getLoggingConfig("onlyslow", self::DEFAULT_ONLYSLOW_ENABLED)) {
+            $now = $this->getDebugSnapshot();
+            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig("details.slow.threshold", self::DEFAULT_SLOW_THRESHOLD)) {
+                return;
+            }
+        }
+
+        // If the necessary additional parameters were given, get the debug log prefix for the log line
+        if ($methodName && $debugSnapshot) {
+            $msg = $this->getLogPrefix($methodName, $debugSnapshot) . $msg;
+        }
+
+        // We won't log empty messages
+        if (!$msg) {
+            return;
+        }
+
+        // Delegate the actual logging forward
+        if ($this->logger) {
+            $this->logger->log($msg, $level);
+        } else {
+            Propel::log($msg, $level);
+        }
+    }
+
+    /**
+     * Returns a prefix that may be prepended to a log line, containing debug information according
+     * to the current configuration.
+     *
+     * Uses a given $debugSnapshot to calculate how much time has passed since the call to self::getDebugSnapshot(),
+     * how much the memory consumption by PHP has changed etc.
+     *
+     * @param string $methodName Name of the method whose execution is being logged.
+     * @param array $debugSnapshot A previous return value from self::getDebugSnapshot().
+     *
+     * @return string
+     * @see       self::getDebugSnapshot()
+     *
+     */
+    protected function getLogPrefix($methodName, $debugSnapshot)
+    {
+        $config = $this->getConfiguration()->getParameters();
+        if (!isset($config['debugpdo']['logging']['details'])) {
+            return '';
+        }
+        $prefix = '';
+        $logDetails = $config['debugpdo']['logging']['details'];
+        $now = $this->getDebugSnapshot();
+        $innerGlue = $this->getLoggingConfig('innerglue', ': ');
+        $outerGlue = $this->getLoggingConfig('outerglue', ' | ');
+
+        // Iterate through each detail that has been configured to be enabled
+        foreach ($logDetails as $detailName => $details) {
+
+            if (!$this->getLoggingConfig("details.$detailName.enabled", false)) {
+                continue;
+            }
+
+            switch ($detailName) {
+
+                case 'slow';
+                    $value = $now['microtime'] - $debugSnapshot['microtime'] >= $this->getLoggingConfig('details.slow.threshold', self::DEFAULT_SLOW_THRESHOLD) ? 'YES' : ' NO';
+                    break;
+
+                case 'time':
+                    $value = number_format($now['microtime'] - $debugSnapshot['microtime'], $this->getLoggingConfig('details.time.precision', 3)) . ' sec';
+                    $value = str_pad($value, $this->getLoggingConfig('details.time.pad', 10), ' ', STR_PAD_LEFT);
+                    break;
+
+                case 'mem':
+                    $value = self::getReadableBytes($now['memory_get_usage'], $this->getLoggingConfig('details.mem.precision', 1));
+                    $value = str_pad($value, $this->getLoggingConfig('details.mem.pad', 9), ' ', STR_PAD_LEFT);
+                    break;
+
+                case 'memdelta':
+                    $value = $now['memory_get_usage'] - $debugSnapshot['memory_get_usage'];
+                    $value = ($value > 0 ? '+' : '') . self::getReadableBytes($value, $this->getLoggingConfig('details.memdelta.precision', 1));
+                    $value = str_pad($value, $this->getLoggingConfig('details.memdelta.pad', 10), ' ', STR_PAD_LEFT);
+                    break;
+
+                case 'mempeak':
+                    $value = self::getReadableBytes($now['memory_get_peak_usage'], $this->getLoggingConfig('details.mempeak.precision', 1));
+                    $value = str_pad($value, $this->getLoggingConfig('details.mempeak.pad', 9), ' ', STR_PAD_LEFT);
+                    break;
+
+                case 'querycount':
+                    $value = str_pad($this->getQueryCount(), $this->getLoggingConfig('details.querycount.pad', 2), ' ', STR_PAD_LEFT);
+                    break;
+
+                case 'method':
+                    $value = str_pad($methodName, $this->getLoggingConfig('details.method.pad', 28), ' ', STR_PAD_RIGHT);
+                    break;
+
+                case 'connection':
+                    $value = $this->connectionName;
+                    break;
+
+                default:
+                    $value = 'n/a';
+                    break;
+            }
+
+            $prefix .= $detailName . $innerGlue . $value . $outerGlue;
+        }
+
+        return $prefix;
+    }
+
+    /**
+     * Returns a human-readable representation of the given byte count.
+     *
+     * @param integer $bytes Byte count to convert.
+     * @param integer $precision How many decimals to include.
+     *
+     * @return string
+     */
+    protected function getReadableBytes($bytes, $precision)
+    {
+        $suffix = ['B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+        $total = count($suffix);
+
+        for ($i = 0; $bytes > 1024 && $i < $total; $i++) {
+            $bytes /= 1024;
+        }
+
+        return number_format($bytes, $precision) . ' ' . $suffix[$i];
+    }
+
+    /**
+     * Returns the number of queries this DebugPDO instance has performed on the database connection.
+     *
+     * When using DebugPDOStatement as the statement class, any queries by DebugPDOStatement instances
+     * are counted as well.
+     *
+     * @return integer
+     * @throws PropelException if persistent connection is used (since unable to override PDOStatement in that case).
+     */
+    public function getQueryCount()
+    {
+        // extending PDOStatement is not supported with persistent connections
+        if ($this->getAttribute(PDO::ATTR_PERSISTENT)) {
+            throw new PropelException('Extending PDOStatement is not supported with persistent connections. Count would be inaccurate, because we cannot count the PDOStatment::execute() calls. Either don\'t use persistent connections or don\'t call PropelPDO::getQueryCount()');
+        }
+
+        return $this->queryCount;
+    }
+
+    /**
+     * Check whether the connection contains a transaction that can be committed.
+     * To be used in an environment where Propelexceptions are caught.
+     *
+     * @return boolean True if the connection is in a committable transaction
+     */
+    public function isCommitable()
+    {
+        return $this->isInTransaction() && !$this->isUncommitable;
+    }
+
+    /**
+     * Is this PDO connection currently in-transaction?
+     * This is equivalent to asking whether the current nested transaction count is greater than 0.
+     *
+     * @return boolean
+     */
+    public function isInTransaction()
+    {
+        return ($this->getNestedTransactionCount() > 0);
     }
 
     /**
@@ -200,28 +487,6 @@ class PropelPDO extends PDO
     protected function setNestedTransactionCount($v)
     {
         $this->nestedTransactionCount = $v;
-    }
-
-    /**
-     * Is this PDO connection currently in-transaction?
-     * This is equivalent to asking whether the current nested transaction count is greater than 0.
-     *
-     * @return boolean
-     */
-    public function isInTransaction()
-    {
-        return ($this->getNestedTransactionCount() > 0);
-    }
-
-    /**
-     * Check whether the connection contains a transaction that can be committed.
-     * To be used in an environment where Propelexceptions are caught.
-     *
-     * @return boolean True if the connection is in a committable transaction
-     */
-    public function isCommitable()
-    {
-        return $this->isInTransaction() && !$this->isUncommitable;
     }
 
     /**
@@ -330,66 +595,19 @@ class PropelPDO extends PDO
     }
 
     /**
-     * Sets a connection attribute.
-     *
-     * This is overridden here to provide support for setting Propel-specific attributes too.
-     *
-     * @param integer $attribute The attribute to set (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
-     * @param mixed   $value     The attribute value.
-     *
-     * @return void
-     */
-    public function setAttribute($attribute, $value)
-    {
-        switch ($attribute) {
-            case self::PROPEL_ATTR_CACHE_PREPARES:
-                $this->cachePreparedStatements = $value;
-                break;
-            case self::PROPEL_ATTR_CONNECTION_NAME:
-                $this->connectionName = $value;
-                break;
-            default:
-                parent::setAttribute($attribute, $value);
-        }
-    }
-
-    /**
-     * Gets a connection attribute.
-     *
-     * This is overridden here to provide support for setting Propel-specific attributes too.
-     *
-     * @param integer $attribute The attribute to get (e.g. PropelPDO::PROPEL_ATTR_CACHE_PREPARES).
-     *
-     * @return mixed
-     */
-    public function getAttribute($attribute)
-    {
-        switch ($attribute) {
-            case self::PROPEL_ATTR_CACHE_PREPARES:
-                return $this->cachePreparedStatements;
-                break;
-            case self::PROPEL_ATTR_CONNECTION_NAME:
-                return $this->connectionName;
-                break;
-            default:
-                return parent::getAttribute($attribute);
-        }
-    }
-
-    /**
      * Prepares a statement for execution and returns a statement object.
      *
      * Overrides PDO::prepare() in order to:
      *  - Add logging and query counting if logging is true.
      *  - Add query caching support if the PropelPDO::PROPEL_ATTR_CACHE_PREPARES was set to true.
      *
-     * @param string $sql            This must be a valid SQL statement for the target database server.
-     * @param array  $driver_options One $array or more key => value pairs to set attribute values
+     * @param string $sql This must be a valid SQL statement for the target database server.
+     * @param array $driver_options One $array or more key => value pairs to set attribute values
      *                                      for the PDOStatement object that this method returns.
      *
      * @return PDOStatement
      */
-    public function prepare($sql, $driver_options = array())
+    public function prepare($sql, $driver_options = [])
     {
         if ($this->useDebug) {
             $debug = $this->getDebugSnapshot();
@@ -439,6 +657,18 @@ class PropelPDO extends PDO
     }
 
     /**
+     * Increments the number of queries performed by this DebugPDO instance.
+     *
+     * Returns the original number of queries (ie the value of $this->queryCount before calling this method).
+     *
+     * @return integer
+     */
+    public function incrementQueryCount()
+    {
+        $this->queryCount++;
+    }
+
+    /**
      * Executes an SQL statement, returning a result set as a PDOStatement object.
      * Despite its signature here, this method takes a variety of parameters.
      *
@@ -456,7 +686,7 @@ class PropelPDO extends PDO
 
         $args = func_get_args();
         if (version_compare(PHP_VERSION, '5.3', '<')) {
-            $return = call_user_func_array(array($this, 'parent::query'), $args);
+            $return = call_user_func_array([$this, 'parent::query'], $args);
         } else {
             $return = call_user_func_array('parent::query', $args);
         }
@@ -469,63 +699,6 @@ class PropelPDO extends PDO
         }
 
         return $return;
-    }
-
-    /**
-     * Clears any stored prepared statements for this connection.
-     */
-    public function clearStatementCache()
-    {
-        $this->preparedStatements = array();
-    }
-
-    /**
-     * Configures the PDOStatement class for this connection.
-     *
-     * @param string  $class
-     * @param boolean $suppressError Whether to suppress an exception if the statement class cannot be set.
-     *
-     * @throws PropelException if the statement class cannot be set (and $suppressError is false).
-     */
-    protected function configureStatementClass($class = 'PDOStatement', $suppressError = true)
-    {
-        // extending PDOStatement is only supported with non-persistent connections
-        if (!$this->getAttribute(PDO::ATTR_PERSISTENT)) {
-            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array($class, array($this)));
-        } elseif (!$suppressError) {
-            throw new PropelException('Extending PDOStatement is not supported with persistent connections.');
-        }
-    }
-
-    /**
-     * Returns the number of queries this DebugPDO instance has performed on the database connection.
-     *
-     * When using DebugPDOStatement as the statement class, any queries by DebugPDOStatement instances
-     * are counted as well.
-     *
-     * @throws PropelException if persistent connection is used (since unable to override PDOStatement in that case).
-     * @return integer
-     */
-    public function getQueryCount()
-    {
-        // extending PDOStatement is not supported with persistent connections
-        if ($this->getAttribute(PDO::ATTR_PERSISTENT)) {
-            throw new PropelException('Extending PDOStatement is not supported with persistent connections. Count would be inaccurate, because we cannot count the PDOStatment::execute() calls. Either don\'t use persistent connections or don\'t call PropelPDO::getQueryCount()');
-        }
-
-        return $this->queryCount;
-    }
-
-    /**
-     * Increments the number of queries performed by this DebugPDO instance.
-     *
-     * Returns the original number of queries (ie the value of $this->queryCount before calling this method).
-     *
-     * @return integer
-     */
-    public function incrementQueryCount()
-    {
-        $this->queryCount++;
     }
 
     /**
@@ -559,12 +732,20 @@ class PropelPDO extends PDO
             $this->configureStatementClass('DebugPDOStatement', true);
         } else {
             // reset query logging
-            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, array('PDOStatement'));
+            $this->setAttribute(PDO::ATTR_STATEMENT_CLASS, ['PDOStatement']);
             $this->setLastExecutedQuery('');
             $this->queryCount = 0;
         }
         $this->clearStatementCache();
         $this->useDebug = $value;
+    }
+
+    /**
+     * Clears any stored prepared statements for this connection.
+     */
+    public function clearStatementCache()
+    {
+        $this->preparedStatements = [];
     }
 
     /**
@@ -578,18 +759,6 @@ class PropelPDO extends PDO
     }
 
     /**
-     * Sets a logger to use.
-     *
-     * The logger will be used by this class to log various method calls and their properties.
-     *
-     * @param BasicLogger $logger A Logger with an API compatible with BasicLogger (or PEAR Log).
-     */
-    public function setLogger($logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
      * Gets the logger in use.
      *
      * @return BasicLogger A Logger with an API compatible with BasicLogger (or PEAR Log).
@@ -600,195 +769,15 @@ class PropelPDO extends PDO
     }
 
     /**
-     * Logs the method call or SQL using the Propel::log() method or a registered logger class.
+     * Sets a logger to use.
      *
-     * @uses      self::getLogPrefix()
-     * @see       self::setLogger()
+     * The logger will be used by this class to log various method calls and their properties.
      *
-     * @param string  $msg           Message to log.
-     * @param integer $level         Log level to use; will use self::setLogLevel() specified level by default.
-     * @param string  $methodName    Name of the method whose execution is being logged.
-     * @param array   $debugSnapshot Previous return value from self::getDebugSnapshot().
+     * @param BasicLogger $logger A Logger with an API compatible with BasicLogger (or PEAR Log).
      */
-    public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
+    public function setLogger($logger)
     {
-        // If logging has been specifically disabled, this method won't do anything
-        if (!$this->getLoggingConfig('enabled', true)) {
-            return;
-        }
-
-        // If the method being logged isn't one of the ones to be logged, bail
-        if (!in_array($methodName, $this->getLoggingConfig('methods', self::$defaultLogMethods))) {
-            return;
-        }
-
-        // If a logging level wasn't provided, use the default one
-        if ($level === null) {
-            $level = $this->logLevel;
-        }
-
-        // Determine if this query is slow enough to warrant logging
-        if ($this->getLoggingConfig("onlyslow", self::DEFAULT_ONLYSLOW_ENABLED)) {
-            $now = $this->getDebugSnapshot();
-            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig("details.slow.threshold", self::DEFAULT_SLOW_THRESHOLD)) {
-                return;
-            }
-        }
-
-        // If the necessary additional parameters were given, get the debug log prefix for the log line
-        if ($methodName && $debugSnapshot) {
-            $msg = $this->getLogPrefix($methodName, $debugSnapshot) . $msg;
-        }
-
-        // We won't log empty messages
-        if (!$msg) {
-            return;
-        }
-
-        // Delegate the actual logging forward
-        if ($this->logger) {
-            $this->logger->log($msg, $level);
-        } else {
-            Propel::log($msg, $level);
-        }
-    }
-
-    /**
-     * Returns a snapshot of the current values of some functions useful in debugging.
-     *
-     * @return array
-     *
-     * @throws PropelException
-     */
-    public function getDebugSnapshot()
-    {
-        if ($this->useDebug) {
-            return array(
-                'microtime'             => microtime(true),
-                'memory_get_usage'      => memory_get_usage($this->getLoggingConfig('realmemoryusage', false)),
-                'memory_get_peak_usage' => memory_get_peak_usage($this->getLoggingConfig('realmemoryusage', false)),
-                );
-        } else {
-            throw new PropelException('Should not get debug snapshot when not debugging');
-        }
-    }
-
-    /**
-     * Returns a named configuration item from the Propel runtime configuration, from under the
-     * 'debugpdo.logging' prefix.  If such a configuration setting hasn't been set, the given default
-     * value will be returned.
-     *
-     * @param string $key          Key for which to return the value.
-     * @param mixed  $defaultValue Default value to apply if config item hasn't been set.
-     *
-     * @return mixed
-     */
-    protected function getLoggingConfig($key, $defaultValue)
-    {
-        return $this->getConfiguration()->getParameter("debugpdo.logging.$key", $defaultValue);
-    }
-
-    /**
-     * Returns a prefix that may be prepended to a log line, containing debug information according
-     * to the current configuration.
-     *
-     * Uses a given $debugSnapshot to calculate how much time has passed since the call to self::getDebugSnapshot(),
-     * how much the memory consumption by PHP has changed etc.
-     *
-     * @see       self::getDebugSnapshot()
-     *
-     * @param string $methodName    Name of the method whose execution is being logged.
-     * @param array  $debugSnapshot A previous return value from self::getDebugSnapshot().
-     *
-     * @return string
-     */
-    protected function getLogPrefix($methodName, $debugSnapshot)
-    {
-        $config = $this->getConfiguration()->getParameters();
-        if (!isset($config['debugpdo']['logging']['details'])) {
-            return '';
-        }
-        $prefix = '';
-        $logDetails = $config['debugpdo']['logging']['details'];
-        $now = $this->getDebugSnapshot();
-        $innerGlue = $this->getLoggingConfig('innerglue', ': ');
-        $outerGlue = $this->getLoggingConfig('outerglue', ' | ');
-
-        // Iterate through each detail that has been configured to be enabled
-        foreach ($logDetails as $detailName => $details) {
-
-            if (!$this->getLoggingConfig("details.$detailName.enabled", false)) {
-                continue;
-            }
-
-            switch ($detailName) {
-
-                case 'slow';
-                    $value = $now['microtime'] - $debugSnapshot['microtime'] >= $this->getLoggingConfig('details.slow.threshold', self::DEFAULT_SLOW_THRESHOLD) ? 'YES' : ' NO';
-                    break;
-
-                case 'time':
-                    $value = number_format($now['microtime'] - $debugSnapshot['microtime'], $this->getLoggingConfig('details.time.precision', 3)) . ' sec';
-                    $value = str_pad($value, $this->getLoggingConfig('details.time.pad', 10), ' ', STR_PAD_LEFT);
-                    break;
-
-                case 'mem':
-                    $value = self::getReadableBytes($now['memory_get_usage'], $this->getLoggingConfig('details.mem.precision', 1));
-                    $value = str_pad($value, $this->getLoggingConfig('details.mem.pad', 9), ' ', STR_PAD_LEFT);
-                    break;
-
-                case 'memdelta':
-                    $value = $now['memory_get_usage'] - $debugSnapshot['memory_get_usage'];
-                    $value = ($value > 0 ? '+' : '') . self::getReadableBytes($value, $this->getLoggingConfig('details.memdelta.precision', 1));
-                    $value = str_pad($value, $this->getLoggingConfig('details.memdelta.pad', 10), ' ', STR_PAD_LEFT);
-                    break;
-
-                case 'mempeak':
-                    $value = self::getReadableBytes($now['memory_get_peak_usage'], $this->getLoggingConfig('details.mempeak.precision', 1));
-                    $value = str_pad($value, $this->getLoggingConfig('details.mempeak.pad', 9), ' ', STR_PAD_LEFT);
-                    break;
-
-                case 'querycount':
-                    $value = str_pad($this->getQueryCount(), $this->getLoggingConfig('details.querycount.pad', 2), ' ', STR_PAD_LEFT);
-                    break;
-
-                case 'method':
-                    $value = str_pad($methodName, $this->getLoggingConfig('details.method.pad', 28), ' ', STR_PAD_RIGHT);
-                    break;
-
-                case 'connection':
-                    $value = $this->connectionName;
-                    break;
-
-                default:
-                    $value = 'n/a';
-                    break;
-            }
-
-            $prefix .= $detailName . $innerGlue . $value . $outerGlue;
-        }
-
-        return $prefix;
-    }
-
-    /**
-     * Returns a human-readable representation of the given byte count.
-     *
-     * @param integer $bytes     Byte count to convert.
-     * @param integer $precision How many decimals to include.
-     *
-     * @return string
-     */
-    protected function getReadableBytes($bytes, $precision)
-    {
-        $suffix = array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
-        $total = count($suffix);
-
-        for ($i = 0; $bytes > 1024 && $i < $total; $i++) {
-            $bytes /= 1024;
-        }
-
-        return number_format($bytes, $precision) . ' ' . $suffix[$i];
+        $this->logger = $logger;
     }
 
     /**

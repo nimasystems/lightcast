@@ -547,83 +547,83 @@ class lcHttpStatusCode
     {
         if ($intcode == self::CONTINUE_REQUEST) {
             return self::CONTINUE_REQUEST_MESSAGE;
-        } elseif ($intcode == self::SWITCHING_PROTOCOLS) {
+        } else if ($intcode == self::SWITCHING_PROTOCOLS) {
             return self::SWITCHING_PROTOCOLS_MESSAGE;
-        } elseif ($intcode == self::OK) {
+        } else if ($intcode == self::OK) {
             return self::OK_MESSAGE;
-        } elseif ($intcode == self::CREATED) {
+        } else if ($intcode == self::CREATED) {
             return self::CREATED_MESSAGE;
-        } elseif ($intcode == self::ACCEPTED) {
+        } else if ($intcode == self::ACCEPTED) {
             return self::ACCEPTED_MESSAGE;
-        } elseif ($intcode == self::NON_AUTHORITIVE) {
+        } else if ($intcode == self::NON_AUTHORITIVE) {
             return self::NON_AUTHORITIVE_MESSAGE;
-        } elseif ($intcode == self::NORESPONSE) {
+        } else if ($intcode == self::NORESPONSE) {
             return self::NORESPONSE_MESSAGE;
-        } elseif ($intcode == self::RESET_CONTENT) {
+        } else if ($intcode == self::RESET_CONTENT) {
             return self::RESET_CONTENT_MESSAGE;
-        } elseif ($intcode == self::PARTIAL) {
+        } else if ($intcode == self::PARTIAL) {
             return self::PARTIAL_MESSAGE;
-        } elseif ($intcode == self::BAD_REQUEST) {
+        } else if ($intcode == self::BAD_REQUEST) {
             return self::BAD_REQUEST_MESSAGE;
-        } elseif ($intcode == self::UNAUTHORIZED) {
+        } else if ($intcode == self::UNAUTHORIZED) {
             return self::UNAUTHORIZED_MESSAGE;
-        } elseif ($intcode == self::PAYMENT_REQUIRED) {
+        } else if ($intcode == self::PAYMENT_REQUIRED) {
             return self::PAYMENT_REQUIRED_MESSAGE;
-        } elseif ($intcode == self::FORBIDDEN) {
+        } else if ($intcode == self::FORBIDDEN) {
             return self::FORBIDDEN_MESSAGE;
-        } elseif ($intcode == self::NOT_FOUND) {
+        } else if ($intcode == self::NOT_FOUND) {
             return self::NOT_FOUND_MESSAGE;
-        } elseif ($intcode == self::METHOD_NOT_ALLOWED) {
+        } else if ($intcode == self::METHOD_NOT_ALLOWED) {
             return self::METHOD_NOT_ALLOWED_MESSAGE;
-        } elseif ($intcode == self::NOT_ACCEPTABLE) {
+        } else if ($intcode == self::NOT_ACCEPTABLE) {
             return self::NOT_ACCEPTABLE_MESSAGE;
-        } elseif ($intcode == self::PROXY_AUTH_REQUIRED) {
+        } else if ($intcode == self::PROXY_AUTH_REQUIRED) {
             return self::PROXY_AUTH_REQUIRED_MESSAGE;
-        } elseif ($intcode == self::REQUEST_TIMEOUT) {
+        } else if ($intcode == self::REQUEST_TIMEOUT) {
             return self::REQUEST_TIMEOUT_MESSAGE;
-        } elseif ($intcode == self::CONFLICT) {
+        } else if ($intcode == self::CONFLICT) {
             return self::CONFLICT_MESSAGE;
-        } elseif ($intcode == self::GONE) {
+        } else if ($intcode == self::GONE) {
             return self::GONE_MESSAGE;
-        } elseif ($intcode == self::LENGTH_REQUIRED) {
+        } else if ($intcode == self::LENGTH_REQUIRED) {
             return self::LENGTH_REQUIRED_MESSAGE;
-        } elseif ($intcode == self::PRECONDITION_FAILED) {
+        } else if ($intcode == self::PRECONDITION_FAILED) {
             return self::PRECONDITION_FAILED_MESSAGE;
-        } elseif ($intcode == self::REQUEST_ENTITY_TOO_LARGE) {
+        } else if ($intcode == self::REQUEST_ENTITY_TOO_LARGE) {
             return self::REQUEST_ENTITY_TOO_LARGE_MESSAGE;
-        } elseif ($intcode == self::REQUEST_URI_TOO_LONG) {
+        } else if ($intcode == self::REQUEST_URI_TOO_LONG) {
             return self::REQUEST_URI_TOO_LONG_MESSAGE;
-        } elseif ($intcode == self::UNSUPPORTED_MEDIA_TYPE) {
+        } else if ($intcode == self::UNSUPPORTED_MEDIA_TYPE) {
             return self::UNSUPPORTED_MEDIA_TYPE_MESSAGE;
-        } elseif ($intcode == self::REQUEST_RANGE_NOT_SATISFIABLE) {
+        } else if ($intcode == self::REQUEST_RANGE_NOT_SATISFIABLE) {
             return self::REQUEST_RANGE_NOT_SATISFIABLE_MESSAGE;
-        } elseif ($intcode == self::EXPECTATION_FAILED) {
+        } else if ($intcode == self::EXPECTATION_FAILED) {
             return self::EXPECTATION_FAILED_MESSAGE;
-        } elseif ($intcode == self::INTERNAL_ERROR) {
+        } else if ($intcode == self::INTERNAL_ERROR) {
             return self::INTERNAL_ERROR_MESSAGE;
-        } elseif ($intcode == self::NOT_IMPLEMENTED) {
+        } else if ($intcode == self::NOT_IMPLEMENTED) {
             return self::NOT_IMPLEMENTED_MESSAGE;
-        } elseif ($intcode == self::BAD_GATEWAY) {
+        } else if ($intcode == self::BAD_GATEWAY) {
             return self::BAD_GATEWAY_MESSAGE;
-        } elseif ($intcode == self::SERVICE_UNAVAILABLE) {
+        } else if ($intcode == self::SERVICE_UNAVAILABLE) {
             return self::SERVICE_UNAVAILABLE_MESSAGE;
-        } elseif ($intcode == self::GATEWAY_TIMEOUT) {
+        } else if ($intcode == self::GATEWAY_TIMEOUT) {
             return self::GATEWAY_TIMEOUT_MESSAGE;
-        } elseif ($intcode == self::HTTP_VER_NOT_SUPPORTED) {
+        } else if ($intcode == self::HTTP_VER_NOT_SUPPORTED) {
             return self::HTTP_VER_NOT_SUPPORTED_MESSAGE;
-        } elseif ($intcode == self::MULTIPLY_CHOICES) {
+        } else if ($intcode == self::MULTIPLY_CHOICES) {
             return self::MULTIPLY_CHOICES_MESSAGE;
-        } elseif ($intcode == self::MOVED) {
+        } else if ($intcode == self::MOVED) {
             return self::MOVED_MESSAGE;
-        } elseif ($intcode == self::FOUND) {
+        } else if ($intcode == self::FOUND) {
             return self::FOUND_MESSAGE;
-        } elseif ($intcode == self::SEE_OTHER) {
+        } else if ($intcode == self::SEE_OTHER) {
             return self::SEE_OTHER_MESSAGE;
-        } elseif ($intcode == self::NOT_MODIFIED) {
+        } else if ($intcode == self::NOT_MODIFIED) {
             return self::NOT_MODIFIED_MESSAGE;
-        } elseif ($intcode == self::USE_PROXY) {
+        } else if ($intcode == self::USE_PROXY) {
             return self::USE_PROXY_MESSAGE;
-        } elseif ($intcode == self::TEMPORARY_REDIRECT) {
+        } else if ($intcode == self::TEMPORARY_REDIRECT) {
             return self::TEMPORARY_REDIRECT_MESSAGE;
         } else {
             return false;
@@ -634,83 +634,83 @@ class lcHttpStatusCode
     {
         if ($intcode == 100) {
             return self::CONTINUE_REQUEST;
-        } elseif ($intcode == 101) {
+        } else if ($intcode == 101) {
             return self::SWITCHING_PROTOCOLS;
-        } elseif ($intcode == 200) {
+        } else if ($intcode == 200) {
             return self::OK;
-        } elseif ($intcode == 201) {
+        } else if ($intcode == 201) {
             return self::CREATED;
-        } elseif ($intcode == 202) {
+        } else if ($intcode == 202) {
             return self::ACCEPTED;
-        } elseif ($intcode == 203) {
+        } else if ($intcode == 203) {
             return self::NON_AUTHORITIVE;
-        } elseif ($intcode == 204) {
+        } else if ($intcode == 204) {
             return self::NORESPONSE;
-        } elseif ($intcode == 205) {
+        } else if ($intcode == 205) {
             return self::RESET_CONTENT;
-        } elseif ($intcode == 206) {
+        } else if ($intcode == 206) {
             return self::PARTIAL;
-        } elseif ($intcode == 300) {
+        } else if ($intcode == 300) {
             return self::MULTIPLY_CHOICES;
-        } elseif ($intcode == 301) {
+        } else if ($intcode == 301) {
             return self::MOVED;
-        } elseif ($intcode == 302) {
+        } else if ($intcode == 302) {
             return self::FOUND;
-        } elseif ($intcode == 303) {
+        } else if ($intcode == 303) {
             return self::SEE_OTHER;
-        } elseif ($intcode == 304) {
+        } else if ($intcode == 304) {
             return self::NOT_MODIFIED;
-        } elseif ($intcode == 305) {
+        } else if ($intcode == 305) {
             return self::USE_PROXY;
-        } elseif ($intcode == 307) {
+        } else if ($intcode == 307) {
             return self::TEMPORARY_REDIRECT;
-        } elseif ($intcode == 400) {
+        } else if ($intcode == 400) {
             return self::BAD_REQUEST;
-        } elseif ($intcode == 401) {
+        } else if ($intcode == 401) {
             return self::UNAUTHORIZED;
-        } elseif ($intcode == 402) {
+        } else if ($intcode == 402) {
             return self::PAYMENT_REQUIRED;
-        } elseif ($intcode == 403) {
+        } else if ($intcode == 403) {
             return self::FORBIDDEN;
-        } elseif ($intcode == 404) {
+        } else if ($intcode == 404) {
             return self::NOT_FOUND;
-        } elseif ($intcode == 405) {
+        } else if ($intcode == 405) {
             return self::METHOD_NOT_ALLOWED;
-        } elseif ($intcode == 406) {
+        } else if ($intcode == 406) {
             return self::NOT_ACCEPTABLE;
-        } elseif ($intcode == 407) {
+        } else if ($intcode == 407) {
             return self::PROXY_AUTH_REQUIRED;
-        } elseif ($intcode == 408) {
+        } else if ($intcode == 408) {
             return self::REQUEST_TIMEOUT;
-        } elseif ($intcode == 409) {
+        } else if ($intcode == 409) {
             return self::CONFLICT;
-        } elseif ($intcode == 410) {
+        } else if ($intcode == 410) {
             return self::GONE;
-        } elseif ($intcode == 411) {
+        } else if ($intcode == 411) {
             return self::LENGTH_REQUIRED;
-        } elseif ($intcode == 412) {
+        } else if ($intcode == 412) {
             return self::PRECONDITION_FAILED;
-        } elseif ($intcode == 413) {
+        } else if ($intcode == 413) {
             return self::REQUEST_ENTITY_TOO_LARGE;
-        } elseif ($intcode == 414) {
+        } else if ($intcode == 414) {
             return self::REQUEST_URI_TOO_LONG;
-        } elseif ($intcode == 415) {
+        } else if ($intcode == 415) {
             return self::UNSUPPORTED_MEDIA_TYPE;
-        } elseif ($intcode == 416) {
+        } else if ($intcode == 416) {
             return self::REQUEST_RANGE_NOT_SATISFIABLE;
-        } elseif ($intcode == 417) {
+        } else if ($intcode == 417) {
             return self::EXPECTATION_FAILED;
-        } elseif ($intcode == 500) {
+        } else if ($intcode == 500) {
             return self::INTERNAL_ERROR;
-        } elseif ($intcode == 501) {
+        } else if ($intcode == 501) {
             return self::NOT_IMPLEMENTED;
-        } elseif ($intcode == 502) {
+        } else if ($intcode == 502) {
             return self::BAD_GATEWAY;
-        } elseif ($intcode == 503) {
+        } else if ($intcode == 503) {
             return self::SERVICE_UNAVAILABLE;
-        } elseif ($intcode == 504) {
+        } else if ($intcode == 504) {
             return self::GATEWAY_TIMEOUT;
-        } elseif ($intcode == 505) {
+        } else if ($intcode == 505) {
             return self::HTTP_VER_NOT_SUPPORTED;
         } else {
             return false;

@@ -65,15 +65,15 @@ class SelectorUtils
      * @param string $str
      * @param bool $isCaseSensitive
      *
-     * @internal param The $pattern pattern to match against. Must not be
-     *                <code>null</code>.
+     * @return bool whether or not a given path matches the start of a given
+     *                 pattern up to the first "**".
      * @internal param The $str path to match, as a String. Must not be
      *                <code>null</code>.
      * @internal param Whether $isCaseSensitive or not matching should be performed
      *                        case sensitively.
      *
-     * @return bool whether or not a given path matches the start of a given
-     *                 pattern up to the first "**".
+     * @internal param The $pattern pattern to match against. Must not be
+     *                <code>null</code>.
      */
     public static function matchPatternStart($pattern, $str, $isCaseSensitive = true)
     {
@@ -112,7 +112,7 @@ class SelectorUtils
         if ($strIdxStart > $strIdxEnd) {
             // String is exhausted
             return true;
-        } elseif ($patIdxStart > $patIdxEnd) {
+        } else if ($patIdxStart > $patIdxEnd) {
             // String not exhausted, but pattern is. Failure.
             return false;
         } else {
@@ -123,45 +123,6 @@ class SelectorUtils
     }
 
     /**
-     * Tests whether or not a given path matches a given pattern.
-     *
-     * @param The $pattern
-     * @param The $str
-     * @param bool|Whether $isCaseSensitive
-     * @internal param The $pattern pattern to match against. Must not be
-     *                <code>null</code>.
-     * @internal param The $str path to match, as a String. Must not be
-     *                <code>null</code>.
-     * @internal param Whether $isCaseSensitive or not matching should be performed
-     *                        case sensitively.
-     *
-     * @return bool <code>true</code> if the pattern matches against the string,
-     */
-    public static function matchPath($pattern, $str, $isCaseSensitive = true)
-    {
-        // explicitly exclude directory itself
-        if ($str == '' && $pattern == '**/*') {
-            return false;
-        }
-
-        $rePattern = preg_quote($pattern, '/');
-        $dirSep = preg_quote(DIRECTORY_SEPARATOR, '/');
-        $trailingDirSep = '((' . $dirSep . ')?|(' . $dirSep . ').+)';
-        $patternReplacements = array(
-            $dirSep . '\*\*' . $dirSep => $dirSep . '.*' . $trailingDirSep,
-            $dirSep . '\*\*' => $trailingDirSep,
-            '\*\*' . $dirSep => '.*' . $trailingDirSep,
-            '\*\*' => '.*',
-            '\*' => '[^' . $dirSep . ']*',
-            '\?' => '[^' . $dirSep . ']'
-        );
-        $rePattern = str_replace(array_keys($patternReplacements), array_values($patternReplacements), $rePattern);
-        $rePattern = '/^' . $rePattern . '$/' . ($isCaseSensitive ? '' : 'i');
-
-        return (bool) preg_match($rePattern, $str);
-    }
-
-    /**
      * Tests whether or not a string matches against a pattern.
      * The pattern may contain two special characters:<br>
      * '*' means zero or more characters<br>
@@ -169,7 +130,7 @@ class SelectorUtils
      *
      * @param string $pattern The pattern to match against.
      *                Must not be <code>null</code>.
-     * @param string $str     The string which must be matched against the pattern.
+     * @param string $str The string which must be matched against the pattern.
      *                Must not be <code>null</code>.
      * @param bool $isCaseSensitive Whether or not matching should be performed
      *                        case sensitively.
@@ -181,10 +142,49 @@ class SelectorUtils
     public static function match($pattern, $str, $isCaseSensitive = true)
     {
         $rePattern = preg_quote($pattern, '/');
-        $rePattern = str_replace(array("\*", "\?"), array('.*', '.'), $rePattern);
+        $rePattern = str_replace(["\*", "\?"], ['.*', '.'], $rePattern);
         $rePattern = '/^' . $rePattern . '$/' . ($isCaseSensitive ? '' : 'i');
 
-        return (bool) preg_match($rePattern, $str);
+        return (bool)preg_match($rePattern, $str);
+    }
+
+    /**
+     * Tests whether or not a given path matches a given pattern.
+     *
+     * @param The $pattern
+     * @param The $str
+     * @param bool|Whether $isCaseSensitive
+     * @return bool <code>true</code> if the pattern matches against the string,
+     * @internal param The $str path to match, as a String. Must not be
+     *                <code>null</code>.
+     * @internal param Whether $isCaseSensitive or not matching should be performed
+     *                        case sensitively.
+     *
+     * @internal param The $pattern pattern to match against. Must not be
+     *                <code>null</code>.
+     */
+    public static function matchPath($pattern, $str, $isCaseSensitive = true)
+    {
+        // explicitly exclude directory itself
+        if ($str == '' && $pattern == '**/*') {
+            return false;
+        }
+
+        $rePattern = preg_quote($pattern, '/');
+        $dirSep = preg_quote(DIRECTORY_SEPARATOR, '/');
+        $trailingDirSep = '((' . $dirSep . ')?|(' . $dirSep . ').+)';
+        $patternReplacements = [
+            $dirSep . '\*\*' . $dirSep => $dirSep . '.*' . $trailingDirSep,
+            $dirSep . '\*\*' => $trailingDirSep,
+            '\*\*' . $dirSep => '.*' . $trailingDirSep,
+            '\*\*' => '.*',
+            '\*' => '[^' . $dirSep . ']*',
+            '\?' => '[^' . $dirSep . ']',
+        ];
+        $rePattern = str_replace(array_keys($patternReplacements), array_values($patternReplacements), $rePattern);
+        $rePattern = '/^' . $rePattern . '$/' . ($isCaseSensitive ? '' : 'i');
+
+        return (bool)preg_match($rePattern, $str);
     }
 
     /**
@@ -195,9 +195,9 @@ class SelectorUtils
      * false if the src file doesn't even exist, since how could the
      * target then be out of date.
      *
-     * @param  PhingFile $src         the original file
-     * @param  PhingFile $target      the file being compared against
-     * @param  int       $granularity the amount in seconds of slack we will give in
+     * @param PhingFile $src the original file
+     * @param PhingFile $target the file being compared against
+     * @param int $granularity the amount in seconds of slack we will give in
      *                                determining out of dateness
      * @return bool whether   the target is out of date
      */

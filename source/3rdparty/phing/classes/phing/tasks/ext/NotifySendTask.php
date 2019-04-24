@@ -30,6 +30,16 @@ class NotifySendTask extends Task
     protected $silent = false;
 
     /**
+     * Get icon to be used (filename or generic name)
+     *
+     * @return string
+     */
+    public function getIcon()
+    {
+        return $this->icon;
+    }
+
+    /**
      * Set icon attribute
      *
      * @param string $icon name/location of icon
@@ -38,38 +48,27 @@ class NotifySendTask extends Task
      */
     public function setIcon($icon)
     {
-        switch ($icon)
-        {
-        case 'info':
-        case 'error':
-        case 'warning':
-            $this->icon = $icon;
-            break;
-        default:
-            if (file_exists($icon) && is_file($icon)) {
+        switch ($icon) {
+            case 'info':
+            case 'error':
+            case 'warning':
                 $this->icon = $icon;
-            } else {
-                if (isset($this->log)) {
-                    $this->log(
-                        sprintf(
-                            "%s is not a file. Using default icon instead.",
-                            $icon
-                        ),
-                        Project::MSG_WARN
-                    );
+                break;
+            default:
+                if (file_exists($icon) && is_file($icon)) {
+                    $this->icon = $icon;
+                } else {
+                    if (isset($this->log)) {
+                        $this->log(
+                            sprintf(
+                                "%s is not a file. Using default icon instead.",
+                                $icon
+                            ),
+                            Project::MSG_WARN
+                        );
+                    }
                 }
-            }
         }
-    }
-
-    /**
-     * Get icon to be used (filename or generic name)
-     *
-     * @return string
-     */
-    public function getIcon()
-    {
-        return $this->icon;
     }
 
     /**
@@ -81,7 +80,17 @@ class NotifySendTask extends Task
      */
     public function setSilent($silent)
     {
-        $this->silent = (bool) $silent;
+        $this->silent = (bool)$silent;
+    }
+
+    /**
+     * Get Title
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
     }
 
     /**
@@ -97,13 +106,13 @@ class NotifySendTask extends Task
     }
 
     /**
-     * Get Title
+     * Get message.
      *
      * @return string
      */
-    public function getTitle()
+    public function getMsg()
     {
-        return $this->title;
+        return $this->msg;
     }
 
     /**
@@ -119,20 +128,10 @@ class NotifySendTask extends Task
     }
 
     /**
-     * Get message.
-     *
-     * @return string
-     */
-    public function getMsg()
-    {
-        return $this->msg;
-    }
-
-    /**
      * The main entry point method.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {

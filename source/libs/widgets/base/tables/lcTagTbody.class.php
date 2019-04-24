@@ -36,11 +36,6 @@ class lcTagTbody extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function create()
-    {
-        return new lcTagTbody();
-    }
-
     public function setAlign($value = null)
     {
         if (isset($value) &&
@@ -76,6 +71,11 @@ class lcTagTbody extends lcHtmlTag
     {
         $this->setAttribute('charoff', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagTbody();
     }
 
     public static function getRequiredAttributes()

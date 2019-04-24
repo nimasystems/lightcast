@@ -25,26 +25,6 @@ class lcDatabaseModelsTranslationsParser extends lcTranslationsParser
 {
     protected $models;
 
-    public function getDirsToParse()
-    {
-        return [
-            'map' => [
-                'file_endings' => ['TableMap.php']
-            ],
-            'om' => [
-                'file_endings' => ['.php', 'Peer.php', 'Query.php']
-            ]
-        ];
-    }
-
-    public function getCategorizationMap()
-    {
-        return [
-            'map' => 'database_models',
-            'om' => 'database_models',
-        ];
-    }
-
     public function setModels($models)
     {
         $this->models = $models;
@@ -93,5 +73,25 @@ class lcDatabaseModelsTranslationsParser extends lcTranslationsParser
         }
 
         return $this->results;
+    }
+
+    public function getDirsToParse()
+    {
+        return [
+            'map' => [
+                'file_endings' => ['TableMap.php'],
+            ],
+            'om' => [
+                'file_endings' => ['.php', 'Peer.php', 'Query.php'],
+            ],
+        ];
+    }
+
+    public function getCategorizationMap()
+    {
+        return [
+            'map' => 'database_models',
+            'om' => 'database_models',
+        ];
     }
 }

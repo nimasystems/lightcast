@@ -81,32 +81,6 @@ class InputStream
     }
 
     /**
-     * Read data from stream until $len chars or EOF.
-     * @param  int    $len Num chars to read.  If not specified this stream will read until EOF.
-     * @return string chars read or -1 if eof.
-     */
-    public function read($len = null)
-    {
-
-        if ($this->eof()) {
-            return -1;
-        }
-
-        if ($len === null) { // we want to keep reading until we get an eof
-            $out = "";
-            while (!$this->eof()) {
-                $out .= fread($this->stream, 8192);
-                $this->currentPosition = ftell($this->stream);
-            }
-        } else {
-            $out = fread($this->stream, $len); // adding 1 seems to ensure that next call to read() will return EOF (-1)
-            $this->currentPosition = ftell($this->stream);
-        }
-
-        return $out;
-    }
-
-    /**
      * Marks the current position in this input stream.
      * @throws IOException - if the underlying stream doesn't support this method.
      */
@@ -142,6 +116,56 @@ class InputStream
     }
 
     /**
+     * Reads a entire until EOF and places contents in passed-in variable.  Stream is closed after read.
+     *
+     * @param string      &$rBuffer String variable where read contents will be put.
+     * @return TRUE        on success.
+     * @throws IOException - if there is an error reading from stream.
+     * @author  Charlie Killian, charlie@tizac.com
+     * @deprecated - Instead, use the read() method or a BufferedReader.
+     */
+    public function readInto(&$rBuffer)
+    {
+        $rBuffer = $this->read();
+        $this->close();
+    }
+
+    /**
+     * Read data from stream until $len chars or EOF.
+     * @param int $len Num chars to read.  If not specified this stream will read until EOF.
+     * @return string chars read or -1 if eof.
+     */
+    public function read($len = null)
+    {
+
+        if ($this->eof()) {
+            return -1;
+        }
+
+        if ($len === null) { // we want to keep reading until we get an eof
+            $out = "";
+            while (!$this->eof()) {
+                $out .= fread($this->stream, 8192);
+                $this->currentPosition = ftell($this->stream);
+            }
+        } else {
+            $out = fread($this->stream, $len); // adding 1 seems to ensure that next call to read() will return EOF (-1)
+            $this->currentPosition = ftell($this->stream);
+        }
+
+        return $out;
+    }
+
+    /**
+     * Whether eof has been reached with stream.
+     * @return boolean
+     */
+    public function eof()
+    {
+        return feof($this->stream);
+    }
+
+    /**
      * Closes stream.
      * @throws IOException if stream cannot be closed (note that calling close() on an already-closed stream will not raise an exception)
      */
@@ -159,35 +183,11 @@ class InputStream
     }
 
     /**
-     * Whether eof has been reached with stream.
-     * @return boolean
-     */
-    public function eof()
-    {
-        return feof($this->stream);
-    }
-
-    /**
-     * Reads a entire until EOF and places contents in passed-in variable.  Stream is closed after read.
-     *
-     * @param  string      &$rBuffer String variable where read contents will be put.
-     * @return TRUE        on success.
-     * @author  Charlie Killian, charlie@tizac.com
-     * @throws IOException - if there is an error reading from stream.
-     * @deprecated - Instead, use the read() method or a BufferedReader.
-     */
-    public function readInto(&$rBuffer)
-    {
-        $rBuffer = $this->read();
-        $this->close();
-    }
-
-    /**
      * Returns string representation of attached stream.
      * @return string
      */
     public function __toString()
     {
-        return (string) $this->stream;
+        return (string)$this->stream;
     }
 }

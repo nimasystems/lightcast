@@ -58,7 +58,7 @@ class PropertyTask extends Task
     /**
      * All filterchain objects assigned to this task
      */
-    protected $filterChains = array();
+    protected $filterChains = [];
 
     /** Whether to log messages as INFO or VERBOSE  */
     protected $logOutput = true;
@@ -76,15 +76,6 @@ class PropertyTask extends Task
         $this->fileParserFactory = $fileParserFactory != null ? $fileParserFactory : new FileParserFactory();
     }
 
-    /**
-     * Sets a the name of current property component
-     * @param $name
-     */
-    public function setName($name)
-    {
-        $this->name = (string) $name;
-    }
-
     /** Get property component name. */
     public function getName()
     {
@@ -92,12 +83,12 @@ class PropertyTask extends Task
     }
 
     /**
-     * Sets a the value of current property component.
-     * @param    mixed      Value of name, all scalars allowed
+     * Sets a the name of current property component
+     * @param $name
      */
-    public function setValue($value)
+    public function setName($name)
     {
-        $this->value = (string) $value;
+        $this->name = (string)$name;
     }
 
     /**
@@ -117,6 +108,21 @@ class PropertyTask extends Task
         return $this->value;
     }
 
+    /**
+     * Sets a the value of current property component.
+     * @param mixed      Value of name, all scalars allowed
+     */
+    public function setValue($value)
+    {
+        $this->value = (string)$value;
+    }
+
+    /** Get the PhingFile that is being used as property source. */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
     /** Set a file to use as the source for properties.
      * @param $file
      */
@@ -126,12 +132,6 @@ class PropertyTask extends Task
             $file = new PhingFile($file);
         }
         $this->file = $file;
-    }
-
-    /** Get the PhingFile that is being used as property source. */
-    public function getFile()
-    {
-        return $this->file;
     }
 
     /**
@@ -148,9 +148,18 @@ class PropertyTask extends Task
     }
 
     /**
+     * @return string
+     * @since 2.0
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
      * Prefix to apply to properties loaded using <code>file</code>.
      * A "." is appended to the prefix if not specified.
-     * @param  string $prefix prefix string
+     * @param string $prefix prefix string
      * @return void
      * @since 2.0
      */
@@ -160,15 +169,6 @@ class PropertyTask extends Task
         if (!StringHelper::endsWith(".", $prefix)) {
             $this->prefix .= ".";
         }
-    }
-
-    /**
-     * @return string
-     * @since 2.0
-     */
-    public function getPrefix()
-    {
-        return $this->prefix;
     }
 
     /**
@@ -192,24 +192,12 @@ class PropertyTask extends Task
      */
     public function setEnvironment($env)
     {
-        $this->env = (string) $env;
+        $this->env = (string)$env;
     }
 
     public function getEnvironment()
     {
         return $this->env;
-    }
-
-    /**
-     * Set whether this is a user property (ro).
-     * This is deprecated in Ant 1.5, but the userProperty attribute
-     * of the class is still being set via constructor, so Phing will
-     * allow this method to function.
-     * @param boolean $v
-     */
-    public function setUserProperty($v)
-    {
-        $this->userProperty = (boolean) $v;
     }
 
     /**
@@ -221,11 +209,15 @@ class PropertyTask extends Task
     }
 
     /**
-     * @param $v
+     * Set whether this is a user property (ro).
+     * This is deprecated in Ant 1.5, but the userProperty attribute
+     * of the class is still being set via constructor, so Phing will
+     * allow this method to function.
+     * @param boolean $v
      */
-    public function setOverride($v)
+    public function setUserProperty($v)
     {
-        $this->override = (boolean) $v;
+        $this->userProperty = (boolean)$v;
     }
 
     /**
@@ -237,11 +229,24 @@ class PropertyTask extends Task
     }
 
     /**
+     * @param $v
+     */
+    public function setOverride($v)
+    {
+        $this->override = (boolean)$v;
+    }
+
+    /**
      * @return string
      */
     public function toString()
     {
-        return (string) $this->value;
+        return (string)$this->value;
+    }
+
+    public function getFallback()
+    {
+        return $this->fallback;
     }
 
     /**
@@ -250,11 +255,6 @@ class PropertyTask extends Task
     public function setFallback($p)
     {
         $this->fallback = $p;
-    }
-
-    public function getFallback()
-    {
-        return $this->fallback;
     }
 
     /**
@@ -270,19 +270,19 @@ class PropertyTask extends Task
     }
 
     /**
-     * @param $logOutput
-     */
-    public function setLogoutput($logOutput)
-    {
-        $this->logOutput = (bool) $logOutput;
-    }
-
-    /**
      * @return bool
      */
     public function getLogoutput()
     {
         return $this->logOutput;
+    }
+
+    /**
+     * @param $logOutput
+     */
+    public function setLogoutput($logOutput)
+    {
+        $this->logOutput = (bool)$logOutput;
     }
 
     /**
@@ -294,8 +294,7 @@ class PropertyTask extends Task
     {
         if ($this->name !== null) {
             if ($this->value === null && $this->reference === null) {
-                throw new BuildException("You must specify value or refid with the name attribute", $this->getLocation(
-                ));
+                throw new BuildException("You must specify value or refid with the name attribute", $this->getLocation());
             }
         } else {
             if ($this->file === null && $this->env === null) {
@@ -352,45 +351,8 @@ class PropertyTask extends Task
     }
 
     /**
-     * load the environment values
-     * @param string $prefix prefix to place before them
-     */
-    protected function loadEnvironment($prefix)
-    {
-
-        $props = new Properties();
-        if (substr($prefix, strlen($prefix) - 1) == '.') {
-            $prefix .= ".";
-        }
-        $this->log("Loading Environment $prefix", Project::MSG_VERBOSE);
-        foreach ($_ENV as $key => $value) {
-            $props->setProperty($prefix . '.' . $key, $value);
-        }
-        $this->addProperties($props);
-    }
-
-    /**
-     * iterate through a set of properties,
-     * resolve them then assign them
-     * @param $props
-     * @throws BuildException
-     */
-    protected function addProperties($props)
-    {
-        $this->resolveAllProperties($props);
-        foreach ($props->keys() as $name) {
-            $value = $props->getProperty($name);
-            $v = $this->project->replaceProperties($value);
-            if ($this->prefix !== null) {
-                $name = $this->prefix . $name;
-            }
-            $this->addProperty($name, $v);
-        }
-    }
-
-    /**
      * add a name value pair to the project property set
-     * @param string $name  name of property
+     * @param string $name name of property
      * @param string $value value to set
      */
     protected function addProperty($name, $value)
@@ -441,12 +403,31 @@ class PropertyTask extends Task
     }
 
     /**
+     * iterate through a set of properties,
+     * resolve them then assign them
+     * @param $props
+     * @throws BuildException
+     */
+    protected function addProperties($props)
+    {
+        $this->resolveAllProperties($props);
+        foreach ($props->keys() as $name) {
+            $value = $props->getProperty($name);
+            $v = $this->project->replaceProperties($value);
+            if ($this->prefix !== null) {
+                $name = $this->prefix . $name;
+            }
+            $this->addProperty($name, $v);
+        }
+    }
+
+    /**
      * Given a Properties object, this method goes through and resolves
      * any references to properties within the object.
      *
-     * @param  Properties $props The collection of Properties that need to be resolved.
-     * @throws BuildException
+     * @param Properties $props The collection of Properties that need to be resolved.
      * @return void
+     * @throws BuildException
      */
     protected function resolveAllProperties(Properties $props)
     {
@@ -460,12 +441,12 @@ class PropertyTask extends Task
 
             $value = $props->getProperty($name);
             $resolved = false;
-            $resolveStack = array();
+            $resolveStack = [];
 
             while (!$resolved) {
 
-                $fragments = array();
-                $propertyRefs = array();
+                $fragments = [];
+                $propertyRefs = [];
 
                 // [HL] this was ::parsePropertyString($this->value ...) ... this seems wrong
                 self::parsePropertyString($value, $fragments, $propertyRefs);
@@ -548,7 +529,7 @@ class PropertyTask extends Task
             if ($pos === (strlen($value) - 1)) {
                 array_push($fragments, '$');
                 $prev = $pos + 1;
-            } elseif ($value{$pos + 1} !== '{') {
+            } else if ($value{$pos + 1} !== '{') {
 
                 // the string positions were changed to value-1 to correct
                 // a fatal error coming from function substring()
@@ -569,5 +550,23 @@ class PropertyTask extends Task
         if ($prev < strlen($value)) {
             array_push($fragments, StringHelper::substring($value, $prev));
         }
+    }
+
+    /**
+     * load the environment values
+     * @param string $prefix prefix to place before them
+     */
+    protected function loadEnvironment($prefix)
+    {
+
+        $props = new Properties();
+        if (substr($prefix, strlen($prefix) - 1) == '.') {
+            $prefix .= ".";
+        }
+        $this->log("Loading Environment $prefix", Project::MSG_VERBOSE);
+        foreach ($_ENV as $key => $value) {
+            $props->setProperty($prefix . '.' . $key, $value);
+        }
+        $this->addProperties($props);
     }
 }

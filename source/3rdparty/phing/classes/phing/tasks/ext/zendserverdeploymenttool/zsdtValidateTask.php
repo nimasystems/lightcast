@@ -42,9 +42,9 @@ class zsdtValidateTask extends zsdtBaseTask
     /**
      * {@inheritdoc}
      *
+     * @return void
      * @throws BuildException
      *
-     * @return void
      */
     protected function validate()
     {

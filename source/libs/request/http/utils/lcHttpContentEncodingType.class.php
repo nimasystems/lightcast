@@ -35,7 +35,7 @@ class lcHttpContentEncodingType
 
         if ($string == 'gzip') {
             return self::ENCODING_GZIP;
-        } elseif ($string == 'deflate') {
+        } else if ($string == 'deflate') {
             return self::ENCODING_DEFLATE;
         } else {
             return false;

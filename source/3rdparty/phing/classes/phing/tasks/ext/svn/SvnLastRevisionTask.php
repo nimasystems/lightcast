@@ -37,29 +37,11 @@ class SvnLastRevisionTask extends SvnBaseTask
     private $lastChanged = false;
 
     /**
-     * Sets the name of the property to use
-     * @param string $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use
-     * @return string
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * Sets whether to force compatibility with older SVN versions (< 1.2)
      *
      * Retained for legacy reasons
-     * @deprecated
      * @param $force
+     * @deprecated
      */
     public function setForceCompatible($force)
     {
@@ -71,7 +53,7 @@ class SvnLastRevisionTask extends SvnBaseTask
      */
     public function setLastChanged($lastChanged)
     {
-        $this->lastChanged = (bool) $lastChanged;
+        $this->lastChanged = (bool)$lastChanged;
     }
 
     /**
@@ -84,16 +66,16 @@ class SvnLastRevisionTask extends SvnBaseTask
         $this->setup('info');
 
         if ($this->oldVersion) {
-            $output = $this->run(array('--xml'));
+            $output = $this->run(['--xml']);
 
             if (!($xmlObj = @simplexml_load_string($output))) {
                 throw new BuildException("Failed to parse the output of 'svn info --xml'.");
             }
 
             if ($this->lastChanged) {
-                $found = (int) $xmlObj->entry->commit['revision'];
+                $found = (int)$xmlObj->entry->commit['revision'];
             } else {
-                $found = (int) $xmlObj->entry['revision'];
+                $found = (int)$xmlObj->entry['revision'];
             }
         } else {
             $output = $this->run();
@@ -110,5 +92,23 @@ class SvnLastRevisionTask extends SvnBaseTask
         }
 
         $this->project->setProperty($this->getPropertyName(), $found);
+    }
+
+    /**
+     * Returns the name of the property to use
+     * @return string
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use
+     * @param string $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 }

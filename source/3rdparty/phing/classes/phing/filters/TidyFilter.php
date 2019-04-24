@@ -45,26 +45,7 @@ class TidyFilter extends BaseParamFilterReader implements ChainableReader
     private $encoding = 'utf8';
 
     /** @var array Parameter[] */
-    private $configParameters = array();
-
-    /**
-     * Set the encoding for resulting (X)HTML document.
-     * @param string $v
-     */
-    public function setEncoding($v)
-    {
-        $this->encoding = $v;
-    }
-
-    /**
-     * Sets the config params.
-     * @param array Parameter[]
-     * @see chain()
-     */
-    public function setConfigParameters($params)
-    {
-        $this->configParameters = $params;
-    }
+    private $configParameters = [];
 
     /**
      * Adds a <config> element (which is a Parameter).
@@ -78,26 +59,12 @@ class TidyFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Converts the Parameter objects being used to store configuration into a simle assoc array.
-     * @return array
-     */
-    private function getDistilledConfig()
-    {
-        $config = array();
-        foreach ($this->configParameters as $p) {
-            $config[$p->getName()] = $p->getValue();
-        }
-
-        return $config;
-    }
-
-    /**
      * Reads input and returns Tidy-filtered output.
      *
      * @param null $len
-     * @throws BuildException
      * @return the resulting stream, or -1 if the end of the resulting stream has been reached
      *
+     * @throws BuildException
      */
     public function read($len = null)
     {
@@ -127,26 +94,6 @@ class TidyFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Creates a new TidyFilter using the passed in Reader for instantiation.
-     *
-     * @param A|Reader $reader
-     * @internal param A $reader Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return a new filter based on this configuration, but filtering
-     *           the specified reader
-     */
-    public function chain(Reader $reader)
-    {
-        $newFilter = new TidyFilter($reader);
-        $newFilter->setConfigParameters($this->configParameters);
-        $newFilter->setEncoding($this->encoding);
-        $newFilter->setProject($this->getProject());
-
-        return $newFilter;
-    }
-
-    /**
      * Initializes any parameters (e.g. config options).
      * This method is only called when this filter is used through a <filterreader> tag in build file.
      */
@@ -167,6 +114,59 @@ class TidyFilter extends BaseParamFilterReader implements ChainableReader
 
             }
         }
+    }
+
+    /**
+     * Set the encoding for resulting (X)HTML document.
+     * @param string $v
+     */
+    public function setEncoding($v)
+    {
+        $this->encoding = $v;
+    }
+
+    /**
+     * Converts the Parameter objects being used to store configuration into a simle assoc array.
+     * @return array
+     */
+    private function getDistilledConfig()
+    {
+        $config = [];
+        foreach ($this->configParameters as $p) {
+            $config[$p->getName()] = $p->getValue();
+        }
+
+        return $config;
+    }
+
+    /**
+     * Creates a new TidyFilter using the passed in Reader for instantiation.
+     *
+     * @param A|Reader $reader
+     * @return a new filter based on this configuration, but filtering
+     *           the specified reader
+     * @internal param A $reader Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new TidyFilter($reader);
+        $newFilter->setConfigParameters($this->configParameters);
+        $newFilter->setEncoding($this->encoding);
+        $newFilter->setProject($this->getProject());
+
+        return $newFilter;
+    }
+
+    /**
+     * Sets the config params.
+     * @param array Parameter[]
+     * @see chain()
+     */
+    public function setConfigParameters($params)
+    {
+        $this->configParameters = $params;
     }
 
 }

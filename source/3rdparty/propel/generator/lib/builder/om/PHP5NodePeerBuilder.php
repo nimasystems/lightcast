@@ -23,16 +23,6 @@ class PHP5NodePeerBuilder extends PeerBuilder
 {
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    /**
      * Returns the name of the current class being built.
      *
      * @return string
@@ -42,16 +32,16 @@ class PHP5NodePeerBuilder extends PeerBuilder
         return $this->getBuildProperty('basePrefix') . $this->getStubNodePeerBuilder()->getUnprefixedClassname();
     }
 
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
      */
     protected function addIncludes(&$script)
     {
-    } // addIncludes()
+    }
 
-    /**
+        /**
      * Adds class phpdoc comment and opening of class.
      *
      * @param string &$script The script will be modified in this method.
@@ -82,6 +72,16 @@ class PHP5NodePeerBuilder extends PeerBuilder
  */
 abstract class " . $this->getClassname() . " {
 ";
+    } // addIncludes()
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
     }
 
     /**
@@ -113,18 +113,6 @@ abstract class " . $this->getClassname() . " {
         $this->addBuildTree($script);
 
         $this->addPopulateNodes($script);
-    }
-
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
-";
     }
 
     protected function addConstants(&$script)
@@ -168,101 +156,6 @@ abstract class " . $this->getClassname() . " {
 
         return (get_class(\$con) == 'ODBCConnection' &&
                 get_class(\$con->getAdapter()) == 'CodeBaseAdapter');
-    }
-";
-    }
-
-    protected function addCreateNewRootNode(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $objectClassname = $this->getStubObjectBuilder()->getClassname();
-
-        $nodePeerClassname = $this->getStubNodePeerBuilder()->getClassname();
-        $nodeObjectClassname = $this->getStubNodeBuilder()->getClassname();
-
-        $script .= "
-    /**
-     * Create a new Node at the top of tree. This method will destroy any
-     * existing root node (along with its children).
-     *
-     * Use at your own risk!
-     *
-     * @param   $objectClassname Object wrapped by new node.
-     * @param      PropelPDO Connection to use.
-     * @return                 $nodeObjectClassname
-     * @throws PropelException
-     */
-    public static function createNewRootNode(\$obj, PropelPDO \$con = null)
-    {
-        if (\$con === null)
-            \$con = Propel::getConnection($peerClassname::DATABASE_NAME, Propel::CONNECTION_WRITE);
-
-        \$con->beginTransaction();
-
-        try {
-            self::deleteNodeSubTree('1', \$con);
-
-            \$setNodePath = 'set' . self::NPATH_PHPNAME;
-
-            \$obj->\$setNodePath('1');
-            \$obj->save(\$con);
-
-            \$con->commit();
-        } catch (Exception \$e) {
-            \$con->rollBack();
-            throw \$e;
-        }
-
-        return new $nodeObjectClassname(\$obj);
-    }
-";
-    }
-
-    protected function addInsertNewRootNode(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $objectClassname = $this->getStubObjectBuilder()->getClassname();
-
-        $nodePeerClassname = $this->getStubNodePeerBuilder()->getClassname();
-        $nodeObjectClassname = $this->getStubNodeBuilder()->getClassname();
-
-        $script .= "
-    /**
-     * Inserts a new Node at the top of tree. Any existing root node (along with
-     * its children) will be made a child of the new root node. This is a
-     * safer alternative to createNewRootNode().
-     *
-     * @param   $objectClassname Object wrapped by new node.
-     * @param      PropelPDO Connection to use.
-     * @return                 $nodeObjectClassname
-     * @throws PropelException
-     */
-    public static function insertNewRootNode(\$obj, PropelPDO \$con = null)
-    {
-        if (\$con === null)
-            \$con = Propel::getConnection($peerClassname::DATABASE_NAME, Propel::CONNECTION_WRITE);
-
-        \$con->beginTransaction();
-        try {
-            // Move root tree to an invalid node path.
-            $nodePeerClassname::moveNodeSubTree('1', '0', \$con);
-
-            \$setNodePath = 'set' . self::NPATH_PHPNAME;
-
-            // Insert the new root node.
-            \$obj->\$setNodePath('1');
-            \$obj->save(\$con);
-
-            // Move the old root tree as a child of the new root.
-            $nodePeerClassname::moveNodeSubTree('0', '1' . self::NPATH_SEP . '1', \$con);
-
-            \$con->commit();
-        } catch (Exception \$e) {
-            \$con->rollBack();
-            throw \$e;
-        }
-
-        return new $nodeObjectClassname(\$obj);
     }
 ";
     }
@@ -376,6 +269,101 @@ abstract class " . $this->getClassname() . " {
     public static function retrieveRootNode(\$descendants = false, PropelPDO \$con = null)
     {
         return self::retrieveNodeByNP('1', false, \$descendants, \$con);
+    }
+";
+    }
+
+    protected function addCreateNewRootNode(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $objectClassname = $this->getStubObjectBuilder()->getClassname();
+
+        $nodePeerClassname = $this->getStubNodePeerBuilder()->getClassname();
+        $nodeObjectClassname = $this->getStubNodeBuilder()->getClassname();
+
+        $script .= "
+    /**
+     * Create a new Node at the top of tree. This method will destroy any
+     * existing root node (along with its children).
+     *
+     * Use at your own risk!
+     *
+     * @param   $objectClassname Object wrapped by new node.
+     * @param      PropelPDO Connection to use.
+     * @return                 $nodeObjectClassname
+     * @throws PropelException
+     */
+    public static function createNewRootNode(\$obj, PropelPDO \$con = null)
+    {
+        if (\$con === null)
+            \$con = Propel::getConnection($peerClassname::DATABASE_NAME, Propel::CONNECTION_WRITE);
+
+        \$con->beginTransaction();
+
+        try {
+            self::deleteNodeSubTree('1', \$con);
+
+            \$setNodePath = 'set' . self::NPATH_PHPNAME;
+
+            \$obj->\$setNodePath('1');
+            \$obj->save(\$con);
+
+            \$con->commit();
+        } catch (Exception \$e) {
+            \$con->rollBack();
+            throw \$e;
+        }
+
+        return new $nodeObjectClassname(\$obj);
+    }
+";
+    }
+
+    protected function addInsertNewRootNode(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $objectClassname = $this->getStubObjectBuilder()->getClassname();
+
+        $nodePeerClassname = $this->getStubNodePeerBuilder()->getClassname();
+        $nodeObjectClassname = $this->getStubNodeBuilder()->getClassname();
+
+        $script .= "
+    /**
+     * Inserts a new Node at the top of tree. Any existing root node (along with
+     * its children) will be made a child of the new root node. This is a
+     * safer alternative to createNewRootNode().
+     *
+     * @param   $objectClassname Object wrapped by new node.
+     * @param      PropelPDO Connection to use.
+     * @return                 $nodeObjectClassname
+     * @throws PropelException
+     */
+    public static function insertNewRootNode(\$obj, PropelPDO \$con = null)
+    {
+        if (\$con === null)
+            \$con = Propel::getConnection($peerClassname::DATABASE_NAME, Propel::CONNECTION_WRITE);
+
+        \$con->beginTransaction();
+        try {
+            // Move root tree to an invalid node path.
+            $nodePeerClassname::moveNodeSubTree('1', '0', \$con);
+
+            \$setNodePath = 'set' . self::NPATH_PHPNAME;
+
+            // Insert the new root node.
+            \$obj->\$setNodePath('1');
+            \$obj->save(\$con);
+
+            // Move the old root tree as a child of the new root.
+            $nodePeerClassname::moveNodeSubTree('0', '1' . self::NPATH_SEP . '1', \$con);
+
+            \$con->commit();
+        } catch (Exception \$e) {
+            \$con->rollBack();
+            throw \$e;
+        }
+
+        return new $nodeObjectClassname(\$obj);
     }
 ";
     }
@@ -733,6 +721,18 @@ abstract class " . $this->getClassname() . " {
 
         return array_values(\$targets);
     }
+";
+    }
+
+    /**
+     * Closes class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addClassClose(&$script)
+    {
+        $script .= "
+} // " . $this->getClassname() . "
 ";
     }
 } // PHP5NodePeerBuilder

@@ -43,7 +43,17 @@ class PhpDependAnalyzerElement
      *
      * @var array
      */
-    protected $value = array();
+    protected $value = [];
+
+    /**
+     * Get the analyzer type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
     /**
      * Sets the analyzer type
@@ -66,13 +76,13 @@ class PhpDependAnalyzerElement
     }
 
     /**
-     * Get the analyzer type
+     * Get the analyzer value
      *
      * @return string
      */
-    public function getType()
+    public function getValue()
     {
-        return $this->type;
+        return $this->value;
     }
 
     /**
@@ -82,7 +92,7 @@ class PhpDependAnalyzerElement
      */
     public function setValue($value)
     {
-        $this->value = array();
+        $this->value = [];
 
         $token = ' ,;';
         $values = strtok($value, $token);
@@ -91,15 +101,5 @@ class PhpDependAnalyzerElement
             $this->value[] = $values;
             $values = strtok($token);
         }
-    }
-
-    /**
-     * Get the analyzer value
-     *
-     * @return string
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 }

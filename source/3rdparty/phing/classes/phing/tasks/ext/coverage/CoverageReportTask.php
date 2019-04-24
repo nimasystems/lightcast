@@ -38,7 +38,7 @@ class CoverageReportTask extends Task
 {
     private $outfile = "coverage.xml";
 
-    private $transformers = array();
+    private $transformers = [];
 
     /** the classpath to use (optional) */
     private $classpath = null;
@@ -48,6 +48,17 @@ class CoverageReportTask extends Task
 
     /** the path to the GeSHi language files (optional) */
     private $geshilanguagespath = "";
+
+    /**
+     *
+     */
+    public function __construct()
+    {
+        $this->doc = new DOMDocument();
+        $this->doc->encoding = 'UTF-8';
+        $this->doc->formatOutput = true;
+        $this->doc->appendChild($this->doc->createElement('snapshot'));
+    }
 
     /**
      * @param Path $classpath
@@ -88,17 +99,6 @@ class CoverageReportTask extends Task
     }
 
     /**
-     *
-     */
-    public function __construct()
-    {
-        $this->doc = new DOMDocument();
-        $this->doc->encoding = 'UTF-8';
-        $this->doc->formatOutput = true;
-        $this->doc->appendChild($this->doc->createElement('snapshot'));
-    }
-
-    /**
      * @param $outfile
      */
     public function setOutfile($outfile)
@@ -117,239 +117,46 @@ class CoverageReportTask extends Task
         return $transformer;
     }
 
-    /**
-     * @param $packageName
-     * @return null
-     */
-    protected function getPackageElement($packageName)
+    public function main()
     {
-        $packages = $this->doc->documentElement->getElementsByTagName('package');
+        $coverageDatabase = $this->project->getProperty('coverage.database');
 
-        foreach ($packages as $package) {
-            if ($package->getAttribute('name') == $packageName) {
-                return $package;
-            }
+        if (!$coverageDatabase) {
+            throw new BuildException("Property coverage.database is not set - please include coverage-setup in your build file");
         }
 
-        return null;
-    }
+        $database = new PhingFile($coverageDatabase);
 
-    /**
-     * @param $packageName
-     * @param $element
-     */
-    protected function addClassToPackage($packageName, $element)
-    {
-        $package = $this->getPackageElement($packageName);
+        $this->log("Transforming coverage report");
 
-        if ($package === null) {
-            $package = $this->doc->createElement('package');
-            $package->setAttribute('name', $packageName);
-            $this->doc->documentElement->appendChild($package);
+        $props = new Properties();
+        $props->load($database);
+
+        foreach ($props->keys() as $filename) {
+            $file = unserialize($props->getProperty($filename));
+
+            $this->transformCoverageInformation($file['fullname'], $file['coverage']);
         }
 
-        $package->appendChild($element);
-    }
+        $this->calculateStatistics();
 
-    /**
-     * Adds a subpackage to their package
-     *
-     * @param string $packageName    The name of the package
-     * @param string $subpackageName The name of the subpackage
-     *
-     * @author Benjamin Schultz <bschultz@proqrent.de>
-     * @return void
-     */
-    protected function addSubpackageToPackage($packageName, $subpackageName)
-    {
-        $package = $this->getPackageElement($packageName);
-        $subpackage = $this->getSubpackageElement($subpackageName);
+        $this->doc->save($this->outfile);
 
-        if ($package === null) {
-            $package = $this->doc->createElement('package');
-            $package->setAttribute('name', $packageName);
-            $this->doc->documentElement->appendChild($package);
+        foreach ($this->transformers as $transformer) {
+            $transformer->setXmlDocument($this->doc);
+            $transformer->transform();
         }
-
-        if ($subpackage === null) {
-            $subpackage = $this->doc->createElement('subpackage');
-            $subpackage->setAttribute('name', $subpackageName);
-        }
-
-        $package->appendChild($subpackage);
-    }
-
-    /**
-     * Returns the subpackage element
-     *
-     * @param string $subpackageName The name of the subpackage
-     *
-     * @author Benjamin Schultz <bschultz@proqrent.de>
-     * @return DOMNode|null null when no DOMNode with the given name exists
-     */
-    protected function getSubpackageElement($subpackageName)
-    {
-        $subpackages = $this->doc->documentElement->getElementsByTagName('subpackage');
-
-        foreach ($subpackages as $subpackage) {
-            if ($subpackage->getAttribute('name') == $subpackageName) {
-                return $subpackage;
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Adds a class to their subpackage
-     *
-     * @param string  $classname The name of the class
-     * @param DOMNode $element   The dom node to append to the subpackage element
-     *
-     * @author Benjamin Schultz <bschultz@proqrent.de>
-     * @return void
-     */
-    protected function addClassToSubpackage($classname, $element)
-    {
-        $subpackageName = PHPUnitUtil::getSubpackageName($classname);
-
-        $subpackage = $this->getSubpackageElement($subpackageName);
-
-        if ($subpackage === null) {
-            $subpackage = $this->doc->createElement('subpackage');
-            $subpackage->setAttribute('name', $subpackageName);
-            $this->doc->documentElement->appendChild($subpackage);
-        }
-
-        $subpackage->appendChild($element);
-    }
-
-    /**
-     * @param $source
-     * @return string
-     */
-    protected function stripDiv($source)
-    {
-        $openpos = strpos($source, "<div");
-        $closepos = strpos($source, ">", $openpos);
-
-        $line = substr($source, $closepos + 1);
-
-        $tagclosepos = strpos($line, "</div>");
-
-        $line = substr($line, 0, $tagclosepos);
-
-        return $line;
-    }
-
-    /**
-     * @param $filename
-     * @return array
-     */
-    protected function highlightSourceFile($filename)
-    {
-        if ($this->geshipath) {
-            require_once $this->geshipath . '/geshi.php';
-
-            $source = file_get_contents($filename);
-
-            $geshi = new GeSHi($source, 'php', $this->geshilanguagespath);
-
-            $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
-
-            $geshi->enable_strict_mode(true);
-
-            $geshi->enable_classes(true);
-
-            $geshi->set_url_for_keyword_group(3, '');
-
-            $html = $geshi->parse_code();
-
-            $lines = preg_split("#</?li>#", $html);
-
-            // skip first and last line
-            array_pop($lines);
-            array_shift($lines);
-
-            $lines = array_filter($lines);
-
-            $lines = array_map(array($this, 'stripDiv'), $lines);
-
-            return $lines;
-        } else {
-            $lines = file($filename);
-
-            for ($i = 0; $i < count($lines); $i++) {
-                $line = $lines[$i];
-
-                $line = rtrim($line);
-
-                if (function_exists('mb_check_encoding') && mb_check_encoding($line, 'UTF-8')) {
-                    $lines[$i] = $line;
-                } else {
-                    if (function_exists('mb_convert_encoding')) {
-                        $lines[$i] = mb_convert_encoding($line, 'UTF-8');
-                    } else {
-                        $lines[$i] = utf8_encode($line);
-                    }
-                }
-            }
-
-            return $lines;
-        }
-    }
-
-    /**
-     * @param $filename
-     * @param $coverageInformation
-     * @param int $classStartLine
-     * @return DOMElement
-     */
-    protected function transformSourceFile($filename, $coverageInformation, $classStartLine = 1)
-    {
-        $sourceElement = $this->doc->createElement('sourcefile');
-        $sourceElement->setAttribute('name', basename($filename));
-
-        /**
-         * Add original/full filename to document
-         */
-        $sourceElement->setAttribute('sourcefile', $filename);
-
-        $filelines = $this->highlightSourceFile($filename);
-
-        $linenr = 1;
-
-        foreach ($filelines as $line) {
-            $lineElement = $this->doc->createElement('sourceline');
-            $lineElement->setAttribute(
-                'coveredcount',
-                (isset($coverageInformation[$linenr]) ? $coverageInformation[$linenr] : '0')
-            );
-
-            if ($linenr == $classStartLine) {
-                $lineElement->setAttribute('startclass', 1);
-            }
-
-            $textnode = $this->doc->createTextNode($line);
-            $lineElement->appendChild($textnode);
-
-            $sourceElement->appendChild($lineElement);
-
-            $linenr++;
-        }
-
-        return $sourceElement;
     }
 
     /**
      * Transforms the coverage information
      *
-     * @param string $filename            The filename
-     * @param array  $coverageInformation Array with covergae information
+     * @param string $filename The filename
+     * @param array $coverageInformation Array with covergae information
      *
-     * @author Michiel Rook <mrook@php.net>
-     * @author Benjamin Schultz <bschultz@proqrent.de>
      * @return void
+     * @author Benjamin Schultz <bschultz@proqrent.de>
+     * @author Michiel Rook <mrook@php.net>
      */
     protected function transformCoverageInformation($filename, $coverageInformation)
     {
@@ -475,6 +282,212 @@ class CoverageReportTask extends Task
         }
     }
 
+    /**
+     * Adds a subpackage to their package
+     *
+     * @param string $packageName The name of the package
+     * @param string $subpackageName The name of the subpackage
+     *
+     * @return void
+     * @author Benjamin Schultz <bschultz@proqrent.de>
+     */
+    protected function addSubpackageToPackage($packageName, $subpackageName)
+    {
+        $package = $this->getPackageElement($packageName);
+        $subpackage = $this->getSubpackageElement($subpackageName);
+
+        if ($package === null) {
+            $package = $this->doc->createElement('package');
+            $package->setAttribute('name', $packageName);
+            $this->doc->documentElement->appendChild($package);
+        }
+
+        if ($subpackage === null) {
+            $subpackage = $this->doc->createElement('subpackage');
+            $subpackage->setAttribute('name', $subpackageName);
+        }
+
+        $package->appendChild($subpackage);
+    }
+
+    /**
+     * @param $packageName
+     * @return null
+     */
+    protected function getPackageElement($packageName)
+    {
+        $packages = $this->doc->documentElement->getElementsByTagName('package');
+
+        foreach ($packages as $package) {
+            if ($package->getAttribute('name') == $packageName) {
+                return $package;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the subpackage element
+     *
+     * @param string $subpackageName The name of the subpackage
+     *
+     * @return DOMNode|null null when no DOMNode with the given name exists
+     * @author Benjamin Schultz <bschultz@proqrent.de>
+     */
+    protected function getSubpackageElement($subpackageName)
+    {
+        $subpackages = $this->doc->documentElement->getElementsByTagName('subpackage');
+
+        foreach ($subpackages as $subpackage) {
+            if ($subpackage->getAttribute('name') == $subpackageName) {
+                return $subpackage;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Adds a class to their subpackage
+     *
+     * @param string $classname The name of the class
+     * @param DOMNode $element The dom node to append to the subpackage element
+     *
+     * @return void
+     * @author Benjamin Schultz <bschultz@proqrent.de>
+     */
+    protected function addClassToSubpackage($classname, $element)
+    {
+        $subpackageName = PHPUnitUtil::getSubpackageName($classname);
+
+        $subpackage = $this->getSubpackageElement($subpackageName);
+
+        if ($subpackage === null) {
+            $subpackage = $this->doc->createElement('subpackage');
+            $subpackage->setAttribute('name', $subpackageName);
+            $this->doc->documentElement->appendChild($subpackage);
+        }
+
+        $subpackage->appendChild($element);
+    }
+
+    /**
+     * @param $packageName
+     * @param $element
+     */
+    protected function addClassToPackage($packageName, $element)
+    {
+        $package = $this->getPackageElement($packageName);
+
+        if ($package === null) {
+            $package = $this->doc->createElement('package');
+            $package->setAttribute('name', $packageName);
+            $this->doc->documentElement->appendChild($package);
+        }
+
+        $package->appendChild($element);
+    }
+
+    /**
+     * @param $filename
+     * @param $coverageInformation
+     * @param int $classStartLine
+     * @return DOMElement
+     */
+    protected function transformSourceFile($filename, $coverageInformation, $classStartLine = 1)
+    {
+        $sourceElement = $this->doc->createElement('sourcefile');
+        $sourceElement->setAttribute('name', basename($filename));
+
+        /**
+         * Add original/full filename to document
+         */
+        $sourceElement->setAttribute('sourcefile', $filename);
+
+        $filelines = $this->highlightSourceFile($filename);
+
+        $linenr = 1;
+
+        foreach ($filelines as $line) {
+            $lineElement = $this->doc->createElement('sourceline');
+            $lineElement->setAttribute(
+                'coveredcount',
+                (isset($coverageInformation[$linenr]) ? $coverageInformation[$linenr] : '0')
+            );
+
+            if ($linenr == $classStartLine) {
+                $lineElement->setAttribute('startclass', 1);
+            }
+
+            $textnode = $this->doc->createTextNode($line);
+            $lineElement->appendChild($textnode);
+
+            $sourceElement->appendChild($lineElement);
+
+            $linenr++;
+        }
+
+        return $sourceElement;
+    }
+
+    /**
+     * @param $filename
+     * @return array
+     */
+    protected function highlightSourceFile($filename)
+    {
+        if ($this->geshipath) {
+            require_once $this->geshipath . '/geshi.php';
+
+            $source = file_get_contents($filename);
+
+            $geshi = new GeSHi($source, 'php', $this->geshilanguagespath);
+
+            $geshi->enable_line_numbers(GESHI_NORMAL_LINE_NUMBERS);
+
+            $geshi->enable_strict_mode(true);
+
+            $geshi->enable_classes(true);
+
+            $geshi->set_url_for_keyword_group(3, '');
+
+            $html = $geshi->parse_code();
+
+            $lines = preg_split("#</?li>#", $html);
+
+            // skip first and last line
+            array_pop($lines);
+            array_shift($lines);
+
+            $lines = array_filter($lines);
+
+            $lines = array_map([$this, 'stripDiv'], $lines);
+
+            return $lines;
+        } else {
+            $lines = file($filename);
+
+            for ($i = 0; $i < count($lines); $i++) {
+                $line = $lines[$i];
+
+                $line = rtrim($line);
+
+                if (function_exists('mb_check_encoding') && mb_check_encoding($line, 'UTF-8')) {
+                    $lines[$i] = $line;
+                } else {
+                    if (function_exists('mb_convert_encoding')) {
+                        $lines[$i] = mb_convert_encoding($line, 'UTF-8');
+                    } else {
+                        $lines[$i] = utf8_encode($line);
+                    }
+                }
+            }
+
+            return $lines;
+        }
+    }
+
     protected function calculateStatistics()
     {
         $packages = $this->doc->documentElement->getElementsByTagName('package');
@@ -557,34 +570,21 @@ class CoverageReportTask extends Task
         $this->doc->documentElement->setAttribute('totalcovered', $totalmethodscovered + $totalstatementscovered);
     }
 
-    public function main()
+    /**
+     * @param $source
+     * @return string
+     */
+    protected function stripDiv($source)
     {
-        $coverageDatabase = $this->project->getProperty('coverage.database');
+        $openpos = strpos($source, "<div");
+        $closepos = strpos($source, ">", $openpos);
 
-        if (!$coverageDatabase) {
-            throw new BuildException("Property coverage.database is not set - please include coverage-setup in your build file");
-        }
+        $line = substr($source, $closepos + 1);
 
-        $database = new PhingFile($coverageDatabase);
+        $tagclosepos = strpos($line, "</div>");
 
-        $this->log("Transforming coverage report");
+        $line = substr($line, 0, $tagclosepos);
 
-        $props = new Properties();
-        $props->load($database);
-
-        foreach ($props->keys() as $filename) {
-            $file = unserialize($props->getProperty($filename));
-
-            $this->transformCoverageInformation($file['fullname'], $file['coverage']);
-        }
-
-        $this->calculateStatistics();
-
-        $this->doc->save($this->outfile);
-
-        foreach ($this->transformers as $transformer) {
-            $transformer->setXmlDocument($this->doc);
-            $transformer->transform();
-        }
+        return $line;
     }
 }

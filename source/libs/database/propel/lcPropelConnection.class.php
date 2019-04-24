@@ -111,39 +111,6 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
-    public function beginTransaction($emulated = true)
-    {
-        if ($emulated) {
-            return parent::beginTransaction();
-        } else {
-            return $this->disableAutocommit();
-        }
-    }
-
-    public function commit($emulated = true)
-    {
-        if ($emulated) {
-            return parent::commit();
-        } else {
-            if (!$this->exec('COMMIT')) {
-                return false;
-            }
-            return $this->enableAutocommit();
-        }
-    }
-
-    public function rollback($emulated = true)
-    {
-        if ($emulated) {
-            return parent::rollBack();
-        } else {
-            if (!$this->exec('ROLLBACK')) {
-                return false;
-            }
-            return $this->enableAutocommit();
-        }
-    }
-
     public function lockTablesInTransaction(array $tables)
     {
         if (!$tables) {
@@ -159,14 +126,18 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
+    public function beginTransaction($emulated = true)
+    {
+        if ($emulated) {
+            return parent::beginTransaction();
+        } else {
+            return $this->disableAutocommit();
+        }
+    }
+
     public function disableAutocommit()
     {
         return $this->exec('SET autocommit = 0');
-    }
-
-    public function enableAutocommit()
-    {
-        return $this->exec('SET autocommit = 1');
     }
 
     public function exec($sql)
@@ -179,7 +150,7 @@ class lcPropelConnection extends PropelPDO
 
         if (is_string($sql)) {
             return parent::exec($sql);
-        } elseif (is_array($sql)) {
+        } else if (is_array($sql)) {
             // execute multiply statements in a transaction
             $this->beginTransaction();
 
@@ -201,7 +172,60 @@ class lcPropelConnection extends PropelPDO
         return false;
     }
 
+    public function commit($emulated = true)
+    {
+        if ($emulated) {
+            return parent::commit();
+        } else {
+            if (!$this->exec('COMMIT')) {
+                return false;
+            }
+            return $this->enableAutocommit();
+        }
+    }
+
+    public function enableAutocommit()
+    {
+        return $this->exec('SET autocommit = 1');
+    }
+
+    public function rollback($emulated = true)
+    {
+        if ($emulated) {
+            return parent::rollBack();
+        } else {
+            if (!$this->exec('ROLLBACK')) {
+                return false;
+            }
+            return $this->enableAutocommit();
+        }
+    }
+
     #pragma mark - Caching
+
+    public function commitAndUnlockTables()
+    {
+        parent::commit();
+
+        /*
+        $this->unlockTables();
+        $this->enableAutocommit();
+*/
+
+        return true;
+    }
+
+    public function rollbackAndUnlockTables()
+    {
+        parent::rollBack();
+
+        /*
+        $this->unlockTables();
+        $this->enableAutocommit();
+*/
+
+        return true;
+    }
 
     public function lockTables(array $tables)
     {
@@ -225,33 +249,9 @@ class lcPropelConnection extends PropelPDO
         return $this->exec($sql);
     }
 
-    public function commitAndUnlockTables()
-    {
-        parent::commit();
-
-        /*
-        $this->unlockTables();
-        $this->enableAutocommit();
-*/
-
-        return true;
-    }
-
     public function unlockTables()
     {
         return $this->exec('UNLOCK TABLES');
-    }
-
-    public function rollbackAndUnlockTables()
-    {
-        parent::rollBack();
-
-        /*
-        $this->unlockTables();
-        $this->enableAutocommit();
-*/
-
-        return true;
     }
 
     public function prepare($sql, $driver_options = [])
@@ -316,13 +316,13 @@ class lcPropelConnection extends PropelPDO
     /**
      * Logs the method call or SQL using the Propel::log() method or a registered logger class.
      *
-     * @uses      self::getLogPrefix()
-     * @see       self::setLogger()
-     *
      * @param string $msg Message to log.
      * @param integer $level Log level to use; will use self::setLogLevel() specified level by default.
      * @param string $methodName Name of the method whose execution is being logged.
      * @param array $debugSnapshot Previous return value from self::getDebugSnapshot().
+     * @uses      self::getLogPrefix()
+     * @see       self::setLogger()
+     *
      */
     public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
     {

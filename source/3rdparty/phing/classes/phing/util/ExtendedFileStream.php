@@ -47,17 +47,6 @@ class ExtendedFileStream
 
     /**
      * @param $path
-     */
-    private function createDirectories($path)
-    {
-        $f = new PhingFile($path);
-        if (!$f->exists()) {
-            $f->mkdirs();
-        }
-    }
-
-    /**
-     * @param $path
      * @param $mode
      * @param $options
      * @param $opened_path
@@ -77,11 +66,22 @@ class ExtendedFileStream
 
         $this->fp = fopen($filepath, $mode);
 
-        if (! $this->fp) {
+        if (!$this->fp) {
             throw new BuildException("Unable to open stream for path {$path}");
         }
 
         return true;
+    }
+
+    /**
+     * @param $path
+     */
+    private function createDirectories($path)
+    {
+        $f = new PhingFile($path);
+        if (!$f->exists()) {
+            $f->mkdirs();
+        }
     }
 
     public function stream_close()

@@ -72,7 +72,7 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
      * different sources available
      * @var array
      */
-    private $_tokensources = array();
+    private $_tokensources = [];
 
     /**
      * Character marking the beginning of a token.
@@ -118,14 +118,99 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     private $_translatehtml = true;
 
     /**
-     * Sets the drectory where to look for the files to use for token replacement
+     * Returns stream with tokens having been replaced with appropriate values.
+     * If a replacement value is not found for a token, the token is left in the stream.
      *
-     * @param $translate
-     * @internal param string $dir
+     * @param null $len
+     * @return mixed filtered stream, -1 on EOF.
      */
-    public function setTranslateHTML($translate)
+    public function read($len = null)
     {
-        $this->_translatehtml = (bool) $translate;
+        if (!$this->getInitialized()) {
+            $this->_initialize();
+            $this->setInitialized(true);
+        }
+
+        // read from next filter up the chain
+        $buffer = $this->in->read($len);
+
+        if ($buffer === -1) {
+            return -1;
+        }
+
+        // filter buffer
+        $buffer = preg_replace_callback(
+            "$" . preg_quote($this->_beginToken) . "([\w\.\-:\/]+?)" . preg_quote($this->_endToken) . "$",
+            [$this, 'replaceTokenCallback'],
+            $buffer
+        );
+
+        return $buffer;
+    }
+
+    /**
+     * Initializes parameters
+     * This method is only called when this filter is used through
+     * a <filterreader> tag in build file.
+     */
+    private function _initialize()
+    {
+        $params = $this->getParameters();
+        $n = count($params);
+
+        if ($params !== null) {
+            for ($i = 0; $i < $n; $i++) {
+                if ($params[$i] !== null) {
+                    $name = $params[$i]->getName();
+                    switch ($name) {
+                        case 'begintoken' :
+                            $this->_beginToken = $params[$i]->getValue();
+                            break;
+                        case 'endtoken' :
+                            $this->_endToken = $params[$i]->getValue();
+                            break;
+                        case 'dir':
+                            $this->_dir = $params[$i]->getValue();
+                            break;
+                        case 'prefix':
+                            $this->_prefix = $params[$i]->getValue();
+                            break;
+                        case 'postfix':
+                            $this->_postfix = $params[$i]->getValue();
+                            break;
+                        case 'translatehtml':
+                            $this->_translatehtml = $params[$i]->getValue();
+                            break;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new ReplaceTokensWithFile using the passed in
+     * Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering
+     *                the specified reader
+     * @internal param A $object Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new ReplaceTokensWithFile($reader);
+        $newFilter->setProject($this->getProject());
+        $newFilter->setTranslateHTML($this->getTranslateHTML());
+        $newFilter->setDir($this->getDir());
+        $newFilter->setPrefix($this->getPrefix());
+        $newFilter->setPostfix($this->getPostfix());
+        $newFilter->setBeginToken($this->getBeginToken());
+        $newFilter->setEndToken($this->getEndToken());
+        $newFilter->setInitialized(true);
+
+        return $newFilter;
     }
 
     /**
@@ -139,12 +224,19 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     /**
      * Sets the drectory where to look for the files to use for token replacement
      *
-     * @param string $dir
+     * @param $translate
+     * @internal param string $dir
      */
-    public function setDir($dir)
+    public function setTranslateHTML($translate)
     {
-        $this->_dir = (string) $dir;
+        $this->_translatehtml = (bool)$translate;
     }
+
+    /*
+     * Returns the prefix that is prepended to the token in order to create the file
+     * name. For example if the token is 01 and the prefix is "example" then
+     * the filename to look for will be "example01"
+     */
 
     /**
      * Returns the drectory where to look for the files to use for token replacement
@@ -152,6 +244,24 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     public function getDir()
     {
         return $this->_dir;
+    }
+
+    /**
+     * Sets the drectory where to look for the files to use for token replacement
+     *
+     * @param string $dir
+     */
+    public function setDir($dir)
+    {
+        $this->_dir = (string)$dir;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->_prefix;
     }
 
     /**
@@ -163,32 +273,7 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
      */
     public function setPrefix($prefix)
     {
-        $this->_prefix = (string) $prefix;
-    }
-
-    /*
-     * Returns the prefix that is prepended to the token in order to create the file
-     * name. For example if the token is 01 and the prefix is "example" then
-     * the filename to look for will be "example01"
-     */
-    /**
-     * @return string
-     */
-    public function getPrefix()
-    {
-        return $this->_prefix;
-    }
-
-    /**
-     * Sets the postfix that is added to the token in order to create the file
-     * name. For example if the token is 01 and the postfix is ".php" then
-     * the filename to look for will be "01.php"
-     *
-     * @param string $postfix
-     */
-    public function setPostfix($postfix)
-    {
-        $this->_postfix = (string) $postfix;
+        $this->_prefix = (string)$prefix;
     }
 
     /**
@@ -202,13 +287,15 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     }
 
     /**
-     * Sets the "begin token" character.
+     * Sets the postfix that is added to the token in order to create the file
+     * name. For example if the token is 01 and the postfix is ".php" then
+     * the filename to look for will be "01.php"
      *
-     * @param string $beginToken the character used to denote the beginning of a token.
+     * @param string $postfix
      */
-    public function setBeginToken($beginToken)
+    public function setPostfix($postfix)
     {
-        $this->_beginToken = (string) $beginToken;
+        $this->_postfix = (string)$postfix;
     }
 
     /**
@@ -222,13 +309,13 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     }
 
     /**
-     * Sets the "end token" character.
+     * Sets the "begin token" character.
      *
-     * @param string $endToken the character used to denote the end of a token
+     * @param string $beginToken the character used to denote the beginning of a token.
      */
-    public function setEndToken($endToken)
+    public function setBeginToken($beginToken)
     {
-        $this->_endToken = (string) $endToken;
+        $this->_beginToken = (string)$beginToken;
     }
 
     /**
@@ -242,8 +329,18 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
     }
 
     /**
+     * Sets the "end token" character.
+     *
+     * @param string $endToken the character used to denote the end of a token
+     */
+    public function setEndToken($endToken)
+    {
+        $this->_endToken = (string)$endToken;
+    }
+
+    /**
      * Replace the token found with the appropriate file contents
-     * @param  array  $matches Array of 1 el containing key to search for.
+     * @param array $matches Array of 1 el containing key to search for.
      * @return string Text with which to replace key or value of key if none is found.
      */
     private function replaceTokenCallback($matches)
@@ -287,101 +384,5 @@ class ReplaceTokensWithFile extends BaseParamFilterReader implements ChainableRe
         }
 
         return $buffer;
-    }
-
-    /**
-     * Returns stream with tokens having been replaced with appropriate values.
-     * If a replacement value is not found for a token, the token is left in the stream.
-     *
-     * @param null $len
-     * @return mixed filtered stream, -1 on EOF.
-     */
-    public function read($len = null)
-    {
-        if (!$this->getInitialized()) {
-            $this->_initialize();
-            $this->setInitialized(true);
-        }
-
-        // read from next filter up the chain
-        $buffer = $this->in->read($len);
-
-        if ($buffer === -1) {
-            return -1;
-        }
-
-        // filter buffer
-        $buffer = preg_replace_callback(
-            "$" . preg_quote($this->_beginToken) . "([\w\.\-:\/]+?)" . preg_quote($this->_endToken) . "$",
-            array($this, 'replaceTokenCallback'),
-            $buffer
-        );
-
-        return $buffer;
-    }
-
-    /**
-     * Creates a new ReplaceTokensWithFile using the passed in
-     * Reader for instantiation.
-     *
-     * @param Reader $reader
-     * @internal param A $object Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering
-     *                the specified reader
-     */
-    public function chain(Reader $reader)
-    {
-        $newFilter = new ReplaceTokensWithFile($reader);
-        $newFilter->setProject($this->getProject());
-        $newFilter->setTranslateHTML($this->getTranslateHTML());
-        $newFilter->setDir($this->getDir());
-        $newFilter->setPrefix($this->getPrefix());
-        $newFilter->setPostfix($this->getPostfix());
-        $newFilter->setBeginToken($this->getBeginToken());
-        $newFilter->setEndToken($this->getEndToken());
-        $newFilter->setInitialized(true);
-
-        return $newFilter;
-    }
-
-    /**
-     * Initializes parameters
-     * This method is only called when this filter is used through
-     * a <filterreader> tag in build file.
-     */
-    private function _initialize()
-    {
-        $params = $this->getParameters();
-        $n = count($params);
-
-        if ($params !== null) {
-            for ($i = 0; $i < $n; $i++) {
-                if ($params[$i] !== null) {
-                    $name = $params[$i]->getName();
-                    switch ($name) {
-                        case 'begintoken' :
-                            $this->_beginToken = $params[$i]->getValue();
-                            break;
-                        case 'endtoken' :
-                            $this->_endToken = $params[$i]->getValue();
-                            break;
-                        case 'dir':
-                            $this->_dir = $params[$i]->getValue();
-                            break;
-                        case 'prefix':
-                            $this->_prefix = $params[$i]->getValue();
-                            break;
-                        case 'postfix':
-                            $this->_postfix = $params[$i]->getValue();
-                            break;
-                        case 'translatehtml':
-                            $this->_translatehtml = $params[$i]->getValue();
-                            break;
-                    }
-                }
-            }
-        }
     }
 }

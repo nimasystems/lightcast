@@ -19,8 +19,6 @@ abstract class lcBasePropelObject extends BaseObject
         $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
     }
 
-    abstract public function getPrimaryKey();
-
     public function setEventDispatcher(lcEventDispatcher $event_dispatcher)
     {
         $this->event_dispatcher = $event_dispatcher;
@@ -90,16 +88,7 @@ abstract class lcBasePropelObject extends BaseObject
         return '#' . $this->getPrimaryKey();
     }
 
-    protected function translate($t)
-    {
-        /** @noinspection PhpUndefinedMethodInspection */
-        return $this->getPeer()->getTableMap()->translate($t);
-    }
-
-    protected function t($t)
-    {
-        return $this->translate($t);
-    }
+    abstract public function getPrimaryKey();
 
     public function getVirtualColumn($name)
     {
@@ -118,6 +107,17 @@ abstract class lcBasePropelObject extends BaseObject
         } else {
             return parent::__call($name, $params);
         }
+    }
+
+    protected function t($t)
+    {
+        return $this->translate($t);
+    }
+
+    protected function translate($t)
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
+        return $this->getPeer()->getTableMap()->translate($t);
     }
 
     protected function logError($msg)

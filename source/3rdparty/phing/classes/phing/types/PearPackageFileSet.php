@@ -105,22 +105,6 @@ class PearPackageFileSet extends FileSet
     }
 
     /**
-     * Returns the base directory all package files are relative to
-     *
-     * @param Project $p Current phing project
-     *
-     * @return PhingFile Base directory
-     */
-    public function getDir(Project $p)
-    {
-        if ($this->pps === null) {
-            $this->loadPearPackageScanner($p);
-        }
-
-        return new PhingFile((string) $this->pps->getBaseDir());
-    }
-
-    /**
      * Loads the package scanner instance into $this->pps
      *
      * @param Project $p Current phing project
@@ -141,6 +125,22 @@ class PearPackageFileSet extends FileSet
     }
 
     /**
+     * Returns the base directory all package files are relative to
+     *
+     * @param Project $p Current phing project
+     *
+     * @return PhingFile Base directory
+     */
+    public function getDir(Project $p)
+    {
+        if ($this->pps === null) {
+            $this->loadPearPackageScanner($p);
+        }
+
+        return new PhingFile((string)$this->pps->getBaseDir());
+    }
+
+    /**
      * Sets the package.xml filename.
      * If it is not set, the local pear installation is queried for the package.
      *
@@ -158,8 +158,8 @@ class PearPackageFileSet extends FileSet
      *
      * @param string $package Single package name, or "channel/name" combination
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function setPackage($package)
     {

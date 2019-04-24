@@ -35,17 +35,17 @@ require_once 'phing/types/selectors/BaseExtendSelector.php';
 class DateSelector extends BaseExtendSelector
 {
 
-    private $seconds = -1; // millis in Ant, but PHP doesn't support that level of precision
-    private $dateTime = null;
-    private $includeDirs = false;
-    private $granularity = 0;
-    private $cmp = 2;
-    const MILLIS_KEY = "millis";
+        const MILLIS_KEY = "millis"; // millis in Ant, but PHP doesn't support that level of precision
     const DATETIME_KEY = "datetime";
     const CHECKDIRS_KEY = "checkdirs";
     const GRANULARITY_KEY = "granularity";
     const WHEN_KEY = "when";
-    private static $timeComparisons = array("before", "after", "equal");
+    private static $timeComparisons = ["before", "after", "equal"];
+private $seconds = -1;
+    private $dateTime = null;
+    private $includeDirs = false;
+    private $granularity = 0;
+    private $cmp = 2;
 
     /**
      *
@@ -67,7 +67,7 @@ class DateSelector extends BaseExtendSelector
         $buf .= " compare: ";
         if ($this->cmp === 0) {
             $buf .= "before";
-        } elseif ($this->cmp === 1) {
+        } else if ($this->cmp === 1) {
             $buf .= "after";
         } else {
             $buf .= "equal";
@@ -80,17 +80,6 @@ class DateSelector extends BaseExtendSelector
     }
 
     /**
-     * For users that prefer to express time in seconds since 1970
-     *
-     * @param int $seconds the time to compare file's last modified date to,
-     *                     expressed in milliseconds
-     */
-    public function setSeconds($seconds)
-    {
-        $this->seconds = (int) $seconds;
-    }
-
-    /**
      * Returns the seconds value the selector is set for.
      */
     public function getSeconds()
@@ -99,60 +88,14 @@ class DateSelector extends BaseExtendSelector
     }
 
     /**
-     * Sets the date. The user must supply it in MM/DD/YYYY HH:MM AM_PM
-     * format
+     * For users that prefer to express time in seconds since 1970
      *
-     * @param string $dateTime a string in MM/DD/YYYY HH:MM AM_PM format
+     * @param int $seconds the time to compare file's last modified date to,
+     *                     expressed in milliseconds
      */
-    public function setDatetime($dateTime)
+    public function setSeconds($seconds)
     {
-        $dt = strtotime($dateTime);
-        if ($dt == -1) {
-            $this->setError(
-                "Date of " . $dateTime
-                . " Cannot be parsed correctly. It should be in"
-                . " a format parsable by PHP's strtotime() function."
-            );
-        } else {
-            $this->dateTime = $dateTime;
-            $this->setSeconds($dt);
-        }
-    }
-
-    /**
-     * Should we be checking dates on directories?
-     *
-     * @param boolean $includeDirs whether to check the timestamp on directories
-     */
-    public function setCheckdirs($includeDirs)
-    {
-        $this->includeDirs = (boolean) $includeDirs;
-    }
-
-    /**
-     * Sets the number of milliseconds leeway we will give before we consider
-     * a file not to have matched a date.
-     * @param int $granularity
-     */
-    public function setGranularity($granularity)
-    {
-        $this->granularity = (int) $granularity;
-    }
-
-    /**
-     * Sets the type of comparison to be done on the file's last modified
-     * date.
-     *
-     * @param string $cmp The comparison to perform
-     */
-    public function setWhen($cmp)
-    {
-        $idx = array_search($cmp, self::$timeComparisons, true);
-        if ($idx === null) {
-            $this->setError("Invalid value for " . self::WHEN_KEY . ": " . $cmp);
-        } else {
-            $this->cmp = $idx;
-        }
+        $this->seconds = (int)$seconds;
     }
 
     /**
@@ -192,6 +135,63 @@ class DateSelector extends BaseExtendSelector
     }
 
     /**
+     * Sets the date. The user must supply it in MM/DD/YYYY HH:MM AM_PM
+     * format
+     *
+     * @param string $dateTime a string in MM/DD/YYYY HH:MM AM_PM format
+     */
+    public function setDatetime($dateTime)
+    {
+        $dt = strtotime($dateTime);
+        if ($dt == -1) {
+            $this->setError(
+                "Date of " . $dateTime
+                . " Cannot be parsed correctly. It should be in"
+                . " a format parsable by PHP's strtotime() function."
+            );
+        } else {
+            $this->dateTime = $dateTime;
+            $this->setSeconds($dt);
+        }
+    }
+
+    /**
+     * Should we be checking dates on directories?
+     *
+     * @param boolean $includeDirs whether to check the timestamp on directories
+     */
+    public function setCheckdirs($includeDirs)
+    {
+        $this->includeDirs = (boolean)$includeDirs;
+    }
+
+    /**
+     * Sets the number of milliseconds leeway we will give before we consider
+     * a file not to have matched a date.
+     * @param int $granularity
+     */
+    public function setGranularity($granularity)
+    {
+        $this->granularity = (int)$granularity;
+    }
+
+    /**
+     * Sets the type of comparison to be done on the file's last modified
+     * date.
+     *
+     * @param string $cmp The comparison to perform
+     */
+    public function setWhen($cmp)
+    {
+        $idx = array_search($cmp, self::$timeComparisons, true);
+        if ($idx === null) {
+            $this->setError("Invalid value for " . self::WHEN_KEY . ": " . $cmp);
+        } else {
+            $this->cmp = $idx;
+        }
+    }
+
+    /**
      * This is a consistency check to ensure the selector's required
      * values have been set.
      */
@@ -202,7 +202,7 @@ class DateSelector extends BaseExtendSelector
                 "You must provide a datetime or the number of "
                 . "seconds."
             );
-        } elseif ($this->seconds < 0) {
+        } else if ($this->seconds < 0) {
             $this->setError(
                 "Date of " . $this->dateTime
                 . " results in negative seconds"
@@ -215,9 +215,9 @@ class DateSelector extends BaseExtendSelector
      * The heart of the matter. This is where the selector gets to decide
      * on the inclusion of a file in a particular fileset.
      *
-     * @param  PhingFile $basedir  the base directory the scan is being done from
-     * @param  string    $filename is the name of the file to check
-     * @param  PhingFile $file     is a PhingFile object the selector can use
+     * @param PhingFile $basedir the base directory the scan is being done from
+     * @param string $filename is the name of the file to check
+     * @param PhingFile $file is a PhingFile object the selector can use
      * @return boolean   Whether the file should be selected or not
      */
     public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
@@ -228,7 +228,7 @@ class DateSelector extends BaseExtendSelector
         }
         if ($this->cmp === 0) {
             return (($file->lastModified() - $this->granularity) < $this->seconds);
-        } elseif ($this->cmp === 1) {
+        } else if ($this->cmp === 1) {
             return (($file->lastModified() - $this->granularity) > $this->seconds);
         } else {
             return (abs($file->lastModified() - $this->seconds) <= $this->granularity);

@@ -37,7 +37,7 @@ include_once 'phing/system/io/IniFileParser.php';
 class Properties
 {
 
-    private $properties = array();
+    private $properties = [];
 
     /**
      * @var FileParserInterface
@@ -67,9 +67,27 @@ class Properties
     }
 
     /**
+     * Set the value for a property.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return mixed  Old property value or null if none was set.
+     */
+    public function setProperty($key, $value)
+    {
+        $oldValue = null;
+        if (isset($this->properties[$key])) {
+            $oldValue = $this->properties[$key];
+        }
+        $this->properties[$key] = $value;
+
+        return $oldValue;
+    }
+
+    /**
      * Load properties from a file.
      *
-     * @param  PhingFile $file
+     * @param PhingFile $file
      * @return void
      * @throws IOException - if unable to read file.
      */
@@ -87,9 +105,9 @@ class Properties
     /**
      * Parses the file given.
      *
-     * @param  PhingFile $file
-     * @internal param bool $processSections Whether to honor [SectionName] sections in INI file.
+     * @param PhingFile $file
      * @return array   Properties loaded from file (no prop replacements done yet).
+     * @internal param bool $processSections Whether to honor [SectionName] sections in INI file.
      */
     protected function parse(PhingFile $file)
     {
@@ -97,45 +115,10 @@ class Properties
     }
 
     /**
-     * Process values when being written out to properties file.
-     * does things like convert true => "true"
-     * @param  mixed  $val The property value (may be boolean, etc.)
-     * @return string
-     */
-    protected function outVal($val)
-    {
-        if ($val === true) {
-            $val = "true";
-        } elseif ($val === false) {
-            $val = "false";
-        }
-
-        return $val;
-    }
-
-    /**
-     * Create string representation that can be written to file and would be loadable using load() method.
-     *
-     * Essentially this function creates a string representation of properties that is ready to
-     * write back out to a properties file.  This is used by store() method.
-     *
-     * @return string
-     */
-    public function toString()
-    {
-        $buf = "";
-        foreach ($this->properties as $key => $item) {
-            $buf .= $key . "=" . $this->outVal($item) . PHP_EOL;
-        }
-
-        return $buf;
-    }
-
-    /**
      * Stores current properties to specified file.
      *
-     * @param  PhingFile   $file   File to create/overwrite with properties.
-     * @param  string      $header Header text that will be placed (within comments) at the top of properties file.
+     * @param PhingFile $file File to create/overwrite with properties.
+     * @param string $header Header text that will be placed (within comments) at the top of properties file.
      * @return void
      * @throws IOException - on error writing properties file.
      */
@@ -164,6 +147,41 @@ class Properties
         }
     }
 
+    /**
+     * Create string representation that can be written to file and would be loadable using load() method.
+     *
+     * Essentially this function creates a string representation of properties that is ready to
+     * write back out to a properties file.  This is used by store() method.
+     *
+     * @return string
+     */
+    public function toString()
+    {
+        $buf = "";
+        foreach ($this->properties as $key => $item) {
+            $buf .= $key . "=" . $this->outVal($item) . PHP_EOL;
+        }
+
+        return $buf;
+    }
+
+    /**
+     * Process values when being written out to properties file.
+     * does things like convert true => "true"
+     * @param mixed $val The property value (may be boolean, etc.)
+     * @return string
+     */
+    protected function outVal($val)
+    {
+        if ($val === true) {
+            $val = "true";
+        } else if ($val === false) {
+            $val = "false";
+        }
+
+        return $val;
+    }
+
     public function storeOutputStream(OutputStream $os, $comments)
     {
         $this->_storeOutputStream(new BufferedWriter(new OutputStreamWriter($os)), $comments);
@@ -177,8 +195,8 @@ class Properties
         $bw->write("#" . gmdate('D, d M Y H:i:s', time()) . ' GMT');
         $bw->newLine();
         foreach ($this->getProperties() as $key => $value) {
-                $bw->write($key . "=" . $value);
-                $bw->newLine();
+            $bw->write($key . "=" . $value);
+            $bw->newLine();
 
         }
         $bw->flush();
@@ -211,7 +229,7 @@ class Properties
      * Get value for specified property.
      * This is the same as get() method.
      *
-     * @param  string $prop The property name (key).
+     * @param string $prop The property name (key).
      * @return mixed
      * @see get()
      */
@@ -229,7 +247,7 @@ class Properties
      * This function exists to provide a hashtable-like interface for
      * properties.
      *
-     * @param  string $prop The property name (key).
+     * @param string $prop The property name (key).
      * @return mixed
      * @see getProperty()
      */
@@ -240,24 +258,6 @@ class Properties
         }
 
         return $this->properties[$prop];
-    }
-
-    /**
-     * Set the value for a property.
-     *
-     * @param  string $key
-     * @param  mixed  $value
-     * @return mixed  Old property value or null if none was set.
-     */
-    public function setProperty($key, $value)
-    {
-        $oldValue = null;
-        if (isset($this->properties[$key])) {
-            $oldValue = $this->properties[$key];
-        }
-        $this->properties[$key] = $value;
-
-        return $oldValue;
     }
 
     /**
@@ -280,7 +280,7 @@ class Properties
      * If the property does not, it just adds it.
      *
      * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      * @param string $delimiter
      */
     public function append($key, $value, $delimiter = ',')
@@ -302,16 +302,6 @@ class Properties
     }
 
     /**
-     * Whether loaded properties array contains specified property name.
-     * @param $key
-     * @return boolean
-     */
-    public function containsKey($key)
-    {
-        return isset($this->properties[$key]);
-    }
-
-    /**
      * Returns properties keys.
      * Use this for foreach () {} iterations, as this is
      * faster than looping through property values.
@@ -320,6 +310,16 @@ class Properties
     public function keys()
     {
         return array_keys($this->properties);
+    }
+
+    /**
+     * Whether loaded properties array contains specified property name.
+     * @param $key
+     * @return boolean
+     */
+    public function containsKey($key)
+    {
+        return isset($this->properties[$key]);
     }
 
     /**

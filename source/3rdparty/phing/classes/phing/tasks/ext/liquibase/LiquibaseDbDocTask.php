@@ -42,6 +42,15 @@ class LiquibaseDbDocTask extends AbstractLiquibaseTask
     }
 
     /**
+     * @see Task::main()
+     */
+    public function main()
+    {
+        $this->checkParams();
+        $this->execute('dbdoc', escapeshellarg($this->outputDir));
+    }
+
+    /**
      * @see AbstractTask::checkParams()
      */
     protected function checkParams()
@@ -67,14 +76,5 @@ class LiquibaseDbDocTask extends AbstractLiquibaseTask
                 )
             );
         }
-    }
-
-    /**
-     * @see Task::main()
-     */
-    public function main()
-    {
-        $this->checkParams();
-        $this->execute('dbdoc', escapeshellarg($this->outputDir));
     }
 }

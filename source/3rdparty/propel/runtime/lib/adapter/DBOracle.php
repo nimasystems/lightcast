@@ -27,10 +27,10 @@ class DBOracle extends DBAdapter
      * post-initialization queries or code.
      * Removes the charset query and adds the date queries
      *
+     * @param PDO $con
+     * @param array $settings A $PDO PDO connection instance
      * @see       parent::initConnection()
      *
-     * @param PDO   $con
-     * @param array $settings A $PDO PDO connection instance
      */
     public function initConnection(PDO $con, array $settings)
     {
@@ -38,7 +38,7 @@ class DBOracle extends DBAdapter
         $con->exec("ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS'");
         if (isset($settings['queries']) && is_array($settings['queries'])) {
             foreach ($settings['queries'] as $queries) {
-                foreach ((array) $queries as $query) {
+                foreach ((array)$queries as $query) {
                     $con->exec($query);
                 }
             }
@@ -85,7 +85,7 @@ class DBOracle extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -109,12 +109,12 @@ class DBOracle extends DBAdapter
     }
 
     /**
+     * @param string $sql
+     * @param integer $offset
+     * @param integer $limit
+     * @param null|Criteria $criteria
      * @see       DBAdapter::applyLimit()
      *
-     * @param string        $sql
-     * @param integer       $offset
-     * @param integer       $limit
-     * @param null|Criteria $criteria
      */
     public function applyLimit(&$sql, $offset, $limit, $criteria = null)
     {
@@ -138,19 +138,11 @@ class DBOracle extends DBAdapter
     }
 
     /**
-     * @return int
-     */
-    protected function getIdMethod()
-    {
-        return DBAdapter::ID_METHOD_SEQUENCE;
-    }
-
-    /**
-     * @param PDO    $con
+     * @param PDO $con
      * @param string $name
      *
-     * @throws PropelException
      * @return integer
+     * @throws PropelException
      */
     public function getId(PDO $con, $name = null)
     {
@@ -215,25 +207,25 @@ class DBOracle extends DBAdapter
     }
 
     /**
+     * @param PDOStatement $stmt
+     * @param string $parameter
+     * @param mixed $value
+     * @param ColumnMap $cMap
+     * @param null|integer $position
+     *
+     * @return boolean
      * @see       DBAdapter::bindValue()
      * Warning: duplicates logic from OraclePlatform::getColumnBindingPHP().
      * Any code modification here must be ported there.
      *
-     * @param PDOStatement $stmt
-     * @param string       $parameter
-     * @param mixed        $value
-     * @param ColumnMap    $cMap
-     * @param null|integer $position
-     *
-     * @return boolean
      */
     public function bindValue(PDOStatement $stmt, $parameter, $value, ColumnMap $cMap, $position = null)
     {
         if ($cMap->isTemporal()) {
             $value = $this->formatTemporalValue($value, $cMap);
-        } elseif ($cMap->getType() == PropelColumnTypes::CLOB_EMU) {
+        } else if ($cMap->getType() == PropelColumnTypes::CLOB_EMU) {
             return $stmt->bindParam(':p' . $position, $value, $cMap->getPdoType(), strlen($value));
-        } elseif (is_resource($value) && $cMap->isLob()) {
+        } else if (is_resource($value) && $cMap->isLob()) {
             // we always need to make sure that the stream is rewound, otherwise nothing will
             // get written to database.
             rewind($value);
@@ -245,17 +237,17 @@ class DBOracle extends DBAdapter
     /**
      * Do Explain Plan for query object or query string
      *
-     * @param PropelPDO            $con   propel connection
+     * @param PropelPDO $con propel connection
      * @param ModelCriteria|string $query query the criteria or the query string
      *
-     * @throws PropelException
      * @return PDOStatement    A PDO statement executed using the connection, ready to be fetched
+     * @throws PropelException
      */
     public function doExplainPlan(PropelPDO $con, $query)
     {
         $con->beginTransaction();
         if ($query instanceof ModelCriteria) {
-            $params = array();
+            $params = [];
             $dbMap = Propel::getDatabaseMap($query->getDbName());
             $sql = BasePeer::createSelectSql($query, $params);
         } else {
@@ -283,7 +275,7 @@ class DBOracle extends DBAdapter
     /**
      * Explain Plan compute query getter
      *
-     * @param string $query    query to explain
+     * @param string $query query to explain
      * @param string $uniqueId query unique id
      *
      * @return string
@@ -305,5 +297,13 @@ class DBOracle extends DBAdapter
         return sprintf('SELECT LEVEL, OPERATION, OPTIONS, COST, CARDINALITY, BYTES
 FROM PLAN_TABLE CONNECT BY PRIOR ID = PARENT_ID AND PRIOR STATEMENT_ID = STATEMENT_ID
 START WITH ID = 0 AND STATEMENT_ID = \'%s\' ORDER BY ID', $uniqueId);
+    }
+
+    /**
+     * @return int
+     */
+    protected function getIdMethod()
+    {
+        return DBAdapter::ID_METHOD_SEQUENCE;
     }
 }

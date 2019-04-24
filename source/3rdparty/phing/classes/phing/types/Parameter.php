@@ -43,23 +43,7 @@ class Parameter extends DataType
     protected $value;
 
     /** Nested parameters */
-    protected $parameters = array();
-
-    /**
-     * @param $name
-     */
-    public function setName($name)
-    {
-        $this->name = (string) $name;
-    }
-
-    /**
-     * @param $type
-     */
-    public function setType($type)
-    {
-        $this->type = (string) $type;
-    }
+    protected $parameters = [];
 
     /**
      * Sets value to dynamic register slot.
@@ -70,22 +54,30 @@ class Parameter extends DataType
         $this->value = $value;
     }
 
-    /**
-     * @param $value
-     */
-    public function setValue($value)
-    {
-        $this->value = (string) $value;
-    }
-
     public function getName()
     {
         return $this->name;
     }
 
+    /**
+     * @param $name
+     */
+    public function setName($name)
+    {
+        $this->name = (string)$name;
+    }
+
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param $type
+     */
+    public function setType($type)
+    {
+        $this->type = (string)$type;
     }
 
     /**
@@ -98,6 +90,14 @@ class Parameter extends DataType
         } else {
             return $this->value;
         }
+    }
+
+    /**
+     * @param $value
+     */
+    public function setValue($value)
+    {
+        $this->value = (string)$value;
     }
 
     /**

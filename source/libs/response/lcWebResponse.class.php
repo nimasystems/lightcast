@@ -827,16 +827,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $content;
     }
 
-    public function getContentHreflangs()
-    {
-        return $this->content_hreflangs;
-    }
-
-    public function setContentHreflangs(array $content_hreflangs = null)
-    {
-        $this->content_hreflangs = $content_hreflangs;
-    }
-
     private function processViewConfiguration()
     {
         // metatags
@@ -955,16 +945,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 unset($config_js);
             }
         }
-    }
-
-    public function setViewJavascriptsEnabled($enabled = true)
-    {
-        $this->view_javascripts_enabled = $enabled;
-    }
-
-    public function setViewStylesheetsEnabled($enabled = true)
-    {
-        $this->view_stylesheets_enabled = $enabled;
     }
 
     protected function sendCookies()
@@ -1134,6 +1114,26 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
+    public function getContentHreflangs()
+    {
+        return $this->content_hreflangs;
+    }
+
+    public function setContentHreflangs(array $content_hreflangs = null)
+    {
+        $this->content_hreflangs = $content_hreflangs;
+    }
+
+    public function setViewJavascriptsEnabled($enabled = true)
+    {
+        $this->view_javascripts_enabled = $enabled;
+    }
+
+    public function setViewStylesheetsEnabled($enabled = true)
+    {
+        $this->view_stylesheets_enabled = $enabled;
+    }
+
     public function getStylesheets()
     {
         return $this->stylesheets;
@@ -1241,12 +1241,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    public function setJavascriptCode($code, $tag = null)
-    {
-        $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
-        $this->javascript_code = [$tag => $code];
-    }
-
     public function getJavascriptCode($combined = true)
     {
         if ($combined) {
@@ -1256,6 +1250,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         } else {
             return $this->javascript_code;
         }
+    }
+
+    public function setJavascriptCode($code, $tag = null)
+    {
+        $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
+        $this->javascript_code = [$tag => $code];
     }
 
     public function addJavascriptCode($code, $tag = null)
@@ -1463,6 +1463,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return null;
     }
 
+    /**
+     * @param $code
+     * @param null $tag
+     * @deprecated This is obsoleted by addJavascriptCode
+     */
+    public function addBodyJavascript($code, $tag = null)
+    {
+        $this->customBodyHtml(null, $code, $tag, true);
+    }
+
     public function customBodyHtml($start = null, $end = null, $tag = null, $is_javascript = false)
     {
         if ($is_javascript && $this->clientside_js) {
@@ -1472,16 +1482,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->html_body_custom[] = ['start' => $start, 'end' => $end, 'tag' => $tag, 'is_javascript' => $is_javascript];
 
         return null;
-    }
-
-    /**
-     * @param $code
-     * @param null $tag
-     * @deprecated This is obsoleted by addJavascriptCode
-     */
-    public function addBodyJavascript($code, $tag = null)
-    {
-        $this->customBodyHtml(null, $code, $tag, true);
     }
 
     public function setCookie(lcCookie $cookie)

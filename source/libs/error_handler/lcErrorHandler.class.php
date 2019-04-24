@@ -73,7 +73,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
     public function getCapabilities()
     {
         return [
-            'error_handler'
+            'error_handler',
         ];
     }
 
@@ -129,7 +129,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 'code' => $exception_code,
                 'cause' => $exception_cause,
                 'trace' => $exception_trace_str,
-                'system_snapshot' => $system_snapshot
+                'system_snapshot' => $system_snapshot,
             ]));
     }
 
@@ -545,7 +545,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                             'code' => $exception_code,
                             'cause' => $exception_cause,
                             'exception_object' => $exception,
-                            'trace' => $exception_trace_str
+                            'trace' => $exception_trace_str,
                         ];
 
                         $front_controller->forward($exceptions_custom_module, $exceptions_custom_action, ['request' => $params]);

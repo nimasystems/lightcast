@@ -31,18 +31,23 @@ class PropelCSVParser extends PropelParser
     public $escapechar = "\\";
     public $quoting = self::QUOTE_MINIMAL;
 
+    public function listFromArray($array)
+    {
+        return $this->fromArray($array, true);
+    }
+
     /**
      * Converts data from an associative array to CSV.
      *
-     * @param array   $array          Source data to convert
-     * @param boolean $isList         Whether the input data contains more than one row
+     * @param array $array Source data to convert
+     * @param boolean $isList Whether the input data contains more than one row
      * @param boolean $includeHeading Whether the output should contain a heading line
      *
      * @return string Converted data, as a CSV string
      */
     public function fromArray($array, $isList = false, $includeHeading = true)
     {
-        $rows = array();
+        $rows = [];
         if ($isList) {
             if ($includeHeading) {
                 $rows[] = implode($this->formatRow(array_keys(reset($array))), $this->delimiter);
@@ -58,11 +63,6 @@ class PropelCSVParser extends PropelParser
         }
 
         return implode($rows, $this->lineTerminator) . $this->lineTerminator;
-    }
-
-    public function listFromArray($array)
-    {
-        return $this->fromArray($array, true);
     }
 
     /**
@@ -103,6 +103,30 @@ class PropelCSVParser extends PropelParser
     }
 
     /**
+     * Serializes a value to place it into a CSV output
+     *
+     * @param mixed $input
+     *
+     * @return string
+     */
+    protected function serialize($input)
+    {
+        return serialize($input);
+    }
+
+    /**
+     * Quotes a column with quotechar
+     *
+     * @param string $input A single value to be quoted for output
+     *
+     * @return string Quoted input value
+     */
+    protected function quote($input)
+    {
+        return $this->quotechar . $input . $this->quotechar;
+    }
+
+    /**
      * Escapes a column (escapes quotechar with escapechar)
      *
      * @param string $input A single value to be escaped for output
@@ -116,18 +140,6 @@ class PropelCSVParser extends PropelParser
             $this->escapechar . $this->quotechar,
             $input
         );
-    }
-
-    /**
-     * Quotes a column with quotechar
-     *
-     * @param string $input A single value to be quoted for output
-     *
-     * @return string Quoted input value
-     */
-    protected function quote($input)
-    {
-        return $this->quotechar . $input . $this->quotechar;
     }
 
     /**
@@ -152,22 +164,10 @@ class PropelCSVParser extends PropelParser
     }
 
     /**
-     * Serializes a value to place it into a CSV output
-     *
-     * @param mixed $input
-     *
-     * @return string
-     */
-    protected function serialize($input)
-    {
-        return serialize($input);
-    }
-
-    /**
      * Alias for PropelCSVParser::fromArray()
      *
-     * @param array   $array          Source data to convert
-     * @param boolean $isList         Whether the input data contains more than one row
+     * @param array $array Source data to convert
+     * @param boolean $isList Whether the input data contains more than one row
      * @param boolean $includeHeading Whether the output should contain a heading line
      *
      * @return string Converted data, as a CSV string
@@ -177,11 +177,16 @@ class PropelCSVParser extends PropelParser
         return $this->fromArray($array, $isList, $includeHeading);
     }
 
+    public function listToArray($array)
+    {
+        return $this->toArray($array, true);
+    }
+
     /**
      * Converts data from CSV to an associative array.
      *
-     * @param string  $data           Source data to convert, as a CSV string
-     * @param boolean $isList         Whether the input data contains more than one row
+     * @param string $data Source data to convert, as a CSV string
+     * @param boolean $isList Whether the input data contains more than one row
      * @param boolean $includeHeading Whether the input contains a heading line
      *
      * @return array Converted data
@@ -196,17 +201,17 @@ class PropelCSVParser extends PropelParser
             $keys = range(0, count($this->getColumns($rows[0])) - 1);
         }
         if ($isList) {
-            $array = array();
+            $array = [];
             foreach ($rows as $row) {
                 $values = $this->cleanupRow($this->getColumns($row));
-                if ($values !== array()) {
+                if ($values !== []) {
                     $array[] = array_combine($keys, $values);
                 }
             }
         } else {
             $values = $this->cleanupRow($this->getColumns(array_shift($rows)));
-            if ($keys === array('') && $values === array()) {
-                $array = array();
+            if ($keys === [''] && $values === []) {
+                $array = [];
             } else {
                 if (count($keys) > count($values)) {
                     // empty values at the end of the row are not match bu the getColumns() regexp
@@ -217,11 +222,6 @@ class PropelCSVParser extends PropelParser
         }
 
         return $array;
-    }
-
-    public function listToArray($array)
-    {
-        return $this->toArray($array, true);
     }
 
     protected function getColumns($row)
@@ -301,8 +301,8 @@ class PropelCSVParser extends PropelParser
     /**
      * Alias for PropelCSVParser::toArray()
      *
-     * @param string  $data           Source data to convert, as a CSV string
-     * @param boolean $isList         Whether the input data contains more than one row
+     * @param string $data Source data to convert, as a CSV string
+     * @param boolean $isList Whether the input data contains more than one row
      * @param boolean $includeHeading Whether the input contains a heading line
      *
      * @return array Converted data

@@ -33,7 +33,7 @@ class MaxLengthValidator implements BasicValidator
 {
     /**
      * @param ValidatorMap $map
-     * @param string       $str
+     * @param string $str
      *
      * @return boolean
      */

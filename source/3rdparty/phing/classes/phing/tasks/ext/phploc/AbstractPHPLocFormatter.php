@@ -30,6 +30,19 @@ require_once 'phing/system/io/PhingFile.php';
 abstract class AbstractPHPLocFormatter
 {
     /**
+     * @var bool
+     */
+    protected $useFile = true;
+    /**
+     * @var string
+     */
+    protected $toDir = ".";
+    /**
+     * @var string
+     */
+    protected $outfile = "";
+
+    /**
      * @param array $count
      * @param bool $countTests
      * @return mixed
@@ -37,19 +50,12 @@ abstract class AbstractPHPLocFormatter
     abstract public function printResult(array $count, $countTests = false);
 
     /**
-     * @var bool
+     * Returns whether to store formatting results in a file
      */
-    protected $useFile = true;
-
-    /**
-     * @var string
-     */
-    protected $toDir = ".";
-
-    /**
-     * @var string
-     */
-    protected $outfile = "";
+    public function getUseFile()
+    {
+        return $this->useFile;
+    }
 
     /**
      * Sets whether to store formatting results in a file
@@ -61,11 +67,12 @@ abstract class AbstractPHPLocFormatter
     }
 
     /**
-     * Returns whether to store formatting results in a file
+     * Returns output directory
+     * @return string
      */
-    public function getUseFile()
+    public function getToDir()
     {
-        return $this->useFile;
+        return $this->toDir;
     }
 
     /**
@@ -83,12 +90,12 @@ abstract class AbstractPHPLocFormatter
     }
 
     /**
-     * Returns output directory
+     * Returns output filename
      * @return string
      */
-    public function getToDir()
+    public function getOutfile()
     {
-        return $this->toDir;
+        return $this->outfile;
     }
 
     /**
@@ -98,15 +105,6 @@ abstract class AbstractPHPLocFormatter
     public function setOutfile($outfile)
     {
         $this->outfile = $outfile;
-    }
-
-    /**
-     * Returns output filename
-     * @return string
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
     }
 
 }

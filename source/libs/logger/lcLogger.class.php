@@ -69,33 +69,42 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     public static function errTypeToStr($error_type)
     {
         switch ($error_type) {
-            case self::LOG_EMERG: {
-                return 'emerg';
-            }
-            case self::LOG_ALERT: {
-                return 'alert';
-            }
-            case self::LOG_CRIT: {
-                return 'crit';
-            }
-            case self::LOG_ERR: {
-                return 'err';
-            }
-            case self::LOG_WARNING: {
-                return 'warning';
-            }
-            case self::LOG_NOTICE: {
-                return 'notice';
-            }
-            case self::LOG_INFO: {
-                return 'info';
-            }
-            case self::LOG_DEBUG: {
-                return 'debug';
-            }
-            default: {
-                return 'info';
-            }
+            case self::LOG_EMERG:
+                {
+                    return 'emerg';
+                }
+            case self::LOG_ALERT:
+                {
+                    return 'alert';
+                }
+            case self::LOG_CRIT:
+                {
+                    return 'crit';
+                }
+            case self::LOG_ERR:
+                {
+                    return 'err';
+                }
+            case self::LOG_WARNING:
+                {
+                    return 'warning';
+                }
+            case self::LOG_NOTICE:
+                {
+                    return 'notice';
+                }
+            case self::LOG_INFO:
+                {
+                    return 'info';
+                }
+            case self::LOG_DEBUG:
+                {
+                    return 'debug';
+                }
+            default:
+                {
+                    return 'info';
+                }
         }
     }
 
@@ -118,36 +127,46 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     public static function strToErrType($error_type_str)
     {
         switch ($error_type_str) {
-            case 'emerg': {
-                return self::LOG_EMERG;
-            }
-            case 'alert': {
-                return self::LOG_ALERT;
-            }
-            case 'crit': {
-                return self::LOG_CRIT;
-            }
-            case 'err': {
-                return self::LOG_ERR;
-            }
-            case 'error': {
-                return self::LOG_ERR;
-            }
-            case 'warning': {
-                return self::LOG_WARNING;
-            }
-            case 'notice': {
-                return self::LOG_NOTICE;
-            }
-            case 'info': {
-                return self::LOG_INFO;
-            }
-            case 'debug': {
-                return self::LOG_DEBUG;
-            }
-            default: {
-                return self::LOG_INFO;
-            }
+            case 'emerg':
+                {
+                    return self::LOG_EMERG;
+                }
+            case 'alert':
+                {
+                    return self::LOG_ALERT;
+                }
+            case 'crit':
+                {
+                    return self::LOG_CRIT;
+                }
+            case 'err':
+                {
+                    return self::LOG_ERR;
+                }
+            case 'error':
+                {
+                    return self::LOG_ERR;
+                }
+            case 'warning':
+                {
+                    return self::LOG_WARNING;
+                }
+            case 'notice':
+                {
+                    return self::LOG_NOTICE;
+                }
+            case 'info':
+                {
+                    return self::LOG_INFO;
+                }
+            case 'debug':
+                {
+                    return self::LOG_DEBUG;
+                }
+            default:
+                {
+                    return self::LOG_INFO;
+                }
         }
     }
 
@@ -159,7 +178,7 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     public function getCapabilities()
     {
         return [
-            'logger'
+            'logger',
         ];
     }
 

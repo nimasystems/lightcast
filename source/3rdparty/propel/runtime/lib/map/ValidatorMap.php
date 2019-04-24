@@ -50,29 +50,19 @@ class ValidatorMap
         return $this->column->getColumnName();
     }
 
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
     public function setClass($classname)
     {
         $this->classname = $classname;
     }
 
-    public function setValue($value)
-    {
-        $this->value = $value;
-    }
-
-    public function setMessage($message)
-    {
-        $this->message = $message;
-    }
-
     public function getName()
     {
         return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     public function getClass()
@@ -85,8 +75,18 @@ class ValidatorMap
         return $this->value;
     }
 
+    public function setValue($value)
+    {
+        $this->value = $value;
+    }
+
     public function getMessage()
     {
         return $this->message;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
     }
 }

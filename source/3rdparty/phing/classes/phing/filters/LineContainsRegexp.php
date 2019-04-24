@@ -59,7 +59,7 @@ class LineContainsRegexp extends BaseParamFilterReader implements ChainableReade
      * Regular expressions that are applied against lines.
      * @var array
      */
-    private $_regexps = array();
+    private $_regexps = [];
 
     /**
      * Returns all lines in a buffer that contain specified strings.
@@ -81,7 +81,7 @@ class LineContainsRegexp extends BaseParamFilterReader implements ChainableReade
         }
 
         $lines = explode("\n", $buffer);
-        $matched = array();
+        $matched = [];
 
         $regexpsSize = count($this->_regexps);
         foreach ($lines as $line) {
@@ -104,6 +104,24 @@ class LineContainsRegexp extends BaseParamFilterReader implements ChainableReade
     }
 
     /**
+     * Parses parameters to add user defined regular expressions.
+     */
+    private function _initialize()
+    {
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0; $i < count($params); $i++) {
+                if (self::REGEXP_KEY === $params[$i]->getType()) {
+                    $pattern = $params[$i]->getValue();
+                    $regexp = new RegularExpression();
+                    $regexp->setPattern($pattern);
+                    array_push($this->_regexps, $regexp);
+                }
+            }
+        }
+    }
+
+    /**
      * Adds a <code>regexp</code> element.
      *
      * @return object regExp The <code>regexp</code> element added.
@@ -113,6 +131,43 @@ class LineContainsRegexp extends BaseParamFilterReader implements ChainableReade
         $num = array_push($this->_regexps, new RegularExpression());
 
         return $this->_regexps[$num - 1];
+    }
+
+    /**
+     * Creates a new LineContainsRegExp using the passed in
+     * Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering
+     *                the specified reader
+     * @throws Exception
+     * @internal param A $object Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new LineContainsRegExp($reader);
+        $newFilter->setRegexps($this->getRegexps());
+        $newFilter->setInitialized(true);
+        $newFilter->setProject($this->getProject());
+
+        return $newFilter;
+    }
+
+    /**
+     * Returns the array of regular expressions which must be contained within
+     * a line read from the original stream in order for it to match this
+     * filter.
+     *
+     * @return array The array of regular expressions which must be contained within
+     *               a line read from the original stream in order for it to match this
+     *               filter. The returned object is "live" - in other words, changes made to
+     *               the returned object are mirrored in the filter.
+     */
+    public function getRegexps()
+    {
+        return $this->_regexps;
     }
 
     /**
@@ -133,60 +188,5 @@ class LineContainsRegexp extends BaseParamFilterReader implements ChainableReade
             throw new Exception("Excpected an 'array', got something else");
         }
         $this->_regexps = $regexps;
-    }
-
-    /**
-     * Returns the array of regular expressions which must be contained within
-     * a line read from the original stream in order for it to match this
-     * filter.
-     *
-     * @return array The array of regular expressions which must be contained within
-     *               a line read from the original stream in order for it to match this
-     *               filter. The returned object is "live" - in other words, changes made to
-     *               the returned object are mirrored in the filter.
-     */
-    public function getRegexps()
-    {
-        return $this->_regexps;
-    }
-
-    /**
-     * Creates a new LineContainsRegExp using the passed in
-     * Reader for instantiation.
-     *
-     * @param Reader $reader
-     * @throws Exception
-     * @internal param A $object Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering
-     *                the specified reader
-     */
-    public function chain(Reader $reader)
-    {
-        $newFilter = new LineContainsRegExp($reader);
-        $newFilter->setRegexps($this->getRegexps());
-        $newFilter->setInitialized(true);
-        $newFilter->setProject($this->getProject());
-
-        return $newFilter;
-    }
-
-    /**
-     * Parses parameters to add user defined regular expressions.
-     */
-    private function _initialize()
-    {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0; $i < count($params); $i++) {
-                if (self::REGEXP_KEY === $params[$i]->getType()) {
-                    $pattern = $params[$i]->getValue();
-                    $regexp = new RegularExpression();
-                    $regexp->setPattern($pattern);
-                    array_push($this->_regexps, $regexp);
-                }
-            }
-        }
     }
 }

@@ -76,7 +76,17 @@ class BaseFilterReader extends FilterReader
      */
     public function setInitialized($initialized)
     {
-        $this->initialized = (boolean) $initialized;
+        $this->initialized = (boolean)$initialized;
+    }
+
+    /**
+     * Returns the project this filter is part of.
+     *
+     * @return object The project this filter is part of
+     */
+    public function getProject()
+    {
+        return $this->project;
     }
 
     /**
@@ -92,19 +102,9 @@ class BaseFilterReader extends FilterReader
     }
 
     /**
-     * Returns the project this filter is part of.
-     *
-     * @return object The project this filter is part of
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /**
      * Reads characters.
      *
-     * @param  int $len  Maximum number of characters to read.
+     * @param int $len Maximum number of characters to read.
      *
      * @return string Characters read, or -1 if the end of the stream
      *                    has been reached
@@ -153,8 +153,8 @@ class BaseFilterReader extends FilterReader
     /**
      * Convenience method to support logging in filters.
      *
-     * @param string $msg   Message to log.
-     * @param int    $level Priority level.
+     * @param string $msg Message to log.
+     * @param int $level Priority level.
      *
      * @return void
      */

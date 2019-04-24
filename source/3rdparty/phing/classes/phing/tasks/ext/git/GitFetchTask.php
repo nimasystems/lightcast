@@ -121,9 +121,9 @@ class GitFetchTask extends GitBaseTask
         // set operation target
         if ($this->isAllRemotes()) { // --all
             $command->setOption('all', true);
-        } elseif ($this->getGroup()) { // <group>
+        } else if ($this->getGroup()) { // <group>
             $command->addArgument($this->getGroup());
-        } elseif ($this->getSource()) { // <repository> [<refspec>]
+        } else if ($this->getSource()) { // <repository> [<refspec>]
             $command->addArgument($this->getSource());
             if ($this->getRefspec()) {
                 $command->addArgument($this->getRefspec());
@@ -148,147 +148,19 @@ class GitFetchTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return bool
      */
-    public function setForce($flag)
+    public function isTags()
     {
-        $this->force = $flag;
+        return $this->getTags();
     }
 
     /**
      * @return bool
      */
-    public function getForce()
+    public function getTags()
     {
-        return $this->force;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isForce()
-    {
-        return $this->getForce();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setQuiet($flag)
-    {
-        $this->quiet = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getQuiet()
-    {
-        return $this->quiet;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isQuiet()
-    {
-        return $this->getQuiet();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setAll($flag)
-    {
-        $this->allRemotes = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getAll()
-    {
-        return $this->allRemotes;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isAllRemotes()
-    {
-        return $this->getAll();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setKeep($flag)
-    {
-        $this->keepFiles = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getKeep()
-    {
-        return $this->keepFiles;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isKeepFiles()
-    {
-        return $this->getKeep();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setPrune($flag)
-    {
-        $this->prune = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getPrune()
-    {
-        return $this->prune;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrune()
-    {
-        return $this->getPrune();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setNoTags($flag)
-    {
-        $this->noTags = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getNoTags()
-    {
-        return $this->noTags;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNoTags()
-    {
-        return $this->getNoTags();
+        return $this->tags;
     }
 
     /**
@@ -302,49 +174,137 @@ class GitFetchTask extends GitBaseTask
     /**
      * @return bool
      */
-    public function getTags()
+    public function isNoTags()
     {
-        return $this->tags;
+        return $this->getNoTags();
     }
 
     /**
      * @return bool
      */
-    public function isTags()
+    public function getNoTags()
     {
-        return $this->getTags();
+        return $this->noTags;
     }
 
     /**
-     * @param $source
+     * @param $flag
      */
-    public function setSource($source)
+    public function setNoTags($flag)
     {
-        $this->source = $source;
+        $this->noTags = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrune()
+    {
+        return $this->getPrune();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getPrune()
+    {
+        return $this->prune;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setPrune($flag)
+    {
+        $this->prune = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isKeepFiles()
+    {
+        return $this->getKeep();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getKeep()
+    {
+        return $this->keepFiles;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isQuiet()
+    {
+        return $this->getQuiet();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getQuiet()
+    {
+        return $this->quiet;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setQuiet($flag)
+    {
+        $this->quiet = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForce()
+    {
+        return $this->getForce();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getForce()
+    {
+        return $this->force;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setForce($flag)
+    {
+        $this->force = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isAllRemotes()
+    {
+        return $this->getAll();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAll()
+    {
+        return $this->allRemotes;
     }
 
     /**
      * @return string
      */
-    public function getSource()
+    public function getGroup()
     {
-        return $this->source;
-    }
-
-    /**
-     * @param $spec
-     */
-    public function setRefspec($spec)
-    {
-        $this->refspec = $spec;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRefspec()
-    {
-        return $this->refspec;
+        return $this->group;
     }
 
     /**
@@ -358,9 +318,49 @@ class GitFetchTask extends GitBaseTask
     /**
      * @return string
      */
-    public function getGroup()
+    public function getSource()
     {
-        return $this->group;
+        return $this->source;
+    }
+
+    /**
+     * @param $source
+     */
+    public function setSource($source)
+    {
+        $this->source = $source;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefspec()
+    {
+        return $this->refspec;
+    }
+
+    /**
+     * @param $spec
+     */
+    public function setRefspec($spec)
+    {
+        $this->refspec = $spec;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setAll($flag)
+    {
+        $this->allRemotes = $flag;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setKeep($flag)
+    {
+        $this->keepFiles = $flag;
     }
 
 }

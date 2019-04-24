@@ -92,7 +92,7 @@ class lcDirs
             chmod($path, $filePerm);
 
             // If this is a directory...
-        } elseif (is_dir($path)) {
+        } else if (is_dir($path)) {
             // Then get an array of the contents
             $foldersAndFiles = scandir($path);
 
@@ -226,7 +226,7 @@ class lcDirs
         if (!file_exists($directory) || !is_dir($directory)) {
             return true;
             //throw new lcIOException('Directory is not valid: '.$directory);
-        } elseif (!is_readable($directory)) {
+        } else if (!is_readable($directory)) {
             throw new lcIOException('Directory is not readable: ' . $directory);
         } else {
             $handle = opendir($directory);
@@ -338,7 +338,7 @@ class lcDirs
 
             $files[] = [
                 'name' => $file,
-                'type' => $t
+                'type' => $t,
             ];
             unset($file, $t);
         }

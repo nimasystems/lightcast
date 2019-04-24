@@ -44,6 +44,15 @@ class LiquibaseTagTask extends AbstractLiquibaseTask
     }
 
     /**
+     * @see Task::main()
+     */
+    public function main()
+    {
+        $this->checkParams();
+        $this->execute('tag', escapeshellarg($this->tag));
+    }
+
+    /**
      * @see AbstractTask::checkParams()
      */
     protected function checkParams()
@@ -58,14 +67,5 @@ class LiquibaseTagTask extends AbstractLiquibaseTask
                 )
             );
         }
-    }
-
-    /**
-     * @see Task::main()
-     */
-    public function main()
-    {
-        $this->checkParams();
-        $this->execute('tag', escapeshellarg($this->tag));
     }
 }

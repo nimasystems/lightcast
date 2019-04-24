@@ -111,7 +111,7 @@ class IfTask extends ConditionBase
 {
 
     private $thenTasks = null;
-    private $elseIfTasks = array();
+    private $elseIfTasks = [];
     private $elseTasks = null;
 
     /***
@@ -213,8 +213,8 @@ class ElseIfTask extends ConditionBase
     }
 
     /**
-     * @throws BuildException
      * @return boolean
+     * @throws BuildException
      */
     public function evaluate()
     {

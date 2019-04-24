@@ -40,6 +40,19 @@
 class MatchValidator implements BasicValidator
 {
     /**
+     * Whether the passed string matches regular expression.
+     *
+     * @param ValidatorMap $map
+     * @param string $str
+     *
+     * @return boolean
+     */
+    public function isValid(ValidatorMap $map, $str)
+    {
+        return (preg_match($this->prepareRegexp($map->getValue()), $str) != 0);
+    }
+
+    /**
      * Prepares the regular expression entered in the XML
      * for use with preg_match().
      *
@@ -58,18 +71,5 @@ class MatchValidator implements BasicValidator
         $exp = preg_replace('/([^\\\])\/([^$])/', '$1\/$2', $exp);
 
         return $exp;
-    }
-
-    /**
-     * Whether the passed string matches regular expression.
-     *
-     * @param ValidatorMap $map
-     * @param string       $str
-     *
-     * @return boolean
-     */
-    public function isValid(ValidatorMap $map, $str)
-    {
-        return (preg_match($this->prepareRegexp($map->getValue()), $str) != 0);
     }
 }

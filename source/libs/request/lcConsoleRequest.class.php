@@ -46,7 +46,7 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
     public function getListenerEvents()
     {
         return [
-            'router.detect_parameters' => 'onRouterDetectParameters'
+            'router.detect_parameters' => 'onRouterDetectParameters',
         ];
     }
 
@@ -55,7 +55,7 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         $debug = [
             'argv' => $this->argv,
             'argc' => $this->argc,
-            'params' => $this->params
+            'params' => $this->params,
         ];
 
         return $debug;
@@ -95,7 +95,7 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
     {
         return [
             'argc' => $this->argc,
-            'argv' => $this->argv
+            'argv' => $this->argv,
         ];
     }
 

@@ -35,7 +35,7 @@ include_once 'phing/util/StringHelper.php';
  */
 class ZendGuardEncodeTask extends MatchingTask
 {
-    protected $filesets = array();
+    protected $filesets = [];
     protected $encodeCommand;
 
     /**
@@ -209,7 +209,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setShortTags($value)
     {
-        $this->shortTags = (bool) $value;
+        $this->shortTags = (bool)$value;
     }
 
     /**
@@ -217,7 +217,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setAspTags($value)
     {
-        $this->aspTags = (bool) $value;
+        $this->aspTags = (bool)$value;
     }
 
     /**
@@ -225,7 +225,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setDeleteSource($value)
     {
-        $this->shortTags = (bool) $value;
+        $this->shortTags = (bool)$value;
     }
 
     /**
@@ -233,7 +233,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setUseCrypto($value)
     {
-        $this->useCrypto = (bool) $value;
+        $this->useCrypto = (bool)$value;
     }
 
     /**
@@ -241,7 +241,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setObfuscationLevel($value)
     {
-        $this->obfuscationLevel = (int) $value;
+        $this->obfuscationLevel = (int)$value;
     }
 
     /**
@@ -249,7 +249,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setLicenseProduct($value)
     {
-        $this->licenseProduct = (bool) $value;
+        $this->licenseProduct = (bool)$value;
     }
 
     /**
@@ -265,7 +265,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setSignProduct($value)
     {
-        $this->signProduct = (bool) $value;
+        $this->signProduct = (bool)$value;
     }
 
     /**
@@ -273,7 +273,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setForceEncode($value)
     {
-        $this->forceEncode = (bool) $value;
+        $this->forceEncode = (bool)$value;
     }
 
     /**
@@ -281,7 +281,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setEncodedOnly($value)
     {
-        $this->encodedOnly = (bool) $value;
+        $this->encodedOnly = (bool)$value;
     }
 
     /**
@@ -289,7 +289,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setIgnoreFileModes($value)
     {
-        $this->ignoreFileModes = (bool) $value;
+        $this->ignoreFileModes = (bool)$value;
     }
 
     /**
@@ -313,7 +313,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setOptMask($value)
     {
-        $this->optMask = (int) $value;
+        $this->optMask = (int)$value;
     }
 
     /**
@@ -329,7 +329,7 @@ class ZendGuardEncodeTask extends MatchingTask
      */
     public function setNoHeader($value)
     {
-        $this->noHeader = (bool) $value;
+        $this->noHeader = (bool)$value;
     }
 
     /**
@@ -343,45 +343,6 @@ class ZendGuardEncodeTask extends MatchingTask
         $this->filesets[] = $this->fileset;
 
         return $this->fileset;
-    }
-
-    /**
-     * Verifies that the configuration is correct
-     *
-     * @throws BuildException
-     */
-    protected function verifyConfiguration()
-    {
-        // Check that the zend encoder path is specified
-        if (empty($this->zendEncoderPath)) {
-            throw new BuildException("Zend Encoder path must be specified");
-        }
-
-        // verify that the zend encoder binary exists
-        if (!file_exists($this->zendEncoderPath)) {
-            throw new BuildException("Zend Encoder not found on path " . $this->zendEncoderPath);
-        }
-
-        // if either sign or license is required the private key path needs to be defined
-        // and the file has to exist and product name has to be specified
-        if ($this->signProduct || $this->licenseProduct) {
-            if (empty($this->privateKeyPath)) {
-                throw new BuildException("Licensing or signing requested but privateKeyPath not provided.");
-            }
-            if (!is_readable($this->privateKeyPath)) {
-                throw new BuildException("Licensing or signing requested but private key path doesn't exist or is unreadable.");
-            }
-            if (empty($this->productName)) {
-                throw new BuildException("Licensing or signing requested but product name not provided.");
-            }
-        }
-
-        // verify prolog file exists
-        if (!empty($this->prologFile)) {
-            if (!file_exists($this->prologFile)) {
-                throw new BuildException("The prolog file doesn't exist: " . $this->prologFile);
-            }
-        }
     }
 
     /**
@@ -432,6 +393,45 @@ class ZendGuardEncodeTask extends MatchingTask
     }
 
     /**
+     * Verifies that the configuration is correct
+     *
+     * @throws BuildException
+     */
+    protected function verifyConfiguration()
+    {
+        // Check that the zend encoder path is specified
+        if (empty($this->zendEncoderPath)) {
+            throw new BuildException("Zend Encoder path must be specified");
+        }
+
+        // verify that the zend encoder binary exists
+        if (!file_exists($this->zendEncoderPath)) {
+            throw new BuildException("Zend Encoder not found on path " . $this->zendEncoderPath);
+        }
+
+        // if either sign or license is required the private key path needs to be defined
+        // and the file has to exist and product name has to be specified
+        if ($this->signProduct || $this->licenseProduct) {
+            if (empty($this->privateKeyPath)) {
+                throw new BuildException("Licensing or signing requested but privateKeyPath not provided.");
+            }
+            if (!is_readable($this->privateKeyPath)) {
+                throw new BuildException("Licensing or signing requested but private key path doesn't exist or is unreadable.");
+            }
+            if (empty($this->productName)) {
+                throw new BuildException("Licensing or signing requested but product name not provided.");
+            }
+        }
+
+        // verify prolog file exists
+        if (!empty($this->prologFile)) {
+            if (!file_exists($this->prologFile)) {
+                throw new BuildException("The prolog file doesn't exist: " . $this->prologFile);
+            }
+        }
+    }
+
+    /**
      * Prepares the main part of the command that will be
      * used to encode the given file(s).
      */
@@ -441,7 +441,7 @@ class ZendGuardEncodeTask extends MatchingTask
 
         if (!empty($this->renameSourceExt)) {
             $command .= " --rename-source " . $this->renameSourceExt . " ";
-        } elseif ($this->deleteSource) {
+        } else if ($this->deleteSource) {
             // delete source
             $command .= " --delete-source ";
         }
@@ -475,7 +475,7 @@ class ZendGuardEncodeTask extends MatchingTask
         // insert prolog file name or no-header
         if (!empty($this->prologFile)) {
             $command .= " --prolog-filename " . $this->prologFile . " ";
-        } elseif ($this->noHeader) {
+        } else if ($this->noHeader) {
             // no-header
             $command .= " --no-header ";
         }
@@ -498,7 +498,7 @@ class ZendGuardEncodeTask extends MatchingTask
         // Signing or licensing
         if ($this->signProduct) {
             $command .= " --sign-product " . $this->productName . " --private-key " . $this->privateKeyPath . " ";
-        } elseif ($this->licenseProduct) {
+        } else if ($this->licenseProduct) {
             $command .= " --license-product " . $this->productName . " --private-key " . $this->privateKeyPath . " ";
         }
 
@@ -513,8 +513,8 @@ class ZendGuardEncodeTask extends MatchingTask
      * Encodes a file using currently defined Zend Guard settings
      *
      * @param string $filePath Path to the encoded file
-     * @throws BuildException
      * @return bool
+     * @throws BuildException
      */
     protected function encodeFile($filePath)
     {
@@ -548,9 +548,9 @@ class ZendGuardFileSet extends FileSet
      *  Get a list of files and directories specified in the fileset.
      * @param Project $p
      * @param bool $includeEmpty
-     * @throws BuildException
      * @return array a list of file and directory names, relative to
      *               the baseDir for the project.
+     * @throws BuildException
      */
     public function getFiles(Project $p, $includeEmpty = true)
     {

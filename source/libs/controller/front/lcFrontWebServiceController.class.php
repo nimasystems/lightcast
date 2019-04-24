@@ -174,7 +174,7 @@ class lcFrontWebServiceController extends lcFrontWebController
                 $fails[] = array_filter([
                     'name' => $failure->getName(),
                     'message' => $failure->getMessage(),
-                    'extra_data' => $failure->getExtraData()
+                    'extra_data' => $failure->getExtraData(),
                 ]);
             }
 
@@ -278,12 +278,6 @@ class lcFrontWebServiceController extends lcFrontWebController
         return $params;
     }
 
-    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
-    {
-        // final stop - we need to handle it as json
-        throw new lcControllerForwardException('Could not forward to controller action');
-    }
-
     private function extractRequestParams(lcRequest $request)
     {
         /** @var lcWebRequest $request */
@@ -310,5 +304,11 @@ class lcFrontWebServiceController extends lcFrontWebController
         $res = $this->use_actual_get_params ? $arr2 : array_values($extraction);
 
         return $res;
+    }
+
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    {
+        // final stop - we need to handle it as json
+        throw new lcControllerForwardException('Could not forward to controller action');
     }
 }

@@ -44,11 +44,6 @@ class lcTagTd extends lcHtmlTag
         $this->setCharoff($charoff);
     }
 
-    public static function create()
-    {
-        return new lcTagTd();
-    }
-
     public function setColspan($value = null)
     {
         $this->setAttribute('colspan', $value);
@@ -122,6 +117,11 @@ class lcTagTd extends lcHtmlTag
         return $this;
     }
 
+    public static function create()
+    {
+        return new lcTagTd();
+    }
+
     public static function getRequiredAttributes()
     {
         return [];
@@ -130,7 +130,7 @@ class lcTagTd extends lcHtmlTag
     public static function getOptionalAttributes()
     {
         return ['colspan', 'rowspan', 'abbr', 'axis', 'headers', 'scope',
-            'align', 'valign', 'char', 'charoff'];
+                'align', 'valign', 'char', 'charoff'];
     }
 
     public function getScope()

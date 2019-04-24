@@ -32,15 +32,15 @@ class lcTagInputFile extends lcTagInput
         $this->setAccept($accept);
     }
 
-    public static function create()
-    {
-        return new lcTagInputFile();
-    }
-
     public function setAccept($value = null)
     {
         $this->setAttribute('accept', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagInputFile();
     }
 
     public static function getOptionalAttributes()

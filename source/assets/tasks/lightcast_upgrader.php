@@ -24,7 +24,7 @@
 class tLightcastUpgrader extends lcTaskController
 {
     private $upgradeable_versions = [
-        '1.4' => 'upgradeFromLC14'
+        '1.4' => 'upgradeFromLC14',
     ];
 
     private $tpl_dir;
@@ -34,17 +34,6 @@ class tLightcastUpgrader extends lcTaskController
     private $available_apps;
     private $available_plugins;
 
-    public function getHelpInfo()
-    {
-        return
-            'Possible commands:' . "\n\n" .
-            'Project Upgrades:' . "\n\n" .
-            lcConsolePainter::formatConsoleText('upgrade-project', 'info') . ' - Upgrades the project for usage by the latest lightcast framework (' . LC_VER . ') ' . "\n" .
-            "\t- project_dir - specify the directory of the project (required)\n" .
-            "\t- project_ver - force a version (skip autodetection)\n" .
-            "\n";
-    }
-
     public function executeTask()
     {
         switch ($this->getRequest()->getParam('action')) {
@@ -53,12 +42,6 @@ class tLightcastUpgrader extends lcTaskController
             default:
                 return $this->displayHelp();
         }
-    }
-
-    private function displayHelp()
-    {
-        $this->consoleDisplay($this->getHelpInfo(), false);
-        return true;
     }
 
     private function upgradeProject()
@@ -105,53 +88,6 @@ class tLightcastUpgrader extends lcTaskController
         return $ret;
     }
 
-    private function matchInFile($regex, $filename)
-    {
-        if (!file_exists($filename) || !is_readable($filename)) {
-            return false;
-        }
-
-        $content = @file_get_contents($filename);
-
-        if (!$content) {
-            return false;
-        }
-
-        $matches = [];
-        $matched = preg_match_all($regex, $content, $matches);
-
-        if (!$matched) {
-            return false;
-        }
-
-        return $matches;
-    }
-
-    private function replaceInFile($regex, $replacement, $filename, $test = false)
-    {
-        $f = file_get_contents($filename);
-
-        if (!$f) {
-            return false;
-        }
-
-        $f = str_replace("\n", ' --\n-- ', $f);
-        $f = str_replace("\r", ' --\r-- ', $f);
-
-        $f = preg_replace($regex, $replacement, $f);
-
-        $f = str_replace(' --\n-- ', "\n", $f);
-        $f = str_replace(' --\r-- ', "\r", $f);
-
-        if ($test) {
-            return $f;
-        }
-
-        $ret = file_put_contents($filename, $f);
-
-        return $ret;
-    }
-
     private function detectProjectVersion($project_dir, $fallback_version, &$project_actual_dir, &$detected_version)
     {
         $detected_version = null;
@@ -181,6 +117,28 @@ class tLightcastUpgrader extends lcTaskController
         return true;
     }
 
+    private function matchInFile($regex, $filename)
+    {
+        if (!file_exists($filename) || !is_readable($filename)) {
+            return false;
+        }
+
+        $content = @file_get_contents($filename);
+
+        if (!$content) {
+            return false;
+        }
+
+        $matches = [];
+        $matched = preg_match_all($regex, $content, $matches);
+
+        if (!$matched) {
+            return false;
+        }
+
+        return $matches;
+    }
+
     private function processUpgrade()
     {
         $this->tpl_dir = $this->configuration->getRootDir() . DS . 'source' . DS . 'assets' . DS . 'templates' . DS . 'default';
@@ -206,23 +164,113 @@ class tLightcastUpgrader extends lcTaskController
         return $ret;
     }
 
-    private function rm($files)
+    private function getAvailableApplications($project_dir)
     {
-        $f = is_array($files) ? $files : [$files];
+        $ret = lcDirs::getSubDirsOfDir($project_dir);
+        return $ret;
+    }
 
-        if (!$f) {
+    private function getAvailablePlugins($plugins_dir)
+    {
+        $ret = lcDirs::getSubDirsOfDir($plugins_dir);
+        return $ret;
+    }
+
+    private function updateTemplateDifferences()
+    {
+        // create dirs if missing
+        $this->mkd(
+            [
+                'addons/extensions',
+                'addons/plugins',
+                'applications',
+                'config/default/applications',
+                'config/default/plugins',
+                'data',
+                'lib/custom_errors/img',
+                'models',
+                'sandbox',
+                'shell',
+                'tmp/logs',
+                'tmp/temp',
+                'tmp/cache',
+            ]
+        );
+
+        // copy / replace missing files
+        $this->cpt(
+            [
+                '.htaccess',
+                'config/boot_config.default.php' => [
+                    'overwrite' => true,
+                    'destination' => 'config/boot_config.php',
+                ],
+                'config/preboot_config.default.php' => [
+                    'overwrite' => true,
+                    'destination' => 'config/preboot_config.php',
+                ],
+                'config/api_configuration.php',
+                'config/project_configuration.php',
+                'data/.htaccess',
+                'lib/custom_errors' => [
+                    'recursive_dir_copy' => true,
+                ],
+                'lib/.htaccess',
+                'lib/boot.php' => [
+                    'overwrite' => true,
+                ],
+                'shell/cmd' => [
+                    'overwrite' => true,
+                    'chmod' => 777,
+                ],
+                'shell/cmd_debug' => [
+                    'overwrite' => true,
+                    'chmod' => 777,
+                ],
+                'shell/console.bat' => [
+                    'overwrite' => true,
+                    'chmod' => 777,
+                ],
+                'webroot/.htaccess',
+                'webroot/robots.txt',
+                'LICENSE' => [
+                    'overwrite' => true,
+                ],
+                'README' => [
+                    'overwrite' => true,
+                ],
+            ]
+        );
+
+        // remove obsolete files
+        $this->rm(
+            [
+                'lib/debug_include.php',
+                'shell/console',
+                'shell/console_debug',
+            ]
+        );
+
+        return true;
+    }
+
+    private function mkd($dirs)
+    {
+        $d = is_array($dirs) ? $dirs : [$dirs];
+
+        if (!$d) {
             return false;
         }
 
-        foreach ($f as $ff) {
-            $ff = $this->project_dir . DS . $ff;
+        foreach ($d as $dir) {
+            $dir = $this->project_dir . DS . $dir;
 
-            if (file_exists($ff) && is_file($ff)) {
-                $this->display('D (f) ' . $ff);
-                unlink($ff);
+            if (!is_dir($dir)) {
+                $this->display('A (d) ' . $dir);
+                lcDirs::mkdirRecursive($dir);
             }
 
-            unset($ff);
+            unset($dir);
         }
 
         return true;
@@ -292,129 +340,26 @@ class tLightcastUpgrader extends lcTaskController
         }
     }
 
-    private function mkd($dirs)
+    private function rm($files)
     {
-        $d = is_array($dirs) ? $dirs : [$dirs];
+        $f = is_array($files) ? $files : [$files];
 
-        if (!$d) {
+        if (!$f) {
             return false;
         }
 
-        foreach ($d as $dir) {
-            $dir = $this->project_dir . DS . $dir;
+        foreach ($f as $ff) {
+            $ff = $this->project_dir . DS . $ff;
 
-            if (!is_dir($dir)) {
-                $this->display('A (d) ' . $dir);
-                lcDirs::mkdirRecursive($dir);
+            if (file_exists($ff) && is_file($ff)) {
+                $this->display('D (f) ' . $ff);
+                unlink($ff);
             }
 
-            unset($dir);
+            unset($ff);
         }
 
         return true;
-    }
-
-    private function updateTemplateDifferences()
-    {
-        // create dirs if missing
-        $this->mkd(
-            [
-                'addons/extensions',
-                'addons/plugins',
-                'applications',
-                'config/default/applications',
-                'config/default/plugins',
-                'data',
-                'lib/custom_errors/img',
-                'models',
-                'sandbox',
-                'shell',
-                'tmp/logs',
-                'tmp/temp',
-                'tmp/cache'
-            ]
-        );
-
-        // copy / replace missing files
-        $this->cpt(
-            [
-                '.htaccess',
-                'config/boot_config.default.php' => [
-                    'overwrite' => true,
-                    'destination' => 'config/boot_config.php'
-                ],
-                'config/preboot_config.default.php' => [
-                    'overwrite' => true,
-                    'destination' => 'config/preboot_config.php'
-                ],
-                'config/api_configuration.php',
-                'config/project_configuration.php',
-                'data/.htaccess',
-                'lib/custom_errors' => [
-                    'recursive_dir_copy' => true
-                ],
-                'lib/.htaccess',
-                'lib/boot.php' => [
-                    'overwrite' => true
-                ],
-                'shell/cmd' => [
-                    'overwrite' => true,
-                    'chmod' => 777
-                ],
-                'shell/cmd_debug' => [
-                    'overwrite' => true,
-                    'chmod' => 777
-                ],
-                'shell/console.bat' => [
-                    'overwrite' => true,
-                    'chmod' => 777
-                ],
-                'webroot/.htaccess',
-                'webroot/robots.txt',
-                'LICENSE' => [
-                    'overwrite' => true
-                ],
-                'README' => [
-                    'overwrite' => true
-                ],
-            ]
-        );
-
-        // remove obsolete files
-        $this->rm(
-            [
-                'lib/debug_include.php',
-                'shell/console',
-                'shell/console_debug',
-            ]
-        );
-
-        return true;
-    }
-
-    private function fixYmls()
-    {
-        $this->consoleDisplay('Fixing YAML syntax');
-
-        // reads / rewrites ymls to fix errorous syntax caused by bad extensions (syck)
-        if (!extension_loaded('yaml')) {
-            $this->displayWarning('PHP extension \'yaml\' is not loaded - omitting YAML fixing');
-            return;
-        }
-
-        // find yamls
-        $found = lcFiles::globRecursive($this->project_dir, '*.yml');
-
-        if (!$found) {
-            return;
-        }
-
-        foreach ($found as $file) {
-            $parser = new lcYamlFileParser($file);
-            $data = $parser->parse();
-            $parser->writeData($data);
-            unset($file, $parser, $data);
-        }
     }
 
     private function moveConfigFiles()
@@ -463,6 +408,31 @@ class tLightcastUpgrader extends lcTaskController
         }
     }
 
+    private function fixYmls()
+    {
+        $this->consoleDisplay('Fixing YAML syntax');
+
+        // reads / rewrites ymls to fix errorous syntax caused by bad extensions (syck)
+        if (!extension_loaded('yaml')) {
+            $this->displayWarning('PHP extension \'yaml\' is not loaded - omitting YAML fixing');
+            return;
+        }
+
+        // find yamls
+        $found = lcFiles::globRecursive($this->project_dir, '*.yml');
+
+        if (!$found) {
+            return;
+        }
+
+        foreach ($found as $file) {
+            $parser = new lcYamlFileParser($file);
+            $data = $parser->parse();
+            $parser->writeData($data);
+            unset($file, $parser, $data);
+        }
+    }
+
     private function upgradeEnd($successful)
     {
         if ($successful) {
@@ -480,22 +450,90 @@ class tLightcastUpgrader extends lcTaskController
         }
     }
 
-    private function getAvailableApplications($project_dir)
+    private function displayHelp()
     {
-        $ret = lcDirs::getSubDirsOfDir($project_dir);
-        return $ret;
+        $this->consoleDisplay($this->getHelpInfo(), false);
+        return true;
     }
 
-    private function getAvailablePlugins($plugins_dir)
+    public function getHelpInfo()
     {
-        $ret = lcDirs::getSubDirsOfDir($plugins_dir);
-        return $ret;
+        return
+            'Possible commands:' . "\n\n" .
+            'Project Upgrades:' . "\n\n" .
+            lcConsolePainter::formatConsoleText('upgrade-project', 'info') . ' - Upgrades the project for usage by the latest lightcast framework (' . LC_VER . ') ' . "\n" .
+            "\t- project_dir - specify the directory of the project (required)\n" .
+            "\t- project_ver - force a version (skip autodetection)\n" .
+            "\n";
     }
 
-    private function getApplicationModules($app_dir)
+    private function _lc14ApplyProjectTreeFixes($item_type, array $details)
     {
-        $ret = lcDirs::getSubDirsOfDir($app_dir . DS . 'modules');
-        return $ret;
+        $filename = $details['filename'];
+        $parent = $details['parent'];
+
+        $this->consoleDisplay('> ' . $item_type . ' : ' . $filename);
+
+        // fix protected vars
+        if ($parent == 'lcSysObj') {
+            $this->consoleDisplay(' - applying lcSysObj protected vars fix');
+
+            $regex = $this->_getFixProtectedSysObjClassVarsRegex();
+            $this->replaceInFile($regex['regex'], $regex['reps'], $filename);
+        } else if ($parent == 'lcAppObj') {
+            $this->consoleDisplay(' - applying lcAppObj protected vars fix');
+
+            $regex = $this->_getFixProtectedAppObjClassVarsRegex();
+            $this->replaceInFile($regex['regex'], $regex['reps'], $filename);
+        }
+
+        // add required plugins
+        if ($parent == 'lcSysObj' || $parent == 'lcAppObj') {
+            $this->fixAddRequiredPlugins($item_type, $details);
+            $this->fixAddRequiredComponents($item_type, $details);
+
+            // replace $request['request'] occurrences (previous way of passing forwarded params)
+            $this->replaceInFile("/" . '\$' . "request\[['\"]request['\"]]/i", '$request', $filename);
+        }
+    }
+
+    private function _getFixProtectedSysObjClassVarsRegex()
+    {
+        static $regex;
+
+        if ($regex) {
+            return $regex;
+        }
+
+        $vars = [
+            'translation_context_type',
+            'translation_context_name',
+            'parent_plugin',
+            'context_type',
+            'context_name',
+            'logger',
+            'i18n',
+            'class_autoloader',
+            'event_dispatcher',
+            'configuration',
+        ];
+
+        $regex = [];
+        $reps = [];
+
+        foreach ($vars as $var) {
+            $regex[] = "/(private|public)[\s]+\\$" . $var . "\s*;/i";
+            $reps[] = 'protected $' . $var . ';';
+
+            unset($var);
+        }
+
+        $regex = [
+            'regex' => $regex,
+            'reps' => $reps,
+        ];
+
+        return $regex;
     }
 
     /*private function getProjectTasks($project_dir)
@@ -524,43 +562,29 @@ class tLightcastUpgrader extends lcTaskController
         return $ret;
     }*/
 
-    private function _getFixProtectedSysObjClassVarsRegex()
+    private function replaceInFile($regex, $replacement, $filename, $test = false)
     {
-        static $regex;
+        $f = file_get_contents($filename);
 
-        if ($regex) {
-            return $regex;
+        if (!$f) {
+            return false;
         }
 
-        $vars = [
-            'translation_context_type',
-            'translation_context_name',
-            'parent_plugin',
-            'context_type',
-            'context_name',
-            'logger',
-            'i18n',
-            'class_autoloader',
-            'event_dispatcher',
-            'configuration'
-        ];
+        $f = str_replace("\n", ' --\n-- ', $f);
+        $f = str_replace("\r", ' --\r-- ', $f);
 
-        $regex = [];
-        $reps = [];
+        $f = preg_replace($regex, $replacement, $f);
 
-        foreach ($vars as $var) {
-            $regex[] = "/(private|public)[\s]+\\$" . $var . "\s*;/i";
-            $reps[] = 'protected $' . $var . ';';
+        $f = str_replace(' --\n-- ', "\n", $f);
+        $f = str_replace(' --\r-- ', "\r", $f);
 
-            unset($var);
+        if ($test) {
+            return $f;
         }
 
-        $regex = [
-            'regex' => $regex,
-            'reps' => $reps
-        ];
+        $ret = file_put_contents($filename, $f);
 
-        return $regex;
+        return $ret;
     }
 
     private function _getFixProtectedAppObjClassVarsRegex()
@@ -581,7 +605,7 @@ class tLightcastUpgrader extends lcTaskController
             'data_storage',
             'cache',
             'mailer',
-            'dbc'
+            'dbc',
         ];
 
         $regex = [];
@@ -596,318 +620,66 @@ class tLightcastUpgrader extends lcTaskController
 
         $regex = [
             'regex' => $regex,
-            'reps' => $reps
+            'reps' => $reps,
         ];
 
         return $regex;
     }
 
-    private function _lc14FixMasterConfigurations($project_dir, array $available_apps)
+    private function fixAddRequiredPlugins($item_type, array $details)
     {
-        // 1. fix configuration issues
-        $this->display('Fixing master config boot files');
+        $filename = $details['filename'];
+        $class = $details['class'];
+        $c = file_get_contents($filename);
 
-        // remove template configs if 'lc' prefixed versions exist
-        // rename 'lc' prefixed versions to non-lc prefixed files
-        $cfg_files = [
-            'config/lcApiConfiguration.class.php' => [
-                'new_class' => 'ApiConfiguration',
-                'old_class' => 'lcWsConfiguration',
-                'new_filename' => 'api_configuration.php'
-            ],
-            'config/lcProjectConfiguration.class.php' => [
-                'new_class' => 'ProjectConfiguration',
-                'old_class' => 'lcProjectConfiguration',
-                'new_filename' => 'project_configuration.php'
-            ],
-        ];
-
-        if ($available_apps) {
-            foreach ($available_apps as $app) {
-                $app_cam = lcInflector::camelize($app, false);
-                $f = 'applications' . DS . $app . DS . 'config' . DS . 'lc' . $app_cam . 'Configuration.class.php';
-                $cfg_files[$f] = [
-                    'new_class' => $app_cam . 'Configuration',
-                    'old_class' => 'lc' . $app_cam . 'Configuration',
-                    'new_filename' => $app . '_configuration.php',
-                    'is_app' => true
-                ];
-                unset($app, $f);
-            }
+        if (!$c) {
+            return;
         }
 
-        foreach ($cfg_files as $source => $options) {
-            $new_filename = $options['new_filename'];
-            $new_class = isset($options['new_class']) ? $options['new_class'] : null;
-            $old_class = isset($options['old_class']) ? $options['old_class'] : null;
-            $is_app = isset($options['is_app']) ? (bool)$options['is_app'] : false;
+        // parse and find out the previous plugins
+        //
+        $used_plugins = [];
 
-            $nf = $project_dir . DS . dirname($source) . DS . $new_filename;
+        /*
+         * $matches = array();
+        $matched = preg_match("/" . 'protected.*\$use_plugins[^=]+=[^a]+array\((.+?)\)' . "/smi", $c, $matches);
+        $matches_str = $matched ? $matches[1] : null;
+        $matches_str = $matches_str ? lcStrings::toAlphaNum($matches_str, array(',')) : null;
+        $used_plugins = $matches_str ? array_unique(array_filter(explode(',', $matches_str))) : array();
+        */
 
-            if (file_exists($project_dir . DS . $source)) {
-                // remove the template version and just leave the original
-                // but rename it to the template filename
+        // parse the file to find other used plugins and add them
+        $matches = $this->matchInFile("/->getPlugin\(['\"]([\w\d]+?)['\"]\)/i", $filename);
 
-                if (file_exists($nf)) {
-                    unlink($nf);
-                }
+        if ($matches) {
+            $used_plugins = array_unique(array_merge(
+                $used_plugins,
+                (array)$matches[1]
+            ));
+        }
 
-                rename($project_dir . DS . $source, $nf);
+        // remove the previous declaration
+        $c = preg_replace("/protected.*" . '\$use_plugins[^;]+;' . "/si", '', $c, 1);
+
+        if ($used_plugins) {
+            // insert in the class
+            $matches = [];
+            $matched = preg_match("/^class\s*" . $class . "\s*extends.*\{$/smi", $c, $matches, PREG_OFFSET_CAPTURE);
+
+            if (!$matched) {
+                assert(false);
+                return;
             }
 
-            if ($old_class && $new_class) {
-                // fix the class parents
-                // from 1.5 applications should inherit from lcWebConfiguration (previously from: lcApplicationConfiguration)
-                if ($is_app) {
-                    $this->replaceInFile(
-                        "/class[\s]+" . $old_class . "[\s]+extends[\s]+lcApplicationConfiguration/i",
-                        'class ' . $new_class . ' extends lcWebConfiguration',
-                        $nf);
-                } else {
-                    // rename class
-                    $this->replaceInFile(
-                        "/class[\s]+[\w]+[\s]+extends[\s]+([\w]+?)Configuration/i",
-                        'class ' . $new_class . ' extends \\1Configuration',
-                        $nf);
-                }
-            }
+            $pos = (int)$matches[0][1];
+            $pos = strpos($c, '{', $pos) + 1;
 
-            unset($source, $options, $new_filename, $new_class, $old_class, $is_app, $nf);
+            $c = substr($c, 0, $pos) .
+                "\n" . ' protected $use_plugins = array(' . "\n" . '\'' . implode('\',' . "\n" . '\'', $used_plugins) . '\');' .
+                substr($c, $pos, strlen($c));
+
+            file_put_contents($filename, $c);
         }
-
-        unset($cfg_files);
-    }
-
-    private function getModulesForTree($app_dir)
-    {
-        if (!$app_dir) {
-            return null;
-        }
-
-        $ret = [];
-
-        $app_modules = $this->getApplicationModules($app_dir);
-
-        if ($app_modules) {
-            foreach ($app_modules as $module) {
-                $ret[] = [
-                    'name' => $module,
-                    'parent' => 'lcAppObj',
-                    'class' => 'c' . lcInflector::camelize($module, false),
-                    'filename' => $app_dir . DS . 'modules' . DS . $module . DS . $module . '.php'
-                ];
-                unset($module);
-            }
-        }
-
-        return $ret;
-    }
-
-    private function getWebServicesInDir($dir)
-    {
-        $tasks = glob($dir . DS . '*.php');
-
-        if (!$tasks) {
-            return null;
-        }
-
-        $ret = [];
-
-        foreach ($tasks as $task_filename) {
-            $b = basename($task_filename);
-            $b = $b ? lcFiles::splitFileName($b) : null;
-            $b = $b ? $b['name'] : null;
-
-            if (!$b) {
-                continue;
-            }
-
-            $ret[] = [
-                'name' => $b,
-                'parent' => 'lcAppObj',
-                'class' => 'ws' . lcInflector::camelize($b, false),
-                'filename' => $task_filename
-            ];
-
-            unset($task_filename, $b);
-        }
-
-        return $ret;
-    }
-
-    private function getConsoleTasksInDir($dir)
-    {
-        $tasks = glob($dir . DS . '*.php');
-
-        if (!$tasks) {
-            return null;
-        }
-
-        $ret = [];
-
-        foreach ($tasks as $task_filename) {
-            $b = basename($task_filename);
-            $b = $b ? lcFiles::splitFileName($b) : null;
-            $b = $b ? $b['name'] : null;
-
-            if (!$b) {
-                continue;
-            }
-
-            $ret[] = [
-                'name' => $b,
-                'parent' => 'lcAppObj',
-                'class' => 't' . lcInflector::camelize($b, false),
-                'filename' => $task_filename
-            ];
-
-            unset($task_filename, $b);
-        }
-
-        return $ret;
-    }
-
-    private function getProjectTree($walk_callback = null)
-    {
-        $this->display('Fixing wrong visibility scope of system object vars (lcSysObj / lcAppObj)');
-
-        $project_dir = $this->project_dir;
-        $available_apps = $this->available_apps;
-        $available_plugins = $this->available_plugins;
-
-        $tree = [
-            'config' => [],
-            'applications' => [],
-            'tasks' => [],
-            'web_services' => [],
-            'plugins' => []
-        ];
-
-        // get applications web module protected vars
-        if ($available_apps) {
-            foreach ($available_apps as $app) {
-                $app_dir = $project_dir . DS . 'applications' . DS . $app;
-
-                // app config
-                $el = [
-                    'class' => lcInflector::camelize($app . '_configuration', false),
-                    'parent' => 'lcSysObj',
-                    'filename' => $app_dir . DS . 'config' . DS . $app . '_configuration.php'
-                ];
-                $tree[$app]['config'][] = $el;
-
-                if ($walk_callback) {
-                    $this->$walk_callback('config', $el);
-                }
-
-                $tree[$app]['modules'] = (array)$this->getModulesForTree($app_dir);
-
-                if ($walk_callback) {
-                    foreach ($tree[$app]['modules'] as $module) {
-                        $this->$walk_callback('module', $module);
-                        unset($module);
-                    }
-                }
-
-                unset($app, $app_dir);
-            }
-        }
-
-        // get project tasks protected vars
-        $tree['tasks'] = (array)$this->getConsoleTasksInDir($project_dir . DS . 'tasks');
-
-        if ($walk_callback) {
-            foreach ($tree['tasks'] as $task) {
-                $this->$walk_callback('task', $task);
-                unset($task);
-            }
-        }
-
-        // get project web service protected vars
-        $tree['web_services'] = (array)$this->getWebServicesInDir($project_dir . DS . 'ws');
-
-        if ($walk_callback) {
-            foreach ($tree['web_services'] as $web_service) {
-                $this->$walk_callback('web_service', $web_service);
-                unset($web_service);
-            }
-        }
-
-        // get project configurations protected vars
-        $el = [
-            'class' => 'ProjectConfiguration',
-            'parent' => 'lcSysObj',
-            'filename' => $project_dir . DS . 'config' . DS . 'project_configuration.php'
-        ];
-        $tree['config'][] = $el;
-
-        if ($walk_callback) {
-            $this->$walk_callback('config', $el);
-        }
-
-        $el = [
-            'class' => 'ApiConfiguration',
-            'parent' => 'lcSysObj',
-            'filename' => $project_dir . DS . 'config' . DS . 'api_configuration.php'
-        ];
-        $tree['config'][] = $el;
-
-        if ($walk_callback) {
-            $this->$walk_callback('config', $el);
-        }
-
-        // get plugins protected vars
-        if ($available_plugins) {
-            foreach ($available_plugins as $plugin) {
-                $plugin_dir = $project_dir . DS . 'addons' . DS . 'plugins' . DS . $plugin;
-
-                $pl = [
-                    'class' => 'p' . lcInflector::camelize($plugin, false),
-                    'parent' => 'lcAppObj',
-                    'filename' => $plugin_dir . DS . $plugin . '.php'
-                ];
-
-                if ($walk_callback) {
-                    $this->$walk_callback('plugin', $pl);
-                }
-
-                // plugin modules
-                $pl['modules'] = (array)$this->getModulesForTree($plugin_dir);
-
-                if ($walk_callback) {
-                    foreach ($pl['modules'] as $module) {
-                        $this->$walk_callback('module', $module);
-                        unset($module);
-                    }
-                }
-
-                // plugin console tasks
-                $pl['tasks'] = (array)$this->getConsoleTasksInDir($plugin_dir . DS . 'tasks');
-
-                if ($walk_callback) {
-                    foreach ($pl['tasks'] as $task) {
-                        $this->$walk_callback('task', $task);
-                        unset($task);
-                    }
-                }
-
-                // plugin web services
-                $pl['web_services'] = (array)$this->getWebServicesInDir($plugin_dir . DS . 'ws');
-
-                if ($walk_callback) {
-                    foreach ($pl['web_services'] as $web_service) {
-                        $this->$walk_callback('web_service', $web_service);
-                        unset($web_service);
-                    }
-                }
-
-                $tree['plugins'][] = $pl;
-
-                unset($plugin);
-            }
-        }
-
-        return $tree;
     }
 
     private function fixAddRequiredComponents($item_type, array $details)
@@ -968,94 +740,6 @@ class tLightcastUpgrader extends lcTaskController
         return null;
     }
 
-    private function fixAddRequiredPlugins($item_type, array $details)
-    {
-        $filename = $details['filename'];
-        $class = $details['class'];
-        $c = file_get_contents($filename);
-
-        if (!$c) {
-            return;
-        }
-
-        // parse and find out the previous plugins
-        //
-        $used_plugins = [];
-
-        /*
-         * $matches = array();
-        $matched = preg_match("/" . 'protected.*\$use_plugins[^=]+=[^a]+array\((.+?)\)' . "/smi", $c, $matches);
-        $matches_str = $matched ? $matches[1] : null;
-        $matches_str = $matches_str ? lcStrings::toAlphaNum($matches_str, array(',')) : null;
-        $used_plugins = $matches_str ? array_unique(array_filter(explode(',', $matches_str))) : array();
-        */
-
-        // parse the file to find other used plugins and add them
-        $matches = $this->matchInFile("/->getPlugin\(['\"]([\w\d]+?)['\"]\)/i", $filename);
-
-        if ($matches) {
-            $used_plugins = array_unique(array_merge(
-                $used_plugins,
-                (array)$matches[1]
-            ));
-        }
-
-        // remove the previous declaration
-        $c = preg_replace("/protected.*" . '\$use_plugins[^;]+;' . "/si", '', $c, 1);
-
-        if ($used_plugins) {
-            // insert in the class
-            $matches = [];
-            $matched = preg_match("/^class\s*" . $class . "\s*extends.*\{$/smi", $c, $matches, PREG_OFFSET_CAPTURE);
-
-            if (!$matched) {
-                assert(false);
-                return;
-            }
-
-            $pos = (int)$matches[0][1];
-            $pos = strpos($c, '{', $pos) + 1;
-
-            $c = substr($c, 0, $pos) .
-                "\n" . ' protected $use_plugins = array(' . "\n" . '\'' . implode('\',' . "\n" . '\'', $used_plugins) . '\');' .
-                substr($c, $pos, strlen($c));
-
-            file_put_contents($filename, $c);
-        }
-    }
-
-    /** @noinspection PhpUnusedPrivateMethodInspection */
-    private function _lc14ApplyProjectTreeFixes($item_type, array $details)
-    {
-        $filename = $details['filename'];
-        $parent = $details['parent'];
-
-        $this->consoleDisplay('> ' . $item_type . ' : ' . $filename);
-
-        // fix protected vars
-        if ($parent == 'lcSysObj') {
-            $this->consoleDisplay(' - applying lcSysObj protected vars fix');
-
-            $regex = $this->_getFixProtectedSysObjClassVarsRegex();
-            $this->replaceInFile($regex['regex'], $regex['reps'], $filename);
-        } elseif ($parent == 'lcAppObj') {
-            $this->consoleDisplay(' - applying lcAppObj protected vars fix');
-
-            $regex = $this->_getFixProtectedAppObjClassVarsRegex();
-            $this->replaceInFile($regex['regex'], $regex['reps'], $filename);
-        }
-
-        // add required plugins
-        if ($parent == 'lcSysObj' || $parent == 'lcAppObj') {
-            $this->fixAddRequiredPlugins($item_type, $details);
-            $this->fixAddRequiredComponents($item_type, $details);
-
-            // replace $request['request'] occurrences (previous way of passing forwarded params)
-            $this->replaceInFile("/" . '\$' . "request\[['\"]request['\"]]/i", '$request', $filename);
-        }
-    }
-
-    /** @noinspection PhpUnusedPrivateMethodInspection */
     private function upgradeFromLC14()
     {
         $project_dir = $this->project_dir;
@@ -1069,5 +753,323 @@ class tLightcastUpgrader extends lcTaskController
         $this->getProjectTree('_lc14ApplyProjectTreeFixes');
 
         return true;
+    }
+
+    private function _lc14FixMasterConfigurations($project_dir, array $available_apps)
+    {
+        // 1. fix configuration issues
+        $this->display('Fixing master config boot files');
+
+        // remove template configs if 'lc' prefixed versions exist
+        // rename 'lc' prefixed versions to non-lc prefixed files
+        $cfg_files = [
+            'config/lcApiConfiguration.class.php' => [
+                'new_class' => 'ApiConfiguration',
+                'old_class' => 'lcWsConfiguration',
+                'new_filename' => 'api_configuration.php',
+            ],
+            'config/lcProjectConfiguration.class.php' => [
+                'new_class' => 'ProjectConfiguration',
+                'old_class' => 'lcProjectConfiguration',
+                'new_filename' => 'project_configuration.php',
+            ],
+        ];
+
+        if ($available_apps) {
+            foreach ($available_apps as $app) {
+                $app_cam = lcInflector::camelize($app, false);
+                $f = 'applications' . DS . $app . DS . 'config' . DS . 'lc' . $app_cam . 'Configuration.class.php';
+                $cfg_files[$f] = [
+                    'new_class' => $app_cam . 'Configuration',
+                    'old_class' => 'lc' . $app_cam . 'Configuration',
+                    'new_filename' => $app . '_configuration.php',
+                    'is_app' => true,
+                ];
+                unset($app, $f);
+            }
+        }
+
+        foreach ($cfg_files as $source => $options) {
+            $new_filename = $options['new_filename'];
+            $new_class = isset($options['new_class']) ? $options['new_class'] : null;
+            $old_class = isset($options['old_class']) ? $options['old_class'] : null;
+            $is_app = isset($options['is_app']) ? (bool)$options['is_app'] : false;
+
+            $nf = $project_dir . DS . dirname($source) . DS . $new_filename;
+
+            if (file_exists($project_dir . DS . $source)) {
+                // remove the template version and just leave the original
+                // but rename it to the template filename
+
+                if (file_exists($nf)) {
+                    unlink($nf);
+                }
+
+                rename($project_dir . DS . $source, $nf);
+            }
+
+            if ($old_class && $new_class) {
+                // fix the class parents
+                // from 1.5 applications should inherit from lcWebConfiguration (previously from: lcApplicationConfiguration)
+                if ($is_app) {
+                    $this->replaceInFile(
+                        "/class[\s]+" . $old_class . "[\s]+extends[\s]+lcApplicationConfiguration/i",
+                        'class ' . $new_class . ' extends lcWebConfiguration',
+                        $nf);
+                } else {
+                    // rename class
+                    $this->replaceInFile(
+                        "/class[\s]+[\w]+[\s]+extends[\s]+([\w]+?)Configuration/i",
+                        'class ' . $new_class . ' extends \\1Configuration',
+                        $nf);
+                }
+            }
+
+            unset($source, $options, $new_filename, $new_class, $old_class, $is_app, $nf);
+        }
+
+        unset($cfg_files);
+    }
+
+    private function getProjectTree($walk_callback = null)
+    {
+        $this->display('Fixing wrong visibility scope of system object vars (lcSysObj / lcAppObj)');
+
+        $project_dir = $this->project_dir;
+        $available_apps = $this->available_apps;
+        $available_plugins = $this->available_plugins;
+
+        $tree = [
+            'config' => [],
+            'applications' => [],
+            'tasks' => [],
+            'web_services' => [],
+            'plugins' => [],
+        ];
+
+        // get applications web module protected vars
+        if ($available_apps) {
+            foreach ($available_apps as $app) {
+                $app_dir = $project_dir . DS . 'applications' . DS . $app;
+
+                // app config
+                $el = [
+                    'class' => lcInflector::camelize($app . '_configuration', false),
+                    'parent' => 'lcSysObj',
+                    'filename' => $app_dir . DS . 'config' . DS . $app . '_configuration.php',
+                ];
+                $tree[$app]['config'][] = $el;
+
+                if ($walk_callback) {
+                    $this->$walk_callback('config', $el);
+                }
+
+                $tree[$app]['modules'] = (array)$this->getModulesForTree($app_dir);
+
+                if ($walk_callback) {
+                    foreach ($tree[$app]['modules'] as $module) {
+                        $this->$walk_callback('module', $module);
+                        unset($module);
+                    }
+                }
+
+                unset($app, $app_dir);
+            }
+        }
+
+        // get project tasks protected vars
+        $tree['tasks'] = (array)$this->getConsoleTasksInDir($project_dir . DS . 'tasks');
+
+        if ($walk_callback) {
+            foreach ($tree['tasks'] as $task) {
+                $this->$walk_callback('task', $task);
+                unset($task);
+            }
+        }
+
+        // get project web service protected vars
+        $tree['web_services'] = (array)$this->getWebServicesInDir($project_dir . DS . 'ws');
+
+        if ($walk_callback) {
+            foreach ($tree['web_services'] as $web_service) {
+                $this->$walk_callback('web_service', $web_service);
+                unset($web_service);
+            }
+        }
+
+        // get project configurations protected vars
+        $el = [
+            'class' => 'ProjectConfiguration',
+            'parent' => 'lcSysObj',
+            'filename' => $project_dir . DS . 'config' . DS . 'project_configuration.php',
+        ];
+        $tree['config'][] = $el;
+
+        if ($walk_callback) {
+            $this->$walk_callback('config', $el);
+        }
+
+        $el = [
+            'class' => 'ApiConfiguration',
+            'parent' => 'lcSysObj',
+            'filename' => $project_dir . DS . 'config' . DS . 'api_configuration.php',
+        ];
+        $tree['config'][] = $el;
+
+        if ($walk_callback) {
+            $this->$walk_callback('config', $el);
+        }
+
+        // get plugins protected vars
+        if ($available_plugins) {
+            foreach ($available_plugins as $plugin) {
+                $plugin_dir = $project_dir . DS . 'addons' . DS . 'plugins' . DS . $plugin;
+
+                $pl = [
+                    'class' => 'p' . lcInflector::camelize($plugin, false),
+                    'parent' => 'lcAppObj',
+                    'filename' => $plugin_dir . DS . $plugin . '.php',
+                ];
+
+                if ($walk_callback) {
+                    $this->$walk_callback('plugin', $pl);
+                }
+
+                // plugin modules
+                $pl['modules'] = (array)$this->getModulesForTree($plugin_dir);
+
+                if ($walk_callback) {
+                    foreach ($pl['modules'] as $module) {
+                        $this->$walk_callback('module', $module);
+                        unset($module);
+                    }
+                }
+
+                // plugin console tasks
+                $pl['tasks'] = (array)$this->getConsoleTasksInDir($plugin_dir . DS . 'tasks');
+
+                if ($walk_callback) {
+                    foreach ($pl['tasks'] as $task) {
+                        $this->$walk_callback('task', $task);
+                        unset($task);
+                    }
+                }
+
+                // plugin web services
+                $pl['web_services'] = (array)$this->getWebServicesInDir($plugin_dir . DS . 'ws');
+
+                if ($walk_callback) {
+                    foreach ($pl['web_services'] as $web_service) {
+                        $this->$walk_callback('web_service', $web_service);
+                        unset($web_service);
+                    }
+                }
+
+                $tree['plugins'][] = $pl;
+
+                unset($plugin);
+            }
+        }
+
+        return $tree;
+    }
+
+    private function getModulesForTree($app_dir)
+    {
+        if (!$app_dir) {
+            return null;
+        }
+
+        $ret = [];
+
+        $app_modules = $this->getApplicationModules($app_dir);
+
+        if ($app_modules) {
+            foreach ($app_modules as $module) {
+                $ret[] = [
+                    'name' => $module,
+                    'parent' => 'lcAppObj',
+                    'class' => 'c' . lcInflector::camelize($module, false),
+                    'filename' => $app_dir . DS . 'modules' . DS . $module . DS . $module . '.php',
+                ];
+                unset($module);
+            }
+        }
+
+        return $ret;
+    }
+
+    private function getApplicationModules($app_dir)
+    {
+        $ret = lcDirs::getSubDirsOfDir($app_dir . DS . 'modules');
+        return $ret;
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+
+    private function getConsoleTasksInDir($dir)
+    {
+        $tasks = glob($dir . DS . '*.php');
+
+        if (!$tasks) {
+            return null;
+        }
+
+        $ret = [];
+
+        foreach ($tasks as $task_filename) {
+            $b = basename($task_filename);
+            $b = $b ? lcFiles::splitFileName($b) : null;
+            $b = $b ? $b['name'] : null;
+
+            if (!$b) {
+                continue;
+            }
+
+            $ret[] = [
+                'name' => $b,
+                'parent' => 'lcAppObj',
+                'class' => 't' . lcInflector::camelize($b, false),
+                'filename' => $task_filename,
+            ];
+
+            unset($task_filename, $b);
+        }
+
+        return $ret;
+    }
+
+    /** @noinspection PhpUnusedPrivateMethodInspection */
+
+    private function getWebServicesInDir($dir)
+    {
+        $tasks = glob($dir . DS . '*.php');
+
+        if (!$tasks) {
+            return null;
+        }
+
+        $ret = [];
+
+        foreach ($tasks as $task_filename) {
+            $b = basename($task_filename);
+            $b = $b ? lcFiles::splitFileName($b) : null;
+            $b = $b ? $b['name'] : null;
+
+            if (!$b) {
+                continue;
+            }
+
+            $ret[] = [
+                'name' => $b,
+                'parent' => 'lcAppObj',
+                'class' => 'ws' . lcInflector::camelize($b, false),
+                'filename' => $task_filename,
+            ];
+
+            unset($task_filename, $b);
+        }
+
+        return $ret;
     }
 }

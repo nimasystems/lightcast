@@ -31,41 +31,6 @@ class ModelJoin extends Join
      */
     protected $previousJoin;
 
-    public function setRelationMap(RelationMap $relationMap, $leftTableAlias = null, $relationAlias = null)
-    {
-        $leftCols = $relationMap->getLeftColumns();
-        $rightCols = $relationMap->getRightColumns();
-        $nbColumns = $relationMap->countColumnMappings();
-        for ($i = 0; $i < $nbColumns; $i++) {
-            $this->addExplicitCondition(
-                $leftCols[$i]->getTableName(), $leftCols[$i]->getName(), $leftTableAlias,
-                $rightCols[$i]->getTableName(), $rightCols[$i]->getName(), $relationAlias,
-                Criteria::EQUAL);
-        }
-        $this->relationMap = $relationMap;
-
-        return $this;
-    }
-
-    public function getRelationMap()
-    {
-        return $this->relationMap;
-    }
-
-    /**
-     * Sets the right tableMap for this join
-     *
-     * @param TableMap $tableMap The table map to use
-     *
-     * @return ModelJoin The current join object, for fluid interface
-     */
-    public function setTableMap(TableMap $tableMap)
-    {
-        $this->tableMap = $tableMap;
-
-        return $this;
-    }
-
     /**
      * Gets the right tableMap for this join
      *
@@ -81,31 +46,17 @@ class ModelJoin extends Join
     }
 
     /**
-     * @param ModelJoin $join
+     * Sets the right tableMap for this join
      *
-     * @return ModelJoin
+     * @param TableMap $tableMap The table map to use
+     *
+     * @return ModelJoin The current join object, for fluid interface
      */
-    public function setPreviousJoin(ModelJoin $join)
+    public function setTableMap(TableMap $tableMap)
     {
-        $this->previousJoin = $join;
+        $this->tableMap = $tableMap;
 
         return $this;
-    }
-
-    /**
-     * @return ModelJoin
-     */
-    public function getPreviousJoin()
-    {
-        return $this->previousJoin;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPrimary()
-    {
-        return null === $this->previousJoin;
     }
 
     public function setRelationAlias($relationAlias)
@@ -146,6 +97,55 @@ class ModelJoin extends Join
 
             return $previousObject->$method();
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPrimary()
+    {
+        return null === $this->previousJoin;
+    }
+
+    /**
+     * @return ModelJoin
+     */
+    public function getPreviousJoin()
+    {
+        return $this->previousJoin;
+    }
+
+    /**
+     * @param ModelJoin $join
+     *
+     * @return ModelJoin
+     */
+    public function setPreviousJoin(ModelJoin $join)
+    {
+        $this->previousJoin = $join;
+
+        return $this;
+    }
+
+    public function getRelationMap()
+    {
+        return $this->relationMap;
+    }
+
+    public function setRelationMap(RelationMap $relationMap, $leftTableAlias = null, $relationAlias = null)
+    {
+        $leftCols = $relationMap->getLeftColumns();
+        $rightCols = $relationMap->getRightColumns();
+        $nbColumns = $relationMap->countColumnMappings();
+        for ($i = 0; $i < $nbColumns; $i++) {
+            $this->addExplicitCondition(
+                $leftCols[$i]->getTableName(), $leftCols[$i]->getName(), $leftTableAlias,
+                $rightCols[$i]->getTableName(), $rightCols[$i]->getName(), $relationAlias,
+                Criteria::EQUAL);
+        }
+        $this->relationMap = $relationMap;
+
+        return $this;
     }
 
     /**

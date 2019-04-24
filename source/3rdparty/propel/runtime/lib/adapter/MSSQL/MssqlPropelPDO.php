@@ -136,7 +136,7 @@ class MssqlPropelPDO extends PropelPDO
     {
         $result = self::query('SELECT SCOPE_IDENTITY()');
 
-        return (int) $result->fetchColumn();
+        return (int)$result->fetchColumn();
     }
 
     /**

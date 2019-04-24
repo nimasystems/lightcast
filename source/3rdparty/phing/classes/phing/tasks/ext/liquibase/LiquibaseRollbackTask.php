@@ -41,6 +41,15 @@ class LiquibaseRollbackTask extends AbstractLiquibaseTask
     }
 
     /**
+     * @see Task::main()
+     */
+    public function main()
+    {
+        $this->checkParams();
+        $this->execute('rollback', escapeshellarg($this->rollbackTag));
+    }
+
+    /**
      * @see AbstractTask::checkParams()
      */
     protected function checkParams()
@@ -55,14 +64,5 @@ class LiquibaseRollbackTask extends AbstractLiquibaseTask
                 )
             );
         }
-    }
-
-    /**
-     * @see Task::main()
-     */
-    public function main()
-    {
-        $this->checkParams();
-        $this->execute('rollback', escapeshellarg($this->rollbackTag));
     }
 }

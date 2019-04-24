@@ -42,11 +42,11 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                     'url' => 'mysql:host=localhost;dbname=',
                     'user' => null,
                     'password' => null,
-                    'charset' => 'utf8'
+                    'charset' => 'utf8',
                 ],
             ],
             'migrations' => [
-                'helper_class' => 'lcDatabaseMigrationsHelper'
+                'helper_class' => 'lcDatabaseMigrationsHelper',
             ],
             'propel_custom' => [
                 'propel.lightcastOverrideBuildPath' => true,
@@ -91,8 +91,8 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                 'propel.builder.addIncludes' => false,
                 'propel.builder.addComments' => true,
                 'propel.builder.addBehaviors' => true,
-                'propel.defaultTranslator' => 'lcPropelTranslator'
-            ]
+                'propel.defaultTranslator' => 'lcPropelTranslator',
+            ],
         ]];
     }
 }

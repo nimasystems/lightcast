@@ -23,7 +23,7 @@ class DotNotation
     /**
      * @var array
      */
-    protected $values = array();
+    protected $values = [];
 
     /**
      * @var array
@@ -31,6 +31,16 @@ class DotNotation
     public function __construct(array $values)
     {
         $this->values = $values;
+    }
+
+    /**
+     * @param $path
+     * @param array $values
+     */
+    public function add($path, array $values)
+    {
+        $get = (array)$this->get($path);
+        $this->set($path, $this->arrayMergeRecursiveDistinct($get, $values));
     }
 
     /**
@@ -56,6 +66,11 @@ class DotNotation
         return $array;
     }
 
+    protected function explode($path)
+    {
+        return preg_split(self::SEPARATOR, $path);
+    }
+
     /**
      * @param string $path
      * @param mixed $value
@@ -77,7 +92,7 @@ class DotNotation
                     $key = array_shift($keys);
 
                     if (!isset($at[$key])) {
-                        $at[$key] = array();
+                        $at[$key] = [];
                     }
 
                     $at = &$at[$key];
@@ -86,56 +101,6 @@ class DotNotation
         } else {
             $this->values = $value;
         }
-    }
-
-    /**
-     * @param $path
-     * @param array $values
-     */
-    public function add($path, array $values)
-    {
-        $get = (array)$this->get($path);
-        $this->set($path, $this->arrayMergeRecursiveDistinct($get, $values));
-    }
-
-    /**
-     * @param string $path
-     * @return bool
-     */
-    public function have($path)
-    {
-        $keys = $this->explode($path);
-        $array = $this->values;
-        foreach ($keys as $key) {
-            if (isset($array[$key])) {
-                $array = $array[$key];
-            } else {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * @param array $values
-     */
-    public function setValues($values)
-    {
-        $this->values = $values;
-    }
-
-    /**
-     * @return array
-     */
-    public function getValues()
-    {
-        return $this->values;
-    }
-
-    protected function explode($path)
-    {
-        return preg_split(self::SEPARATOR, $path);
     }
 
     /**
@@ -189,5 +154,40 @@ class DotNotation
         }
 
         return $merged;
+    }
+
+    /**
+     * @param string $path
+     * @return bool
+     */
+    public function have($path)
+    {
+        $keys = $this->explode($path);
+        $array = $this->values;
+        foreach ($keys as $key) {
+            if (isset($array[$key])) {
+                $array = $array[$key];
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * @param array $values
+     */
+    public function setValues($values)
+    {
+        $this->values = $values;
     }
 }

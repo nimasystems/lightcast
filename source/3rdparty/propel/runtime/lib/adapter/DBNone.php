@@ -21,10 +21,10 @@ class DBNone extends DBAdapter
 {
 
     /**
+     * @param PDO $con
+     * @param array $settings
      * @see        DBAdapter::initConnection()
      *
-     * @param PDO   $con
-     * @param array $settings
      */
     public function initConnection(PDO $con, array $settings)
     {
@@ -70,7 +70,7 @@ class DBNone extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -96,7 +96,7 @@ class DBNone extends DBAdapter
     /**
      * Modifies the passed-in SQL to add LIMIT and/or OFFSET.
      *
-     * @param string  $sql
+     * @param string $sql
      * @param integer $offset
      * @param integer $limit
      */

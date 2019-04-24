@@ -100,7 +100,7 @@ class DefaultLogger implements StreamRequiredBuildLogger
      */
     public function setMessageOutputLevel($level)
     {
-        $this->msgOutputLevel = (int) $level;
+        $this->msgOutputLevel = (int)$level;
     }
 
     /**
@@ -154,6 +154,22 @@ class DefaultLogger implements StreamRequiredBuildLogger
     }
 
     /**
+     * Prints a message to console.
+     *
+     * @param string $message The message to print.
+     *                            Should not be <code>null</code>.
+     * @param OutputStream|resource $stream The stream to use for message printing.
+     * @param int $priority The priority of the message.
+     *                            (Ignored in this implementation.)
+     * @return void
+     * @throws IOException
+     */
+    protected function printMessage($message, OutputStream $stream, $priority)
+    {
+        $stream->write($message . PHP_EOL);
+    }
+
+    /**
      *  Prints whether the build succeeded or failed, and any errors that
      *  occurred during the build. Also outputs the total build-time.
      *
@@ -184,6 +200,15 @@ class DefaultLogger implements StreamRequiredBuildLogger
     }
 
     /**
+     * Get the message to return when a build succeeded.
+     * @return string The classic "BUILD FINISHED"
+     */
+    protected function getBuildSuccessfulMessage()
+    {
+        return "BUILD FINISHED";
+    }
+
+    /**
      * Get the message to return when a build failed.
      * @return string The classic "BUILD FAILED"
      */
@@ -193,12 +218,26 @@ class DefaultLogger implements StreamRequiredBuildLogger
     }
 
     /**
-     * Get the message to return when a build succeeded.
-     * @return string The classic "BUILD FINISHED"
+     *  Formats a time micro integer to human readable format.
+     *
+     * @param integer The time stamp
+     * @return string
      */
-    protected function getBuildSuccessfulMessage()
+    public static function formatTime($micros)
     {
-        return "BUILD FINISHED";
+        $seconds = $micros;
+        $minutes = $seconds / 60;
+        if ($minutes > 1) {
+            return sprintf(
+                "%1.0f minute%s %0.2f second%s",
+                $minutes,
+                ($minutes === 1 ? " " : "s "),
+                $seconds - floor($seconds / 60) * 60,
+                ($seconds % 60 === 1 ? "" : "s")
+            );
+        } else {
+            return sprintf("%0.4f second%s", $seconds, ($seconds % 60 === 1 ? "" : "s"));
+        }
     }
 
     /**
@@ -214,8 +253,7 @@ class DefaultLogger implements StreamRequiredBuildLogger
             && $event->getTarget()->getName() != ''
         ) {
             $showLongTargets = $event->getProject()->getProperty("phing.showlongtargets");
-            $msg = PHP_EOL . $event->getProject()->getName() . ' > ' . $event->getTarget()->getName(
-                ) . ($showLongTargets ? ' [' . $event->getTarget()->getDescription() . ']' : '') . ':' . PHP_EOL;
+            $msg = PHP_EOL . $event->getProject()->getName() . ' > ' . $event->getTarget()->getName() . ($showLongTargets ? ' [' . $event->getTarget()->getDescription() . ']' : '') . ':' . PHP_EOL;
             $this->printMessage($msg, $this->out, $event->getPriority());
         }
     }
@@ -248,7 +286,7 @@ class DefaultLogger implements StreamRequiredBuildLogger
      *  Fired when a task has finished. We don't need specific action on this
      *  event. So the methods are empty.
      *
-     * @param  BuildEvent $event  The BuildEvent
+     * @param BuildEvent $event The BuildEvent
      * @see    BuildEvent::getException()
      */
     public function taskFinished(BuildEvent $event)
@@ -280,44 +318,5 @@ class DefaultLogger implements StreamRequiredBuildLogger
                 $this->printMessage($msg, $this->err, $priority);
             }
         }
-    }
-
-    /**
-     *  Formats a time micro integer to human readable format.
-     *
-     * @param  integer The time stamp
-     * @return string
-     */
-    public static function formatTime($micros)
-    {
-        $seconds = $micros;
-        $minutes = $seconds / 60;
-        if ($minutes > 1) {
-            return sprintf(
-                "%1.0f minute%s %0.2f second%s",
-                $minutes,
-                ($minutes === 1 ? " " : "s "),
-                $seconds - floor($seconds / 60) * 60,
-                ($seconds % 60 === 1 ? "" : "s")
-            );
-        } else {
-            return sprintf("%0.4f second%s", $seconds, ($seconds % 60 === 1 ? "" : "s"));
-        }
-    }
-
-    /**
-     * Prints a message to console.
-     *
-     * @param  string $message The message to print.
-     *                            Should not be <code>null</code>.
-     * @param OutputStream|resource $stream The stream to use for message printing.
-     * @param  int $priority The priority of the message.
-     *                            (Ignored in this implementation.)
-     * @throws IOException
-     * @return void
-     */
-    protected function printMessage($message, OutputStream $stream, $priority)
-    {
-        $stream->write($message . PHP_EOL);
     }
 }

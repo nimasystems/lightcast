@@ -90,48 +90,6 @@ class StripLineBreaks extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the line-breaking characters.
-     *
-     * @param string $lineBreaks A String containing all the characters to be
-     *                           considered as line-breaking.
-     */
-    public function setLineBreaks($lineBreaks)
-    {
-        $this->_lineBreaks = (string) $lineBreaks;
-    }
-
-    /**
-     * Gets the line-breaking characters.
-     *
-     * @return string A String containing all the characters that are considered as line-breaking.
-     */
-    public function getLineBreaks()
-    {
-        return $this->_lineBreaks;
-    }
-
-    /**
-     * Creates a new StripLineBreaks using the passed in
-     * Reader for instantiation.
-     *
-     * @param Reader $reader
-     * @internal param A $object Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering
-     *                the specified reader
-     */
-    public function chain(Reader $reader)
-    {
-        $newFilter = new StripLineBreaks($reader);
-        $newFilter->setLineBreaks($this->getLineBreaks());
-        $newFilter->setInitialized(true);
-        $newFilter->setProject($this->getProject());
-
-        return $newFilter;
-    }
-
-    /**
      * Parses the parameters to set the line-breaking characters.
      */
     private function _initialize()
@@ -150,5 +108,47 @@ class StripLineBreaks extends BaseParamFilterReader implements ChainableReader
         if ($userDefinedLineBreaks !== null) {
             $this->_lineBreaks = $userDefinedLineBreaks;
         }
+    }
+
+    /**
+     * Creates a new StripLineBreaks using the passed in
+     * Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering
+     *                the specified reader
+     * @internal param A $object Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new StripLineBreaks($reader);
+        $newFilter->setLineBreaks($this->getLineBreaks());
+        $newFilter->setInitialized(true);
+        $newFilter->setProject($this->getProject());
+
+        return $newFilter;
+    }
+
+    /**
+     * Gets the line-breaking characters.
+     *
+     * @return string A String containing all the characters that are considered as line-breaking.
+     */
+    public function getLineBreaks()
+    {
+        return $this->_lineBreaks;
+    }
+
+    /**
+     * Sets the line-breaking characters.
+     *
+     * @param string $lineBreaks A String containing all the characters to be
+     *                           considered as line-breaking.
+     */
+    public function setLineBreaks($lineBreaks)
+    {
+        $this->_lineBreaks = (string)$lineBreaks;
     }
 }

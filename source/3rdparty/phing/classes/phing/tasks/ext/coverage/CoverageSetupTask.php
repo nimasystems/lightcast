@@ -36,10 +36,10 @@ require_once 'phing/tasks/ext/coverage/CoverageMerger.php';
 class CoverageSetupTask extends Task
 {
     /** the list of filesets containing the .php filename rules */
-    private $filesets = array();
+    private $filesets = [];
 
     /** Any filelists of files containing the .php filenames */
-    private $filelists = array();
+    private $filelists = [];
 
     /** the filename of the coverage database */
     private $database = "coverage.db";
@@ -100,43 +100,6 @@ class CoverageSetupTask extends Task
         return $this->classpath;
     }
 
-    /**
-     * Iterate over all filesets and return the filename of all files.
-     *
-     * @return array an array of (basedir, filenames) pairs
-     */
-    private function getFilenames()
-    {
-        $files = array();
-
-        foreach ($this->filelists as $fl) {
-            try {
-                $list = $fl->getFiles($this->project);
-                foreach ($list as $file) {
-                    $fs = new PhingFile(strval($fl->getDir($this->project)), $file);
-                    $files[] = array('key' => strtolower($fs->getAbsolutePath()), 'fullname' => $fs->getAbsolutePath());
-                }
-            } catch (BuildException $be) {
-                $this->log($be->getMessage(), Project::MSG_WARN);
-            }
-        }
-
-        foreach ($this->filesets as $fileset) {
-            $ds = $fileset->getDirectoryScanner($this->project);
-            $ds->scan();
-
-            $includedFiles = $ds->getIncludedFiles();
-
-            foreach ($includedFiles as $file) {
-                $fs = new PhingFile(realpath($ds->getBaseDir()), $file);
-
-                $files[] = array('key' => strtolower($fs->getAbsolutePath()), 'fullname' => $fs->getAbsolutePath());
-            }
-        }
-
-        return $files;
-    }
-
     public function init()
     {
     }
@@ -153,7 +116,7 @@ class CoverageSetupTask extends Task
             $fullname = $file['fullname'];
             $filename = $file['key'];
 
-            $props->setProperty($filename, serialize(array('fullname' => $fullname, 'coverage' => array())));
+            $props->setProperty($filename, serialize(['fullname' => $fullname, 'coverage' => []]));
         }
 
         $dbfile = new PhingFile($this->database);
@@ -161,5 +124,42 @@ class CoverageSetupTask extends Task
         $props->store($dbfile);
 
         $this->project->setProperty('coverage.database', $dbfile->getAbsolutePath());
+    }
+
+    /**
+     * Iterate over all filesets and return the filename of all files.
+     *
+     * @return array an array of (basedir, filenames) pairs
+     */
+    private function getFilenames()
+    {
+        $files = [];
+
+        foreach ($this->filelists as $fl) {
+            try {
+                $list = $fl->getFiles($this->project);
+                foreach ($list as $file) {
+                    $fs = new PhingFile(strval($fl->getDir($this->project)), $file);
+                    $files[] = ['key' => strtolower($fs->getAbsolutePath()), 'fullname' => $fs->getAbsolutePath()];
+                }
+            } catch (BuildException $be) {
+                $this->log($be->getMessage(), Project::MSG_WARN);
+            }
+        }
+
+        foreach ($this->filesets as $fileset) {
+            $ds = $fileset->getDirectoryScanner($this->project);
+            $ds->scan();
+
+            $includedFiles = $ds->getIncludedFiles();
+
+            foreach ($includedFiles as $file) {
+                $fs = new PhingFile(realpath($ds->getBaseDir()), $file);
+
+                $files[] = ['key' => strtolower($fs->getAbsolutePath()), 'fullname' => $fs->getAbsolutePath()];
+            }
+        }
+
+        return $files;
     }
 }

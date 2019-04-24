@@ -44,23 +44,23 @@ class lcBaseActionFormValidationFailure extends lcObj
         $this->message = $message;
     }
 
-    public function setFieldName($field_name)
-    {
-        $this->field_name = $field_name;
-    }
-
     public function getFieldName()
     {
         return $this->field_name;
     }
 
-    public function setMessage($message)
+    public function setFieldName($field_name)
     {
-        $this->message = $message;
+        $this->field_name = $field_name;
     }
 
     public function getMessage()
     {
         return $this->message;
+    }
+
+    public function setMessage($message)
+    {
+        $this->message = $message;
     }
 }

@@ -33,11 +33,6 @@ class lcTagLegend extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function create()
-    {
-        return new lcTagLegend();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -48,6 +43,11 @@ class lcTagLegend extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagLegend();
     }
 
     public static function getRequiredAttributes()

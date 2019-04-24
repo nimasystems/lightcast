@@ -26,17 +26,6 @@ class tSvn extends lcTaskController
     const SVN_COMMAND = 'svn';
     const SVN_DATA_DIR = 'svn';
 
-    public function getHelpInfo()
-    {
-        return
-            'Possible commands:
-
-				SVN:
-
-- ' . lcConsolePainter::formatConsoleText('list-changed-files', 'info') . ' - Get a list of all changed files between --rev1 and --rev2
-- ' . lcConsolePainter::formatConsoleText('download-changed-files', 'info') . ' - Download all changed files into --dest from --rev1 to --rev2';
-    }
-
     public function executeTask()
     {
         switch ($this->getRequest()->getParam('action')) {
@@ -83,6 +72,62 @@ class tSvn extends lcTaskController
         $this->consoleDisplay("\n", false);
 
         return $list;
+    }
+
+    private function svnGetDiffSummary($repo_url, $rev1, $rev2)
+    {
+        $repo_url = (string)$repo_url;
+        $rev1 = (string)$rev1;
+        $rev2 = (string)$rev2;
+
+        if (!$repo_url || !$rev1 || !$rev2) {
+            throw new lcInvalidArgumentException('Invalid params');
+        }
+
+        // exec the cmd
+        $cmd = self::SVN_COMMAND . ' diff -r ' . escapeshellarg($rev1) . ':' . escapeshellarg($rev2) . ' --summarize ' . escapeshellarg($repo_url);
+
+        $result = 0;
+        $output = lcSys::execCmd($cmd, $result, true);
+
+        if ($result != 0) {
+            throw new lcSystemException('Could not execute svn command: ' . print_r($output, true));
+        }
+
+        if (!$output || !is_array($output)) {
+            return false;
+        }
+
+        $files = [];
+
+        foreach ($output as $line) {
+            $mod = trim(substr($line, 0, strpos($line, ' ')));
+
+            // skip deleted files
+            if ($mod == 'D') {
+                continue;
+            }
+
+            $file = substr($line, strrpos($line, ' '), strlen($line));
+
+            if (!$file) {
+                assert(false);
+                continue;
+            }
+
+            // strip the url
+            $file = str_replace($repo_url, '', $file);
+
+            $files[] = trim($file);
+
+            unset($line);
+        }
+
+        $files = array_unique($files);
+
+        sort($files);
+
+        return $files;
     }
 
     private function downloadChangedFiles()
@@ -173,66 +218,21 @@ class tSvn extends lcTaskController
         return true;
     }
 
-    private function svnGetDiffSummary($repo_url, $rev1, $rev2)
-    {
-        $repo_url = (string)$repo_url;
-        $rev1 = (string)$rev1;
-        $rev2 = (string)$rev2;
-
-        if (!$repo_url || !$rev1 || !$rev2) {
-            throw new lcInvalidArgumentException('Invalid params');
-        }
-
-        // exec the cmd
-        $cmd = self::SVN_COMMAND . ' diff -r ' . escapeshellarg($rev1) . ':' . escapeshellarg($rev2) . ' --summarize ' . escapeshellarg($repo_url);
-
-        $result = 0;
-        $output = lcSys::execCmd($cmd, $result, true);
-
-        if ($result != 0) {
-            throw new lcSystemException('Could not execute svn command: ' . print_r($output, true));
-        }
-
-        if (!$output || !is_array($output)) {
-            return false;
-        }
-
-        $files = [];
-
-        foreach ($output as $line) {
-            $mod = trim(substr($line, 0, strpos($line, ' ')));
-
-            // skip deleted files
-            if ($mod == 'D') {
-                continue;
-            }
-
-            $file = substr($line, strrpos($line, ' '), strlen($line));
-
-            if (!$file) {
-                assert(false);
-                continue;
-            }
-
-            // strip the url
-            $file = str_replace($repo_url, '', $file);
-
-            $files[] = trim($file);
-
-            unset($line);
-        }
-
-        $files = array_unique($files);
-
-        sort($files);
-
-        return $files;
-    }
-
     private function displayHelp()
     {
         $this->consoleDisplay($this->getHelpInfo(), false);
 
         return true;
+    }
+
+    public function getHelpInfo()
+    {
+        return
+            'Possible commands:
+
+				SVN:
+
+- ' . lcConsolePainter::formatConsoleText('list-changed-files', 'info') . ' - Get a list of all changed files between --rev1 and --rev2
+- ' . lcConsolePainter::formatConsoleText('download-changed-files', 'info') . ' - Download all changed files into --dest from --rev1 to --rev2';
     }
 }

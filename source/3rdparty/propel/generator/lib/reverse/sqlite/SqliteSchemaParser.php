@@ -28,7 +28,7 @@ class SqliteSchemaParser extends BaseSchemaParser
      *
      * @var        array
      */
-    private static $sqliteTypeMap = array(
+    private static $sqliteTypeMap = [
         'tinyint' => PropelTypes::TINYINT,
         'smallint' => PropelTypes::SMALLINT,
         'mediumint' => PropelTypes::SMALLINT,
@@ -58,17 +58,7 @@ class SqliteSchemaParser extends BaseSchemaParser
         'text' => PropelTypes::LONGVARCHAR,
         'enum' => PropelTypes::CHAR,
         'set' => PropelTypes::CHAR,
-    );
-
-    /**
-     * Gets a type mapping from native types to Propel types
-     *
-     * @return array
-     */
-    protected function getTypeMapping()
-    {
-        return self::$sqliteTypeMap;
-    }
+    ];
 
     /**
      *
@@ -78,7 +68,7 @@ class SqliteSchemaParser extends BaseSchemaParser
         $stmt = $this->dbh->query("SELECT name FROM sqlite_master WHERE type='table' UNION ALL SELECT name FROM sqlite_temp_master WHERE type='table' ORDER BY name;");
 
         // First load the tables (important that this happen before filling out details of tables)
-        $tables = array();
+        $tables = [];
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $name = $row[0];
             if ($name == $this->getMigrationTable()) {
@@ -103,10 +93,10 @@ class SqliteSchemaParser extends BaseSchemaParser
         return count($tables);
     }
 
-    /**
+/**
      * Adds Columns to the specified table.
      *
-     * @param Table  $table   The Table model class to add columns to.
+     * @param Table $table The Table model class to add columns to.
      * @param string $version The database version.
      */
     protected function addColumns(Table $table)
@@ -126,7 +116,7 @@ class SqliteSchemaParser extends BaseSchemaParser
                 $type = $matches[1];
                 $precision = $matches[2];
                 $scale = $matches[3]; // aka precision
-            } elseif (preg_match('/^([^\(]+)\(\s*(\d+)\s*\)$/', $fulltype, $matches)) {
+            } else if (preg_match('/^([^\(]+)\(\s*(\d+)\s*\)$/', $fulltype, $matches)) {
                 $type = $matches[1];
                 $size = $matches[2];
             } else {
@@ -163,9 +153,9 @@ class SqliteSchemaParser extends BaseSchemaParser
 
             $table->addColumn($column);
         }
-    } // addColumn()
+    }
 
-    /**
+        /**
      * Load indexes for this table
      */
     protected function addIndexes(Table $table)
@@ -185,5 +175,15 @@ class SqliteSchemaParser extends BaseSchemaParser
 
             $table->addIndex($index);
         }
+    } // addColumn()
+
+    /**
+     * Gets a type mapping from native types to Propel types
+     *
+     * @return array
+     */
+    protected function getTypeMapping()
+    {
+        return self::$sqliteTypeMap;
     }
 }

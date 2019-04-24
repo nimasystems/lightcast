@@ -49,7 +49,7 @@ class IniFileParser implements FileParserInterface
             }
         }
 
-        $properties = array();
+        $properties = [];
         foreach ($lines as $line) {
             // strip comments and leading/trailing spaces
             $line = trim(preg_replace("/\s+[;#]\s.+$/", "", $line));
@@ -78,7 +78,7 @@ class IniFileParser implements FileParserInterface
     {
         if ($val === "true") {
             $val = true;
-        } elseif ($val === "false") {
+        } else if ($val === "false") {
             $val = false;
         }
         return $val;

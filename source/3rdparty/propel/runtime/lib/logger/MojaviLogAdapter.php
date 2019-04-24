@@ -44,6 +44,52 @@ class MojaviLogAdapter implements BasicLogger
     }
 
     /**
+     * Primary method to handle logging.
+     *
+     * @param mixed $message String or Exception object containing the message to log.
+     * @param integer $severity The numeric severity.  Defaults to null so that no
+     *                                assumptions are made about the logging backend.
+     */
+    public function log($message, $severity = null)
+    {
+        if (is_null($this->logger)) {
+            $this->logger = LogManager::getLogger('propel');
+        }
+
+        switch ($severity) {
+            case 'crit':
+                $method = 'fatal';
+                break;
+            case 'err':
+                $method = 'error';
+                break;
+            case 'alert':
+            case 'warning':
+                $method = 'warning';
+                break;
+            case 'notice':
+            case 'info':
+                $method = 'info';
+                break;
+            case 'debug':
+            default:
+                $method = 'debug';
+        }
+
+        // get a backtrace to pass class, function, file, & line to Mojavi logger
+        $trace = debug_backtrace();
+
+        // call the appropriate Mojavi logger method
+        $this->logger->{$method} (
+            $message,
+            $trace[2]['class'],
+            $trace[2]['function'],
+            $trace[1]['file'],
+            $trace[1]['line']
+        );
+    }
+
+    /**
      * A convenience function for logging a critical event.
      *
      * @param mixed $message String or Exception object containing the message to log.
@@ -101,51 +147,5 @@ class MojaviLogAdapter implements BasicLogger
     public function debug($message)
     {
         $this->log($message, 'debug');
-    }
-
-    /**
-     * Primary method to handle logging.
-     *
-     * @param mixed   $message  String or Exception object containing the message to log.
-     * @param integer $severity The numeric severity.  Defaults to null so that no
-     *                                assumptions are made about the logging backend.
-     */
-    public function log($message, $severity = null)
-    {
-        if (is_null($this->logger)) {
-            $this->logger = LogManager::getLogger('propel');
-        }
-
-        switch ($severity) {
-            case 'crit':
-                $method = 'fatal';
-                break;
-            case 'err':
-                $method = 'error';
-                break;
-            case 'alert':
-            case 'warning':
-                $method = 'warning';
-                break;
-            case 'notice':
-            case 'info':
-                $method = 'info';
-                break;
-            case 'debug':
-            default:
-                $method = 'debug';
-        }
-
-        // get a backtrace to pass class, function, file, & line to Mojavi logger
-        $trace = debug_backtrace();
-
-        // call the appropriate Mojavi logger method
-        $this->logger->{$method} (
-            $message,
-            $trace[2]['class'],
-            $trace[2]['function'],
-            $trace[1]['file'],
-            $trace[1]['line']
-            );
     }
 }

@@ -26,11 +26,9 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 {
     protected $model_paths = [];
     protected $registered_models = [];
-    private $used_models = [];
-
-    private $models_gen_dir;
-
     protected $db_select_column_mappings;
+    private $used_models = [];
+    private $models_gen_dir;
 
     public function initialize()
     {
@@ -225,6 +223,12 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         return $this->used_models;
     }
 
+    public function getQuerySelectColumns($container_identifier, $query_identifier)
+    {
+        $mappings = $this->getDbSelectColumnMappings();
+        return (isset($mappings[$container_identifier][$query_identifier]) ? $mappings[$container_identifier][$query_identifier] : null);
+    }
+
     public function getDbSelectColumnMappings()
     {
         if (empty($this->db_select_column_mappings)) {
@@ -265,16 +269,10 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         return $this->db_select_column_mappings;
     }
 
-    public function getQuerySelectColumns($container_identifier, $query_identifier)
-    {
-        $mappings = $this->getDbSelectColumnMappings();
-        return (isset($mappings[$container_identifier][$query_identifier]) ? $mappings[$container_identifier][$query_identifier] : null);
-    }
-
     public function writeClassCache()
     {
         $cached_data = [
-            'db_select_column_mappings' => $this->db_select_column_mappings
+            'db_select_column_mappings' => $this->db_select_column_mappings,
         ];
 
         return $cached_data;

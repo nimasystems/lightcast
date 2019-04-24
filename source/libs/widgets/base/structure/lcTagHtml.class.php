@@ -36,11 +36,6 @@ class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
         $this->setXmlNs($xmlns);
     }
 
-    public static function create()
-    {
-        return new lcTagHtml();
-    }
-
     public function setDir($value = null)
     {
         $this->setAttribute('dir', $value);
@@ -63,6 +58,11 @@ class lcTagHtml extends lcHtmlBaseTag implements iI18nAttributes
     {
         $this->setAttribute('xmlns', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagHtml();
     }
 
     public static function getRequiredAttributes()

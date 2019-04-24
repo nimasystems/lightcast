@@ -34,7 +34,6 @@ include_once 'phing/RuntimeConfigurable.php';
  * @version   $Id: b8f555762a9eb7b012fb7712a208979dc18f82ab $
  * @package   phing.parser
  */
-
 class DataTypeHandler extends AbstractHandler
 {
 
@@ -45,17 +44,18 @@ class DataTypeHandler extends AbstractHandler
     /**
      * Constructs a new DataTypeHandler and sets up everything.
      *
-     * @param AbstractSAXParser   $parser        The XML parser (default: ExpatParser)
-     * @param AbstractHandler     $parentHandler The parent handler that invoked this handler.
-     * @param ProjectConfigurator $configurator  The ProjectConfigurator object
-     * @param Target              $target        The target object this datatype is contained in (null for top-level datatypes).
+     * @param AbstractSAXParser $parser The XML parser (default: ExpatParser)
+     * @param AbstractHandler $parentHandler The parent handler that invoked this handler.
+     * @param ProjectConfigurator $configurator The ProjectConfigurator object
+     * @param Target $target The target object this datatype is contained in (null for top-level datatypes).
      */
     public function __construct(
         AbstractSAXParser $parser,
         AbstractHandler $parentHandler,
         ProjectConfigurator $configurator,
         $target = null
-    ) { // FIXME b2 typehinting
+    )
+    { // FIXME b2 typehinting
         parent::__construct($parser, $parentHandler);
         $this->target = $target;
         $this->configurator = $configurator;
@@ -73,8 +73,8 @@ class DataTypeHandler extends AbstractHandler
      * <li>adding a reference to the task (if id attribute is given)</li>
      * </ul>
      *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
      * @throws ExpatParseException if attributes are incomplete or invalid
      */
     public function init($propType, $attrs)
@@ -125,8 +125,8 @@ class DataTypeHandler extends AbstractHandler
      * Checks for nested tags within the current one. Creates and calls
      * handlers respectively.
      *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
      */
     public function startElement($name, $attrs)
     {
@@ -140,7 +140,7 @@ class DataTypeHandler extends AbstractHandler
      * handlers know they can perform actions that need to be
      * based on the data contained within the element.
      *
-     * @param  string  the name of the XML element
+     * @param string  the name of the XML element
      * @return void
      */
     public function endElement($name)

@@ -65,7 +65,7 @@ class Domain extends XMLElement
      * Creates a new Domain object.
      * If this domain needs a name, it must be specified manually.
      *
-     * @param string $type    Propel type.
+     * @param string $type Propel type.
      * @param string $sqlType SQL type.
      * @param string $size
      * @param string $scale
@@ -79,19 +79,153 @@ class Domain extends XMLElement
     }
 
     /**
-     * Copy the values from current object into passed-in Domain.
+     * Replaces the size if the new value is not null.
      *
-     * @param Domain $domain Domain to copy values into.
+     * @param string $value The size to set.
      */
-    public function copy(Domain $domain)
+    public function replaceScale($value)
     {
-        $this->defaultValue = $domain->getDefaultValue();
-        $this->description = $domain->getDescription();
-        $this->name = $domain->getName();
-        $this->scale = $domain->getScale();
-        $this->size = $domain->getSize();
-        $this->sqlType = $domain->getSqlType();
-        $this->propelType = $domain->getType();
+        if ($value !== null) {
+            $this->scale = $value;
+        }
+    }
+
+    /**
+     * Replaces the size if the new value is not null.
+     *
+     * @param int $value The size to set.
+     */
+    public function replaceSize($value)
+    {
+        if ($value !== null) {
+            $this->size = $value;
+        }
+    }
+
+    /**
+     * @param string $propelType The PropelTypes type to set.
+     */
+    public function setType($propelType)
+    {
+        $this->propelType = $propelType;
+    }
+
+    /**
+     * Replaces the type if the new value is not null.
+     *
+     * @param string $value The type to set.
+     */
+    public function replaceType($value)
+    {
+        if ($value !== null) {
+            $this->propelType = $value;
+        }
+    }
+
+    /**
+     * Gets the default value, type-casted for use in PHP OM.
+     *
+     * @return mixed
+     * @throws EngineException
+     * @see        getDefaultValue()
+     */
+    public function getPhpDefaultValue()
+    {
+        if ($this->defaultValue === null) {
+            return null;
+        }
+
+        if ($this->defaultValue->isExpression()) {
+            throw new EngineException("Cannot get PHP version of default value for default value EXPRESSION.");
+        }
+
+        if ($this->propelType === PropelTypes::BOOLEAN || $this->propelType === PropelTypes::BOOLEAN_EMU) {
+            return $this->booleanValue($this->defaultValue->getValue());
+        }
+
+        if (PropelTypes::PHP_ARRAY === $this->propelType) {
+            return $this->getDefaultValueForArray($this->defaultValue->getValue());
+        }
+
+        return $this->defaultValue->getValue();
+    }
+
+    /**
+     * Replaces the default value if the new value is not null.
+     *
+     * @param ColumnDefaultValue $value The default value object
+     */
+    public function replaceDefaultValue(ColumnDefaultValue $value = null)
+    {
+        if ($value !== null) {
+            $this->defaultValue = $value;
+        }
+    }
+
+    /**
+     * Replaces the SQL type if the new value is not null.
+     *
+     * @param string $sqlType The native SQL type to use for this domain.
+     */
+    public function replaceSqlType($sqlType)
+    {
+        if ($sqlType !== null) {
+            $this->sqlType = $sqlType;
+        }
+    }
+
+    /**
+     * Return the size and scale in brackets for use in an sql schema.
+     *
+     * @return string Size and scale or an empty String if there are no values
+     *         available.
+     */
+    public function printSize()
+    {
+        if ($this->size !== null && $this->scale !== null) {
+            return '(' . $this->size . ',' . $this->scale . ')';
+        } else if ($this->size !== null) {
+            return '(' . $this->size . ')';
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * @see        XMLElement::appendXml(DOMNode)
+     */
+    public function appendXml(DOMNode $node)
+    {
+        $doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
+
+        $domainNode = $node->appendChild($doc->createElement('domain'));
+        $domainNode->setAttribute('type', $this->getType());
+        $domainNode->setAttribute('name', $this->getName());
+
+        if ($this->sqlType !== $this->getType()) {
+            $domainNode->setAttribute('sqlType', $this->sqlType);
+        }
+
+        $def = $this->getDefaultValue();
+        if ($def) {
+            if ($def->isExpression()) {
+                $domainNode->setAttribute('defaultExpr', $def->getValue());
+            } else {
+                $domainNode->setAttribute('defaultValue', $def->getValue());
+            }
+        }
+
+        if ($this->size) {
+            $domainNode->setAttribute('size', $this->size);
+        }
+
+        if ($this->scale) {
+            $domainNode->setAttribute('scale', $this->scale);
+        }
+
+        if ($this->description) {
+            $domainNode->setAttribute('description', $this->description);
+        }
     }
 
     /**
@@ -111,7 +245,7 @@ class Domain extends XMLElement
         $defval = $this->getAttribute("defaultValue", $this->getAttribute("default"));
         if ($defval !== null) {
             $this->setDefaultValue(new ColumnDefaultValue($defval, ColumnDefaultValue::TYPE_VALUE));
-        } elseif ($this->getAttribute("defaultExpr") !== null) {
+        } else if ($this->getAttribute("defaultExpr") !== null) {
             $this->setDefaultValue(new ColumnDefaultValue($this->getAttribute("defaultExpr"), ColumnDefaultValue::TYPE_EXPR));
         }
 
@@ -121,23 +255,37 @@ class Domain extends XMLElement
     }
 
     /**
-     * Sets the owning database object (if this domain is being setup via XML).
+     * Copy the values from current object into passed-in Domain.
      *
-     * @param Database $database
+     * @param Domain $domain Domain to copy values into.
      */
-    public function setDatabase(Database $database)
+    public function copy(Domain $domain)
     {
-        $this->database = $database;
+        $this->defaultValue = $domain->getDefaultValue();
+        $this->description = $domain->getDescription();
+        $this->name = $domain->getName();
+        $this->scale = $domain->getScale();
+        $this->size = $domain->getSize();
+        $this->sqlType = $domain->getSqlType();
+        $this->propelType = $domain->getType();
     }
 
     /**
-     * Gets the owning database object (if this domain was setup via XML).
+     * Gets the default value object.
      *
-     * @return Database
+     * @return ColumnDefaultValue The default value object for this domain.
      */
-    public function getDatabase()
+    public function getDefaultValue()
     {
-        return $this->database;
+        return $this->defaultValue;
+    }
+
+    /**
+     * @param ColumnDefaultValue $value The column default value to set.
+     */
+    public function setDefaultValue(ColumnDefaultValue $value)
+    {
+        $this->defaultValue = $value;
     }
 
     /**
@@ -189,18 +337,6 @@ class Domain extends XMLElement
     }
 
     /**
-     * Replaces the size if the new value is not null.
-     *
-     * @param string $value The size to set.
-     */
-    public function replaceScale($value)
-    {
-        if ($value !== null) {
-            $this->scale = $value;
-        }
-    }
-
-    /**
      * @return int Returns the size.
      */
     public function getSize()
@@ -214,104 +350,6 @@ class Domain extends XMLElement
     public function setSize($size)
     {
         $this->size = $size;
-    }
-
-    /**
-     * Replaces the size if the new value is not null.
-     *
-     * @param int $value The size to set.
-     */
-    public function replaceSize($value)
-    {
-        if ($value !== null) {
-            $this->size = $value;
-        }
-    }
-
-    /**
-     * @return string Returns the propelType.
-     */
-    public function getType()
-    {
-        return $this->propelType;
-    }
-
-    /**
-     * @param string $propelType The PropelTypes type to set.
-     */
-    public function setType($propelType)
-    {
-        $this->propelType = $propelType;
-    }
-
-    /**
-     * Replaces the type if the new value is not null.
-     *
-     * @param string $value The type to set.
-     */
-    public function replaceType($value)
-    {
-        if ($value !== null) {
-            $this->propelType = $value;
-        }
-    }
-
-    /**
-     * Gets the default value object.
-     *
-     * @return ColumnDefaultValue The default value object for this domain.
-     */
-    public function getDefaultValue()
-    {
-        return $this->defaultValue;
-    }
-
-    /**
-     * Gets the default value, type-casted for use in PHP OM.
-     *
-     * @return mixed
-     * @see        getDefaultValue()
-     * @throws EngineException
-     */
-    public function getPhpDefaultValue()
-    {
-        if ($this->defaultValue === null) {
-            return null;
-        }
-
-        if ($this->defaultValue->isExpression()) {
-            throw new EngineException("Cannot get PHP version of default value for default value EXPRESSION.");
-        }
-
-        if ($this->propelType === PropelTypes::BOOLEAN || $this->propelType === PropelTypes::BOOLEAN_EMU) {
-            return $this->booleanValue($this->defaultValue->getValue());
-        }
-
-        if (PropelTypes::PHP_ARRAY === $this->propelType) {
-            return $this->getDefaultValueForArray($this->defaultValue->getValue());
-        }
-
-        return $this->defaultValue->getValue();
-    }
-
-    /**
-     * @param ColumnDefaultValue $value The column default value to set.
-     */
-    public function setDefaultValue(ColumnDefaultValue $value)
-    {
-        $this->defaultValue = $value;
-    }
-
-    /**
-     * Replaces the default value if the new value is not null.
-     *
-     * @param ColumnDefaultValue $value The default value object
-     */
-    public function replaceDefaultValue(ColumnDefaultValue $value = null)
-    {
-        if ($value !== null) {
-            $this->defaultValue = $value;
-        }
     }
 
     /**
@@ -331,68 +369,30 @@ class Domain extends XMLElement
     }
 
     /**
-     * Replaces the SQL type if the new value is not null.
-     *
-     * @param string $sqlType The native SQL type to use for this domain.
+     * @return string Returns the propelType.
      */
-    public function replaceSqlType($sqlType)
+    public function getType()
     {
-        if ($sqlType !== null) {
-            $this->sqlType = $sqlType;
-        }
+        return $this->propelType;
     }
 
     /**
-     * Return the size and scale in brackets for use in an sql schema.
+     * Gets the owning database object (if this domain was setup via XML).
      *
-     * @return string Size and scale or an empty String if there are no values
-     *         available.
+     * @return Database
      */
-    public function printSize()
+    public function getDatabase()
     {
-        if ($this->size !== null && $this->scale !== null) {
-            return '(' . $this->size . ',' . $this->scale . ')';
-        } elseif ($this->size !== null) {
-            return '(' . $this->size . ')';
-        } else {
-            return "";
-        }
+        return $this->database;
     }
 
     /**
-     * @see        XMLElement::appendXml(DOMNode)
+     * Sets the owning database object (if this domain is being setup via XML).
+     *
+     * @param Database $database
      */
-    public function appendXml(DOMNode $node)
+    public function setDatabase(Database $database)
     {
-        $doc = ($node instanceof DOMDocument) ? $node : $node->ownerDocument;
-
-        $domainNode = $node->appendChild($doc->createElement('domain'));
-        $domainNode->setAttribute('type', $this->getType());
-        $domainNode->setAttribute('name', $this->getName());
-
-        if ($this->sqlType !== $this->getType()) {
-            $domainNode->setAttribute('sqlType', $this->sqlType);
-        }
-
-        $def = $this->getDefaultValue();
-        if ($def) {
-            if ($def->isExpression()) {
-                $domainNode->setAttribute('defaultExpr', $def->getValue());
-            } else {
-                $domainNode->setAttribute('defaultValue', $def->getValue());
-            }
-        }
-
-        if ($this->size) {
-            $domainNode->setAttribute('size', $this->size);
-        }
-
-        if ($this->scale) {
-            $domainNode->setAttribute('scale', $this->scale);
-        }
-
-        if ($this->description) {
-            $domainNode->setAttribute('description', $this->description);
-        }
+        $this->database = $database;
     }
 }

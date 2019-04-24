@@ -65,63 +65,90 @@ class TranslateGettext extends BaseParamFilterReader implements ChainableReader
     private $storedLocale;
 
     /**
-     * Set the text domain to use.
-     * The text domain must correspond to the name of the compiled .mo files.
-     * E.g. "messages" ==> $dir/LC_MESSAGES/messages.mo
-     *         "mydomain" ==> $dir/LC_MESSAGES/mydomain.mo
-     * @param string $domain
+     * Returns the filtered stream.
+     * The original stream is first read in fully, and then translation is performed.
+     *
+     * @param null $len
+     * @return mixed the filtered stream, or -1 if the end of the resulting stream has been reached.
+     *
+     * @throws BuildException
      */
-    public function setDomain($domain)
+    public function read($len = null)
     {
-        $this->domain = $domain;
+
+        if (!$this->getInitialized()) {
+            $this->_initialize();
+            $this->setInitialized(true);
+        }
+
+        // Make sure correct params/attribs have been set
+        $this->checkAttributes();
+
+        $buffer = $this->in->read($len);
+        if ($buffer === -1) {
+            return -1;
+        }
+
+        // Setup the locale/gettext environment
+        $this->initEnvironment();
+
+
+        // replace any occurrences of _("") or gettext("") with
+        // the translated value.
+        //
+        // ([^\w]|^)_\("((\\"|[^"])*)"\)
+        //  --$1---      -----$2----
+        //                 ---$3--  [match escaped quotes or any char that's not a quote]
+        //
+        // also match gettext() -- same as above
+
+        $buffer = preg_replace_callback(
+            '/([^\w]|^)_\("((\\\"|[^"])*)"\)/',
+            [$this, 'xlateStringCallback'],
+            $buffer
+        );
+        $buffer = preg_replace_callback(
+            '/([^\w]|^)gettext\("((\\\"|[^"])*)"\)/',
+            [$this, 'xlateStringCallback'],
+            $buffer
+        );
+
+        // Check to see if there are any _('') calls and flag an error
+
+        // Check to see if there are any unmatched gettext() calls -- and flag an error
+
+        $matches = [];
+        if (preg_match('/([^\w]|^)(gettext\([^\)]+\))/', $buffer, $matches)) {
+            $this->log("Unable to perform translation on: " . $matches[2], Project::MSG_WARN);
+        }
+
+        $this->restoreEnvironment();
+
+        return $buffer;
     }
 
     /**
-     * Get the current domain.
-     * @return string
+     * Parses the parameters if this filter is being used in "generic" mode.
      */
-    public function getDomain()
+    private function _initialize()
     {
-        return $this->domain;
-    }
+        $params = $this->getParameters();
+        if ($params !== null) {
+            foreach ($params as $param) {
+                switch ($param->getType()) {
+                    case self::DOMAIN_KEY:
+                        $this->setDomain($param->getValue());
+                        break;
+                    case self::DIR_KEY:
+                        $this->setDir($this->project->resolveFile($param->getValue()));
+                        break;
 
-    /**
-     * Sets the root locale directory.
-     * @param PhingFile $dir
-     */
-    public function setDir(PhingFile $dir)
-    {
-        $this->dir = $dir;
-    }
-
-    /**
-     * Gets the root locale directory.
-     * @return PhingFile
-     */
-    public function getDir()
-    {
-        return $this->dir;
-    }
-
-    /**
-     * Sets the locale to use for translation.
-     * Note that for gettext() to work, you have to make sure this locale
-     * is specific enough for your system (e.g. some systems may allow an 'en' locale,
-     * but others will require 'en_US', etc.).
-     * @param string $locale
-     */
-    public function setLocale($locale)
-    {
-        $this->locale = $locale;
-    }
-
-    /**
-     * Gets the locale to use for translation.
-     * @return string
-     */
-    public function getLocale()
-    {
-        return $this->locale;
+                    case self::LOCALE_KEY:
+                        $this->setLocale($param->getValue());
+                        break;
+                } // switch
+            }
+        } // if params !== null
     }
 
     /**
@@ -177,89 +204,6 @@ class TranslateGettext extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Performs gettext translation of msgid and returns translated text.
-     *
-     * This function simply wraps gettext() call, but provides ability to log
-     * string replacements.  (alternative would be using preg_replace with /e which
-     * would probably be faster, but no ability to debug/log.)
-     *
-     * @param  array  $matches Array of matches; we're interested in $matches[2].
-     * @return string Translated text
-     */
-    private function xlateStringCallback($matches)
-    {
-        $charbefore = $matches[1];
-        $msgid = $matches[2];
-        $translated = gettext($msgid);
-        $this->log("Translating \"$msgid\" => \"$translated\"", Project::MSG_DEBUG);
-
-        return $charbefore . '"' . $translated . '"';
-    }
-
-    /**
-     * Returns the filtered stream.
-     * The original stream is first read in fully, and then translation is performed.
-     *
-     * @param null $len
-     * @throws BuildException
-     * @return mixed the filtered stream, or -1 if the end of the resulting stream has been reached.
-     *
-     */
-    public function read($len = null)
-    {
-
-        if (!$this->getInitialized()) {
-            $this->_initialize();
-            $this->setInitialized(true);
-        }
-
-        // Make sure correct params/attribs have been set
-        $this->checkAttributes();
-
-        $buffer = $this->in->read($len);
-        if ($buffer === -1) {
-            return -1;
-        }
-
-        // Setup the locale/gettext environment
-        $this->initEnvironment();
-
-
-        // replace any occurrences of _("") or gettext("") with
-        // the translated value.
-        //
-        // ([^\w]|^)_\("((\\"|[^"])*)"\)
-        //  --$1---      -----$2----
-        //                 ---$3--  [match escaped quotes or any char that's not a quote]
-        //
-        // also match gettext() -- same as above
-
-        $buffer = preg_replace_callback(
-            '/([^\w]|^)_\("((\\\"|[^"])*)"\)/',
-            array($this, 'xlateStringCallback'),
-            $buffer
-        );
-        $buffer = preg_replace_callback(
-            '/([^\w]|^)gettext\("((\\\"|[^"])*)"\)/',
-            array($this, 'xlateStringCallback'),
-            $buffer
-        );
-
-        // Check to see if there are any _('') calls and flag an error
-
-        // Check to see if there are any unmatched gettext() calls -- and flag an error
-
-        $matches = array();
-        if (preg_match('/([^\w]|^)(gettext\([^\)]+\))/', $buffer, $matches)) {
-            $this->log("Unable to perform translation on: " . $matches[2], Project::MSG_WARN);
-        }
-
-        $this->restoreEnvironment();
-
-        return $buffer;
-    }
-
-    /**
      * Creates a new TranslateGettext filter using the passed in
      * Reader for instantiation.
      *
@@ -281,26 +225,82 @@ class TranslateGettext extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Parses the parameters if this filter is being used in "generic" mode.
+     * Get the current domain.
+     * @return string
      */
-    private function _initialize()
+    public function getDomain()
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            foreach ($params as $param) {
-                switch ($param->getType()) {
-                    case self::DOMAIN_KEY:
-                        $this->setDomain($param->getValue());
-                        break;
-                    case self::DIR_KEY:
-                        $this->setDir($this->project->resolveFile($param->getValue()));
-                        break;
+        return $this->domain;
+    }
 
-                    case self::LOCALE_KEY:
-                        $this->setLocale($param->getValue());
-                        break;
-                } // switch
-            }
-        } // if params !== null
+    /**
+     * Set the text domain to use.
+     * The text domain must correspond to the name of the compiled .mo files.
+     * E.g. "messages" ==> $dir/LC_MESSAGES/messages.mo
+     *         "mydomain" ==> $dir/LC_MESSAGES/mydomain.mo
+     * @param string $domain
+     */
+    public function setDomain($domain)
+    {
+        $this->domain = $domain;
+    }
+
+    /**
+     * Gets the locale to use for translation.
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
+    }
+
+    /**
+     * Sets the locale to use for translation.
+     * Note that for gettext() to work, you have to make sure this locale
+     * is specific enough for your system (e.g. some systems may allow an 'en' locale,
+     * but others will require 'en_US', etc.).
+     * @param string $locale
+     */
+    public function setLocale($locale)
+    {
+        $this->locale = $locale;
+    }
+
+    /**
+     * Gets the root locale directory.
+     * @return PhingFile
+     */
+    public function getDir()
+    {
+        return $this->dir;
+    }
+
+    /**
+     * Sets the root locale directory.
+     * @param PhingFile $dir
+     */
+    public function setDir(PhingFile $dir)
+    {
+        $this->dir = $dir;
+    }
+
+    /**
+     * Performs gettext translation of msgid and returns translated text.
+     *
+     * This function simply wraps gettext() call, but provides ability to log
+     * string replacements.  (alternative would be using preg_replace with /e which
+     * would probably be faster, but no ability to debug/log.)
+     *
+     * @param array $matches Array of matches; we're interested in $matches[2].
+     * @return string Translated text
+     */
+    private function xlateStringCallback($matches)
+    {
+        $charbefore = $matches[1];
+        $msgid = $matches[2];
+        $translated = gettext($msgid);
+        $this->log("Translating \"$msgid\" => \"$translated\"", Project::MSG_DEBUG);
+
+        return $charbefore . '"' . $translated . '"';
     }
 }

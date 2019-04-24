@@ -23,7 +23,7 @@ class PropelOnDemandCollection extends PropelCollection
 
     /**
      * @param PropelFormatter $formatter
-     * @param PDOStatement    $stmt
+     * @param PDOStatement $stmt
      */
     public function initIterator(PropelFormatter $formatter, PDOStatement $stmt)
     {
@@ -57,11 +57,11 @@ class PropelOnDemandCollection extends PropelCollection
     // ArrayAccess Interface
 
     /**
-     * @throws PropelException
-     *
      * @param integer $offset
      *
      * @return boolean
+     * @throws PropelException
+     *
      */
     public function offsetExists($offset)
     {
@@ -69,11 +69,11 @@ class PropelOnDemandCollection extends PropelCollection
     }
 
     /**
-     * @throws PropelException
-     *
      * @param integer $offset
      *
      * @return mixed
+     * @throws PropelException
+     *
      */
     public function offsetGet($offset)
     {
@@ -81,10 +81,10 @@ class PropelOnDemandCollection extends PropelCollection
     }
 
     /**
+     * @param integer $offset
+     * @param mixed $value
      * @throws PropelException
      *
-     * @param integer $offset
-     * @param mixed   $value
      */
     public function offsetSet($offset, $value)
     {
@@ -92,9 +92,9 @@ class PropelOnDemandCollection extends PropelCollection
     }
 
     /**
+     * @param integer $offset
      * @throws PropelException
      *
-     * @param integer $offset
      */
     public function offsetUnset($offset)
     {
@@ -112,11 +112,11 @@ class PropelOnDemandCollection extends PropelCollection
     }
 
     /**
-     * @throws PropelException
-     *
      * @param string $data
      *
      * @return void
+     * @throws PropelException
+     *
      */
     public function unserialize($data)
     {

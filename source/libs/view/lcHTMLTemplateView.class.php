@@ -108,21 +108,23 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     }
 
     // left here for compatibility
-    public function __get($name)
-    {
-        return $this->params->__get($name);
-    }
-
-    // left here for compatibility
-    public function __set($name, $value = null)
-    {
-        return $this->params->__set($name, $value);
-    }
 
     public function setParams(array $params = null)
     {
         $this->params->setParams($params);
         return $this;
+    }
+
+    // left here for compatibility
+
+    public function __get($name)
+    {
+        return $this->params->__get($name);
+    }
+
+    public function __set($name, $value = null)
+    {
+        return $this->params->__set($name, $value);
     }
 
     /*
@@ -264,7 +266,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         $this->found_controller_actions[] = [
             'tag_name' => $rep_tag,
             'route' => $url,
-            'action_type' => 'partial'
+            'action_type' => 'partial',
         ];
 
         // return the tag as the replacement of the preg - this is
@@ -306,7 +308,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         $this->found_fragments[] = [
             'tag_name' => $rep_tag,
             'url' => $res,
-            'type' => $type
+            'type' => $type,
         ];
 
         return $rep_tag;

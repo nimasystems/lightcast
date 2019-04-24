@@ -85,11 +85,11 @@ class StripWhitespace extends BaseFilterReader implements ChainableReader
      * Reader for instantiation.
      *
      * @param A|Reader $reader
+     * @return a new filter based on this configuration, but filtering
+     *           the specified reader
      * @internal param A $reader Reader object providing the underlying stream.
      *               Must not be <code>null</code>.
      *
-     * @return a new filter based on this configuration, but filtering
-     *           the specified reader
      */
     public function chain(Reader $reader)
     {

@@ -65,17 +65,6 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * Gets the position of the internal pointer
-     * This position can be later used in seek()
-     *
-     * @return integer
-     */
-    public function getPosition()
-    {
-        return (int) $this->getInternalIterator()->key();
-    }
-
-    /**
      * Move the internal pointer to the beginning of the list
      * And get the first element in the collection
      *
@@ -89,6 +78,41 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
+     * @return ArrayIterator
+     */
+    public function getInternalIterator()
+    {
+        if (null === $this->iterator) {
+            return $this->getIterator();
+        }
+
+        return $this->iterator;
+    }
+
+    /**
+     * Overrides ArrayObject::getIterator() to save the iterator object
+     * for internal use e.g. getNext(), isOdd(), etc.
+     *
+     * @return ArrayIterator
+     */
+    public function getIterator()
+    {
+        $this->iterator = new ArrayIterator($this);
+
+        return $this->iterator;
+    }
+
+    /**
+     * Get the current element in the collection
+     *
+     * @return mixed
+     */
+    public function getCurrent()
+    {
+        return $this->getInternalIterator()->current();
+    }
+
+    /**
      * Check whether the internal pointer is at the beginning of the list
      *
      * @return boolean
@@ -96,6 +120,17 @@ class PropelCollection extends ArrayObject implements Serializable
     public function isFirst()
     {
         return $this->getPosition() == 0;
+    }
+
+    /**
+     * Gets the position of the internal pointer
+     * This position can be later used in seek()
+     *
+     * @return integer
+     */
+    public function getPosition()
+    {
+        return (int)$this->getInternalIterator()->key();
     }
 
     /**
@@ -117,16 +152,6 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * Get the current element in the collection
-     *
-     * @return mixed
-     */
-    public function getCurrent()
-    {
-        return $this->getInternalIterator()->current();
-    }
-
-    /**
      * Move the internal pointer forward
      * And get the next element in the collection
      *
@@ -137,24 +162,6 @@ class PropelCollection extends ArrayObject implements Serializable
         $this->getInternalIterator()->next();
 
         return $this->getCurrent();
-    }
-
-    /**
-     * Move the internal pointer to the end of the list
-     * And get the last element in the collection
-     *
-     * @return mixed
-     */
-    public function getLast()
-    {
-        $count = $this->count();
-        if ($count == 0) {
-            return null;
-        } else {
-            $this->getInternalIterator()->seek($count - 1);
-
-            return $this->getCurrent();
-        }
     }
 
     /**
@@ -184,16 +191,6 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * Check if the current index is an odd integer
-     *
-     * @return boolean
-     */
-    public function isOdd()
-    {
-        return (boolean) ($this->getInternalIterator()->key() % 2);
-    }
-
-    /**
      * Check if the current index is an even integer
      *
      * @return boolean
@@ -201,6 +198,16 @@ class PropelCollection extends ArrayObject implements Serializable
     public function isEven()
     {
         return !$this->isOdd();
+    }
+
+    /**
+     * Check if the current index is an odd integer
+     *
+     * @return boolean
+     */
+    public function isOdd()
+    {
+        return (boolean)($this->getInternalIterator()->key() % 2);
     }
 
     /**
@@ -234,9 +241,27 @@ class PropelCollection extends ArrayObject implements Serializable
         }
         $ret = $this->getLast();
         $lastKey = $this->getInternalIterator()->key();
-        $this->offsetUnset((string) $lastKey);
+        $this->offsetUnset((string)$lastKey);
 
         return $ret;
+    }
+
+    /**
+     * Move the internal pointer to the end of the list
+     * And get the last element in the collection
+     *
+     * @return mixed
+     */
+    public function getLast()
+    {
+        $count = $this->count();
+        if ($count == 0) {
+            return null;
+        } else {
+            $this->getInternalIterator()->seek($count - 1);
+
+            return $this->getCurrent();
+        }
     }
 
     /**
@@ -305,28 +330,6 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * Clears the collection
-     *
-     * @return array The previous collection
-     */
-    public function clear()
-    {
-        return $this->exchangeArray(array());
-    }
-
-    /**
-     * Whether or not this collection contains a specified element
-     *
-     * @param mixed $element
-     *
-     * @return boolean
-     */
-    public function contains($element)
-    {
-        return in_array($element, $this->getArrayCopy(), true);
-    }
-
-    /**
      * Search an element in the collection
      *
      * @param mixed $element
@@ -363,14 +366,38 @@ class PropelCollection extends ArrayObject implements Serializable
     // Serializable interface
 
     /**
+     * Clears the collection
+     *
+     * @return array The previous collection
+     */
+    public function clear()
+    {
+        return $this->exchangeArray([]);
+    }
+
+    /**
+     * Whether or not this collection contains a specified element
+     *
+     * @param mixed $element
+     *
+     * @return boolean
+     */
+    public function contains($element)
+    {
+        return in_array($element, $this->getArrayCopy(), true);
+    }
+
+    // IteratorAggregate method
+
+    /**
      * @return string
      */
     public function serialize()
     {
-        $repr = array(
-            'data'   => $this->getArrayCopy(),
-            'model'  => $this->model,
-        );
+        $repr = [
+            'data' => $this->getArrayCopy(),
+            'model' => $this->model,
+        ];
 
         return serialize($repr);
     }
@@ -385,33 +412,6 @@ class PropelCollection extends ArrayObject implements Serializable
         $repr = unserialize($data);
         $this->exchangeArray($repr['data']);
         $this->model = $repr['model'];
-    }
-
-    // IteratorAggregate method
-
-    /**
-     * Overrides ArrayObject::getIterator() to save the iterator object
-     * for internal use e.g. getNext(), isOdd(), etc.
-     *
-     * @return ArrayIterator
-     */
-    public function getIterator()
-    {
-        $this->iterator = new ArrayIterator($this);
-
-        return $this->iterator;
-    }
-
-    /**
-     * @return ArrayIterator
-     */
-    public function getInternalIterator()
-    {
-        if (null === $this->iterator) {
-            return $this->getIterator();
-        }
-
-        return $this->iterator;
     }
 
     /**
@@ -429,23 +429,33 @@ class PropelCollection extends ArrayObject implements Serializable
     // Propel collection methods
 
     /**
-     * Set the model of the elements in the collection
-     *
-     * @param string $model Name of the Propel object classes stored in the collection
+     * @return PropelFormatter
      */
-    public function setModel($model)
+    public function getFormatter()
     {
-        $this->model = $model;
+        return $this->formatter;
     }
 
     /**
-     * Get the model of the elements in the collection
-     *
-     * @return string Name of the Propel object class stored in the collection
+     * @param PropelFormatter $formatter
      */
-    public function getModel()
+    public function setFormatter(PropelFormatter $formatter)
     {
-        return $this->model;
+        $this->formatter = $formatter;
+    }
+
+    /**
+     * Get a connection object for the database containing the elements of the collection
+     *
+     * @param string $type The connection type (Propel::CONNECTION_READ by default; can be Propel::connection_WRITE)
+     *
+     * @return PropelPDO A PropelPDO connection object
+     */
+    public function getConnection($type = Propel::CONNECTION_READ)
+    {
+        $databaseName = constant($this->getPeerClass() . '::DATABASE_NAME');
+
+        return Propel::getConnection($databaseName, $type);
     }
 
     /**
@@ -465,33 +475,50 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * @param PropelFormatter $formatter
+     * Get the model of the elements in the collection
+     *
+     * @return string Name of the Propel object class stored in the collection
      */
-    public function setFormatter(PropelFormatter $formatter)
+    public function getModel()
     {
-        $this->formatter = $formatter;
+        return $this->model;
     }
 
     /**
-     * @return PropelFormatter
+     * Set the model of the elements in the collection
+     *
+     * @param string $model Name of the Propel object classes stored in the collection
      */
-    public function getFormatter()
+    public function setModel($model)
     {
-        return $this->formatter;
+        $this->model = $model;
     }
 
     /**
-     * Get a connection object for the database containing the elements of the collection
+     * Catches calls to undefined methods.
      *
-     * @param string $type The connection type (Propel::CONNECTION_READ by default; can be Propel::connection_WRITE)
+     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
+     * Allows to define default __call() behavior if you use a custom BaseObject
      *
-     * @return PropelPDO A PropelPDO connection object
+     * @param string $name
+     * @param mixed $params
+     *
+     * @return array|string
+     *
+     * @throws PropelException
      */
-    public function getConnection($type = Propel::CONNECTION_READ)
+    public function __call($name, $params)
     {
-        $databaseName = constant($this->getPeerClass() . '::DATABASE_NAME');
+        if (preg_match('/^from(\w+)$/', $name, $matches)) {
+            return $this->importFrom($matches[1], reset($params));
+        }
+        if (preg_match('/^to(\w+)$/', $name, $matches)) {
+            $usePrefix = isset($params[0]) ? $params[0] : true;
+            $includeLazyLoadColumns = isset($params[1]) ? $params[1] : true;
 
-        return Propel::getConnection($databaseName, $type);
+            return $this->exportTo($matches[1], $usePrefix, $includeLazyLoadColumns);
+        }
+        throw new PropelException('Call to undefined method: ' . $name);
     }
 
     /**
@@ -502,8 +529,8 @@ class PropelCollection extends ArrayObject implements Serializable
      * $coll->importFrom('JSON', '{{"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}}');
      * </code>
      *
-     * @param mixed  $parser A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
-     * @param string $data   The source data to import from
+     * @param mixed $parser A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param string $data The source data to import from
      *
      * @return BaseObject The current object, for fluid interface
      */
@@ -526,7 +553,7 @@ class PropelCollection extends ArrayObject implements Serializable
      *
      * A PropelOnDemandCollection cannot be exported. Any attempt will result in a PropelExecption being thrown.
      *
-     * @param mixed   $parser    A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param mixed $parser A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param boolean $usePrefix (optional) If true, the returned element keys will be prefixed with the
      *                                            model class name ('Article_0', 'Article_1', etc). Defaults to TRUE.
      *                                            Not supported by PropelArrayCollection, as PropelArrayFormatter has
@@ -547,60 +574,6 @@ class PropelCollection extends ArrayObject implements Serializable
     }
 
     /**
-     * Catches calls to undefined methods.
-     *
-     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
-     * Allows to define default __call() behavior if you use a custom BaseObject
-     *
-     * @param string $name
-     * @param mixed  $params
-     *
-     * @return array|string
-     *
-     * @throws PropelException
-     */
-    public function __call($name, $params)
-    {
-        if (preg_match('/^from(\w+)$/', $name, $matches)) {
-            return $this->importFrom($matches[1], reset($params));
-        }
-        if (preg_match('/^to(\w+)$/', $name, $matches)) {
-            $usePrefix = isset($params[0]) ? $params[0] : true;
-            $includeLazyLoadColumns = isset($params[1]) ? $params[1] : true;
-
-            return $this->exportTo($matches[1], $usePrefix, $includeLazyLoadColumns);
-        }
-        throw new PropelException('Call to undefined method: ' . $name);
-    }
-
-    /**
-     * Returns a string representation of the current collection.
-     * Based on the string representation of the underlying objects, defined in
-     * the Peer::DEFAULT_STRING_FORMAT constant
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return (string) $this->exportTo(constant($this->getPeerClass() . '::DEFAULT_STRING_FORMAT'));
-    }
-
-    /**
-     * Creates clones of the containing data.
-     */
-    public function __clone()
-    {
-        foreach ($this as $key => $val) {
-            // we need to clone only objects, all scalar values will be copied using "="
-            if (is_object($val)) {
-                $this[$key] = clone $val;
-            } else {
-                $this[$key] = $val;
-            }
-        }
-    }
-
-    /**
      * Get an array representation of the collection
      * Each object is turned into an array and the result is returned
      *
@@ -612,7 +585,7 @@ class PropelCollection extends ArrayObject implements Serializable
      *                               BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME,
      *                               BasePeer::TYPE_NUM. Defaults to BasePeer::TYPE_PHPNAME.
      * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy loaded columns. Defaults to TRUE.
-     * @param array   $alreadyDumpedObjects   List of objects to skip to avoid recursion
+     * @param array $alreadyDumpedObjects List of objects to skip to avoid recursion
      *
      * <code>
      * $bookCollection->toArray();
@@ -634,9 +607,9 @@ class PropelCollection extends ArrayObject implements Serializable
      *
      * @return array
      */
-    public function toArray($keyColumn = null, $usePrefix = false, $keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyColumn = null, $usePrefix = false, $keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = [])
     {
-        $ret = array();
+        $ret = [];
         $keyGetterMethod = 'get' . $keyColumn;
 
         /** @var $obj BaseObject */
@@ -647,5 +620,32 @@ class PropelCollection extends ArrayObject implements Serializable
         }
 
         return $ret;
+    }
+
+    /**
+     * Returns a string representation of the current collection.
+     * Based on the string representation of the underlying objects, defined in
+     * the Peer::DEFAULT_STRING_FORMAT constant
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->exportTo(constant($this->getPeerClass() . '::DEFAULT_STRING_FORMAT'));
+    }
+
+    /**
+     * Creates clones of the containing data.
+     */
+    public function __clone()
+    {
+        foreach ($this as $key => $val) {
+            // we need to clone only objects, all scalar values will be copied using "="
+            if (is_object($val)) {
+                $this[$key] = clone $val;
+            } else {
+                $this[$key] = $val;
+            }
+        }
     }
 }

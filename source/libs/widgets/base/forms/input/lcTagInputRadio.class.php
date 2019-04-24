@@ -32,15 +32,15 @@ class lcTagInputRadio extends lcTagInput
         $this->setIsChecked($checked);
     }
 
-    public static function create()
-    {
-        return new lcTagInputRadio();
-    }
-
     public function setIsChecked($value = false)
     {
         $this->setAttribute('checked', $value ? 'checked' : null);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagInputRadio();
     }
 
     public static function getRequiredAttributes()

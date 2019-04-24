@@ -23,19 +23,17 @@ include_once 'phing/system/io/OutputStreamWriter.php';
 class PrintStream
 {
     /**
+     * @var OutputStream
+     */
+    protected $out;
+    /**
      * @var bool
      */
     private $autoFlush = false;
-
     /**
      * @var BufferedWriter
      */
     private $textOut;
-
-    /**
-     * @var OutputStream
-     */
-    protected $out;
 
     /**
      * @param OutputStream $out
@@ -67,19 +65,7 @@ class PrintStream
             $value = $value === true ? 'true' : 'false';
         }
 
-        $this->write((string) $value);
-    }
-
-    /**
-     *
-     */
-    private function newLine()
-    {
-        $this->textOut->newLine();
-
-        if ($this->autoFlush) {
-            $this->textOut->flush();
-        }
+        $this->write((string)$value);
     }
 
     /**
@@ -92,6 +78,18 @@ class PrintStream
         $this->textOut->write($buf, $off, $len);
 
         if ($this->autoFlush || $buff = '\n' && $this->autoFlush) {
+            $this->textOut->flush();
+        }
+    }
+
+    /**
+     *
+     */
+    private function newLine()
+    {
+        $this->textOut->newLine();
+
+        if ($this->autoFlush) {
             $this->textOut->flush();
         }
     }

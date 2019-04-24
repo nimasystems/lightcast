@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 require_once 'phing/filters/BaseParamFilterReader.php';
 
@@ -58,11 +58,11 @@ class TailFilter extends BaseParamFilterReader implements ChainableReader
      * Array to hold lines.
      * @var array
      */
-    private $_lineBuffer = array();
+    private $_lineBuffer = [];
 
     /**
      * Returns the last n lines of a file.
-     * @param  int   $len Num chars to read.
+     * @param int $len Num chars to read.
      * @return mixed The filtered buffer or -1 if EOF.
      */
     public function read($len = null)
@@ -93,30 +93,10 @@ class TailFilter extends BaseParamFilterReader implements ChainableReader
             $ret = -1;
         } else {
             $ret = implode("\n", $this->_lineBuffer);
-            $this->_lineBuffer = array();
+            $this->_lineBuffer = [];
         }
 
         return $ret;
-    }
-
-    /**
-     * Sets the number of lines to be returned in the filtered stream.
-     *
-     * @param integer $lines the number of lines to be returned in the filtered stream.
-     */
-    public function setLines($lines)
-    {
-        $this->_lines = (int) $lines;
-    }
-
-    /**
-     * Returns the number of lines to be returned in the filtered stream.
-     *
-     * @return integer The number of lines to be returned in the filtered stream.
-     */
-    public function getLines()
-    {
-        return $this->_lines;
     }
 
     /**
@@ -140,6 +120,26 @@ class TailFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
+     * Returns the number of lines to be returned in the filtered stream.
+     *
+     * @return integer The number of lines to be returned in the filtered stream.
+     */
+    public function getLines()
+    {
+        return $this->_lines;
+    }
+
+    /**
+     * Sets the number of lines to be returned in the filtered stream.
+     *
+     * @param integer $lines the number of lines to be returned in the filtered stream.
+     */
+    public function setLines($lines)
+    {
+        $this->_lines = (int)$lines;
+    }
+
+    /**
      * Scans the parameters list for the "lines" parameter and uses
      * it to set the number of lines to be returned in the filtered stream.
      */
@@ -149,7 +149,7 @@ class TailFilter extends BaseParamFilterReader implements ChainableReader
         if ($params !== null) {
             for ($i = 0, $_i = count($params); $i < $_i; $i++) {
                 if (self::LINES_KEY == $params[$i]->getName()) {
-                    $this->_lines = (int) $params[$i]->getValue();
+                    $this->_lines = (int)$params[$i]->getValue();
                     break;
                 }
             }

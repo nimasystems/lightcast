@@ -67,26 +67,6 @@ class LiquibaseDiffTask extends AbstractLiquibaseTask
     }
 
     /**
-     * @see AbstractTask::checkParams()
-     */
-    protected function checkParams()
-    {
-        parent::checkParams();
-
-        if (null === $this->referenceUsername) {
-            throw new BuildException('Please provide a username for the reference database acccess!');
-        }
-
-        if (null === $this->referencePassword) {
-            throw new BuildException('Please provide a password for the reference database acccess!');
-        }
-
-        if (null === $this->referenceUrl) {
-            throw new BuildException('Please provide a url for the reference database acccess!');
-        }
-    }
-
-    /**
      * @see Task::main()
      */
     public function main()
@@ -124,5 +104,25 @@ class LiquibaseDiffTask extends AbstractLiquibaseTask
 
         $this->setChangeLogFile($changelogFile);
         $this->execute('markNextChangeSetRan');
+    }
+
+    /**
+     * @see AbstractTask::checkParams()
+     */
+    protected function checkParams()
+    {
+        parent::checkParams();
+
+        if (null === $this->referenceUsername) {
+            throw new BuildException('Please provide a username for the reference database acccess!');
+        }
+
+        if (null === $this->referencePassword) {
+            throw new BuildException('Please provide a password for the reference database acccess!');
+        }
+
+        if (null === $this->referenceUrl) {
+            throw new BuildException('Please provide a url for the reference database acccess!');
+        }
     }
 }

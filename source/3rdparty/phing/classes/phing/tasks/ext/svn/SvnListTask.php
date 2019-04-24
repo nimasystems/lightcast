@@ -40,26 +40,9 @@ class SvnListTask extends SvnBaseTask
     private $orderDescending = false;
 
     /**
-     * Sets the name of the property to use
-     * @param $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * Sets whether to force compatibility with older SVN versions (< 1.2)
-     * @deprecated
      * @param $force
+     * @deprecated
      */
     public function setForceCompatible($force)
     {
@@ -71,7 +54,7 @@ class SvnListTask extends SvnBaseTask
      */
     public function setLimit($limit)
     {
-        $this->limit = (int) $limit;
+        $this->limit = (int)$limit;
     }
 
     /**
@@ -80,7 +63,7 @@ class SvnListTask extends SvnBaseTask
      */
     public function setOrderDescending($orderDescending)
     {
-        $this->orderDescending = (bool) $orderDescending;
+        $this->orderDescending = (bool)$orderDescending;
     }
 
     /**
@@ -93,28 +76,28 @@ class SvnListTask extends SvnBaseTask
         $this->setup('list');
 
         if ($this->oldVersion) {
-            $this->svn->setOptions(array('fetchmode' => VERSIONCONTROL_SVN_FETCHMODE_XML));
-            $output = $this->run(array('--xml'));
+            $this->svn->setOptions(['fetchmode' => VERSIONCONTROL_SVN_FETCHMODE_XML]);
+            $output = $this->run(['--xml']);
 
             if (!($xmlObj = @simplexml_load_string($output))) {
                 throw new BuildException("Failed to parse the output of 'svn list --xml'.");
             }
 
             $objects = $xmlObj->list->entry;
-            $entries = array();
+            $entries = [];
 
             foreach ($objects as $object) {
-                $entries[] = array(
-                    'commit' => array(
-                        'revision' => (string) $object->commit['revision'],
-                        'author' => (string) $object->commit->author,
-                        'date' => (string) $object->commit->date
-                    ),
-                    'name' => (string) $object->name
-                );
+                $entries[] = [
+                    'commit' => [
+                        'revision' => (string)$object->commit['revision'],
+                        'author' => (string)$object->commit->author,
+                        'date' => (string)$object->commit->date,
+                    ],
+                    'name' => (string)$object->name,
+                ];
             }
         } else {
-            $output = $this->run(array());
+            $output = $this->run([]);
             $entries = $output['list'][0]['entry'];
         }
 
@@ -140,5 +123,22 @@ class SvnListTask extends SvnBaseTask
         } else {
             throw new BuildException("Failed to parse the output of 'svn list'.");
         }
+    }
+
+    /**
+     * Returns the name of the property to use
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use
+     * @param $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 }

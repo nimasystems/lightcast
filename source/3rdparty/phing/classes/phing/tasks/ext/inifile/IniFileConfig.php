@@ -33,7 +33,7 @@ class IniFileConfig
      *
      * @var array
      */
-    protected $lines = array();
+    protected $lines = [];
 
     /**
      * Read ini file
@@ -44,35 +44,35 @@ class IniFileConfig
      */
     public function read($file)
     {
-        $this->lines = array();
+        $this->lines = [];
 
         $section = '';
 
         foreach (file($file) as $line) {
             if (preg_match('/^\s*(;.*)?$/', $line)) {
                 // comment or whitespace
-                $this->lines[] = array(
+                $this->lines[] = [
                     'type' => 'comment',
                     'data' => $line,
-                    'section' => $section
-                );
-            } elseif (preg_match('/^\s?\[(.*)\]/', $line, $match)) {
+                    'section' => $section,
+                ];
+            } else if (preg_match('/^\s?\[(.*)\]/', $line, $match)) {
                 // section
                 $section = $match[1];
-                $this->lines[] = array(
+                $this->lines[] = [
                     'type' => 'section',
                     'data' => $line,
-                    'section' => $section
-                );
-            } elseif (preg_match('/^\s*(.*?)\s*=\s*(.*?)\s*$/', $line, $match)) {
+                    'section' => $section,
+                ];
+            } else if (preg_match('/^\s*(.*?)\s*=\s*(.*?)\s*$/', $line, $match)) {
                 // entry
-                $this->lines[] = array(
+                $this->lines[] = [
                     'type' => 'entry',
                     'data' => $line,
                     'section' => $section,
                     'key' => $match[1],
-                    'value' => $match[2]
-                );
+                    'value' => $match[2],
+                ];
             }
         }
     }
@@ -81,7 +81,7 @@ class IniFileConfig
      * Get value of given key in specified section
      *
      * @param string $section Section
-     * @param string $key     Key
+     * @param string $key Key
      *
      * @return void
      */
@@ -107,8 +107,8 @@ class IniFileConfig
      * Set key to value in specified section
      *
      * @param string $section Section
-     * @param string $key     Key
-     * @param string $value   Value
+     * @param string $key Key
+     * @param string $value Value
      *
      * @return void
      */
@@ -138,7 +138,7 @@ class IniFileConfig
      * If key is not specified, then the entire section will be removed.
      *
      * @param string $section Section to manipulate/remove
-     * @param string $key     Name of key to remove, might be null/empty
+     * @param string $key Name of key to remove, might be null/empty
      *
      * @return void
      */

@@ -12,7 +12,7 @@
  * PropelConfigurationIterator is used internally by PropelConfiguration to
  * build a flat array from nesting configuration arrays.
  *
- * @author     Veikko Mäkinen <veikko@veikko.fi>
+ * @author     Veikko Mï¿½kinen <veikko@veikko.fi>
  * @version    $Revision$
  * @package    propel.runtime.config
  */
@@ -33,7 +33,7 @@ class PropelConfigurationIterator extends RecursiveIteratorIterator
      *
      * @var       array
      */
-    protected $namespaceStack = array();
+    protected $namespaceStack = [];
 
     /**
      * Current node type. Possible values: null (undefined), self::NODE_PARENT or self::NODE_ITEM

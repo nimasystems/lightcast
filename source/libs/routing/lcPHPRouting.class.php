@@ -40,7 +40,7 @@ class lcPHPRouting extends lcRouting
 
         // allow others to be notified when base routes have been loaded
         $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, [
-            'context' => $this->context
+            'context' => $this->context,
         ]));
 
         // try to detect the parameters from request

@@ -35,65 +35,19 @@ include_once 'phing/system/io/PhingFile.php';
 class FileUtils
 {
     /**
-     * Returns the default file/dir creation mask value
-     * (The mask value is prepared w.r.t the current user's file-creation mask value)
-     *
-     * @param  boolean $dirmode     Directory creation mask to select
-     * @param  boolean $returnoctal Whether the return value is in octal representation
-     *
-     * @return string  Creation Mask
-     */
-    public static function getDefaultFileCreationMask($dirmode = false, $returnoctal = false)
-    {
-
-        // Preparing the creation mask base permission
-        $permission = ($dirmode === true) ? 0777 : 0666;
-
-        // Default mask information
-        $defaultmask = sprintf('%03o', ($permission & ($permission - (int) sprintf('%04o', umask()))));
-
-        return ($returnoctal ? octdec($defaultmask) : $defaultmask);
-    }
-
-    /**
-     * Returns a new Reader with filterchains applied.  If filterchains are empty,
-     * simply returns passed reader.
-     *
-     * @param  Reader  $in            Reader to modify (if appropriate).
-     * @param  array   &$filterChains filter chains to apply.
-     * @param  Project $project
-     * @return Reader  Assembled Reader (w/ filter chains).
-     */
-    public static function getChainedReader(Reader $in, &$filterChains, Project $project)
-    {
-        if (!empty($filterChains)) {
-            $crh = new ChainReaderHelper();
-            $crh->setBufferSize(65536); // 64k buffer, but isn't being used (yet?)
-            $crh->setPrimaryReader($in);
-            $crh->setFilterChains($filterChains);
-            $crh->setProject($project);
-            $rdr = $crh->getAssembledReader();
-
-            return $rdr;
-        } else {
-            return $in;
-        }
-    }
-
-    /**
      * Copies a file using filter chains.
      *
-     * @param  PhingFile $sourceFile
-     * @param  PhingFile $destFile
-     * @param  boolean $overwrite
-     * @param  boolean $preserveLastModified
-     * @param  array $filterChains
-     * @param  Project $project
-     * @param  integer $mode
+     * @param PhingFile $sourceFile
+     * @param PhingFile $destFile
+     * @param boolean $overwrite
+     * @param boolean $preserveLastModified
+     * @param array $filterChains
+     * @param Project $project
+     * @param integer $mode
      * @param bool $preservePermissions
+     * @return void
      * @throws Exception
      * @throws IOException
-     * @return void
      */
     public function copyFile(
         PhingFile $sourceFile,
@@ -104,7 +58,8 @@ class FileUtils
         Project $project,
         $mode = 0755,
         $preservePermissions = true
-    ) {
+    )
+    {
 
         if ($overwrite || !$destFile->exists() || $destFile->lastModified() < $sourceFile->lastModified()) {
             if ($destFile->exists() && $destFile->isFile()) {
@@ -165,18 +120,64 @@ class FileUtils
     }
 
     /**
+     * Returns a new Reader with filterchains applied.  If filterchains are empty,
+     * simply returns passed reader.
+     *
+     * @param Reader $in Reader to modify (if appropriate).
+     * @param array   &$filterChains filter chains to apply.
+     * @param Project $project
+     * @return Reader  Assembled Reader (w/ filter chains).
+     */
+    public static function getChainedReader(Reader $in, &$filterChains, Project $project)
+    {
+        if (!empty($filterChains)) {
+            $crh = new ChainReaderHelper();
+            $crh->setBufferSize(65536); // 64k buffer, but isn't being used (yet?)
+            $crh->setPrimaryReader($in);
+            $crh->setFilterChains($filterChains);
+            $crh->setProject($project);
+            $rdr = $crh->getAssembledReader();
+
+            return $rdr;
+        } else {
+            return $in;
+        }
+    }
+
+    /**
+     * Returns the default file/dir creation mask value
+     * (The mask value is prepared w.r.t the current user's file-creation mask value)
+     *
+     * @param boolean $dirmode Directory creation mask to select
+     * @param boolean $returnoctal Whether the return value is in octal representation
+     *
+     * @return string  Creation Mask
+     */
+    public static function getDefaultFileCreationMask($dirmode = false, $returnoctal = false)
+    {
+
+        // Preparing the creation mask base permission
+        $permission = ($dirmode === true) ? 0777 : 0666;
+
+        // Default mask information
+        $defaultmask = sprintf('%03o', ($permission & ($permission - (int)sprintf('%04o', umask()))));
+
+        return ($returnoctal ? octdec($defaultmask) : $defaultmask);
+    }
+
+    /**
      * Interpret the filename as a file relative to the given file -
      * unless the filename already represents an absolute filename.
      *
-     * @param  PhingFile $file the "reference" file for relative paths. This
+     * @param PhingFile $file the "reference" file for relative paths. This
      *         instance must be an absolute file and must not contain
      *         ./ or ../ sequences (same for \ instead of /).
-     * @param  string $filename a file name
-     *
-     * @throws IOException
+     * @param string $filename a file name
      *
      * @return PhingFile A PhingFile object pointing to an absolute file that doesn't contain ./ or ../ sequences
      *                   and uses the correct separator for the current platform.
+     * @throws IOException
+     *
      */
     public function resolveFile($file, $filename)
     {
@@ -232,16 +233,16 @@ class FileUtils
      *   - DOS style paths that start with a drive letter will have
      *     \ as the separator.
      *
-     * @param  string $path Path to normalize.
-     *
-     * @throws IOException
+     * @param string $path Path to normalize.
      *
      * @return string
+     * @throws IOException
+     *
      */
     public function normalize($path)
     {
 
-        $path = (string) $path;
+        $path = (string)$path;
         $orig = $path;
 
         $path = str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $path));
@@ -300,7 +301,7 @@ class FileUtils
             }
         }
 
-        $s = array();
+        $s = [];
         array_push($s, $root);
         $tok = strtok($path, DIRECTORY_SEPARATOR);
         while ($tok !== false) {
@@ -308,7 +309,7 @@ class FileUtils
             if ("." === $thisToken) {
                 $tok = strtok(DIRECTORY_SEPARATOR);
                 continue;
-            } elseif (".." === $thisToken) {
+            } else if (".." === $thisToken) {
                 if (count($s) < 2) {
                     // using '..' in path that is too short
                     throw new IOException("Cannot resolve path: $orig");
@@ -328,11 +329,11 @@ class FileUtils
                 // already contains one
                 $sb .= DIRECTORY_SEPARATOR;
             }
-            $sb .= (string) $s[$i];
+            $sb .= (string)$s[$i];
         }
 
 
-        $path = (string) $sb;
+        $path = (string)$sb;
         if ($dosWithDrive === true) {
             $path = str_replace('/', '\\', $path);
         }
@@ -347,13 +348,13 @@ class FileUtils
      * exist before this method was invoked, any subsequent invocation
      * of this method will yield a different file name.</p>
      *
-     * @param string $prefix        prefix before the random number.
-     * @param string $suffix        file extension; include the '.'.
-     * @param PhingFile $parentDir  Directory to create the temporary file in;
+     * @param string $prefix prefix before the random number.
+     * @param string $suffix file extension; include the '.'.
+     * @param PhingFile $parentDir Directory to create the temporary file in;
      *                              sys_get_temp_dir() used if not specified.
      * @param boolean $deleteOnExit whether to set the tempfile for deletion on
      *                              normal exit.
-     * @param boolean $createFile   true if the file must actually be created. If false
+     * @param boolean $createFile true if the file must actually be created. If false
      *                              chances exist that a file with the same name is created in the time
      *                              between invoking this method and the moment the file is actually created.
      *                              If possible set to true.

@@ -53,14 +53,14 @@ class XmlToAppData
      *
      * @var array
      */
-    private $schemasTagsStack = array();
+    private $schemasTagsStack = [];
 
     /**
      * Creates a new instance for the specified database type.
      *
      * @param PropelPlatformInterface $defaultPlatform The default database platform for the application.
-     * @param string                  $defaultPackage  the default PHP package used for the om
-     * @param string                  $encoding        The database encoding.
+     * @param string $defaultPackage the default PHP package used for the om
+     * @param string $encoding The database encoding.
      */
     public function __construct(PropelPlatformInterface $defaultPlatform = null, $defaultPackage = null, $encoding = 'iso-8859-1')
     {
@@ -78,61 +78,6 @@ class XmlToAppData
     public function setGeneratorConfig(GeneratorConfigInterface $generatorConfig)
     {
         $this->app->setGeneratorConfig($generatorConfig);
-    }
-
-    /**
-     * Parses a XML input file and returns a newly created and
-     * populated AppData structure.
-     *
-     * @param string $xmlFile The input file to parse.
-     *
-     * @return AppData populated by <code>xmlFile</code>.
-     */
-    public function parseFile($xmlFile)
-    {
-        // we don't want infinite recursion
-        if ($this->isAlreadyParsed($xmlFile)) {
-            return;
-        }
-
-        return $this->parseString(file_get_contents($xmlFile), $xmlFile);
-    }
-
-    /**
-     * Parses a XML input string and returns a newly created and
-     * populated AppData structure.
-     *
-     * @param string $xmlString The input string to parse.
-     * @param string $xmlFile   The input file name.
-     *
-     * @return AppData   populated by <code>xmlFile</code>.
-     * @throws Exception
-     */
-    public function parseString($xmlString, $xmlFile = null)
-    {
-        // we don't want infinite recursion
-        if ($this->isAlreadyParsed($xmlFile)) {
-            return;
-        }
-        // store current schema file path
-        $this->schemasTagsStack[$xmlFile] = array();
-        $this->currentXmlFile = $xmlFile;
-
-        $parser = xml_parser_create();
-        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
-        xml_set_object($parser, $this);
-        xml_set_element_handler($parser, 'startElement', 'endElement');
-        if (!xml_parse($parser, $xmlString)) {
-            throw new Exception(sprintf("XML error: %s at line %d",
-                xml_error_string(xml_get_error_code($parser)),
-                xml_get_current_line_number($parser))
-            );
-        }
-        xml_parser_free($parser);
-
-        array_pop($this->schemasTagsStack);
-
-        return $this->app;
     }
 
     /**
@@ -168,7 +113,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "database") {
+        } else if ($parentTag == "database") {
 
             switch ($name) {
 
@@ -215,7 +160,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "table") {
+        } else if ($parentTag == "table") {
 
             switch ($name) {
                 case "column":
@@ -253,7 +198,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "column") {
+        } else if ($parentTag == "column") {
 
             switch ($name) {
                 case "inheritance":
@@ -267,7 +212,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "foreign-key") {
+        } else if ($parentTag == "foreign-key") {
 
             switch ($name) {
                 case "reference":
@@ -281,7 +226,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "index") {
+        } else if ($parentTag == "index") {
 
             switch ($name) {
                 case "index-column":
@@ -295,7 +240,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "unique") {
+        } else if ($parentTag == "unique") {
 
             switch ($name) {
                 case "unique-column":
@@ -309,7 +254,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "behavior") {
+        } else if ($parentTag == "behavior") {
 
             switch ($name) {
                 case "parameter":
@@ -319,7 +264,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "validator") {
+        } else if ($parentTag == "validator") {
             switch ($name) {
                 case "rule":
                     $this->currValidator->addRule($attributes);
@@ -327,7 +272,7 @@ class XmlToAppData
                 default:
                     $this->_throwInvalidTagException($parser, $name);
             }
-        } elseif ($parentTag == "vendor") {
+        } else if ($parentTag == "vendor") {
 
             switch ($name) {
                 case "parameter":
@@ -344,6 +289,18 @@ class XmlToAppData
         $this->pushCurrentSchemaTag($name);
     }
 
+    protected function peekCurrentSchemaTag()
+    {
+        $keys = array_keys($this->schemasTagsStack);
+
+        return end($this->schemasTagsStack[end($keys)]);
+    }
+
+    protected function isExternalSchema()
+    {
+        return count($this->schemasTagsStack) > 1;
+    }
+
     public function _throwInvalidTagException($parser, $tag_name)
     {
         $location = '';
@@ -358,12 +315,96 @@ class XmlToAppData
     }
 
     /**
+     * See: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Filesystem/Filesystem.php#L379
+     */
+    protected function isAbsolutePath($file)
+    {
+        if (strspn($file, '/\\', 0, 1)
+            || (strlen($file) > 3 && ctype_alpha($file[0])
+                && substr($file, 1, 1) === ':'
+                && (strspn($file, '/\\', 2, 1))
+            )
+            || null !== parse_url($file, PHP_URL_SCHEME)
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Parses a XML input file and returns a newly created and
+     * populated AppData structure.
+     *
+     * @param string $xmlFile The input file to parse.
+     *
+     * @return AppData populated by <code>xmlFile</code>.
+     */
+    public function parseFile($xmlFile)
+    {
+        // we don't want infinite recursion
+        if ($this->isAlreadyParsed($xmlFile)) {
+            return;
+        }
+
+        return $this->parseString(file_get_contents($xmlFile), $xmlFile);
+    }
+
+    protected function isAlreadyParsed($filePath)
+    {
+        return isset($this->schemasTagsStack[$filePath]);
+    }
+
+    /**
+     * Parses a XML input string and returns a newly created and
+     * populated AppData structure.
+     *
+     * @param string $xmlString The input string to parse.
+     * @param string $xmlFile The input file name.
+     *
+     * @return AppData   populated by <code>xmlFile</code>.
+     * @throws Exception
+     */
+    public function parseString($xmlString, $xmlFile = null)
+    {
+        // we don't want infinite recursion
+        if ($this->isAlreadyParsed($xmlFile)) {
+            return;
+        }
+        // store current schema file path
+        $this->schemasTagsStack[$xmlFile] = [];
+        $this->currentXmlFile = $xmlFile;
+
+        $parser = xml_parser_create();
+        xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, 0);
+        xml_set_object($parser, $this);
+        xml_set_element_handler($parser, 'startElement', 'endElement');
+        if (!xml_parse($parser, $xmlString)) {
+            throw new Exception(sprintf("XML error: %s at line %d",
+                    xml_error_string(xml_get_error_code($parser)),
+                    xml_get_current_line_number($parser))
+            );
+        }
+        xml_parser_free($parser);
+
+        array_pop($this->schemasTagsStack);
+
+        return $this->app;
+    }
+
+    protected function pushCurrentSchemaTag($tag)
+    {
+        $keys = array_keys($this->schemasTagsStack);
+        $this->schemasTagsStack[end($keys)][] = $tag;
+    }
+
+    /**
      * Handles closing elements of the xml file.
      *
-     * @param      uri
-     * @param      localName The local name (without prefix), or the empty string if
+     * @param uri
+     * @param localName The local name (without prefix), or the empty string if
      *         Namespace processing is not being performed.
-     * @param      rawName The qualified name (with prefix), or the empty string if
+     * @param rawName The qualified name (with prefix), or the empty string if
      *         qualified names are not available.
      */
     public function endElement($parser, $name)
@@ -375,50 +416,9 @@ class XmlToAppData
         $this->popCurrentSchemaTag();
     }
 
-    protected function peekCurrentSchemaTag()
-    {
-        $keys = array_keys($this->schemasTagsStack);
-
-        return end($this->schemasTagsStack[end($keys)]);
-    }
-
     protected function popCurrentSchemaTag()
     {
         $keys = array_keys($this->schemasTagsStack);
         array_pop($this->schemasTagsStack[end($keys)]);
-    }
-
-    protected function pushCurrentSchemaTag($tag)
-    {
-        $keys = array_keys($this->schemasTagsStack);
-        $this->schemasTagsStack[end($keys)][] = $tag;
-    }
-
-    protected function isExternalSchema()
-    {
-        return count($this->schemasTagsStack) > 1;
-    }
-
-    protected function isAlreadyParsed($filePath)
-    {
-        return isset($this->schemasTagsStack[$filePath]);
-    }
-
-    /**
-     * See: https://github.com/symfony/symfony/blob/master/src/Symfony/Component/Filesystem/Filesystem.php#L379
-     */
-    protected function isAbsolutePath($file)
-    {
-        if (strspn($file, '/\\', 0, 1)
-            || (strlen($file) > 3 && ctype_alpha($file[0])
-            && substr($file, 1, 1) === ':'
-            && (strspn($file, '/\\', 2, 1))
-        )
-        || null !== parse_url($file, PHP_URL_SCHEME)
-        ) {
-            return true;
-        }
-
-        return false;
     }
 }

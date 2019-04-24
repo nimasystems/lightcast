@@ -40,7 +40,7 @@ class PhingPhpDocumentorErrorTracker extends ErrorTracker
 {
 
     /**
-     * @var object	Reference to the task we're called with
+     * @var object    Reference to the task we're called with
      */
     private $task;
 
@@ -53,7 +53,7 @@ class PhingPhpDocumentorErrorTracker extends ErrorTracker
      */
     public function addWarning($num)
     {
-        $a = array('', '', '', '');
+        $a = ['', '', '', ''];
         if (func_num_args() > 1) {
             for ($i = 1; $i < func_num_args(); $i++) {
                 $a[$i - 1] = func_get_arg($i);
@@ -75,7 +75,7 @@ class PhingPhpDocumentorErrorTracker extends ErrorTracker
 
     public function addError($num)
     {
-        $a = array('', '', '', '');
+        $a = ['', '', '', ''];
         if (func_num_args() > 1) {
             for ($i = 1; $i < func_num_args(); $i++) {
                 $a[$i - 1] = func_get_arg($i);
@@ -91,7 +91,7 @@ class PhingPhpDocumentorErrorTracker extends ErrorTracker
      * Sets the task we're working with. This is necessary since we need to be
      * able to call the method "log".
      *
-     * @param  object  $task The task we're working with
+     * @param object $task The task we're working with
      * @return nothing
      */
     public function setTask($task)

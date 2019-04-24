@@ -66,6 +66,28 @@ class AttribTask extends ApplyTask
     }
 
     /**
+     * Check the attributes.
+     * @throws BuildException
+     */
+    protected function checkConfiguration()
+    {
+        if (!$this->hasAttr()) {
+            throw new BuildException(
+                'Missing attribute parameter',
+                $this->getLocation()
+            );
+        }
+    }
+
+    /**
+     * @return bool
+     */
+    private function hasAttr()
+    {
+        return $this->attr;
+    }
+
+    /**
      * @param bool $b
      */
     public function setVerbose($b)
@@ -91,6 +113,17 @@ class AttribTask extends ApplyTask
     public function setReadonly($value)
     {
         $this->addArg($value, self::$ATTR_READONLY);
+    }
+
+    private function addArg($sign, $attribute)
+    {
+        $this->createArg()->setValue(self::getSignString($sign) . $attribute);
+        $this->attr = true;
+    }
+
+    private static function getSignString($attr)
+    {
+        return ($attr ? self::$SET : self::$UNSET);
     }
 
     /**
@@ -121,20 +154,6 @@ class AttribTask extends ApplyTask
     }
 
     /**
-     * Check the attributes.
-     * @throws BuildException
-     */
-    protected function checkConfiguration()
-    {
-        if (!$this->hasAttr()) {
-            throw new BuildException(
-                'Missing attribute parameter',
-                $this->getLocation()
-            );
-        }
-    }
-
-    /**
      * Set the executable.
      * This is not allowed, and it always throws a BuildException.
      * @param mixed $e
@@ -158,7 +177,7 @@ class AttribTask extends ApplyTask
     {
         throw new BuildException(
             $this->getTaskType()
-                . ' doesn\'t support the addsourcefile attribute',
+            . ' doesn\'t support the addsourcefile attribute',
             $this->getLocation()
         );
     }
@@ -173,7 +192,7 @@ class AttribTask extends ApplyTask
     {
         throw new BuildException(
             $this->getTaskType()
-                . ' doesn\'t support the maxparallel attribute',
+            . ' doesn\'t support the maxparallel attribute',
             $this->getLocation()
         );
     }
@@ -198,24 +217,5 @@ class AttribTask extends ApplyTask
         return $this->os === null && $this->osvariant === null
             ? $this->os === null && $this->osvariant === null
             : parent::validateOS();
-    }
-
-    private static function getSignString($attr)
-    {
-        return ($attr ? self::$SET : self::$UNSET);
-    }
-
-    private function addArg($sign, $attribute)
-    {
-        $this->createArg()->setValue(self::getSignString($sign) . $attribute);
-        $this->attr = true;
-    }
-
-    /**
-     * @return bool
-     */
-    private function hasAttr()
-    {
-        return $this->attr;
     }
 }

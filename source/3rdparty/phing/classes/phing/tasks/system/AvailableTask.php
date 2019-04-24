@@ -61,7 +61,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setProperty($property)
     {
-        $this->property = (string) $property;
+        $this->property = (string)$property;
     }
 
     /**
@@ -69,7 +69,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setValue($value)
     {
-        $this->value = (string) $value;
+        $this->value = (string)$value;
     }
 
     /**
@@ -85,7 +85,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setResource($resource)
     {
-        $this->resource = (string) $resource;
+        $this->resource = (string)$resource;
     }
 
     /**
@@ -93,7 +93,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setExtension($extension)
     {
-        $this->extension = (string) $extension;
+        $this->extension = (string)$extension;
     }
 
     /**
@@ -101,7 +101,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setType($type)
     {
-        $this->type = (string) strtolower($type);
+        $this->type = (string)strtolower($type);
     }
 
     /**
@@ -109,7 +109,7 @@ class AvailableTask extends Task implements Condition
      */
     public function setFollowSymlinks($followSymlinks)
     {
-        $this->followSymlinks = (bool) $followSymlinks;
+        $this->followSymlinks = (bool)$followSymlinks;
     }
 
     /**
@@ -195,6 +195,7 @@ class AvailableTask extends Task implements Condition
     }
 
     // this is prepared for the path type
+
     /**
      * @return bool
      */

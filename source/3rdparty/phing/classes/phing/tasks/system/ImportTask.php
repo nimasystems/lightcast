@@ -54,16 +54,14 @@ class ImportTask extends Task
      * @var PhingFile
      */
     protected $file = null;
-
-    /**
-     * @var array
-     */
-    private $filesets = array();
-
     /**
      * @var bool
      */
     protected $optional = false;
+    /**
+     * @var array
+     */
+    private $filesets = [];
 
     /**
      * Initialize task.
@@ -76,7 +74,7 @@ class ImportTask extends Task
 
     /**
      * Set the file to import.
-     * @param  string $f Path to file
+     * @param string $f Path to file
      * @return void
      */
     public function setFile($f)
@@ -92,12 +90,12 @@ class ImportTask extends Task
     public function createFileSet()
     {
         $num = array_push($this->filesets, new FileSet());
-        return $this->filesets[$num-1];
+        return $this->filesets[$num - 1];
     }
 
     /**
      * Is this include optional?
-     * @param  bool $opt If true, do not stop the build if the file does not
+     * @param bool $opt If true, do not stop the build if the file does not
      *                   exist
      * @return void
      */
@@ -110,8 +108,8 @@ class ImportTask extends Task
      * Parse a Phing build file and copy the properties, tasks, data types and
      * targets it defines into the current project.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {
@@ -165,8 +163,8 @@ class ImportTask extends Task
      * Parse a Phing build file and copy the properties, tasks, data types and
      * targets it defines into the current project.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     protected function importFile(PhingFile $file)
     {

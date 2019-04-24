@@ -20,11 +20,11 @@ class SortableRelationBehavior extends Behavior
     protected $builder;
     protected $name = 'sortable_relation';
     // default parameters value
-    protected $parameters = array(
-        'foreign_table'        => '',
+    protected $parameters = [
+        'foreign_table' => '',
         'foreign_scope_column' => '',
-        'foreign_rank_column'  => '',
-    );
+        'foreign_rank_column' => '',
+    ];
 
     public function objectMethods($builder)
     {
@@ -32,38 +32,6 @@ class SortableRelationBehavior extends Behavior
         $this->addObjectMoveRelatedToNullScope($script);
 
         return $script;
-    }
-
-    public function preDelete($builder)
-    {
-        $this->builder = $builder;
-
-        $script = "\$this->{$this->getObjectMoveRelatedToNullScopeMethodName()}(\$con);
-";
-
-        return $script;
-    }
-
-    protected function getForeignTable()
-    {
-        return $this->getTable()->getDatabase()->getTable($this->getParameter('foreign_table'));
-    }
-
-    protected function getForeignColumnForParameter($param)
-    {
-        return $this->getForeignTable()->getColumn($this->getParameter($param));
-    }
-
-    protected function getRelatedClassPluralForm()
-    {
-        $relatedClass = $this->getForeignTable()->getPhpName();
-
-        return $this->builder->getPluralizer()->getPluralForm($relatedClass);
-    }
-
-    protected function getObjectMoveRelatedToNullScopeMethodName()
-    {
-        return "moveRelated{$this->getRelatedClassPluralForm()}ToNullScope";
     }
 
     protected function addObjectMoveRelatedToNullScope(&$script)
@@ -86,5 +54,37 @@ public function {$this->getObjectMoveRelatedToNullScopeMethodName()}(PropelPDO \
 ";
 
         return $script;
+    }
+
+    protected function getForeignTable()
+    {
+        return $this->getTable()->getDatabase()->getTable($this->getParameter('foreign_table'));
+    }
+
+    protected function getRelatedClassPluralForm()
+    {
+        $relatedClass = $this->getForeignTable()->getPhpName();
+
+        return $this->builder->getPluralizer()->getPluralForm($relatedClass);
+    }
+
+    protected function getObjectMoveRelatedToNullScopeMethodName()
+    {
+        return "moveRelated{$this->getRelatedClassPluralForm()}ToNullScope";
+    }
+
+    public function preDelete($builder)
+    {
+        $this->builder = $builder;
+
+        $script = "\$this->{$this->getObjectMoveRelatedToNullScopeMethodName()}(\$con);
+";
+
+        return $script;
+    }
+
+    protected function getForeignColumnForParameter($param)
+    {
+        return $this->getForeignTable()->getColumn($this->getParameter($param));
     }
 }

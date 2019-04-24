@@ -43,7 +43,7 @@ class EscapeUnicode extends BaseFilterReader implements ChainableReader
      * Returns the next line in the filtered stream, converting non latin
      * characters to unicode escapes.
      *
-     * @param int $len     optional
+     * @param int $len optional
      * @return string      the converted lines in the resulting stream, or -1
      *                     if the end of the resulting stream has been reached
      * @throws IOException if the underlying stream throws
@@ -69,7 +69,7 @@ class EscapeUnicode extends BaseFilterReader implements ChainableReader
 
         $textArray = preg_split("~\R~", $text);
 
-        $lines = array();
+        $lines = [];
         foreach ($textArray as $offset => $line) {
             $lines[] = trim(json_encode($line), '"');
             if (strlen($line) !== strlen($lines[$offset])) {
@@ -84,6 +84,13 @@ class EscapeUnicode extends BaseFilterReader implements ChainableReader
         $escaped = implode(PHP_EOL, $lines);
 
         return $escaped;
+    }
+
+    /**
+     * Parses the parameters (currently unused)
+     */
+    private function initialize()
+    {
     }
 
     /**
@@ -103,12 +110,5 @@ class EscapeUnicode extends BaseFilterReader implements ChainableReader
         $newFilter->setProject($this->getProject());
 
         return $newFilter;
-    }
-
-    /**
-     * Parses the parameters (currently unused)
-     */
-    private function initialize()
-    {
     }
 }

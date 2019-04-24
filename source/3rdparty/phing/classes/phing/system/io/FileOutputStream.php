@@ -37,8 +37,8 @@ class FileOutputStream extends OutputStream
 
     /**
      * Construct a new FileOutputStream.
-     * @param  mixed       $file
-     * @param  boolean     $append Whether to append bytes to end of file rather than beginning.
+     * @param mixed $file
+     * @param boolean $append Whether to append bytes to end of file rather than beginning.
      * @throws Exception   - if invalid argument specified.
      * @throws IOException - if unable to open file.
      */
@@ -47,7 +47,7 @@ class FileOutputStream extends OutputStream
         global $php_errormsg;
         if ($file instanceof PhingFile) {
             $this->file = $file;
-        } elseif (is_string($file)) {
+        } else if (is_string($file)) {
             $this->file = new PhingFile($file);
         } else {
             throw new Exception("Invalid argument type for \$file.");

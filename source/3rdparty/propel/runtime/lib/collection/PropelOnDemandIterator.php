@@ -42,18 +42,13 @@ class PropelOnDemandIterator implements Iterator
 
     /**
      * @param PropelFormatter $formatter
-     * @param PDOStatement    $stmt
+     * @param PDOStatement $stmt
      */
     public function __construct(PropelFormatter $formatter, PDOStatement $stmt)
     {
         $this->formatter = $formatter;
         $this->stmt = $stmt;
         $this->enableInstancePoolingOnFinish = Propel::disableInstancePooling();
-    }
-
-    public function closeCursor()
-    {
-        $this->stmt->closeCursor();
     }
 
     /**
@@ -71,9 +66,9 @@ class PropelOnDemandIterator implements Iterator
      * Gets the current Model object in the collection
      * This is where the hydration takes place.
      *
+     * @return BaseObject
      * @see PropelObjectFormatter::getAllObjectsFromRow()
      *
-     * @return BaseObject
      */
     public function current()
     {
@@ -88,23 +83,6 @@ class PropelOnDemandIterator implements Iterator
     public function key()
     {
         return $this->currentKey;
-    }
-
-    /**
-     * Advances the cursor in the statement
-     * Closes the cursor if the end of the statement is reached
-     */
-    public function next()
-    {
-        $this->currentRow = $this->stmt->fetch(PDO::FETCH_NUM);
-        $this->currentKey++;
-        $this->isValid = (boolean) $this->currentRow;
-        if (!$this->isValid) {
-            $this->closeCursor();
-            if ($this->enableInstancePoolingOnFinish) {
-                Propel::enableInstancePooling();
-            }
-        }
     }
 
     /**
@@ -129,10 +107,32 @@ class PropelOnDemandIterator implements Iterator
     }
 
     /**
+     * Advances the cursor in the statement
+     * Closes the cursor if the end of the statement is reached
+     */
+    public function next()
+    {
+        $this->currentRow = $this->stmt->fetch(PDO::FETCH_NUM);
+        $this->currentKey++;
+        $this->isValid = (boolean)$this->currentRow;
+        if (!$this->isValid) {
+            $this->closeCursor();
+            if ($this->enableInstancePoolingOnFinish) {
+                Propel::enableInstancePooling();
+            }
+        }
+    }
+
+    public function closeCursor()
+    {
+        $this->stmt->closeCursor();
+    }
+
+    /**
      * @return boolean
      */
     public function valid()
     {
-        return (boolean) $this->isValid;
+        return (boolean)$this->isValid;
     }
 }

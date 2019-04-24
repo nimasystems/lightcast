@@ -36,11 +36,6 @@ class lcTagBdo extends lcHtmlTag
         $this->setXmlLang($xml_lang);
     }
 
-    public static function create()
-    {
-        return new lcTagBdo();
-    }
-
     public function setDir($value = self::DEFAULT_DIR)
     {
         if ($value != 'ltr' && $value != 'rtl') {
@@ -55,6 +50,11 @@ class lcTagBdo extends lcHtmlTag
     {
         $this->setAttribute('xml:lang', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagBdo();
     }
 
     public static function getRequiredAttributes()

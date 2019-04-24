@@ -37,6 +37,16 @@ abstract class ProjectComponent
     protected $project = null;
 
     /**
+     * Returns a reference to current project
+     *
+     * @return Project Reference to current porject object
+     */
+    public function getProject()
+    {
+        return $this->project;
+    }
+
+    /**
      * References the project to the current component.
      *
      * @param Project $project The reference to the current project
@@ -49,19 +59,9 @@ abstract class ProjectComponent
     }
 
     /**
-     * Returns a reference to current project
-     *
-     * @return Project Reference to current porject object
-     */
-    public function getProject()
-    {
-        return $this->project;
-    }
-
-    /**
      * Logs a message with the given priority.
      *
-     * @param string  $msg   The message to be logged.
+     * @param string $msg The message to be logged.
      * @param integer $level The message's priority at this message should have
      *
      * @return void

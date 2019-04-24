@@ -44,40 +44,6 @@ class SvnCommitTask extends SvnBaseTask
     private $propertyName = "svn.committedrevision";
 
     /**
-     * Sets the commit message
-     * @param $message
-     */
-    public function setMessage($message)
-    {
-        $this->message = $message;
-    }
-
-    /**
-     * Gets the commit message
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * Sets the name of the property to use for returned revision
-     * @param $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use for returned revision
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * The main entry point
      *
      * @throws BuildException
@@ -94,7 +60,7 @@ class SvnCommitTask extends SvnBaseTask
             "Committing SVN working copy at '" . $this->getWorkingCopy() . "' with message '" . $this->GetMessage() . "'"
         );
 
-        $output = $this->run(array(), array('message' => $this->GetMessage()));
+        $output = $this->run([], ['message' => $this->GetMessage()]);
 
         if (preg_match('/[\s]*Committed revision[\s]+([\d]+)/', $output, $matches)) {
             $this->project->setProperty($this->getPropertyName(), $matches[1]);
@@ -108,5 +74,39 @@ class SvnCommitTask extends SvnBaseTask
             $this->project->setProperty($this->getPropertyName(), '');
         }
 
+    }
+
+    /**
+     * Gets the commit message
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * Sets the commit message
+     * @param $message
+     */
+    public function setMessage($message)
+    {
+        $this->message = $message;
+    }
+
+    /**
+     * Returns the name of the property to use for returned revision
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use for returned revision
+     * @param $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 }

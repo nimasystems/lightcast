@@ -32,8 +32,8 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
                 'timezone' => 'Europe/Sofia',
                 'exception_http_header' => [
                     'enabled' => false,
-                    'header' => 'HTTP/1.1 500 Internal Server Error'
-                ]
+                    'header' => 'HTTP/1.1 500 Internal Server Error',
+                ],
             ],
             'tools' => ['htmldoc' => '/usr/bin/htmldoc'],
             'plugins' => ['locations' => ['addons/plugins']],
@@ -44,9 +44,9 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
                     'enabled' => false,
                     'recipient' => null,
                     'skip_exceptions' => [],
-                    'only_exceptions' => []
-                ]
-            ]
+                    'only_exceptions' => [],
+                ],
+            ],
         ];
     }
 }

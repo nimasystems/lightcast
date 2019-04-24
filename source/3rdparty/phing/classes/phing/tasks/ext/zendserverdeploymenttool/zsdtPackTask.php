@@ -108,6 +108,7 @@ class zsdtPackTask extends zsdtBaseTask
     {
         $this->scripts = escapeshellarg($scripts);
     }
+
     /**
      * The directory that contains the application resources (PHP sources, JavaScript, etc.).
      * The directory's internal structure must match the necessary structure for the application to be functional.
@@ -145,7 +146,7 @@ class zsdtPackTask extends zsdtBaseTask
                 'The deployment tool needs at least the project descriptor, '
                 . 'the scripts folder and package folder to be set.'
             );
-        } elseif ($this->lint !== false && $this->phpbin === null) {
+        } else if ($this->lint !== false && $this->phpbin === null) {
             throw new BuildException('You set the lint option but not the path to the php executable.');
         }
 

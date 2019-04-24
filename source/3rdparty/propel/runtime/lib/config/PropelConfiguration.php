@@ -26,8 +26,8 @@ class PropelConfiguration implements ArrayAccess
     const TYPE_ARRAY_FLAT = 2;
     const TYPE_OBJECT = 3;
 
-    protected $parameters = array();
-    protected $flattenedParameters = array();
+    protected $parameters = [];
+    protected $flattenedParameters = [];
     protected $isFlattened = false;
 
     /**
@@ -35,7 +35,7 @@ class PropelConfiguration implements ArrayAccess
      *
      * @param array $parameters
      */
-    public function __construct(array $parameters = array())
+    public function __construct(array $parameters = [])
     {
         $this->parameters = $parameters;
     }
@@ -56,7 +56,7 @@ class PropelConfiguration implements ArrayAccess
      * @see       http://www.php.net/ArrayAccess
      *
      * @param integer $offset
-     * @param mixed   $value
+     * @param mixed $value
      */
     public function offsetSet($offset, $value)
     {
@@ -99,8 +99,8 @@ class PropelConfiguration implements ArrayAccess
      *   echo $c->getParameter('foo1.foo2'); => 'bar'
      * </code>
      *
-     * @param string $name    Parameter name
-     * @param mixed  $default Default value to be used if the requested value is not found
+     * @param string $name Parameter name
+     * @param mixed $default Default value to be used if the requested value is not found
      *
      * @return mixed Parameter value or the default
      */
@@ -115,6 +115,32 @@ class PropelConfiguration implements ArrayAccess
     }
 
     /**
+     * @return array
+     */
+    public function getFlattenedParameters()
+    {
+        if (!$this->isFlattened) {
+            $this->flattenParameters();
+            $this->isFlattened = true;
+        }
+
+        return $this->flattenedParameters;
+    }
+
+    protected function flattenParameters()
+    {
+        $result = [];
+        $it = new PropelConfigurationIterator(new RecursiveArrayIterator($this->parameters), RecursiveIteratorIterator::SELF_FIRST);
+        foreach ($it as $key => $value) {
+            $ns = $it->getDepth() ? $it->getNamespace() . '.' . $key : $key;
+            if ($it->getNodeType() == PropelConfigurationIterator::NODE_ITEM) {
+                $result[$ns] = $value;
+            }
+        }
+        $this->flattenedParameters = array_merge($this->flattenedParameters, $result);
+    }
+
+    /**
      * Store a value to the container. Accept scalar and array values.
      * Examples:
      * <code>
@@ -124,8 +150,8 @@ class PropelConfiguration implements ArrayAccess
      *   print_r($c['foo1']); => array('foo2' => 'bar')
      * </code>
      *
-     * @param string  $name              Configuration item name (name.space.name)
-     * @param mixed   $value             Value to be stored
+     * @param string $name Configuration item name (name.space.name)
+     * @param mixed $value Value to be stored
      * @param Boolean $autoFlattenArrays
      */
     public function setParameter($name, $value, $autoFlattenArrays = true)
@@ -145,11 +171,11 @@ class PropelConfiguration implements ArrayAccess
     }
 
     /**
-     * @throws PropelException
-     *
      * @param integer $type
      *
      * @return mixed
+     * @throws PropelException
+     *
      */
     public function getParameters($type = PropelConfiguration::TYPE_ARRAY)
     {
@@ -163,31 +189,5 @@ class PropelConfiguration implements ArrayAccess
             default:
                 throw new PropelException('Unknown configuration type: ' . var_export($type, true));
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getFlattenedParameters()
-    {
-        if (!$this->isFlattened) {
-            $this->flattenParameters();
-            $this->isFlattened = true;
-        }
-
-        return $this->flattenedParameters;
-    }
-
-    protected function flattenParameters()
-    {
-        $result = array();
-        $it = new PropelConfigurationIterator(new RecursiveArrayIterator($this->parameters), RecursiveIteratorIterator::SELF_FIRST);
-        foreach ($it as $key => $value) {
-            $ns = $it->getDepth() ? $it->getNamespace() . '.' . $key : $key;
-            if ($it->getNodeType() == PropelConfigurationIterator::NODE_ITEM) {
-                $result[$ns] = $value;
-            }
-        }
-        $this->flattenedParameters = array_merge($this->flattenedParameters, $result);
     }
 }

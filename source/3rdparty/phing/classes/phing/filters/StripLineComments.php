@@ -59,7 +59,7 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
     const COMMENTS_KEY = "comment";
 
     /** Array that holds the comment prefixes. */
-    private $_comments = array();
+    private $_comments = [];
 
     /**
      * Returns stream only including
@@ -86,7 +86,7 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
         }
 
         $lines = explode("\n", $buffer);
-        $filtered = array();
+        $filtered = [];
 
         $commentsSize = count($this->_comments);
 
@@ -114,11 +114,19 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
      * @return comment The <code>comment</code> element added to the
      *                 list of comment prefixes to strip.
     */
-    public function createComment()
-    {
-        $num = array_push($this->_comments, new Comment());
 
-        return $this->_comments[$num - 1];
+    private function _initialize()
+    {
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0; $i < count($params); $i++) {
+                if (self::COMMENTS_KEY === $params[$i]->getType()) {
+                    $comment = new Comment();
+                    $comment->setValue($params[$i]->getValue());
+                    array_push($this->_comments, $comment);
+                }
+            }
+        }
     }
 
     /*
@@ -127,16 +135,12 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
      * @param comments A list of strings, each of which is a prefix
      *                 for a comment line. Must not be <code>null</code>.
     */
-    /**
-     * @param $lineBreaks
-     * @throws Exception
-     */
-    public function setComments($lineBreaks)
+
+    public function createComment()
     {
-        if (!is_array($lineBreaks)) {
-            throw new Exception("Excpected 'array', got something else");
-        }
-        $this->_comments = $lineBreaks;
+        $num = array_push($this->_comments, new Comment());
+
+        return $this->_comments[$num - 1];
     }
 
     /*
@@ -144,24 +148,7 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
      *
      * @return array The list of comment prefixes to strip.
     */
-    /**
-     * @return array
-     */
-    public function getComments()
-    {
-        return $this->_comments;
-    }
 
-    /*
-     * Creates a new StripLineComments using the passed in
-     * Reader for instantiation.
-     *
-     * @param reader A Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return a new filter based on this configuration, but filtering
-     *           the specified reader
-     */
     /**
      * @param Reader $reader
      * @return StripLineComments
@@ -178,20 +165,38 @@ class StripLineComments extends BaseParamFilterReader implements ChainableReader
     }
 
     /*
+     * Creates a new StripLineComments using the passed in
+     * Reader for instantiation.
+     *
+     * @param reader A Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     * @return a new filter based on this configuration, but filtering
+     *           the specified reader
+     */
+
+    /**
+     * @return array
+     */
+    public function getComments()
+    {
+        return $this->_comments;
+    }
+
+    /*
      * Parses the parameters to set the comment prefixes.
     */
-    private function _initialize()
+
+    /**
+     * @param $lineBreaks
+     * @throws Exception
+     */
+    public function setComments($lineBreaks)
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0; $i < count($params); $i++) {
-                if (self::COMMENTS_KEY === $params[$i]->getType()) {
-                    $comment = new Comment();
-                    $comment->setValue($params[$i]->getValue());
-                    array_push($this->_comments, $comment);
-                }
-            }
+        if (!is_array($lineBreaks)) {
+            throw new Exception("Excpected 'array', got something else");
         }
+        $this->_comments = $lineBreaks;
     }
 }
 
@@ -212,12 +217,10 @@ class Comment
      * @param string $value The prefix for a line comment of this type.
      *                      Must not be <code>null</code>.
      */
-    /**
-     * @param $value
-     */
-    public function setValue($value)
+
+    public function getValue()
     {
-        $this->_value = (string) $value;
+        return $this->_value;
     }
 
     /*
@@ -225,8 +228,12 @@ class Comment
      *
      * @return string The prefix for this type of line comment.
     */
-    public function getValue()
+
+    /**
+     * @param $value
+     */
+    public function setValue($value)
     {
-        return $this->_value;
+        $this->_value = (string)$value;
     }
 }

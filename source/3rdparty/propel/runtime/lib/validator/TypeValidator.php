@@ -26,14 +26,14 @@
 class TypeValidator implements BasicValidator
 {
     /**
-     * @see       BasicValidator::isValid()
-     *
      * @param ValidatorMap $map
-     * @param mixed        $value
+     * @param mixed $value
      *
      * @return boolean
      *
      * @throws PropelException
+     * @see       BasicValidator::isValid()
+     *
      */
     public function isValid(ValidatorMap $map, $value)
     {

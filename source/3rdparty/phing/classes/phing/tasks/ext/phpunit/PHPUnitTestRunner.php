@@ -40,15 +40,15 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     private $lastFailureMessage = '';
     private $lastIncompleteMessage = '';
     private $lastSkippedMessage = '';
-    private $formatters = array();
-    private $listeners = array();
+    private $formatters = [];
+    private $listeners = [];
 
     private $codecoverage = null;
 
     private $project = null;
 
-    private $groups = array();
-    private $excludeGroups = array();
+    private $groups = [];
+    private $excludeGroups = [];
 
     private $processIsolation = false;
 
@@ -62,10 +62,11 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
      */
     public function __construct(
         Project $project,
-        $groups = array(),
-        $excludeGroups = array(),
+        $groups = [],
+        $excludeGroups = [],
         $processIsolation = false
-    ) {
+    )
+    {
         $this->project = $project;
         $this->groups = $groups;
         $this->excludeGroups = $excludeGroups;
@@ -97,6 +98,11 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
         $this->formatters[] = $formatter;
     }
 
+    public function addListener($listener)
+    {
+        $this->listeners[] = $listener;
+    }
+
     /**
      * @param $level
      * @param $message
@@ -106,11 +112,6 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     public function handleError($level, $message, $file, $line)
     {
         return PHPUnit_Util_ErrorHandler::handleError($level, $message, $file, $line);
-    }
-
-    public function addListener($listener)
-    {
-        $this->listeners[] = $listener;
     }
 
     /**
@@ -137,7 +138,7 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
 
         /* Set PHPUnit error handler */
         if ($this->useCustomErrorHandler) {
-            $oldErrorHandler = set_error_handler(array($this, 'handleError'), E_ALL | E_STRICT);
+            $oldErrorHandler = set_error_handler([$this, 'handleError'], E_ALL | E_STRICT);
         }
 
         $version = PHPUnit_Runner_Version::id();
@@ -162,6 +163,30 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
         }
 
         $this->checkResult($res);
+    }
+
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     */
+    private function injectFilters(PHPUnit_Framework_TestSuite $suite)
+    {
+        $filterFactory = new PHPUnit_Runner_Filter_Factory();
+
+        if (!empty($this->excludeGroups)) {
+            $filterFactory->addFilter(
+                new ReflectionClass('PHPUnit_Runner_Filter_Group_Exclude'),
+                $this->excludeGroups
+            );
+        }
+
+        if (!empty($this->groups)) {
+            $filterFactory->addFilter(
+                new ReflectionClass('PHPUnit_Runner_Filter_Group_Include'),
+                $this->groups
+            );
+        }
+
+        $suite->injectFilter($filterFactory);
     }
 
     private function checkResult($res)
@@ -248,6 +273,18 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     }
 
     /**
+     * An error occurred.
+     *
+     * @param PHPUnit_Framework_Test $test
+     * @param Exception $e
+     * @param float $time
+     */
+    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
+    {
+        $this->lastErrorMessage = $this->composeMessage("ERROR", $test, $e);
+    }
+
+    /**
      * @param string $message
      * @param PHPUnit_Framework_Test $test
      * @param Exception $e
@@ -265,23 +302,11 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     }
 
     /**
-     * An error occurred.
-     *
-     * @param PHPUnit_Framework_Test $test
-     * @param Exception              $e
-     * @param float                  $time
-     */
-    public function addError(PHPUnit_Framework_Test $test, Exception $e, $time)
-    {
-        $this->lastErrorMessage = $this->composeMessage("ERROR", $test, $e);
-    }
-
-    /**
      * A failure occurred.
      *
-     * @param PHPUnit_Framework_Test                 $test
+     * @param PHPUnit_Framework_Test $test
      * @param PHPUnit_Framework_AssertionFailedError $e
-     * @param float                                  $time
+     * @param float $time
      */
     public function addFailure(PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e, $time)
     {
@@ -292,8 +317,8 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
      * Incomplete test.
      *
      * @param PHPUnit_Framework_Test $test
-     * @param Exception              $e
-     * @param float                  $time
+     * @param Exception $e
+     * @param float $time
      */
     public function addIncompleteTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
@@ -304,8 +329,8 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
      * Skipped test.
      *
      * @param PHPUnit_Framework_Test $test
-     * @param Exception              $e
-     * @param float                  $time
+     * @param Exception $e
+     * @param float $time
      * @since  Method available since Release 3.0.0
      */
     public function addSkippedTest(PHPUnit_Framework_Test $test, Exception $e, $time)
@@ -317,8 +342,8 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
      * Risky test
      *
      * @param PHPUnit_Framework_Test $test
-     * @param Exception              $e
-     * @param float                  $time
+     * @param Exception $e
+     * @param float $time
      */
     public function addRiskyTest(PHPUnit_Framework_Test $test, Exception $e, $time)
     {
@@ -345,24 +370,12 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     /**
      * A test failed.
      *
-     * @param integer                                $status
-     * @param PHPUnit_Framework_Test                 $test
+     * @param integer $status
+     * @param PHPUnit_Framework_Test $test
      * @param PHPUnit_Framework_AssertionFailedError $e
      */
     public function testFailed($status, PHPUnit_Framework_Test $test, PHPUnit_Framework_AssertionFailedError $e)
     {
-    }
-
-    /**
-     * Override to define how to handle a failed loading of
-     * a test suite.
-     *
-     * @param string $message
-     * @throws BuildException
-     */
-    protected function runFailed($message)
-    {
-        throw new BuildException($message);
     }
 
     /**
@@ -398,7 +411,7 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
      * A test ended.
      *
      * @param PHPUnit_Framework_Test $test
-     * @param float                  $time
+     * @param float $time
      */
     public function endTest(PHPUnit_Framework_Test $test, $time)
     {
@@ -410,26 +423,14 @@ class PHPUnitTestRunner extends PHPUnit_Runner_BaseTestRunner implements PHPUnit
     }
 
     /**
-     * @param PHPUnit_Framework_TestSuite $suite
+     * Override to define how to handle a failed loading of
+     * a test suite.
+     *
+     * @param string $message
+     * @throws BuildException
      */
-    private function injectFilters(PHPUnit_Framework_TestSuite $suite)
+    protected function runFailed($message)
     {
-        $filterFactory = new PHPUnit_Runner_Filter_Factory();
-
-        if (!empty($this->excludeGroups)) {
-            $filterFactory->addFilter(
-                new ReflectionClass('PHPUnit_Runner_Filter_Group_Exclude'),
-                $this->excludeGroups
-            );
-        }
-
-        if (!empty($this->groups)) {
-            $filterFactory->addFilter(
-                new ReflectionClass('PHPUnit_Runner_Filter_Group_Include'),
-                $this->groups
-            );
-        }
-
-        $suite->injectFilter($filterFactory);
+        throw new BuildException($message);
     }
 }

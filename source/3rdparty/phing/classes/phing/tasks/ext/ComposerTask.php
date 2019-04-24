@@ -73,62 +73,6 @@ class ComposerTask extends Task
     }
 
     /**
-     * Sets the path to php executable.
-     *
-     * @param string $php
-     */
-    public function setPhp($php)
-    {
-        $this->php = $php;
-    }
-
-    /**
-     * gets the path to php executable.
-     *
-     * @return string
-     */
-    public function getPhp()
-    {
-        return $this->php;
-    }
-
-    /**
-     * sets the Composer command to execute
-     * @param string $command
-     */
-    public function setCommand($command)
-    {
-        $this->command = $command;
-    }
-
-    /**
-     * return the Composer command to execute
-     * @return String
-     */
-    public function getCommand()
-    {
-        return $this->command;
-    }
-
-    /**
-     * sets the path to Composer application
-     * @param string $console
-     */
-    public function setComposer($console)
-    {
-        $this->composer = $console;
-    }
-
-    /**
-     * returns the path to Composer application
-     * @return string
-     */
-    public function getComposer()
-    {
-        return $this->composer;
-    }
-
-    /**
      * creates a nested arg task
      *
      * @return Arg Argument object
@@ -137,23 +81,6 @@ class ComposerTask extends Task
     public function createArg()
     {
         return $this->commandLine->createArgument();
-    }
-
-    /**
-     * Prepares the command string to be executed
-     * @return string
-     */
-    private function prepareCommandLine()
-    {
-        $this->commandLine->setExecutable($this->getPhp());
-        //We are un-shifting arguments to the beginning of the command line because arguments should be at the end
-        $this->commandLine->createArgument(true)->setValue($this->getCommand());
-        $this->commandLine->createArgument(true)->setValue($this->getComposer());
-        $commandLine = strval($this->commandLine);
-        //Creating new Commandline instance. It allows to handle subsequent calls correctly
-        $this->commandLine = new Commandline();
-
-        return $commandLine;
     }
 
     /**
@@ -175,5 +102,78 @@ class ComposerTask extends Task
         if ($return > 0) {
             throw new BuildException("Composer execution failed");
         }
+    }
+
+    /**
+     * Prepares the command string to be executed
+     * @return string
+     */
+    private function prepareCommandLine()
+    {
+        $this->commandLine->setExecutable($this->getPhp());
+        //We are un-shifting arguments to the beginning of the command line because arguments should be at the end
+        $this->commandLine->createArgument(true)->setValue($this->getCommand());
+        $this->commandLine->createArgument(true)->setValue($this->getComposer());
+        $commandLine = strval($this->commandLine);
+        //Creating new Commandline instance. It allows to handle subsequent calls correctly
+        $this->commandLine = new Commandline();
+
+        return $commandLine;
+    }
+
+    /**
+     * gets the path to php executable.
+     *
+     * @return string
+     */
+    public function getPhp()
+    {
+        return $this->php;
+    }
+
+    /**
+     * Sets the path to php executable.
+     *
+     * @param string $php
+     */
+    public function setPhp($php)
+    {
+        $this->php = $php;
+    }
+
+    /**
+     * return the Composer command to execute
+     * @return String
+     */
+    public function getCommand()
+    {
+        return $this->command;
+    }
+
+    /**
+     * sets the Composer command to execute
+     * @param string $command
+     */
+    public function setCommand($command)
+    {
+        $this->command = $command;
+    }
+
+    /**
+     * returns the path to Composer application
+     * @return string
+     */
+    public function getComposer()
+    {
+        return $this->composer;
+    }
+
+    /**
+     * sets the path to Composer application
+     * @param string $console
+     */
+    public function setComposer($console)
+    {
+        $this->composer = $console;
     }
 }

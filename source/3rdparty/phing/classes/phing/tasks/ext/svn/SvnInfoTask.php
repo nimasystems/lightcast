@@ -38,20 +38,13 @@ class SvnInfoTask extends SvnBaseTask
     private $subElement = null;
 
     /**
-     * Sets the name of the property to use
-     * @param $propertyName
+     * Returns the name of the xml element to use.
+     *
+     * @return string
      */
-    public function setPropertyName($propertyName)
+    public function getElement()
     {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
+        return $this->element;
     }
 
     /**
@@ -67,13 +60,13 @@ class SvnInfoTask extends SvnBaseTask
     }
 
     /**
-     * Returns the name of the xml element to use.
+     * Returns the name of the xml sub element to use.
      *
      * @return string
      */
-    public function getElement()
+    public function getSubElement()
     {
-        return $this->element;
+        return $this->subElement;
     }
 
     /**
@@ -89,16 +82,6 @@ class SvnInfoTask extends SvnBaseTask
     }
 
     /**
-     * Returns the name of the xml sub element to use.
-     *
-     * @return string
-     */
-    public function getSubElement()
-    {
-        return $this->subElement;
-    }
-
-    /**
      * The main entry point.
      *
      * @return void
@@ -110,7 +93,7 @@ class SvnInfoTask extends SvnBaseTask
         $this->setup('info');
 
         if ($this->oldVersion) {
-            $output = $this->run(array('--xml', '--incremental'));
+            $output = $this->run(['--xml', '--incremental']);
 
             if (!($xmlObj = @simplexml_load_string($output))) {
                 throw new BuildException("Failed to parse the output of 'svn info --xml'.");
@@ -135,6 +118,23 @@ class SvnInfoTask extends SvnBaseTask
             }
         }
 
-        $this->project->setProperty($this->getPropertyName(), (string) $object);
+        $this->project->setProperty($this->getPropertyName(), (string)$object);
+    }
+
+    /**
+     * Returns the name of the property to use
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use
+     * @param $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 }

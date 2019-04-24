@@ -601,6 +601,18 @@ class lcStrings
         return $ret;
     }
 
+    public static function sluggable($string, $separator = '-')
+    {
+        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
+        $special_cases = ['&' => 'and'];
+        $string = mb_strtolower(trim($string), 'UTF-8');
+        $string = str_replace(array_keys($special_cases), array_values($special_cases), $string);
+        $string = preg_replace($accents_regex, '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'));
+        $string = preg_replace("/[^\w\d]/u", "$separator", $string);
+        $string = preg_replace("/[$separator]+/u", "$separator", $string);
+        return $string;
+    }
+
     public static function url_slug($str, $options = [])
     {
         // Make sure string is in UTF-8 and strip invalid UTF-8 characters
@@ -697,18 +709,6 @@ class lcStrings
         $str = trim($str, $options['delimiter']);
 
         return $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
-    }
-
-    public static function sluggable($string, $separator = '-')
-    {
-        $accents_regex = '~&([a-z]{1,2})(?:acute|cedil|circ|grave|lig|orn|ring|slash|th|tilde|uml);~i';
-        $special_cases = ['&' => 'and'];
-        $string = mb_strtolower(trim($string), 'UTF-8');
-        $string = str_replace(array_keys($special_cases), array_values($special_cases), $string);
-        $string = preg_replace($accents_regex, '$1', htmlentities($string, ENT_QUOTES, 'UTF-8'));
-        $string = preg_replace("/[^\w\d]/u", "$separator", $string);
-        $string = preg_replace("/[$separator]+/u", "$separator", $string);
-        return $string;
     }
 
     public static function shorten($string, $max_len)

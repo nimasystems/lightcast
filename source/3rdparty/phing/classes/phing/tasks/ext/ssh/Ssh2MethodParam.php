@@ -55,78 +55,6 @@ class Ssh2MethodParam extends DataType
     private $server_to_client;
 
     /**
-     * @param string $hostkey
-     */
-    public function setHostkey($hostkey)
-    {
-        $this->hostkey = $hostkey;
-    }
-
-    /**
-     * @param Project $p
-     * @throws BuildException
-     * @return string
-     */
-    public function getHostkey(Project $p)
-    {
-        if ($this->isReference()) {
-            return $this->getRef($p)->getHostkey($p);
-        }
-
-        return $this->hostkey;
-    }
-
-    /**
-     * @param string $kex
-     */
-    public function setKex($kex)
-    {
-        $this->kex = $kex;
-    }
-
-    /**
-     * @param Project $p
-     * @throws BuildException
-     * @return string
-     */
-    public function getKex(Project $p)
-    {
-        if ($this->isReference()) {
-            return $this->getRef($p)->getKex($p);
-        }
-
-        return $this->kex;
-    }
-
-    /**
-     * @param Project $p
-     * @throws BuildException
-     * @return \Ssh2MethodConnectionParam
-     */
-    public function getClientToServer(Project $p)
-    {
-        if ($this->isReference()) {
-            return $this->getRef($p)->getClientToServer($p);
-        }
-
-        return $this->client_to_server;
-    }
-
-    /**
-     * @param Project $p
-     * @throws BuildException
-     * @return \Ssh2MethodConnectionParam
-     */
-    public function getServerToClient(Project $p)
-    {
-        if ($this->isReference()) {
-            return $this->getRef($p)->getServerToClient($p);
-        }
-
-        return $this->server_to_client;
-    }
-
-    /**
      * Handles the <client /> nested element
      * @return Ssh2MethodConnectionParam
      */
@@ -158,14 +86,107 @@ class Ssh2MethodParam extends DataType
         $client_to_server = $this->getClientToServer($p);
         $server_to_client = $this->getServerToClient($p);
 
-        $array = array(
+        $array = [
             'kex' => $this->getKex($p),
             'hostkey' => $this->getHostkey($p),
             'client_to_server' => !is_null($client_to_server) ? $client_to_server->toArray() : null,
-            'server_to_client' => !is_null($server_to_client) ? $server_to_client->toArray() : null
-        );
+            'server_to_client' => !is_null($server_to_client) ? $server_to_client->toArray() : null,
+        ];
 
-        return array_filter($array, array($this, '_filterParam'));
+        return array_filter($array, [$this, '_filterParam']);
+    }
+
+    /**
+     * @param Project $p
+     * @return \Ssh2MethodConnectionParam
+     * @throws BuildException
+     */
+    public function getClientToServer(Project $p)
+    {
+        if ($this->isReference()) {
+            return $this->getRef($p)->getClientToServer($p);
+        }
+
+        return $this->client_to_server;
+    }
+
+    /**
+     *
+     * @param Project $p
+     * @return Ssh2MethodParam
+     * @throws BuildException
+     */
+    public function getRef(Project $p)
+    {
+        if (!$this->checked) {
+            $stk = [];
+            array_push($stk, $this);
+            $this->dieOnCircularReference($stk, $p);
+        }
+        $o = $this->ref->getReferencedObject($p);
+        if (!($o instanceof Ssh2MethodParam)) {
+            throw new BuildException($this->ref->getRefId() . " doesn't denote a Ssh2MethodParam");
+        } else {
+            return $o;
+        }
+    }
+
+    /**
+     * @param Project $p
+     * @return \Ssh2MethodConnectionParam
+     * @throws BuildException
+     */
+    public function getServerToClient(Project $p)
+    {
+        if ($this->isReference()) {
+            return $this->getRef($p)->getServerToClient($p);
+        }
+
+        return $this->server_to_client;
+    }
+
+    /**
+     * @param Project $p
+     * @return string
+     * @throws BuildException
+     */
+    public function getKex(Project $p)
+    {
+        if ($this->isReference()) {
+            return $this->getRef($p)->getKex($p);
+        }
+
+        return $this->kex;
+    }
+
+    /**
+     * @param string $kex
+     */
+    public function setKex($kex)
+    {
+        $this->kex = $kex;
+    }
+
+    /**
+     * @param Project $p
+     * @return string
+     * @throws BuildException
+     */
+    public function getHostkey(Project $p)
+    {
+        if ($this->isReference()) {
+            return $this->getRef($p)->getHostkey($p);
+        }
+
+        return $this->hostkey;
+    }
+
+    /**
+     * @param string $hostkey
+     */
+    public function setHostkey($hostkey)
+    {
+        $this->hostkey = $hostkey;
     }
 
     /**
@@ -179,27 +200,6 @@ class Ssh2MethodParam extends DataType
         }
 
         return !is_null($var);
-    }
-
-    /**
-     *
-     * @param Project $p
-     * @throws BuildException
-     * @return Ssh2MethodParam
-     */
-    public function getRef(Project $p)
-    {
-        if (!$this->checked) {
-            $stk = array();
-            array_push($stk, $this);
-            $this->dieOnCircularReference($stk, $p);
-        }
-        $o = $this->ref->getReferencedObject($p);
-        if (!($o instanceof Ssh2MethodParam)) {
-            throw new BuildException($this->ref->getRefId() . " doesn't denote a Ssh2MethodParam");
-        } else {
-            return $o;
-        }
     }
 
 }

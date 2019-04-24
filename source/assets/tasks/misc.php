@@ -26,17 +26,6 @@ class tMisc extends lcTaskController
     private $found_models;
     private $found_php_files;
 
-    public function getHelpInfo()
-    {
-        return "\n" . '--find-models - Detect all used models in the project by scanning all php plugin / module files' . "\n";
-    }
-
-    public function displayHelp()
-    {
-        $this->consoleDisplay($this->getHelpInfo(), false, false);
-        return true;
-    }
-
     public function executeTask()
     {
         switch ($this->getRequest()->getParam('action')) {
@@ -238,5 +227,16 @@ class tMisc extends lcTaskController
 
             unset($filename);
         }
+    }
+
+    public function displayHelp()
+    {
+        $this->consoleDisplay($this->getHelpInfo(), false, false);
+        return true;
+    }
+
+    public function getHelpInfo()
+    {
+        return "\n" . '--find-models - Detect all used models in the project by scanning all php plugin / module files' . "\n";
     }
 }

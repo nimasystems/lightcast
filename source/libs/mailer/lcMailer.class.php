@@ -58,6 +58,30 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->attachments = [];
     }
 
+    public function parseDefaultSender()
+    {
+        $sender = $this->configuration->get('mailer.default_sender');
+        $email = null;
+        $name = null;
+
+        if ($sender) {
+            $sender = lcStrings::splitEmail($sender);
+
+            if ($sender) {
+                $email = (isset($sender['email']) ? $sender['email'] : null);
+                $name = (isset($sender['name']) ? $sender['name'] : null);
+            }
+        }
+
+        $email = $email ? $email : $this->configuration->getDefaultEmailSender();
+
+        if (!$email) {
+            return null;
+        }
+
+        $this->default_sender = new lcMailRecipient($email, $name);
+    }
+
     public function shutdown()
     {
         $this->recipients =
@@ -70,7 +94,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
     public function getCapabilities()
     {
         return [
-            'mailer'
+            'mailer',
         ];
     }
 
@@ -113,11 +137,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->body = $body;
     }
 
-    public function setAttachments(array $attachments = null)
-    {
-        $this->attachments = $attachments;
-    }
-
     public function addAttachment(lcMailAttachment $attachment)
     {
         $this->attachments[] = $attachment;
@@ -131,6 +150,14 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
         return $this->attachments;
     }
+
+    public function setAttachments(array $attachments = null)
+    {
+        $this->attachments = $attachments;
+    }
+
+    // TODO: Remove or rework this
+    // It is just temporary here because lcApp sendMail method is no longer there
 
     public function sendMail(array $to, $message, $subject = null, $from = null)
     {
@@ -165,8 +192,8 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         return $res;
     }
 
-    // TODO: Remove or rework this
-    // It is just temporary here because lcApp sendMail method is no longer there
+    // TODO: Add a capability to test sending emails!
+    // as we have now hidden the exceptions here!
 
     public function clear()
     {
@@ -178,9 +205,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->sender = null;
     }
 
-    // TODO: Add a capability to test sending emails!
-    // as we have now hidden the exceptions here!
-
     public function addRecipient(lcMailRecipient $recipient)
     {
         $email = $recipient->getEmail();
@@ -191,35 +215,6 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         }
 
         $this->recipients[$email] = $recipient;
-    }
-
-    public function parseDefaultSender()
-    {
-        $sender = $this->configuration->get('mailer.default_sender');
-        $email = null;
-        $name = null;
-
-        if ($sender) {
-            $sender = lcStrings::splitEmail($sender);
-
-            if ($sender) {
-                $email = (isset($sender['email']) ? $sender['email'] : null);
-                $name = (isset($sender['name']) ? $sender['name'] : null);
-            }
-        }
-
-        $email = $email ? $email : $this->configuration->getDefaultEmailSender();
-
-        if (!$email) {
-            return null;
-        }
-
-        $this->default_sender = new lcMailRecipient($email, $name);
-    }
-
-    public function getDefaultSender()
-    {
-        return $this->default_sender;
     }
 
     public function send()
@@ -238,7 +233,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
                 'body' => $this->body,
                 'recipients' => $this->recipients,
                 'sender' => $this->sender,
-                'subject' => $this->subject
+                'subject' => $this->subject,
             ];
 
             // notify about this forward
@@ -248,7 +243,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
                     'body' => $this->body,
                     'recipients' => $this->recipients,
                     'sender' => $this->sender,
-                    'subject' => $this->subject
+                    'subject' => $this->subject,
                 ]);
 
             $evn = $this->event_dispatcher->filter($event, $res);
@@ -299,6 +294,11 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->clear();
 
         return $res;
+    }
+
+    public function getDefaultSender()
+    {
+        return $this->default_sender;
     }
 
     abstract protected function sendMailInternal();

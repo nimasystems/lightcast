@@ -36,7 +36,7 @@ class lcProjectTranslationsParser extends lcTranslationsParser
             'extensions',
             'models',
             'tasks',
-            'ws'
+            'ws',
         ];
     }
 }

@@ -51,6 +51,11 @@ class BufferedWriter extends Writer
         $this->bufferSize = $buffsize;
     }
 
+    public function newLine()
+    {
+        $this->write(PHP_EOL);
+    }
+
     /**
      * @param string $buf
      * @param int $off
@@ -60,11 +65,6 @@ class BufferedWriter extends Writer
     public function write($buf, $off = null, $len = null)
     {
         return $this->out->write($buf, $off, $len);
-    }
-
-    public function newLine()
-    {
-        $this->write(PHP_EOL);
     }
 
     /**

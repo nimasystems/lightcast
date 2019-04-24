@@ -31,21 +31,21 @@ class TableMap
      *
      * @var ColumnMap[]
      */
-    protected $columns = array();
+    protected $columns = [];
 
     /**
      * Columns in the table, using table phpName as key
      *
      * @var ColumnMap[]
      */
-    protected $columnsByPhpName = array();
+    protected $columnsByPhpName = [];
 
     /**
      * Columns in the table, using  as key
      *
      * @var ColumnMap[]
      */
-    protected $columnsByInsensitiveCase = array();
+    protected $columnsByInsensitiveCase = [];
 
     /**
      * The database this table belongs to
@@ -76,23 +76,29 @@ class TableMap
     protected $isCrossRef = false;
 
     // The primary key columns in the table
-    protected $primaryKeys = array();
+    protected $primaryKeys = [];
 
     // The foreign key columns in the table
-    protected $foreignKeys = array();
+    protected $foreignKeys = [];
 
     /**
      * The relationships in the table
      *
      * @var RelationMap[]
      */
-    protected $relations = array();
+    protected $relations = [];
 
     // Relations are lazy loaded. This property tells if the relations are loaded or not
     protected $relationsBuilt = false;
 
     // Object to store information that is needed if the for generating primary keys
     protected $pkInfo;
+    /**
+     * The prefix on the table name.
+     *
+     * @deprecated Not used anywhere in Propel
+     */
+    private $prefix;
 
     /**
      * Construct a new TableMap.
@@ -110,11 +116,13 @@ class TableMap
     }
 
     /**
-     * Initialize the TableMap to build columns, relations, etc
-     * This method should be overridden by descendents
+     * Set the name of the Table.
+     *
+     * @param string $name The name of the table.
      */
-    public function initialize()
+    public function setName($name)
     {
+        $this->tableName = $name;
     }
 
     /**
@@ -128,6 +136,14 @@ class TableMap
     }
 
     /**
+     * Initialize the TableMap to build columns, relations, etc
+     * This method should be overridden by descendents
+     */
+    public function initialize()
+    {
+    }
+
+    /**
      * Get the DatabaseMap containing this TableMap.
      *
      * @return DatabaseMap A DatabaseMap.
@@ -135,16 +151,6 @@ class TableMap
     public function getDatabaseMap()
     {
         return $this->dbMap;
-    }
-
-    /**
-     * Set the name of the Table.
-     *
-     * @param string $name The name of the table.
-     */
-    public function setName($name)
-    {
-        $this->tableName = $name;
     }
 
     /**
@@ -158,6 +164,16 @@ class TableMap
     }
 
     /**
+     * Get the PHP name of the Table.
+     *
+     * @return string A String with the name of the table.
+     */
+    public function getPhpName()
+    {
+        return $this->phpName;
+    }
+
+    /**
      * Set the PHP name of the Table.
      *
      * @param string $phpName The PHP Name for this table
@@ -168,13 +184,13 @@ class TableMap
     }
 
     /**
-     * Get the PHP name of the Table.
+     * Get the Classname of the Propel Class belonging to this table.
      *
-     * @return string A String with the name of the table.
+     * @return string
      */
-    public function getPhpName()
+    public function getClassname()
     {
-        return $this->phpName;
+        return $this->classname;
     }
 
     /**
@@ -189,16 +205,6 @@ class TableMap
     }
 
     /**
-     * Get the Classname of the Propel Class belonging to this table.
-     *
-     * @return string
-     */
-    public function getClassname()
-    {
-        return $this->classname;
-    }
-
-    /**
      * Get the Peer Classname of the Propel Class belonging to this table.
      *
      * @return string
@@ -209,16 +215,6 @@ class TableMap
     }
 
     /**
-     * Set the Package of the Table
-     *
-     * @param string $package The Package
-     */
-    public function setPackage($package)
-    {
-        $this->package = $package;
-    }
-
-    /**
      * Get the Package of the table.
      *
      * @return string
@@ -226,6 +222,16 @@ class TableMap
     public function getPackage()
     {
         return $this->package;
+    }
+
+    /**
+     * Set the Package of the Table
+     *
+     * @param string $package The Package
+     */
+    public function setPackage($package)
+    {
+        $this->package = $package;
     }
 
     /**
@@ -289,47 +295,6 @@ class TableMap
     }
 
     /**
-     * Add a column to the table.
-     *
-     * @param string  $name         A string with the column name.
-     * @param string  $phpName      A string specifying php name.
-     * @param string  $type         A string specifying the Propel type.
-     * @param boolean $isNotNull    Whether column does not allow NULL values.
-     * @param int     $size         An int specifying the size.
-     * @param boolean $pk           True if column is a primary key.
-     * @param string  $fkTable      A String with the foreign key table name.
-     * @param string  $fkColumn     A String with the foreign key column name.
-     * @param string  $defaultValue The default value for this column.
-     *
-     * @return ColumnMap The newly created column.
-     */
-    public function addColumn($name, $phpName, $type, $isNotNull = false, $size = null, $defaultValue = null, $pk = false, $fkTable = null, $fkColumn = null)
-    {
-        $col = new ColumnMap($name, $this);
-        $col->setType($type);
-        $col->setSize($size);
-        $col->setPhpName($phpName);
-        $col->setNotNull($isNotNull);
-        $col->setDefaultValue($defaultValue);
-
-        if ($pk) {
-            $col->setPrimaryKey(true);
-            $this->primaryKeys[$name] = $col;
-        }
-
-        if ($fkTable && $fkColumn) {
-            $col->setForeignKey($fkTable, $fkColumn);
-            $this->foreignKeys[$name] = $col;
-        }
-
-        $this->columns[$name] = $col;
-        $this->columnsByPhpName[$phpName] = $col;
-        $this->columnsByInsensitiveCase[strtolower($phpName)] = $col;
-
-        return $col;
-    }
-
-    /**
      * Add a pre-created column to this table. It will replace any
      * existing column.
      *
@@ -342,46 +307,6 @@ class TableMap
         $this->columns[$cmap->getName()] = $cmap;
 
         return $cmap;
-    }
-
-    /**
-     * Does this table contain the specified column?
-     *
-     * @param mixed   $name      name of the column or ColumnMap instance
-     * @param boolean $normalize Normalize the column name (if column name not like FIRST_NAME)
-     *
-     * @return boolean True if the table contains the column.
-     */
-    public function hasColumn($name, $normalize = true)
-    {
-        if ($name instanceof ColumnMap) {
-            $name = $name->getColumnName();
-        } elseif ($normalize) {
-            $name = ColumnMap::normalizeName($name);
-        }
-
-        return isset($this->columns[$name]);
-    }
-
-    /**
-     * Get a ColumnMap for the table.
-     *
-     * @param string  $name      A String with the name of the table.
-     * @param boolean $normalize Normalize the column name (if column name not like FIRST_NAME)
-     *
-     * @return ColumnMap       A ColumnMap.
-     * @throws PropelException if the column is undefined
-     */
-    public function getColumn($name, $normalize = true)
-    {
-        if ($normalize) {
-            $name = ColumnMap::normalizeName($name);
-        }
-        if (!$this->hasColumn($name, false)) {
-            throw new PropelException("Cannot fetch ColumnMap for undefined column: " . $name);
-        }
-
-        return $this->columns[$name];
     }
 
     /**
@@ -429,24 +354,14 @@ class TableMap
     }
 
     /**
-     * Get a ColumnMap[] of the columns in this table.
-     *
-     * @return ColumnMap[]
-     */
-    public function getColumns()
-    {
-        return $this->columns;
-    }
-
-    /**
      * Add a primary key column to this Table.
      *
-     * @param string  $columnName   A string with the column name.
-     * @param string  $phpName      A string with the php name.
-     * @param string  $type         A string specifying the Propel type.
-     * @param boolean $isNotNull    Whether column does not allow NULL values.
-     * @param int     $size         An int specifying the size.
-     * @param string  $defaultValue
+     * @param string $columnName A string with the column name.
+     * @param string $phpName A string with the php name.
+     * @param string $type A string specifying the Propel type.
+     * @param boolean $isNotNull Whether column does not allow NULL values.
+     * @param int $size An int specifying the size.
+     * @param string $defaultValue
      *
      * @return ColumnMap Newly added PrimaryKey column.
      */
@@ -456,16 +371,57 @@ class TableMap
     }
 
     /**
+     * Add a column to the table.
+     *
+     * @param string $name A string with the column name.
+     * @param string $phpName A string specifying php name.
+     * @param string $type A string specifying the Propel type.
+     * @param boolean $isNotNull Whether column does not allow NULL values.
+     * @param int $size An int specifying the size.
+     * @param boolean $pk True if column is a primary key.
+     * @param string $fkTable A String with the foreign key table name.
+     * @param string $fkColumn A String with the foreign key column name.
+     * @param string $defaultValue The default value for this column.
+     *
+     * @return ColumnMap The newly created column.
+     */
+    public function addColumn($name, $phpName, $type, $isNotNull = false, $size = null, $defaultValue = null, $pk = false, $fkTable = null, $fkColumn = null)
+    {
+        $col = new ColumnMap($name, $this);
+        $col->setType($type);
+        $col->setSize($size);
+        $col->setPhpName($phpName);
+        $col->setNotNull($isNotNull);
+        $col->setDefaultValue($defaultValue);
+
+        if ($pk) {
+            $col->setPrimaryKey(true);
+            $this->primaryKeys[$name] = $col;
+        }
+
+        if ($fkTable && $fkColumn) {
+            $col->setForeignKey($fkTable, $fkColumn);
+            $this->foreignKeys[$name] = $col;
+        }
+
+        $this->columns[$name] = $col;
+        $this->columnsByPhpName[$phpName] = $col;
+        $this->columnsByInsensitiveCase[strtolower($phpName)] = $col;
+
+        return $col;
+    }
+
+    /**
      * Add a foreign key column to the table.
      *
-     * @param string  $columnName   A String with the column name.
-     * @param string  $phpName      A string with the php name.
-     * @param string  $type         A string specifying the Propel type.
-     * @param string  $fkTable      A String with the foreign key table name.
-     * @param string  $fkColumn     A String with the foreign key column name.
-     * @param boolean $isNotNull    Whether column does not allow NULL values.
-     * @param int     $size         An int specifying the size.
-     * @param string  $defaultValue The default value for this column.
+     * @param string $columnName A String with the column name.
+     * @param string $phpName A string with the php name.
+     * @param string $type A string specifying the Propel type.
+     * @param string $fkTable A String with the foreign key table name.
+     * @param string $fkColumn A String with the foreign key column name.
+     * @param boolean $isNotNull Whether column does not allow NULL values.
+     * @param int $size An int specifying the size.
+     * @param string $defaultValue The default value for this column.
      *
      * @return ColumnMap Newly added ForeignKey column.
      */
@@ -477,14 +433,14 @@ class TableMap
     /**
      * Add a foreign primary key column to the table.
      *
-     * @param string  $columnName   A String with the column name.
-     * @param string  $phpName      A string with the php name.
-     * @param string  $type         A string specifying the Propel type.
-     * @param string  $fkTable      A String with the foreign key table name.
-     * @param string  $fkColumn     A String with the foreign key column name.
-     * @param boolean $isNotNull    Whether column does not allow NULL values.
-     * @param int     $size         An int specifying the size.
-     * @param string  $defaultValue The default value for this column.
+     * @param string $columnName A String with the column name.
+     * @param string $phpName A string with the php name.
+     * @param string $type A string specifying the Propel type.
+     * @param string $fkTable A String with the foreign key table name.
+     * @param string $fkColumn A String with the foreign key column name.
+     * @param boolean $isNotNull Whether column does not allow NULL values.
+     * @param int $size An int specifying the size.
+     * @param string $defaultValue The default value for this column.
      *
      * @return ColumnMap Newly created foreign pkey column.
      */
@@ -535,10 +491,10 @@ class TableMap
      * Add a validator to a table's column
      *
      * @param string $columnName The name of the validator's column
-     * @param string $name       The rule name of this validator
-     * @param string $classname  The dot-path name of class to use (e.g. myapp.propel.MyValidator)
+     * @param string $name The rule name of this validator
+     * @param string $classname The dot-path name of class to use (e.g. myapp.propel.MyValidator)
      * @param string $value
-     * @param string $message    The error message which is returned on invalid values
+     * @param string $message The error message which is returned on invalid values
      *
      * @return void
      */
@@ -560,28 +516,59 @@ class TableMap
     }
 
     /**
-     * Build relations
-     * Relations are lazy loaded for performance reasons
-     * This method should be overridden by descendents
+     * Get a ColumnMap for the table.
+     *
+     * @param string $name A String with the name of the table.
+     * @param boolean $normalize Normalize the column name (if column name not like FIRST_NAME)
+     *
+     * @return ColumnMap       A ColumnMap.
+     * @throws PropelException if the column is undefined
      */
-    public function buildRelations()
+    public function getColumn($name, $normalize = true)
     {
+        if ($normalize) {
+            $name = ColumnMap::normalizeName($name);
+        }
+        if (!$this->hasColumn($name, false)) {
+            throw new PropelException("Cannot fetch ColumnMap for undefined column: " . $name);
+        }
+
+        return $this->columns[$name];
+    }
+
+    /**
+     * Does this table contain the specified column?
+     *
+     * @param mixed $name name of the column or ColumnMap instance
+     * @param boolean $normalize Normalize the column name (if column name not like FIRST_NAME)
+     *
+     * @return boolean True if the table contains the column.
+     */
+    public function hasColumn($name, $normalize = true)
+    {
+        if ($name instanceof ColumnMap) {
+            $name = $name->getColumnName();
+        } else if ($normalize) {
+            $name = ColumnMap::normalizeName($name);
+        }
+
+        return isset($this->columns[$name]);
     }
 
     /**
      * Adds a RelationMap to the table
      *
-     * @param string  $name          The relation name
-     * @param string  $tablePhpName  The related table name
-     * @param integer $type          The relation type (either RelationMap::MANY_TO_ONE, RelationMap::ONE_TO_MANY, or RelationMAp::ONE_TO_ONE)
-     * @param array   $columnMapping An associative array mapping column names (local => foreign)
-     * @param string  $onDelete      SQL behavior upon deletion ('SET NULL', 'CASCADE', ...)
-     * @param string  $onUpdate      SQL behavior upon update ('SET NULL', 'CASCADE', ...)
-     * @param string  $pluralName    Optional plural name for *_TO_MANY relationships
+     * @param string $name The relation name
+     * @param string $tablePhpName The related table name
+     * @param integer $type The relation type (either RelationMap::MANY_TO_ONE, RelationMap::ONE_TO_MANY, or RelationMAp::ONE_TO_ONE)
+     * @param array $columnMapping An associative array mapping column names (local => foreign)
+     * @param string $onDelete SQL behavior upon deletion ('SET NULL', 'CASCADE', ...)
+     * @param string $onUpdate SQL behavior upon update ('SET NULL', 'CASCADE', ...)
+     * @param string $pluralName Optional plural name for *_TO_MANY relationships
      *
      * @return RelationMap the built RelationMap object
      */
-    public function addRelation($name, $tablePhpName, $type, $columnMapping = array(), $onDelete = null, $onUpdate = null, $pluralName = null)
+    public function addRelation($name, $tablePhpName, $type, $columnMapping = [], $onDelete = null, $onUpdate = null, $pluralName = null)
     {
         // note: using phpName for the second table allows the use of DatabaseMap::getTableByPhpName()
         // and this method autoloads the TableMap if the table isn't loaded yet
@@ -627,6 +614,31 @@ class TableMap
     }
 
     /**
+     * Gets the RelationMap objects of the table
+     * This method will build the relations if they are not built yet
+     *
+     * @return RelationMap[]
+     */
+    public function getRelations()
+    {
+        if (!$this->relationsBuilt) {
+            $this->buildRelations();
+            $this->relationsBuilt = true;
+        }
+
+        return $this->relations;
+    }
+
+    /**
+     * Build relations
+     * Relations are lazy loaded for performance reasons
+     * This method should be overridden by descendents
+     */
+    public function buildRelations()
+    {
+    }
+
+    /**
      * Gets a RelationMap of the table by relation name
      * This method will build the relations if they are not built yet
      *
@@ -645,22 +657,6 @@ class TableMap
     }
 
     /**
-     * Gets the RelationMap objects of the table
-     * This method will build the relations if they are not built yet
-     *
-     * @return RelationMap[]
-     */
-    public function getRelations()
-    {
-        if (!$this->relationsBuilt) {
-            $this->buildRelations();
-            $this->relationsBuilt = true;
-        }
-
-        return $this->relations;
-    }
-
-    /**
      *
      * Gets the list of behaviors registered for this table
      *
@@ -668,7 +664,7 @@ class TableMap
      */
     public function getBehaviors()
     {
-        return array();
+        return [];
     }
 
     /**
@@ -700,14 +696,24 @@ class TableMap
     // Deprecated methods and attributes, to be removed
 
     /**
+     * Get a ColumnMap[] of the columns in this table.
+     *
+     * @return ColumnMap[]
+     */
+    public function getColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
      * Does this table contain the specified column?
      *
-     * @deprecated Use hasColumn instead
-     *
-     * @param mixed   $name      name of the column or ColumnMap instance
+     * @param mixed $name name of the column or ColumnMap instance
      * @param boolean $normalize Normalize the column name (if column name not like FIRST_NAME)
      *
      * @return boolean True if the table contains the column.
+     * @deprecated Use hasColumn instead
+     *
      */
     public function containsColumn($name, $normalize = true)
     {
@@ -715,25 +721,10 @@ class TableMap
     }
 
     /**
-     * Normalizes the column name, removing table prefix and uppercasing.
-     * article.first_name becomes FIRST_NAME
-     *
-     * @deprecated Use ColumnMap::normalizeColumnName() instead
-     *
-     * @param string $name
-     *
-     * @return string Normalized column name.
-     */
-    protected function normalizeColName($name)
-    {
-        return ColumnMap::normalizeName($name);
-    }
-
-    /**
      * Returns array of ColumnMap objects that make up the primary key for this table.
      *
-     * @deprecated Use getPrimaryKeys instead
      * @return ColumnMap[]
+     * @deprecated Use getPrimaryKeys instead
      */
     public function getPrimaryKeyColumns()
     {
@@ -743,17 +734,10 @@ class TableMap
     //---Utility methods for doing intelligent lookup of table names
 
     /**
-     * The prefix on the table name.
-     *
-     * @deprecated Not used anywhere in Propel
-     */
-    private $prefix;
-
-    /**
      * Get table prefix name.
      *
-     * @deprecated Not used anywhere in Propel
      * @return string A String with the prefix.
+     * @deprecated Not used anywhere in Propel
      */
     public function getPrefix()
     {
@@ -763,44 +747,16 @@ class TableMap
     /**
      * Set table prefix name.
      *
-     * @deprecated Not used anywhere in Propel
-     *
      * @param string $prefix The prefix for the table name (ie: SCARAB for
      * SCARAB_PROJECT).
      *
      * @return void
+     * @deprecated Not used anywhere in Propel
+     *
      */
     public function setPrefix($prefix)
     {
         $this->prefix = $prefix;
-    }
-
-    /**
-     * Tell me if i have PREFIX in my string.
-     *
-     * @deprecated Not used anywhere in Propel
-     *
-     * @param string $data
-     *
-     * @return boolean True if prefix is contained in data.
-     */
-    protected function hasPrefix($data)
-    {
-        return (strpos($data, $this->prefix) === 0);
-    }
-
-    /**
-     * Removes the PREFIX if found
-     *
-     * @deprecated Not used anywhere in Propel
-     *
-     * @param string $data A String.
-     *
-     * @return string A String with data, but with prefix removed.
-     */
-    protected function removePrefix($data)
-    {
-        return $this->hasPrefix($data) ? substr($data, strlen($this->prefix)) : $data;
     }
 
     /**
@@ -809,11 +765,11 @@ class TableMap
      *
      * SCARAB_FOO_BAR becomes FooBar.
      *
-     * @deprecated Not used anywhere in Propel. At buildtime, use Column::generatePhpName() for that purpose
-     *
      * @param string $data
      *
      * @return string A String with data processed.
+     * @deprecated Not used anywhere in Propel. At buildtime, use Column::generatePhpName() for that purpose
+     *
      */
     final public function removeUnderScores($data)
     {
@@ -829,13 +785,56 @@ class TableMap
     }
 
     /**
-     * Makes the first letter caps and the rest lowercase.
+     * Removes the PREFIX if found
      *
-     * @deprecated Not used anywhere in Propel.
+     * @param string $data A String.
+     *
+     * @return string A String with data, but with prefix removed.
+     * @deprecated Not used anywhere in Propel
+     *
+     */
+    protected function removePrefix($data)
+    {
+        return $this->hasPrefix($data) ? substr($data, strlen($this->prefix)) : $data;
+    }
+
+    /**
+     * Tell me if i have PREFIX in my string.
+     *
+     * @param string $data
+     *
+     * @return boolean True if prefix is contained in data.
+     * @deprecated Not used anywhere in Propel
+     *
+     */
+    protected function hasPrefix($data)
+    {
+        return (strpos($data, $this->prefix) === 0);
+    }
+
+    /**
+     * Normalizes the column name, removing table prefix and uppercasing.
+     * article.first_name becomes FIRST_NAME
+     *
+     * @param string $name
+     *
+     * @return string Normalized column name.
+     * @deprecated Use ColumnMap::normalizeColumnName() instead
+     *
+     */
+    protected function normalizeColName($name)
+    {
+        return ColumnMap::normalizeName($name);
+    }
+
+    /**
+     * Makes the first letter caps and the rest lowercase.
      *
      * @param string $data A String.
      *
      * @return string A String with data processed.
+     * @deprecated Not used anywhere in Propel.
+     *
      */
     private function firstLetterCaps($data)
     {

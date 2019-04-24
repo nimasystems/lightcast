@@ -31,24 +31,25 @@ require_once 'phing/util/regexp/RegexpEngine.php';
 class PregEngine implements RegexpEngine
 {
     /**
+     * Pattern delimiter.
+     */
+    const DELIMITER = '`';
+    /**
      * Set to null by default to distinguish between false and not set
      * @var boolean
      */
     private $ignoreCase = null;
-
     /**
      * Set to null by default to distinguish between false and not set
      * @var boolean
      */
     private $multiline = null;
-
     /**
      * Pattern modifiers
      * @link http://php.net/manual/en/reference.pcre.pattern.modifiers.php
      * @var string
      */
     private $modifiers = null;
-
     /**
      * Set the limit.
      * @var int
@@ -56,80 +57,12 @@ class PregEngine implements RegexpEngine
     private $limit = -1;
 
     /**
-     * Pattern delimiter.
+     * Returns the maximum possible replacements for each pattern.
+     * @return int
      */
-    const DELIMITER = '`';
-
-    /**
-     * Sets pattern modifiers for regex engine
-     *
-     * @param  string $mods Modifiers to be applied to a given regex
-     * @return void
-     */
-    public function setModifiers($mods)
+    public function getLimit()
     {
-        $this->modifiers = (string) $mods;
-    }
-
-    /**
-     * Gets pattern modifiers.
-     * @return string
-     */
-    public function getModifiers()
-    {
-        $mods = $this->modifiers;
-        if ($this->getIgnoreCase()) {
-            $mods .= 'i';
-        } elseif ($this->getIgnoreCase() === false) {
-            $mods = str_replace('i', '', $mods);
-        }
-        if ($this->getMultiline()) {
-            $mods .= 's';
-        } elseif ($this->getMultiline() === false) {
-            $mods = str_replace('s', '', $mods);
-        }
-        // filter out duplicates
-        $mods = preg_split('//', $mods, -1, PREG_SPLIT_NO_EMPTY);
-        $mods = implode('', array_unique($mods));
-
-        return $mods;
-    }
-
-    /**
-     * Sets whether or not regex operation is case sensitive.
-     * @param  boolean $bit
-     * @return void
-     */
-    public function setIgnoreCase($bit)
-    {
-        $this->ignoreCase = (boolean) $bit;
-    }
-
-    /**
-     * Gets whether or not regex operation is case sensitive.
-     * @return boolean
-     */
-    public function getIgnoreCase()
-    {
-        return $this->ignoreCase;
-    }
-
-    /**
-     * Sets whether regexp should be applied in multiline mode.
-     * @param boolean $bit
-     */
-    public function setMultiline($bit)
-    {
-        $this->multiline = $bit;
-    }
-
-    /**
-     * Gets whether regexp is to be applied in multiline mode.
-     * @return boolean
-     */
-    public function getMultiline()
-    {
-        return $this->multiline;
+        return $this->limit;
     }
 
     /**
@@ -142,17 +75,20 @@ class PregEngine implements RegexpEngine
     }
 
     /**
-     * Returns the maximum possible replacements for each pattern.
-     * @return int
+     * Matches pattern against source string and sets the matches array.
+     * @param string $pattern The regex pattern to match.
+     * @param string $source The source string.
+     * @param array $matches The array in which to store matches.
+     * @return boolean Success of matching operation.
      */
-    public function getLimit()
+    public function match($pattern, $source, &$matches)
     {
-        return $this->limit;
+        return preg_match($this->preparePattern($pattern), $source, $matches);
     }
 
     /**
      * The pattern needs to be converted into PREG style -- which includes adding expression delims & any flags, etc.
-     * @param  string $pattern
+     * @param string $pattern
      * @return string prepared pattern.
      */
     private function preparePattern($pattern)
@@ -165,11 +101,11 @@ class PregEngine implements RegexpEngine
 
             foreach ($matches[0] as $match) {
                 $str = $match[0];
-                $offset = $match[1]+$diffOffset;
+                $offset = $match[1] + $diffOffset;
 
-                $escStr = (strlen($str) % 2) ? '\\'.$str : $str; // This will increase an even number of backslashes, before a forward slash, to an odd number.  I.e. '\\/' becomes '\\\/'.
+                $escStr = (strlen($str) % 2) ? '\\' . $str : $str; // This will increase an even number of backslashes, before a forward slash, to an odd number.  I.e. '\\/' becomes '\\\/'.
 
-                $diffOffset += strlen($escStr)-strlen($str);
+                $diffOffset += strlen($escStr) - strlen($str);
 
                 $pattern = substr_replace($pattern, $escStr, $offset, strlen($str));
             }
@@ -179,22 +115,82 @@ class PregEngine implements RegexpEngine
     }
 
     /**
-     * Matches pattern against source string and sets the matches array.
-     * @param  string  $pattern The regex pattern to match.
-     * @param  string  $source  The source string.
-     * @param  array   $matches The array in which to store matches.
-     * @return boolean Success of matching operation.
+     * Gets pattern modifiers.
+     * @return string
      */
-    public function match($pattern, $source, &$matches)
+    public function getModifiers()
     {
-        return preg_match($this->preparePattern($pattern), $source, $matches);
+        $mods = $this->modifiers;
+        if ($this->getIgnoreCase()) {
+            $mods .= 'i';
+        } else if ($this->getIgnoreCase() === false) {
+            $mods = str_replace('i', '', $mods);
+        }
+        if ($this->getMultiline()) {
+            $mods .= 's';
+        } else if ($this->getMultiline() === false) {
+            $mods = str_replace('s', '', $mods);
+        }
+        // filter out duplicates
+        $mods = preg_split('//', $mods, -1, PREG_SPLIT_NO_EMPTY);
+        $mods = implode('', array_unique($mods));
+
+        return $mods;
+    }
+
+    /**
+     * Sets pattern modifiers for regex engine
+     *
+     * @param string $mods Modifiers to be applied to a given regex
+     * @return void
+     */
+    public function setModifiers($mods)
+    {
+        $this->modifiers = (string)$mods;
+    }
+
+    /**
+     * Gets whether or not regex operation is case sensitive.
+     * @return boolean
+     */
+    public function getIgnoreCase()
+    {
+        return $this->ignoreCase;
+    }
+
+    /**
+     * Sets whether or not regex operation is case sensitive.
+     * @param boolean $bit
+     * @return void
+     */
+    public function setIgnoreCase($bit)
+    {
+        $this->ignoreCase = (boolean)$bit;
+    }
+
+    /**
+     * Gets whether regexp is to be applied in multiline mode.
+     * @return boolean
+     */
+    public function getMultiline()
+    {
+        return $this->multiline;
+    }
+
+    /**
+     * Sets whether regexp should be applied in multiline mode.
+     * @param boolean $bit
+     */
+    public function setMultiline($bit)
+    {
+        $this->multiline = $bit;
     }
 
     /**
      * Matches all patterns in source string and sets the matches array.
-     * @param  string  $pattern The regex pattern to match.
-     * @param  string  $source  The source string.
-     * @param  array   $matches The array in which to store matches.
+     * @param string $pattern The regex pattern to match.
+     * @param string $source The source string.
+     * @param array $matches The array in which to store matches.
      * @return boolean Success of matching operation.
      */
     public function matchAll($pattern, $source, &$matches)
@@ -206,9 +202,9 @@ class PregEngine implements RegexpEngine
      * Replaces $pattern with $replace in $source string.
      * References to \1 group matches will be replaced with more preg-friendly
      * $1.
-     * @param  string $pattern The regex pattern to match.
-     * @param  string $replace The string with which to replace matches.
-     * @param  string $source  The source string.
+     * @param string $pattern The regex pattern to match.
+     * @param string $replace The string with which to replace matches.
+     * @param string $source The source string.
      * @return string The replaced source string.
      */
     public function replace($pattern, $replace, $source)

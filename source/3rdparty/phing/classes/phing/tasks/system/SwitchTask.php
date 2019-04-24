@@ -81,7 +81,7 @@ class SwitchTask extends Task
     private $value = null;
 
     /** @var array $cases */
-    private $cases = array();
+    private $cases = [];
 
     /** @var SequentialTask $defaultCase */
     private $defaultCase = null;
@@ -185,6 +185,14 @@ class CaseTask extends SequentialTask
     private $value = null;
 
     /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
      * @param $value
      *
      * @return void
@@ -192,14 +200,6 @@ class CaseTask extends SequentialTask
     public function setValue($value)
     {
         $this->value = $value;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getValue()
-    {
-        return $this->value;
     }
 
     /**

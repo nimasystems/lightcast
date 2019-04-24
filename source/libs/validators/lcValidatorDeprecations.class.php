@@ -85,8 +85,8 @@ abstract class lcValidatorBase extends lcObj
     public static function validatePasswordComplex($password)
     {
         if (!preg_match_all('$\S*(?=\S{8,})(?=\S*[a-z])(?=\S*[A-Z])(?=\S*[\d])(?=\S*[\W])\S*$', $password))
-            return FALSE;
-        return TRUE;
+            return false;
+        return true;
     }
 
     public static function validateUsername($username, $min_length = 6, $max_length = 30, &$errors = null)

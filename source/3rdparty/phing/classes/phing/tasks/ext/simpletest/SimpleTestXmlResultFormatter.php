@@ -61,17 +61,6 @@ class SimpleTestXmlResultFormatter extends SimpleTestResultFormatter
         return "testsuites";
     }
 
-    private function captureStart()
-    {
-        ob_start();
-    }
-
-    private function captureStop()
-    {
-        $this->xmlData .= ob_get_contents();
-        ob_end_clean();
-    }
-
     /**
      * @param string $test_name
      * @param int $size
@@ -83,6 +72,17 @@ class SimpleTestXmlResultFormatter extends SimpleTestResultFormatter
         $this->captureStart();
         $this->logger->paintGroupStart($test_name, $size);
         $this->captureStop();
+    }
+
+    private function captureStart()
+    {
+        ob_start();
+    }
+
+    private function captureStop()
+    {
+        $this->xmlData .= ob_get_contents();
+        ob_end_clean();
     }
 
     /**

@@ -52,14 +52,14 @@ abstract class HttpTask extends Task
      *
      * @var Parameter[]
      */
-    protected $headers = array();
+    protected $headers = [];
 
     /**
      * Holds additional config data for HTTP_Request2
      *
      * @var Parameter[]
      */
-    protected $configData = array();
+    protected $configData = [];
 
     /**
      * Holds the authentication user name
@@ -123,6 +123,33 @@ abstract class HttpTask extends Task
     }
 
     /**
+     * Makes a HTTP request and processes its response
+     *
+     * @throws BuildException
+     */
+    public function main()
+    {
+        if (!isset($this->url)) {
+            throw new BuildException("Required attribute 'url' is missing");
+        }
+
+        try {
+            $this->processResponse($this->createRequest()->send());
+        } catch (HTTP_Request2_MessageException $e) {
+            throw new BuildException($e);
+        }
+    }
+
+    /**
+     * Processes the server's response
+     *
+     * @param HTTP_Request2_Response $response
+     * @return void
+     * @throws BuildException
+     */
+    abstract protected function processResponse(HTTP_Request2_Response $response);
+
+    /**
      * Creates and configures an instance of HTTP_Request2
      *
      * @return HTTP_Request2
@@ -161,33 +188,6 @@ abstract class HttpTask extends Task
         }
 
         return $request;
-    }
-
-    /**
-     * Processes the server's response
-     *
-     * @param  HTTP_Request2_Response $response
-     * @return void
-     * @throws BuildException
-     */
-    abstract protected function processResponse(HTTP_Request2_Response $response);
-
-    /**
-     * Makes a HTTP request and processes its response
-     *
-     * @throws BuildException
-     */
-    public function main()
-    {
-        if (!isset($this->url)) {
-            throw new BuildException("Required attribute 'url' is missing");
-        }
-
-        try {
-            $this->processResponse($this->createRequest()->send());
-        } catch (HTTP_Request2_MessageException $e) {
-            throw new BuildException($e);
-        }
     }
 
     /**

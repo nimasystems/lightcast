@@ -40,7 +40,7 @@ class EchoTask extends Task
 
     protected $level = "info";
 
-    protected $filesets = array();
+    protected $filesets = [];
 
     public function main()
     {
@@ -118,7 +118,7 @@ class EchoTask extends Task
      */
     public function setFile($file)
     {
-        $this->file = (string) $file;
+        $this->file = (string)$file;
     }
 
     /** setter for level
@@ -126,7 +126,7 @@ class EchoTask extends Task
      */
     public function setLevel($level)
     {
-        $this->level = (string) $level;
+        $this->level = (string)$level;
     }
 
     /** setter for append
@@ -150,7 +150,7 @@ class EchoTask extends Task
      */
     public function setMessage($msg)
     {
-        $this->msg = (string) $msg;
+        $this->msg = (string)$msg;
     }
 
     /** Supporting the <echo>Message</echo> syntax.
@@ -158,7 +158,7 @@ class EchoTask extends Task
      */
     public function addText($msg)
     {
-        $this->msg = (string) $msg;
+        $this->msg = (string)$msg;
     }
 
     /**

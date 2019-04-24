@@ -48,10 +48,10 @@ class LogWriter extends Writer
     }
 
     /**
-     * @see Writer::write()
      * @param string $buf
      * @param null $off
      * @param null $len
+     * @see Writer::write()
      */
     public function write($buf, $off = null, $len = null)
     {

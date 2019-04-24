@@ -84,29 +84,22 @@ class PearPackageTask extends MatchingTask
 
     /** Base directory for reading files. */
     protected $dir;
-
-    /** Package file */
-    private $packageFile;
-
-    /** @var array FileSet[] */
-    private $filesets = array();
-
     /** @var PEAR_PackageFileManager */
     protected $pkg;
-
-    private $preparedOptions = array();
-
     /** @var array PearPkgOption[] */
-    protected $options = array();
-
+    protected $options = [];
     /** Nested <mapping> (complex options) types. */
-    protected $mappings = array();
-
+    protected $mappings = [];
     /**
      * Nested <role> elements
      * @var PearPkgRole[]
      */
-    protected $roles = array();
+    protected $roles = [];
+    /** Package file */
+    private $packageFile;
+    /** @var array FileSet[] */
+    private $filesets = [];
+    private $preparedOptions = [];
 
     public function init()
     {
@@ -117,9 +110,36 @@ class PearPackageTask extends MatchingTask
     }
 
     /**
-     * Sets PEAR package.xml options, based on class properties.
-     * @throws BuildException
+     * Main entry point.
      * @return void
+     * @throws BuildException
+     */
+    public function main()
+    {
+
+        if ($this->dir === null) {
+            throw new BuildException("You must specify the \"dir\" attribute for PEAR package task.");
+        }
+
+        if ($this->package === null) {
+            throw new BuildException("You must specify the \"name\" attribute for PEAR package task.");
+        }
+
+        $this->pkg = new PEAR_PackageFileManager();
+
+        $this->setOptions();
+
+        $e = $this->pkg->writePackageFile();
+        if (PEAR::isError($e)) {
+            throw new BuildException("Unable to write package file.", new Exception($e->getMessage()));
+        }
+
+    }
+
+    /**
+     * Sets PEAR package.xml options, based on class properties.
+     * @return void
+     * @throws BuildException
      */
     protected function setOptions()
     {
@@ -144,7 +164,7 @@ class PearPackageTask extends MatchingTask
             // Some PHING-specific options needed by our Fileset reader
             $this->preparedOptions['phing_project'] = $this->project;
             $this->preparedOptions['phing_filesets'] = $this->filesets;
-        } elseif ($this->preparedOptions['filelistgenerator'] != 'Fileset' && !empty($this->filesets)) {
+        } else if ($this->preparedOptions['filelistgenerator'] != 'Fileset' && !empty($this->filesets)) {
             throw new BuildException("You cannot use <fileset> element if you have specified the \"filelistgenerator\" option.");
         }
 
@@ -162,22 +182,6 @@ class PearPackageTask extends MatchingTask
         foreach ($this->roles as $role) {
             $this->pkg->addRole($role->getExtension(), $role->getRole());
         }
-    }
-
-    /**
-     * Fixes the boolean in optional dependencies
-     * @param $deps
-     * @return
-     */
-    private function fixDeps($deps)
-    {
-        foreach (array_keys($deps) as $dep) {
-            if (isset($deps[$dep]['optional']) && $deps[$dep]['optional']) {
-                $deps[$dep]['optional'] = "yes";
-            }
-        }
-
-        return $deps;
     }
 
     /**
@@ -205,8 +209,7 @@ class PearPackageTask extends MatchingTask
         // key => value options that can be passed to PEAR_PackageFileManager
 
         foreach ($this->options as $opt) {
-            $this->preparedOptions[$opt->getName()] = $opt->getValue(
-            ); //no arrays yet. preg_split('/\s*,\s*/', $opt->getValue());
+            $this->preparedOptions[$opt->getName()] = $opt->getValue(); //no arrays yet. preg_split('/\s*,\s*/', $opt->getValue());
         }
 
         foreach ($this->mappings as $map) {
@@ -221,30 +224,19 @@ class PearPackageTask extends MatchingTask
     }
 
     /**
-     * Main entry point.
-     * @throws BuildException
-     * @return void
+     * Fixes the boolean in optional dependencies
+     * @param $deps
+     * @return
      */
-    public function main()
+    private function fixDeps($deps)
     {
-
-        if ($this->dir === null) {
-            throw new BuildException("You must specify the \"dir\" attribute for PEAR package task.");
+        foreach (array_keys($deps) as $dep) {
+            if (isset($deps[$dep]['optional']) && $deps[$dep]['optional']) {
+                $deps[$dep]['optional'] = "yes";
+            }
         }
 
-        if ($this->package === null) {
-            throw new BuildException("You must specify the \"name\" attribute for PEAR package task.");
-        }
-
-        $this->pkg = new PEAR_PackageFileManager();
-
-        $this->setOptions();
-
-        $e = $this->pkg->writePackageFile();
-        if (PEAR::isError($e)) {
-            throw new BuildException("Unable to write package file.", new Exception($e->getMessage()));
-        }
-
+        return $deps;
     }
 
     /**
@@ -264,9 +256,9 @@ class PearPackageTask extends MatchingTask
      * Nested creator, creates a FileSet for this task
      *
      * @param FileSet $fs
+     * @return void
      * @internal param FileSet $fileset Set of files to add to the package
      *
-     * @return void
      */
     public function addFileSet(FileSet $fs)
     {
@@ -275,9 +267,9 @@ class PearPackageTask extends MatchingTask
 
     /**
      * Set "package" property from XML.
-     * @see setName()
-     * @param  string $v
+     * @param string $v
      * @return void
+     * @see setName()
      */
     public function setPackage($v)
     {
@@ -286,7 +278,7 @@ class PearPackageTask extends MatchingTask
 
     /**
      * Sets "dir" property from XML.
-     * @param  PhingFile $f
+     * @param PhingFile $f
      * @return void
      */
     public function setDir(PhingFile $f)
@@ -296,7 +288,7 @@ class PearPackageTask extends MatchingTask
 
     /**
      * Sets "name" property from XML.
-     * @param  string $v
+     * @param string $v
      * @return void
      */
     public function setName($v)
@@ -359,14 +351,6 @@ class PearPkgOption
     private $name;
     private $value;
 
-    /**
-     * @param $v
-     */
-    public function setName($v)
-    {
-        $this->name = $v;
-    }
-
     public function getName()
     {
         return $this->name;
@@ -375,14 +359,22 @@ class PearPkgOption
     /**
      * @param $v
      */
-    public function setValue($v)
+    public function setName($v)
     {
-        $this->value = $v;
+        $this->name = $v;
     }
 
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @param $v
+     */
+    public function setValue($v)
+    {
+        $this->value = $v;
     }
 
     /**
@@ -404,7 +396,12 @@ class PearPkgMapping
 {
 
     private $name;
-    private $elements = array();
+    private $elements = [];
+
+    public function getName()
+    {
+        return $this->name;
+    }
 
     /**
      * @param $v
@@ -412,11 +409,6 @@ class PearPkgMapping
     public function setName($v)
     {
         $this->name = $v;
-    }
-
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -431,20 +423,12 @@ class PearPkgMapping
     }
 
     /**
-     * @return array
-     */
-    public function getElements()
-    {
-        return $this->elements;
-    }
-
-    /**
      * Returns the PHP hash or array of hashes (etc.) that this mapping represents.
      * @return array
      */
     public function getValue()
     {
-        $value = array();
+        $value = [];
         foreach ($this->getElements() as $el) {
             if ($el->getKey() !== null) {
                 $value[$el->getKey()] = $el->getValue();
@@ -454,6 +438,14 @@ class PearPkgMapping
         }
 
         return $value;
+    }
+
+    /**
+     * @return array
+     */
+    public function getElements()
+    {
+        return $this->elements;
     }
 }
 
@@ -467,15 +459,7 @@ class PearPkgMappingElement
 
     private $key;
     private $value;
-    private $elements = array();
-
-    /**
-     * @param $v
-     */
-    public function setKey($v)
-    {
-        $this->key = $v;
-    }
+    private $elements = [];
 
     public function getKey()
     {
@@ -485,9 +469,9 @@ class PearPkgMappingElement
     /**
      * @param $v
      */
-    public function setValue($v)
+    public function setKey($v)
     {
-        $this->value = $v;
+        $this->key = $v;
     }
 
     /**
@@ -498,7 +482,7 @@ class PearPkgMappingElement
     public function getValue()
     {
         if (!empty($this->elements)) {
-            $value = array();
+            $value = [];
             foreach ($this->elements as $el) {
                 if ($el->getKey() !== null) {
                     $value[$el->getKey()] = $el->getValue();
@@ -511,6 +495,14 @@ class PearPkgMappingElement
         } else {
             return $this->value;
         }
+    }
+
+    /**
+     * @param $v
+     */
+    public function setValue($v)
+    {
+        $this->value = $v;
     }
 
     /**
@@ -544,15 +536,6 @@ class PearPkgRole
     private $role;
 
     /**
-     * Sets the file extension
-     * @param string $extension
-     */
-    public function setExtension($extension)
-    {
-        $this->extension = $extension;
-    }
-
-    /**
      * Retrieves the file extension
      * @return string
      */
@@ -562,12 +545,12 @@ class PearPkgRole
     }
 
     /**
-     * Sets the role
-     * @param string $role
+     * Sets the file extension
+     * @param string $extension
      */
-    public function setRole($role)
+    public function setExtension($extension)
     {
-        $this->role = $role;
+        $this->extension = $extension;
     }
 
     /**
@@ -577,5 +560,14 @@ class PearPkgRole
     public function getRole()
     {
         return $this->role;
+    }
+
+    /**
+     * Sets the role
+     * @param string $role
+     */
+    public function setRole($role)
+    {
+        $this->role = $role;
     }
 }

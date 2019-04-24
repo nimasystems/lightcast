@@ -47,6 +47,14 @@ class Ssh2MethodConnectionParam
     private $mac = null;
 
     /**
+     * @return string
+     */
+    public function getComp()
+    {
+        return $this->comp;
+    }
+
+    /**
      * @param string $comp
      */
     public function setComp($comp)
@@ -57,9 +65,9 @@ class Ssh2MethodConnectionParam
     /**
      * @return string
      */
-    public function getComp()
+    public function getCrypt()
     {
-        return $this->comp;
+        return $this->crypt;
     }
 
     /**
@@ -73,9 +81,9 @@ class Ssh2MethodConnectionParam
     /**
      * @return string
      */
-    public function getCrypt()
+    public function getMac()
     {
-        return $this->crypt;
+        return $this->mac;
     }
 
     /**
@@ -87,14 +95,6 @@ class Ssh2MethodConnectionParam
     }
 
     /**
-     * @return string
-     */
-    public function getMac()
-    {
-        return $this->mac;
-    }
-
-    /**
      * Get the params as an array
      * unset/null params are excluded from the array
      * @return array
@@ -103,7 +103,7 @@ class Ssh2MethodConnectionParam
     {
         return array_filter(
             get_object_vars($this),
-            array($this, '_filterParam')
+            [$this, '_filterParam']
         );
     }
 

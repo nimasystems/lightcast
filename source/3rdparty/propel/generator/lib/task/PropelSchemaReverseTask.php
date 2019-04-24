@@ -57,91 +57,6 @@ class PropelSchemaReverseTask extends PDOTask
      * Bit for all validators
      */
     const VALIDATORS_ALL = 255;
-
-    /**
-     * File to contain XML database schema.
-     *
-     * @var        PhingFIle
-     */
-    protected $xmlSchema;
-
-    /**
-     * DB encoding to use
-     *
-     * @var        string
-     */
-    protected $dbEncoding = 'iso-8859-1';
-
-    /**
-     * DB schema to use.
-     *
-     * @var        string
-     */
-    protected $dbSchema;
-
-    /**
-     * The datasource name (used for <database name=""> in schema.xml)
-     *
-     * @var        string
-     */
-    protected $databaseName;
-
-    /**
-     * DOM document produced.
-     *
-     * @var        DOMDocument
-     */
-    protected $doc;
-
-    /**
-     * The document root element.
-     *
-     * @var        DOMElement
-     */
-    protected $databaseNode;
-
-    /**
-     * Hashtable of columns that have primary keys.
-     *
-     * @var        array
-     */
-    protected $primaryKeys;
-
-    /**
-     * Whether to use same name for phpName or not.
-     *
-     * @var        boolean
-     */
-    protected $samePhpName;
-
-    /**
-     * whether to add vendor info or not
-     *
-     * @var        boolean
-     */
-    protected $addVendorInfo;
-
-    /**
-     * Bitfield to switch on/off which validators will be created.
-     *
-     * @var        int
-     */
-    protected $validatorBits = PropelSchemaReverseTask::VALIDATORS_NONE;
-
-    /**
-     * Collect validatorInfos to create validators.
-     *
-     * @var        int
-     */
-    protected $validatorInfos;
-
-    /**
-     * An initialized GeneratorConfig object containing the converted Phing props.
-     *
-     * @var        GeneratorConfig
-     */
-    private $generatorConfig;
-
     /**
      * Maps validator type tokens to bits
      *
@@ -150,7 +65,7 @@ class PropelSchemaReverseTask extends PDOTask
      *
      * @var        array
      */
-    protected static $validatorBitMap = array (
+    protected static $validatorBitMap = [
         'none' => PropelSchemaReverseTask::VALIDATORS_NONE,
         'maxlength' => PropelSchemaReverseTask::VALIDATORS_MAXLENGTH,
         'maxvalue' => PropelSchemaReverseTask::VALIDATORS_MAXVALUE,
@@ -158,35 +73,106 @@ class PropelSchemaReverseTask extends PDOTask
         'required' => PropelSchemaReverseTask::VALIDATORS_REQUIRED,
         'unique' => PropelSchemaReverseTask::VALIDATORS_UNIQUE,
         'all' => PropelSchemaReverseTask::VALIDATORS_ALL,
-    );
-
+    ];
     /**
      * Defines messages that are added to validators
      *
      * @var        array
      */
-    protected static $validatorMessages = array (
-        'maxlength' => array (
+    protected static $validatorMessages = [
+        'maxlength' => [
             'msg' => 'The field %s must be not longer than %s characters.',
-            'var' => array('colName', 'value')
-        ),
-        'maxvalue' => array (
+            'var' => ['colName', 'value'],
+        ],
+        'maxvalue' => [
             'msg' => 'The field %s must be not greater than %s.',
-            'var' => array('colName', 'value')
-        ),
-        'type' => array (
+            'var' => ['colName', 'value'],
+        ],
+        'type' => [
             'msg' => 'The column %s must be an %s value.',
-            'var' => array('colName', 'value')
-        ),
-        'required' => array (
+            'var' => ['colName', 'value'],
+        ],
+        'required' => [
             'msg' => 'The field %s is required.',
-            'var' => array('colName')
-        ),
-        'unique' => array (
+            'var' => ['colName'],
+        ],
+        'unique' => [
             'msg' => 'This %s already exists in table %s.',
-            'var' => array('colName', 'tableName')
-        ),
-    );
+            'var' => ['colName', 'tableName'],
+        ],
+    ];
+    /**
+     * File to contain XML database schema.
+     *
+     * @var        PhingFIle
+     */
+    protected $xmlSchema;
+    /**
+     * DB encoding to use
+     *
+     * @var        string
+     */
+    protected $dbEncoding = 'iso-8859-1';
+    /**
+     * DB schema to use.
+     *
+     * @var        string
+     */
+    protected $dbSchema;
+    /**
+     * The datasource name (used for <database name=""> in schema.xml)
+     *
+     * @var        string
+     */
+    protected $databaseName;
+    /**
+     * DOM document produced.
+     *
+     * @var        DOMDocument
+     */
+    protected $doc;
+    /**
+     * The document root element.
+     *
+     * @var        DOMElement
+     */
+    protected $databaseNode;
+    /**
+     * Hashtable of columns that have primary keys.
+     *
+     * @var        array
+     */
+    protected $primaryKeys;
+    /**
+     * Whether to use same name for phpName or not.
+     *
+     * @var        boolean
+     */
+    protected $samePhpName;
+    /**
+     * whether to add vendor info or not
+     *
+     * @var        boolean
+     */
+    protected $addVendorInfo;
+    /**
+     * Bitfield to switch on/off which validators will be created.
+     *
+     * @var        int
+     */
+    protected $validatorBits = PropelSchemaReverseTask::VALIDATORS_NONE;
+    /**
+     * Collect validatorInfos to create validators.
+     *
+     * @var        int
+     */
+    protected $validatorInfos;
+    /**
+     * An initialized GeneratorConfig object containing the converted Phing props.
+     *
+     * @var        GeneratorConfig
+     */
+    private $generatorConfig;
 
     /**
      * Gets the (optional) schema name to use.
@@ -229,28 +215,6 @@ class PropelSchemaReverseTask extends PDOTask
     }
 
     /**
-     * Gets the datasource name.
-     *
-     * @return string
-     */
-    public function getDatabaseName()
-    {
-        return $this->databaseName;
-    }
-
-    /**
-     * Sets the datasource name.
-     *
-     * This will be used as the <database name=""> value in the generated schema.xml
-     *
-     * @param string $v
-     */
-    public function setDatabaseName($v)
-    {
-        $this->databaseName = $v;
-    }
-
-    /**
      * Sets the output name for the XML file.
      *
      * @param PhingFile $v
@@ -261,23 +225,13 @@ class PropelSchemaReverseTask extends PDOTask
     }
 
     /**
-     * Set whether to use the column name as phpName without any translation.
-     *
-     * @param boolean $v
-     */
-    public function setSamePhpName($v)
-    {
-        $this->samePhpName = (boolean) $v;
-    }
-
-    /**
      * Set whether to add vendor info to the schema.
      *
      * @param boolean $v
      */
     public function setAddVendorInfo($v)
     {
-        $this->addVendorInfo = (boolean) $v;
+        $this->addVendorInfo = (boolean)$v;
     }
 
     /**
@@ -312,18 +266,6 @@ class PropelSchemaReverseTask extends PDOTask
     }
 
     /**
-     * Checks whether to add validators of specified type or not
-     *
-     * @param int $type The validator type constant.
-     *
-     * @return boolean
-     */
-    protected function isValidatorRequired($type)
-    {
-        return (($this->validatorBits & $type) === $type);
-    }
-
-    /**
      * Whether to use the column name as phpName without any translation.
      *
      * @return boolean
@@ -331,6 +273,16 @@ class PropelSchemaReverseTask extends PDOTask
     public function isSamePhpName()
     {
         return $this->samePhpName;
+    }
+
+    /**
+     * Set whether to use the column name as phpName without any translation.
+     *
+     * @param boolean $v
+     */
+    public function setSamePhpName($v)
+    {
+        $this->samePhpName = (boolean)$v;
     }
 
     /**
@@ -376,18 +328,25 @@ class PropelSchemaReverseTask extends PDOTask
     }
 
     /**
-     * Gets the GeneratorConfig object for this task or creates it on-demand.
+     * Gets the datasource name.
      *
-     * @return GeneratorConfig
+     * @return string
      */
-    protected function getGeneratorConfig()
+    public function getDatabaseName()
     {
-        if ($this->generatorConfig === null) {
-            $this->generatorConfig = new GeneratorConfig();
-            $this->generatorConfig->setBuildProperties($this->getProject()->getProperties());
-        }
+        return $this->databaseName;
+    }
 
-        return $this->generatorConfig;
+    /**
+     * Sets the datasource name.
+     *
+     * This will be used as the <database name=""> value in the generated schema.xml
+     *
+     * @param string $v
+     */
+    public function setDatabaseName($v)
+    {
+        $this->databaseName = $v;
     }
 
     /**
@@ -411,6 +370,21 @@ class PropelSchemaReverseTask extends PDOTask
         $this->log(sprintf('Successfully reverse engineered %d tables', $nbTables));
 
         return $database;
+    }
+
+    /**
+     * Gets the GeneratorConfig object for this task or creates it on-demand.
+     *
+     * @return GeneratorConfig
+     */
+    protected function getGeneratorConfig()
+    {
+        if ($this->generatorConfig === null) {
+            $this->generatorConfig = new GeneratorConfig();
+            $this->generatorConfig->setBuildProperties($this->getProject()->getProperties());
+        }
+
+        return $this->generatorConfig;
     }
 
     /**
@@ -447,7 +421,7 @@ class PropelSchemaReverseTask extends PDOTask
                     $validator->addRule($this->getValidatorRule($col, 'required'));
                 }
 
-                if (in_array($col->getType(), array(PropelTypes::CHAR, PropelTypes::VARCHAR, PropelTypes::LONGVARCHAR)) && $col->getSize() && $this->isValidatorRequired(self::VALIDATORS_MAXLENGTH)) {
+                if (in_array($col->getType(), [PropelTypes::CHAR, PropelTypes::VARCHAR, PropelTypes::LONGVARCHAR]) && $col->getSize() && $this->isValidatorRequired(self::VALIDATORS_MAXLENGTH)) {
                     $validator = $set->getValidator($col);
                     $validator->addRule($this->getValidatorRule($col, 'maxLength', $col->getSize()));
                 }
@@ -481,11 +455,23 @@ class PropelSchemaReverseTask extends PDOTask
     }
 
     /**
+     * Checks whether to add validators of specified type or not
+     *
+     * @param int $type The validator type constant.
+     *
+     * @return boolean
+     */
+    protected function isValidatorRequired($type)
+    {
+        return (($this->validatorBits & $type) === $type);
+    }
+
+    /**
      * Gets validator rule for specified type (string) .
      *
      * @param Column $column The column that is being validated.
-     * @param string $type   The type (string) for validator (e.g. 'required').
-     * @param mixed  $value  The value for the validator (if applicable)
+     * @param string $type The type (string) for validator (e.g. 'required').
+     * @param mixed $value The value for the validator (if applicable)
      *
      * @return Rule
      */
@@ -506,7 +492,7 @@ class PropelSchemaReverseTask extends PDOTask
      *
      * @param Column $column
      * @param string $type
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return string
      */
@@ -537,7 +523,7 @@ class PropelSchemaReverse_ValidatorSet
      *
      * @var        array Validator[]
      */
-    private $validators = array();
+    private $validators = [];
 
     /**
      * Gets a single validator for specified column name.

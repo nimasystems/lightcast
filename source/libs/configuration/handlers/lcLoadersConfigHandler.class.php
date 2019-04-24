@@ -38,7 +38,7 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
             'storage',
             'user',
             'data_storage',
-            'controller'
+            'controller',
         ];
     }
 
@@ -48,57 +48,57 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
         return [
             'logger' => [
                 'required' => false,
-                'inheritance' => 'lcLogger'
+                'inheritance' => 'lcLogger',
             ],
             'cache' => [
                 'required' => false,
                 'inheritance' => 'lcCacheStore',
-                'config_enabled_key' => 'cache.enabled'
+                'config_enabled_key' => 'cache.enabled',
             ],
             'request' => [
                 'required' => true,
-                'inheritance' => 'lcRequest'
+                'inheritance' => 'lcRequest',
             ],
             'response' => [
                 'required' => true,
-                'inheritance' => 'lcResponse'
+                'inheritance' => 'lcResponse',
             ],
             'database_manager' => [
                 'required' => false,
                 'inheritance' => 'iDatabaseManager',
-                'config_enabled_key' => 'db.use_database'
+                'config_enabled_key' => 'db.use_database',
             ],
             'controller' => [
                 'required' => true,
-                'inheritance' => 'iFrontController'
+                'inheritance' => 'iFrontController',
             ],
             'router' => [
                 'required' => true,
-                'inheritance' => 'lcRouting'
+                'inheritance' => 'lcRouting',
             ],
             'storage' => [
                 'required' => false,
                 'inheritance' => 'lcStorage',
-                'config_enabled_key' => 'storage.enabled'
+                'config_enabled_key' => 'storage.enabled',
             ],
             'i18n' => [
                 'required' => false,
                 'inheritance' => 'lcI18n',
-                'config_enabled_key' => 'i18n.enabled'
+                'config_enabled_key' => 'i18n.enabled',
             ],
             'user' => [
                 'required' => false,
                 'inheritance' => 'lcUser',
-                'config_enabled_key' => 'user.enabled'
+                'config_enabled_key' => 'user.enabled',
             ],
             'mailer' => [
                 'required' => true,
-                'inheritance' => 'lcMailer'
+                'inheritance' => 'lcMailer',
             ],
             'data_storage' => [
                 'required' => false,
                 'inheritance' => 'lcDataStorage',
-                'config_enabled_key' => 'data_storage.enabled'
+                'config_enabled_key' => 'data_storage.enabled',
             ],
         ];
     }

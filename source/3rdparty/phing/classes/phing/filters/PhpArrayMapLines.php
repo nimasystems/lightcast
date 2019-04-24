@@ -80,23 +80,19 @@ class PhpArrayMapLines extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the function used by array_map.
-     *
-     * @param string $function The function used by array_map.
+     * Initializes the function if it is available from the parameters.
      */
-    public function setFunction($function)
+    private function _initialize()
     {
-        $this->function = (string) $function;
-    }
-
-    /**
-     * Returns the prefix which will be added at the start of each input line.
-     *
-     * @return string The prefix which will be added at the start of each input line
-     */
-    public function getFunction()
-    {
-        return $this->function;
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
+                if (self::FUNCTION_KEY == $params[$i]->getName()) {
+                    $this->function = (string)$params[$i]->getValue();
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -131,18 +127,22 @@ class PhpArrayMapLines extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Initializes the function if it is available from the parameters.
+     * Returns the prefix which will be added at the start of each input line.
+     *
+     * @return string The prefix which will be added at the start of each input line
      */
-    private function _initialize()
+    public function getFunction()
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
-                if (self::FUNCTION_KEY == $params[$i]->getName()) {
-                    $this->function = (string) $params[$i]->getValue();
-                    break;
-                }
-            }
-        }
+        return $this->function;
+    }
+
+    /**
+     * Sets the function used by array_map.
+     *
+     * @param string $function The function used by array_map.
+     */
+    public function setFunction($function)
+    {
+        $this->function = (string)$function;
     }
 }

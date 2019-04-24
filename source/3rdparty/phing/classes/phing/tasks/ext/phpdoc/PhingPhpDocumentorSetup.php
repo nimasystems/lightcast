@@ -86,7 +86,7 @@ class PhingPhpDocumentorSetup extends phpDocumentor_setup
     public function setGenerateSourcecode($b)
     {
         global $_phpDocumentor_setting;
-        $_phpDocumentor_setting['sourcecode'] = (boolean) $b;
+        $_phpDocumentor_setting['sourcecode'] = (boolean)$b;
     }
 
     /**
@@ -118,11 +118,11 @@ class PhingPhpDocumentorSetup extends phpDocumentor_setup
         global $_phpDocumentor_setting;
         $ignoretags = explode(',', $tags);
         $ignoretags = array_map('trim', $ignoretags);
-        $tags = array();
+        $tags = [];
         foreach ($ignoretags as $tag) {
             if (!in_array(
                 $tag,
-                array('@global', '@access', '@package', '@ignore', '@name', '@param', '@return', '@staticvar', '@var')
+                ['@global', '@access', '@package', '@ignore', '@name', '@param', '@return', '@staticvar', '@var']
             )
             ) {
                 $tags[] = $tag;
@@ -143,7 +143,7 @@ class PhingPhpDocumentorSetup extends phpDocumentor_setup
     public function setPear($b)
     {
         global $_phpDocumentor_setting;
-        $_phpDocumentor_setting['pear'] = (boolean) $b;
+        $_phpDocumentor_setting['pear'] = (boolean)$b;
     }
 
     /**

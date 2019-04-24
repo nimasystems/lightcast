@@ -83,6 +83,20 @@ class Mapper extends DataType
     }
 
     /**
+     * Reference to a classpath to use when loading the files.
+     * @param Reference $r
+     * @throws BuildException
+     */
+    public function setClasspathRef(Reference $r)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        $this->classpathId = $r->getRefId();
+        $this->createClasspath()->setRefid($r);
+    }
+
+    /**
      * Create the classpath to be used when searching for component being defined
      */
     public function createClasspath()
@@ -98,20 +112,6 @@ class Mapper extends DataType
     }
 
     /**
-     * Reference to a classpath to use when loading the files.
-     * @param Reference $r
-     * @throws BuildException
-     */
-    public function setClasspathRef(Reference $r)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        $this->classpathId = $r->getRefId();
-        $this->createClasspath()->setRefid($r);
-    }
-
-    /**
      * Set the type of FileNameMapper to use.
      * @param $type
      * @throws BuildException
@@ -122,6 +122,15 @@ class Mapper extends DataType
             throw $this->tooManyAttributes();
         }
         $this->type = $type;
+    }
+
+    /**
+     * Add a Mapper
+     * @param Mapper $mapper the mapper to add
+     */
+    public function addMapper(Mapper $mapper)
+    {
+        $this->add($mapper);
     }
 
     /**
@@ -148,69 +157,6 @@ class Mapper extends DataType
         }
         $this->container->add($fileNameMapper);
         $this->checked = false;
-    }
-
-    /**
-     * Add a Mapper
-     * @param Mapper $mapper the mapper to add
-     */
-    public function addMapper(Mapper $mapper)
-    {
-        $this->add($mapper);
-    }
-
-    /**
-     * Set the class name of the FileNameMapper to use.
-     * @param string $classname
-     * @throws BuildException
-     */
-    public function setClassname($classname)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        $this->classname = $classname;
-    }
-
-    /**
-     * Set the argument to FileNameMapper.setFrom
-     * @param $from
-     * @throws BuildException
-     */
-    public function setFrom($from)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        $this->from = $from;
-    }
-
-    /**
-     * Set the argument to FileNameMapper.setTo
-     * @param $to
-     * @throws BuildException
-     */
-    public function setTo($to)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        $this->to = $to;
-    }
-
-    /**
-     * Make this Mapper instance a reference to another Mapper.
-     *
-     * You must not set any other attribute if you make it a reference.
-     * @param Reference $r
-     * @throws BuildException
-     */
-    public function setRefid(Reference $r)
-    {
-        if ($this->type !== null || $this->from !== null || $this->to !== null) {
-            throw DataType::tooManyAttributes();
-        }
-        parent::setRefid($r);
     }
 
     /** Factory, returns inmplementation of file name mapper as new instance */
@@ -287,7 +233,7 @@ class Mapper extends DataType
     private function getRef()
     {
         if (!$this->checked) {
-            $stk = array();
+            $stk = [];
             $stk[] = $this;
             $this->dieOnCircularReference($stk, $this->project);
         }
@@ -299,5 +245,59 @@ class Mapper extends DataType
         } else {
             return $o;
         }
+    }
+
+    /**
+     * Set the class name of the FileNameMapper to use.
+     * @param string $classname
+     * @throws BuildException
+     */
+    public function setClassname($classname)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        $this->classname = $classname;
+    }
+
+    /**
+     * Set the argument to FileNameMapper.setFrom
+     * @param $from
+     * @throws BuildException
+     */
+    public function setFrom($from)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        $this->from = $from;
+    }
+
+    /**
+     * Set the argument to FileNameMapper.setTo
+     * @param $to
+     * @throws BuildException
+     */
+    public function setTo($to)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        $this->to = $to;
+    }
+
+    /**
+     * Make this Mapper instance a reference to another Mapper.
+     *
+     * You must not set any other attribute if you make it a reference.
+     * @param Reference $r
+     * @throws BuildException
+     */
+    public function setRefid(Reference $r)
+    {
+        if ($this->type !== null || $this->from !== null || $this->to !== null) {
+            throw DataType::tooManyAttributes();
+        }
+        parent::setRefid($r);
     }
 }

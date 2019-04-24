@@ -37,7 +37,7 @@ class ExtendSelector extends BaseSelector
 
     private $classname;
     private $dynselector;
-    private $parameters = array();
+    private $parameters = [];
 
     /**
      * Sets the classname of the custom selector.
@@ -47,32 +47,6 @@ class ExtendSelector extends BaseSelector
     public function setClassname($classname)
     {
         $this->classname = $classname;
-    }
-
-    /**
-     * Instantiates the identified custom selector class.
-     */
-    public function selectorCreate()
-    {
-        if ($this->classname !== null && $this->classname !== "") {
-            try {
-                // assume it's fully qualified, import it
-                $cls = Phing::import($this->classname);
-
-                // make sure class exists
-                if (class_exists($cls)) {
-                    $this->dynselector = new $cls();
-                } else {
-                    $this->setError("Selector " . $this->classname . " not initialized, no such class");
-                }
-            } catch (Exception $e) {
-                $this->setError(
-                    "Selector " . $this->classname . " not initialized, could not create class: " . $e->getMessage()
-                );
-            }
-        } else {
-            $this->setError("There is no classname specified");
-        }
     }
 
     /**
@@ -102,13 +76,39 @@ class ExtendSelector extends BaseSelector
 
         if (empty($this->classname)) {
             $this->setError("The classname attribute is required");
-        } elseif ($this->dynselector === null) {
+        } else if ($this->dynselector === null) {
             $this->setError("Internal Error: The custom selector was not created");
-        } elseif (!($this->dynselector instanceof ExtendFileSelector) && (count($this->parameters) > 0)) {
+        } else if (!($this->dynselector instanceof ExtendFileSelector) && (count($this->parameters) > 0)) {
             $this->setError(
                 "Cannot set parameters on custom selector that does not "
                 . "implement ExtendFileSelector."
             );
+        }
+    }
+
+    /**
+     * Instantiates the identified custom selector class.
+     */
+    public function selectorCreate()
+    {
+        if ($this->classname !== null && $this->classname !== "") {
+            try {
+                // assume it's fully qualified, import it
+                $cls = Phing::import($this->classname);
+
+                // make sure class exists
+                if (class_exists($cls)) {
+                    $this->dynselector = new $cls();
+                } else {
+                    $this->setError("Selector " . $this->classname . " not initialized, no such class");
+                }
+            } catch (Exception $e) {
+                $this->setError(
+                    "Selector " . $this->classname . " not initialized, could not create class: " . $e->getMessage()
+                );
+            }
+        } else {
+            $this->setError("There is no classname specified");
         }
     }
 

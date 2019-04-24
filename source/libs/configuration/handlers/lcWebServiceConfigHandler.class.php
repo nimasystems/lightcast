@@ -29,12 +29,12 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
         return [
             'routing' => [
                 'module_prefix' => 'service',
-                'action_prefix' => 'method'
+                'action_prefix' => 'method',
             ],
             'settings' => ['admin_email' => '',],
             'controller' => [
                 'max_forwards' => 10,
-                'filters' => []
+                'filters' => [],
             ],
             'view' => [
                 'filters' => [],
@@ -45,7 +45,7 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
                 'enabled' => true,
                 'email_to' => '',
                 'email_threshold' => 'crit',
-                'log_files' => []
+                'log_files' => [],
             ],
             'mailer' => [
                 'charset' => 'UTF-8',
@@ -58,8 +58,8 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
                 'smtp_port' => 25,
                 'security' => [
                     'smtp_user' => '',
-                    'smtp_pass' => ''
-                ]
+                    'smtp_pass' => '',
+                ],
             ],
             'loaders' => [
                 'logger' => 'lcFileLoggerNG',
@@ -74,7 +74,7 @@ class lcWebServiceConfigHandler extends lcEnvConfigHandler
                 'user' => '',
                 'mailer' => 'lcPHPMailer',
                 'data_storage' => '',
-            ]
+            ],
         ];
     }
 }

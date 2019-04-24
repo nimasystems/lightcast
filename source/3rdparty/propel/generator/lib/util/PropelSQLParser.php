@@ -25,34 +25,11 @@ class PropelSQLParser
     protected $pos = 0;
 
     /**
-     * Sets the inner SQL string for this object.
-     * Also resets the parsing cursor (see getNextStatement)
-     *
-     * @param string $sql The SQL string to parse
-     */
-    public function setSQL($sql)
-    {
-        $this->sql = $sql;
-        $this->pos = 0;
-        $this->len = strlen($sql);
-    }
-
-    /**
-     * Gets the inner SQL string for this object.
-     *
-     * @return string The SQL string to parse
-     */
-    public function getSQL()
-    {
-        return $this->sql;
-    }
-
-    /**
      * Execute a list of DDL statements based on a string
      * Does not use transactions since they are not supported in DDL statements
      *
-     * @param string $input      The SQL statements
-     * @param PDO    $connection a connection object
+     * @param string $input The SQL statements
+     * @param PDO $connection a connection object
      *
      * @return integer the number of executed statements
      */
@@ -62,25 +39,11 @@ class PropelSQLParser
     }
 
     /**
-     * Execute a list of DDL statements based on the path to the SQL file
-     * Does not use transactions since they are not supported in DDL statements
-     *
-     * @param string $file       the path to the SQL file
-     * @param PDO    $connection a connection object
-     *
-     * @return integer the number of executed statements
-     */
-    public static function executeFile($file, $connection)
-    {
-        return self::executeStatements(self::parseFile($file), $connection);
-    }
-
-    /**
      * Execute a list of DDL statements based on an array
      * Does not use transactions since they are not supported in DDL statements
      *
      * @param array $statements a list of SQL statements
-     * @param PDO   $connection a connection object
+     * @param PDO $connection a connection object
      *
      * @return integer the number of executed statements
      */
@@ -100,6 +63,9 @@ class PropelSQLParser
     /**
      * Explodes a SQL string into an array of SQL statements.
      *
+     * @param string $input The SQL code to parse
+     *
+     * @return array A list of SQL statement strings
      * @example
      * <code>
      * echo PropelSQLParser::parseString("-- Table foo
@@ -120,9 +86,6 @@ class PropelSQLParser
      * // )
      * </code>
      *
-     * @param string $input The SQL code to parse
-     *
-     * @return array A list of SQL statement strings
      */
     public static function parseString($input)
     {
@@ -134,47 +97,17 @@ class PropelSQLParser
         return $parser->explodeIntoStatements();
     }
 
-    /**
-     * Explodes a SQL file into an array of SQL statements.
-     *
-     * @example
-     * <code>
-     * echo PropelSQLParser::parseFile('/var/tmp/foo.sql');
-     * // results in
-     * // array(
-     * //   "DROP TABLE foo;",
-     * //   "CREATE TABLE foo (
-     * //      id int(11) NOT NULL AUTO_INCREMENT,
-     * //      title varchar(255) NOT NULL,
-     * //      PRIMARY KEY (id),
-     * //   ) ENGINE=InnoDB;"
-     * // )
-     * </code>
-     *
-     * @param string $input The absolute path to the file to parse
-     *
-     * @return array A list of SQL statement strings
-     */
-    public static function parseFile($file)
-    {
-        if (!file_exists($file)) {
-            return array();
-        }
-
-        return self::parseString(file_get_contents($file));
-    }
-
     public function convertLineFeedsToUnixStyle()
     {
-        $this->setSQL(str_replace(array("\r\n", "\r"), "\n", $this->sql));
+        $this->setSQL(str_replace(["\r\n", "\r"], "\n", $this->sql));
     }
 
     public function stripSQLCommentLines()
     {
-        $this->setSQL(preg_replace(array(
+        $this->setSQL(preg_replace([
             '#^\s*(//|--|\#).*(\n|$)#m',    // //, --, or # style comments
             '#^\s*/\*.*?\*/#s'              // c-style comments
-        ), '', $this->sql));
+        ], '', $this->sql));
     }
 
     /**
@@ -185,7 +118,7 @@ class PropelSQLParser
     public function explodeIntoStatements()
     {
         $this->pos = 0;
-        $sqlStatements = array();
+        $sqlStatements = [];
         while ($sqlStatement = $this->getNextStatement()) {
             $sqlStatements[] = $sqlStatement;
         }
@@ -220,7 +153,7 @@ class PropelSQLParser
                         if (!$isAfterBackslash) {
                             $isInString = false;
                         }
-                    } elseif (!$isInString) {
+                    } else if (!$isInString) {
                         $stringQuotes = $char;
                         $isInString = true;
                     }
@@ -266,7 +199,7 @@ class PropelSQLParser
                 }
 
                 // check for end of statement
-                if ($char.$nextChars == $this->delimiter) {
+                if ($char . $nextChars == $this->delimiter) {
                     $this->pos += $i; // increase position
 
                     return trim($parsedString);
@@ -281,5 +214,72 @@ class PropelSQLParser
         }
 
         return trim($parsedString);
+    }
+
+    /**
+     * Execute a list of DDL statements based on the path to the SQL file
+     * Does not use transactions since they are not supported in DDL statements
+     *
+     * @param string $file the path to the SQL file
+     * @param PDO $connection a connection object
+     *
+     * @return integer the number of executed statements
+     */
+    public static function executeFile($file, $connection)
+    {
+        return self::executeStatements(self::parseFile($file), $connection);
+    }
+
+    /**
+     * Explodes a SQL file into an array of SQL statements.
+     *
+     * @param string $input The absolute path to the file to parse
+     *
+     * @return array A list of SQL statement strings
+     * @example
+     * <code>
+     * echo PropelSQLParser::parseFile('/var/tmp/foo.sql');
+     * // results in
+     * // array(
+     * //   "DROP TABLE foo;",
+     * //   "CREATE TABLE foo (
+     * //      id int(11) NOT NULL AUTO_INCREMENT,
+     * //      title varchar(255) NOT NULL,
+     * //      PRIMARY KEY (id),
+     * //   ) ENGINE=InnoDB;"
+     * // )
+     * </code>
+     *
+     */
+    public static function parseFile($file)
+    {
+        if (!file_exists($file)) {
+            return [];
+        }
+
+        return self::parseString(file_get_contents($file));
+    }
+
+    /**
+     * Gets the inner SQL string for this object.
+     *
+     * @return string The SQL string to parse
+     */
+    public function getSQL()
+    {
+        return $this->sql;
+    }
+
+    /**
+     * Sets the inner SQL string for this object.
+     * Also resets the parsing cursor (see getNextStatement)
+     *
+     * @param string $sql The SQL string to parse
+     */
+    public function setSQL($sql)
+    {
+        $this->sql = $sql;
+        $this->pos = 0;
+        $this->len = strlen($sql);
     }
 }

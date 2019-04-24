@@ -70,7 +70,7 @@ class ForeachTask extends Task
     private $callee;
 
     /** Array of filesets */
-    private $filesets = array();
+    private $filesets = [];
 
     /** Instance of mapper **/
     private $mapperElement;
@@ -79,7 +79,7 @@ class ForeachTask extends Task
      * Array of filelists
      * @var array
      */
-    private $filelists = array();
+    private $filelists = [];
 
     /**
      * Target to execute.
@@ -110,8 +110,8 @@ class ForeachTask extends Task
 
     /**
      * This method does the work.
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function main()
     {
@@ -167,7 +167,7 @@ class ForeachTask extends Task
         foreach ($this->filelists as $fl) {
             $srcFiles = $fl->getFiles($this->project);
 
-            $this->process($callee, $fl->getDir($this->project), $srcFiles, array());
+            $this->process($callee, $fl->getDir($this->project), $srcFiles, []);
         }
 
         // filesets
@@ -195,10 +195,10 @@ class ForeachTask extends Task
     /**
      * Processes a list of files & directories
      *
-     * @param Task      $callee
+     * @param Task $callee
      * @param PhingFile $fromDir
-     * @param array     $srcFiles
-     * @param array     $srcDirs
+     * @param array $srcFiles
+     * @param array $srcDirs
      */
     protected function process(Task $callee, PhingFile $fromDir, $srcFiles, $srcDirs)
     {
@@ -288,7 +288,7 @@ class ForeachTask extends Task
      */
     public function setList($list)
     {
-        $this->list = (string) $list;
+        $this->list = (string)$list;
     }
 
     /**
@@ -296,7 +296,7 @@ class ForeachTask extends Task
      */
     public function setTarget($target)
     {
-        $this->calleeTarget = (string) $target;
+        $this->calleeTarget = (string)$target;
     }
 
     /**
@@ -304,7 +304,7 @@ class ForeachTask extends Task
      */
     public function setParam($param)
     {
-        $this->param = (string) $param;
+        $this->param = (string)$param;
     }
 
     /**
@@ -312,7 +312,7 @@ class ForeachTask extends Task
      */
     public function setAbsparam($absparam)
     {
-        $this->absparam = (string) $absparam;
+        $this->absparam = (string)$absparam;
     }
 
     /**
@@ -320,7 +320,7 @@ class ForeachTask extends Task
      */
     public function setDelimiter($delimiter)
     {
-        $this->delimiter = (string) $delimiter;
+        $this->delimiter = (string)$delimiter;
     }
 
     /**

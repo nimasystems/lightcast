@@ -15,24 +15,21 @@
 class Capsule
 {
     /**
+     * The variables that can be used by the templates.
+     * @var array Hash of variables.
+     */
+    public $vars = [];
+    /**
      * Look for templates here (if relative path provided).
      * @var string
      */
     protected $templatePath;
-
     /**
      * Where should output files be written?
      * (This is named inconsistently to be compatible w/ Texen.)
      * @var string
      */
     protected $outputDirectory;
-
-    /**
-     * The variables that can be used by the templates.
-     * @var array Hash of variables.
-     */
-    public $vars = array();
-
     /**
      * Has template been initialized.
      *
@@ -55,29 +52,20 @@ class Capsule
 
     /**
      * Clears one or several or all variables.
-     * @param  mixed $which String name of var, or array of names.
+     * @param mixed $which String name of var, or array of names.
      * @return void
      */
     public function clear($which = null)
     {
         if ($which === null) {
-            $this->vars = array();
-        } elseif (is_array($which)) {
+            $this->vars = [];
+        } else if (is_array($which)) {
             foreach ($which as $var) {
                 unset($this->vars[$var]);
             }
         } else {
             unset($this->vars[$which]);
         }
-    }
-
-    /**
-     * Set the basepath to use for template lookups.
-     * @param string $v
-     */
-    public function setTemplatePath($v)
-    {
-        $this->templatePath = rtrim($v, DIRECTORY_SEPARATOR . '/');
     }
 
     /**
@@ -90,12 +78,12 @@ class Capsule
     }
 
     /**
-     * Set a basepath to use for output file creation.
+     * Set the basepath to use for template lookups.
      * @param string $v
      */
-    public function setOutputDirectory($v)
+    public function setTemplatePath($v)
     {
-        $this->outputDirectory = rtrim($v, DIRECTORY_SEPARATOR . '/');
+        $this->templatePath = rtrim($v, DIRECTORY_SEPARATOR . '/');
     }
 
     /**
@@ -108,53 +96,21 @@ class Capsule
     }
 
     /**
-     * Low overhead (no output buffering) method to simply dump template
-     * to buffer.
-     *
-     * @param  string    $__template
-     * @return void
-     * @throws Exception - if template cannot be found
+     * Set a basepath to use for output file creation.
+     * @param string $v
      */
-    public function display($__template)
+    public function setOutputDirectory($v)
     {
-
-        // Prepend "private" variable names with $__ in this function
-        // to keep namespace conflict potential to a minimum.
-
-        // Alias this class to $generator.
-        $generator = $this;
-
-        if (isset($this->vars['this'])) {
-            throw new Exception("Assigning a variable named \$this to a context conflicts with class namespace.");
-        }
-
-        // extract variables into local namespace
-        extract($this->vars);
-
-        // prepend template path to include path,
-        // so that include "path/relative/to/templates"; can be used within templates
-        $__old_inc_path = ini_get('include_path');
-        ini_set('include_path', $this->templatePath . PATH_SEPARATOR . $__old_inc_path);
-
-        @ini_set('track_errors', true);
-        include $__template;
-        @ini_restore('track_errors');
-
-        // restore the include path
-        ini_set('include_path', $__old_inc_path);
-
-        if (!empty($php_errormsg)) {
-            throw new Exception("Unable to parse template " . $__template . ": " . $php_errormsg);
-        }
+        $this->outputDirectory = rtrim($v, DIRECTORY_SEPARATOR . '/');
     }
 
     /**
      * Fetches the results of a template parse and either returns
      * the string or writes results to a specified output file.
      *
-     * @param  string    $template   The template filename (relative to templatePath or absolute).
-     * @param  string    $outputFile If specified, contents of template will also be written to this file.
-     * @param  boolean   $append     Should output be appended to source file?
+     * @param string $template The template filename (relative to templatePath or absolute).
+     * @param string $outputFile If specified, contents of template will also be written to this file.
+     * @param boolean $append Should output be appended to source file?
      * @return string    The "parsed" template output.
      * @throws Exception - if template not found.
      */
@@ -192,10 +148,51 @@ class Capsule
     }
 
     /**
+     * Low overhead (no output buffering) method to simply dump template
+     * to buffer.
+     *
+     * @param string $__template
+     * @return void
+     * @throws Exception - if template cannot be found
+     */
+    public function display($__template)
+    {
+
+        // Prepend "private" variable names with $__ in this function
+        // to keep namespace conflict potential to a minimum.
+
+        // Alias this class to $generator.
+        $generator = $this;
+
+        if (isset($this->vars['this'])) {
+            throw new Exception("Assigning a variable named \$this to a context conflicts with class namespace.");
+        }
+
+        // extract variables into local namespace
+        extract($this->vars);
+
+        // prepend template path to include path,
+        // so that include "path/relative/to/templates"; can be used within templates
+        $__old_inc_path = ini_get('include_path');
+        ini_set('include_path', $this->templatePath . PATH_SEPARATOR . $__old_inc_path);
+
+        @ini_set('track_errors', true);
+        include $__template;
+        @ini_restore('track_errors');
+
+        // restore the include path
+        ini_set('include_path', $__old_inc_path);
+
+        if (!empty($php_errormsg)) {
+            throw new Exception("Unable to parse template " . $__template . ": " . $php_errormsg);
+        }
+    }
+
+    /**
      * This returns a "best guess" path for the given file.
      *
-     * @param  string $file     File name or possibly absolute path.
-     * @param  string $basepath The basepath that should be prepended if $file is not absolute.
+     * @param string $file File name or possibly absolute path.
+     * @param string $basepath The basepath that should be prepended if $file is not absolute.
      * @return string "Best guess" path for this file.
      */
     protected function resolvePath($file, $basepath)
@@ -214,7 +211,7 @@ class Capsule
 
     /**
      * Gets value of specified var or NULL if var has not been put().
-     * @param  string $name Variable name to retrieve.
+     * @param string $name Variable name to retrieve.
      * @return mixed
      */
     public function get($name)
@@ -236,8 +233,8 @@ class Capsule
      *
      * Resulting template will have access to $myvar and $myvar2.
      *
-     * @param  array   $vars
-     * @param  boolean $recursiveMerge Should matching keys be recursively merged?
+     * @param array $vars
+     * @param boolean $recursiveMerge Should matching keys be recursively merged?
      * @return void
      */
     public function putAll($vars, $recursiveMerge = false)
@@ -255,7 +252,7 @@ class Capsule
      * Resulting template will have access to ${$name$} variable.
      *
      * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function put($name, $value)
     {
@@ -272,7 +269,7 @@ class Capsule
      */
     public function putRef($name, &$value)
     {
-        $this->vars[$name] = & $value;
+        $this->vars[$name] = &$value;
     }
 
     /**
@@ -280,7 +277,7 @@ class Capsule
      * This is primarily to force copying (cloning) of objects, rather
      * than the default behavior which is to assign them by reference.
      * @param string $name
-     * @param mixed  $value
+     * @param mixed $value
      */
     public function putCopy($name, $value)
     {

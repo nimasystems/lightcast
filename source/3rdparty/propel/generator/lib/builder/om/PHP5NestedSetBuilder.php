@@ -23,16 +23,6 @@ class PHP5NestedSetBuilder extends ObjectBuilder
 {
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    /**
      * Returns the name of the current class being built.
      *
      * @return string
@@ -42,7 +32,7 @@ class PHP5NestedSetBuilder extends ObjectBuilder
         return $this->getBuildProperty('basePrefix') . $this->getStubObjectBuilder()->getUnprefixedClassname() . 'NestedSet';
     }
 
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
@@ -52,9 +42,9 @@ class PHP5NestedSetBuilder extends ObjectBuilder
         $script .= "
 require '" . $this->getObjectBuilder()->getClassFilePath() . "';
 ";
-    } // addIncludes()
+    }
 
-    /**
+        /**
      * Adds class phpdoc comment and opening of class.
      *
      * @param string &$script The script will be modified in this method.
@@ -86,6 +76,16 @@ require '" . $this->getObjectBuilder()->getClassFilePath() . "';
  */
 abstract class " . $this->getClassname() . " extends " . $this->getObjectBuilder()->getClassname() . " implements NodeObject {
 ";
+    } // addIncludes()
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
     }
 
     /**
@@ -159,18 +159,6 @@ abstract class " . $this->getClassname() . " extends " . $this->getObjectBuilder
         $this->addSetLeft($script);
         $this->addSetRight($script);
         $this->addSetScopeId($script);
-    }
-
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
-";
     }
 
     /**
@@ -337,6 +325,99 @@ abstract class " . $this->getClassname() . " extends " . $this->getObjectBuilder
 ";
     }
 
+    protected function addGetPath(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $script .= "
+    /**
+     * Get the path to the node in the tree
+     *
+     * @param      PropelPDO Connection to use.
+     * @return array
+     */
+    public function getPath(PropelPDO \$con = null)
+    {
+        return $peerClassname::getPath(\$this, \$con);
+    }
+";
+    }
+
+    protected function addGetNumberOfChildren(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $script .= "
+    /**
+     * Gets the number of children for the node (direct descendants)
+     *
+     * @param      PropelPDO Connection to use.
+     * @return int
+     */
+    public function getNumberOfChildren(PropelPDO \$con = null)
+    {
+        return $peerClassname::getNumberOfChildren(\$this, \$con);
+    }
+";
+    }
+
+    protected function addGetNumberOfDescendants(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $script .= "
+    /**
+     * Gets the total number of descendants for the node
+     *
+     * @param      PropelPDO Connection to use.
+     * @return int
+     */
+    public function getNumberOfDescendants(PropelPDO \$con = null)
+    {
+        return $peerClassname::getNumberOfDescendants(\$this, \$con);
+    }
+";
+    }
+
+    protected function addGetChildren(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $script .= "
+    /**
+     * Gets the children for the node
+     *
+     * @param      PropelPDO Connection to use.
+     * @return array
+     */
+    public function getChildren(PropelPDO \$con = null)
+    {
+        \$this->getLevel();
+
+        if (is_array(\$this->_children)) {
+            return \$this->_children;
+        }
+
+        return $peerClassname::retrieveChildren(\$this, \$con);
+    }
+";
+    }
+
+    protected function addGetDescendants(&$script)
+    {
+        $peerClassname = $this->getStubPeerBuilder()->getClassname();
+        $script .= "
+    /**
+     * Gets the descendants for the node
+     *
+     * @param      PropelPDO Connection to use.
+     * @return array
+     */
+    public function getDescendants(PropelPDO \$con = null)
+    {
+        \$this->getLevel();
+
+        return $peerClassname::retrieveDescendants(\$this, \$con);
+    }
+";
+    }
+
     protected function addSetLevel(&$script)
     {
         $objectClassName = $this->getStubObjectBuilder()->getClassname();
@@ -433,99 +514,6 @@ abstract class " . $this->getClassname() . " extends " . $this->getObjectBuilder
         \$this->hasNextSibling = $peerClassname::isValid(\$node);
 
         return \$this;
-    }
-";
-    }
-
-    protected function addGetPath(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $script .= "
-    /**
-     * Get the path to the node in the tree
-     *
-     * @param      PropelPDO Connection to use.
-     * @return array
-     */
-    public function getPath(PropelPDO \$con = null)
-    {
-        return $peerClassname::getPath(\$this, \$con);
-    }
-";
-    }
-
-    protected function addGetNumberOfChildren(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $script .= "
-    /**
-     * Gets the number of children for the node (direct descendants)
-     *
-     * @param      PropelPDO Connection to use.
-     * @return int
-     */
-    public function getNumberOfChildren(PropelPDO \$con = null)
-    {
-        return $peerClassname::getNumberOfChildren(\$this, \$con);
-    }
-";
-    }
-
-    protected function addGetNumberOfDescendants(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $script .= "
-    /**
-     * Gets the total number of descendants for the node
-     *
-     * @param      PropelPDO Connection to use.
-     * @return int
-     */
-    public function getNumberOfDescendants(PropelPDO \$con = null)
-    {
-        return $peerClassname::getNumberOfDescendants(\$this, \$con);
-    }
-";
-    }
-
-    protected function addGetChildren(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $script .= "
-    /**
-     * Gets the children for the node
-     *
-     * @param      PropelPDO Connection to use.
-     * @return array
-     */
-    public function getChildren(PropelPDO \$con = null)
-    {
-        \$this->getLevel();
-
-        if (is_array(\$this->_children)) {
-            return \$this->_children;
-        }
-
-        return $peerClassname::retrieveChildren(\$this, \$con);
-    }
-";
-    }
-
-    protected function addGetDescendants(&$script)
-    {
-        $peerClassname = $this->getStubPeerBuilder()->getClassname();
-        $script .= "
-    /**
-     * Gets the descendants for the node
-     *
-     * @param      PropelPDO Connection to use.
-     * @return array
-     */
-    public function getDescendants(PropelPDO \$con = null)
-    {
-        \$this->getLevel();
-
-        return $peerClassname::retrieveDescendants(\$this, \$con);
     }
 ";
     }
@@ -1157,6 +1145,18 @@ abstract class " . $this->getClassname() . " extends " . $this->getObjectBuilder
 
         return \$this;
     }
+";
+    }
+
+    /**
+     * Closes class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addClassClose(&$script)
+    {
+        $script .= "
+} // " . $this->getClassname() . "
 ";
     }
 } // PHP5NestedSetBuilder

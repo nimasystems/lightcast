@@ -76,9 +76,9 @@ class DefaultInputHandler implements InputHandler
 
         if ($request instanceof YesNoInputRequest) {
             $choices = $request->getChoices();
-            $defaultValue = $choices[(int) !$request->getDefaultValue()];
+            $defaultValue = $choices[(int)!$request->getDefaultValue()];
             $prompt .= '(' . implode('/', $request->getChoices()) . ')';
-        } elseif ($request instanceof MultipleChoiceInputRequest) { // (a,b,c,d)
+        } else if ($request instanceof MultipleChoiceInputRequest) { // (a,b,c,d)
             $prompt .= '(' . implode(',', $request->getChoices()) . ')';
         }
 

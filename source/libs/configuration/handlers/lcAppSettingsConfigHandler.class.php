@@ -34,30 +34,30 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                 'charset' => 'utf-8',
                 'admin_email' => null,
                 'enabled_modules' => [],
-                'disabled_modules' => []
+                'disabled_modules' => [],
             ],
             'exceptions' => [
                 'module' => null,
-                'action' => null
+                'action' => null,
             ],
             'logger' => [
                 'enabled' => true,
                 'email_to' => '',
                 'email_threshold' => 'crit',
-                'log_files' => []
+                'log_files' => [],
             ],
             'controller' => [
                 'max_forwards' => 10,
-                'filters' => []
+                'filters' => [],
             ],
             'storage' => [
                 'enabled' => true,
-                'timeout' => 60
+                'timeout' => 60,
             ],
             'data_storage' => ['enabled' => true],
             'user' => [
                 'enabled' => true,
-                'timeout' => 60
+                'timeout' => 60,
             ],
             'cache' => ['enabled' => true,],
             'i18n' => [
@@ -74,17 +74,17 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                     'uri' => '/localized',
                     'search_tags' => [
                         'img' => 'src',
-                        'script' => 'src'
-                    ]
+                        'script' => 'src',
+                    ],
                 ],
                 'skip_append_for' => [
                     '^\/img',
                     '^\/files',
                     '^\/images',
-                    '^\/vfs'
+                    '^\/vfs',
                 ],
                 'lang_code_match' => '^\/(([a-z]{2}(_[A-Z]{2})?\/)|([a-z]{2}(_[A-Z]{2})?)$)\/*',
-                'autodetect' => true
+                'autodetect' => true,
             ],
             'mailer' => [
                 'charset' => 'UTF-8',
@@ -98,8 +98,8 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                 'smtp_port' => 25,
                 'security' => null,
                 'smtp_user' => null,
-                'smtp_pass' => null
-            ]
+                'smtp_pass' => null,
+            ],
         ];
     }
 

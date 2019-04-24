@@ -50,17 +50,17 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
                 'handler' => 'web_service',
                 'dirs' => [
                     $this->getBaseConfigDir(),
-                    $this->getConfigDir()
+                    $this->getConfigDir(),
                 ],
-                'config_key' => 'ws'
+                'config_key' => 'ws',
             ],
             [
                 'handler' => 'routing',
                 'dirs' => [
                     $this->getBaseConfigDir(),
-                    $this->getConfigDir()
+                    $this->getConfigDir(),
                 ],
-                'config_key' => 'ws_routing'
+                'config_key' => 'ws_routing',
             ],
         ];
 

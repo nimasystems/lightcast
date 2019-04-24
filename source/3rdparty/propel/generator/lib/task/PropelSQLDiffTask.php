@@ -27,6 +27,16 @@ class PropelSQLDiffTask extends AbstractPropelDataModelTask
     protected $isCaseInsensitive = false;
 
     /**
+     * Gets the datasource name.
+     *
+     * @return string
+     */
+    public function getDatabaseName()
+    {
+        return $this->databaseName;
+    }
+
+    /**
      * Sets the datasource name.
      *
      * This will be used as the <database name=""> value in the generated schema.xml
@@ -39,53 +49,13 @@ class PropelSQLDiffTask extends AbstractPropelDataModelTask
     }
 
     /**
-     * Gets the datasource name.
-     *
-     * @return string
-     */
-    public function getDatabaseName()
-    {
-        return $this->databaseName;
-    }
-
-    /**
-     * Setter for the editorCmd property
-     *
-     * @param string $editorCmd
-     */
-    public function setEditorCmd($editorCmd)
-    {
-        $this->editorCmd = $editorCmd;
-    }
-
-    /**
-     * Getter for the editorCmd property
-     *
-     * @return string
-     */
-    public function getEditorCmd()
-    {
-        return $this->editorCmd;
-    }
-
-    /**
      * Defines whether the comparison is case insensitive
      *
      * @param boolean $isCaseInsensitive
      */
     public function setCaseInsensitive($isCaseInsensitive)
     {
-        $this->isCaseInsensitive = (boolean) $isCaseInsensitive;
-    }
-
-    /**
-     * Checks whether the comparison is case insensitive
-     *
-     * @return boolean
-     */
-    public function isCaseInsensitive()
-    {
-        return $this->isCaseInsensitive;
+        $this->isCaseInsensitive = (boolean)$isCaseInsensitive;
     }
 
     /**
@@ -145,8 +115,8 @@ class PropelSQLDiffTask extends AbstractPropelDataModelTask
 
         // comparing models
         $this->log('Comparing models...');
-        $migrationsUp = array();
-        $migrationsDown = array();
+        $migrationsUp = [];
+        $migrationsDown = [];
         foreach ($ad->getDatabases() as $database) {
             $name = $database->getName();
             $this->log(sprintf('Comparing database "%s"', $name), Project::MSG_VERBOSE);
@@ -187,5 +157,35 @@ class PropelSQLDiffTask extends AbstractPropelDataModelTask
             $this->log('  Please review the generated SQL statements, and add data migration code if necessary.');
             $this->log('  Once the migration class is valid, call the "migrate" task to execute it.');
         }
+    }
+
+    /**
+     * Checks whether the comparison is case insensitive
+     *
+     * @return boolean
+     */
+    public function isCaseInsensitive()
+    {
+        return $this->isCaseInsensitive;
+    }
+
+    /**
+     * Getter for the editorCmd property
+     *
+     * @return string
+     */
+    public function getEditorCmd()
+    {
+        return $this->editorCmd;
+    }
+
+    /**
+     * Setter for the editorCmd property
+     *
+     * @param string $editorCmd
+     */
+    public function setEditorCmd($editorCmd)
+    {
+        $this->editorCmd = $editorCmd;
     }
 }

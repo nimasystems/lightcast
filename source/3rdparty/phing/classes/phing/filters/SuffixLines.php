@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 include_once 'phing/filters/BaseParamFilterReader.php';
 include_once 'phing/filters/ChainableReader.php';
@@ -69,7 +69,7 @@ class SuffixLines extends BaseParamFilterReader implements ChainableReader
             return -1;
         }
         $lines = preg_split("~\R~", $buffer);
-        $filtered = array();
+        $filtered = [];
 
         foreach ($lines as $line) {
             $filtered[] = $line . $this->suffix;
@@ -81,15 +81,40 @@ class SuffixLines extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the suffix to add at the end of each input line.
-     *
-     * @param string $suffix The suffix to add at the start of each input line.
-     *                       May be <code>null</code>, in which case no suffix
-     *                       is added.
+     * Initializes the suffix if it is available from the parameters.
      */
-    public function setSuffix($suffix)
+    private function _initialize()
     {
-        $this->suffix = (string) $suffix;
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
+                if (self::SUFFIX_KEY == $params[$i]->getName()) {
+                    $this->suffix = (string)$params[$i]->getValue();
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Creates a new PrefixLines filter using the passed in
+     * Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering
+     *                the specified reader
+     * @internal param A $object Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new SuffixLines($reader);
+        $newFilter->setSuffix($this->getSuffix());
+        $newFilter->setInitialized(true);
+        $newFilter->setProject($this->getProject());
+
+        return $newFilter;
     }
 
     /**
@@ -103,39 +128,14 @@ class SuffixLines extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Creates a new PrefixLines filter using the passed in
-     * Reader for instantiation.
+     * Sets the suffix to add at the end of each input line.
      *
-     * @param Reader $reader
-     * @internal param A $object Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering
-     *                the specified reader
+     * @param string $suffix The suffix to add at the start of each input line.
+     *                       May be <code>null</code>, in which case no suffix
+     *                       is added.
      */
-    public function chain(Reader $reader)
+    public function setSuffix($suffix)
     {
-        $newFilter = new SuffixLines($reader);
-        $newFilter->setSuffix($this->getSuffix());
-        $newFilter->setInitialized(true);
-        $newFilter->setProject($this->getProject());
-
-        return $newFilter;
-    }
-
-    /**
-     * Initializes the suffix if it is available from the parameters.
-     */
-    private function _initialize()
-    {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
-                if (self::SUFFIX_KEY == $params[$i]->getName()) {
-                    $this->suffix = (string) $params[$i]->getValue();
-                    break;
-                }
-            }
-        }
+        $this->suffix = (string)$suffix;
     }
 }

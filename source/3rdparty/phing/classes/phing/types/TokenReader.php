@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 // include_once 'phing/system/io/Reader.php'; // really this is unrelated to Reader
 include_once 'phing/system/io/IOException.php';
@@ -63,9 +63,9 @@ abstract class TokenReader
     /**
      * Reads the next token from the Reader.
      *
+     * @return string
      * @throws IOException - On error
      *
-     * @return string
      */
     abstract public function readToken();
 

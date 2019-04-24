@@ -170,7 +170,7 @@ abstract class lcController extends lcBaseController
             }
 
             unset($router, $options);
-        } elseif (!is_array($params)) {
+        } else if (!is_array($params)) {
             return null;
         }
 
@@ -200,7 +200,7 @@ abstract class lcController extends lcBaseController
                 ],
                 (array)$params
             ),
-            'type' => lcController::TYPE_PARTIAL
+            'type' => lcController::TYPE_PARTIAL,
         ];
 
         $content = null;
@@ -234,7 +234,7 @@ abstract class lcController extends lcBaseController
                 $content = [
                     'content' => (isset($rendered_contents['content']) ? $rendered_contents['content'] : null),
                     'content_type' => (isset($rendered_contents['content_type']) ? $rendered_contents['content_type'] : null),
-                    'controller' => $controller_instance
+                    'controller' => $controller_instance,
                 ];
             } else {
                 $content = (isset($rendered_contents['content']) ? $rendered_contents['content'] : null);
@@ -255,6 +255,82 @@ abstract class lcController extends lcBaseController
 
         return $content;
     }
+
+    protected function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    {
+        if (!$this->root_controller) {
+            throw new lcNotAvailableException('Root controller not available');
+        }
+
+        return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
+    }
+
+    public function renderControllerAction(lcController $controller, $action_name, array $action_params = null)
+    {
+        if (!$controller || !$action_name) {
+            throw new lcInvalidArgumentException('Invalid controller / action');
+        }
+
+        //$this->info('Rendering action (' . $controller->getControllerName() . '/' .
+        // $action_name . ': ' . "\n\n" . print_r($action_params, true) . "\n\n");
+
+        // set params
+        $controller->setControllerStack($this->controller_stack);
+        $controller->setRootController($this->root_controller);
+        $controller->setDispatchParams($this->dispatch_params);
+
+        // execute the request
+        $action_result = null;
+        $action_params = $action_params ? $action_params : [];
+
+        $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, [
+            'action_params' => $action_params,
+            'action_name' => $action_name,
+        ]));
+
+        $action_result = $controller->execute($action_name, $action_params);
+
+        // set back to controller
+        $controller->action_result = $action_result;
+
+        // view rendering
+        $view = $controller->getView();
+        $rendered_view_contents = null;
+
+        if (!$view || (int)$action_result == (int)lcBaseController::RENDER_NONE) {
+            // if user specified render none - don't render anything!
+            $controller->unsetView();
+        } else if ($view) {
+            // set the result
+            $view->setActionResult($action_result);
+
+            try {
+                $rendered_view_contents = $controller->renderView();
+            } catch (Exception $e) {
+                throw new lcRenderException('Could not render controller response: ' .
+                    $e->getMessage(),
+                    $e->getCode(),
+                    $e);
+            }
+
+            // notify about this render
+            $notification_params = [
+                'controller_name' => $controller->getControllerName(),
+                'action_name' => $action_name,
+                'params' => $action_params,
+            ];
+            $this->event_dispatcher->filter(new lcEvent('controller.did_render_action', $this, $notification_params), $notification_params);
+            unset($notification_params);
+
+            // shutdown the view after rendering to preserve memory
+            $view->shutdown();
+            $controller->view = null;
+        }
+
+        return $rendered_view_contents;
+    }
+
+    abstract protected function execute($action_name, array $action_params);
 
     public function shutdown()
     {
@@ -397,7 +473,7 @@ abstract class lcController extends lcBaseController
 
         $action_params = [
             'request' => (array)$action_params,
-            'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION)
+            'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION),
         ];
 
         // override the web controller's forward for the sake of using this method within
@@ -410,23 +486,22 @@ abstract class lcController extends lcBaseController
         );
     }
 
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
     public function getRootController()
     {
         return $this->root_controller;
     }
 
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
     public function setRootController(iFrontController & $controller = null)
     {
         $this->root_controller = $controller;
-    }
-
-    protected function getControllerInstance($controller_name, $context_type = null, $context_name = null)
-    {
-        if (!$this->root_controller) {
-            throw new lcNotAvailableException('Root controller not available');
-        }
-
-        return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
     }
 
     /*
@@ -500,7 +575,7 @@ abstract class lcController extends lcBaseController
 
         // this is the new filter which we use
         $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), [
-            'should_execute' => true
+            'should_execute' => true,
         ]);
 
         if ($execute_action_event->isProcessed()) {
@@ -543,10 +618,6 @@ abstract class lcController extends lcBaseController
         exit(0);
     }
 
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-
     public function getActionName()
     {
         return $this->action_name;
@@ -565,7 +636,7 @@ abstract class lcController extends lcBaseController
     {
         // LC 1.4 compatibility fixes:
         $params = [
-            'view' => $view
+            'view' => $view,
         ];
 
         $full_template_name = null;
@@ -602,10 +673,6 @@ abstract class lcController extends lcBaseController
             $this->notice($log_str);
         }
     }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
 
     public function unsetDecoratorView()
     {
@@ -646,7 +713,7 @@ abstract class lcController extends lcBaseController
             'controller_instance' => $controller_instance,
             'controller_name' => $controller_name,
             'action_name' => $action_name,
-            'action_params' => $action_params
+            'action_params' => $action_params,
         ]), true);
 
         if ($event->isProcessed()) {
@@ -728,7 +795,7 @@ abstract class lcController extends lcBaseController
             if (isset($ac['skip_filters'])) {
                 if (is_bool($ac['skip_filters'])) {
                     $should_filter = !(bool)$ac['skip_filters'];
-                } elseif (is_array($ac['skip_filters'])) {
+                } else if (is_array($ac['skip_filters'])) {
                     $should_filter = array_filter($ac['skip_filters']);
                     $should_filter = $should_filter ? $should_filter : true;
                 }
@@ -749,78 +816,11 @@ abstract class lcController extends lcBaseController
             'controller_context_name' => $controller_context_name,
             'controller_context_type' => $controller_context_type,
             'controller_filename' => $controller_filename,
-            'controller_parent_plugin' => $controller_parent_plugin_name
+            'controller_parent_plugin' => $controller_parent_plugin_name,
         ], $skip_filter_categories);
 
         return $filter_results;
     }
-
-    public function renderControllerAction(lcController $controller, $action_name, array $action_params = null)
-    {
-        if (!$controller || !$action_name) {
-            throw new lcInvalidArgumentException('Invalid controller / action');
-        }
-
-        //$this->info('Rendering action (' . $controller->getControllerName() . '/' .
-        // $action_name . ': ' . "\n\n" . print_r($action_params, true) . "\n\n");
-
-        // set params
-        $controller->setControllerStack($this->controller_stack);
-        $controller->setRootController($this->root_controller);
-        $controller->setDispatchParams($this->dispatch_params);
-
-        // execute the request
-        $action_result = null;
-        $action_params = $action_params ? $action_params : [];
-
-        $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, [
-            'action_params' => $action_params,
-            'action_name' => $action_name
-        ]));
-
-        $action_result = $controller->execute($action_name, $action_params);
-
-        // set back to controller
-        $controller->action_result = $action_result;
-
-        // view rendering
-        $view = $controller->getView();
-        $rendered_view_contents = null;
-
-        if (!$view || (int)$action_result == (int)lcBaseController::RENDER_NONE) {
-            // if user specified render none - don't render anything!
-            $controller->unsetView();
-        } elseif ($view) {
-            // set the result
-            $view->setActionResult($action_result);
-
-            try {
-                $rendered_view_contents = $controller->renderView();
-            } catch (Exception $e) {
-                throw new lcRenderException('Could not render controller response: ' .
-                    $e->getMessage(),
-                    $e->getCode(),
-                    $e);
-            }
-
-            // notify about this render
-            $notification_params = [
-                'controller_name' => $controller->getControllerName(),
-                'action_name' => $action_name,
-                'params' => $action_params,
-            ];
-            $this->event_dispatcher->filter(new lcEvent('controller.did_render_action', $this, $notification_params), $notification_params);
-            unset($notification_params);
-
-            // shutdown the view after rendering to preserve memory
-            $view->shutdown();
-            $controller->view = null;
-        }
-
-        return $rendered_view_contents;
-    }
-
-    abstract protected function execute($action_name, array $action_params);
 
     protected function renderLayoutView($layout_content, $layout_content_type = null)
     {
@@ -838,7 +838,7 @@ abstract class lcController extends lcBaseController
         ]), [
             'use_layout' => true,
             'content' => $layout_content,
-            'content_type' => $layout_content_type
+            'content_type' => $layout_content_type,
         ]);
 
         if ($event->isProcessed()) {
@@ -872,7 +872,7 @@ abstract class lcController extends lcBaseController
         // notify / filter
         $event = $this->event_dispatcher->filter(new lcEvent('controller.did_render_layout', $this), [
             'content' => $render_result['content'],
-            'content_type' => $layout_content_type
+            'content_type' => $layout_content_type,
         ]);
 
         if ($event->isProcessed()) {
@@ -928,7 +928,7 @@ abstract class lcController extends lcBaseController
                     'context_name' => $controller->getContextName(),
                     'context_type' => $controller->getContextType(),
                     'translation_context_name' => $controller->getTranslationContextName(),
-                    'translation_context_type' => $controller->getTranslationContextType()
+                    'translation_context_type' => $controller->getTranslationContextType(),
                 ]));
 
             // render the view
@@ -943,7 +943,7 @@ abstract class lcController extends lcBaseController
                     'context_type' => $controller->getContextType(),
                     'context_name' => $controller->getContextName(),
                     'translation_context_name' => $controller->getTranslationContextName(),
-                    'translation_context_type' => $controller->getTranslationContextType()
+                    'translation_context_type' => $controller->getTranslationContextType(),
                 ]), $output);
 
             if ($event->isProcessed()) {
@@ -959,7 +959,7 @@ abstract class lcController extends lcBaseController
 
         $ret = [
             'content_type' => $content_type,
-            'content' => $output
+            'content' => $output,
         ];
 
         return $ret;
@@ -999,7 +999,7 @@ abstract class lcController extends lcBaseController
 
         if ($type == 'file' || $type == 'url') {
             $fragment_content = file_get_contents($url);
-        } elseif ($type == 'php') {
+        } else if ($type == 'php') {
             ob_start();
             ob_implicit_flush(0);
 

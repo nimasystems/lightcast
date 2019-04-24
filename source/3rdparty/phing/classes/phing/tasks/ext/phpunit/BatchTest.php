@@ -31,24 +31,20 @@ require_once 'phing/types/FileSet.php';
  */
 class BatchTest
 {
+    /** name of the batchtest/suite */
+    protected $name = "Phing Batchtest";
     /**
      * The list of filesets containing the testcase filename rules.
      *
      * @var array $filesets
      */
-    private $filesets = array();
-
+    private $filesets = [];
     /** the reference to the project */
     private $project = null;
-
     /** the classpath to use with Phing::__import() calls */
     private $classpath = null;
-
     /** names of classes to exclude */
-    private $excludeClasses = array();
-
-    /** name of the batchtest/suite */
-    protected $name = "Phing Batchtest";
+    private $excludeClasses = [];
 
     /**
      * Create a new batchtest instance
@@ -82,22 +78,6 @@ class BatchTest
     }
 
     /**
-     * Sets the classpath.
-     *
-     * @param Path $classpath
-     *
-     * @return void
-     */
-    public function setClasspath(Path $classpath)
-    {
-        if ($this->classpath === null) {
-            $this->classpath = $classpath;
-        } else {
-            $this->classpath->append($classpath);
-        }
-    }
-
-    /**
      * Creates a new Path object.
      *
      * @return Path
@@ -120,6 +100,22 @@ class BatchTest
     }
 
     /**
+     * Sets the classpath.
+     *
+     * @param Path $classpath
+     *
+     * @return void
+     */
+    public function setClasspath(Path $classpath)
+    {
+        if ($this->classpath === null) {
+            $this->classpath = $classpath;
+        } else {
+            $this->classpath->append($classpath);
+        }
+    }
+
+    /**
      * Add a new fileset containing the XML results to aggregate.
      *
      * @param FileSet $fileset the new fileset containing XML results.
@@ -132,13 +128,40 @@ class BatchTest
     }
 
     /**
+     * Returns an array of test cases and test suites that are declared
+     * by the files included by the filesets
+     *
+     * @return array an array of tests.
+     */
+    public function elements()
+    {
+        $filenames = $this->getFilenames();
+
+        $declaredClasses = [];
+
+        foreach ($filenames as $filename) {
+            $definedClasses = PHPUnitUtil::getDefinedClasses($filename, $this->classpath);
+
+            foreach ($definedClasses as $definedClass) {
+                $this->project->log("(PHPUnit) Adding $definedClass (from $filename) to tests.", Project::MSG_DEBUG);
+            }
+
+            $declaredClasses = array_merge($declaredClasses, $definedClasses);
+        }
+
+        $elements = array_filter($declaredClasses, [$this, "filterTests"]);
+
+        return $elements;
+    }
+
+    /**
      * Iterate over all filesets and return the filename of all files.
      *
      * @return array an array of filenames
      */
     private function getFilenames()
     {
-        $filenames = array();
+        $filenames = [];
 
         foreach ($this->filesets as $fileset) {
             $ds = $fileset->getDirectoryScanner($this->project);
@@ -152,21 +175,6 @@ class BatchTest
         }
 
         return $filenames;
-    }
-
-    /**
-     * Checks wheter $input is a PHPUnit Test.
-     *
-     * @param $input
-     *
-     * @return bool
-     */
-    private function isTestCase($input)
-    {
-        return is_subclass_of($input, 'PHPUnit_Framework_TestCase') || is_subclass_of(
-            $input,
-            'PHPUnit_Framework_TestSuite'
-        );
     }
 
     /**
@@ -185,29 +193,17 @@ class BatchTest
     }
 
     /**
-     * Returns an array of test cases and test suites that are declared
-     * by the files included by the filesets
+     * Checks wheter $input is a PHPUnit Test.
      *
-     * @return array an array of tests.
+     * @param $input
+     *
+     * @return bool
      */
-    public function elements()
+    private function isTestCase($input)
     {
-        $filenames = $this->getFilenames();
-
-        $declaredClasses = array();
-
-        foreach ($filenames as $filename) {
-            $definedClasses = PHPUnitUtil::getDefinedClasses($filename, $this->classpath);
-
-            foreach ($definedClasses as $definedClass) {
-                $this->project->log("(PHPUnit) Adding $definedClass (from $filename) to tests.", Project::MSG_DEBUG);
-            }
-
-            $declaredClasses = array_merge($declaredClasses, $definedClasses);
-        }
-
-        $elements = array_filter($declaredClasses, array($this, "filterTests"));
-
-        return $elements;
+        return is_subclass_of($input, 'PHPUnit_Framework_TestCase') || is_subclass_of(
+                $input,
+                'PHPUnit_Framework_TestSuite'
+            );
     }
 }

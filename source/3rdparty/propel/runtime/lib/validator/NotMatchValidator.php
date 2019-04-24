@@ -38,6 +38,19 @@
 class NotMatchValidator implements BasicValidator
 {
     /**
+     * @param ValidatorMap $map
+     * @param string $str
+     *
+     * @return boolean
+     * @see       BasicValidator::isValid()
+     *
+     */
+    public function isValid(ValidatorMap $map, $str)
+    {
+        return (preg_match($this->prepareRegexp($map->getValue()), $str) == 0);
+    }
+
+    /**
      * Prepares the regular expression entered in the XML
      * for use with preg_match().
      *
@@ -56,18 +69,5 @@ class NotMatchValidator implements BasicValidator
         $exp = preg_replace('/([^\\\])\/([^$])/', '$1\/$2', $exp);
 
         return $exp;
-    }
-
-    /**
-     * @see       BasicValidator::isValid()
-     *
-     * @param ValidatorMap $map
-     * @param string       $str
-     *
-     * @return boolean
-     */
-    public function isValid(ValidatorMap $map, $str)
-    {
-        return (preg_match($this->prepareRegexp($map->getValue()), $str) == 0);
     }
 }

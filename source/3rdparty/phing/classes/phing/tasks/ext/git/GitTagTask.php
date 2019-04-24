@@ -217,11 +217,11 @@ class GitTagTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return bool
      */
-    public function setAnnotate($flag)
+    public function isAnnotate()
     {
-        $this->annotate = (bool) $flag;
+        return $this->getAnnotate();
     }
 
     /**
@@ -233,19 +233,203 @@ class GitTagTask extends GitBaseTask
     }
 
     /**
+     * @param $flag
+     */
+    public function setAnnotate($flag)
+    {
+        $this->annotate = (bool)$flag;
+    }
+
+    /**
      * @return bool
      */
-    public function isAnnotate()
+    public function isDelete()
     {
-        return $this->getAnnotate();
+        return $this->getDelete();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDelete()
+    {
+        return $this->delete;
     }
 
     /**
      * @param $flag
      */
-    public function setSign($flag)
+    public function setDelete($flag)
     {
-        $this->sign = (bool) $flag;
+        $this->delete = (bool)$flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVerify()
+    {
+        return $this->getVerify();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getVerify()
+    {
+        return $this->verify;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setVerify($flag)
+    {
+        $this->verify = (bool)$flag;
+    }
+
+    /**
+     * @return string
+     */
+    public function getKeySign()
+    {
+        return $this->keySign;
+    }
+
+    /**
+     * @param $keyId
+     */
+    public function setKeySign($keyId)
+    {
+        $this->keySign = $keyId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * @param $msg
+     */
+    public function setMessage($msg)
+    {
+        $this->message = $msg;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+
+    /**
+     * @param $file
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCommit()
+    {
+        return $this->commit;
+    }
+
+    /**
+     * @param $commit
+     */
+    public function setCommit($commit)
+    {
+        $this->commit = $commit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getObject()
+    {
+        return $this->object;
+    }
+
+    /**
+     * @param $object
+     */
+    public function setObject($object)
+    {
+        $this->object = $object;
+    }
+
+    /**
+     * @return string
+     */
+    public function getContains()
+    {
+        return $this->contains;
+    }
+
+    /**
+     * @param $commit
+     */
+    public function setContains($commit)
+    {
+        $this->contains = $commit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPattern()
+    {
+        return $this->pattern;
+    }
+
+    /**
+     * @param $pattern
+     */
+    public function setPattern($pattern)
+    {
+        $this->pattern = $pattern;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNum()
+    {
+        return $this->num;
+    }
+
+    /**
+     * @param $num
+     */
+    public function setNum($num)
+    {
+        $this->num = (int)$num;
     }
 
     /**
@@ -265,27 +449,11 @@ class GitTagTask extends GitBaseTask
     }
 
     /**
-     * @param $keyId
-     */
-    public function setKeySign($keyId)
-    {
-        $this->keySign = $keyId;
-    }
-
-    /**
-     * @return string
-     */
-    public function getKeySign()
-    {
-        return $this->keySign;
-    }
-
-    /**
      * @param $flag
      */
-    public function setReplace($flag)
+    public function setSign($flag)
     {
-        $this->replace = (bool) $flag;
+        $this->sign = (bool)$flag;
     }
 
     /**
@@ -307,65 +475,17 @@ class GitTagTask extends GitBaseTask
     /**
      * @param $flag
      */
+    public function setReplace($flag)
+    {
+        $this->replace = (bool)$flag;
+    }
+
+    /**
+     * @param $flag
+     */
     public function setForce($flag)
     {
         return $this->setReplace($flag);
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setDelete($flag)
-    {
-        $this->delete = (bool) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getDelete()
-    {
-        return $this->delete;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isDelete()
-    {
-        return $this->getDelete();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setVerify($flag)
-    {
-        $this->verify = (bool) $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getVerify()
-    {
-        return $this->verify;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isVerify()
-    {
-        return $this->getVerify();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setList($flag)
-    {
-        $this->list = (bool) $flag;
     }
 
     /**
@@ -385,131 +505,11 @@ class GitTagTask extends GitBaseTask
     }
 
     /**
-     * @param $num
+     * @param $flag
      */
-    public function setNum($num)
+    public function setList($flag)
     {
-        $this->num = (int) $num;
-    }
-
-    /**
-     * @return int
-     */
-    public function getNum()
-    {
-        return $this->num;
-    }
-
-    /**
-     * @param $commit
-     */
-    public function setContains($commit)
-    {
-        $this->contains = $commit;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContains()
-    {
-        return $this->contains;
-    }
-
-    /**
-     * @param $msg
-     */
-    public function setMessage($msg)
-    {
-        $this->message = $msg;
-    }
-
-    /**
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->message;
-    }
-
-    /**
-     * @param $file
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFile()
-    {
-        return $this->file;
-    }
-
-    /**
-     * @param $name
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * @param $commit
-     */
-    public function setCommit($commit)
-    {
-        $this->commit = $commit;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCommit()
-    {
-        return $this->commit;
-    }
-
-    /**
-     * @param $object
-     */
-    public function setObject($object)
-    {
-        $this->object = $object;
-    }
-
-    /**
-     * @return string
-     */
-    public function getObject()
-    {
-        return $this->object;
-    }
-
-    /**
-     * @param $pattern
-     */
-    public function setPattern($pattern)
-    {
-        $this->pattern = $pattern;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPattern()
-    {
-        return $this->pattern;
+        $this->list = (bool)$flag;
     }
 
     /**

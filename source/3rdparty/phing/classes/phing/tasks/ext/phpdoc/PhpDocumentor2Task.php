@@ -36,7 +36,7 @@ class PhpDocumentor2Task extends Task
      * List of filesets
      * @var FileSet[]
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Destination/target directory
@@ -89,8 +89,8 @@ class PhpDocumentor2Task extends Task
     }
 
     /**
-     * Convenience setter (@see setDestDir)
-     * @param PhingFile $output
+     * Convenience setter (@param PhingFile $output
+     * @see setDestDir)
      */
     public function setOutput(PhingFile $output)
     {
@@ -103,7 +103,7 @@ class PhpDocumentor2Task extends Task
      */
     public function setTemplate($template)
     {
-        $this->template = (string) $template;
+        $this->template = (string)$template;
     }
 
     /**
@@ -112,7 +112,7 @@ class PhpDocumentor2Task extends Task
      */
     public function setTitle($title)
     {
-        $this->title = (string) $title;
+        $this->title = (string)$title;
     }
 
     /**
@@ -121,7 +121,7 @@ class PhpDocumentor2Task extends Task
      */
     public function setDefaultPackageName($defaultPackageName)
     {
-        $this->defaultPackageName = (string) $defaultPackageName;
+        $this->defaultPackageName = (string)$defaultPackageName;
     }
 
     /**
@@ -134,8 +134,8 @@ class PhpDocumentor2Task extends Task
 
     /**
      * Forces phpDocumentor to be quiet
-     * @deprecated
      * @param boolean $quiet
+     * @deprecated
      */
     public function setQuiet($quiet)
     {

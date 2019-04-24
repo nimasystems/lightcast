@@ -92,7 +92,7 @@ abstract class lcComponent extends lcBaseController
                 'context_name' => $controller->getContextName(),
                 'context_type' => $controller->getContextType(),
                 'translation_context_name' => $controller->getTranslationContextName(),
-                'translation_context_type' => $controller->getTranslationContextType()
+                'translation_context_type' => $controller->getTranslationContextType(),
             ]));
 
             // render the view
@@ -104,7 +104,7 @@ abstract class lcComponent extends lcBaseController
                 'context_type' => $controller->getContextType(),
                 'context_name' => $controller->getContextName(),
                 'translation_context_name' => $controller->getTranslationContextName(),
-                'translation_context_type' => $controller->getTranslationContextType()
+                'translation_context_type' => $controller->getTranslationContextType(),
             ]), $output);
 
             $output = $event->getReturnValue();
@@ -116,7 +116,7 @@ abstract class lcComponent extends lcBaseController
 
         $ret = [
             'content_type' => $content_type,
-            'content' => $output
+            'content' => $output,
         ];
 
         return $ret;

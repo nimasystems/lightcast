@@ -28,7 +28,7 @@ class DocBlox_Parallel_Worker
     protected $task = null;
 
     /** @var mixed[] A list of argument to pass to the task */
-    protected $arguments = array();
+    protected $arguments = [];
 
     /** @var int The return code to tell the parent process how it went */
     protected $return_code = -1;
@@ -43,37 +43,13 @@ class DocBlox_Parallel_Worker
      * Creates the worker and sets the task to execute optionally including
      * the arguments that need to be passed to the task.
      *
-     * @param callback $task      The task to invoke upon execution.
-     * @param mixed[]  $arguments The arguments to provide to the task.
+     * @param callback $task The task to invoke upon execution.
+     * @param mixed[] $arguments The arguments to provide to the task.
      */
-    public function __construct($task, array $arguments = array())
+    public function __construct($task, array $arguments = [])
     {
         $this->setTask($task);
         $this->arguments = $arguments;
-    }
-
-    /**
-     * Returns the list of arguments as provided in the constructor.
-     *
-     * @see DocBlox_Parallel_Worker::__construct()
-     *
-     * @return mixed[]
-     */
-    public function getArguments()
-    {
-        return $this->arguments;
-    }
-
-    /**
-     * Returns the task as provided in the constructor.
-     *
-     * @see DocBlox_Parallel_Worker::__construct()
-     *
-     * @return callback
-     */
-    public function getTask()
-    {
-        return $this->task;
     }
 
     /**
@@ -178,17 +154,29 @@ class DocBlox_Parallel_Worker
     }
 
     /**
+     * Returns the task as provided in the constructor.
+     *
+     * @return callback
+     * @see DocBlox_Parallel_Worker::__construct()
+     *
+     */
+    public function getTask()
+    {
+        return $this->task;
+    }
+
+    /**
      * Sets the task for this worker and validates whether it is callable.
      *
      * @param callback $task The task to execute when the execute method
      *                       is invoked.
      *
+     * @return void
      * @throws InvalidArgumentException if the given argument is not a callback.
      *
-     * @see DocBlox_Parallel_Worker::__construct()
      * @see DocBlox_Parallel_Worker::execute()
      *
-     * @return void
+     * @see DocBlox_Parallel_Worker::__construct()
      */
     protected function setTask($task)
     {
@@ -199,5 +187,17 @@ class DocBlox_Parallel_Worker
         }
 
         $this->task = $task;
+    }
+
+    /**
+     * Returns the list of arguments as provided in the constructor.
+     *
+     * @return mixed[]
+     * @see DocBlox_Parallel_Worker::__construct()
+     *
+     */
+    public function getArguments()
+    {
+        return $this->arguments;
     }
 }

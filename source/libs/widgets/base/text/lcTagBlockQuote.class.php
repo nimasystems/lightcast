@@ -33,15 +33,15 @@ class lcTagBlockQuote extends lcHtmlTag
         $this->setCite($cite);
     }
 
-    public static function create()
-    {
-        return new lcTagBlockQuote();
-    }
-
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagBlockQuote();
     }
 
     public static function getRequiredAttributes()

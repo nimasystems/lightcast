@@ -28,9 +28,8 @@ include_once 'phing/BuildEvent.php';
  */
 class ProfileLogger extends DefaultLogger
 {
-    private $profileData = array();
-
     protected static $dateFormat = DATE_RFC2822;
+    private $profileData = [];
 
     /**
      * Logs a message to say that the target has started.
@@ -50,6 +49,12 @@ class ProfileLogger extends DefaultLogger
         $this->profileData[] = $now;
     }
 
+    private function logStart(BuildEvent $event, $start, $name)
+    {
+        $msg = Phing::getProperty("line.separator") . $name . ": started " . date(self::$dateFormat, $start);
+        $this->printMessage($msg, $this->out, $event->getPriority());
+    }
+
     /**
      * Logs a message to say that the target has finished.
      *
@@ -63,6 +68,22 @@ class ProfileLogger extends DefaultLogger
 
         $name = "Target " . $event->getTarget()->getName();
         $this->logFinish($event, $start, $name);
+    }
+
+    private function logFinish(BuildEvent $event, $start, $name)
+    {
+        $msg = null;
+        if ($start != null) {
+            $diff = self::formatTime(Phing::currentTimeMillis() - $start);
+            $msg = Phing::getProperty("line.separator") . $name . ": finished "
+                . date(self::$dateFormat, time()) . " ("
+                . $diff
+                . ")";
+        } else {
+            $msg = Phing::getProperty("line.separator") . $name . ": finished " . date(self::$dateFormat, time())
+                . " (unknown duration, start not detected)";
+        }
+        $this->printMessage($msg, $this->out, $event->getPriority());
     }
 
     /**
@@ -93,27 +114,5 @@ class ProfileLogger extends DefaultLogger
 
         $name = $event->getTask()->getTaskName();
         $this->logFinish($event, $start, $name);
-    }
-
-    private function logFinish(BuildEvent $event, $start, $name)
-    {
-        $msg = null;
-        if ($start != null) {
-            $diff = self::formatTime(Phing::currentTimeMillis() - $start);
-            $msg = Phing::getProperty("line.separator") . $name . ": finished "
-                . date(self::$dateFormat, time()) . " ("
-                . $diff
-                . ")";
-        } else {
-            $msg = Phing::getProperty("line.separator") . $name . ": finished " . date(self::$dateFormat, time())
-                . " (unknown duration, start not detected)";
-        }
-        $this->printMessage($msg, $this->out, $event->getPriority());
-    }
-
-    private function logStart(BuildEvent $event, $start, $name)
-    {
-        $msg = Phing::getProperty("line.separator") . $name . ": started " . date(self::$dateFormat, $start);
-        $this->printMessage($msg, $this->out, $event->getPriority());
     }
 }

@@ -136,6 +136,11 @@ abstract class lcBaseCollection extends lcObj
      * Manage Position of List
     */
 
+    public function key()
+    {
+        return $this->list->key();
+    }
+
     public function count()
     {
         return $this->list->count();
@@ -177,6 +182,12 @@ abstract class lcBaseCollection extends lcObj
         return $out;
     }
 
+    public function clear()
+    {
+        $spl = self::SPL_OBJECT_NAME;
+        $this->list = new $spl;
+    }
+
     protected function appendColl($value)
     {
         $this->list->append($value);
@@ -192,6 +203,10 @@ abstract class lcBaseCollection extends lcObj
         $this->list->offsetUnset($index);
     }
 
+    /*
+     * Sorting functions
+    */
+
     protected function setColl($value, $offset = null)
     {
         $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
@@ -200,21 +215,6 @@ abstract class lcBaseCollection extends lcObj
     protected function delete($offset = null)
     {
         $this->list->offsetUnset($offset ? $offset : $this->key());
-    }
-
-    /*
-     * Sorting functions
-    */
-
-    public function key()
-    {
-        return $this->list->key();
-    }
-
-    public function clear()
-    {
-        $spl = self::SPL_OBJECT_NAME;
-        $this->list = new $spl;
     }
 
     protected function asort()

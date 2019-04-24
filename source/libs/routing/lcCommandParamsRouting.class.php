@@ -50,7 +50,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
 
         // allow others to be notified when base routes have been loaded
         $this->event_dispatcher->notify(new lcEvent('router.load_configuration', $this, [
-            'context' => $this->context
+            'context' => $this->context,
         ]));
 
         // try to detect the parameters from request
@@ -82,7 +82,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
                 // module
                 $compiled_params['module'] = (string)$param;
                 continue;
-            } elseif ($i == 2 && !strstr($param, '--')) {
+            } else if ($i == 2 && !strstr($param, '--')) {
                 // action
                 $compiled_params['action'] = (string)$param;
                 continue;
@@ -140,7 +140,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         $this->event_dispatcher->notify(new lcEvent('router.detect_parameters', $this, [
             'params' => $compiled_params,
             'default_module' => $this->default_module,
-            'default_action' => $this->default_action
+            'default_action' => $this->default_action,
         ]));
     }
 
@@ -156,7 +156,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         $debug_parent = (array)parent::getDebugInfo();
 
         $debug = [
-            'detected_params' => $this->detected_params
+            'detected_params' => $this->detected_params,
         ];
 
         $debug = array_merge($debug_parent, $debug);

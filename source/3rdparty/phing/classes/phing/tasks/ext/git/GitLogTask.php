@@ -154,14 +154,6 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $stat
-     */
-    public function setStat($stat)
-    {
-        $this->stat = $stat;
-    }
-
-    /**
      * @return bool|string
      */
     public function getStat()
@@ -170,11 +162,91 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @param $stat
      */
-    public function setNameStatus($flag)
+    public function setStat($stat)
     {
-        $this->nameStatus = (boolean) $flag;
+        $this->stat = $stat;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormat()
+    {
+        return $this->format;
+    }
+
+    /**
+     * @param $format
+     */
+    public function setFormat($format)
+    {
+        $this->format = $format;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxCount()
+    {
+        return $this->maxCount;
+    }
+
+    /**
+     * @param $count
+     */
+    public function setMaxCount($count)
+    {
+        $this->maxCount = (int)$count;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    /**
+     * @param $date
+     */
+    public function setDate($date)
+    {
+        $this->date = $date;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSince()
+    {
+        return $this->sinceCommit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUntil()
+    {
+        return $this->untilCommit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaths()
+    {
+        return $this->paths;
+    }
+
+    /**
+     * @param $paths
+     */
+    public function setPaths($paths)
+    {
+        $this->paths = $paths;
     }
 
     /**
@@ -194,27 +266,11 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $count
-     */
-    public function setMaxCount($count)
-    {
-        $this->maxCount = (int) $count;
-    }
-
-    /**
-     * @return int
-     */
-    public function getMaxCount()
-    {
-        return $this->maxCount;
-    }
-
-    /**
      * @param $flag
      */
-    public function setNoMerges($flag)
+    public function setNameStatus($flag)
     {
-        $this->noMerges = (bool) $flag;
+        $this->nameStatus = (boolean)$flag;
     }
 
     /**
@@ -234,51 +290,11 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $format
+     * @param $flag
      */
-    public function setFormat($format)
+    public function setNoMerges($flag)
     {
-        $this->format = $format;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFormat()
-    {
-        return $this->format;
-    }
-
-    /**
-     * @param $date
-     */
-    public function setDate($date)
-    {
-        $this->date = $date;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDate()
-    {
-        return $this->date;
-    }
-
-    /**
-     * @param $since
-     */
-    public function setSince($since)
-    {
-        $this->sinceCommit = $since;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSince()
-    {
-        return $this->sinceCommit;
+        $this->noMerges = (bool)$flag;
     }
 
     /**
@@ -290,19 +306,11 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $until
+     * @param $since
      */
-    public function setUntil($until)
+    public function setSince($since)
     {
-        $this->untilCommit = $until;
-    }
-
-    /**
-     * @return string
-     */
-    public function getUntil()
-    {
-        return $this->untilCommit;
+        $this->sinceCommit = $since;
     }
 
     /**
@@ -314,19 +322,11 @@ class GitLogTask extends GitBaseTask
     }
 
     /**
-     * @param $paths
+     * @param $until
      */
-    public function setPaths($paths)
+    public function setUntil($until)
     {
-        $this->paths = $paths;
-    }
-
-    /**
-     * @return string
-     */
-    public function getPaths()
-    {
-        return $this->paths;
+        $this->untilCommit = $until;
     }
 
     /**

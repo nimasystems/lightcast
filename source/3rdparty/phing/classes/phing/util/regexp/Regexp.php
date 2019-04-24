@@ -32,7 +32,7 @@ class Regexp
      * Matching groups found.
      * @var array
      */
-    private $groups = array();
+    private $groups = [];
 
     /**
      * Pattern to match.
@@ -68,16 +68,6 @@ class Regexp
     }
 
     /**
-     * Sets pattern to use for matching.
-     * @param  string $pat The pattern to match on.
-     * @return void
-     */
-    public function setPattern($pat)
-    {
-        $this->pattern = (string) $pat;
-    }
-
-    /**
      * Gets pattern to use for matching.
      * @return string The pattern to match on.
      */
@@ -87,13 +77,13 @@ class Regexp
     }
 
     /**
-     * Sets replacement string.
-     * @param  string $rep The pattern to replace matches with.
+     * Sets pattern to use for matching.
+     * @param string $pat The pattern to match on.
      * @return void
      */
-    public function setReplace($rep)
+    public function setPattern($pat)
     {
-        $this->replace = (string) $rep;
+        $this->pattern = (string)$pat;
     }
 
     /**
@@ -106,10 +96,20 @@ class Regexp
     }
 
     /**
+     * Sets replacement string.
+     * @param string $rep The pattern to replace matches with.
+     * @return void
+     */
+    public function setReplace($rep)
+    {
+        $this->replace = (string)$rep;
+    }
+
+    /**
      * Performs match of specified pattern against $subject.
-     * @param  string $subject The subject, on which to perform matches.
-     * @throws Exception
+     * @param string $subject The subject, on which to perform matches.
      * @return boolean Whether or not pattern matches subject string passed.
+     * @throws Exception
      */
     public function matches($subject)
     {
@@ -122,9 +122,9 @@ class Regexp
 
     /**
      * Performs replacement of specified pattern and replacement strings.
-     * @param  string $subject Text on which to perform replacement.
-     * @throws Exception
+     * @param string $subject Text on which to perform replacement.
      * @return string subject after replacement has been performed.
+     * @throws Exception
      */
     public function replace($subject)
     {
@@ -146,7 +146,7 @@ class Regexp
 
     /**
      * Get specific matched group.
-     * @param  integer $idx
+     * @param integer $idx
      * @return string  specified group or NULL if group is not set.
      */
     public function getGroup($idx)
@@ -161,7 +161,7 @@ class Regexp
     /**
      * Sets pattern modifiers for regex engine
      *
-     * @param  string $mods Modifiers to be applied to a given regex
+     * @param string $mods Modifiers to be applied to a given regex
      * @return void
      */
     public function setModifiers($mods)

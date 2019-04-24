@@ -64,52 +64,6 @@ abstract class GitBaseTask extends Task
     }
 
     /**
-     * Set repository directory
-     *
-     * @param  string      $repository Repo directory
-     * @return GitBaseTask
-     */
-    public function setRepository($repository)
-    {
-        $this->repository = $repository;
-
-        return $this;
-    }
-
-    /**
-     * Get repository directory
-     *
-     * @return string
-     */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * Set path to git executable
-     *
-     * @param  string      $gitPath New path to git repository
-     * @return GitBaseTask
-     */
-    public function setGitPath($gitPath)
-    {
-        $this->gitPath = $gitPath;
-
-        return $this;
-    }
-
-    /**
-     * Get path to git executable
-     *
-     * @return string
-     */
-    public function getGitPath()
-    {
-        return $this->gitPath;
-    }
-
-    /**
      * @param bool $reset
      * @param null $repository
      * @return null|VersionControl_Git
@@ -135,5 +89,51 @@ abstract class GitBaseTask extends Task
         $this->gitClient->setGitCommandPath($this->getGitPath());
 
         return $this->gitClient;
+    }
+
+    /**
+     * Get repository directory
+     *
+     * @return string
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * Set repository directory
+     *
+     * @param string $repository Repo directory
+     * @return GitBaseTask
+     */
+    public function setRepository($repository)
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * Get path to git executable
+     *
+     * @return string
+     */
+    public function getGitPath()
+    {
+        return $this->gitPath;
+    }
+
+    /**
+     * Set path to git executable
+     *
+     * @param string $gitPath New path to git repository
+     * @return GitBaseTask
+     */
+    public function setGitPath($gitPath)
+    {
+        $this->gitPath = $gitPath;
+
+        return $this;
     }
 }

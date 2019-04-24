@@ -53,6 +53,16 @@ class IniFileSet
     protected $operation = null;
 
     /**
+     * Get Operation
+     *
+     * @return void
+     */
+    public function getOperation()
+    {
+        return $this->operation;
+    }
+
+    /**
      * Set Operation
      *
      * @param string $operation +/-
@@ -65,25 +75,13 @@ class IniFileSet
     }
 
     /**
-     * Get Operation
+     * Get Property
      *
-     * @return void
+     * @return string
      */
-    public function getOperation()
+    public function getProperty()
     {
-        return $this->operation;
-    }
-
-    /**
-     * Set Section name
-     *
-     * @param string $section Name of section in ini file
-     *
-     * @return void
-     */
-    public function setSection($section)
-    {
-        $this->section = trim($section);
+        return $this->property;
     }
 
     /**
@@ -99,6 +97,16 @@ class IniFileSet
     }
 
     /**
+     * Get Value
+     *
+     * @return string
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    /**
      * Set Value
      *
      * @param string $value Value to set for key in ini file
@@ -111,25 +119,6 @@ class IniFileSet
     }
 
     /**
-     * Get Property
-     *
-     * @return string
-     */
-    public function getProperty()
-    {
-        return $this->property;
-    }
-
-    /**
-     * Get Value
-     *
-     * @return string
-     */
-    public function getValue()
-    {
-        return $this->value;
-    }
-    /**
      * Get Section
      *
      * @return string
@@ -137,5 +126,17 @@ class IniFileSet
     public function getSection()
     {
         return $this->section;
+    }
+
+    /**
+     * Set Section name
+     *
+     * @param string $section Name of section in ini file
+     *
+     * @return void
+     */
+    public function setSection($section)
+    {
+        $this->section = trim($section);
     }
 }

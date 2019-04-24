@@ -10,7 +10,7 @@ all:
     htmldoc: /usr/bin/htmldoc
   plugins:
     locations:
-    - addons/plugins
+      - addons/plugins
   exceptions:
     module: ~
     action: ~
@@ -23,5 +23,5 @@ all:
     default_lifetime: 3600
     namespace: project_namespace
     servers:
-    - 127.0.0.1:11211
+      - 127.0.0.1:11211
 ...

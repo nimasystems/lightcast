@@ -21,6 +21,7 @@
 
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
+
 /**
  * Wrapper around git-checkout
  *
@@ -76,11 +77,11 @@ class GitCheckoutTask extends GitBaseTask
      * create, forceCreate, merge
      * @var array
      */
-    private $extraOptions = array(
+    private $extraOptions = [
         'b' => false,
         'B' => false,
         'm' => false,
-    );
+    ];
 
     /**
      * The main entry point for the task
@@ -129,14 +130,6 @@ class GitCheckoutTask extends GitBaseTask
     }
 
     /**
-     * @param $branchname
-     */
-    public function setBranchname($branchname)
-    {
-        $this->branchname = $branchname;
-    }
-
-    /**
      * @return string
      */
     public function getBranchname()
@@ -145,91 +138,27 @@ class GitCheckoutTask extends GitBaseTask
     }
 
     /**
-     * @param $startPoint
+     * @param $branchname
      */
-    public function setStartPoint($startPoint)
+    public function setBranchname($branchname)
     {
-        $this->startPoint = $startPoint;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStartPoint()
-    {
-        return $this->startPoint;
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setForce($flag)
-    {
-        $this->force = $flag;
+        $this->branchname = $branchname;
     }
 
     /**
      * @return bool
      */
-    public function getForce()
+    public function isNoTrack()
     {
-        return $this->force;
+        return $this->getNoTrack();
     }
 
     /**
      * @return bool
      */
-    public function isForce()
+    public function getNoTrack()
     {
-        return $this->getForce();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setQuiet($flag)
-    {
-        $this->quiet = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getQuiet()
-    {
-        return $this->quiet;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isQuiet()
-    {
-        return $this->getQuiet();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setTrack($flag)
-    {
-        $this->track = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getTrack()
-    {
-        return $this->track;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isTrack()
-    {
-        return $this->getTrack();
+        return $this->noTrack;
     }
 
     /**
@@ -243,17 +172,122 @@ class GitCheckoutTask extends GitBaseTask
     /**
      * @return bool
      */
-    public function getNoTrack()
+    public function isQuiet()
     {
-        return $this->noTrack;
+        return $this->getQuiet();
     }
 
     /**
      * @return bool
      */
-    public function isNoTrack()
+    public function getQuiet()
     {
-        return $this->getNoTrack();
+        return $this->quiet;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setQuiet($flag)
+    {
+        $this->quiet = $flag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForce()
+    {
+        return $this->getForce();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getForce()
+    {
+        return $this->force;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setForce($flag)
+    {
+        $this->force = $flag;
+    }
+
+    public function isCreate()
+    {
+        return $this->getCreate();
+    }
+
+    public function getCreate()
+    {
+        return $this->extraOptions['b'];
+    }
+
+    public function isForceCreate()
+    {
+        return $this->getForceCreate();
+    }
+
+    public function getForceCreate()
+    {
+        return $this->extraOptions['B'];
+    }
+
+    public function isMerge()
+    {
+        return $this->getMerge();
+    }
+
+    public function getMerge()
+    {
+        return $this->extraOptions['m'];
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTrack()
+    {
+        return $this->getTrack();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrack()
+    {
+        return $this->track;
+    }
+
+    // -B flag is not found in all versions of git
+    // --force is present everywhere
+
+    /**
+     * @param $flag
+     */
+    public function setTrack($flag)
+    {
+        $this->track = $flag;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStartPoint()
+    {
+        return $this->startPoint;
+    }
+
+    /**
+     * @param $startPoint
+     */
+    public function setStartPoint($startPoint)
+    {
+        $this->startPoint = $startPoint;
     }
 
     /**
@@ -264,18 +298,6 @@ class GitCheckoutTask extends GitBaseTask
         $this->extraOptions['b'] = $flag;
     }
 
-    public function getCreate()
-    {
-        return $this->extraOptions['b'];
-    }
-
-    public function isCreate()
-    {
-        return $this->getCreate();
-    }
-
-    // -B flag is not found in all versions of git
-    // --force is present everywhere
     /**
      * @param $flag
      */
@@ -284,31 +306,11 @@ class GitCheckoutTask extends GitBaseTask
         $this->setForce($flag);
     }
 
-    public function getForceCreate()
-    {
-        return $this->extraOptions['B'];
-    }
-
-    public function isForceCreate()
-    {
-        return $this->getForceCreate();
-    }
-
     /**
      * @param $flag
      */
     public function setMerge($flag)
     {
         $this->extraOptions['m'] = $flag;
-    }
-
-    public function getMerge()
-    {
-        return $this->extraOptions['m'];
-    }
-
-    public function isMerge()
-    {
-        return $this->getMerge();
     }
 }

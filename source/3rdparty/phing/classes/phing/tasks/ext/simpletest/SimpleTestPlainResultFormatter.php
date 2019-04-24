@@ -94,16 +94,6 @@ class SimpleTestPlainResultFormatter extends SimpleTestResultFormatter
     }
 
     /**
-     * @param string $message
-     */
-    public function paintFail($message)
-    {
-        parent::paintFail($message);
-
-        $this->formatError("FAILED", $message);
-    }
-
-    /**
      * @param $type
      * @param $message
      */
@@ -111,5 +101,15 @@ class SimpleTestPlainResultFormatter extends SimpleTestResultFormatter
     {
         $this->inner .= $this->getTestName() . " " . $type . "\n";
         $this->inner .= $message . "\n";
+    }
+
+    /**
+     * @param string $message
+     */
+    public function paintFail($message)
+    {
+        parent::paintFail($message);
+
+        $this->formatError("FAILED", $message);
     }
 }

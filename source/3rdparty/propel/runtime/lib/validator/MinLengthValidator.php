@@ -26,12 +26,12 @@
 class MinLengthValidator implements BasicValidator
 {
     /**
-     * @see       BasicValidator::isValid()
-     *
      * @param ValidatorMap $map
-     * @param string       $str
+     * @param string $str
      *
      * @return boolean
+     * @see       BasicValidator::isValid()
+     *
      */
     public function isValid(ValidatorMap $map, $str)
     {

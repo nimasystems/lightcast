@@ -41,6 +41,17 @@ abstract class BaseExtendSelector extends BaseSelector implements ExtendFileSele
     protected $parameters = null;
 
     /**
+     * Allows access to the parameters gathered and set within the
+     * &lt;custom&gt; tag.
+     *
+     * @return array the set of parameters defined for this selector
+     */
+    protected function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
      * Set all the Parameters for this custom selector, collected by
      * the ExtendSelector class.
      *
@@ -50,16 +61,5 @@ abstract class BaseExtendSelector extends BaseSelector implements ExtendFileSele
     public function setParameters($parameters)
     {
         $this->parameters = $parameters;
-    }
-
-    /**
-     * Allows access to the parameters gathered and set within the
-     * &lt;custom&gt; tag.
-     *
-     * @return array the set of parameters defined for this selector
-     */
-    protected function getParameters()
-    {
-        return $this->parameters;
     }
 }

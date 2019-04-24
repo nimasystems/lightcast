@@ -53,11 +53,6 @@ class lcTagForm extends lcHtmlTag
         }
     }
 
-    public static function create()
-    {
-        return new lcTagForm();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -96,6 +91,11 @@ class lcTagForm extends lcHtmlTag
     {
         $this->setAttribute('accept-charset', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagForm();
     }
 
     public static function getRequiredAttributes()

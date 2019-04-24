@@ -45,7 +45,7 @@ class PHPCPDTask extends Task
      *
      * @var FileSet[]
      */
-    protected $filesets = array();
+    protected $filesets = [];
 
     /**
      * Minimum number of identical lines.
@@ -73,14 +73,14 @@ class PHPCPDTask extends Task
      *
      * @var array
      */
-    protected $allowedFileExtensions = array('php');
+    protected $allowedFileExtensions = ['php'];
 
     /**
      * List of exclude directory patterns.
      *
      * @var array
      */
-    protected $ignorePatterns = array('.git', '.svn', 'CVS', '.bzr', '.hg');
+    protected $ignorePatterns = ['.git', '.svn', 'CVS', '.bzr', '.hg'];
 
     /**
      * The format for the report
@@ -94,7 +94,7 @@ class PHPCPDTask extends Task
      *
      * @var PHPCPDFormatterElement[]
      */
-    protected $formatters = array();
+    protected $formatters = [];
 
     /**
      * @var bool
@@ -163,7 +163,7 @@ class PHPCPDTask extends Task
      */
     public function setAllowedFileExtensions($fileExtensions)
     {
-        $this->allowedFileExtensions = array();
+        $this->allowedFileExtensions = [];
 
         $token = ' ,;';
         $ext = strtok($fileExtensions, $token);
@@ -181,7 +181,7 @@ class PHPCPDTask extends Task
      */
     public function setIgnorePatterns($ignorePatterns)
     {
-        $this->ignorePatterns = array();
+        $this->ignorePatterns = [];
 
         $token = ' ,;';
         $pattern = strtok($ignorePatterns, $token);
@@ -220,6 +220,77 @@ class PHPCPDTask extends Task
     public function setPharLocation($pharLocation)
     {
         $this->pharLocation = $pharLocation;
+    }
+
+    /**
+     * Executes PHPCPD against PhingFile or a FileSet
+     *
+     * @throws BuildException
+     */
+    public function main()
+    {
+        $this->loadDependencies();
+
+        if (!isset($this->file) && count($this->filesets) == 0) {
+            throw new BuildException('Missing either a nested fileset or attribute "file" set');
+        }
+
+        if (count($this->formatters) == 0) {
+            // turn legacy format attribute into formatter
+            $fmt = new PHPCPDFormatterElement($this);
+            $fmt->setType($this->format);
+            $fmt->setUseFile(false);
+
+            $this->formatters[] = $fmt;
+        }
+
+        $this->validateFormatters();
+
+        $filesToParse = [];
+
+        if ($this->file instanceof PhingFile) {
+            $filesToParse[] = $this->file->getPath();
+        } else {
+            // append any files in filesets
+            foreach ($this->filesets as $fs) {
+                $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
+
+                foreach ($files as $filename) {
+                    $f = new PhingFile($fs->getDir($this->project), $filename);
+                    $filesToParse[] = $f->getAbsolutePath();
+                }
+            }
+        }
+
+        $this->log('Processing files...');
+
+        if ($this->oldVersion) {
+            $detectorClass = 'PHPCPD_Detector';
+            $strategyClass = 'PHPCPD_Detector_Strategy_Default';
+        } else {
+            $detectorClass = '\\SebastianBergmann\\PHPCPD\\Detector\\Detector';
+            $strategyClass = '\\SebastianBergmann\\PHPCPD\\Detector\\Strategy\\DefaultStrategy';
+        }
+
+        $detector = new $detectorClass(new $strategyClass());
+        $clones = $detector->copyPasteDetection(
+            $filesToParse,
+            $this->minLines,
+            $this->minTokens,
+            $this->fuzzy
+        );
+
+        $this->log('Finished copy/paste detection');
+
+        foreach ($this->formatters as $fe) {
+            $formatter = $fe->getFormatter();
+            $formatter->processClones(
+                $clones,
+                $this->project,
+                $fe->getUseFile(),
+                $fe->getOutfile()
+            );
+        }
     }
 
     /**
@@ -275,77 +346,6 @@ class Application
             'PHPCPDTask depends on PHPCPD being installed and on include_path.',
             $this->getLocation()
         );
-    }
-
-    /**
-     * Executes PHPCPD against PhingFile or a FileSet
-     *
-     * @throws BuildException
-     */
-    public function main()
-    {
-        $this->loadDependencies();
-
-        if (!isset($this->file) && count($this->filesets) == 0) {
-            throw new BuildException('Missing either a nested fileset or attribute "file" set');
-        }
-
-        if (count($this->formatters) == 0) {
-            // turn legacy format attribute into formatter
-            $fmt = new PHPCPDFormatterElement($this);
-            $fmt->setType($this->format);
-            $fmt->setUseFile(false);
-
-            $this->formatters[] = $fmt;
-        }
-
-        $this->validateFormatters();
-
-        $filesToParse = array();
-
-        if ($this->file instanceof PhingFile) {
-            $filesToParse[] = $this->file->getPath();
-        } else {
-            // append any files in filesets
-            foreach ($this->filesets as $fs) {
-                $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
-
-                foreach ($files as $filename) {
-                    $f = new PhingFile($fs->getDir($this->project), $filename);
-                    $filesToParse[] = $f->getAbsolutePath();
-                }
-            }
-        }
-
-        $this->log('Processing files...');
-
-        if ($this->oldVersion) {
-            $detectorClass = 'PHPCPD_Detector';
-            $strategyClass = 'PHPCPD_Detector_Strategy_Default';
-        } else {
-            $detectorClass = '\\SebastianBergmann\\PHPCPD\\Detector\\Detector';
-            $strategyClass = '\\SebastianBergmann\\PHPCPD\\Detector\\Strategy\\DefaultStrategy';
-        }
-
-        $detector = new $detectorClass(new $strategyClass());
-        $clones = $detector->copyPasteDetection(
-            $filesToParse,
-            $this->minLines,
-            $this->minTokens,
-            $this->fuzzy
-        );
-
-        $this->log('Finished copy/paste detection');
-
-        foreach ($this->formatters as $fe) {
-            $formatter = $fe->getFormatter();
-            $formatter->processClones(
-                $clones,
-                $this->project,
-                $fe->getUseFile(),
-                $fe->getOutfile()
-            );
-        }
     }
 
     /**

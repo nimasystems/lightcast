@@ -53,9 +53,9 @@ class OsCondition implements Condition
         if ($this->family !== null) {
             if ($this->family === "windows") {
                 return StringHelper::startsWith("win", $osName);
-            } elseif ($this->family === "mac") {
+            } else if ($this->family === "mac") {
                 return (strpos($osName, "mac") !== false || strpos($osName, "darwin") !== false);
-            } elseif ($this->family === ("unix")) {
+            } else if ($this->family === ("unix")) {
                 return (
                     StringHelper::endsWith("ix", $osName) ||
                     StringHelper::endsWith("ux", $osName) ||

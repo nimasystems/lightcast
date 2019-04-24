@@ -23,12 +23,12 @@ require_once dirname(__FILE__) . '/Pluralizer.php';
  */
 class StandardEnglishPluralizer implements Pluralizer
 {
-    protected $_plural = array(
+    protected $_plural = [
         '(matr|vert|ind)(ix|ex)' => '\1ices',
         '(alumn|bacill|cact|foc|fung|nucle|radi|stimul|syllab|termin|vir)us' => '\1i',
         '(buffal|tomat)o' => '\1oes',
 
-        'x'  => 'xes',
+        'x' => 'xes',
         'ch' => 'ches',
         'sh' => 'shes',
         'ss' => 'sses',
@@ -38,14 +38,14 @@ class StandardEnglishPluralizer implements Pluralizer
         'iy' => 'iys',
         'oy' => 'oys',
         'uy' => 'uys',
-        'y'  => 'ies',
+        'y' => 'ies',
 
         'ao' => 'aos',
         'eo' => 'eos',
         'io' => 'ios',
         'oo' => 'oos',
         'uo' => 'uos',
-        'o'  => 'os',
+        'o' => 'os',
 
         'us' => 'uses',
 
@@ -56,46 +56,46 @@ class StandardEnglishPluralizer implements Pluralizer
         'zoon' => 'zoa',
 
         'itis' => 'itis',
-        'ois'  => 'ois',
-        'pox'  => 'pox',
-        'ox'   => 'oxes',
+        'ois' => 'ois',
+        'pox' => 'pox',
+        'ox' => 'oxes',
 
-        'foot'  => 'feet',
+        'foot' => 'feet',
         'goose' => 'geese',
         'tooth' => 'teeth',
         'quiz' => 'quizzes',
         'alias' => 'aliases',
 
-        'alf'  => 'alves',
-        'elf'  => 'elves',
-        'olf'  => 'olves',
-        'arf'  => 'arves',
+        'alf' => 'alves',
+        'elf' => 'elves',
+        'olf' => 'olves',
+        'arf' => 'arves',
         'nife' => 'nives',
-        'life' => 'lives'
-    );
+        'life' => 'lives',
+    ];
 
-    protected $_irregular = array(
-        'leaf'   => 'leaves',
-        'loaf'   => 'loaves',
-        'move'   => 'moves',
-        'foot'   => 'feet',
-        'goose'  => 'geese',
-        'genus'  => 'genera',
-        'sex'    => 'sexes',
-        'ox'     => 'oxen',
-        'child'  => 'children',
-        'man'    => 'men',
-        'tooth'  => 'teeth',
+    protected $_irregular = [
+        'leaf' => 'leaves',
+        'loaf' => 'loaves',
+        'move' => 'moves',
+        'foot' => 'feet',
+        'goose' => 'geese',
+        'genus' => 'genera',
+        'sex' => 'sexes',
+        'ox' => 'oxen',
+        'child' => 'children',
+        'man' => 'men',
+        'tooth' => 'teeth',
         'person' => 'people',
-        'wife'   => 'wives',
+        'wife' => 'wives',
         'mythos' => 'mythoi',
         'testis' => 'testes',
-        'numen'  => 'numina',
+        'numen' => 'numina',
         'quiz' => 'quizzes',
         'alias' => 'aliases',
-    );
+    ];
 
-    private $_uncountable = array(
+    private $_uncountable = [
         'sheep',
         'fish',
         'deer',
@@ -107,7 +107,7 @@ class StandardEnglishPluralizer implements Pluralizer
         'equipment',
         'news',
         'people',
-    );
+    ];
 
     /**
      * Generate a plural name based on the passed in root.

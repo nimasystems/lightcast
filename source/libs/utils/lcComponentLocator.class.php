@@ -95,7 +95,7 @@ class lcComponentLocator
             'name' => $plugin_name,
             'path' => $path,
             'filename' => $plugin_name . '.php',
-            'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false)
+            'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false),
         ];
         return $ret;
     }
@@ -139,7 +139,7 @@ class lcComponentLocator
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.class.php',
-            'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+            'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
         ];
         return $ret;
     }
@@ -183,7 +183,7 @@ class lcComponentLocator
             'name' => $form_name,
             'path' => $path,
             'filename' => $form_name . '.php',
-            'class' => lcInflector::camelize($form_name, false) . 'Form'
+            'class' => lcInflector::camelize($form_name, false) . 'Form',
         ];
         return $ret;
     }
@@ -227,7 +227,7 @@ class lcComponentLocator
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+            'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
         ];
         return $ret;
     }
@@ -280,7 +280,7 @@ class lcComponentLocator
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+            'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
         ];
         return $ret;
     }
@@ -333,7 +333,7 @@ class lcComponentLocator
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::TASK_CLASS_PREFIX . lcInflector::camelize($controller_name, false)
+            'class' => self::TASK_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
         ];
         return $ret;
     }

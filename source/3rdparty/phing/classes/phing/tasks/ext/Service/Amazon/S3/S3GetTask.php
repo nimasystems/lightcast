@@ -50,30 +50,29 @@ class S3GetTask extends Service_Amazon_S3
      */
     protected $_object = null;
 
-    /**
-     * @param $object
-     * @throws BuildException
-     */
-    public function setObject($object)
+    public function execute()
     {
-        if (empty($object) || !is_string($object)) {
-            throw new BuildException('Object must be a non-empty string');
+        $target = $this->getTarget();
+
+        // Use the object name as the target if the current target is a directory
+        if (is_dir($target)) {
+            $target = rtrim($target, '/') . '/' . $this->getObject();
         }
 
-        $this->_object = $object;
+        file_put_contents($target, $this->getObjectContents($this->getObject()));
     }
 
     /**
      * @return mixed
      * @throws BuildException
      */
-    public function getObject()
+    public function getTarget()
     {
-        if ($this->_object === null) {
-            throw new BuildException('Object is not set');
+        if ($this->_target === null) {
+            throw new BuildException('Target is not set');
         }
 
-        return $this->_object;
+        return $this->_target;
     }
 
     /**
@@ -99,24 +98,25 @@ class S3GetTask extends Service_Amazon_S3
      * @return mixed
      * @throws BuildException
      */
-    public function getTarget()
+    public function getObject()
     {
-        if ($this->_target === null) {
-            throw new BuildException('Target is not set');
+        if ($this->_object === null) {
+            throw new BuildException('Object is not set');
         }
 
-        return $this->_target;
+        return $this->_object;
     }
 
-    public function execute()
+    /**
+     * @param $object
+     * @throws BuildException
+     */
+    public function setObject($object)
     {
-        $target = $this->getTarget();
-
-        // Use the object name as the target if the current target is a directory
-        if (is_dir($target)) {
-            $target = rtrim($target, '/') . '/' . $this->getObject();
+        if (empty($object) || !is_string($object)) {
+            throw new BuildException('Object must be a non-empty string');
         }
 
-        file_put_contents($target, $this->getObjectContents($this->getObject()));
+        $this->_object = $object;
     }
 }

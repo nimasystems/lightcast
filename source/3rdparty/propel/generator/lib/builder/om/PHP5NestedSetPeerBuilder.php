@@ -23,16 +23,6 @@ class PHP5NestedSetPeerBuilder extends PeerBuilder
 {
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    /**
      * Returns the name of the current class being built.
      *
      * @return string
@@ -42,7 +32,7 @@ class PHP5NestedSetPeerBuilder extends PeerBuilder
         return $this->getBuildProperty('basePrefix') . $this->getStubObjectBuilder()->getUnprefixedClassname() . 'NestedSetPeer';
     }
 
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
@@ -52,9 +42,9 @@ class PHP5NestedSetPeerBuilder extends PeerBuilder
         $script .= "
 require '" . $this->getPeerBuilder()->getClassFilePath() . "';
 ";
-    } // addIncludes()
+    }
 
-    /**
+        /**
      * Adds class phpdoc comment and opening of class.
      *
      * @param string &$script The script will be modified in this method.
@@ -86,6 +76,16 @@ require '" . $this->getPeerBuilder()->getClassFilePath() . "';
  */
 abstract class " . $this->getClassname() . " extends " . $this->getPeerBuilder()->getClassName() . " implements NodePeer {
 ";
+    } // addIncludes()
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
     }
 
     /**
@@ -169,24 +169,12 @@ abstract class " . $this->getClassname() . " extends " . $this->getPeerBuilder()
         $this->addShiftRLRange($script);
     }
 
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
-";
-    }
-
     protected function addConstants(&$script)
     {
         $table = $this->getTable();
         $tableName = $table->getName();
 
-        $colname = array();
+        $colname = [];
 
         foreach ($table->getColumns() as $col) {
             if ($col->isNestedSetLeftKey()) {
@@ -1520,7 +1508,7 @@ abstract class " . $this->getClassname() . " extends " . $this->getPeerBuilder()
                 \$criteria->add(" . $this->getColumnConstant($col) . ", \$keys, Criteria::IN);
 ";
         } else {
-            $fields = array();
+            $fields = [];
             foreach ($table->getPrimaryKey() as $k => $col) {
                 $fields[] = $this->getColumnConstant($col);
             };
@@ -1556,7 +1544,7 @@ abstract class " . $this->getClassname() . " extends " . $this->getPeerBuilder()
             if ($col->isNestedSetLeftKey()) {
                 $script .= "
                         \$object->setLeftValue(\$row[$n]);";
-            } elseif ($col->isNestedSetRightKey()) {
+            } else if ($col->isNestedSetRightKey()) {
                 $script .= "
                         \$object->setRightValue(\$row[$n]);";
             }
@@ -1736,6 +1724,18 @@ abstract class " . $this->getClassname() . " extends " . $this->getPeerBuilder()
 
         return array('left' => \$first + \$delta, 'right' => \$last + \$delta);
     }
+";
+    }
+
+    /**
+     * Closes class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addClassClose(&$script)
+    {
+        $script .= "
+} // " . $this->getClassname() . "
 ";
     }
 } // PHP5NestedSetPeerBuilder

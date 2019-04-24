@@ -62,7 +62,7 @@ class PatchTask extends Task
      * Command line arguments for patch binary
      * @var array
      */
-    private $cmdArgs = array();
+    private $cmdArgs = [];
 
     /**
      * Halt on error return value from patch invocation.
@@ -75,7 +75,7 @@ class PatchTask extends Task
      *
      * Required.
      *
-     * @param  string         $file File containing the diff output
+     * @param string $file File containing the diff output
      * @return void
      * @throws BuildException if $file not exists
      */
@@ -92,7 +92,7 @@ class PatchTask extends Task
      *
      * Optional if it can be inferred from the diff file.
      *
-     * @param  string $file File to patch
+     * @param string $file File to patch
      * @return void
      */
     public function setOriginalFile($file)
@@ -106,7 +106,7 @@ class PatchTask extends Task
      *
      * Optional.
      *
-     * @param  string $file File to send the output to
+     * @param string $file File to send the output to
      * @return void
      */
     public function setDestFile($file)
@@ -121,7 +121,7 @@ class PatchTask extends Task
      *
      * Optional, default - false
      *
-     * @param  bool $backups If true create backups
+     * @param bool $backups If true create backups
      * @return void
      */
     public function setBackups($backups)
@@ -136,7 +136,7 @@ class PatchTask extends Task
      *
      * Default - false
      *
-     * @param  bool $ignore If true ignore whitespace differences
+     * @param bool $ignore If true ignore whitespace differences
      * @return void
      */
     public function setIgnoreWhiteSpace($ignore)
@@ -152,7 +152,7 @@ class PatchTask extends Task
      *
      * patch's <i>--strip</i> option.
      *
-     * @param  int            $num number of lines to strip
+     * @param int $num number of lines to strip
      * @return void
      * @throws BuildException if num is < 0, or other errors
      */
@@ -169,7 +169,7 @@ class PatchTask extends Task
      * Work silently unless an error occurs
      *
      * Optional, default - false
-     * @param  bool $flag If true suppress set the -s option on the patch command
+     * @param bool $flag If true suppress set the -s option on the patch command
      * @return void
      */
     public function setQuiet($flag)
@@ -184,7 +184,7 @@ class PatchTask extends Task
      *
      * Optional, default - false
      *
-     * @param  bool $flag If true set the -R option on the patch command
+     * @param bool $flag If true set the -R option on the patch command
      * @return void
      */
     public function setReverse($flag)
@@ -199,7 +199,7 @@ class PatchTask extends Task
      *
      * Defaults to the project's base directory.
      *
-     * @param  string $directory Directory to run the patch command in
+     * @param string $directory Directory to run the patch command in
      * @return void
      */
     public function setDir($directory)
@@ -210,7 +210,7 @@ class PatchTask extends Task
     /**
      * Ignore patches that seem to be reversed or already applied
      *
-     * @param  bool $flag If true set the -N (--forward) option
+     * @param bool $flag If true set the -N (--forward) option
      * @return void
      */
     public function setForward($flag)
@@ -225,7 +225,7 @@ class PatchTask extends Task
      *
      * Defaults to 0
      *
-     * @param  string $value Value of a fuzz factor
+     * @param string $value Value of a fuzz factor
      * @return void
      */
     public function setFuzz($value)
@@ -239,7 +239,7 @@ class PatchTask extends Task
      *
      * The default is "false"
      *
-     * @param  bool $value "true" if it should halt, otherwise "false"
+     * @param bool $value "true" if it should halt, otherwise "false"
      * @return void
      */
     public function setHaltOnFailure($value)

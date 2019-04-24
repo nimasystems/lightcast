@@ -44,7 +44,7 @@ class lcPageIterateCounter
             'total_rows' => 0,
             'total_pages' => 0,
             'previous_page' => 0,
-            'next_page' => 0
+            'next_page' => 0,
         ];
 
         if (!$numHits) {

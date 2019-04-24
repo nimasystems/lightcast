@@ -54,12 +54,10 @@ include_once 'phing/system/io/StringReader.php';
 class CreoleSQLExecTask extends CreoleTask
 {
 
-    private $goodSql = 0;
-    private $totalSql = 0;
-
     const DELIM_ROW = "row";
     const DELIM_NORMAL = "normal";
-
+    private $goodSql = 0;
+    private $totalSql = 0;
     /**
      * Database connection
      */
@@ -68,12 +66,12 @@ class CreoleSQLExecTask extends CreoleTask
     /**
      * files to load
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * all filterchains objects assigned to this task
      */
-    private $filterChains = array();
+    private $filterChains = [];
 
     /**
      * SQL statement
@@ -93,7 +91,7 @@ class CreoleSQLExecTask extends CreoleTask
     /**
      * SQL transactions to perform
      */
-    private $transactions = array();
+    private $transactions = [];
 
     /**
      * SQL Statement delimiter
@@ -179,17 +177,6 @@ class CreoleSQLExecTask extends CreoleTask
     }
 
     /**
-     * Add a SQL transaction to execute
-     */
-    public function createTransaction()
-    {
-        $t = new SQLExecTransaction($this);
-        $this->transactions[] = $t;
-
-        return $t;
-    }
-
-    /**
      * Set the file encoding to use on the SQL files read in
      *
      * @param the $encoding
@@ -233,7 +220,7 @@ class CreoleSQLExecTask extends CreoleTask
      */
     public function setPrint($print)
     {
-        $this->print = (boolean) $print;
+        $this->print = (boolean)$print;
     }
 
     /**
@@ -243,7 +230,7 @@ class CreoleSQLExecTask extends CreoleTask
      */
     public function setShowheaders($showheaders)
     {
-        $this->showheaders = (boolean) $showheaders;
+        $this->showheaders = (boolean)$showheaders;
     }
 
     /**
@@ -263,9 +250,8 @@ class CreoleSQLExecTask extends CreoleTask
      */
     public function setAppend($append)
     {
-        $this->append = (boolean) $append;
+        $this->append = (boolean)$append;
     }
-
 
     /**
      * Action to perform when statement fails: continue, stop, or abort
@@ -284,7 +270,7 @@ class CreoleSQLExecTask extends CreoleTask
     public function main()
     {
 
-        $savedTransaction = array();
+        $savedTransaction = [];
         for ($i = 0, $size = count($this->transactions); $i < $size; $i++) {
             $savedTransaction[] = clone $this->transactions[$i];
         }
@@ -394,6 +380,16 @@ class CreoleSQLExecTask extends CreoleTask
 
     }
 
+    /**
+     * Add a SQL transaction to execute
+     */
+    public function createTransaction()
+    {
+        $t = new SQLExecTransaction($this);
+        $this->transactions[] = $t;
+
+        return $t;
+    }
 
     /**
      * read in lines and execute them

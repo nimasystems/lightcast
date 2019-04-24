@@ -31,24 +31,24 @@
 class StringHelper
 {
     /** @var array */
-    private static $TRUE_VALUES = array("on", "true", "t", "yes");
+    private static $TRUE_VALUES = ["on", "true", "t", "yes"];
 
     /** @var array */
-    private static $FALSE_VALUES = array("off", "false", "f", "no");
+    private static $FALSE_VALUES = ["off", "false", "f", "no"];
 
     /**
      * Replaces identifier tokens with corresponding text values in passed string.
      *
-     * @param  array  $strings      Array of strings to multiply. (If string is passed, will convert to array)
-     * @param  array  $tokens       The tokens to search for.
-     * @param  array  $replacements The values with which to replace found tokens.
+     * @param array $strings Array of strings to multiply. (If string is passed, will convert to array)
+     * @param array $tokens The tokens to search for.
+     * @param array $replacements The values with which to replace found tokens.
      *
      * @return string
      */
     public static function multiply($strings, $tokens, $replacements)
     {
-        $strings = (array) $strings;
-        $results = array();
+        $strings = (array)$strings;
+        $results = [];
         foreach ($strings as $string) {
             $results[] = str_replace($tokens, $replacements, $string);
         }
@@ -89,7 +89,7 @@ class StringHelper
      */
     public static function toCharArray($str)
     {
-        $ret = array();
+        $ret = [];
         $len = strlen($str);
         for ($i = 0; $i < $len; $i++) {
             $ret[] = $str{$i};
@@ -118,8 +118,8 @@ class StringHelper
     }
 
     /**
-     * @param  array  $columns String[]
-     * @param  string $prefix
+     * @param array $columns String[]
+     * @param string $prefix
      *
      * @return array  String[]
      */
@@ -128,7 +128,7 @@ class StringHelper
         if ($prefix == null) {
             return $columns;
         }
-        $qualified = array();
+        $qualified = [];
         foreach ($columns as $key => $column) {
             $qualified[$key] = $prefix . $column;
         }
@@ -172,7 +172,7 @@ class StringHelper
         // otherwise assume it's something like "true" or "t"
         $trimmed = strtolower(trim($s));
 
-        return (boolean) in_array($trimmed, self::$TRUE_VALUES);
+        return (boolean)in_array($trimmed, self::$TRUE_VALUES);
     }
 
     /**
@@ -195,7 +195,7 @@ class StringHelper
 
         $test = trim(strtolower($s));
 
-        return (boolean) in_array($test, array_merge(self::$FALSE_VALUES, self::$TRUE_VALUES));
+        return (boolean)in_array($test, array_merge(self::$FALSE_VALUES, self::$TRUE_VALUES));
     }
 
     /**
@@ -257,7 +257,7 @@ class StringHelper
     public static function substring($string, $startpos, $endpos = -1)
     {
         $len = strlen($string);
-        $endpos = (int) (($endpos === -1) ? $len - 1 : $endpos);
+        $endpos = (int)(($endpos === -1) ? $len - 1 : $endpos);
         if ($startpos > $len - 1 || $startpos < 0) {
             trigger_error("substring(), Startindex out of bounds must be 0<n<$len", E_USER_ERROR);
         }
@@ -265,7 +265,7 @@ class StringHelper
             trigger_error("substring(), Endindex out of bounds must be $startpos<n<" . ($len - 1), E_USER_ERROR);
         }
         if ($startpos === $endpos) {
-            return (string) $string{$startpos};
+            return (string)$string{$startpos};
         } else {
             $len = $endpos - $startpos;
         }
@@ -293,7 +293,7 @@ class StringHelper
     /**
      * Extracts the variable name for a slot var in the format %{task.current_file}
      *
-     * @param  string $var The var from build file.
+     * @param string $var The var from build file.
      *
      * @return string Extracted name part.
      */

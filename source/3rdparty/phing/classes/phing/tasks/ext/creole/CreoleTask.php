@@ -44,7 +44,7 @@ abstract class CreoleTask extends Task
      *
      * NOT IMPLEMENTED YET
      */
-    private static $loaderMap = array();
+    private static $loaderMap = [];
 
     private $caching = true;
 
@@ -94,26 +94,6 @@ abstract class CreoleTask extends Task
     }
 
     /**
-     * Caching loaders / driver. This is to avoid
-     * getting an OutOfMemoryError when calling this task
-     * multiple times in a row; default: true
-     * @param bool $enable
-     */
-    public function setCaching($enable)
-    {
-        $this->caching = $enable;
-    }
-
-    /**
-     * Sets the database connection URL; required.
-     * @param string $url
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
      * Set the Creole driver to be used.
      *
      * @param string $driver driver class name
@@ -121,15 +101,6 @@ abstract class CreoleTask extends Task
     public function setDriver($driver)
     {
         $this->driver = $driver;
-    }
-
-    /**
-     * Sets the password; required.
-     * @param string $password The password to set
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
     }
 
     /**
@@ -152,6 +123,34 @@ abstract class CreoleTask extends Task
     public function setVersion($version)
     {
         $this->version = $version;
+    }
+
+    /**
+     * @param $value
+     */
+    public function isCaching($value)
+    {
+        $this->caching = $value;
+    }
+
+    /**
+     * Caching loaders / driver. This is to avoid
+     * getting an OutOfMemoryError when calling this task
+     * multiple times in a row; default: true
+     * @param bool $enable
+     */
+    public function setCaching($enable)
+    {
+        $this->caching = $enable;
+    }
+
+    /**
+     * Gets the autocommit.
+     * @return Returns a boolean
+     */
+    public function isAutocommit()
+    {
+        return $this->autocommit;
     }
 
     /**
@@ -212,23 +211,6 @@ abstract class CreoleTask extends Task
     }
 
     /**
-     * @param $value
-     */
-    public function isCaching($value)
-    {
-        $this->caching = $value;
-    }
-
-    /**
-     * Gets the autocommit.
-     * @return Returns a boolean
-     */
-    public function isAutocommit()
-    {
-        return $this->autocommit;
-    }
-
-    /**
      * Gets the url.
      *
      * @return string
@@ -236,6 +218,15 @@ abstract class CreoleTask extends Task
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Sets the database connection URL; required.
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
@@ -264,5 +255,14 @@ abstract class CreoleTask extends Task
     public function getPassword()
     {
         return $this->password;
+    }
+
+    /**
+     * Sets the password; required.
+     * @param string $password The password to set
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 }

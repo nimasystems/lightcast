@@ -133,7 +133,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
             'timeout' => $this->timeout,
             'last_request' => $this->last_request,
             'default_namespace' => self::DEFAULT_NAMESPACE,
-            'default_timeout' => self::DEFAULT_TIMEOUT
+            'default_timeout' => self::DEFAULT_TIMEOUT,
         ];
 
         $debug = array_merge($parent_debug, $debug);

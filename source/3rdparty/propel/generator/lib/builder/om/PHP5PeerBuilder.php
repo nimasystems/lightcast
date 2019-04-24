@@ -24,6 +24,32 @@ class PHP5PeerBuilder extends PeerBuilder
 {
 
     /**
+     * Returns the name of the current class being built.
+     *
+     * @return string
+     */
+    public function getUnprefixedClassname()
+    {
+        return $this->getBuildProperty('basePrefix') . $this->getStubPeerBuilder()->getUnprefixedClassname();
+    }
+
+    public function getNamespace()
+    {
+        if ($namespace = parent::getNamespace()) {
+            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
+                return $namespace . '\\' . $omns;
+            } else {
+                return $namespace;
+            }
+        }
+    }
+
+    public function getTablePhpName()
+    {
+        return ($this->getTable()->isAbstract() ? '' : $this->getStubObjectBuilder()->getClassname());
+    }
+
+    /**
      * Validates the current table to make sure that it won't
      * result in generated code that will not parse.
      *
@@ -38,7 +64,7 @@ class PHP5PeerBuilder extends PeerBuilder
         $table = $this->getTable();
 
         // Check to see if any of the column constants are PHP reserved words.
-        $colConstants = array();
+        $colConstants = [];
 
         foreach ($table->getColumns() as $col) {
             $colConstants[] = $this->getColumnName($col);
@@ -49,37 +75,6 @@ class PHP5PeerBuilder extends PeerBuilder
         $intersect = array_intersect($reservedConstants, $colConstants);
         if (!empty($intersect)) {
             throw new EngineException("One or more of your column names for [" . $table->getName() . "] table conflict with a PHP reserved word (" . implode(", ", $intersect) . ")");
-        }
-    }
-
-    /**
-     * Returns the name of the current class being built.
-     *
-     * @return string
-     */
-    public function getUnprefixedClassname()
-    {
-        return $this->getBuildProperty('basePrefix') . $this->getStubPeerBuilder()->getUnprefixedClassname();
-    }
-
-    /**
-     * Gets the package for the [base] peer classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    public function getNamespace()
-    {
-        if ($namespace = parent::getNamespace()) {
-            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
-                return $namespace . '\\' . $omns;
-            } else {
-                return $namespace;
-            }
         }
     }
 
@@ -135,6 +130,16 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 ";
     }
 
+    /**
+     * Gets the package for the [base] peer classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
+    }
+
     protected function addClassBody(&$script)
     {
         $this->declareClassFromBuilder($this->getStubPeerBuilder());
@@ -178,23 +183,6 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 
 ";
         $this->applyBehaviorModifier('peerFilter', $script, "");
-    }
-
-    public function getTableMapClass()
-    {
-        // Trim first backslash for php 5.3.{0,1,2} compatibility
-        $fullyQualifiedClassname = ltrim($this->getStubObjectBuilder()->getFullyQualifiedClassname(), '\\');
-
-        if (($pos = strrpos($fullyQualifiedClassname, '\\')) !== false) {
-            return substr_replace($fullyQualifiedClassname, '\\map\\', $pos, 1) . 'TableMap';
-        } else {
-            return $fullyQualifiedClassname . 'TableMap';
-        }
-    }
-
-    public function getTablePhpName()
-    {
-        return ($this->getTable()->isAbstract() ? '' : $this->getStubObjectBuilder()->getClassname());
     }
 
     /**
@@ -263,6 +251,18 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         }
     }
 
+    public function getTableMapClass()
+    {
+        // Trim first backslash for php 5.3.{0,1,2} compatibility
+        $fullyQualifiedClassname = ltrim($this->getStubObjectBuilder()->getFullyQualifiedClassname(), '\\');
+
+        if (($pos = strrpos($fullyQualifiedClassname, '\\')) !== false) {
+            return substr_replace($fullyQualifiedClassname, '\\map\\', $pos, 1) . 'TableMap';
+        } else {
+            return $fullyQualifiedClassname . 'TableMap';
+        }
+    }
+
     /**
      * Adds the COLUMN_NAME constants to the class definition.
      *
@@ -276,6 +276,52 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     const " . $this->getColumnName($col) . " = '" . $this->getTable()->getName() . "." . $col->getName() . "';
 ";
         } // foreach
+    }
+
+/**
+     * Adds the CLASSKEY_* and CLASSNAME_* constants used for inheritance.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    public function addInheritanceColumnConstants(&$script)
+    {
+        if ($this->getTable()->getChildrenColumn()) {
+
+            $col = $this->getTable()->getChildrenColumn();
+            $cfc = $col->getPhpName();
+
+            if ($col->isEnumeratedClasses()) {
+
+                if ($col->isPhpPrimitiveNumericType()) {
+                    $quote = "";
+                } else {
+                    $quote = '"';
+                }
+
+                foreach ($col->getChildren() as $child) {
+                    $childBuilder = $this->getMultiExtendObjectBuilder();
+                    $childBuilder->setChild($child);
+                    $fqcn = addslashes($childBuilder->getFullyQualifiedClassname());
+
+                    $script .= "
+    /** A key representing a particular subclass */
+    const CLASSKEY_" . strtoupper($child->getKey()) . " = '" . $child->getKey() . "';
+";
+
+                    if (strtoupper($child->getClassname()) != strtoupper($child->getKey())) {
+                        $script .= "
+    /** A key representing a particular subclass */
+    const CLASSKEY_" . strtoupper($child->getClassname()) . " = '" . $child->getKey() . "';
+";
+                    }
+
+                    $script .= "
+    /** A class that can be returned by this peer. */
+    const CLASSNAME_" . strtoupper($child->getKey()) . " = '" . $fqcn . "';
+";
+                } /* foreach children */
+            } /* if col->isenumerated...() */
+        } /* if table->getchildrencolumn() */
     }
 
     /**
@@ -304,7 +350,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return strtoupper(preg_replace('/[^a-zA-Z0-9_\x7f-\xff]/', '_', $value));
     }
 
-    protected function addFieldNamesAttribute(&$script)
+        protected function addFieldNamesAttribute(&$script)
     {
         $table = $this->getTable();
 
@@ -350,9 +396,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= ")
     );
 ";
-    }
+    } // addFieldKeysAttribute
 
-    protected function addFieldKeysAttribute(&$script)
+protected function addFieldKeysAttribute(&$script)
     {
         $table = $this->getTable();
 
@@ -398,9 +444,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= ")
     );
 ";
-    } // addFieldKeysAttribute
+    }
 
-    /**
+        /**
      * Adds the valueSet attributes for ENUM columns.
      *
      * @param string &$script The script will be modified in this method.
@@ -425,7 +471,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= "
     );
 ";
-    }
+    } // addGetFieldNames()
 
     protected function addGetFieldNames(&$script)
     {
@@ -448,9 +494,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return " . $this->getPeerClassname() . "::\$fieldNames[\$type];
     }
 ";
-    } // addGetFieldNames()
+    } // addTranslateFieldName()
 
-    protected function addTranslateFieldName(&$script)
+protected function addTranslateFieldName(&$script)
     {
         $script .= "
     /**
@@ -474,7 +520,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return \$toNames[\$key];
     }
 ";
-    } // addTranslateFieldName()
+    }
 
     /**
      * Adds the getValueSets() method.
@@ -556,32 +602,6 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     }
 
     /**
-     * Adds methods for ENUM columns.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addEnumMethods(&$script)
-    {
-        foreach ($this->getTable()->getColumns() as $col) {
-            /* @var $col Column */
-            if ($col->isEnumType()) {
-                $script .= "
-    /**
-     * Gets the SQL value for " . $col->getPhpName() . " ENUM value
-     *
-     * @param  string \$enumVal ENUM value to get SQL value for
-     * @return int SQL value
-     */
-    public static function get{$col->getPhpName()}SqlValue(\$enumVal)
-    {
-        return {$this->getPeerClassname()}::getSqlValueForEnum({$this->getColumnConstant($col)}, \$enumVal);
-    }
-";
-            }
-        }
-    }
-
-    /**
      * Adds the buildTableMap() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -602,52 +622,6 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     }
 ";
     }
-
-    /**
-     * Adds the CLASSKEY_* and CLASSNAME_* constants used for inheritance.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    public function addInheritanceColumnConstants(&$script)
-    {
-        if ($this->getTable()->getChildrenColumn()) {
-
-            $col = $this->getTable()->getChildrenColumn();
-            $cfc = $col->getPhpName();
-
-            if ($col->isEnumeratedClasses()) {
-
-                if ($col->isPhpPrimitiveNumericType()) {
-                    $quote = "";
-                } else {
-                    $quote = '"';
-                }
-
-                foreach ($col->getChildren() as $child) {
-                    $childBuilder = $this->getMultiExtendObjectBuilder();
-                    $childBuilder->setChild($child);
-                    $fqcn = addslashes($childBuilder->getFullyQualifiedClassname());
-
-                    $script .= "
-    /** A key representing a particular subclass */
-    const CLASSKEY_" . strtoupper($child->getKey()) . " = '" . $child->getKey() . "';
-";
-
-                    if (strtoupper($child->getClassname()) != strtoupper($child->getKey())) {
-                        $script .= "
-    /** A key representing a particular subclass */
-    const CLASSKEY_" . strtoupper($child->getClassname()) . " = '" . $child->getKey() . "';
-";
-                    }
-
-                    $script .= "
-    /** A class that can be returned by this peer. */
-    const CLASSNAME_" . strtoupper($child->getKey()) . " = '" . $fqcn . "';
-";
-                } /* foreach children */
-            } /* if col->isenumerated...() */
-        } /* if table->getchildrencolumn() */
-    } //
 
     /**
      * Adds the alias() utility method.
@@ -674,7 +648,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return str_replace(" . $this->getPeerClassname() . "::TABLE_NAME.'.', \$alias.'.', \$column);
     }
 ";
-    } // addAliasMethod
+    } //
 
     /**
      * Adds the addSelectColumns() method.
@@ -718,9 +692,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= "
     }
 ";
-    } // addAddSelectColumns()
+    } // addAliasMethod
 
-    /**
+        /**
      * Adds the doCount() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -777,7 +751,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 
         return \$count;
     }";
-    }
+    } // addAddSelectColumns()
 
     /**
      * Adds the doSelectOne() method.
@@ -792,7 +766,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
      *
      * @param      Criteria \$criteria object used to create the SELECT statement.
      * @param      PropelPDO \$con
-     * @return "               . $this->getObjectClassname() . "
+     * @return " . $this->getObjectClassname() . "
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -878,32 +852,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     }";
     }
 
-    /**
-     * Adds the PHP code to return a instance pool key for the passed-in primary key variable names.
-     *
-     * @param array $pkphp An array of PHP var names / method calls representing complete pk.
-     *
-     * @return string
-     */
-    public function getInstancePoolKeySnippet($pkphp)
-    {
-        $pkphp = (array) $pkphp; // make it an array if it is not.
-        $script = "";
-        if (count($pkphp) > 1) {
-            $script .= "serialize(array(";
-            $i = 0;
-            foreach ($pkphp as $pkvar) {
-                $script .= ($i++ ? ', ' : '') . "(string) $pkvar";
-            }
-            $script .= "))";
-        } else {
-            $script .= "(string) " . $pkphp[0];
-        }
-
-        return $script;
-    }
-
-    /**
+/**
      * Creates a convenience method to add objects to an instance pool.
      *
      * @param string &$script The script will be modified in this method.
@@ -931,7 +880,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 
         $pks = $this->getTable()->getPrimaryKey();
 
-        $php = array();
+        $php = [];
         foreach ($pks as $pk) {
             if ($pk->isTemporalType()) {
                 $php[] = '$obj->get' . $pk->getPhpName() . "('U')";
@@ -947,7 +896,32 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         }
     }
 ";
-    } // addAddInstanceToPool()
+    }
+
+    /**
+     * Adds the PHP code to return a instance pool key for the passed-in primary key variable names.
+     *
+     * @param array $pkphp An array of PHP var names / method calls representing complete pk.
+     *
+     * @return string
+     */
+    public function getInstancePoolKeySnippet($pkphp)
+    {
+        $pkphp = (array)$pkphp; // make it an array if it is not.
+        $script = "";
+        if (count($pkphp) > 1) {
+            $script .= "serialize(array(";
+            $i = 0;
+            foreach ($pkphp as $pkvar) {
+                $script .= ($i++ ? ', ' : '') . "(string) $pkvar";
+            }
+            $script .= "))";
+        } else {
+            $script .= "(string) " . $pkphp[0];
+        }
+
+        return $script;
+    }
 
     /**
      *  Creates a convenience method to remove objects form an instance pool.
@@ -980,7 +954,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= "
             if (is_object(\$value) && \$value instanceof " . $this->getObjectClassname() . ") {";
 
-        $php = array();
+        $php = [];
         foreach ($pks as $pk) {
             $php[] = '$value->get' . $pk->getPhpName() . '()';
         }
@@ -992,7 +966,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
                 // assume we've been passed a primary key";
 
         if (count($pks) > 1) {
-            $php = array();
+            $php = [];
             for ($i = 0; $i < count($pks); $i++) {
                 $php[] = "\$value[$i]";
             }
@@ -1011,9 +985,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         }
     } // removeInstanceFromPool()
 ";
-    } // addRemoveFromInstancePool()
+    } // addAddInstanceToPool()
 
-    /**
+        /**
      * Adds method to clear the instance pool.
      *
      * @param string &$script The script will be modified in this method.
@@ -1036,7 +1010,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         " . $this->getPeerClassname() . "::\$instances = array();
     }
     ";
-    }
+    } // addRemoveFromInstancePool()
 
     /**
      * Adds method to clear the instance pool of related tables.
@@ -1113,7 +1087,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     ";
     }
 
-    /**
+/**
      * Adds method to get a version of the primary key that can be used as a unique key for identifier map.
      *
      * @param string &$script The script will be modified in this method.
@@ -1137,8 +1111,8 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         // We have to iterate through all the columns so that we know the offset of the primary
         // key columns.
         $n = 0;
-        $pk = array();
-        $cond = array();
+        $pk = [];
+        $cond = [];
         foreach ($this->getTable()->getColumns() as $col) {
             if (!$col->isLazyLoad()) {
                 if ($col->isPrimaryKey()) {
@@ -1159,7 +1133,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return " . $this->getInstancePoolKeySnippet($pk) . ";
     }
 ";
-    } // addGetPrimaryKeyHash
+    }
 
     /**
      * Adds method to get the primary key from a row
@@ -1185,7 +1159,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         // key columns.
         $table = $this->getTable();
         $n = 0;
-        $pks = array();
+        $pks = [];
         foreach ($table->getColumns() as $col) {
             if (!$col->isLazyLoad()) {
                 if ($col->isPrimaryKey()) {
@@ -1209,9 +1183,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         $script .= "
     }
     ";
-    } // addGetPrimaryKeyFromRow
+    } // addGetPrimaryKeyHash
 
-    /**
+        /**
      * Adds the populateObjects() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -1270,7 +1244,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 
         return \$results;
     }";
-    }
+    } // addGetPrimaryKeyFromRow
 
     /**
      * Adds the populateObject() method.
@@ -1480,7 +1454,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         \$criteria->remove(" . $this->getColumnConstant($col) . ");
 ";
                 }
-            } elseif ($col->isPrimaryKey() && $col->isAutoIncrement() && $table->getIdMethod() != "none" && $table->isAllowPkInsert() && !$this->getPlatform()->supportsInsertNullPk()) {
+            } else if ($col->isPrimaryKey() && $col->isAutoIncrement() && $table->getIdMethod() != "none" && $table->isAllowPkInsert() && !$this->getPlatform()->supportsInsertNullPk()) {
                 $script .= "
         // remove pkey col if it is null since this table does not accept that
         if (\$criteria->containsKey(" . $this->getColumnConstant($col) . ") && !\$criteria->keyContainsValue(" . $this->getColumnConstant($col) . ") ) {
@@ -1781,7 +1755,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 ";
     }
 
-    /**
+/**
      * Adds the doOnDeleteCascade() method, which provides ON DELETE CASCADE emulation.
      *
      * @param string &$script The script will be modified in this method.
@@ -1859,9 +1833,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return \$affectedRows;
     }
 ";
-    } // end addDoOnDeleteCascade
+    }
 
-    /**
+        /**
      * Adds the doOnDeleteSetNull() method, which provides ON DELETE SET NULL emulation.
      *
      * @param string &$script The script will be modified in this method.
@@ -1938,9 +1912,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         }
     }
 ";
-    }
+    } // end addDoOnDeleteCascade
 
-    /**
+/**
      * Adds the doValidate() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -1997,9 +1971,9 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return {$this->basePeerClassname}::doValidate(" . $this->getPeerClassname() . "::DATABASE_NAME, " . $this->getPeerClassname() . "::TABLE_NAME, \$columns);
     }
 ";
-    } // end addDoValidate()
+    }
 
-    /**
+        /**
      * Adds the retrieveByPK method for tables with single-column primary key.
      *
      * @param string &$script The script will be modified in this method.
@@ -2037,7 +2011,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return !empty(\$v) > 0 ? \$v[0] : null;
     }
 ";
-    }
+    } // end addDoValidate()
 
     /**
      * Adds the retrieveByPKs method for tables with single-column primary key.
@@ -2053,7 +2027,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
      *
      * @param      array \$pks List of primary keys
      * @param      PropelPDO \$con the connection to use
-     * @return "               . $this->getObjectClassname() . "[]
+     * @return " . $this->getObjectClassname() . "[]
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -2103,7 +2077,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
      */
     public static function " . $this->getRetrieveMethodName() . "(";
 
-        $php = array();
+        $php = [];
         foreach ($table->getPrimaryKey() as $col) {
             $clo = strtolower($col->getName());
             $php[] = '$' . $clo;
@@ -2198,27 +2172,133 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
     }
 
     /**
-     * Get the column offsets of the primary key(s) for specified table.
+     * Adds methods for ENUM columns.
      *
-     * @param Table $tbl
-     *
-     * @return array int[] The column offsets of the primary key(s).
+     * @param string &$script The script will be modified in this method.
      */
-    protected function getPrimaryKeyColOffsets(Table $tbl)
+    protected function addEnumMethods(&$script)
     {
-        $offsets = array();
-        $idx = 0;
-        foreach ($tbl->getColumns() as $col) {
-            if ($col->isPrimaryKey()) {
-                $offsets[] = $idx;
+        foreach ($this->getTable()->getColumns() as $col) {
+            /* @var $col Column */
+            if ($col->isEnumType()) {
+                $script .= "
+    /**
+     * Gets the SQL value for " . $col->getPhpName() . " ENUM value
+     *
+     * @param  string \$enumVal ENUM value to get SQL value for
+     * @return int SQL value
+     */
+    public static function get{$col->getPhpName()}SqlValue(\$enumVal)
+    {
+        return {$this->getPeerClassname()}::getSqlValueForEnum({$this->getColumnConstant($col)}, \$enumVal);
+    }
+";
             }
-            $idx++;
         }
-
-        return $offsets;
     }
 
-    public function addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder)
+/**
+     * Adds the doCountJoin*() methods.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addDoCountJoin(&$script)
+    {
+        $table = $this->getTable();
+        $className = $this->getObjectClassname();
+        $countFK = count($table->getForeignKeys());
+        $join_behavior = $this->getJoinBehavior();
+
+        if ($countFK >= 1) {
+
+            foreach ($table->getForeignKeys() as $fk) {
+
+                $joinTable = $table->getDatabase()->getTable($fk->getForeignTableName());
+
+                if (!$joinTable->isForReferenceOnly()) {
+
+                    if ($fk->getForeignTableName() != $table->getName()) {
+
+                        $thisTableObjectBuilder = $this->getNewObjectBuilder($table);
+                        $joinedTableObjectBuilder = $this->getNewObjectBuilder($joinTable);
+                        $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
+
+                        $joinClassName = $joinedTableObjectBuilder->getObjectClassname();
+
+                        $script .= "
+
+    /**
+     * Returns the number of rows matching criteria, joining the related " . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . " table
+     *
+     * @param      Criteria \$criteria
+     * @param      boolean \$distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO \$con
+     * @param      String    \$join_behavior the type of joins to use, defaults to $join_behavior
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoin" . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . "(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
+    {
+        // we're going to modify criteria, so copy it first
+        \$criteria = clone \$criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        \$criteria->setPrimaryTableName(" . $this->getPeerClassname() . "::TABLE_NAME);
+
+        if (\$distinct && !in_array(Criteria::DISTINCT, \$criteria->getSelectModifiers())) {
+            \$criteria->setDistinct();
+        }
+
+        if (!\$criteria->hasSelectClause()) {
+            " . $this->getPeerClassname() . "::addSelectColumns(\$criteria);
+        }
+
+        \$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        \$criteria->setDbName(" . $this->getPeerClassname() . "::DATABASE_NAME);
+
+        if (\$con === null) {
+            \$con = Propel::getConnection(" . $this->getPeerClassname() . "::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+";
+                        $script .= $this->addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder);
+
+                        // apply behaviors
+                        $this->applyBehaviorModifier('preSelect', $script);
+
+                        $script .= "
+        \$stmt = " . $this->basePeerClassname . "::doCount(\$criteria, \$con);
+
+        if (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
+            \$count = (int) \$row[0];
+        } else {
+            \$count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        \$stmt->closeCursor();
+
+        return \$count;
+    }
+";
+                    } // if fk table name != this table name
+                } // if ! is reference only
+            } // foreach column
+        } // if count(fk) > 1
+
+    }
+
+    /**
+     * returns the desired join behavior as set in the build properties
+     * see trac ticket #588, #491
+     *
+     */
+    protected function getJoinBehavior()
+    {
+        return $this->getGeneratorConfig()->getBuildProperty('useLeftJoinsInDoJoinMethods') ? 'Criteria::LEFT_JOIN' : 'Criteria::INNER_JOIN';
+    }
+
+        public function addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder)
     {
         $script = '';
         $lfMap = $fk->getLocalForeignMapping();
@@ -2243,7 +2323,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         }
 
         return $script;
-    }
+    } // addDoSelectJoin()
 
     /**
      * Adds the doSelectJoin*() methods.
@@ -2380,40 +2460,23 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
             } // foreach column
         } // if count(fk) > 1
 
-    } // addDoSelectJoin()
+    } // addDoCountJoin()
 
     /**
-     * Adds the doCountJoin*() methods.
+     * Adds the doCountJoinAll() method.
      *
      * @param string &$script The script will be modified in this method.
      */
-    protected function addDoCountJoin(&$script)
+    protected function addDoCountJoinAll(&$script)
     {
         $table = $this->getTable();
         $className = $this->getObjectClassname();
-        $countFK = count($table->getForeignKeys());
         $join_behavior = $this->getJoinBehavior();
 
-        if ($countFK >= 1) {
-
-            foreach ($table->getForeignKeys() as $fk) {
-
-                $joinTable = $table->getDatabase()->getTable($fk->getForeignTableName());
-
-                if (!$joinTable->isForReferenceOnly()) {
-
-                    if ($fk->getForeignTableName() != $table->getName()) {
-
-                        $thisTableObjectBuilder = $this->getNewObjectBuilder($table);
-                        $joinedTableObjectBuilder = $this->getNewObjectBuilder($joinTable);
-                        $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
-
-                        $joinClassName = $joinedTableObjectBuilder->getObjectClassname();
-
-                        $script .= "
+        $script .= "
 
     /**
-     * Returns the number of rows matching criteria, joining the related " . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . " table
+     * Returns the number of rows matching criteria, joining all related tables
      *
      * @param      Criteria \$criteria
      * @param      boolean \$distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2421,7 +2484,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
      * @param      String    \$join_behavior the type of joins to use, defaults to $join_behavior
      * @return int Number of matching rows.
      */
-    public static function doCountJoin" . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . "(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
+    public static function doCountJoinAll(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
     {
         // we're going to modify criteria, so copy it first
         \$criteria = clone \$criteria;
@@ -2448,12 +2511,20 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
             \$con = Propel::getConnection(" . $this->getPeerClassname() . "::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 ";
-                        $script .= $this->addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder);
 
-                        // apply behaviors
-                        $this->applyBehaviorModifier('preSelect', $script);
+        foreach ($table->getForeignKeys() as $fk) {
+            // want to cover this case, but the code is not there yet.
+            if ($fk->getForeignTableName() != $table->getName()) {
+                $joinTable = $table->getDatabase()->getTable($fk->getForeignTableName());
+                $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
+                $script .= $this->addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder);
+            } // if fk->getForeignTableName != table->getName
+        } // foreach [sub] foreign keys
 
-                        $script .= "
+        // apply behaviors
+        $this->applyBehaviorModifier('preSelect', $script);
+
+        $script .= "
         \$stmt = " . $this->basePeerClassname . "::doCount(\$criteria, \$con);
 
         if (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
@@ -2464,16 +2535,10 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         \$stmt->closeCursor();
 
         return \$count;
-    }
-";
-                    } // if fk table name != this table name
-                } // if ! is reference only
-            } // foreach column
-        } // if count(fk) > 1
+    }";
+    } // end addDoSelectJoinAll()
 
-    } // addDoCountJoin()
-
-    /**
+/**
      * Adds the doSelectJoinAll() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -2638,24 +2703,36 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         return \$results;
     }
 ";
-    } // end addDoSelectJoinAll()
-
+    } // end addDoCountJoinAll()
 
     /**
-     * Adds the doCountJoinAll() method.
+     * Adds the doCountJoinAllExcept*() methods.
      *
      * @param string &$script The script will be modified in this method.
      */
-    protected function addDoCountJoinAll(&$script)
+    protected function addDoCountJoinAllExcept(&$script)
     {
         $table = $this->getTable();
-        $className = $this->getObjectClassname();
         $join_behavior = $this->getJoinBehavior();
 
-        $script .= "
+        $fkeys = $table->getForeignKeys(); // this sep assignment is necessary otherwise sub-loops over
+        // getForeignKeys() will cause this to only execute one time.
+        foreach ($fkeys as $fk) {
+
+            $tblFK = $table->getDatabase()->getTable($fk->getForeignTableName());
+
+            $excludedTable = $table->getDatabase()->getTable($fk->getForeignTableName());
+
+            $thisTableObjectBuilder = $this->getNewObjectBuilder($table);
+            $excludedTableObjectBuilder = $this->getNewObjectBuilder($excludedTable);
+            $excludedTablePeerBuilder = $this->getNewPeerBuilder($excludedTable);
+
+            $excludedClassName = $excludedTableObjectBuilder->getObjectClassname();
+
+            $script .= "
 
     /**
-     * Returns the number of rows matching criteria, joining all related tables
+     * Returns the number of rows matching criteria, joining the related " . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . " table
      *
      * @param      Criteria \$criteria
      * @param      boolean \$distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -2663,7 +2740,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
      * @param      String    \$join_behavior the type of joins to use, defaults to $join_behavior
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAll(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
+    public static function doCountJoinAllExcept" . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . "(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
     {
         // we're going to modify criteria, so copy it first
         \$criteria = clone \$criteria;
@@ -2681,7 +2758,7 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
             " . $this->getPeerClassname() . "::addSelectColumns(\$criteria);
         }
 
-        \$criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+        \$criteria->clearOrderByColumns(); // ORDER BY should not affect count
 
         // Set the correct dbName
         \$criteria->setDbName(" . $this->getPeerClassname() . "::DATABASE_NAME);
@@ -2689,21 +2766,25 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         if (\$con === null) {
             \$con = Propel::getConnection(" . $this->getPeerClassname() . "::DATABASE_NAME, Propel::CONNECTION_READ);
         }
-";
+    ";
 
-        foreach ($table->getForeignKeys() as $fk) {
-            // want to cover this case, but the code is not there yet.
-            if ($fk->getForeignTableName() != $table->getName()) {
-                $joinTable = $table->getDatabase()->getTable($fk->getForeignTableName());
-                $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
-                $script .= $this->addCriteriaJoin($fk, $table, $joinTable, $joinedTablePeerBuilder);
-            } // if fk->getForeignTableName != table->getName
-        } // foreach [sub] foreign keys
+            foreach ($table->getForeignKeys() as $subfk) {
+                // want to cover this case, but the code is not there yet.
+                if ($subfk->getForeignTableName() != $table->getName()) {
+                    $joinTable = $table->getDatabase()->getTable($subfk->getForeignTableName());
+                    $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
+                    $joinClassName = $joinedTablePeerBuilder->getObjectClassname();
 
-        // apply behaviors
-        $this->applyBehaviorModifier('preSelect', $script);
+                    if ($joinClassName != $excludedClassName) {
+                        $script .= $this->addCriteriaJoin($subfk, $table, $joinTable, $joinedTablePeerBuilder);
+                    }
+                }
+            } // foreach fkeys
 
-        $script .= "
+            // apply behaviors
+            $this->applyBehaviorModifier('preSelect', $script);
+
+            $script .= "
         \$stmt = " . $this->basePeerClassname . "::doCount(\$criteria, \$con);
 
         if (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
@@ -2714,8 +2795,11 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
         \$stmt->closeCursor();
 
         return \$count;
-    }";
-    } // end addDoCountJoinAll()
+    }
+";
+        } // foreach fk
+
+    } // addDoSelectJoinAllExcept
 
     /**
      * Adds the doSelectJoinAllExcept*() methods.
@@ -2912,111 +2996,26 @@ abstract class " . $this->getClassname() . $extendingPeerClass . "
 ";
         } // foreach fk
 
-    } // addDoSelectJoinAllExcept
-
-    /**
-     * Adds the doCountJoinAllExcept*() methods.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addDoCountJoinAllExcept(&$script)
-    {
-        $table = $this->getTable();
-        $join_behavior = $this->getJoinBehavior();
-
-        $fkeys = $table->getForeignKeys(); // this sep assignment is necessary otherwise sub-loops over
-        // getForeignKeys() will cause this to only execute one time.
-        foreach ($fkeys as $fk) {
-
-            $tblFK = $table->getDatabase()->getTable($fk->getForeignTableName());
-
-            $excludedTable = $table->getDatabase()->getTable($fk->getForeignTableName());
-
-            $thisTableObjectBuilder = $this->getNewObjectBuilder($table);
-            $excludedTableObjectBuilder = $this->getNewObjectBuilder($excludedTable);
-            $excludedTablePeerBuilder = $this->getNewPeerBuilder($excludedTable);
-
-            $excludedClassName = $excludedTableObjectBuilder->getObjectClassname();
-
-            $script .= "
-
-    /**
-     * Returns the number of rows matching criteria, joining the related " . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . " table
-     *
-     * @param      Criteria \$criteria
-     * @param      boolean \$distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO \$con
-     * @param      String    \$join_behavior the type of joins to use, defaults to $join_behavior
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExcept" . $thisTableObjectBuilder->getFKPhpNameAffix($fk, $plural = false) . "(Criteria \$criteria, \$distinct = false, PropelPDO \$con = null, \$join_behavior = $join_behavior)
-    {
-        // we're going to modify criteria, so copy it first
-        \$criteria = clone \$criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        \$criteria->setPrimaryTableName(" . $this->getPeerClassname() . "::TABLE_NAME);
-
-        if (\$distinct && !in_array(Criteria::DISTINCT, \$criteria->getSelectModifiers())) {
-            \$criteria->setDistinct();
-        }
-
-        if (!\$criteria->hasSelectClause()) {
-            " . $this->getPeerClassname() . "::addSelectColumns(\$criteria);
-        }
-
-        \$criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        \$criteria->setDbName(" . $this->getPeerClassname() . "::DATABASE_NAME);
-
-        if (\$con === null) {
-            \$con = Propel::getConnection(" . $this->getPeerClassname() . "::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-    ";
-
-            foreach ($table->getForeignKeys() as $subfk) {
-                // want to cover this case, but the code is not there yet.
-                if ($subfk->getForeignTableName() != $table->getName()) {
-                    $joinTable = $table->getDatabase()->getTable($subfk->getForeignTableName());
-                    $joinedTablePeerBuilder = $this->getNewPeerBuilder($joinTable);
-                    $joinClassName = $joinedTablePeerBuilder->getObjectClassname();
-
-                    if ($joinClassName != $excludedClassName) {
-                        $script .= $this->addCriteriaJoin($subfk, $table, $joinTable, $joinedTablePeerBuilder);
-                    }
-                }
-            } // foreach fkeys
-
-            // apply behaviors
-            $this->applyBehaviorModifier('preSelect', $script);
-
-            $script .= "
-        \$stmt = " . $this->basePeerClassname . "::doCount(\$criteria, \$con);
-
-        if (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
-            \$count = (int) \$row[0];
-        } else {
-            \$count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        \$stmt->closeCursor();
-
-        return \$count;
-    }
-";
-        } // foreach fk
-
     } // addDoCountJoinAllExcept
 
     /**
-     * returns the desired join behavior as set in the build properties
-     * see trac ticket #588, #491
+     * Get the column offsets of the primary key(s) for specified table.
      *
+     * @param Table $tbl
+     *
+     * @return array int[] The column offsets of the primary key(s).
      */
-    protected function getJoinBehavior()
+    protected function getPrimaryKeyColOffsets(Table $tbl)
     {
-        return $this->getGeneratorConfig()->getBuildProperty('useLeftJoinsInDoJoinMethods') ? 'Criteria::LEFT_JOIN' : 'Criteria::INNER_JOIN';
+        $offsets = [];
+        $idx = 0;
+        foreach ($tbl->getColumns() as $col) {
+            if ($col->isPrimaryKey()) {
+                $offsets[] = $idx;
+            }
+            $idx++;
+        }
+
+        return $offsets;
     }
 } // PHP5PeerBuilder

@@ -30,14 +30,12 @@ require_once 'phing/types/selectors/BaseExtendSelector.php';
  */
 class DepthSelector extends BaseExtendSelector
 {
-    /** @var int $min */
-    public $min = -1;
-
-    /** @var int $max */
-    public $max = -1;
-
     const MIN_KEY = "min";
     const MAX_KEY = "max";
+    /** @var int $min */
+    public $min = -1;
+    /** @var int $max */
+    public $max = -1;
 
     /**
      * @return string
@@ -51,30 +49,6 @@ class DepthSelector extends BaseExtendSelector
         $buf .= "}";
 
         return $buf;
-    }
-
-    /**
-     * The minimum depth below the basedir before a file is selected.
-     *
-     * @param int $min minimum directory levels below basedir to go
-     *
-     * @return void
-     */
-    public function setMin($min)
-    {
-        $this->min = (int) $min;
-    }
-
-    /**
-     * The minimum depth below the basedir before a file is selected.
-     *
-     * @param int $max maximum directory levels below basedir to go
-     *
-     * @return void
-     */
-    public function setMax($max)
-    {
-        $this->max = (int) $max;
     }
 
     /**
@@ -106,6 +80,30 @@ class DepthSelector extends BaseExtendSelector
                 } // switch
             }
         }
+    }
+
+    /**
+     * The minimum depth below the basedir before a file is selected.
+     *
+     * @param int $min minimum directory levels below basedir to go
+     *
+     * @return void
+     */
+    public function setMin($min)
+    {
+        $this->min = (int)$min;
+    }
+
+    /**
+     * The minimum depth below the basedir before a file is selected.
+     *
+     * @param int $max maximum directory levels below basedir to go
+     *
+     * @return void
+     */
+    public function setMax($max)
+    {
+        $this->max = (int)$max;
     }
 
     /**
@@ -142,9 +140,9 @@ class DepthSelector extends BaseExtendSelector
      * @param string $filename the name of the file to check
      * @param PhingFile $file a PhingFile object the selector can use
      *
+     * @return bool whether the file should be selected or not
      * @throws BuildException
      *
-     * @return bool whether the file should be selected or not
      */
     public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
     {

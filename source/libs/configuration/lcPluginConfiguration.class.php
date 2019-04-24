@@ -33,6 +33,8 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     protected $name;
     protected $root_dir;
     protected $web_path;
+    private $is_lc15_targeting;
+    private $_is_lc15_targeting_checked;
 
     public function initialize()
     {
@@ -119,19 +121,19 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             'company' => [
                 'url' => 'http://www.nimasystems.com',
                 'email' => 'info@nimasystems.com',
-                'name' => 'Nimasystems Ltd'
+                'name' => 'Nimasystems Ltd',
             ],
             'license' => [
                 'url' => 'http://www.nimasystems.com/lightcast',
-                'type' => 'private'
+                'type' => 'private',
             ],
             'copyright' => 'Nimasystems Ltd 2007-2013 (&copy;) All Rights Reserved.',
             'developers' => [[
-                'email' => 'miracle@nimasystems.com',
-                'team' => 'PHP Development',
-                'role' => 'PHP Developer',
-                'name' => 'Martin Kovachev'
-            ]]
+                                 'email' => 'miracle@nimasystems.com',
+                                 'team' => 'PHP Development',
+                                 'role' => 'PHP Developer',
+                                 'name' => 'Martin Kovachev',
+                             ]],
         ];
     }
 
@@ -144,21 +146,21 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             'urls' => [
                 [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin',
-                    'title' => 'Homepage'
+                    'title' => 'Homepage',
                 ],
                 [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/download',
-                    'title' => 'Download'
+                    'title' => 'Download',
                 ],
                 [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/readme',
-                    'title' => 'README'
+                    'title' => 'README',
                 ],
                 [
                     'url' => 'http://lightcast.nimasystems.com/plugins/sample_plugin/install',
-                    'title' => 'INSTALL'
+                    'title' => 'INSTALL',
                 ],
-            ]
+            ],
         ];
     }
 
@@ -187,9 +189,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     {
         throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));
     }
-
-    private $is_lc15_targeting;
-    private $_is_lc15_targeting_checked;
 
     public function isTargetingLC15()
     {
@@ -262,11 +261,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return iSupportsVersions::STABILITY_CODE_PRODUCTION;
     }
 
-    public function getImplements()
-    {
-        // subclassers may override this method to return custom class names which the plugin implements
-    }
-
     /**
      * @param array|string $interface_name
      * @return bool
@@ -292,26 +286,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         }
     }
 
-    /**
-     * @return string
-     */
-    public function getConfigDir()
+    public function getImplements()
     {
-        return $this->getRootDir() . DS . 'config';
-    }
-
-    /**
-     * @return string
-     */
-    public function getRootDir()
-    {
-        return $this->root_dir;
-    }
-
-    public function setRootDir($root_dir)
-    {
-        $this->root_dir = $root_dir;
-        return $this;
+        // subclassers may override this method to return custom class names which the plugin implements
     }
 
     /**
@@ -349,17 +326,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             [
                 'handler' => 'plugin',
                 'config_key' => 'settings',
-                'defaults' => $this->getDefaultConfiguration()
+                'defaults' => $this->getDefaultConfiguration(),
             ],
             [
                 'handler' => 'plugin_routing',
                 'config_key' => 'routing',
-                'defaults' => $this->getDefaultRoutingConfiguration()
+                'defaults' => $this->getDefaultRoutingConfiguration(),
             ],
             [
                 'handler' => 'plugin_view',
                 'config_key' => 'view',
-                'defaults' => $this->getDefaultViewConfiguration()
+                'defaults' => $this->getDefaultViewConfiguration(),
             ],
         ];
 
@@ -434,5 +411,27 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         }
 
         return null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfigDir()
+    {
+        return $this->getRootDir() . DS . 'config';
+    }
+
+    /**
+     * @return string
+     */
+    public function getRootDir()
+    {
+        return $this->root_dir;
+    }
+
+    public function setRootDir($root_dir)
+    {
+        $this->root_dir = $root_dir;
+        return $this;
     }
 }

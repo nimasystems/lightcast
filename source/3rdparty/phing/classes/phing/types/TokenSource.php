@@ -59,7 +59,7 @@ class TokenSource extends DataType
      * Array holding parameters for the wrapped TokenReader.
      * @var array
      */
-    protected $parameters = array();
+    protected $parameters = [];
 
     /**
      * Reference to the TokenReader used by this TokenSource
@@ -70,7 +70,21 @@ class TokenSource extends DataType
     /**
      * Array with key/value pairs of tokens
      */
-    protected $tokens = array();
+    protected $tokens = [];
+
+    /**
+     * This function uses the wrapper to read the tokens and then
+     * returns them.
+     *
+     */
+    public function getTokens()
+    {
+        if (count($this->tokens) == 0) {
+            $this->Load();
+        }
+
+        return $this->tokens;
+    }
 
     /**
      * This method is called to load the sources from the reader
@@ -102,20 +116,6 @@ class TokenSource extends DataType
     }
 
     /**
-     * This function uses the wrapper to read the tokens and then
-     * returns them.
-     *
-     */
-    public function getTokens()
-    {
-        if (count($this->tokens) == 0) {
-            $this->Load();
-        }
-
-        return $this->tokens;
-    }
-
-    /**
      * Configures a TokenReader with the parameters passed to the
      * TokenSource.
      * @param TokenReader $reader
@@ -131,21 +131,21 @@ class TokenSource extends DataType
     }
 
     /**
-     * Set the classname (dot-path) to use for handling token replacement.
-     * @param string $c
-     */
-    public function setClassname($c)
-    {
-        $this->classname = $c;
-    }
-
-    /**
      * Returns the qualified classname (dot-path) to use for handling token replacement.
      * @return string
      */
     public function getClassname()
     {
         return $this->classname;
+    }
+
+    /**
+     * Set the classname (dot-path) to use for handling token replacement.
+     * @param string $c
+     */
+    public function setClassname($c)
+    {
+        $this->classname = $c;
     }
 
     /**

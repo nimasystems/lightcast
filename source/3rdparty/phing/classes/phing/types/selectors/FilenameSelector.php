@@ -30,12 +30,12 @@ include_once 'phing/types/selectors/BaseExtendSelector.php';
 class FilenameSelector extends BaseExtendSelector
 {
 
-    private $pattern = null;
-    private $casesensitive = true;
-    private $negated = false;
     const NAME_KEY = "name";
     const CASE_KEY = "casesensitive";
     const NEGATE_KEY = "negate";
+    private $pattern = null;
+    private $casesensitive = true;
+    private $negated = false;
 
     /**
      * @return string
@@ -59,6 +59,37 @@ class FilenameSelector extends BaseExtendSelector
         $buf .= "}";
 
         return $buf;
+    }
+
+    /**
+     * When using this as a custom selector, this method will be called.
+     * It translates each parameter into the appropriate setXXX() call.
+     *
+     * @param array $parameters the complete set of parameters for this selector
+     *
+     * @return void
+     */
+    public function setParameters($parameters)
+    {
+        parent::setParameters($parameters);
+        if ($parameters !== null) {
+            for ($i = 0, $len = count($parameters); $i < $len; $i++) {
+                $paramname = $parameters[$i]->getName();
+                switch (strtolower($paramname)) {
+                    case self::NAME_KEY:
+                        $this->setName($parameters[$i]->getValue());
+                        break;
+                    case self::CASE_KEY:
+                        $this->setCasesensitive($parameters[$i]->getValue());
+                        break;
+                    case self::NEGATE_KEY:
+                        $this->setNegate($parameters[$i]->getValue());
+                        break;
+                    default:
+                        $this->setError("Invalid parameter " . $paramname);
+                }
+            } // for each param
+        } // if params
     }
 
     /**
@@ -106,37 +137,6 @@ class FilenameSelector extends BaseExtendSelector
     public function setNegate($negated)
     {
         $this->negated = $negated;
-    }
-
-    /**
-     * When using this as a custom selector, this method will be called.
-     * It translates each parameter into the appropriate setXXX() call.
-     *
-     * @param array $parameters the complete set of parameters for this selector
-     *
-     * @return void
-     */
-    public function setParameters($parameters)
-    {
-        parent::setParameters($parameters);
-        if ($parameters !== null) {
-            for ($i = 0, $len = count($parameters); $i < $len; $i++) {
-                $paramname = $parameters[$i]->getName();
-                switch (strtolower($paramname)) {
-                    case self::NAME_KEY:
-                        $this->setName($parameters[$i]->getValue());
-                        break;
-                    case self::CASE_KEY:
-                        $this->setCasesensitive($parameters[$i]->getValue());
-                        break;
-                    case self::NEGATE_KEY:
-                        $this->setNegate($parameters[$i]->getValue());
-                        break;
-                    default:
-                        $this->setError("Invalid parameter " . $paramname);
-                }
-            } // for each param
-        } // if params
     }
 
     /**

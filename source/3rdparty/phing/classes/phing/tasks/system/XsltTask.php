@@ -41,7 +41,7 @@ class XsltTask extends CopyTask
     private $xsltFilter;
 
     /** Parameters to pass to XSLT procesor. */
-    private $parameters = array();
+    private $parameters = [];
 
     /**
      * Setup the filterchains w/ XSLTFilter that we will use while copying the files.
@@ -83,7 +83,7 @@ class XsltTask extends CopyTask
      */
     public function setResolveDocumentExternals($resolveExternals)
     {
-        $this->xsltFilter->setResolveDocumentExternals((bool) $resolveExternals);
+        $this->xsltFilter->setResolveDocumentExternals((bool)$resolveExternals);
     }
 
     /**
@@ -95,7 +95,7 @@ class XsltTask extends CopyTask
      */
     public function setResolveStylesheetExternals($resolveExternals)
     {
-        $this->xsltFilter->setResolveStylesheetExternals((bool) $resolveExternals);
+        $this->xsltFilter->setResolveStylesheetExternals((bool)$resolveExternals);
     }
 
     /**

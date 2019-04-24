@@ -84,6 +84,16 @@ class TypedefTask extends Task
     }
 
     /**
+     * Reference to a classpath to use when loading the files.
+     * @param Reference $r
+     */
+    public function setClasspathRef(Reference $r)
+    {
+        $this->classpathId = $r->getRefId();
+        $this->createClasspath()->setRefid($r);
+    }
+
+    /**
      * Create the classpath to be used when searching for component being defined
      *
      * @return Path
@@ -95,16 +105,6 @@ class TypedefTask extends Task
         }
 
         return $this->classpath->createPath();
-    }
-
-    /**
-     * Reference to a classpath to use when loading the files.
-     * @param Reference $r
-     */
-    public function setClasspathRef(Reference $r)
-    {
-        $this->classpathId = $r->getRefId();
-        $this->createClasspath()->setRefid($r);
     }
 
     /** Main entry point */

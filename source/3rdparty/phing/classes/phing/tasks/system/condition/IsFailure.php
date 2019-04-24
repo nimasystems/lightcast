@@ -32,21 +32,30 @@ class IsFailure implements Condition
     private $code;
 
     /**
-     * Set the return code to check.
-     * @param int $c the return code.
-     */
-    public function setCode($c)
-    {
-        $this->code = (int) $c;
-    }
-
-    /**
      * Get the return code that will be checked by this IsFailure condition.
      * @return int return code as int.
      */
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * Set the return code to check.
+     * @param int $c the return code.
+     */
+    public function setCode($c)
+    {
+        $this->code = (int)$c;
+    }
+
+    /**
+     * Fulfill the condition interface.
+     * @return boolean the result of evaluating the specified return code.
+     */
+    public function evaluate()
+    {
+        return $this->isFailureCode($this->code);
     }
 
     /**
@@ -59,14 +68,5 @@ class IsFailure implements Condition
     protected function isFailureCode($code)
     {
         return $code !== 0;
-    }
-
-    /**
-     * Fulfill the condition interface.
-     * @return boolean the result of evaluating the specified return code.
-     */
-    public function evaluate()
-    {
-        return $this->isFailureCode($this->code);
     }
 }

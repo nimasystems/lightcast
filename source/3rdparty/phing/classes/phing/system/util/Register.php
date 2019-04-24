@@ -42,14 +42,14 @@ class Register
 {
 
     /** Slots that have been registered */
-    private static $slots = array();
+    private static $slots = [];
 
     /**
      * Returns RegisterSlot for specified key.
      *
      * If not slot exists a new one is created for key.
      *
-     * @param  string       $key
+     * @param string $key
      * @return RegisterSlot
      */
     public static function getSlot($key)
@@ -82,16 +82,7 @@ class RegisterSlot
      */
     public function __construct($key)
     {
-        $this->key = (string) $key;
-    }
-
-    /**
-     * Sets the key / name for this slot.
-     * @param string $k
-     */
-    public function setKey($k)
-    {
-        $this->key = (string) $k;
+        $this->key = (string)$key;
     }
 
     /**
@@ -104,12 +95,12 @@ class RegisterSlot
     }
 
     /**
-     * Sets the value for this slot.
-     * @param mixed
+     * Sets the key / name for this slot.
+     * @param string $k
      */
-    public function setValue($v)
+    public function setKey($k)
     {
-        $this->value = $v;
+        $this->key = (string)$k;
     }
 
     /**
@@ -122,23 +113,12 @@ class RegisterSlot
     }
 
     /**
-     * Recursively implodes an array to a comma-separated string
-     * @param  array  $arr
-     * @return string
+     * Sets the value for this slot.
+     * @param mixed
      */
-    private function implodeArray(array $arr)
+    public function setValue($v)
     {
-        $values = array();
-
-        foreach ($arr as $value) {
-            if (is_array($value)) {
-                $values[] = $this->implodeArray($value);
-            } else {
-                $values[] = $value;
-            }
-        }
-
-        return "{" . implode(",", $values) . "}";
+        $this->value = $v;
     }
 
     /**
@@ -150,8 +130,28 @@ class RegisterSlot
         if (is_array($this->value)) {
             return $this->implodeArray($this->value);
         } else {
-            return (string) $this->value;
+            return (string)$this->value;
         }
+    }
+
+    /**
+     * Recursively implodes an array to a comma-separated string
+     * @param array $arr
+     * @return string
+     */
+    private function implodeArray(array $arr)
+    {
+        $values = [];
+
+        foreach ($arr as $value) {
+            if (is_array($value)) {
+                $values[] = $this->implodeArray($value);
+            } else {
+                $values[] = $value;
+            }
+        }
+
+        return "{" . implode(",", $values) . "}";
     }
 
 }

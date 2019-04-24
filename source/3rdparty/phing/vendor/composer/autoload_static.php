@@ -6,7 +6,7 @@ namespace Composer\Autoload;
 
 class ComposerStaticInit314612bf54e52d3d053799b2daa8c7b6
 {
-    public static $classMap = array (
+    public static $classMap = [
         'AbstractFileSet' => __DIR__ . '/../..' . '/classes/phing/types/AbstractFileSet.php',
         'AbstractHandler' => __DIR__ . '/../..' . '/classes/phing/parser/AbstractHandler.php',
         'AbstractLiquibaseTask' => __DIR__ . '/../..' . '/classes/phing/tasks/ext/liquibase/AbstractLiquibaseTask.php',
@@ -481,7 +481,7 @@ class ComposerStaticInit314612bf54e52d3d053799b2daa8c7b6
         'zsdtBaseTask' => __DIR__ . '/../..' . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtBaseTask.php',
         'zsdtPackTask' => __DIR__ . '/../..' . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtPackTask.php',
         'zsdtValidateTask' => __DIR__ . '/../..' . '/classes/phing/tasks/ext/zendserverdeploymenttool/zsdtValidateTask.php',
-    );
+    ];
 
     public static function getInitializer(ClassLoader $loader)
     {

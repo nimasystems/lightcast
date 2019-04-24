@@ -72,14 +72,14 @@ class ReplaceTokens extends BaseParamFilterReader implements ChainableReader
      * Array to hold the replacee-replacer pairs (String to String).
      * @var array
      */
-    private $_tokens = array();
+    private $_tokens = [];
 
     /**
      * Array to hold the token sources that make tokens from
      * different sources available
      * @var array
      */
-    private $_tokensources = array();
+    private $_tokensources = [];
 
     /**
      * Array holding all tokens given directly to the Filter and
@@ -99,56 +99,6 @@ class ReplaceTokens extends BaseParamFilterReader implements ChainableReader
      * @var string
      */
     private $_endToken = "@"; //self::DEFAULT_END_TOKEN;
-
-    /**
-     * Performs lookup on key and returns appropriate replacement string.
-     * @param  array  $matches Array of 1 el containing key to search for.
-     * @return string Text with which to replace key or value of key if none is found.
-     */
-    private function replaceTokenCallback($matches)
-    {
-
-        $key = $matches[1];
-
-        /* Get tokens from tokensource and merge them with the
-         * tokens given directly via build file. This should be
-         * done a bit more elegantly
-         */
-        if ($this->_alltokens === null) {
-            $this->_alltokens = array();
-
-            $count = count($this->_tokensources);
-            for ($i = 0; $i < $count; $i++) {
-                $source = $this->_tokensources[$i];
-                $this->_alltokens = array_merge($this->_alltokens, $source->getTokens());
-            }
-
-            $this->_alltokens = array_merge($this->_tokens, $this->_alltokens);
-        }
-
-        $tokens = $this->_alltokens;
-
-        $replaceWith = null;
-        $count = count($tokens);
-
-        for ($i = 0; $i < $count; $i++) {
-            if ($tokens[$i]->getKey() === $key) {
-                $replaceWith = $tokens[$i]->getValue();
-            }
-        }
-
-        if ($replaceWith === null) {
-            $replaceWith = $this->_beginToken . $key . $this->_endToken;
-            $this->log("No token defined for key \"" . $this->_beginToken . $key . $this->_endToken . "\"");
-        } else {
-            $this->log(
-                "Replaced \"" . $this->_beginToken . $key . $this->_endToken . "\" with \"" . $replaceWith . "\"",
-                Project::MSG_VERBOSE
-            );
-        }
-
-        return $replaceWith;
-    }
 
     /**
      * Returns stream with tokens having been replaced with appropriate values.
@@ -174,157 +124,11 @@ class ReplaceTokens extends BaseParamFilterReader implements ChainableReader
         // filter buffer
         $buffer = preg_replace_callback(
             "/" . preg_quote($this->_beginToken, '/') . "([\w\.\-:]+?)" . preg_quote($this->_endToken, '/') . "/",
-            array($this, 'replaceTokenCallback'),
+            [$this, 'replaceTokenCallback'],
             $buffer
         );
 
         return $buffer;
-    }
-
-    /**
-     * Sets the "begin token" character.
-     *
-     * @param string $beginToken the character used to denote the beginning of a token.
-     */
-    public function setBeginToken($beginToken)
-    {
-        $this->_beginToken = (string) $beginToken;
-    }
-
-    /**
-     * Returns the "begin token" character.
-     *
-     * @return string The character used to denote the beginning of a token.
-     */
-    public function getBeginToken()
-    {
-        return $this->_beginToken;
-    }
-
-    /**
-     * Sets the "end token" character.
-     *
-     * @param string $endToken the character used to denote the end of a token
-     */
-    public function setEndToken($endToken)
-    {
-        $this->_endToken = (string) $endToken;
-    }
-
-    /**
-     * Returns the "end token" character.
-     *
-     * @return the character used to denote the beginning of a token
-     */
-    public function getEndToken()
-    {
-        return $this->_endToken;
-    }
-
-    /**
-     * Adds a token element to the map of tokens to replace.
-     *
-     * @return object The token added to the map of replacements.
-     *                Must not be <code>null</code>.
-     */
-    public function createToken()
-    {
-        $num = array_push($this->_tokens, new Token());
-
-        return $this->_tokens[$num - 1];
-    }
-
-    /**
-     * Adds a token source to the sources of this filter.
-     *
-     * @return object A Reference to the source just added.
-     */
-    public function createTokensource()
-    {
-        $num = array_push($this->_tokensources, new TokenSource());
-
-        return $this->_tokensources[$num - 1];
-    }
-
-    /**
-     * Sets the map of tokens to replace.
-     * ; used by ReplaceTokens::chain()
-     *
-     * @param $tokens
-     * @throws Exception
-     * @internal param A $array map (String->String) of token keys to replacement
-     *              values. Must not be <code>null</code>.
-     */
-    public function setTokens($tokens)
-    {
-        // type check, error must never occur, bad code of it does
-        if (!is_array($tokens)) {
-            throw new Exception("Excpected 'array', got something else");
-        }
-
-        $this->_tokens = $tokens;
-    }
-
-    /**
-     * Returns the map of tokens which will be replaced.
-     * ; used by ReplaceTokens::chain()
-     *
-     * @return array A map (String->String) of token keys to replacement values.
-     */
-    public function getTokens()
-    {
-        return $this->_tokens;
-    }
-
-    /**
-     * Sets the tokensources to use; used by ReplaceTokens::chain()
-     *
-     * @param $sources
-     * @throws Exception
-     * @internal param An $array array of token sources.
-     */
-    public function setTokensources($sources)
-    {
-        // type check
-        if (!is_array($sources)) {
-            throw new Exception("Exspected 'array', got something else");
-        }
-        $this->_tokensources = $sources;
-    }
-
-    /**
-     * Returns the token sources used by this filter; used by ReplaceTokens::chain()
-     *
-     * @return array
-     */
-    public function getTokensources()
-    {
-        return $this->_tokensources;
-    }
-
-    /**
-     * Creates a new ReplaceTokens using the passed in
-     * Reader for instantiation.
-     *
-     * @param Reader $reader
-     * @throws Exception
-     * @internal param A $object Reader object providing the underlying stream.
-     *               Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering
-     *                the specified reader
-     */
-    public function chain(Reader $reader)
-    {
-        $newFilter = new ReplaceTokens($reader);
-        $newFilter->setProject($this->getProject());
-        $newFilter->setBeginToken($this->getBeginToken());
-        $newFilter->setEndToken($this->getEndToken());
-        $newFilter->setTokens($this->getTokens());
-        $newFilter->setTokensources($this->getTokensources());
-        $newFilter->setInitialized(true);
-
-        return $newFilter;
     }
 
     /**
@@ -361,7 +165,7 @@ class ReplaceTokens extends BaseParamFilterReader implements ChainableReader
                         } else {
                             if ($type === "tokensource") {
                                 // Store data from nested tags in local array
-                                $arr = array();
+                                $arr = [];
 
                                 $subparams = $params[$i]->getParams();
                                 foreach ($subparams as $subparam) {
@@ -392,6 +196,202 @@ class ReplaceTokens extends BaseParamFilterReader implements ChainableReader
             }
         }
     }
+
+    /**
+     * Adds a token element to the map of tokens to replace.
+     *
+     * @return object The token added to the map of replacements.
+     *                Must not be <code>null</code>.
+     */
+    public function createToken()
+    {
+        $num = array_push($this->_tokens, new Token());
+
+        return $this->_tokens[$num - 1];
+    }
+
+    /**
+     * Adds a token source to the sources of this filter.
+     *
+     * @return object A Reference to the source just added.
+     */
+    public function createTokensource()
+    {
+        $num = array_push($this->_tokensources, new TokenSource());
+
+        return $this->_tokensources[$num - 1];
+    }
+
+    /**
+     * Creates a new ReplaceTokens using the passed in
+     * Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering
+     *                the specified reader
+     * @throws Exception
+     * @internal param A $object Reader object providing the underlying stream.
+     *               Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $newFilter = new ReplaceTokens($reader);
+        $newFilter->setProject($this->getProject());
+        $newFilter->setBeginToken($this->getBeginToken());
+        $newFilter->setEndToken($this->getEndToken());
+        $newFilter->setTokens($this->getTokens());
+        $newFilter->setTokensources($this->getTokensources());
+        $newFilter->setInitialized(true);
+
+        return $newFilter;
+    }
+
+    /**
+     * Returns the "begin token" character.
+     *
+     * @return string The character used to denote the beginning of a token.
+     */
+    public function getBeginToken()
+    {
+        return $this->_beginToken;
+    }
+
+    /**
+     * Sets the "begin token" character.
+     *
+     * @param string $beginToken the character used to denote the beginning of a token.
+     */
+    public function setBeginToken($beginToken)
+    {
+        $this->_beginToken = (string)$beginToken;
+    }
+
+    /**
+     * Returns the "end token" character.
+     *
+     * @return the character used to denote the beginning of a token
+     */
+    public function getEndToken()
+    {
+        return $this->_endToken;
+    }
+
+    /**
+     * Sets the "end token" character.
+     *
+     * @param string $endToken the character used to denote the end of a token
+     */
+    public function setEndToken($endToken)
+    {
+        $this->_endToken = (string)$endToken;
+    }
+
+    /**
+     * Returns the map of tokens which will be replaced.
+     * ; used by ReplaceTokens::chain()
+     *
+     * @return array A map (String->String) of token keys to replacement values.
+     */
+    public function getTokens()
+    {
+        return $this->_tokens;
+    }
+
+    /**
+     * Sets the map of tokens to replace.
+     * ; used by ReplaceTokens::chain()
+     *
+     * @param $tokens
+     * @throws Exception
+     * @internal param A $array map (String->String) of token keys to replacement
+     *              values. Must not be <code>null</code>.
+     */
+    public function setTokens($tokens)
+    {
+        // type check, error must never occur, bad code of it does
+        if (!is_array($tokens)) {
+            throw new Exception("Excpected 'array', got something else");
+        }
+
+        $this->_tokens = $tokens;
+    }
+
+    /**
+     * Returns the token sources used by this filter; used by ReplaceTokens::chain()
+     *
+     * @return array
+     */
+    public function getTokensources()
+    {
+        return $this->_tokensources;
+    }
+
+    /**
+     * Sets the tokensources to use; used by ReplaceTokens::chain()
+     *
+     * @param $sources
+     * @throws Exception
+     * @internal param An $array array of token sources.
+     */
+    public function setTokensources($sources)
+    {
+        // type check
+        if (!is_array($sources)) {
+            throw new Exception("Exspected 'array', got something else");
+        }
+        $this->_tokensources = $sources;
+    }
+
+    /**
+     * Performs lookup on key and returns appropriate replacement string.
+     * @param array $matches Array of 1 el containing key to search for.
+     * @return string Text with which to replace key or value of key if none is found.
+     */
+    private function replaceTokenCallback($matches)
+    {
+
+        $key = $matches[1];
+
+        /* Get tokens from tokensource and merge them with the
+         * tokens given directly via build file. This should be
+         * done a bit more elegantly
+         */
+        if ($this->_alltokens === null) {
+            $this->_alltokens = [];
+
+            $count = count($this->_tokensources);
+            for ($i = 0; $i < $count; $i++) {
+                $source = $this->_tokensources[$i];
+                $this->_alltokens = array_merge($this->_alltokens, $source->getTokens());
+            }
+
+            $this->_alltokens = array_merge($this->_tokens, $this->_alltokens);
+        }
+
+        $tokens = $this->_alltokens;
+
+        $replaceWith = null;
+        $count = count($tokens);
+
+        for ($i = 0; $i < $count; $i++) {
+            if ($tokens[$i]->getKey() === $key) {
+                $replaceWith = $tokens[$i]->getValue();
+            }
+        }
+
+        if ($replaceWith === null) {
+            $replaceWith = $this->_beginToken . $key . $this->_endToken;
+            $this->log("No token defined for key \"" . $this->_beginToken . $key . $this->_endToken . "\"");
+        } else {
+            $this->log(
+                "Replaced \"" . $this->_beginToken . $key . $this->_endToken . "\" with \"" . $replaceWith . "\"",
+                Project::MSG_VERBOSE
+            );
+        }
+
+        return $replaceWith;
+    }
 }
 
 /**
@@ -415,13 +415,33 @@ class Token
     private $_value;
 
     /**
+     * Returns the key for this token.
+     *
+     * @return string The key for this token.
+     */
+    public function getKey()
+    {
+        return $this->_key;
+    }
+
+    /**
      * Sets the token key.
      *
      * @param string $key The key for this token. Must not be <code>null</code>.
      */
     public function setKey($key)
     {
-        $this->_key = (string) $key;
+        $this->_key = (string)$key;
+    }
+
+    /**
+     * Returns the value for this token.
+     *
+     * @return string The value for this token.
+     */
+    public function getValue()
+    {
+        return $this->_value;
     }
 
     /**
@@ -439,28 +459,8 @@ class Token
                 $this->_value = "false";
             }
         } else {
-            $this->_value = (string) $value;
+            $this->_value = (string)$value;
         }
-    }
-
-    /**
-     * Returns the key for this token.
-     *
-     * @return string The key for this token.
-     */
-    public function getKey()
-    {
-        return $this->_key;
-    }
-
-    /**
-     * Returns the value for this token.
-     *
-     * @return string The value for this token.
-     */
-    public function getValue()
-    {
-        return $this->_value;
     }
 
     /**

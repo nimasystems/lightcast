@@ -28,7 +28,7 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
     public function getCategorizationMap()
     {
         return [
-            'models' => 'database_models'
+            'models' => 'database_models',
         ];
     }
 
@@ -41,7 +41,7 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
             'forms',
             'modules',
             'models',
-            'ws'
+            'ws',
         ];
     }
 }

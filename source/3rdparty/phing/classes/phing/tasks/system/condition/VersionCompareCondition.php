@@ -75,7 +75,7 @@ class VersionCompareCondition implements Condition
      */
     public function setOperator($operator)
     {
-        $allowed = array('<', 'lt', '<=', 'le', '>', 'gt', '>=', 'ge', '==', '=', 'eq', '!=', '<>', 'ne');
+        $allowed = ['<', 'lt', '<=', 'le', '>', 'gt', '>=', 'ge', '==', '=', 'eq', '!=', '<>', 'ne'];
         if (!in_array($operator, $allowed)) { // allowed operators for php's version_comapare()
             require_once 'phing/BuildException.php';
             throw new BuildException(sprintf(
@@ -92,7 +92,7 @@ class VersionCompareCondition implements Condition
      */
     public function setDebug($debug)
     {
-        $this->debug = (bool) $debug;
+        $this->debug = (bool)$debug;
     }
 
     /**
@@ -112,7 +112,7 @@ class VersionCompareCondition implements Condition
                 $this->version,
                 $this->operator,
                 $this->desiredVersion
-             );
+            );
         }
         return $isValid;
     }

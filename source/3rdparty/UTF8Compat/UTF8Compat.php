@@ -102,11 +102,11 @@ function utf8_check($Str)
     for ($i = 0; $i < strlen($Str); $i++) {
         $b = ord($Str[$i]);
         if ($b < 0x80) continue; # 0bbbbbbb
-        elseif (($b & 0xE0) == 0xC0) $n = 1; # 110bbbbb
-        elseif (($b & 0xF0) == 0xE0) $n = 2; # 1110bbbb
-        elseif (($b & 0xF8) == 0xF0) $n = 3; # 11110bbb
-        elseif (($b & 0xFC) == 0xF8) $n = 4; # 111110bb
-        elseif (($b & 0xFE) == 0xFC) $n = 5; # 1111110b
+        else if (($b & 0xE0) == 0xC0) $n = 1; # 110bbbbb
+        else if (($b & 0xF0) == 0xE0) $n = 2; # 1110bbbb
+        else if (($b & 0xF8) == 0xF0) $n = 3; # 11110bbb
+        else if (($b & 0xFC) == 0xF8) $n = 4; # 111110bb
+        else if (($b & 0xFE) == 0xFC) $n = 5; # 1111110b
         else return false; # Does not match any model
         for ($j = 0; $j < $n; $j++) { # n bytes matching 10bbbbbb follow ?
             if ((++$i == strlen($Str)) || ((ord($Str[$i]) & 0xC0) != 0x80))
@@ -137,12 +137,12 @@ function utf8_strlen($string)
  *
  * Return part of a string given character offset (and optionally length)
  *
- * @author Harry Fuecks <hfuecks@gmail.com>
- * @author Chris Smith <chris@jalakai.co.uk>
  * @param string
  * @param integer number of UTF-8 characters offset (from left)
  * @param integer (optional) length in UTF-8 characters from offset
  * @return mixed string or false if failure
+ * @author Harry Fuecks <hfuecks@gmail.com>
+ * @author Chris Smith <chris@jalakai.co.uk>
  */
 function utf8_substr($str, $offset, $length = null)
 {
@@ -287,9 +287,9 @@ function utf8_str_replace($s, $r, $str)
 /**
  * Unicode aware replacement for ltrim()
  *
- * @author Andreas Gohr <andi@splitbrain.org>
- * @see    ltrim()
  * @return string
+ * @see    ltrim()
+ * @author Andreas Gohr <andi@splitbrain.org>
  */
 function utf8_ltrim($str, $charlist = '')
 {
@@ -304,11 +304,11 @@ function utf8_ltrim($str, $charlist = '')
 /**
  * Unicode aware replacement for rtrim()
  *
- * @author Andreas Gohr <andi@splitbrain.org>
- * @see    rtrim()
  * @return string
+ * @see    rtrim()
+ * @author Andreas Gohr <andi@splitbrain.org>
  */
-function  utf8_rtrim($str, $charlist = '')
+function utf8_rtrim($str, $charlist = '')
 {
     if ($charlist == '') return rtrim($str);
 
@@ -321,11 +321,11 @@ function  utf8_rtrim($str, $charlist = '')
 /**
  * Unicode aware replacement for trim()
  *
- * @author Andreas Gohr <andi@splitbrain.org>
- * @see    trim()
  * @return string
+ * @see    trim()
+ * @author Andreas Gohr <andi@splitbrain.org>
  */
-function  utf8_trim($str, $charlist = '')
+function utf8_trim($str, $charlist = '')
 {
     if ($charlist == '') return trim($str);
 
@@ -421,10 +421,10 @@ function utf8_romanize($string)
  * This function adds the controlchars 0x00 to 0x19 to the array of
  * stripped chars (they are not included in $UTF8_SPECIAL_CHARS)
  *
+ * @param string $string The UTF8 string to strip of special chars
+ * @param string $repl Replace special with this string
+ * @param string $additional Additional chars to strip (used in regexp char class)
  * @author Andreas Gohr <andi@splitbrain.org>
- * @param  string $string The UTF8 string to strip of special chars
- * @param  string $repl Replace special with this string
- * @param  string $additional Additional chars to strip (used in regexp char class)
  */
 function utf8_stripspecials($string, $repl = '', $additional = '')
 {
@@ -486,7 +486,7 @@ function utf8_tohtml($str)
     foreach (utf8_to_unicode($str) as $cp) {
         if ($cp < 0x80)
             $ret .= chr($cp);
-        elseif ($cp < 0x100)
+        else if ($cp < 0x100)
             $ret .= "&#$cp;";
         else
             $ret .= '&#x' . dechex($cp) . ';';
@@ -507,10 +507,10 @@ function utf8_tohtml($str)
  * utf8_unhtml(unhtmlspecialchars($s)) -> "&&amp#38;"
  * what it should be                   -> "&#38;&amp#38;"
  *
- * @author Tom N Harris <tnharris@whoopdedo.org>
- * @param  string $str UTF-8 encoded string
- * @param  boolean $entities Flag controlling decoding of named entities.
+ * @param string $str UTF-8 encoded string
+ * @param boolean $entities Flag controlling decoding of named entities.
  * @return UTF-8 encoded string with numeric (and named) entities replaced.
+ * @author Tom N Harris <tnharris@whoopdedo.org>
  */
 function utf8_unhtml($str, $entities = null)
 {
@@ -522,7 +522,7 @@ function utf8_unhtml($str, $entities = null)
             'utf8_decode_numeric', $str);
     else
         return preg_replace_callback('/&(#)?([Xx])?([0-9A-Za-z]+);/m',
-            array(&$decoder, 'decode'), $str);
+            [&$decoder, 'decode'], $str);
 }
 
 function utf8_decode_numeric($ent)
@@ -536,7 +536,7 @@ function utf8_decode_numeric($ent)
             $cp = intval($ent[3]);
             break;
     }
-    return unicode_to_utf8(array($cp));
+    return unicode_to_utf8([$cp]);
 }
 
 class utf8_entity_decoder
@@ -547,19 +547,19 @@ class utf8_entity_decoder
     {
         $table = get_html_translation_table(HTML_ENTITIES);
         $table = array_flip($table);
-        $this->table = array_map(array(&$this, 'makeutf8'), $table);
+        $this->table = array_map([&$this, 'makeutf8'], $table);
     }
 
     function makeutf8($c)
     {
-        return unicode_to_utf8(array(ord($c)));
+        return unicode_to_utf8([ord($c)]);
     }
 
     function decode($ent)
     {
         if ($ent[1] == '#') {
             return utf8_decode_numeric($ent);
-        } elseif (array_key_exists($ent[0], $this->table)) {
+        } else if (array_key_exists($ent[0], $this->table)) {
             return $this->table[$ent[0]];
         } else {
             return $ent[0];
@@ -580,11 +580,11 @@ class utf8_entity_decoder
  * Note: this function has been modified slightly in this library to
  * trigger errors on encountering bad bytes
  *
- * @author <hsivonen@iki.fi>
- * @author Harry Fuecks <hfuecks@gmail.com>
- * @param  string  UTF-8 encoded string
- * @param  boolean Check for invalid sequences?
+ * @param string  UTF-8 encoded string
+ * @param boolean Check for invalid sequences?
  * @return mixed array of unicode code points or false if UTF-8 invalid
+ * @author Harry Fuecks <hfuecks@gmail.com>
+ * @author <hsivonen@iki.fi>
  * @see    unicode_to_utf8
  * @link   http://hsivonen.iki.fi/php-utf8/
  * @link   http://sourceforge.net/projects/phputf8/
@@ -596,7 +596,7 @@ function utf8_to_unicode($str, $strict = false)
     $mUcs4 = 0;     // cached Unicode character
     $mBytes = 1;     // cached expected number of octets in the current sequence
 
-    $out = array();
+    $out = [];
 
     $len = strlen($str);
 
@@ -655,7 +655,7 @@ function utf8_to_unicode($str, $strict = false)
                 $mState = 5;
                 $mBytes = 6;
 
-            } elseif ($strict) {
+            } else if ($strict) {
                 /* Current octet is neither in the US-ASCII range nor a legal first
 				 * octet of a multi-octet sequence.
 				*/
@@ -723,7 +723,7 @@ function utf8_to_unicode($str, $strict = false)
                     $mBytes = 1;
                 }
 
-            } elseif ($strict) {
+            } else if ($strict) {
                 /**
                  *((0xC0 & (*in) != 0x80) && (mState != 0))
                  * Incomplete multi-octet sequence.
@@ -755,8 +755,8 @@ function utf8_to_unicode($str, $strict = false)
  * output buffering to concatenate the UTF-8 string (faster) as well as
  * reference the array by it's keys
  *
- * @param  array of unicode code points representing a string
- * @param  boolean Check for invalid sequences?
+ * @param array of unicode code points representing a string
+ * @param boolean Check for invalid sequences?
  * @return mixed UTF-8 string or false if array contains invalid code points
  * @author <hsivonen@iki.fi>
  * @author Harry Fuecks <hfuecks@gmail.com>
@@ -815,7 +815,7 @@ function unicode_to_utf8($arr, $strict = false)
             echo chr(0x80 | (($arr[$k] >> 6) & 0x3f));
             echo chr(0x80 | ($arr[$k] & 0x3f));
 
-        } elseif ($strict) {
+        } else if ($strict) {
 
             trigger_error(
                 'unicode_to_utf8: Codepoint out of Unicode range ' .
@@ -870,11 +870,11 @@ function utf16be_to_utf8(&$str)
  * Comes from W3 FAQ: Multilingual Forms
  * Note: modified to include full ASCII range including control chars
  *
- * @author Harry Fuecks <hfuecks@gmail.com>
- * @see http://www.w3.org/International/questions/qa-forms-utf-8
  * @param string to search
  * @param string to replace bad bytes with (defaults to '?') - use ASCII
  * @return string
+ * @see http://www.w3.org/International/questions/qa-forms-utf-8
+ * @author Harry Fuecks <hfuecks@gmail.com>
  */
 function utf8_bad_replace($str, $replace = '')
 {
@@ -944,7 +944,7 @@ if (!UTF8_MBSTRING) {
      * @author Andreas Gohr <andi@splitbrain.org>
      */
     global $UTF8_LOWER_TO_UPPER;
-    $UTF8_LOWER_TO_UPPER = array(
+    $UTF8_LOWER_TO_UPPER = [
         0x0061 => 0x0041, 0x03C6 => 0x03A6, 0x0163 => 0x0162, 0x00E5 => 0x00C5, 0x0062 => 0x0042,
         0x013A => 0x0139, 0x00E1 => 0x00C1, 0x0142 => 0x0141, 0x03CD => 0x038E, 0x0101 => 0x0100,
         0x0491 => 0x0490, 0x03B4 => 0x0394, 0x015B => 0x015A, 0x0064 => 0x0044, 0x03B3 => 0x0393,
@@ -988,7 +988,7 @@ if (!UTF8_MBSTRING) {
         0x0074 => 0x0054, 0x006A => 0x004A, 0x045B => 0x040B, 0x0456 => 0x0406, 0x0103 => 0x0102,
         0x03BB => 0x039B, 0x00F1 => 0x00D1, 0x043D => 0x041D, 0x03CC => 0x038C, 0x00E9 => 0x00C9,
         0x00F0 => 0x00D0, 0x0457 => 0x0407, 0x0123 => 0x0122,
-    );
+    ];
 
     /**
      * UTF-8 Case lookup table
@@ -1014,7 +1014,7 @@ if (!UTF8_MBSTRING) {
  * @see    utf8_deaccent()
  */
 global $UTF8_LOWER_ACCENTS;
-$UTF8_LOWER_ACCENTS = array(
+$UTF8_LOWER_ACCENTS = [
     'à' => 'a', 'ô' => 'o', 'ď' => 'd', 'ḟ' => 'f', 'ë' => 'e', 'š' => 's', 'ơ' => 'o',
     'ß' => 'ss', 'ă' => 'a', 'ř' => 'r', 'ț' => 't', 'ň' => 'n', 'ā' => 'a', 'ķ' => 'k',
     'ŝ' => 's', 'ỳ' => 'y', 'ņ' => 'n', 'ĺ' => 'l', 'ħ' => 'h', 'ṗ' => 'p', 'ó' => 'o',
@@ -1030,7 +1030,7 @@ $UTF8_LOWER_ACCENTS = array(
     'â' => 'a', 'ľ' => 'l', 'ẅ' => 'w', 'ż' => 'z', 'ī' => 'i', 'ã' => 'a', 'ġ' => 'g',
     'ṁ' => 'm', 'ō' => 'o', 'ĩ' => 'i', 'ù' => 'u', 'į' => 'i', 'ź' => 'z', 'á' => 'a',
     'û' => 'u', 'þ' => 'th', 'ð' => 'dh', 'æ' => 'ae', 'µ' => 'u', 'ĕ' => 'e',
-);
+];
 
 /**
  * UTF-8 lookup table for upper case accented letters
@@ -1042,7 +1042,7 @@ $UTF8_LOWER_ACCENTS = array(
  * @see    utf8_deaccent()
  */
 global $UTF8_UPPER_ACCENTS;
-$UTF8_UPPER_ACCENTS = array(
+$UTF8_UPPER_ACCENTS = [
     'À' => 'A', 'Ô' => 'O', 'Ď' => 'D', 'Ḟ' => 'F', 'Ë' => 'E', 'Š' => 'S', 'Ơ' => 'O',
     'Ă' => 'A', 'Ř' => 'R', 'Ț' => 'T', 'Ň' => 'N', 'Ā' => 'A', 'Ķ' => 'K',
     'Ŝ' => 'S', 'Ỳ' => 'Y', 'Ņ' => 'N', 'Ĺ' => 'L', 'Ħ' => 'H', 'Ṗ' => 'P', 'Ó' => 'O',
@@ -1058,7 +1058,7 @@ $UTF8_UPPER_ACCENTS = array(
     'Â' => 'A', 'Ľ' => 'L', 'Ẅ' => 'W', 'Ż' => 'Z', 'Ī' => 'I', 'Ã' => 'A', 'Ġ' => 'G',
     'Ṁ' => 'M', 'Ō' => 'O', 'Ĩ' => 'I', 'Ù' => 'U', 'Į' => 'I', 'Ź' => 'Z', 'Á' => 'A',
     'Û' => 'U', 'Þ' => 'Th', 'Ð' => 'Dh', 'Æ' => 'Ae', 'Ĕ' => 'E',
-);
+];
 
 /**
  * UTF-8 array of common special characters
@@ -1075,7 +1075,7 @@ $UTF8_UPPER_ACCENTS = array(
  * @see    utf8_stripspecials()
  */
 global $UTF8_SPECIAL_CHARS;
-$UTF8_SPECIAL_CHARS = array(
+$UTF8_SPECIAL_CHARS = [
     0x001a, 0x001b, 0x001c, 0x001d, 0x001e, 0x001f, 0x0020, 0x0021, 0x0022, 0x0023,
     0x0024, 0x0025, 0x0026, 0x0027, 0x0028, 0x0029, 0x002b, 0x002c,
     0x002f, 0x003b, 0x003c, 0x003d, 0x003e, 0x003f, 0x0040, 0x005b,
@@ -1135,7 +1135,7 @@ $UTF8_SPECIAL_CHARS = array(
     0xff5c, 0xff5d, 0xff5e, 0xff5f, 0xff60, 0xff61, 0xff62, 0xff63, 0xff64, 0xff65,
     0xffe0, 0xffe1, 0xffe2, 0xffe3, 0xffe4, 0xffe5, 0xffe6, 0xffe8, 0xffe9, 0xffea,
     0xffeb, 0xffec, 0xffed, 0xffee,
-);
+];
 
 // utf8 version of above data
 global $UTF8_SPECIAL_CHARS2;
@@ -1181,7 +1181,7 @@ $UTF8_SPECIAL_CHARS2 =
  * @link   http://www.btranslations.com/resources/romanization/korean.asp
  */
 global $UTF8_ROMANIZATION;
-$UTF8_ROMANIZATION = array(
+$UTF8_ROMANIZATION = [
     //russian cyrillic
     'а' => 'a', 'А' => 'A', 'б' => 'b', 'Б' => 'B', 'в' => 'v', 'В' => 'V', 'г' => 'g', 'Г' => 'G',
     'д' => 'd', 'Д' => 'D', 'е' => 'e', 'Е' => 'E', 'ё' => 'jo', 'Ё' => 'Jo', 'ж' => 'zh', 'Ж' => 'Zh',
@@ -1325,7 +1325,7 @@ $UTF8_ROMANIZATION = array(
     'ㅜ' => 'wu', 'ㅡ' => 'u', 'ㅣ' => 'i', 'ㅐ' => 'ay', 'ㅔ' => 'ey', 'ㅚ' => 'oy', 'ㅘ' => 'wa', 'ㅝ' => 'we',
     'ㅟ' => 'wi', 'ㅙ' => 'way', 'ㅞ' => 'wey', 'ㅢ' => 'uy', 'ㅑ' => 'ya', 'ㅕ' => 'ye', 'ㅛ' => 'oy',
     'ㅠ' => 'yu', 'ㅒ' => 'yay', 'ㅖ' => 'yey',
-);
+];
 
 //Setup VIM: ex: et ts=2 enc=utf-8 :
 

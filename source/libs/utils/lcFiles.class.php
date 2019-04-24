@@ -272,6 +272,8 @@ class lcFiles
 
     /**
      * Sanitizes a filename replacing whitespace with dashes
+     * @param string $filename The filename to be sanitized
+     * @return string The sanitized filename
      * @author WordPress
      *
      * Removes special characters that are illegal in filenames on certain
@@ -282,8 +284,6 @@ class lcFiles
      *
      * @since 2.1.0
      *
-     * @param string $filename The filename to be sanitized
-     * @return string The sanitized filename
      */
     public static function sanitizeFilename($filename)
     {

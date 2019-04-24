@@ -43,7 +43,7 @@ class lcHttpAcceptParser extends lcObj
 
         if ($this->type == lcHttpAcceptType::ACCEPT_MIMETYPES) {
             return $this->_check_mimetype($accept_test);
-        } elseif ($this->type == lcHttpAcceptType::ACCEPT_LANGUAGE) {
+        } else if ($this->type == lcHttpAcceptType::ACCEPT_LANGUAGE) {
             return $this->_check_language($accept_test);
         } else {
             return $this->_check_general($accept_test);

@@ -35,14 +35,6 @@ class lcTagLink extends lcHtmlTag
         $this->setMedia($media);
     }
 
-    /**
-     * @return lcTagLink
-     */
-    public static function create()
-    {
-        return new lcTagLink();
-    }
-
     public function setHref($href)
     {
         $this->setAttribute('href', $href);
@@ -65,6 +57,14 @@ class lcTagLink extends lcHtmlTag
     {
         $this->setAttribute('media', $media);
         return $this;
+    }
+
+    /**
+     * @return lcTagLink
+     */
+    public static function create()
+    {
+        return new lcTagLink();
     }
 
     public static function getRequiredAttributes()

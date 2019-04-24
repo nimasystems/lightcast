@@ -41,20 +41,18 @@ include_once 'phing/IntrospectionHelper.php';
 class ProjectConfigurator
 {
 
+    private static $propReplaceProject;
+    private static $propReplaceProperties;
+    private static $propReplaceLogLevel = Project::MSG_VERBOSE;
     public $project;
     public $locator;
-
     public $buildFile;
     public $buildFileParent;
-
     /** Synthetic target that will be called at the end to the parse phase */
     private $parseEndTarget;
-
     /** Name of the current project */
     private $currentProjectName;
-
     private $isParsing = true;
-
     /**
      * Indicates whether the project tag attributes are to be ignored
      * when processing a particular build file.
@@ -62,25 +60,12 @@ class ProjectConfigurator
     private $ignoreProjectTag = false;
 
     /**
-     * Static call to ProjectConfigurator. Use this to configure a
-     * project. Do not use the new operator.
-     *
-     * @param  Project $project  the Project instance this configurator should use
-     * @param  PhingFile $buildFile  the buildfile object the parser should use
-     */
-    public static function configureProject(Project $project, PhingFile $buildFile)
-    {
-        $pc = new ProjectConfigurator($project, $buildFile);
-        $pc->parse();
-    }
-
-    /**
      * Constructs a new ProjectConfigurator object
      * This constructor is private. Use a static call to
      * <code>configureProject</code> to configure a project.
      *
-     * @param  Project $project     the Project instance this configurator should use
-     * @param  PhingFile $buildFile the buildfile object the parser should use
+     * @param Project $project the Project instance this configurator should use
+     * @param PhingFile $buildFile the buildfile object the parser should use
      */
     public function __construct(Project $project, PhingFile $buildFile)
     {
@@ -91,65 +76,16 @@ class ProjectConfigurator
     }
 
     /**
-     * find out the build file
-     * @return PhingFile the build file to which the xml context belongs
+     * Static call to ProjectConfigurator. Use this to configure a
+     * project. Do not use the new operator.
+     *
+     * @param Project $project the Project instance this configurator should use
+     * @param PhingFile $buildFile the buildfile object the parser should use
      */
-    public function getBuildFile()
+    public static function configureProject(Project $project, PhingFile $buildFile)
     {
-        return $this->buildFile;
-    }
-
-    /**
-     * find out the parent build file of this build file
-     * @return PhingFile the parent build file of this build file
-     */
-    public function getBuildFileParent()
-    {
-        return $this->buildFileParent;
-    }
-
-    /**
-     * find out the current project name
-     * @return string current project name
-     */
-    public function getCurrentProjectName()
-    {
-        return $this->currentProjectName;
-    }
-
-    /**
-     * set the name of the current project
-     * @param string $name name of the current project
-     */
-    public function setCurrentProjectName($name)
-    {
-        $this->currentProjectName = $name;
-    }
-
-    /**
-     * tells whether the project tag is being ignored
-     * @return bool whether the project tag is being ignored
-     */
-    public function isIgnoringProjectTag()
-    {
-        return $this->ignoreProjectTag;
-    }
-
-    /**
-     * sets the flag to ignore the project tag
-     * @param bool $flag flag to ignore the project tag
-     */
-    public function setIgnoreProjectTag($flag)
-    {
-        $this->ignoreProjectTag = $flag;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isParsing()
-    {
-        return $this->isParsing;
+        $pc = new ProjectConfigurator($project, $buildFile);
+        $pc->parse();
     }
 
     /**
@@ -180,7 +116,7 @@ class ProjectConfigurator
                 $newCurrent = new Target();
                 $newCurrent->setProject($this->project);
                 $newCurrent->setName('');
-                $ctx->setCurrentTargets(array());
+                $ctx->setCurrentTargets([]);
                 $ctx->setImplicitTarget($newCurrent);
 
                 // this is an imported file
@@ -192,7 +128,7 @@ class ProjectConfigurator
                 $ctx->setImplicitTarget($currentImplicit);
                 $ctx->setCurrentTargets($currentTargets);
             } else {
-                $ctx->setCurrentTargets(array());
+                $ctx->setCurrentTargets([]);
                 $this->_parse($ctx);
                 $ctx->getImplicitTarget()->main();
             }
@@ -201,6 +137,15 @@ class ProjectConfigurator
             //throw new BuildException("Error reading project file", $exc);
             throw $exc;
         }
+    }
+
+    /**
+     * sets the flag to ignore the project tag
+     * @param bool $flag flag to ignore the project tag
+     */
+    public function setIgnoreProjectTag($flag)
+    {
+        $this->ignoreProjectTag = $flag;
     }
 
     /**
@@ -226,17 +171,6 @@ class ProjectConfigurator
         $this->parseEndTarget->main();
         // pop this action from the global stack
         $ctx->endConfigure();
-    }
-
-    /**
-     * Delay execution of a task until after the current parse phase has
-     * completed.
-     *
-     * @param Task $task Task to execute after parse
-     */
-    public function delayTaskUntilParseEnd($task)
-    {
-        $this->parseEndTarget->addTask($task);
     }
 
     /**
@@ -287,54 +221,13 @@ class ProjectConfigurator
     }
 
     /**
-     * Configures the #CDATA of an element.
-     *
-     * @param  object  the project this element belongs to
-     * @param  object  the element to configure
-     * @param  string  the element's #CDATA
-     */
-    public static function addText($project, $target, $text = null)
-    {
-        if ($text === null || strlen(trim($text)) === 0) {
-            return;
-        }
-        $ih = IntrospectionHelper::getHelper(get_class($target));
-        $text = self::replaceProperties($project, $text, $project->getProperties());
-        $ih->addText($project, $target, $text);
-    }
-
-    /**
-     * Stores a configured child element into its parent object
-     *
-     * @param  object  the project this element belongs to
-     * @param  object  the parent element
-     * @param  object  the child element
-     * @param  string  the XML tagname
-     */
-    public static function storeChild($project, $parent, $child, $tag)
-    {
-        $ih = IntrospectionHelper::getHelper(get_class($parent));
-        $ih->storeElement($project, $parent, $child, $tag);
-    }
-
-    // The following three properties are a sort of hack
-    // to enable a static function to serve as the callback
-    // for preg_replace_callback().  Clearly we cannot use object
-    // variables, since the replaceProperties() is called statically.
-    // This is IMO better than using global variables in the callback.
-
-    private static $propReplaceProject;
-    private static $propReplaceProperties;
-    private static $propReplaceLogLevel = Project::MSG_VERBOSE;
-
-    /**
      * Replace ${} style constructions in the given value with the
      * string value of the corresponding data types. This method is
      * static.
      *
      * @param object|Project $project the project that should be used for property look-ups
-     * @param  string $value the string to be scanned for property references
-     * @param  array $keys property keys
+     * @param string $value the string to be scanned for property references
+     * @param array $keys property keys
      * @param int $logLevel the level of generated log messages
      * @return string  the replaced string or <code>null</code> if the string
      *                          itself was null
@@ -365,7 +258,7 @@ class ProjectConfigurator
         while (strpos($sb, '${') !== false) {
             $sb = preg_replace_callback(
                 '/\$\{([^\$}]+)\}/',
-                array('ProjectConfigurator', 'replacePropertyCallback'),
+                ['ProjectConfigurator', 'replacePropertyCallback'],
                 $sb
             );
 
@@ -377,6 +270,37 @@ class ProjectConfigurator
         }
 
         return $sb;
+    }
+
+    /**
+     * Configures the #CDATA of an element.
+     *
+     * @param object  the project this element belongs to
+     * @param object  the element to configure
+     * @param string  the element's #CDATA
+     */
+    public static function addText($project, $target, $text = null)
+    {
+        if ($text === null || strlen(trim($text)) === 0) {
+            return;
+        }
+        $ih = IntrospectionHelper::getHelper(get_class($target));
+        $text = self::replaceProperties($project, $text, $project->getProperties());
+        $ih->addText($project, $target, $text);
+    }
+
+    /**
+     * Stores a configured child element into its parent object
+     *
+     * @param object  the project this element belongs to
+     * @param object  the parent element
+     * @param object  the child element
+     * @param string  the XML tagname
+     */
+    public static function storeChild($project, $parent, $child, $tag)
+    {
+        $ih = IntrospectionHelper::getHelper(get_class($parent));
+        $ih->storeElement($project, $parent, $child, $tag);
     }
 
     /**
@@ -413,6 +337,76 @@ class ProjectConfigurator
         }
 
         return $propertyValue;
+    }
+
+    /**
+     * find out the build file
+     * @return PhingFile the build file to which the xml context belongs
+     */
+    public function getBuildFile()
+    {
+        return $this->buildFile;
+    }
+
+    /**
+     * find out the parent build file of this build file
+     * @return PhingFile the parent build file of this build file
+     */
+    public function getBuildFileParent()
+    {
+        return $this->buildFileParent;
+    }
+
+    // The following three properties are a sort of hack
+    // to enable a static function to serve as the callback
+    // for preg_replace_callback().  Clearly we cannot use object
+    // variables, since the replaceProperties() is called statically.
+    // This is IMO better than using global variables in the callback.
+
+    /**
+     * find out the current project name
+     * @return string current project name
+     */
+    public function getCurrentProjectName()
+    {
+        return $this->currentProjectName;
+    }
+
+    /**
+     * set the name of the current project
+     * @param string $name name of the current project
+     */
+    public function setCurrentProjectName($name)
+    {
+        $this->currentProjectName = $name;
+    }
+
+    /**
+     * tells whether the project tag is being ignored
+     * @return bool whether the project tag is being ignored
+     */
+    public function isIgnoringProjectTag()
+    {
+        return $this->ignoreProjectTag;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isParsing()
+    {
+        return $this->isParsing;
+    }
+
+    /**
+     * Delay execution of a task until after the current parse phase has
+     * completed.
+     *
+     * @param Task $task Task to execute after parse
+     */
+    public function delayTaskUntilParseEnd($task)
+    {
+        $this->parseEndTarget->addTask($task);
     }
 
     /**

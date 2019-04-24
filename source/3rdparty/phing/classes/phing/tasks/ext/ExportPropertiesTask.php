@@ -55,22 +55,22 @@ class ExportPropertiesTask extends Task
      *
      * @var array
      */
-    private $_disallowedPropertyPrefixes = array(
+    private $_disallowedPropertyPrefixes = [
         'host.',
         'phing.',
         'os.',
         'php.',
         'line.',
         'env.',
-        'user.'
-    );
+        'user.',
+    ];
 
     /**
      * setter for _targetFile
      *
-     * @param  string $file
-     * @throws BuildException
+     * @param string $file
      * @return bool
+     * @throws BuildException
      */
     public function setTargetFile($file)
     {
@@ -91,8 +91,8 @@ class ExportPropertiesTask extends Task
      * setter for _disallowedPropertyPrefixes
      *
      * @param $prefixes
-     * @internal param string $file
      * @return bool
+     * @internal param string $file
      */
     public function setDisallowedPropertyPrefixes($prefixes)
     {
@@ -123,7 +123,7 @@ class ExportPropertiesTask extends Task
     /**
      * Checks if a property name is disallowed
      *
-     * @param  string $propertyName
+     * @param string $propertyName
      * @return bool
      */
     protected function isDisallowedPropery($propertyName)

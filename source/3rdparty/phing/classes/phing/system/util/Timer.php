@@ -82,7 +82,7 @@ class Timer
      * the end of script execution.  Then, call elapsed_time() to obtain the
      * difference between start_time() and end_time().
      *
-     * @param  int $places decimal place precision of elapsed time (default is 5)
+     * @param int $places decimal place precision of elapsed time (default is 5)
      *
      * @return string Properly formatted time.
      */

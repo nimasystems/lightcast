@@ -49,6 +49,23 @@ class PropelArrayCollection extends PropelCollection
     }
 
     /**
+     * @return BaseObject
+     * @throws PropelException
+     */
+    protected function getWorkerObject()
+    {
+        if (null === $this->workerObject) {
+            if ($this->model == '') {
+                throw new PropelException('You must set the collection model before interacting with it');
+            }
+            $class = $this->getModel();
+            $this->workerObject = new $class();
+        }
+
+        return $this->workerObject;
+    }
+
+    /**
      * Delete all the elements in the collection
      *
      * @param PropelPDO $con
@@ -87,8 +104,8 @@ class PropelArrayCollection extends PropelCollection
      */
     public function getPrimaryKeys($usePrefix = true)
     {
-        $callable = array($this->getPeerClass(), 'getPrimaryKeyFromRow');
-        $ret = array();
+        $callable = [$this->getPeerClass(), 'getPrimaryKeyFromRow'];
+        $ret = [];
         foreach ($this as $key => $element) {
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;
             $ret[$key] = call_user_func($callable, array_values($element));
@@ -111,6 +128,23 @@ class PropelArrayCollection extends PropelCollection
             $obj->clear();
             $obj->fromArray($element);
             $this->append($obj->toArray());
+        }
+    }
+
+    /**
+     * Synonym for toArray(), to provide a similar interface to PopelObjectCollection
+     *
+     * @param string $keyColumn
+     * @param boolean $usePrefix
+     *
+     * @return array
+     */
+    public function getArrayCopy($keyColumn = null, $usePrefix = false)
+    {
+        if (null === $keyColumn && false === $usePrefix) {
+            return parent::getArrayCopy();
+        } else {
+            return $this->toArray($keyColumn, $usePrefix);
         }
     }
 
@@ -143,9 +177,9 @@ class PropelArrayCollection extends PropelCollection
      *
      * @return array
      */
-    public function toArray($keyColumn = null, $usePrefix = false, $keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array())
+    public function toArray($keyColumn = null, $usePrefix = false, $keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = [])
     {
-        $ret = array();
+        $ret = [];
         foreach ($this as $key => $element) {
             $key = null === $keyColumn ? $key : $element[$keyColumn];
             $key = $usePrefix ? ($this->getModel() . '_' . $key) : $key;
@@ -153,23 +187,6 @@ class PropelArrayCollection extends PropelCollection
         }
 
         return $ret;
-    }
-
-    /**
-     * Synonym for toArray(), to provide a similar interface to PopelObjectCollection
-     *
-     * @param string  $keyColumn
-     * @param boolean $usePrefix
-     *
-     * @return array
-     */
-    public function getArrayCopy($keyColumn = null, $usePrefix = false)
-    {
-        if (null === $keyColumn && false === $usePrefix) {
-            return parent::getArrayCopy();
-        } else {
-            return $this->toArray($keyColumn, $usePrefix);
-        }
     }
 
     /**
@@ -187,28 +204,11 @@ class PropelArrayCollection extends PropelCollection
      */
     public function toKeyValue($keyColumn, $valueColumn)
     {
-        $ret = array();
+        $ret = [];
         foreach ($this as $obj) {
             $ret[$obj[$keyColumn]] = $obj[$valueColumn];
         }
 
         return $ret;
-    }
-
-    /**
-     * @throws PropelException
-     * @return BaseObject
-     */
-    protected function getWorkerObject()
-    {
-        if (null === $this->workerObject) {
-            if ($this->model == '') {
-                throw new PropelException('You must set the collection model before interacting with it');
-            }
-            $class = $this->getModel();
-            $this->workerObject = new $class();
-        }
-
-        return $this->workerObject;
     }
 }

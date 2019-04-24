@@ -48,7 +48,7 @@ class ConfigurationException extends Exception
      *         throw new BuildException($msg);
      *         throw new BuildException($msg, $causeExc);
      * @param Exception|string $p1
-     * @param Exception|null   $p2
+     * @param Exception|null $p2
      */
     public function __construct($p1, $p2 = null)
     {
@@ -61,7 +61,7 @@ class ConfigurationException extends Exception
                 $cause = $p2;
                 $msg = $p1;
             }
-        } elseif ($p1 instanceof Exception) {
+        } else if ($p1 instanceof Exception) {
             $cause = $p1;
         } else {
             $msg = $p1;

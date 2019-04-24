@@ -30,11 +30,11 @@
  */
 class PresentSelector extends BaseSelector
 {
+    private static $filePresence = ["srconly", "both"];
     private $targetdir = null;
     private $mapperElement = null;
     private $map = null;
     private $destmustexist = true;
-    private static $filePresence = array("srconly", "both");
 
     /**
      * @return string
@@ -55,7 +55,7 @@ class PresentSelector extends BaseSelector
         }
         if ($this->map !== null) {
             $buf .= $this->map->toString();
-        } elseif ($this->mapperElement !== null) {
+        } else if ($this->mapperElement !== null) {
             $buf .= $this->mapperElement->toString();
         }
         $buf .= "}";
@@ -144,9 +144,9 @@ class PresentSelector extends BaseSelector
      * @param string $filename the name of the file to check
      * @param PhingFile $file a PhingFile object the selector can use
      *
+     * @return bool whether the file should be selected or not
      * @throws BuildException
      *
-     * @return bool whether the file should be selected or not
      */
     public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
     {

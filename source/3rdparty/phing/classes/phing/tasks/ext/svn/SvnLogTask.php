@@ -39,26 +39,9 @@ class SvnLogTask extends SvnBaseTask
     private $limit = null;
 
     /**
-     * Sets the name of the property to use
-     * @param $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Returns the name of the property to use
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * Sets whether to force compatibility with older SVN versions (< 1.2)
-     * @deprecated
      * @param $force
+     * @deprecated
      */
     public function setForceCompatible($force)
     {
@@ -70,7 +53,7 @@ class SvnLogTask extends SvnBaseTask
      */
     public function setLimit($limit)
     {
-        $this->limit = (int) $limit;
+        $this->limit = (int)$limit;
     }
 
     /**
@@ -82,12 +65,12 @@ class SvnLogTask extends SvnBaseTask
     {
         $this->setup('log');
 
-        $switches = array();
+        $switches = [];
         if ($this->limit > 0) {
             $switches['limit'] = $this->limit;
         }
 
-        $output = $this->run(array(), $switches);
+        $output = $this->run([], $switches);
         $result = null;
 
         if ($this->oldVersion) {
@@ -107,5 +90,22 @@ class SvnLogTask extends SvnBaseTask
         } else {
             throw new BuildException("Failed to parse the output of 'svn log'.");
         }
+    }
+
+    /**
+     * Returns the name of the property to use
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
+    }
+
+    /**
+     * Sets the name of the property to use
+     * @param $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
     }
 }

@@ -205,7 +205,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, [
             'module_name' => $controller,
             'action_name' => $action,
-            'request_params' => (array)$request_params
+            'request_params' => (array)$request_params,
         ]));
 
         $request->setRequestData($request_params);
@@ -290,9 +290,9 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             // notify listeners
             $this->event_dispatcher->notify(new lcEvent('controller.not_found', $this,
                 ['controller_name' => $controller_name,
-                    'action_name' => $action_name,
-                    'action_type' => (isset($action_params['type']) ? $action_params['type'] : null),
-                    'action_params' => $action_params,
+                 'action_name' => $action_name,
+                 'action_type' => (isset($action_params['type']) ? $action_params['type'] : null),
+                 'action_params' => $action_params,
                 ]
             ));
 

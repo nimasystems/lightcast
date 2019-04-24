@@ -39,11 +39,11 @@ class PharMetadataElement
     private $value;
 
     /**
-     * @param string $value
+     * @return string
      */
-    public function setValue($value)
+    public function getName()
     {
-        $this->value = $value;
+        return $this->name;
     }
 
     /**
@@ -52,14 +52,6 @@ class PharMetadataElement
     public function setName($name)
     {
         $this->name = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
     }
 
     /**
@@ -74,6 +66,14 @@ class PharMetadataElement
          */
 
         return (empty($this->elements) ? $this->value : $this->elements);
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setValue($value)
+    {
+        $this->value = $value;
     }
 
     /**

@@ -79,20 +79,9 @@ class UntarTask extends ExtractBaseTask
     }
 
     /**
-     * @param PhingFile $tarfile
-     * @return array|int
-     */
-    protected function listArchiveContent(PhingFile $tarfile)
-    {
-        $tar = $this->initTar($tarfile);
-
-        return $tar->listContent();
-    }
-
-    /**
      * Init a Archive_Tar class with correct compression for the given file.
      *
-     * @param  PhingFile   $tarfile
+     * @param PhingFile $tarfile
      * @return Archive_Tar the tar class instance
      */
     private function initTar(PhingFile $tarfile)
@@ -101,10 +90,10 @@ class UntarTask extends ExtractBaseTask
         $tarfileName = $tarfile->getName();
         $mode = strtolower(substr($tarfileName, strrpos($tarfileName, '.')));
 
-        $compressions = array(
-            'gz' => array('.gz', '.tgz',),
-            'bz2' => array('.bz2',),
-        );
+        $compressions = [
+            'gz' => ['.gz', '.tgz',],
+            'bz2' => ['.bz2',],
+        ];
         foreach ($compressions as $algo => $ext) {
             if (array_search($mode, $ext) !== false) {
                 $compression = $algo;
@@ -113,5 +102,16 @@ class UntarTask extends ExtractBaseTask
         }
 
         return new Archive_Tar($tarfile->getAbsolutePath(), $compression);
+    }
+
+    /**
+     * @param PhingFile $tarfile
+     * @return array|int
+     */
+    protected function listArchiveContent(PhingFile $tarfile)
+    {
+        $tar = $this->initTar($tarfile);
+
+        return $tar->listContent();
     }
 }

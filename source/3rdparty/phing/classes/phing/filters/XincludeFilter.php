@@ -53,18 +53,6 @@ class XincludeFilter extends BaseParamFilterReader implements ChainableReader
     private $resolveExternals = false;
 
     /**
-     * Whether to resolve entities.
-     *
-     * @param $resolveExternals
-     *
-     * @since 2.4
-     */
-    public function setResolveExternals($resolveExternals)
-    {
-        $this->resolveExternals = (bool) $resolveExternals;
-    }
-
-    /**
      * @return bool
      *
      * @since 2.4
@@ -75,26 +63,22 @@ class XincludeFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * @param PhingFile $dir
+     * Whether to resolve entities.
+     *
+     * @param $resolveExternals
+     *
+     * @since 2.4
      */
-    public function setBasedir(PhingFile $dir)
+    public function setResolveExternals($resolveExternals)
     {
-        $this->basedir = $dir;
-    }
-
-    /**
-     * @return null
-     */
-    public function getBasedir()
-    {
-        return $this->basedir;
+        $this->resolveExternals = (bool)$resolveExternals;
     }
 
     /**
      * Reads stream, applies XSLT and returns resulting stream.
      * @param null $len
-     * @throws BuildException
      * @return string         transformed buffer.
+     * @throws BuildException
      */
     public function read($len = null)
     {
@@ -140,7 +124,7 @@ class XincludeFilter extends BaseParamFilterReader implements ChainableReader
     /**
      * Try to process the Xinclude transformation
      *
-     * @param   string  XML to process.
+     * @param string  XML to process.
      *
      * @return string
      * @throws BuildException On errors
@@ -185,6 +169,22 @@ class XincludeFilter extends BaseParamFilterReader implements ChainableReader
         $newFilter->setBasedir($this->getBasedir());
 
         return $newFilter;
+    }
+
+    /**
+     * @return null
+     */
+    public function getBasedir()
+    {
+        return $this->basedir;
+    }
+
+    /**
+     * @param PhingFile $dir
+     */
+    public function setBasedir(PhingFile $dir)
+    {
+        $this->basedir = $dir;
     }
 
 }

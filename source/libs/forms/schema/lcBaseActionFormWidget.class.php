@@ -92,8 +92,6 @@ abstract class lcBaseActionFormWidget extends lcObj
     protected $field_tag_id;
     protected $field_tag_id_prefix;
 
-    abstract public function render();
-
     public function __construct()
     {
         parent::__construct();
@@ -101,6 +99,8 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->validation_failures = [];
         $this->validators = [];
     }
+
+    abstract public function render();
 
     public function initialize()
     {
@@ -120,6 +120,12 @@ abstract class lcBaseActionFormWidget extends lcObj
         //
     }
 
+    public function getFieldClassesMerged(array $additional_classes = null)
+    {
+        $classes = implode(' ', array_filter(array_merge([$this->getFieldClass(), $this->default_class], (array)$additional_classes)));
+        return $classes;
+    }
+
     /**
      * @return string|null
      */
@@ -128,10 +134,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         //
     }
 
-    public function getFieldClassesMerged(array $additional_classes = null)
+    public function getDataAlias()
     {
-        $classes = implode(' ', array_filter(array_merge([$this->getFieldClass(), $this->default_class], (array)$additional_classes)));
-        return $classes;
+        return $this->data_alias;
     }
 
     public function setDataAlias($alias)
@@ -140,20 +145,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function getDataAlias()
+    public function getLabelShownAfter()
     {
-        return $this->data_alias;
+        return $this->label_shown_after;
     }
 
     public function setLabelShownAfter($after)
     {
         $this->label_shown_after = $after;
         return $this;
-    }
-
-    public function getLabelShownAfter()
-    {
-        return $this->label_shown_after;
     }
 
     public function getIdPrefix()
@@ -167,20 +167,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function setTitle($title)
-    {
-        $this->title = $title;
-        return $this;
-    }
-
     public function getTitle()
     {
         return $this->title;
     }
 
-    public function setValidationRules($rules)
+    public function setTitle($title)
     {
-        $this->validation_rules = $rules;
+        $this->title = $title;
+        return $this;
     }
 
     public function getValidationRules()
@@ -188,26 +183,20 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->validation_rules;
     }
 
-    public function getNamePrefix()
+    public function setValidationRules($rules)
     {
-        return $this->name_prefix;
+        $this->validation_rules = $rules;
     }
 
-    public function setNamePrefix($prefix)
+    public function getDefaultClass()
     {
-        $this->name_prefix = $prefix;
-        return $this;
+        return $this->default_class;
     }
 
     public function setDefaultClass($class)
     {
         $this->default_class = $class;
         return $this;
-    }
-
-    public function getDefaultClass()
-    {
-        return $this->default_class;
     }
 
     public function getPlaceholder()
@@ -239,26 +228,26 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    public function getUIDescription()
+    {
+        return $this->ui_description;
+    }
+
     public function setUIDescription($description)
     {
         $this->ui_description = $description;
         return $this;
     }
 
+    public function getUIRequirements()
+    {
+        return $this->ui_requirements;
+    }
+
     public function setUIRequirements($requirements)
     {
         $this->ui_requirements = $requirements;
         return $this;
-    }
-
-    public function getUIDescription()
-    {
-        return $this->ui_description;
-    }
-
-    public function getUIRequirements()
-    {
-        return $this->ui_requirements;
     }
 
     public function getOnInitJavascript()
@@ -272,20 +261,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function setActionForm(lcActionForm $form)
-    {
-        $this->action_form = $form;
-        return $this;
-    }
-
     public function getActionForm()
     {
         return $this->action_form;
     }
 
-    public function getContainerFormName()
+    public function setActionForm(lcActionForm $form)
     {
-        return $this->action_form ? $this->action_form->getName() : null;
+        $this->action_form = $form;
+        return $this;
     }
 
     public function getConstraints()
@@ -305,17 +289,6 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function getNameSuffix()
-    {
-        return $this->name_suffix;
-    }
-
-    public function setNameSuffix($name_suffix)
-    {
-        $this->name_suffix = $name_suffix;
-        return $this;
-    }
-
     public function getPrefixedFieldName()
     {
         $container = $this->getContainer();
@@ -332,6 +305,49 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $full_name;
     }
 
+    public function getContainer()
+    {
+        return $this->container_name;
+    }
+
+    public function getContainerFormName()
+    {
+        return $this->action_form ? $this->action_form->getName() : null;
+    }
+
+    public function getNamePrefix()
+    {
+        return $this->name_prefix;
+    }
+
+    public function setNamePrefix($prefix)
+    {
+        $this->name_prefix = $prefix;
+        return $this;
+    }
+
+    public function getNameSuffix()
+    {
+        return $this->name_suffix;
+    }
+
+    public function setNameSuffix($name_suffix)
+    {
+        $this->name_suffix = $name_suffix;
+        return $this;
+    }
+
+    public function getFieldName()
+    {
+        return $this->field_name;
+    }
+
+    public function setFieldName($field_name)
+    {
+        $this->field_name = $field_name;
+        return $this;
+    }
+
     public function setAttributes(array $attributes)
     {
         $this->additional_tag_attributes = $attributes;
@@ -342,32 +358,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         $this->additional_tag_attributes[$key] = $value;
     }
 
-    public function getAttributes()
-    {
-        return array_merge((array)$this->additional_tag_attributes,
-            (isset($this->options['attributes']) ? (array)$this->options['attributes'] : []));
-    }
-
-    protected function addAdditionalAttributesToTag(lcHtmlTag $tag)
-    {
-        $attrs = $this->getAttributes();
-
-        if (!$attrs) {
-            return false;
-        }
-
-        foreach ($attrs as $name => $value) {
-            $tag->setAttribute($name, $value);
-            unset($name, $value);
-        }
-
-        return $this;
-    }
-
     public function setContainerName($container_name)
     {
         $this->container_name = $container_name;
         return $this;
+    }
+
+    public function getFieldTagId()
+    {
+        return $this->field_tag_id;
     }
 
     public function setFieldTagId($field_id)
@@ -376,30 +375,15 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
+    public function getFieldTagIdPrefix()
+    {
+        return $this->field_tag_id_prefix;
+    }
+
     public function setFieldTagIdPrefix($id_prefix)
     {
         $this->field_tag_id_prefix = $id_prefix;
         return $this;
-    }
-
-    public function getContainer()
-    {
-        return $this->container_name;
-    }
-
-    protected function getContainerNameForForm()
-    {
-        return strtolower($this->getContainer());
-    }
-
-    public function getFieldTagId()
-    {
-        return $this->field_tag_id;
-    }
-
-    public function getFieldTagIdPrefix()
-    {
-        return $this->field_tag_id_prefix;
     }
 
     public function getFieldId()
@@ -410,15 +394,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $id;
     }
 
-    public function setIsDisabled($is_disabled)
+    public function getIsReadOnly()
     {
-        $this->is_disabled = $is_disabled;
-        return $this;
-    }
-
-    public function getIsDisabled()
-    {
-        return $this->is_disabled;
+        return $this->is_read_only;
     }
 
     public function setIsReadOnly($read_only)
@@ -427,19 +405,19 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function getIsReadOnly()
-    {
-        return $this->is_read_only;
-    }
-
     public function getIsEnabled()
     {
         return !$this->getIsDisabled();
     }
 
-    public function setIsHidden($is_hidden)
+    public function getIsDisabled()
     {
-        $this->is_hidden = $is_hidden;
+        return $this->is_disabled;
+    }
+
+    public function setIsDisabled($is_disabled)
+    {
+        $this->is_disabled = $is_disabled;
         return $this;
     }
 
@@ -448,9 +426,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->is_hidden;
     }
 
-    public function setIsRequired($is_required)
+    public function setIsHidden($is_hidden)
     {
-        $this->is_required = $is_required;
+        $this->is_hidden = $is_hidden;
         return $this;
     }
 
@@ -470,9 +448,9 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->is_required;
     }
 
-    public function setPriority($priority)
+    public function setIsRequired($is_required)
     {
-        $this->priority = $priority;
+        $this->is_required = $is_required;
         return $this;
     }
 
@@ -481,15 +459,31 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this->priority;
     }
 
-    public function setFieldName($field_name)
+    public function setPriority($priority)
     {
-        $this->field_name = $field_name;
+        $this->priority = $priority;
         return $this;
     }
 
-    public function getFieldName()
+    public function getRawData()
     {
-        return $this->field_name;
+        return $this->getData();
+    }
+
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    public function setData($data = null)
+    {
+        $this->data = $data;
+        return $this;
+    }
+
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     public function setOptions(array $options = null)
@@ -589,33 +583,10 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function getRawData()
-    {
-        return $this->getData();
-    }
-
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    public function setData($data = null)
-    {
-        $this->data = $data;
-        return $this;
-    }
-
-    public function getData()
-    {
-        return $this->data;
-    }
-
     public function getValue()
     {
         return $this->data;
     }
-
-    #pragma mark - Validation
 
     public function validate()
     {
@@ -649,10 +620,20 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $is_valid;
     }
 
+    public function clearValidationFailures()
+    {
+        $this->validation_failures = [];
+        $this->is_valid = false;
+        $this->is_validated = false;
+        return $this;
+    }
+
     public function isValid()
     {
         return $this->is_valid;
     }
+
+    #pragma mark - Validation
 
     public function isValidated()
     {
@@ -689,21 +670,40 @@ abstract class lcBaseActionFormWidget extends lcObj
         return $this;
     }
 
-    public function clearValidationFailures()
+    public function __toString()
     {
-        $this->validation_failures = [];
-        $this->is_valid = false;
-        $this->is_validated = false;
+        return (!is_array($this->data) ? $this->data : '');
+    }
+
+    protected function addAdditionalAttributesToTag(lcHtmlTag $tag)
+    {
+        $attrs = $this->getAttributes();
+
+        if (!$attrs) {
+            return false;
+        }
+
+        foreach ($attrs as $name => $value) {
+            $tag->setAttribute($name, $value);
+            unset($name, $value);
+        }
+
         return $this;
+    }
+
+    public function getAttributes()
+    {
+        return array_merge((array)$this->additional_tag_attributes,
+            (isset($this->options['attributes']) ? (array)$this->options['attributes'] : []));
+    }
+
+    protected function getContainerNameForForm()
+    {
+        return strtolower($this->getContainer());
     }
 
     protected function t($string)
     {
         return $this->action_form ? $this->action_form->translate($string) : $string;
-    }
-
-    public function __toString()
-    {
-        return (!is_array($this->data) ? $this->data : '');
     }
 }

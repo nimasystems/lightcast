@@ -44,7 +44,7 @@ class BufferedReader extends Reader
 
     /**
      *
-     * @param Reader  $reader   The reader (e.g. FileReader).
+     * @param Reader $reader The reader (e.g. FileReader).
      * @param integer $buffsize The size of the buffer we should use for reading files.
      *                          A large buffer ensures that most files (all scripts?) are parsed in 1 buffer.
      */
@@ -56,7 +56,7 @@ class BufferedReader extends Reader
 
     /**
      * Reads and returns a chunk of data.
-     * @param  int   $len Number of bytes to read.  Default is to read configured buffer size number of bytes.
+     * @param int $len Number of bytes to read.  Default is to read configured buffer size number of bytes.
      * @return mixed buffer or -1 if EOF.
      */
     public function read($len = null)

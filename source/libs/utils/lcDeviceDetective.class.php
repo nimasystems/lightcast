@@ -25,27 +25,27 @@ class lcDeviceDetective
 {
     private static $device_strings =
         [
-        'symbian' => 'symbian',
-        'windows ce' => 'winmobile',
-        'windows' => 'winmobile',
-        'iemobile' => 'winmobile',
-        'wm5 pie' => 'winmobile', //old winmobile device :?
-        'blackberry' => 'blackberry',
-        'iphone' => 'iphone',
-        'ipad' => 'ipad',
-        'android' => 'android'
+            'symbian' => 'symbian',
+            'windows ce' => 'winmobile',
+            'windows' => 'winmobile',
+            'iemobile' => 'winmobile',
+            'wm5 pie' => 'winmobile', //old winmobile device :?
+            'blackberry' => 'blackberry',
+            'iphone' => 'iphone',
+            'ipad' => 'ipad',
+            'android' => 'android',
         ];
     private static $mobile_agents =
         [
-        'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
-        'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
-        'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
-        'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
-        'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox',
-        'qwap', 'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar',
-        'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
-        'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
-        'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-'
+            'w3c ', 'acs-', 'alav', 'alca', 'amoi', 'audi', 'avan', 'benq', 'bird', 'blac',
+            'blaz', 'brew', 'cell', 'cldc', 'cmd-', 'dang', 'doco', 'eric', 'hipt', 'inno',
+            'ipaq', 'java', 'jigs', 'kddi', 'keji', 'leno', 'lg-c', 'lg-d', 'lg-g', 'lge-',
+            'maui', 'maxo', 'midp', 'mits', 'mmef', 'mobi', 'mot-', 'moto', 'mwbp', 'nec-',
+            'newt', 'noki', 'palm', 'pana', 'pant', 'phil', 'play', 'port', 'prox',
+            'qwap', 'sage', 'sams', 'sany', 'sch-', 'sec-', 'send', 'seri', 'sgh-', 'shar',
+            'sie-', 'siem', 'smal', 'smar', 'sony', 'sph-', 'symb', 't-mo', 'teli', 'tim-',
+            'tosh', 'tsm-', 'upg1', 'upsi', 'vk-v', 'voda', 'wap-', 'wapa', 'wapi', 'wapp',
+            'wapr', 'webc', 'winw', 'winw', 'xda', 'xda-',
         ];
     private $useragent;
     private $httpaccept;
@@ -163,145 +163,151 @@ class lcDeviceDetective
     public function processDevice($device_key)
     {
         switch ($device_key) {
-            case 'iphone': {
-                // match iphone devices
-                preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 2) {
-                    return
-                        [
-                        'device' => 'iphone',
-                        'sdk' => $matches[1][0]
-                        ];
-                }
-
-                //default case unknow symbian device//
-                return
-                    [
-                    'device' => 'iphone',
-                    'sdk' => null
-                    ];
-
-                break;
-            }
-            case 'ipad': {
-                // match iphone devices
-                preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 2) {
-                    return
-                        [
-                        'device' => 'ipad',
-                        'sdk' => $matches[1][0]
-                        ];
-                }
-
-                //default case unknow symbian device//
-                return
-                    [
-                    'device' => 'ipad',
-                    'sdk' => null
-                    ];
-
-                break;
-            }
-            case 'android': {
-                // match android devices
-                preg_match_all('/Android\s(.*?);\s/i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 2) {
-                    return
-                        [
-                        'device' => 'android',
-                        'sdk' => $matches[1][0]
-                        ];
-                }
-
-                //default case unknow android device//
-                return
-                    [
-                    'device' => 'android',
-                    'sdk' => null
-                    ];
-
-                break;
-            }
-            case 'symbian': {
-                //new headers
-                preg_match_all('/series(.*?)\/(.*?) /i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 3) {
-                    return
-                        [
-                        'device' => 'symbian',
-                        'sdk' => (int)$matches[1][0],
-                        'fp' => $this->getFpCodeByBrowser($matches[2][0])
-                        ];
-                }
-
-                //default case unknow symbian device//
-                return
-                    [
-                    'device' => 'symbian',
-                    'sdk' => 0,
-                    'fp' => false
-                    ];
-
-                break;
-            }
-            case 'winmobile': {
-                //ie//
-                preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 2) {
-                    return
-                        [
-                        'device' => 'winmobile',
-                        'os_version' => (float)$matches[1][0]
-                        ];
-                }
-
-                //opera
-                preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
-                $matches = array_filter($matches);
-
-                if ($matches && count($matches) == 2) {
-                    return
-                        [
-                        'device' => 'winmobile',
-                        'os_version' => (float)$matches[1][0]
-                        ];
-                }
-
-                //opera sucks//
-                if (stripos('opera', $this->useragent) > -1) {
-                    preg_match_all('/windows nt (.*?);/i', $this->useragent, $matches);
+            case 'iphone':
+                {
+                    // match iphone devices
+                    preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
                     $matches = array_filter($matches);
 
                     if ($matches && count($matches) == 2) {
                         return
                             [
-                            'device' => 'winmobile',
-                            'os_version' => (float)$matches[1][0]
+                                'device' => 'iphone',
+                                'sdk' => $matches[1][0],
                             ];
                     }
-                }
 
-                //i dont know what are you!
-                return
-                    [
-                    'device' => 'winmobile',
-                    'os_version' => 0
-                    ];
-            }
-            default: {
-                return [];
-            }
+                    //default case unknow symbian device//
+                    return
+                        [
+                            'device' => 'iphone',
+                            'sdk' => null,
+                        ];
+
+                    break;
+                }
+            case 'ipad':
+                {
+                    // match iphone devices
+                    preg_match_all('/\sos\s(.*?)\s/i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
+
+                    if ($matches && count($matches) == 2) {
+                        return
+                            [
+                                'device' => 'ipad',
+                                'sdk' => $matches[1][0],
+                            ];
+                    }
+
+                    //default case unknow symbian device//
+                    return
+                        [
+                            'device' => 'ipad',
+                            'sdk' => null,
+                        ];
+
+                    break;
+                }
+            case 'android':
+                {
+                    // match android devices
+                    preg_match_all('/Android\s(.*?);\s/i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
+
+                    if ($matches && count($matches) == 2) {
+                        return
+                            [
+                                'device' => 'android',
+                                'sdk' => $matches[1][0],
+                            ];
+                    }
+
+                    //default case unknow android device//
+                    return
+                        [
+                            'device' => 'android',
+                            'sdk' => null,
+                        ];
+
+                    break;
+                }
+            case 'symbian':
+                {
+                    //new headers
+                    preg_match_all('/series(.*?)\/(.*?) /i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
+
+                    if ($matches && count($matches) == 3) {
+                        return
+                            [
+                                'device' => 'symbian',
+                                'sdk' => (int)$matches[1][0],
+                                'fp' => $this->getFpCodeByBrowser($matches[2][0]),
+                            ];
+                    }
+
+                    //default case unknow symbian device//
+                    return
+                        [
+                            'device' => 'symbian',
+                            'sdk' => 0,
+                            'fp' => false,
+                        ];
+
+                    break;
+                }
+            case 'winmobile':
+                {
+                    //ie//
+                    preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
+
+                    if ($matches && count($matches) == 2) {
+                        return
+                            [
+                                'device' => 'winmobile',
+                                'os_version' => (float)$matches[1][0],
+                            ];
+                    }
+
+                    //opera
+                    preg_match_all('/msie (.*?);/i', $this->useragent, $matches);
+                    $matches = array_filter($matches);
+
+                    if ($matches && count($matches) == 2) {
+                        return
+                            [
+                                'device' => 'winmobile',
+                                'os_version' => (float)$matches[1][0],
+                            ];
+                    }
+
+                    //opera sucks//
+                    if (stripos('opera', $this->useragent) > -1) {
+                        preg_match_all('/windows nt (.*?);/i', $this->useragent, $matches);
+                        $matches = array_filter($matches);
+
+                        if ($matches && count($matches) == 2) {
+                            return
+                                [
+                                    'device' => 'winmobile',
+                                    'os_version' => (float)$matches[1][0],
+                                ];
+                        }
+                    }
+
+                    //i dont know what are you!
+                    return
+                        [
+                            'device' => 'winmobile',
+                            'os_version' => 0,
+                        ];
+                }
+            default:
+                {
+                    return [];
+                }
         }
     }
 

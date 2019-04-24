@@ -82,7 +82,22 @@ class GlobMapper implements FileNameMapper
         $varpart = $this->extractVariablePart($sourceFileName);
         $substitution = $this->toPrefix . $varpart . $this->toPostfix;
 
-        return array($substitution);
+        return [$substitution];
+    }
+
+    /**
+     * Extracts the variable part.
+     * @param string $name
+     * @return string
+     */
+    private function extractVariablePart($name)
+    {
+        // ergh, i really hate php's string functions .... all but natural
+        $start = ($this->prefixLength === 0) ? 0 : $this->prefixLength;
+        $end = ($this->postfixLength === 0) ? strlen($name) : strlen($name) - $this->postfixLength;
+        $len = $end - $start;
+
+        return substr($name, $start, $len);
     }
 
     /**
@@ -121,20 +136,5 @@ class GlobMapper implements FileNameMapper
             $this->toPrefix = substr($to, 0, $index);
             $this->toPostfix = substr($to, $index + 1);
         }
-    }
-
-    /**
-     * Extracts the variable part.
-     * @param string $name
-     * @return string
-     */
-    private function extractVariablePart($name)
-    {
-        // ergh, i really hate php's string functions .... all but natural
-        $start = ($this->prefixLength === 0) ? 0 : $this->prefixLength;
-        $end = ($this->postfixLength === 0) ? strlen($name) : strlen($name) - $this->postfixLength;
-        $len = $end - $start;
-
-        return substr($name, $start, $len);
     }
 }

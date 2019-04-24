@@ -122,7 +122,7 @@ class UnixFileSystem extends FileSystem
         if ($len === 0) {
             return $pathname;
         }
-        $n = (int) $len;
+        $n = (int)$len;
         while (($n > 0) && ($pathname{$n - 1} === '/')) {
             $n--;
         }
@@ -178,6 +178,41 @@ class UnixFileSystem extends FileSystem
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultParent()
+    {
+        return '/';
+    }
+
+    /**
+     * the file resolver
+     *
+     * @param PhingFile $f
+     *
+     * @return string
+     */
+    public function resolveFile(PhingFile $f)
+    {
+        // resolve if parent is a file oject only
+        if ($this->isAbsolute($f)) {
+            return $f->getPath();
+        } else {
+            return $this->resolve(Phing::getProperty("user.dir"), $f->getPath());
+        }
+    }
+
+    /**
+     * @param PhingFile $f
+     *
+     * @return bool
+     */
+    public function isAbsolute(PhingFile $f)
+    {
+        return ($f->getPrefixLength() !== 0);
+    }
+
+    /**
      * Resolve the child pathname string against the parent.
      * Both strings must be in normal form, and the result
      * will be in normal form.
@@ -209,44 +244,10 @@ class UnixFileSystem extends FileSystem
         return $parent . '/' . $child;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultParent()
-    {
-        return '/';
-    }
-
-    /**
-     * @param PhingFile $f
-     *
-     * @return bool
-     */
-    public function isAbsolute(PhingFile $f)
-    {
-        return ($f->getPrefixLength() !== 0);
-    }
-
-    /**
-     * the file resolver
-     *
-     * @param PhingFile $f
-     *
-     * @return string
-     */
-    public function resolveFile(PhingFile $f)
-    {
-        // resolve if parent is a file oject only
-        if ($this->isAbsolute($f)) {
-            return $f->getPath();
-        } else {
-            return $this->resolve(Phing::getProperty("user.dir"), $f->getPath());
-        }
-    }
-
     /* -- most of the following is mapped to the php natives wrapped by FileSystem */
 
     /* -- Attribute accessors -- */
+
     /**
      * @param PhingFile $f
      * @return int
@@ -269,8 +270,8 @@ class UnixFileSystem extends FileSystem
     public function setReadOnly($f)
     {
         if ($f instanceof PhingFile) {
-            $strPath = (string) $f->getPath();
-            $perms = (int) (@fileperms($strPath) & 0444);
+            $strPath = (string)$f->getPath();
+            $perms = (int)(@fileperms($strPath) & 0444);
 
             return FileSystem::getFileSystem()->chmod($strPath, $perms);
         } else {
@@ -289,13 +290,13 @@ class UnixFileSystem extends FileSystem
         $f1Path = $f1->getPath();
         $f2Path = $f2->getPath();
 
-        return strcmp((string) $f1Path, (string) $f2Path);
+        return strcmp((string)$f1Path, (string)$f2Path);
     }
 
     /**
      * Copy a file, takes care of symbolic links
      *
-     * @param PhingFile $src  Source path and name file to copy.
+     * @param PhingFile $src Source path and name file to copy.
      * @param PhingFile $dest Destination path and name of new file.
      *
      * @return void
@@ -330,14 +331,14 @@ class UnixFileSystem extends FileSystem
             die ("Can not access root");
         }
 
-        return array(new PhingFile("/"));
+        return [new PhingFile("/")];
     }
 
     /**
      * returns the contents of a directory in an array
      * @param $f
-     * @throws Exception
      * @return array
+     * @throws Exception
      */
     public function lister($f)
     {
@@ -345,12 +346,12 @@ class UnixFileSystem extends FileSystem
         if (!$dir) {
             throw new Exception("Can't open directory " . $f->__toString());
         }
-        $vv = array();
+        $vv = [];
         while (($file = @readdir($dir)) !== false) {
             if ($file == "." || $file == "..") {
                 continue;
             }
-            $vv[] = (string) $file;
+            $vv[] = (string)$file;
         }
         @closedir($dir);
 
@@ -375,7 +376,7 @@ class UnixFileSystem extends FileSystem
 
     /**
      * Whether file can be deleted.
-     * @param  PhingFile $f
+     * @param PhingFile $f
      * @return boolean
      */
     public function canDelete(PhingFile $f)
@@ -383,7 +384,7 @@ class UnixFileSystem extends FileSystem
         @clearstatcache();
         $dir = dirname($f->getAbsolutePath());
 
-        return (bool) @is_writable($dir);
+        return (bool)@is_writable($dir);
     }
 
 }

@@ -52,23 +52,10 @@ class MailLogger extends DefaultLogger
             throw new BuildException('Need the PEAR Mail package to send logs');
         }
 
-        $tolist  = Phing::getDefinedProperty('phing.log.mail.recipients');
+        $tolist = Phing::getDefinedProperty('phing.log.mail.recipients');
 
         if (!empty($tolist)) {
             $this->tolist = $tolist;
-        }
-    }
-
-    /**
-     * @see DefaultLogger::printMessage
-     * @param string $message
-     * @param OutputStream $stream
-     * @param int $priority
-     */
-    final protected function printMessage($message, OutputStream $stream, $priority)
-    {
-        if ($message !== null) {
-            $this->mailMessage .= $message . "\n";
         }
     }
 
@@ -116,14 +103,14 @@ class MailLogger extends DefaultLogger
             } else {
                 $defaultSubject = ($success) ? 'Build Success' : 'Build Failure';
             }
-            $hdrs = array();
-            $hdrs['From']     = $this->getValue($properties, 'from', $this->from);
+            $hdrs = [];
+            $hdrs['From'] = $this->getValue($properties, 'from', $this->from);
             $hdrs['Reply-To'] = $this->getValue($properties, 'replyto', '');
-            $hdrs['Cc']       = $this->getValue($properties, $prefix . '.cc', '');
-            $hdrs['Bcc']      = $this->getValue($properties, $prefix . '.bcc', '');
-            $hdrs['Body']     = $this->getValue($properties, $prefix . '.body', '');
-            $hdrs['Subject']  = $this->getValue($properties, $prefix . '.subject', $defaultSubject);
-            $tolist           = $this->getValue($properties, $prefix . '.to', $this->tolist);
+            $hdrs['Cc'] = $this->getValue($properties, $prefix . '.cc', '');
+            $hdrs['Bcc'] = $this->getValue($properties, $prefix . '.bcc', '');
+            $hdrs['Body'] = $this->getValue($properties, $prefix . '.body', '');
+            $hdrs['Subject'] = $this->getValue($properties, $prefix . '.subject', $defaultSubject);
+            $tolist = $this->getValue($properties, $prefix . '.to', $this->tolist);
         } catch (BadMethodCallException $e) {
             $project->log($e->getMessage(), Project::MSG_WARN);
         }
@@ -158,5 +145,18 @@ class MailLogger extends DefaultLogger
 
         }
         return $value;
+    }
+
+    /**
+     * @param string $message
+     * @param OutputStream $stream
+     * @param int $priority
+     * @see DefaultLogger::printMessage
+     */
+    final protected function printMessage($message, OutputStream $stream, $priority)
+    {
+        if ($message !== null) {
+            $this->mailMessage .= $message . "\n";
+        }
     }
 }

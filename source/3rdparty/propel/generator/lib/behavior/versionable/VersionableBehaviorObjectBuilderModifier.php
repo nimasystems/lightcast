@@ -42,63 +42,6 @@ class VersionableBehaviorObjectBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
-    protected function getColumnAttribute($name = 'version_column')
-    {
-        return strtolower($this->behavior->getColumnForParameter($name)->getName());
-    }
-
-    protected function getColumnPhpName($name = 'version_column')
-    {
-        return $this->behavior->getColumnForParameter($name)->getPhpName();
-    }
-
-    protected function getVersionQueryClassName()
-    {
-        return $this->builder->getNewStubQueryBuilder($this->behavior->getVersionTable())->getClassname();
-    }
-
-    protected function getActiveRecordClassName()
-    {
-        return $this->builder->getStubObjectBuilder()->getClassname();
-    }
-
-    protected function setBuilder(PHP5ObjectBuilder $builder)
-    {
-        $this->builder = $builder;
-        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
-        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
-        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
-    }
-
-    /**
-     * Get the getter of the column of the behavior
-     *
-     * @param string $name
-     *
-     * @return string The related getter, e.g. 'getVersion'
-     */
-    protected function getColumnGetter($name = 'version_column')
-    {
-        return 'get' . $this->getColumnPhpName($name);
-    }
-
-    /**
-     * Get the setter of the column of the behavior
-     *
-     * @param string $name
-     *
-     * @return string The related setter, e.g. 'setVersion'
-     */
-    protected function getColumnSetter($name = 'version_column')
-    {
-        return 'set' . $this->getColumnPhpName($name);
-    }
-
     public function preSave(PHP5ObjectBuilder $builder)
     {
         $script = "if (\$this->isVersioningNecessary()) {
@@ -126,6 +69,23 @@ class VersionableBehaviorObjectBuilderModifier
         return $script;
     }
 
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
+    }
+
+    /**
+     * Get the setter of the column of the behavior
+     *
+     * @param string $name
+     *
+     * @return string The related setter, e.g. 'setVersion'
+     */
+    protected function getColumnSetter($name = 'version_column')
+    {
+        return 'set' . $this->getColumnPhpName($name);
+    }
+
     public function postSave(PHP5ObjectBuilder $builder)
     {
         return "if (isset(\$createVersion)) {
@@ -144,6 +104,11 @@ class VersionableBehaviorObjectBuilderModifier
 
             return $script;
         }
+    }
+
+    protected function getVersionQueryClassName()
+    {
+        return $this->builder->getNewStubQueryBuilder($this->behavior->getVersionTable())->getClassname();
     }
 
     public function objectAttributes(PHP5ObjectBuilder $builder)
@@ -191,6 +156,14 @@ protected \$enforceVersion = false;
         return $script;
     }
 
+    protected function setBuilder(PHP5ObjectBuilder $builder)
+    {
+        $this->builder = $builder;
+        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
+        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
+        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
+    }
+
     protected function addVersionSetter(&$script)
     {
         $script .= "
@@ -220,6 +193,23 @@ public function getVersion()
     return \$this->" . $this->getColumnGetter() . "();
 }
 ";
+    }
+
+    /**
+     * Get the getter of the column of the behavior
+     *
+     * @param string $name
+     *
+     * @return string The related getter, e.g. 'getVersion'
+     */
+    protected function getColumnGetter($name = 'version_column')
+    {
+        return 'get' . $this->getColumnPhpName($name);
+    }
+
+    protected function getColumnPhpName($name = 'version_column')
+    {
+        return $this->behavior->getColumnForParameter($name)->getPhpName();
     }
 
     protected function addEnforceVersioning(&$script)
@@ -404,6 +394,11 @@ public function toVersion(\$versionNumber, \$con = null)
     return \$this;
 }
 ";
+    }
+
+    protected function getActiveRecordClassName()
+    {
+        return $this->builder->getStubObjectBuilder()->getClassname();
     }
 
     protected function addPopulateFromVersion(&$script)
@@ -631,6 +626,67 @@ public function getAllVersions(\$con = null)
 ";
     }
 
+    protected function addCompareVersion(&$script)
+    {
+        $script .= "
+/**
+ * Compares the current object with another of its version.
+ * <code>
+ * print_r(\$book->compareVersion(1));
+ * => array(
+ *   '1' => array('Title' => 'Book title at version 1'),
+ *   '2' => array('Title' => 'Book title at version 2')
+ * );
+ * </code>
+ *
+ * @param   integer   \$versionNumber
+ * @param   string    \$keys Main key used for the result diff (versions|columns)
+ * @param   PropelPDO \$con the connection to use
+ * @param   array     \$ignoredColumns  The columns to exclude from the diff.
+ *
+ * @return  array A list of differences
+ */
+public function compareVersion(\$versionNumber, \$keys = 'columns', \$con = null, \$ignoredColumns = array())
+{
+    \$fromVersion = \$this->toArray();
+    \$toVersion = \$this->getOneVersion(\$versionNumber, \$con)->toArray();
+
+    return \$this->computeDiff(\$fromVersion, \$toVersion, \$keys, \$ignoredColumns);
+}
+";
+    }
+
+    protected function addCompareVersions(&$script)
+    {
+        $script .= "
+/**
+ * Compares two versions of the current object.
+ * <code>
+ * print_r(\$book->compareVersions(1, 2));
+ * => array(
+ *   '1' => array('Title' => 'Book title at version 1'),
+ *   '2' => array('Title' => 'Book title at version 2')
+ * );
+ * </code>
+ *
+ * @param   integer   \$fromVersionNumber
+ * @param   integer   \$toVersionNumber
+ * @param   string    \$keys Main key used for the result diff (versions|columns)
+ * @param   PropelPDO \$con the connection to use
+ * @param   array     \$ignoredColumns  The columns to exclude from the diff.
+ *
+ * @return  array A list of differences
+ */
+public function compareVersions(\$fromVersionNumber, \$toVersionNumber, \$keys = 'columns', \$con = null, \$ignoredColumns = array())
+{
+    \$fromVersion = \$this->getOneVersion(\$fromVersionNumber, \$con)->toArray();
+    \$toVersion = \$this->getOneVersion(\$toVersionNumber, \$con)->toArray();
+
+    return \$this->computeDiff(\$fromVersion, \$toVersion, \$keys, \$ignoredColumns);
+}
+";
+    }
+
     protected function addComputeDiff(&$script)
     {
         $versionTable = $this->behavior->getVersionTable();
@@ -702,67 +758,6 @@ protected function computeDiff(\$fromVersion, \$toVersion, \$keys = 'columns', \
 ";
     }
 
-    protected function addCompareVersion(&$script)
-    {
-        $script .= "
-/**
- * Compares the current object with another of its version.
- * <code>
- * print_r(\$book->compareVersion(1));
- * => array(
- *   '1' => array('Title' => 'Book title at version 1'),
- *   '2' => array('Title' => 'Book title at version 2')
- * );
- * </code>
- *
- * @param   integer   \$versionNumber
- * @param   string    \$keys Main key used for the result diff (versions|columns)
- * @param   PropelPDO \$con the connection to use
- * @param   array     \$ignoredColumns  The columns to exclude from the diff.
- *
- * @return  array A list of differences
- */
-public function compareVersion(\$versionNumber, \$keys = 'columns', \$con = null, \$ignoredColumns = array())
-{
-    \$fromVersion = \$this->toArray();
-    \$toVersion = \$this->getOneVersion(\$versionNumber, \$con)->toArray();
-
-    return \$this->computeDiff(\$fromVersion, \$toVersion, \$keys, \$ignoredColumns);
-}
-";
-    }
-
-    protected function addCompareVersions(&$script)
-    {
-        $script .= "
-/**
- * Compares two versions of the current object.
- * <code>
- * print_r(\$book->compareVersions(1, 2));
- * => array(
- *   '1' => array('Title' => 'Book title at version 1'),
- *   '2' => array('Title' => 'Book title at version 2')
- * );
- * </code>
- *
- * @param   integer   \$fromVersionNumber
- * @param   integer   \$toVersionNumber
- * @param   string    \$keys Main key used for the result diff (versions|columns)
- * @param   PropelPDO \$con the connection to use
- * @param   array     \$ignoredColumns  The columns to exclude from the diff.
- *
- * @return  array A list of differences
- */
-public function compareVersions(\$fromVersionNumber, \$toVersionNumber, \$keys = 'columns', \$con = null, \$ignoredColumns = array())
-{
-    \$fromVersion = \$this->getOneVersion(\$fromVersionNumber, \$con)->toArray();
-    \$toVersion = \$this->getOneVersion(\$toVersionNumber, \$con)->toArray();
-
-    return \$this->computeDiff(\$fromVersion, \$toVersion, \$keys, \$ignoredColumns);
-}
-";
-    }
-
     protected function addGetLastVersions(&$script)
     {
         $versionTable = $this->behavior->getVersionTable();
@@ -794,5 +789,10 @@ public function getLastVersions(\$number = 10, \$criteria = null, PropelPDO \$co
     return \$this->{$versionGetter}(\$criteria, \$con);
 }
 EOF;
+    }
+
+    protected function getColumnAttribute($name = 'version_column')
+    {
+        return strtolower($this->behavior->getColumnForParameter($name)->getName());
     }
 }

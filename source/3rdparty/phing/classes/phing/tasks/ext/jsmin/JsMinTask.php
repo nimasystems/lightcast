@@ -39,7 +39,7 @@ class JsMinTask extends Task
      *
      * @var  FileSet
      */
-    protected $filesets = array();
+    protected $filesets = [];
     /**
      * Whether the build should fail, if
      * errors occurred
@@ -170,7 +170,7 @@ class JsMinTask extends Task
                 $contents = file_get_contents($fullPath . '/' . $file);
 
                 // nasty hack to not trip PHP 5.2 parser
-                $minified = forward_static_call(array('\\JShrink\\Minifier', 'minify'), $contents);
+                $minified = forward_static_call(['\\JShrink\\Minifier', 'minify'], $contents);
 
                 file_put_contents($target, $minified);
             } catch (Exception $jsme) {

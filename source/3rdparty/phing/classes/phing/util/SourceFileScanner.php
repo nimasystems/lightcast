@@ -47,16 +47,37 @@ class SourceFileScanner
     }
 
     /**
+     * Convenience layer on top of restrict that returns the source
+     * files as PhingFile objects (containing absolute paths if srcDir is
+     * absolute).
+     * @param $files
+     * @param $srcDir
+     * @param $destDir
+     * @param $mapper
+     * @return array
+     */
+    public function restrictAsFiles(&$files, &$srcDir, &$destDir, &$mapper)
+    {
+        $res = $this->restrict($files, $srcDir, $destDir, $mapper);
+        $result = [];
+        for ($i = 0; $i < count($res); $i++) {
+            $result[$i] = new PhingFile($srcDir, $res[$i]);
+        }
+
+        return $result;
+    }
+
+    /**
      * Restrict the given set of files to those that are newer than
      * their corresponding target files.
      *
-     * @param array $files   the original set of files
-     * @param PhingFile $srcDir  all files are relative to this directory
+     * @param array $files the original set of files
+     * @param PhingFile $srcDir all files are relative to this directory
      * @param PhingFile $destDir target files live here. if null file names
      *                returned by the mapper are assumed to be absolute.
-     * @param FilenameMapper $mapper  knows how to construct a target file names from
+     * @param FilenameMapper $mapper knows how to construct a target file names from
      *                source file names.
-     * @param bool $force   Boolean that determines if the files should be
+     * @param bool $force Boolean that determines if the files should be
      *                forced to be copied.
      * @return array
      */
@@ -78,7 +99,7 @@ class SourceFileScanner
             $now += 2000;
         }
 
-        $v = array();
+        $v = [];
 
         for ($i = 0, $size = count($files); $i < $size; $i++) {
 
@@ -98,8 +119,7 @@ class SourceFileScanner
 
                 if ($src->lastModified() > $now) {
                     $this->task->log(
-                        "Warning: " . $files[$i] . " modified in the future (" . $src->lastModified(
-                        ) . " > " . $now . ")",
+                        "Warning: " . $files[$i] . " modified in the future (" . $src->lastModified() . " > " . $now . ")",
                         Project::MSG_WARN
                     );
                 }
@@ -127,14 +147,14 @@ class SourceFileScanner
                     );
                     $v[] = $files[$i];
                     $added = true;
-                } elseif ($src->lastModified() > $dest->lastModified()) {
+                } else if ($src->lastModified() > $dest->lastModified()) {
                     $this->task->log(
                         $files[$i] . " added as " . $dest->__toString() . " is outdated.",
                         Project::MSG_VERBOSE
                     );
                     $v[] = $files[$i];
                     $added = true;
-                } elseif ($force === true) {
+                } else if ($force === true) {
                     $this->task->log(
                         $files[$i] . " added as " . $dest->__toString() . " is forced to be overwritten.",
                         Project::MSG_VERBOSE
@@ -159,29 +179,8 @@ class SourceFileScanner
             }
 
         }
-        $result = array();
+        $result = [];
         $result = $v;
-
-        return $result;
-    }
-
-    /**
-     * Convenience layer on top of restrict that returns the source
-     * files as PhingFile objects (containing absolute paths if srcDir is
-     * absolute).
-     * @param $files
-     * @param $srcDir
-     * @param $destDir
-     * @param $mapper
-     * @return array
-     */
-    public function restrictAsFiles(&$files, &$srcDir, &$destDir, &$mapper)
-    {
-        $res = $this->restrict($files, $srcDir, $destDir, $mapper);
-        $result = array();
-        for ($i = 0; $i < count($res); $i++) {
-            $result[$i] = new PhingFile($srcDir, $res[$i]);
-        }
 
         return $result;
     }

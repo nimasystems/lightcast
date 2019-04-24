@@ -19,11 +19,11 @@
 class TimestampableBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = array(
-        'create_column'      => 'created_at',
-        'update_column'      => 'updated_at',
+    protected $parameters = [
+        'create_column' => 'created_at',
+        'update_column' => 'updated_at',
         'disable_updated_at' => 'false',
-    );
+    ];
 
     /**
      * Add the create_column and update_columns to the current table
@@ -31,45 +31,25 @@ class TimestampableBehavior extends Behavior
     public function modifyTable()
     {
         if (!$this->getTable()->containsColumn($this->getParameter('create_column'))) {
-            $this->getTable()->addColumn(array(
+            $this->getTable()->addColumn([
                 'name' => $this->getParameter('create_column'),
-                'type' => 'TIMESTAMP'
-            ));
+                'type' => 'TIMESTAMP',
+            ]);
         }
 
         if ($this->withUpdatedAt()) {
             if (!$this->getTable()->containsColumn($this->getParameter('update_column'))) {
-                $this->getTable()->addColumn(array(
+                $this->getTable()->addColumn([
                     'name' => $this->getParameter('update_column'),
-                    'type' => 'TIMESTAMP'
-                ));
+                    'type' => 'TIMESTAMP',
+                ]);
             }
         }
     }
 
-    /**
-     * Get the setter of one of the columns of the behavior
-     *
-     * @param string $column One of the behavior columns, 'create_column' or 'update_column'
-     *
-     * @return string The related setter, 'setCreatedOn' or 'setUpdatedOn'
-     */
-    protected function getColumnSetter($column)
+    protected function withUpdatedAt()
     {
-        return 'set' . $this->getColumnForParameter($column)->getPhpName();
-    }
-
-    /**
-     * Return the constant for a given column.
-     *
-     * @param string    $columnName
-     * @param OMBuilder $builder
-     *
-     * @return string
-     */
-    protected function getColumnConstant($columnName, OMBuilder $builder)
-    {
-        return $builder->getColumnConstant($this->getColumnForParameter($columnName));
+        return 'true' !== $this->getParameter('disable_updated_at');
     }
 
     /**
@@ -88,6 +68,31 @@ class TimestampableBehavior extends Behavior
         }
 
         return '';
+    }
+
+    /**
+     * Return the constant for a given column.
+     *
+     * @param string $columnName
+     * @param OMBuilder $builder
+     *
+     * @return string
+     */
+    protected function getColumnConstant($columnName, OMBuilder $builder)
+    {
+        return $builder->getColumnConstant($this->getColumnForParameter($columnName));
+    }
+
+    /**
+     * Get the setter of one of the columns of the behavior
+     *
+     * @param string $column One of the behavior columns, 'create_column' or 'update_column'
+     *
+     * @return string The related setter, 'setCreatedOn' or 'setUpdatedOn'
+     */
+    protected function getColumnSetter($column)
+    {
+        return 'set' . $this->getColumnForParameter($column)->getPhpName();
     }
 
     /**
@@ -211,10 +216,5 @@ public function firstCreatedFirst()
 }";
 
         return $script;
-    }
-
-    protected function withUpdatedAt()
-    {
-        return 'true' !== $this->getParameter('disable_updated_at');
     }
 }

@@ -120,11 +120,11 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
                 ['controller_name' => $this->controller_name,
-                    'action_name' => $this->action_name,
-                    'action_type' => $this->action_type,
-                    'controller' => $this,
-                    'action_params' => $this->action_params,
-                    'action_result' => $this->action_result,
+                 'action_name' => $this->action_name,
+                 'action_type' => $this->action_type,
+                 'controller' => $this,
+                 'action_params' => $this->action_params,
+                 'action_result' => $this->action_result,
                 ]
             ));
         }
@@ -135,7 +135,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         if ($view && $view instanceof lcDataView) {
             $view_contents = $this->send_direct_response ? $this->action_result : [
                 'error' => 0,
-                'result' => $this->action_result
+                'result' => $this->action_result,
             ];
             $view->setContent($view_contents);
         }

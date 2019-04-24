@@ -48,7 +48,7 @@ class LoadFileTask extends Task
      * Array of FilterChain objects
      * @var FilterChain[]
      */
-    private $filterChains = array();
+    private $filterChains = [];
 
     /**
      * Set file to read
@@ -60,8 +60,8 @@ class LoadFileTask extends Task
     }
 
     /**
-     * Convenience setter to maintain Ant compatibility (@see setFile())
-     * @param $srcFile
+     * Convenience setter to maintain Ant compatibility (@param $srcFile
+     * @see setFile())
      * @internal param PhingFile $file
      */
     public function setSrcFile($srcFile)

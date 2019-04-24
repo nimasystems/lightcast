@@ -81,12 +81,12 @@ class GitBranchTask extends GitBaseTask
      * delete, forceDelete, move, forceMove
      * @var array
      */
-    private $extraOptions = array(
+    private $extraOptions = [
         'd' => false,
         'D' => false,
         'm' => false,
         'M' => false,
-    );
+    ];
 
     /**
      * The main entry point for the task
@@ -150,19 +150,55 @@ class GitBranchTask extends GitBaseTask
     }
 
     /**
-     * @param $flag
+     * @return string
      */
-    public function setSetUpstream($flag)
+    public function getBranchname()
     {
-        $this->setUpstream = $flag;
+        return $this->branchname;
     }
 
     /**
-     * @return bool
+     * @param $branchname
      */
-    public function getSetUpstream()
+    public function setBranchname($branchname)
     {
-        return $this->setUpstream;
+        $this->branchname = $branchname;
+    }
+
+    public function isMove()
+    {
+        return $this->getMove();
+    }
+
+    public function getMove()
+    {
+        return $this->extraOptions['m'];
+    }
+
+    public function isForceMove()
+    {
+        return $this->getForceMove();
+    }
+
+    public function getForceMove()
+    {
+        return $this->extraOptions['M'];
+    }
+
+    /**
+     * @return string
+     */
+    public function getNewBranch()
+    {
+        return $this->newbranch;
+    }
+
+    /**
+     * @param $name
+     */
+    public function setNewBranch($name)
+    {
+        $this->newbranch = $name;
     }
 
     /**
@@ -174,27 +210,35 @@ class GitBranchTask extends GitBaseTask
     }
 
     /**
+     * @return bool
+     */
+    public function getSetUpstream()
+    {
+        return $this->setUpstream;
+    }
+
+    /**
      * @param $flag
      */
-    public function setTrack($flag)
+    public function setSetUpstream($flag)
     {
-        $this->track = $flag;
+        $this->setUpstream = $flag;
     }
 
     /**
      * @return bool
      */
-    public function getTrack()
+    public function isNoTrack()
     {
-        return $this->track;
+        return $this->getNoTrack();
     }
 
     /**
      * @return bool
      */
-    public function isTrack()
+    public function getNoTrack()
     {
-        return $this->getTrack();
+        return $this->noTrack;
     }
 
     /**
@@ -208,25 +252,9 @@ class GitBranchTask extends GitBaseTask
     /**
      * @return bool
      */
-    public function getNoTrack()
+    public function isForce()
     {
-        return $this->noTrack;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNoTrack()
-    {
-        return $this->getNoTrack();
-    }
-
-    /**
-     * @param $flag
-     */
-    public function setForce($flag)
-    {
-        $this->force = $flag;
+        return $this->getForce();
     }
 
     /**
@@ -238,35 +266,11 @@ class GitBranchTask extends GitBaseTask
     }
 
     /**
-     * @return bool
+     * @param $flag
      */
-    public function isForce()
+    public function setForce($flag)
     {
-        return $this->getForce();
-    }
-
-    /**
-     * @param $branchname
-     */
-    public function setBranchname($branchname)
-    {
-        $this->branchname = $branchname;
-    }
-
-    /**
-     * @return string
-     */
-    public function getBranchname()
-    {
-        return $this->branchname;
-    }
-
-    /**
-     * @param $startPoint
-     */
-    public function setStartPoint($startPoint)
-    {
-        $this->startPoint = $startPoint;
+        $this->force = $flag;
     }
 
     /**
@@ -278,6 +282,38 @@ class GitBranchTask extends GitBaseTask
     }
 
     /**
+     * @param $startPoint
+     */
+    public function setStartPoint($startPoint)
+    {
+        $this->startPoint = $startPoint;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTrack()
+    {
+        return $this->getTrack();
+    }
+
+    /**
+     * @return bool
+     */
+    public function getTrack()
+    {
+        return $this->track;
+    }
+
+    /**
+     * @param $flag
+     */
+    public function setTrack($flag)
+    {
+        $this->track = $flag;
+    }
+
+    /**
      * @param $flag
      */
     public function setDelete($flag)
@@ -285,14 +321,14 @@ class GitBranchTask extends GitBaseTask
         $this->extraOptions['d'] = $flag;
     }
 
-    public function getDelete()
-    {
-        return $this->extraOptions['d'];
-    }
-
     public function isDelete()
     {
         return $this->getDelete();
+    }
+
+    public function getDelete()
+    {
+        return $this->extraOptions['d'];
     }
 
     /**
@@ -316,48 +352,12 @@ class GitBranchTask extends GitBaseTask
         $this->extraOptions['m'] = $flag;
     }
 
-    public function getMove()
-    {
-        return $this->extraOptions['m'];
-    }
-
-    public function isMove()
-    {
-        return $this->getMove();
-    }
-
     /**
      * @param $flag
      */
     public function setForceMove($flag)
     {
         $this->extraOptions['M'] = $flag;
-    }
-
-    public function getForceMove()
-    {
-        return $this->extraOptions['M'];
-    }
-
-    public function isForceMove()
-    {
-        return $this->getForceMove();
-    }
-
-    /**
-     * @param $name
-     */
-    public function setNewBranch($name)
-    {
-        $this->newbranch = $name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getNewBranch()
-    {
-        return $this->newbranch;
     }
 
 }

@@ -32,15 +32,15 @@ class lcTagBase extends lcHtmlTag
         $this->setHref($href);
     }
 
-    public static function create()
-    {
-        return new lcTagBase();
-    }
-
     public function setHref($href)
     {
         $this->setAttribute('href', $href);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagBase();
     }
 
     public static function getRequiredAttributes()

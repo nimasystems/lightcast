@@ -157,6 +157,15 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         }
     }
 
+    public function repeat($name, $params = null)
+    {
+        $rep = count($this->node_repeats);
+
+        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);;
+
+        return $this->node_repeats[$rep];
+    }
+
     public function getNode($name, $params = null)
     {
         assert(isset($name));
@@ -170,15 +179,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->subnodes[$name] = $subnode;
 
         return $this->subnodes[$name];
-    }
-
-    public function repeat($name, $params = null)
-    {
-        $rep = count($this->node_repeats);
-
-        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);;
-
-        return $this->node_repeats[$rep];
     }
 
     public function getDeepNode($node_deep_name)
@@ -296,16 +296,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         $this->set($name, $value);
     }
 
-    public function set($name, $value)
-    {
-        $this->setParam($name, $value);
-    }
-
-    public function setParam($name, $value)
-    {
-        $this->params[$name] = $value;
-    }
-
     public function get($name)
     {
         return $this->getParam($name);
@@ -318,6 +308,16 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
         }
 
         return $this->params[$name];
+    }
+
+    public function set($name, $value)
+    {
+        $this->setParam($name, $value);
+    }
+
+    public function setParam($name, $value)
+    {
+        $this->params[$name] = $value;
     }
 
     public function offsetExists($name)

@@ -24,11 +24,6 @@ class ArchivableBehaviorObjectBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
     /**
      * Add object attributes to the built class.
      *
@@ -82,7 +77,7 @@ class ArchivableBehaviorObjectBuilderModifier
     /**
      * Add code to the postUpdate hoook.
      *
-     * @param PHP5ObjectBuilder $builder)
+     * @param PHP5ObjectBuilder $builder )
      *
      * @return string The PHP code to be added to the builder.
      */
@@ -111,10 +106,10 @@ class ArchivableBehaviorObjectBuilderModifier
     public function preDelete($builder)
     {
         if ($this->behavior->isArchiveOnDelete()) {
-            return $this->behavior->renderTemplate('objectPreDelete', array(
+            return $this->behavior->renderTemplate('objectPreDelete', [
                 'queryClassname' => $builder->getStubQueryBuilder()->getClassname(),
-                'isAddHooks'     => $builder->getGeneratorConfig()->getBuildProperty('addHooks'),
-            ));
+                'isAddHooks' => $builder->getGeneratorConfig()->getBuildProperty('addHooks'),
+            ]);
         }
     }
 
@@ -151,10 +146,10 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addGetArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectGetArchive', array(
-            'archiveTablePhpName'   => $this->behavior->getArchiveTablePhpName($builder),
+        return $this->behavior->renderTemplate('objectGetArchive', [
+            'archiveTablePhpName' => $this->behavior->getArchiveTablePhpName($builder),
             'archiveTableQueryName' => $this->behavior->getArchiveTableQueryName($builder),
-        ));
+        ]);
     }
 
     /**
@@ -162,12 +157,12 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectArchive', array(
-            'archiveTablePhpName'   => $this->behavior->getArchiveTablePhpName($builder),
+        return $this->behavior->renderTemplate('objectArchive', [
+            'archiveTablePhpName' => $this->behavior->getArchiveTablePhpName($builder),
             'archiveTableQueryName' => $this->behavior->getArchiveTableQueryName($builder),
-            'archivedAtColumn'      => $this->behavior->getArchivedAtColumn(),
-            'hasArchiveClass'       => $this->behavior->hasArchiveClass()
-        ));
+            'archivedAtColumn' => $this->behavior->getArchivedAtColumn(),
+            'hasArchiveClass' => $this->behavior->hasArchiveClass(),
+        ]);
     }
 
     /**
@@ -176,9 +171,9 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addRestoreFromArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectRestoreFromArchive', array(
+        return $this->behavior->renderTemplate('objectRestoreFromArchive', [
             'objectClassname' => $this->builder->getObjectClassname(),
-        ));
+        ]);
     }
 
     /**
@@ -190,13 +185,13 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addPopulateFromArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectPopulateFromArchive', array(
+        return $this->behavior->renderTemplate('objectPopulateFromArchive', [
             'archiveTablePhpName' => $this->behavior->getArchiveTablePhpName($builder),
-            'usesAutoIncrement'   => $this->table->hasAutoIncrementPrimaryKey(),
+            'usesAutoIncrement' => $this->table->hasAutoIncrementPrimaryKey(),
             'fakeAutoIncrementParameter' => $this->fakeAutoIncrementPrimaryKeyForConcreteInheritance(),
-            'objectClassname'     => $this->builder->getObjectClassname(),
-            'columns'             => $this->table->getColumns(),
-        ));
+            'objectClassname' => $this->builder->getObjectClassname(),
+            'columns' => $this->table->getColumns(),
+        ]);
     }
 
     /**
@@ -233,11 +228,11 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addSaveWithoutArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectSaveWithoutArchive', array(
-            'objectClassname'   => $this->builder->getObjectClassname(),
+        return $this->behavior->renderTemplate('objectSaveWithoutArchive', [
+            'objectClassname' => $this->builder->getObjectClassname(),
             'isArchiveOnInsert' => $this->behavior->isArchiveOnInsert(),
             'isArchiveOnUpdate' => $this->behavior->isArchiveOnUpdate(),
-        ));
+        ]);
     }
 
     /**
@@ -245,8 +240,13 @@ class ArchivableBehaviorObjectBuilderModifier
      */
     public function addDeleteWithoutArchive($builder)
     {
-        return $this->behavior->renderTemplate('objectDeleteWithoutArchive', array(
+        return $this->behavior->renderTemplate('objectDeleteWithoutArchive', [
             'objectClassname' => $this->builder->getObjectClassname(),
-        ));
+        ]);
+    }
+
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
     }
 }

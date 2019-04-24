@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 include_once 'phing/filters/BaseFilterReader.php';
 include_once 'phing/types/Parameterizable.php';
@@ -37,7 +37,17 @@ class BaseParamFilterReader extends BaseFilterReader implements Parameterizable
      *
      * @var array $_parameters
      */
-    protected $_parameters = array();
+    protected $_parameters = [];
+
+    /**
+     * Returns the parameters to be used by this filter.
+     *
+     * @return array the parameters to be used by this filter
+     */
+    public function &getParameters()
+    {
+        return $this->_parameters;
+    }
 
     /**
      * Sets the parameters used by this filter, and sets
@@ -59,15 +69,5 @@ class BaseParamFilterReader extends BaseFilterReader implements Parameterizable
 
         $this->_parameters = $parameters;
         $this->setInitialized(false);
-    }
-
-    /**
-     * Returns the parameters to be used by this filter.
-     *
-     * @return array the parameters to be used by this filter
-     */
-    public function &getParameters()
-    {
-        return $this->_parameters;
     }
 }

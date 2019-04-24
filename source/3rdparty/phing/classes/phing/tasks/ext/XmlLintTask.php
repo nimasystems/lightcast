@@ -33,7 +33,7 @@ class XmlLintTask extends Task
 
     protected $file; // the source file (from xml attribute)
     protected $schema; // the schema file (from xml attribute)
-    protected $filesets = array(); // all fileset objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
     protected $useRNG = false;
 
     protected $haltonfailure = true;
@@ -65,7 +65,7 @@ class XmlLintTask extends Task
      */
     public function setUseRNG($bool)
     {
-        $this->useRNG = (boolean) $bool;
+        $this->useRNG = (boolean)$bool;
     }
 
     /**
@@ -89,7 +89,7 @@ class XmlLintTask extends Task
      */
     public function setHaltonfailure($haltonfailure)
     {
-        $this->haltonfailure = (bool) $haltonfailure;
+        $this->haltonfailure = (bool)$haltonfailure;
     }
 
     /**
@@ -97,9 +97,9 @@ class XmlLintTask extends Task
      *
      * {@inheritdoc}
      *
+     * @return void
      * @throws BuildException
      *
-     * @return void
      */
     public function main()
     {
@@ -110,7 +110,7 @@ class XmlLintTask extends Task
             throw new BuildException("Missing either a nested fileset or attribute 'file' set");
         }
 
-        set_error_handler(array($this, 'errorHandler'));
+        set_error_handler([$this, 'errorHandler']);
         if ($this->file instanceof PhingFile) {
             $this->lint($this->file->getPath());
         } else { // process filesets
@@ -128,25 +128,9 @@ class XmlLintTask extends Task
     }
 
     /**
-     * @param $message
-     *
-     * @return void
-     *
-     * @throws BuildException
-     */
-    protected function logError($message)
-    {
-        if ($this->haltonfailure) {
-            throw new BuildException($message);
-        } else {
-            $this->log($message, Project::MSG_ERR);
-        }
-    }
-
-    /**
      * Performs validation
      *
-     * @param  string $file
+     * @param string $file
      *
      * @return void
      */
@@ -189,6 +173,22 @@ class XmlLintTask extends Task
     }
 
     /**
+     * @param $message
+     *
+     * @return void
+     *
+     * @throws BuildException
+     */
+    protected function logError($message)
+    {
+        if ($this->haltonfailure) {
+            throw new BuildException($message);
+        } else {
+            $this->log($message, Project::MSG_ERR);
+        }
+    }
+
+    /**
      * Local error handler to catch validation errors and log them through Phing
      *
      * @param int $level
@@ -201,7 +201,7 @@ class XmlLintTask extends Task
      */
     public function errorHandler($level, $message, $file, $line, $context)
     {
-        $matches = array();
+        $matches = [];
         preg_match('/^.*\(\): (.*)$/', $message, $matches);
         $this->log($matches[1], Project::MSG_ERR);
     }

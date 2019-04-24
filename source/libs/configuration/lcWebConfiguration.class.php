@@ -81,28 +81,28 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         $config_map = [
             [
                 'handler' => 'loaders',
-                'config_key' => 'loaders'
+                'config_key' => 'loaders',
             ],
             [
                 'handler' => 'routing',
-                'config_key' => 'routing'
+                'config_key' => 'routing',
             ],
             [
                 'handler' => 'app_security',
-                'config_key' => 'security'
+                'config_key' => 'security',
             ],
             [
                 'handler' => 'app_plugins',
-                'config_key' => 'plugins'
+                'config_key' => 'plugins',
             ],
             [
                 'handler' => 'app_settings',
-                'config_key' => 'settings'
+                'config_key' => 'settings',
             ],
             [
                 'handler' => 'view',
-                'config_key' => 'view'
-            ]
+                'config_key' => 'view',
+            ],
         ];
 
         $app_map = array_merge($parent_map, $config_map);
@@ -123,10 +123,10 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
 
         // app modules
         $controller_locations = [[
-            'context_type' => lcSysObj::CONTEXT_APP,
-            'context_name' => $this->getApplicationName(),
-            'path' => $this->app_dir . DS . 'forms'
-        ],];
+                                     'context_type' => lcSysObj::CONTEXT_APP,
+                                     'context_name' => $this->getApplicationName(),
+                                     'path' => $this->app_dir . DS . 'forms',
+                                 ],];
 
         $locations = array_merge((array)$parent_locations, $controller_locations);
 
@@ -139,10 +139,10 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
 
         // app modules
         $controller_locations = [[
-            'context_type' => lcSysObj::CONTEXT_APP,
-            'context_name' => $this->getApplicationName(),
-            'path' => $this->app_dir . DS . 'modules'
-        ],];
+                                     'context_type' => lcSysObj::CONTEXT_APP,
+                                     'context_name' => $this->getApplicationName(),
+                                     'path' => $this->app_dir . DS . 'modules',
+                                 ],];
 
         $locations = array_merge((array)$parent_locations, $controller_locations);
 

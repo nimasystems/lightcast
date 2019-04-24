@@ -58,7 +58,7 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
         $yaml_parser = new lcYamlFileParser($filename);
         return $yaml_parser->writeData($config_data, [
             'indent' => $indent,
-            'word_wrap' => $word_wrap
+            'word_wrap' => $word_wrap,
         ]);
     }
 

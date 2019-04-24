@@ -35,11 +35,6 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
         $this->setTitle($title);
     }
 
-    public static function create()
-    {
-        return new lcTagMap();
-    }
-
     public function setClass($value = null)
     {
         $this->setAttribute('class', $value);
@@ -50,6 +45,11 @@ class lcTagMap extends lcHtmlBaseTag implements iI18nAttributes, iEventAttribute
     {
         $this->setAttribute('title', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagMap();
     }
 
     public static function getRequiredAttributes()

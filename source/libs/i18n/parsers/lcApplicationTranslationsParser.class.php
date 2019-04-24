@@ -30,7 +30,7 @@ class lcApplicationTranslationsParser extends lcProjectTranslationsParser
         return [
             'layouts',
             'modules',
-            'ws'
+            'ws',
         ];
     }
 }

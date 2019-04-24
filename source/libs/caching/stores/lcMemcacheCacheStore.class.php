@@ -413,7 +413,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                     }
                 }
 
-            } elseif (!isset($results[$unnamespaced_keys[$keys[0]]])) {
+            } else if (!isset($results[$unnamespaced_keys[$keys[0]]])) {
                 $key1 = $keys[0];
 
                 $value = $this->memcache->get($key1);

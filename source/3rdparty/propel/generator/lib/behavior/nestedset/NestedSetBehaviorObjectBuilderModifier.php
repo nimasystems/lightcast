@@ -25,33 +25,6 @@ class NestedSetBehaviorObjectBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
-    protected function getColumnAttribute($name)
-    {
-        return strtolower($this->behavior->getColumnForParameter($name)->getName());
-    }
-
-    protected function getColumnPhpName($name)
-    {
-        return $this->behavior->getColumnForParameter($name)->getPhpName();
-    }
-
-    protected function setBuilder($builder)
-    {
-        $this->builder = $builder;
-
-        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
-        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
-        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
-
-        $this->builder->declareClass($builder->getStubObjectBuilder()->getFullyQualifiedClassname());
-        $this->builder->declareClass($builder->getStubQueryBuilder()->getFullyQualifiedClassname());
-    }
-
     public function objectAttributes($builder)
     {
         $objectClassname = $builder->getStubObjectBuilder()->getClassname();
@@ -232,6 +205,18 @@ if (\$this->isInTree()) {
         return $script;
     }
 
+    protected function setBuilder($builder)
+    {
+        $this->builder = $builder;
+
+        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
+        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
+        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
+
+        $this->builder->declareClass($builder->getStubObjectBuilder()->getFullyQualifiedClassname());
+        $this->builder->declareClass($builder->getStubQueryBuilder()->getFullyQualifiedClassname());
+    }
+
     protected function addProcessNestedSetQueries(&$script)
     {
         $script .= "
@@ -249,6 +234,11 @@ protected function processNestedSetQueries(\$con)
 ";
     }
 
+    protected function getColumnPhpName($name)
+    {
+        return $this->behavior->getColumnForParameter($name)->getPhpName();
+    }
+
     protected function addGetLeft(&$script)
     {
         $script .= "
@@ -263,6 +253,11 @@ public function getLeftValue()
     return \$this->{$this->getColumnAttribute('left_column')};
 }
 ";
+    }
+
+    protected function getColumnAttribute($name)
+    {
+        return strtolower($this->behavior->getColumnForParameter($name)->getName());
     }
 
     protected function addGetRight(&$script)
@@ -295,6 +290,11 @@ public function getLevel()
     return \$this->{$this->getColumnAttribute('level_column')};
 }
 ";
+    }
+
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
     }
 
     protected function addGetScope(&$script)
@@ -1011,16 +1011,6 @@ public function addChild($objectClassname \$child)
 ";
     }
 
-    protected function getPeerClassNameWithNamespace()
-    {
-        $peerClassname = $this->peerClassname;
-        if ($namespace = $this->builder->getStubPeerBuilder()->getNamespace()) {
-            $peerClassname = '\\\\' . $namespace . '\\\\' . $peerClassname;
-        }
-
-        return $peerClassname;
-    }
-
     protected function addInsertAsFirstChildOf(&$script)
     {
         $objectClassname = $this->objectClassname;
@@ -1064,6 +1054,16 @@ public function insertAsFirstChildOf(\$parent)
     return \$this;
 }
 ";
+    }
+
+    protected function getPeerClassNameWithNamespace()
+    {
+        $peerClassname = $this->peerClassname;
+        if ($namespace = $this->builder->getStubPeerBuilder()->getNamespace()) {
+            $peerClassname = '\\\\' . $namespace . '\\\\' . $peerClassname;
+        }
+
+        return $peerClassname;
     }
 
     protected function addInsertAsLastChildOf(&$script)

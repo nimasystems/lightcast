@@ -47,11 +47,6 @@ class lcTagObject extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    public static function create()
-    {
-        return new lcTagObject();
-    }
-
     public function setClassId($value = null)
     {
         $this->setAttribute('classid', $value);
@@ -124,6 +119,11 @@ class lcTagObject extends lcHtmlTag
         return $this;
     }
 
+    public static function create()
+    {
+        return new lcTagObject();
+    }
+
     public static function getRequiredAttributes()
     {
         return [];
@@ -132,7 +132,7 @@ class lcTagObject extends lcHtmlTag
     public static function getOptionalAttributes()
     {
         return ['classid', 'data', 'codebase', 'declare', 'type', 'codetype', 'archive', 'standby',
-            'width', 'height', 'name', 'tabindex'];
+                'width', 'height', 'name', 'tabindex'];
     }
 
     public function getClassId()

@@ -33,15 +33,15 @@ class lcTagQ extends lcHtmlTag
         $this->setCite($cite);
     }
 
-    public static function create()
-    {
-        return new lcTagQ();
-    }
-
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagQ();
     }
 
     public static function getRequiredAttributes()

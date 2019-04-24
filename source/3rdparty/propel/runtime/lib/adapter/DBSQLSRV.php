@@ -18,10 +18,10 @@
 class DBSQLSRV extends DBMSSQL
 {
     /**
+     * @param PDO $con
+     * @param array $settings
      * @see       parent::initConnection()
      *
-     * @param PDO   $con
-     * @param array $settings
      */
     public function initConnection(PDO $con, array $settings)
     {
@@ -32,12 +32,12 @@ class DBSQLSRV extends DBMSSQL
     }
 
     /**
-     * @see       parent::setCharset()
-     *
-     * @param PDO    $con
+     * @param PDO $con
      * @param string $charset
      *
      * @throws PropelException
+     * @see       parent::setCharset()
+     *
      */
     public function setCharset(PDO $con, $charset)
     {
@@ -54,12 +54,12 @@ class DBSQLSRV extends DBMSSQL
     }
 
     /**
+     * @param string $sql
+     * @param array $params
+     * @param Criteria $values
+     * @param DatabaseMap $dbMap
      * @see       parent::cleanupSQL()
      *
-     * @param string      $sql
-     * @param array       $params
-     * @param Criteria    $values
-     * @param DatabaseMap $dbMap
      */
     public function cleanupSQL(&$sql, array &$params, Criteria $values, DatabaseMap $dbMap)
     {
@@ -82,21 +82,21 @@ class DBSQLSRV extends DBMSSQL
     }
 
     /**
-     * @see       DBAdapter::bindValue()
-     *
      * @param PDOStatement $stmt
-     * @param string       $parameter
-     * @param mixed        $value
-     * @param ColumnMap    $cMap
+     * @param string $parameter
+     * @param mixed $value
+     * @param ColumnMap $cMap
      * @param null|integer $position
      *
      * @return boolean
+     * @see       DBAdapter::bindValue()
+     *
      */
     public function bindValue(PDOStatement $stmt, $parameter, $value, ColumnMap $cMap, $position = null)
     {
         if ($cMap->isTemporal()) {
             $value = $this->formatTemporalValue($value, $cMap);
-        } elseif (is_resource($value) && $cMap->isLob()) {
+        } else if (is_resource($value) && $cMap->isLob()) {
             // we always need to make sure that the stream is rewound, otherwise nothing will
             // get written to database.
             rewind($value);

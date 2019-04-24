@@ -32,7 +32,7 @@ require_once 'phing/system/io/FileWriter.php';
  */
 class DataStore
 {
-    private $data = array();
+    private $data = [];
     private $file = null;
 
     /**
@@ -50,11 +50,59 @@ class DataStore
     }
 
     /**
+     * Internal function to read data store from file
+     *
+     * @return none
+     * @throws BuildException
+     */
+    private function read()
+    {
+        if (!$this->file->canRead()) {
+            throw new BuildException("Can't read data store from '" .
+                $this->file->getPath() . "'");
+        } else {
+            $serializedData = $this->file->contents();
+
+            $this->data = unserialize($serializedData);
+        }
+    }
+
+    /**
      * Destructor
      */
     public function __destruct()
     {
         $this->commit();
+    }
+
+    /**
+     * Commits data store to disk
+     *
+     * @return none
+     */
+    public function commit()
+    {
+        $this->write();
+    }
+
+    /**
+     * Internal function to write data store to file
+     *
+     * @return none
+     * @throws BuildException
+     */
+    private function write()
+    {
+        if (!$this->file->canWrite()) {
+            throw new BuildException("Can't write data store to '" .
+                $this->file->getPath() . "'");
+        } else {
+            $serializedData = serialize($this->data);
+
+            $writer = new FileWriter($this->file);
+            $writer->write($serializedData);
+            $writer->close();
+        }
     }
 
     /**
@@ -76,8 +124,8 @@ class DataStore
     /**
      * Adds a value to the data store
      *
-     * @param string  $key        the key
-     * @param mixed   $value      the value
+     * @param string $key the key
+     * @param mixed $value the value
      * @param boolean $autocommit whether to auto-commit (write)
      *                            the data store to disk
      *
@@ -95,7 +143,7 @@ class DataStore
     /**
      * Remove a value from the data store
      *
-     * @param string  $key        the key
+     * @param string $key the key
      * @param boolean $autocommit whether to auto-commit (write)
      *                            the data store to disk
      */
@@ -105,54 +153,6 @@ class DataStore
 
         if ($autocommit) {
             $this->commit();
-        }
-    }
-
-    /**
-     * Commits data store to disk
-     *
-     * @return none
-     */
-    public function commit()
-    {
-        $this->write();
-    }
-
-    /**
-     * Internal function to read data store from file
-     *
-     * @throws BuildException
-     * @return none
-     */
-    private function read()
-    {
-        if (!$this->file->canRead()) {
-            throw new BuildException("Can't read data store from '" .
-                $this->file->getPath() . "'");
-        } else {
-            $serializedData = $this->file->contents();
-
-            $this->data = unserialize($serializedData);
-        }
-    }
-
-    /**
-     * Internal function to write data store to file
-     *
-     * @throws BuildException
-     * @return none
-     */
-    private function write()
-    {
-        if (!$this->file->canWrite()) {
-            throw new BuildException("Can't write data store to '" .
-                $this->file->getPath() . "'");
-        } else {
-            $serializedData = serialize($this->data);
-
-            $writer = new FileWriter($this->file);
-            $writer->write($serializedData);
-            $writer->close();
         }
     }
 }

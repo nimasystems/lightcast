@@ -35,7 +35,7 @@ class lcHttpVersion
     {
         if ($code == self::HTTPVER_1_0) {
             return self::HTTPVER_1_0_STRING;
-        } elseif ($code == self::HTTPVER_1_1) {
+        } else if ($code == self::HTTPVER_1_1) {
             return self::HTTPVER_1_1_STRING;
         } else {
             return false;

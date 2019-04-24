@@ -49,37 +49,6 @@ class SortableBehaviorPeerBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
-    protected function getColumnAttribute($name)
-    {
-        return strtolower($this->behavior->getColumnForParameter($name)->getName());
-    }
-
-    protected function getColumnConstant($name)
-    {
-        return $this->behavior->getColumnForParameter($name)->getName();
-    }
-
-    protected function getColumnPhpName($name)
-    {
-        return $this->behavior->getColumnForParameter($name)->getPhpName();
-    }
-
-    protected function setBuilder($builder)
-    {
-        $this->builder = $builder;
-        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
-        $this->peerClassname   = $builder->getStubPeerBuilder()->getClassname();
-        $this->queryClassname  = $builder->getStubQueryBuilder()->getClassname();
-
-        $builder->declareClassFromBuilder($builder->getStubObjectBuilder());
-        $builder->declareClassFromBuilder($builder->getStubQueryBuilder());
-    }
-
     public function staticAttributes($builder)
     {
         $tableName = $this->table->getName();
@@ -94,12 +63,12 @@ const RANK_COL = '" . $tableName . '.' . $this->getColumnConstant('rank_column')
 
             if ($this->behavior->hasMultipleScopes()) {
                 foreach ($this->behavior->getScopes() as $scope) {
-                    $col[] = "$tableName.".strtoupper($scope);
+                    $col[] = "$tableName." . strtoupper($scope);
                 }
                 $col = json_encode($col);
                 $col = "'$col'";
 
-                $script .=   "
+                $script .= "
 /**
  * If defined, the `SCOPE_COL` contains a json_encoded array with all columns.
  * @var boolean
@@ -110,10 +79,10 @@ const MULTI_SCOPE_COL = true;
             } else {
                 $colNames = $this->getColumnConstant('scope_column');
 
-                $col =  "'$tableName.$colNames'";
+                $col = "'$tableName.$colNames'";
             }
 
-            $script .=   "
+            $script .= "
 /**
  * Scope column for the set
  */
@@ -123,6 +92,11 @@ const SCOPE_COL = $col;
         }
 
         return $script;
+    }
+
+    protected function getColumnConstant($name)
+    {
+        return $this->behavior->getColumnForParameter($name)->getName();
     }
 
     /**
@@ -150,36 +124,15 @@ const SCOPE_COL = $col;
         return $script;
     }
 
-    public function addSortableApplyScopeCriteria(&$script)
+    protected function setBuilder($builder)
     {
-        $script .= "
-/**
- * Applies all scope fields to the given criteria.
- *
- * @param  Criteria \$criteria Applies the values directly to this criteria.
- * @param  mixed    \$scope    The scope value as scalar type or array(\$value1, ...).
- * @param  string   \$method   The method we use to apply the values.
- *
- */
-public static function sortableApplyScopeCriteria(Criteria \$criteria, \$scope, \$method = 'add')
-{
-";
-        if ($this->behavior->hasMultipleScopes()) {
-            foreach ($this->behavior->getScopes() as $idx => $scope) {
-                $script .= "
-    \$criteria->\$method({$this->peerClassname}::".strtoupper($scope).", \$scope[$idx], Criteria::EQUAL);
-";
-            }
-        } else {
-            $script .= "
-    \$criteria->\$method({$this->peerClassname}::".strtoupper(current($this->behavior->getScopes())).", \$scope, Criteria::EQUAL);
-";
-        }
+        $this->builder = $builder;
+        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
+        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
+        $this->queryClassname = $builder->getStubQueryBuilder()->getClassname();
 
-        $script .= "
-}
-";
-
+        $builder->declareClassFromBuilder($builder->getStubObjectBuilder());
+        $builder->declareClassFromBuilder($builder->getStubQueryBuilder());
     }
 
     protected function addGetMaxRank(&$script)
@@ -207,7 +160,7 @@ public static function getMaxRank(" . ($useScope ? "\$scope = null, " : "") . "P
     \$c = new Criteria();
     \$c->addSelectColumn('MAX(' . {$this->peerClassname}::RANK_COL . ')');";
         if ($useScope) {
-        $script .= "
+            $script .= "
     {$this->peerClassname}::sortableApplyScopeCriteria(\$c, \$scope);";
         }
         $script .= "
@@ -403,6 +356,39 @@ public static function deleteList(\$scope, PropelPDO \$con = null)
 }
 ";
     }
+
+    public function addSortableApplyScopeCriteria(&$script)
+    {
+        $script .= "
+/**
+ * Applies all scope fields to the given criteria.
+ *
+ * @param  Criteria \$criteria Applies the values directly to this criteria.
+ * @param  mixed    \$scope    The scope value as scalar type or array(\$value1, ...).
+ * @param  string   \$method   The method we use to apply the values.
+ *
+ */
+public static function sortableApplyScopeCriteria(Criteria \$criteria, \$scope, \$method = 'add')
+{
+";
+        if ($this->behavior->hasMultipleScopes()) {
+            foreach ($this->behavior->getScopes() as $idx => $scope) {
+                $script .= "
+    \$criteria->\$method({$this->peerClassname}::" . strtoupper($scope) . ", \$scope[$idx], Criteria::EQUAL);
+";
+            }
+        } else {
+            $script .= "
+    \$criteria->\$method({$this->peerClassname}::" . strtoupper(current($this->behavior->getScopes())) . ", \$scope, Criteria::EQUAL);
+";
+        }
+
+        $script .= "
+}
+";
+
+    }
+
     protected function addShiftRank(&$script)
     {
         $useScope = $this->behavior->useScope();
@@ -448,5 +434,20 @@ public static function shiftRank(\$delta, \$first = null, \$last = null, " . ($u
     $peerClassname::clearInstancePool();
 }
 ";
+    }
+
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
+    }
+
+    protected function getColumnAttribute($name)
+    {
+        return strtolower($this->behavior->getColumnForParameter($name)->getName());
+    }
+
+    protected function getColumnPhpName($name)
+    {
+        return $this->behavior->getColumnForParameter($name)->getPhpName();
     }
 }

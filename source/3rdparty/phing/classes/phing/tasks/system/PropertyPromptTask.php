@@ -143,6 +143,16 @@ class PropertyPromptTask extends Task
     }
 
     /**
+     * Sets defaultValue for the Property
+     * being set by this task.
+     * @param string $newDefaultvalue
+     */
+    public function setDefaultvalue($newDefaultvalue)
+    {
+        $this->defaultValue = $newDefaultvalue;
+    }
+
+    /**
      * Returns the terminating character used to
      * punctuate the prompt text.
      * @return string
@@ -150,6 +160,16 @@ class PropertyPromptTask extends Task
     public function getPromptCharacter()
     {
         return $this->promptCharacter;
+    }
+
+    /**
+     * Sets the terminating character used to
+     * punctuate the prompt text (default is "?").
+     * @param string $newPromptcharacter
+     */
+    public function setPromptCharacter($newPromptcharacter)
+    {
+        $this->promptCharacter = $newPromptcharacter;
     }
 
     /**
@@ -162,6 +182,15 @@ class PropertyPromptTask extends Task
     }
 
     /**
+     * Sets text of the prompt.
+     * @param string $newPrompttext
+     */
+    public function setPromptText($newPrompttext)
+    {
+        $this->promptText = $newPrompttext;
+    }
+
+    /**
      * Returns name of the Ant Project Property
      * being set by this task.
      * @return string
@@ -169,6 +198,17 @@ class PropertyPromptTask extends Task
     public function getPropertyName()
     {
         return $this->propertyName;
+    }
+
+    /**
+     * Specifies the Phing Project Property
+     * being set by this task.
+     * @param java $newPropertyname
+     * @internal param java $newPropertyname .lang.String
+     */
+    public function setPropertyName($newPropertyname)
+    {
+        $this->propertyName = $newPropertyname;
     }
 
     /**
@@ -193,46 +233,6 @@ class PropertyPromptTask extends Task
     }
 
     /**
-     * Sets defaultValue for the Property
-     * being set by this task.
-     * @param string $newDefaultvalue
-     */
-    public function setDefaultvalue($newDefaultvalue)
-    {
-        $this->defaultValue = $newDefaultvalue;
-    }
-
-    /**
-     * Sets the terminating character used to
-     * punctuate the prompt text (default is "?").
-     * @param string $newPromptcharacter
-     */
-    public function setPromptCharacter($newPromptcharacter)
-    {
-        $this->promptCharacter = $newPromptcharacter;
-    }
-
-    /**
-     * Sets text of the prompt.
-     * @param string $newPrompttext
-     */
-    public function setPromptText($newPrompttext)
-    {
-        $this->promptText = $newPrompttext;
-    }
-
-    /**
-     * Specifies the Phing Project Property
-     * being set by this task.
-     * @param java $newPropertyname
-     * @internal param java $newPropertyname .lang.String
-     */
-    public function setPropertyName($newPropertyname)
-    {
-        $this->propertyName = $newPropertyname;
-    }
-
-    /**
      *
      * @param boolean $newUseExistingValue
      */
@@ -243,7 +243,7 @@ class PropertyPromptTask extends Task
 
     /**
      * Sets the prompt text that will be presented to the user.
-     * @param  string $prompt
+     * @param string $prompt
      * @return void
      */
     public function addText($prompt)

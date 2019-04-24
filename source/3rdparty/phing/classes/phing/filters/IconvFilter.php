@@ -76,69 +76,11 @@ class IconvFilter
         }
 
         $this->log(
-            "Encoding " . $this->in->getResource() . " from " . $this->getInputEncoding(
-            ) . " to " . $this->getOutputEncoding(),
+            "Encoding " . $this->in->getResource() . " from " . $this->getInputEncoding() . " to " . $this->getOutputEncoding(),
             Project::MSG_VERBOSE
         );
 
         return iconv($this->_inputEncoding, $this->_outputEncoding, $text);
-    }
-
-    /**
-     *
-     * @param string $encoding Input encoding.
-     */
-    public function setInputEncoding($encoding)
-    {
-        $this->_inputEncoding = $encoding;
-    }
-
-    /**
-     *
-     * @return string
-     */
-    public function getInputEncoding()
-    {
-        return $this->_inputEncoding;
-    }
-
-    /**
-     *
-     * @param string $encoding Output encoding.
-     */
-    public function setOutputEncoding($encoding)
-    {
-        $this->_outputEncoding = $encoding;
-    }
-
-    /**
-     *
-     * @return string
-     */
-    public function getOutputEncoding()
-    {
-        return $this->_outputEncoding;
-    }
-
-    /**
-     * Creates a new IconvFilter using the passed in Reader for instantiation.
-     *
-     * @param Reader $reader
-     * @internal param A $object Reader object providing the underlying stream. Must not be <code>null</code>.
-     *
-     * @return object A new filter based on this configuration, but filtering the specified reader.
-     */
-    public function chain(Reader $reader)
-    {
-        $filter = new self($reader);
-
-        $filter->setInputEncoding($this->getInputEncoding());
-        $filter->setOutputEncoding($this->getOutputEncoding());
-
-        $filter->setInitialized(true);
-        $filter->setProject($this->getProject());
-
-        return $filter;
     }
 
     /**
@@ -164,5 +106,62 @@ class IconvFilter
         }
 
         $this->setInitialized(true);
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getInputEncoding()
+    {
+        return $this->_inputEncoding;
+    }
+
+    /**
+     *
+     * @param string $encoding Input encoding.
+     */
+    public function setInputEncoding($encoding)
+    {
+        $this->_inputEncoding = $encoding;
+    }
+
+    /**
+     *
+     * @return string
+     */
+    public function getOutputEncoding()
+    {
+        return $this->_outputEncoding;
+    }
+
+    /**
+     *
+     * @param string $encoding Output encoding.
+     */
+    public function setOutputEncoding($encoding)
+    {
+        $this->_outputEncoding = $encoding;
+    }
+
+    /**
+     * Creates a new IconvFilter using the passed in Reader for instantiation.
+     *
+     * @param Reader $reader
+     * @return object A new filter based on this configuration, but filtering the specified reader.
+     * @internal param A $object Reader object providing the underlying stream. Must not be <code>null</code>.
+     *
+     */
+    public function chain(Reader $reader)
+    {
+        $filter = new self($reader);
+
+        $filter->setInputEncoding($this->getInputEncoding());
+        $filter->setOutputEncoding($this->getOutputEncoding());
+
+        $filter->setInitialized(true);
+        $filter->setProject($this->getProject());
+
+        return $filter;
     }
 }

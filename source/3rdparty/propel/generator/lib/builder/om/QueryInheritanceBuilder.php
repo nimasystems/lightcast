@@ -40,37 +40,6 @@ class QueryInheritanceBuilder extends OMBuilder
     }
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return ($this->getChild()->getPackage() ? $this->getChild()->getPackage() : parent::getPackage()) . ".om";
-    }
-
-    public function getNamespace()
-    {
-        if ($namespace = parent::getNamespace()) {
-            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
-                return $namespace . '\\' . $omns;
-            } else {
-                return $namespace;
-            }
-        }
-    }
-
-    /**
-     * Set the child object that we're operating on currently.
-     *
-     * @param   $child Inheritance
-     */
-    public function setChild(Inheritance $child)
-    {
-        $this->child = $child;
-    }
-
-    /**
      * Returns the child object we're operating on currently.
      *
      * @return Inheritance
@@ -86,26 +55,27 @@ class QueryInheritanceBuilder extends OMBuilder
     }
 
     /**
-     * Returns classpath to parent class.
+     * Set the child object that we're operating on currently.
      *
-     * @return string
+     * @param   $child Inheritance
      */
-    protected function getParentClassName()
+    public function setChild(Inheritance $child)
     {
-        $ancestorClassName = ClassTools::classname($this->getChild()->getAncestor());
-        if ($this->getDatabase()->hasTableByPhpName($ancestorClassName)) {
-            return $this->getNewStubQueryBuilder($this->getDatabase()->getTableByPhpName($ancestorClassName))->getClassname();
-        } else {
-            // find the inheritance for the parent class
-            foreach ($this->getTable()->getChildrenColumn()->getChildren() as $child) {
-                if ($child->getClassName() == $ancestorClassName) {
-                    return $this->getNewStubQueryInheritanceBuilder($child)->getClassname();
-                }
+        $this->child = $child;
+    }
+
+    public function getNamespace()
+    {
+        if ($namespace = parent::getNamespace()) {
+            if ($this->getGeneratorConfig() && $omns = $this->getGeneratorConfig()->getBuildProperty('namespaceOm')) {
+                return $namespace . '\\' . $omns;
+            } else {
+                return $namespace;
             }
         }
     }
 
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
@@ -117,7 +87,7 @@ class QueryInheritanceBuilder extends OMBuilder
         $script .= "
 require '" . $requiredClassFilePath . "';
 ";
-    } // addIncludes()
+    }
 
     /**
      * Adds class phpdoc comment and opening of class.
@@ -157,6 +127,36 @@ require '" . $requiredClassFilePath . "';
  */
 class " . $this->getClassname() . " extends " . $baseClassname . " {
 ";
+    }
+
+        /**
+     * Returns classpath to parent class.
+     *
+     * @return string
+     */
+    protected function getParentClassName()
+    {
+        $ancestorClassName = ClassTools::classname($this->getChild()->getAncestor());
+        if ($this->getDatabase()->hasTableByPhpName($ancestorClassName)) {
+            return $this->getNewStubQueryBuilder($this->getDatabase()->getTableByPhpName($ancestorClassName))->getClassname();
+        } else {
+            // find the inheritance for the parent class
+            foreach ($this->getTable()->getChildrenColumn()->getChildren() as $child) {
+                if ($child->getClassName() == $ancestorClassName) {
+                    return $this->getNewStubQueryInheritanceBuilder($child)->getClassname();
+                }
+            }
+        }
+    } // addIncludes()
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return ($this->getChild()->getPackage() ? $this->getChild()->getPackage() : parent::getPackage()) . ".om";
     }
 
     /**
@@ -232,6 +232,14 @@ class " . $this->getClassname() . " extends " . $baseClassname . " {
 ";
     }
 
+    protected function getClassKeyCondition()
+    {
+        $child = $this->getChild();
+        $col = $child->getColumn();
+
+        return "\$this->addUsingAlias(" . $this->getColumnConstant($col) . ", " . $this->getPeerClassname() . "::CLASSKEY_" . strtoupper($child->getKey()) . ");";
+    }
+
     protected function addPreUpdate(&$script)
     {
         $child = $this->getChild();
@@ -264,14 +272,6 @@ class " . $this->getClassname() . " extends " . $baseClassname . " {
 ";
     }
 
-    protected function getClassKeyCondition()
-    {
-        $child = $this->getChild();
-        $col = $child->getColumn();
-
-        return "\$this->addUsingAlias(" . $this->getColumnConstant($col) . ", " . $this->getPeerClassname() . "::CLASSKEY_" . strtoupper($child->getKey()) . ");";
-    }
-
     protected function addDoDeleteAll(&$script)
     {
         $child = $this->getChild();
@@ -291,18 +291,6 @@ class " . $this->getClassname() . " extends " . $baseClassname . " {
         // condition on class key is already added in preDelete()
         return parent::doDelete(\$con);
     }
-";
-    }
-
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
 ";
     }
 
@@ -344,6 +332,18 @@ class " . $this->getClassname() . " extends " . $baseClassname . " {
 
         return \$ret;
     }
+";
+    }
+
+    /**
+     * Closes class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addClassClose(&$script)
+    {
+        $script .= "
+} // " . $this->getClassname() . "
 ";
     }
 } // MultiExtensionQueryBuilder

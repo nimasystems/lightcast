@@ -45,10 +45,10 @@ class PHP_CodeSniffer_Reports_PhingRemoveFromCache implements PHP_CodeSniffer_Re
     /**
      * Remove file from cache if contains errors
      *
-     * @param array                $report      Prepared report data.
-     * @param PHP_CodeSniffer_File $phpcsFile   The file being reported on.
-     * @param boolean              $showSources Show sources?
-     * @param int                  $width       Maximum allowed line width.
+     * @param array $report Prepared report data.
+     * @param PHP_CodeSniffer_File $phpcsFile The file being reported on.
+     * @param boolean $showSources Show sources?
+     * @param int $width Maximum allowed line width.
      *
      * @return boolean
      */
@@ -57,7 +57,8 @@ class PHP_CodeSniffer_Reports_PhingRemoveFromCache implements PHP_CodeSniffer_Re
         PHP_CodeSniffer_File $phpcsFile,
         $showSources = false,
         $width = 80
-    ) {
+    )
+    {
         if (!self::$cache || ($report['errors'] === 0 && $report['warnings'] === 0)) {
             // Nothing to do
             return false;
@@ -71,15 +72,15 @@ class PHP_CodeSniffer_Reports_PhingRemoveFromCache implements PHP_CodeSniffer_Re
     /**
      * Do nothing
      *
-     * @param string  $cachedData    Any partial report data that was returned from
+     * @param string $cachedData Any partial report data that was returned from
      *                               generateFileReport during the run.
-     * @param int     $totalFiles    Total number of files processed during the run.
-     * @param int     $totalErrors   Total number of errors found during the run.
-     * @param int     $totalWarnings Total number of warnings found during the run.
-     * @param int     $totalFixable  Total number of problems that can be fixed.
-     * @param boolean $showSources   Show sources?
-     * @param int     $width         Maximum allowed line width.
-     * @param boolean $toScreen      Is the report being printed to screen?
+     * @param int $totalFiles Total number of files processed during the run.
+     * @param int $totalErrors Total number of errors found during the run.
+     * @param int $totalWarnings Total number of warnings found during the run.
+     * @param int $totalFixable Total number of problems that can be fixed.
+     * @param boolean $showSources Show sources?
+     * @param int $width Maximum allowed line width.
+     * @param boolean $toScreen Is the report being printed to screen?
      *
      * @return void
      */
@@ -92,7 +93,8 @@ class PHP_CodeSniffer_Reports_PhingRemoveFromCache implements PHP_CodeSniffer_Re
         $showSources = false,
         $width = 80,
         $toScreen = true
-    ) {
+    )
+    {
         // Do nothing
     }
 }

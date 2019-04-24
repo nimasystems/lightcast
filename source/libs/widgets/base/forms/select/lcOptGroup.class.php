@@ -37,11 +37,6 @@ class lcOptGroup extends lcHtmlTag
         $this->setIsDisabled($disabled);
     }
 
-    public static function create($label)
-    {
-        return new lcOptGroup($label);
-    }
-
     public function setLabel($value = null)
     {
         $this->setAttribute('label', $value);
@@ -52,6 +47,11 @@ class lcOptGroup extends lcHtmlTag
     {
         $this->setAttribute('disabled', $value ? 'disabled' : null);
         return $this;
+    }
+
+    public static function create($label)
+    {
+        return new lcOptGroup($label);
     }
 
     public static function getRequiredAttributes()

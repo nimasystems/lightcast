@@ -154,6 +154,43 @@ class AnsiColorLogger extends DefaultLogger
     }
 
     /**
+     * @see DefaultLogger#printMessage
+     * @param string $message
+     * @param OutputStream $stream
+     * @param int $priority
+     */
+    final protected function printMessage($message, OutputStream $stream, $priority)
+    {
+        if ($message !== null) {
+
+            if (!$this->colorsSet) {
+                $this->setColors();
+                $this->colorsSet = true;
+            }
+
+            switch ($priority) {
+                case Project::MSG_ERR:
+                    $message = $this->errColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_WARN:
+                    $message = $this->warnColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_INFO:
+                    $message = $this->infoColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_VERBOSE:
+                    $message = $this->verboseColor . $message . self::END_COLOR;
+                    break;
+                case Project::MSG_DEBUG:
+                    $message = $this->debugColor . $message . self::END_COLOR;
+                    break;
+            }
+
+            $stream->write($message . PHP_EOL);
+        }
+    }
+
+    /**
      * Set the colors to use from a property file specified by the
      * special ant property ant.logger.defaults
      */
@@ -196,43 +233,6 @@ class AnsiColorLogger extends DefaultLogger
             }
         } catch (IOException $ioe) {
             //Ignore exception - we will use the defaults.
-        }
-    }
-
-    /**
-     * @see DefaultLogger#printMessage
-     * @param string       $message
-     * @param OutputStream $stream
-     * @param int          $priority
-     */
-    final protected function printMessage($message, OutputStream $stream, $priority)
-    {
-        if ($message !== null) {
-
-            if (!$this->colorsSet) {
-                $this->setColors();
-                $this->colorsSet = true;
-            }
-
-            switch ($priority) {
-                case Project::MSG_ERR:
-                    $message = $this->errColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_WARN:
-                    $message = $this->warnColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_INFO:
-                    $message = $this->infoColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_VERBOSE:
-                    $message = $this->verboseColor . $message . self::END_COLOR;
-                    break;
-                case Project::MSG_DEBUG:
-                    $message = $this->debugColor . $message . self::END_COLOR;
-                    break;
-            }
-
-            $stream->write($message . PHP_EOL);
         }
     }
 }

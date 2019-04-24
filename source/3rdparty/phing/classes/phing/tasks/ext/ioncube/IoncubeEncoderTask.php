@@ -34,13 +34,13 @@ require_once 'phing/tasks/ext/ioncube/IoncubeComment.php';
  */
 class IoncubeEncoderTask extends Task
 {
-    private $ionSwitches = array();
+    private $ionSwitches = [];
 
-    private $ionOptions = array();
+    private $ionOptions = [];
 
-    private $ionOptionsXS = array();
+    private $ionOptionsXS = [];
 
-    private $comments = array();
+    private $comments = [];
 
     private $encoderName = 'ioncube_encoder';
 
@@ -195,20 +195,20 @@ class IoncubeEncoderTask extends Task
     }
 
     /**
+     * Returns the source directory
+     */
+    public function getFromDir()
+    {
+        return $this->fromDir;
+    }
+
+    /**
      * Sets the source directory
      * @param $value
      */
     public function setFromDir($value)
     {
         $this->fromDir = $value;
-    }
-
-    /**
-     * Returns the source directory
-     */
-    public function getFromDir()
-    {
-        return $this->fromDir;
     }
 
     /**
@@ -230,20 +230,20 @@ class IoncubeEncoderTask extends Task
     }
 
     /**
+     * Returns the path to the ionCube encoder
+     */
+    public function getIoncubePath()
+    {
+        return $this->ioncubePath;
+    }
+
+    /**
      * Sets the path to the ionCube encoder
      * @param $value
      */
     public function setIoncubePath($value)
     {
         $this->ioncubePath = $value;
-    }
-
-    /**
-     * Returns the path to the ionCube encoder
-     */
-    public function getIoncubePath()
-    {
-        return $this->ioncubePath;
     }
 
     /**
@@ -366,6 +366,14 @@ class IoncubeEncoderTask extends Task
     }
 
     /**
+     * Returns the version of PHP to use (defaults to 5)
+     */
+    public function getPhpVersion()
+    {
+        return $this->phpVersion;
+    }
+
+    /**
      * Sets the version of PHP to use (defaults to 5)
      * @param $value
      */
@@ -375,11 +383,11 @@ class IoncubeEncoderTask extends Task
     }
 
     /**
-     * Returns the version of PHP to use (defaults to 5)
+     * Returns the target directory
      */
-    public function getPhpVersion()
+    public function getToDir()
     {
-        return $this->phpVersion;
+        return $this->toDir;
     }
 
     /**
@@ -389,14 +397,6 @@ class IoncubeEncoderTask extends Task
     public function setToDir($value)
     {
         $this->toDir = $value;
-    }
-
-    /**
-     * Returns the target directory
-     */
-    public function getToDir()
-    {
-        return $this->toDir;
     }
 
     /**
@@ -519,20 +519,20 @@ class IoncubeEncoderTask extends Task
     }
 
     /**
+     * Returns the option to use when encoding target directory already exists (defaults to none)
+     */
+    public function getTargetOption()
+    {
+        return $this->targetOption;
+    }
+
+    /**
      * Sets the option to use when encoding target directory already exists (defaults to none)
      * @param $targetOption
      */
     public function setTargetOption($targetOption)
     {
         $this->targetOption = $targetOption;
-    }
-
-    /**
-     * Returns the option to use when encoding target directory already exists (defaults to none)
-     */
-    public function getTargetOption()
-    {
-        return $this->targetOption;
     }
 
     /**
@@ -578,7 +578,7 @@ class IoncubeEncoderTask extends Task
     {
         $arguments = $this->constructArguments();
 
-        if (in_array($this->phpVersion, array(5, 53, 54, 55, 56))) {
+        if (in_array($this->phpVersion, [5, 53, 54, 55, 56])) {
             $encoderName = $this->encoderName . $this->phpVersion;
         } else {
             $encoderName = $this->encoderName;
@@ -639,14 +639,14 @@ class IoncubeEncoderTask extends Task
                 case "merge":
                 case "update":
                 case "rename":
-                {
-                    $arguments .= "--" . $this->targetOption . "-target ";
-                }
+                    {
+                        $arguments .= "--" . $this->targetOption . "-target ";
+                    }
                     break;
 
                 default:
                     {
-                    throw new BuildException("Unknown target option '" . $this->targetOption . "'");
+                        throw new BuildException("Unknown target option '" . $this->targetOption . "'");
                     }
                     break;
             }

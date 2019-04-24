@@ -29,7 +29,7 @@ class lcPluginViewConfigHandler extends lcEnvConfigHandler
         return ['view' => [
             'metatags' => [],
             'stylesheets' => ['all' => []],
-            'javascripts' => []
+            'javascripts' => [],
         ]];
     }
 }

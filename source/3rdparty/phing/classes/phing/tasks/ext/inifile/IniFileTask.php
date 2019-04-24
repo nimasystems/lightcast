@@ -52,13 +52,13 @@ class InifileTask extends Task
      *
      * @var array
      */
-    protected $sets = array();
+    protected $sets = [];
     /**
      * Removals
      *
      * @var array
      */
-    protected $removals = array();
+    protected $removals = [];
 
     /**
      * IniFileConfig instance
@@ -72,6 +72,64 @@ class InifileTask extends Task
      * @var string
      */
     protected $taskName = 'IniFile';
+
+    /**
+     * The main entry point method.
+     *
+     * @return void
+     */
+    public function main()
+    {
+        $this->ini = new IniFileConfig();
+        $readFile = null;
+        $writeFile = null;
+
+        if (!is_null($this->source) && is_null($this->dest)) {
+            $readFile = $this->source;
+        } else if (!is_null($this->dest) && is_null($this->source)) {
+            $readFile = $this->dest;
+        } else {
+            $readFile = $this->source;
+        }
+
+        if (!is_null($this->dest)) {
+            $writeFile = $this->dest;
+        } else if (!is_null($this->source)) {
+            $writeFile = $this->source;
+        } else {
+            $writeFile = $this->dest;
+        }
+
+        if ($readFile === null && $writeFile === null) {
+            $msg = "Neither source nor dest is set";
+            if ($this->haltonerror) {
+                throw new BuildException($msg);
+            }
+            $this->log($msg, Project::MSG_ERR);
+            return;
+        }
+
+        if (!$this->checkReadFile($readFile)) {
+            return;
+        }
+
+        if (!$this->checkWriteFile($writeFile)) {
+            return;
+        }
+
+        $this->enumerateSets();
+        $this->enumerateRemoves();
+        try {
+            $this->ini->write($writeFile);
+            $this->log("Wrote to $writeFile");
+        } catch (Exception $ex) {
+            $msg = $ex->getMessage();
+            if ($this->haltonerror) {
+                throw new BuildException($msg);
+            }
+            $this->log($msg, Project::MSG_ERR);
+        }
+    }
 
     /**
      * Check file to be read from
@@ -127,64 +185,6 @@ class InifileTask extends Task
     }
 
     /**
-     * The main entry point method.
-     *
-     * @return void
-     */
-    public function main()
-    {
-        $this->ini = new IniFileConfig();
-        $readFile = null;
-        $writeFile = null;
-
-        if (!is_null($this->source) && is_null($this->dest)) {
-            $readFile = $this->source;
-        } elseif (!is_null($this->dest) && is_null($this->source)) {
-            $readFile = $this->dest;
-        } else {
-            $readFile = $this->source;
-        }
-
-        if (!is_null($this->dest)) {
-            $writeFile = $this->dest;
-        } elseif (!is_null($this->source)) {
-            $writeFile = $this->source;
-        } else {
-            $writeFile = $this->dest;
-        }
-
-        if ($readFile === null && $writeFile === null) {
-            $msg = "Neither source nor dest is set";
-            if ($this->haltonerror) {
-                throw new BuildException($msg);
-            }
-            $this->log($msg, Project::MSG_ERR);
-            return;
-        }
-
-        if (!$this->checkReadFile($readFile)) {
-            return;
-        }
-
-        if (!$this->checkWriteFile($writeFile)) {
-            return;
-        }
-
-        $this->enumerateSets();
-        $this->enumerateRemoves();
-        try {
-            $this->ini->write($writeFile);
-            $this->log("Wrote to $writeFile");
-        } catch (Exception $ex) {
-            $msg = $ex->getMessage();
-            if ($this->haltonerror) {
-                throw new BuildException($msg);
-            }
-            $this->log($msg, Project::MSG_ERR);
-        }
-    }
-
-    /**
      * Work through all Set commands.
      *
      * @return void
@@ -206,17 +206,17 @@ class InifileTask extends Task
                 } catch (Exception $ex) {
                     $this->log(
                         "Error setting value for section '" . $section .
-                        "', key '" . $key ."'"
+                        "', key '" . $key . "'"
                     );
                     $this->log($ex->getMessage(), Project::MSG_DEBUG);
                 }
-            } elseif ($operation !== null) {
+            } else if ($operation !== null) {
                 $v = $this->ini->get($section, $key);
                 // value might be wrapped in quotes with a semicolon at the end
                 if (!is_numeric($v)) {
                     if (preg_match('/^"(\d*)";?$/', $v, $match)) {
                         $v = $match[1];
-                    } elseif (preg_match("/^'(\d*)';?$/", $v, $match)) {
+                    } else if (preg_match("/^'(\d*)';?$/", $v, $match)) {
                         $v = $match[1];
                     } else {
                         $this->log(
@@ -227,7 +227,7 @@ class InifileTask extends Task
                 }
                 if ($operation == '+') {
                     ++$v;
-                } elseif ($operation == '-') {
+                } else if ($operation == '-') {
                     --$v;
                 } else {
                     if (($operation != '-') && ($operation != '+')) {
@@ -247,7 +247,7 @@ class InifileTask extends Task
                 } catch (Exception $ex) {
                     $this->log(
                         "Error setting value for section '" . $section .
-                        "', key '" . $key ."'"
+                        "', key '" . $key . "'"
                     );
                     $this->log($ex->getMessage(), Project::MSG_DEBUG);
                 }
@@ -283,7 +283,7 @@ class InifileTask extends Task
                     "$key in section [$section] has been removed.",
                     Project::MSG_DEBUG
                 );
-            } elseif (($section != '') && ($key == '')) {
+            } else if (($section != '') && ($key == '')) {
                 $this->log("[$section] has been removed.", Project::MSG_DEBUG);
             }
         }

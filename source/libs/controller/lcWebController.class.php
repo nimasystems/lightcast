@@ -44,57 +44,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     protected $title;
     protected $description;
     protected $keywords;
-
-    private $show_extra_debugging;
-
-    private $default_decorator;
-    private $default_decorator_extension;
-
     /** @var lcBaseActionForm[] */
     protected $action_forms;
-
-    public function initialize()
-    {
-        parent::initialize();
-
-        // initialize layout view
-        if (!$this->default_decorator) {
-            $this->default_decorator = isset($this->configuration['view.decorator']) ? (string)$this->configuration['view.decorator'] : self::DEFAULT_LAYOUT_NAME;
-        }
-
-        if (!$this->default_decorator_extension) {
-            $this->default_decorator_extension = isset($this->configuration['view.extension']) ? (string)$this->configuration['view.extension'] : self::DEFAULT_LAYOUT_EXT;
-        }
-
-        // extra debugging
-        $this->show_extra_debugging = isset($this->configuration['controller.extra_debug']) ? (bool)$this->configuration['controller.extra_debug'] : DO_DEBUG;
-
-        // init default layout
-        $has_layout = isset($this->configuration['view.has_layout']) ? (bool)$this->configuration['view.has_layout'] : self::DEFAULT_HAS_LAYOUT;
-
-        // do not enable decorator by default on ajax requests
-        if ($has_layout && !$this->request->isAjax()) {
-            $this->setDecorator($this->default_decorator, $this->default_decorator_extension);
-        }
-    }
-
-    public function shutdown()
-    {
-        if ($this->action_forms) {
-            foreach ($this->action_forms as $form) {
-                $form->shutdown();
-                unset($form);
-            }
-            $this->action_forms = null;
-        }
-
-        parent::shutdown();
-    }
-
-    private function getRandomIdentifier()
-    {
-        return 'anon_' . $this->getControllerName() . '/' . $this->getActionName() . '_' . lcStrings::randomString(15);
-    }
+    private $show_extra_debugging;
+    private $default_decorator;
+    private $default_decorator_extension;
 
     public function addJavascriptInclude($location, $identifier = null)
     {
@@ -102,16 +56,15 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         $this->required_js_includes[$identifier] = $location;
     }
 
+    private function getRandomIdentifier()
+    {
+        return 'anon_' . $this->getControllerName() . '/' . $this->getActionName() . '_' . lcStrings::randomString(15);
+    }
+
     public function addCssInclude($location, $identifier = null)
     {
         $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
         $this->required_css_includes[$identifier] = $location;
-    }
-
-    public function addJavascriptCode($code, $identifier = null)
-    {
-        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_javascript_code[$identifier] = (is_array($code) ? implode("\n", $code) : $code);
     }
 
     public function getRequiredJavascriptIncludes()
@@ -127,84 +80,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function getRequiredJavascriptCode()
     {
         return $this->required_javascript_code;
-    }
-
-    public function renderJavascriptCode($with_children = true, $with_script_tag = true)
-    {
-        $code = (array)$this->required_javascript_code;
-
-        if ($with_children) {
-            $components = $this->getLoadedComponents();
-
-            if ($components) {
-                foreach ($components as $component_data) {
-                    /** @var lcWebComponent $component */
-                    $component = $component_data['instance'];
-
-                    if ($component instanceof lcWebComponent) {
-                        $js_codes = $component->getRequiredJavascriptCode();
-
-                        if ($js_codes) {
-                            foreach ($js_codes as $identifier => $code2) {
-                                // append the component name before the identifier - to prevent overlapping of identifiers
-                                $identifier = $component->getControllerName() . '-' . $identifier;
-                                $code[$identifier] = $code2;
-                                unset($identifier, $code2);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if ($code) {
-            $out = implode("\n", array_values($code));
-
-            if ($with_script_tag) {
-                return lcTagScript::create()
-                    ->setContent($out)
-                    ->toString();
-            } else {
-                return $out;
-            }
-        }
-
-        return null;
-    }
-
-    public function setDecorator($decorator_template_name = null, $extension = 'htm')
-    {
-        if (!$decorator_template_name) {
-            $this->unsetDecoratorView();
-            return;
-        }
-
-        $extension = $extension ? $extension : $this->default_decorator_extension;
-
-        $full_template_name = $this->configuration->getLayoutsDir() . DS . $decorator_template_name . '.' . $extension;
-
-        $view = $this->getDefaultLayoutViewInstance();
-
-        if (!$view) {
-            return;
-        }
-
-        $view->setTemplateFilename($full_template_name);
-
-        $this->setDecoratorView($view);
-    }
-
-    public function getDefaultLayoutViewInstance()
-    {
-        $view = new lcHTMLTemplateLayoutView();
-
-        $view->setEventDispatcher($this->event_dispatcher);
-        $view->setConfiguration($this->configuration);
-        $view->setController($this);
-        $view->setReplacementString(self::LAYOUT_CONTENT_REPLACEMENT);
-        $view->initialize();
-
-        return $view;
     }
 
     public function setDefaultDecorator($default_decorator, $decorator_filename_ext = self::DEFAULT_LAYOUT_EXT)
@@ -224,15 +99,10 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     {
         if ($key == 'my_webpath' || $key == 'my_path') {
             return $this->getWebPath();
-        } elseif ($key == 'my_action_path') {
+        } else if ($key == 'my_action_path') {
             return $this->getMyActionPath();
         }
         return null;
-    }
-
-    public function getMyActionPath()
-    {
-        return $this->getWebPath() . $this->action_name;
     }
 
     public function getWebPath($suffixed = true)
@@ -243,6 +113,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     public function setWebPath($web_path)
     {
         $this->web_path = $web_path;
+    }
+
+    public function getMyActionPath()
+    {
+        return $this->getWebPath() . $this->action_name;
     }
 
     public function setCustomTemplate($filename)
@@ -310,7 +185,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                                     ],
                                     (array)$params
                                 ),
-                                'type' => $action_type
+                                'type' => $action_type,
                             ];
 
                             if (!$tag_name || !$route || !$module || !$action) {
@@ -458,6 +333,128 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $content;
     }
 
+    public function initialize()
+    {
+        parent::initialize();
+
+        // initialize layout view
+        if (!$this->default_decorator) {
+            $this->default_decorator = isset($this->configuration['view.decorator']) ? (string)$this->configuration['view.decorator'] : self::DEFAULT_LAYOUT_NAME;
+        }
+
+        if (!$this->default_decorator_extension) {
+            $this->default_decorator_extension = isset($this->configuration['view.extension']) ? (string)$this->configuration['view.extension'] : self::DEFAULT_LAYOUT_EXT;
+        }
+
+        // extra debugging
+        $this->show_extra_debugging = isset($this->configuration['controller.extra_debug']) ? (bool)$this->configuration['controller.extra_debug'] : DO_DEBUG;
+
+        // init default layout
+        $has_layout = isset($this->configuration['view.has_layout']) ? (bool)$this->configuration['view.has_layout'] : self::DEFAULT_HAS_LAYOUT;
+
+        // do not enable decorator by default on ajax requests
+        if ($has_layout && !$this->request->isAjax()) {
+            $this->setDecorator($this->default_decorator, $this->default_decorator_extension);
+        }
+    }
+
+    public function setDecorator($decorator_template_name = null, $extension = 'htm')
+    {
+        if (!$decorator_template_name) {
+            $this->unsetDecoratorView();
+            return;
+        }
+
+        $extension = $extension ? $extension : $this->default_decorator_extension;
+
+        $full_template_name = $this->configuration->getLayoutsDir() . DS . $decorator_template_name . '.' . $extension;
+
+        $view = $this->getDefaultLayoutViewInstance();
+
+        if (!$view) {
+            return;
+        }
+
+        $view->setTemplateFilename($full_template_name);
+
+        $this->setDecoratorView($view);
+    }
+
+    public function getDefaultLayoutViewInstance()
+    {
+        $view = new lcHTMLTemplateLayoutView();
+
+        $view->setEventDispatcher($this->event_dispatcher);
+        $view->setConfiguration($this->configuration);
+        $view->setController($this);
+        $view->setReplacementString(self::LAYOUT_CONTENT_REPLACEMENT);
+        $view->initialize();
+
+        return $view;
+    }
+
+    public function renderJavascriptCode($with_children = true, $with_script_tag = true)
+    {
+        $code = (array)$this->required_javascript_code;
+
+        if ($with_children) {
+            $components = $this->getLoadedComponents();
+
+            if ($components) {
+                foreach ($components as $component_data) {
+                    /** @var lcWebComponent $component */
+                    $component = $component_data['instance'];
+
+                    if ($component instanceof lcWebComponent) {
+                        $js_codes = $component->getRequiredJavascriptCode();
+
+                        if ($js_codes) {
+                            foreach ($js_codes as $identifier => $code2) {
+                                // append the component name before the identifier - to prevent overlapping of identifiers
+                                $identifier = $component->getControllerName() . '-' . $identifier;
+                                $code[$identifier] = $code2;
+                                unset($identifier, $code2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ($code) {
+            $out = implode("\n", array_values($code));
+
+            if ($with_script_tag) {
+                return lcTagScript::create()
+                    ->setContent($out)
+                    ->toString();
+            } else {
+                return $out;
+            }
+        }
+
+        return null;
+    }
+
+    public function shutdown()
+    {
+        if ($this->action_forms) {
+            foreach ($this->action_forms as $form) {
+                $form->shutdown();
+                unset($form);
+            }
+            $this->action_forms = null;
+        }
+
+        parent::shutdown();
+    }
+
+    public function addJavascriptCode($code, $identifier = null)
+    {
+        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
+        $this->required_javascript_code[$identifier] = (is_array($code) ? implode("\n", $code) : $code);
+    }
+
     public function getActionFormInstance($form_name)
     {
         if (!$this->system_component_factory) {
@@ -544,11 +541,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('controller.executed_action', $this,
                 ['controller_name' => $this->controller_name,
-                    'action_name' => $this->action_name,
-                    'action_type' => $this->action_type,
-                    'controller' => $this,
-                    'action_params' => $this->action_params,
-                    'action_result' => $this->action_result,
+                 'action_name' => $this->action_name,
+                 'action_type' => $this->action_type,
+                 'controller' => $this,
+                 'action_params' => $this->action_params,
+                 'action_result' => $this->action_result,
                 ]
             ));
         }

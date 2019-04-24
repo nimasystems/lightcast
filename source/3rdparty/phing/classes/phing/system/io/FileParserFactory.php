@@ -37,8 +37,8 @@ class FileParserFactory implements FileParserFactoryInterface
     const YAMLFILEEXTENSION = 'yml';
 
     /**
-   * @const string
-   */
+     * @const string
+     */
     const YAMLFILEEXTENSIONLONG = 'yaml';
 
     /**

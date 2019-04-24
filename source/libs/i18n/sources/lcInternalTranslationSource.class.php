@@ -32,7 +32,7 @@ class lcInternalTranslationSource extends lcSerializedFileTranslationSource
         return
             serialize(
                 [
-                    $this->translations
+                    $this->translations,
                 ]
             );
     }

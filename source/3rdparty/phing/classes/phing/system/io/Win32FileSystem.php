@@ -27,11 +27,10 @@ include_once 'phing/system/io/FileSystem.php';
 class Win32FileSystem extends FileSystem
 {
 
+    private static $driveDirCache = [];
     protected $slash;
     protected $altSlash;
     protected $semicolon;
-
-    private static $driveDirCache = array();
 
     /**
      *
@@ -42,40 +41,6 @@ class Win32FileSystem extends FileSystem
         $this->semicolon = self::getPathSeparator();
         $this->altSlash = ($this->slash === '\\') ? '/' : '\\';
     }
-
-    /**
-     * @param $c
-     * @return bool
-     */
-    public function isSlash($c)
-    {
-        return ($c == '\\') || ($c == '/');
-    }
-
-    /**
-     * @param $c
-     * @return bool
-     */
-    public function isLetter($c)
-    {
-        return ((ord($c) >= ord('a')) && (ord($c) <= ord('z')))
-        || ((ord($c) >= ord('A')) && (ord($c) <= ord('Z')));
-    }
-
-    /**
-     * @param $p
-     * @return string
-     */
-    public function slashify($p)
-    {
-        if ((strlen($p) > 0) && ($p{0} != $this->slash)) {
-            return $this->slash . $p;
-        } else {
-            return $p;
-        }
-    }
-
-    /* -- Normalization and construction -- */
 
     /**
      * @return string
@@ -92,6 +57,320 @@ class Win32FileSystem extends FileSystem
     public function getPathSeparator()
     {
         return ';';
+    }
+
+    /**
+     * @param string $parent
+     * @param string $child
+     * @return string
+     */
+    public function resolve($parent, $child)
+    {
+        $parent = (string)$parent;
+        $child = (string)$child;
+        $slash = (string)$this->slash;
+
+        $pn = (int)strlen($parent);
+        if ($pn === 0) {
+            return $child;
+        }
+        $cn = (int)strlen($child);
+        if ($cn === 0) {
+            return $parent;
+        }
+
+        $c = $child;
+        if (($cn > 1) && ($c{0} === $slash)) {
+            if ($c{1} === $slash) {
+                // drop prefix when child is a UNC pathname
+                $c = substr($c, 2);
+            } else {
+                //Drop prefix when child is drive-relative */
+                $c = substr($c, 1);
+            }
+        }
+
+        $p = $parent;
+        if ($p{$pn - 1} === $slash) {
+            $p = substr($p, 0, $pn - 1);
+        }
+
+        return $p . $this->slashify($c);
+    }
+
+    /* -- Normalization and construction -- */
+
+    /**
+     * @param $p
+     * @return string
+     */
+    public function slashify($p)
+    {
+        if ((strlen($p) > 0) && ($p{0} != $this->slash)) {
+            return $this->slash . $p;
+        } else {
+            return $p;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultParent()
+    {
+        return (string)("" . $this->slash);
+    }
+
+    /**
+     * @param string $strPath
+     * @return string
+     */
+    public function fromURIPath($strPath)
+    {
+        $p = (string)$strPath;
+        if ((strlen($p) > 2) && ($p{2} === ':')) {
+
+            // "/c:/foo" --> "c:/foo"
+            $p = substr($p, 1);
+
+            // "c:/foo/" --> "c:/foo", but "c:/" --> "c:/"
+            if ((strlen($p) > 3) && StringHelper::endsWith('/', $p)) {
+                $p = substr($p, 0, strlen($p) - 1);
+            }
+        } else if ((strlen($p) > 1) && StringHelper::endsWith('/', $p)) {
+            // "/foo/" --> "/foo"
+            $p = substr($p, 0, strlen($p) - 1);
+        }
+
+        return (string)$p;
+    }
+
+    /**
+     * @param PhingFile $f
+     * @return bool
+     */
+    public function isAbsolute(PhingFile $f)
+    {
+        $pl = (int)$f->getPrefixLength();
+        $p = (string)$f->getPath();
+
+        return ((($pl === 2) && ($p{0} === $this->slash)) || ($pl === 3) || ($pl === 1 && $p{0} === $this->slash));
+    }
+
+    /**
+     * @param PhingFile $f
+     */
+    public function resolveFile(PhingFile $f)
+    {
+        $path = $f->getPath();
+        $pl = (int)$f->getPrefixLength();
+
+        if (($pl === 2) && ($path{0} === $this->slash)) {
+            return $path; // UNC
+        }
+
+        if ($pl === 3) {
+            return $path; // Absolute local
+        }
+
+        if ($pl === 0) {
+            if ($this->_isPharArchive($path)) {
+                return $path;
+            }
+
+            return (string)($this->_getUserPath() . $this->slashify($path)); //Completely relative
+        }
+
+        if ($pl === 1) { // Drive-relative
+            $up = (string)$this->_getUserPath();
+            $ud = (string)$this->_getDrive($up);
+            if ($ud !== null) {
+                return (string)$ud . $path;
+            }
+
+            return (string)$up . $path; //User dir is a UNC path
+        }
+
+        if ($pl === 2) { // Directory-relative
+            $up = (string)$this->_getUserPath();
+            $ud = (string)$this->_getDrive($up);
+            if (($ud !== null) && StringHelper::startsWith($ud, $path)) {
+                return (string)($up . $this->slashify(substr($path, 2)));
+            }
+            $drive = (string)$path{0};
+            $dir = (string)$this->_getDriveDirectory($drive);
+
+            $np = (string)"";
+            if ($dir !== null) {
+                /* When resolving a directory-relative path that refers to a
+                drive other than the current drive, insist that the caller
+                have read permission on the result */
+                $p = (string)$drive . (':' . $dir . $this->slashify(substr($path, 2)));
+
+                if (!$this->checkAccess($p, false)) {
+                    // FIXME
+                    // throw security error
+                    die("Can't resolve path $p");
+                }
+
+                return $p;
+            }
+
+            return (string)$drive . ':' . $this->slashify(substr($path, 2)); //fake it
+        }
+
+        throw new InvalidArgumentException("Unresolvable path: " . $path);
+    }
+
+    /** private
+     * @param $strPath
+     * @return bool
+     */
+    public function _isPharArchive($strPath)
+    {
+        return (strpos($strPath, 'phar://') === 0);
+    }
+
+    /**
+     * @return string
+     */
+    public function _getUserPath()
+    {
+        //For both compatibility and security, we must look this up every time
+        return (string)$this->normalize(Phing::getProperty("user.dir"));
+    }
+
+    /**
+     * Check that the given pathname is normal.  If not, invoke the real
+     * normalizer on the part of the pathname that requires normalization.
+     * This way we iterate through the whole pathname string only once.
+     * @param string $strPath
+     * @return string
+     */
+    public function normalize($strPath)
+    {
+        $strPath = $this->fixEncoding($strPath);
+
+        if ($this->_isPharArchive($strPath)) {
+            return str_replace('\\', '/', $strPath);
+        }
+
+        $n = strlen($strPath);
+        $slash = $this->slash;
+        $altSlash = $this->altSlash;
+        $prev = 0;
+        for ($i = 0; $i < $n; $i++) {
+            $c = $strPath{$i};
+            if ($c === $altSlash) {
+                return $this->normalizer($strPath, $n, ($prev === $slash) ? $i - 1 : $i);
+            }
+            if (($c === $slash) && ($prev === $slash) && ($i > 1)) {
+                return $this->normalizer($strPath, $n, $i - 1);
+            }
+            if (($c === ':') && ($i > 1)) {
+                return $this->normalizer($strPath, $n, 0);
+            }
+            $prev = $c;
+        }
+        if ($prev === $slash) {
+            return $this->normalizer($strPath, $n, $n - 1);
+        }
+
+        return $strPath;
+    }
+
+    /**
+     * On Windows platforms, PHP will mangle non-ASCII characters, see http://bugs.php.net/bug.php?id=47096
+     *
+     * @param $strPath
+     * @return mixed|string
+     */
+    private function fixEncoding($strPath)
+    {
+        $codepage = 'CP' . trim(strstr(setlocale(LC_CTYPE, ''), '.'), '.');
+        if (function_exists('iconv')) {
+            $strPath = iconv('UTF-8', $codepage . '//IGNORE', $strPath);
+        } else if (function_exists('mb_convert_encoding')) {
+            $strPath = mb_convert_encoding($strPath, $codepage, 'UTF-8');
+        }
+        return $strPath;
+    }
+
+    /* -- Path operations -- */
+
+    /** Normalize the given pathname, whose length is len, starting at the given
+     * offset; everything before this offset is already normal.
+     * @param $strPath
+     * @param $len
+     * @param $offset
+     * @return string
+     */
+    protected function normalizer($strPath, $len, $offset)
+    {
+        if ($len == 0) {
+            return $strPath;
+        }
+        if ($offset < 3) {
+            $offset = 0; //Avoid fencepost cases with UNC pathnames
+        }
+        $src = 0;
+        $slash = $this->slash;
+        $sb = "";
+
+        if ($offset == 0) {
+            // Complete normalization, including prefix
+            $src = $this->normalizePrefix($strPath, $len, $sb);
+        } else {
+            // Partial normalization
+            $src = $offset;
+            $sb .= substr($strPath, 0, $offset);
+        }
+
+        // Remove redundant slashes from the remainder of the path, forcing all
+        // slashes into the preferred slash
+        while ($src < $len) {
+            $c = $strPath{$src++};
+            if ($this->isSlash($c)) {
+                while (($src < $len) && $this->isSlash($strPath{$src})) {
+                    $src++;
+                }
+                if ($src === $len) {
+                    /* Check for trailing separator */
+                    $sn = (int)strlen($sb);
+                    if (($sn == 2) && ($sb{1} === ':')) {
+                        // "z:\\"
+                        $sb .= $slash;
+                        break;
+                    }
+                    if ($sn === 0) {
+                        // "\\"
+                        $sb .= $slash;
+                        break;
+                    }
+                    if (($sn === 1) && ($this->isSlash($sb{0}))) {
+                        /* "\\\\" is not collapsed to "\\" because "\\\\" marks
+                        the beginning of a UNC pathname.  Even though it is
+                        not, by itself, a valid UNC pathname, we leave it as
+                        is in order to be consistent with the win32 APIs,
+                        which treat this case as an invalid UNC pathname
+                        rather than as an alias for the root directory of
+                        the current drive. */
+                        $sb .= $slash;
+                        break;
+                    }
+                    // Path does not denote a root directory, so do not append
+                    // trailing slash
+                    break;
+                } else {
+                    $sb .= $slash;
+                }
+            } else {
+                $sb .= $c;
+            }
+        }
+        $rv = (string)$sb;
+
+        return $rv;
     }
 
     /**
@@ -147,118 +426,35 @@ class Win32FileSystem extends FileSystem
         return $src;
     }
 
-    /** Normalize the given pathname, whose length is len, starting at the given
-     * offset; everything before this offset is already normal.
-     * @param $strPath
-     * @param $len
-     * @param $offset
-     * @return string
+    /**
+     * @param $c
+     * @return bool
      */
-    protected function normalizer($strPath, $len, $offset)
+    public function isSlash($c)
     {
-        if ($len == 0) {
-            return $strPath;
-        }
-        if ($offset < 3) {
-            $offset = 0; //Avoid fencepost cases with UNC pathnames
-        }
-        $src = 0;
-        $slash = $this->slash;
-        $sb = "";
-
-        if ($offset == 0) {
-            // Complete normalization, including prefix
-            $src = $this->normalizePrefix($strPath, $len, $sb);
-        } else {
-            // Partial normalization
-            $src = $offset;
-            $sb .= substr($strPath, 0, $offset);
-        }
-
-        // Remove redundant slashes from the remainder of the path, forcing all
-        // slashes into the preferred slash
-        while ($src < $len) {
-            $c = $strPath{$src++};
-            if ($this->isSlash($c)) {
-                while (($src < $len) && $this->isSlash($strPath{$src})) {
-                    $src++;
-                }
-                if ($src === $len) {
-                    /* Check for trailing separator */
-                    $sn = (int) strlen($sb);
-                    if (($sn == 2) && ($sb{1} === ':')) {
-                        // "z:\\"
-                        $sb .= $slash;
-                        break;
-                    }
-                    if ($sn === 0) {
-                        // "\\"
-                        $sb .= $slash;
-                        break;
-                    }
-                    if (($sn === 1) && ($this->isSlash($sb{0}))) {
-                        /* "\\\\" is not collapsed to "\\" because "\\\\" marks
-                        the beginning of a UNC pathname.  Even though it is
-                        not, by itself, a valid UNC pathname, we leave it as
-                        is in order to be consistent with the win32 APIs,
-                        which treat this case as an invalid UNC pathname
-                        rather than as an alias for the root directory of
-                        the current drive. */
-                        $sb .= $slash;
-                        break;
-                    }
-                    // Path does not denote a root directory, so do not append
-                    // trailing slash
-                    break;
-                } else {
-                    $sb .= $slash;
-                }
-            } else {
-                $sb .= $c;
-            }
-        }
-        $rv = (string) $sb;
-
-        return $rv;
+        return ($c == '\\') || ($c == '/');
     }
 
     /**
-     * Check that the given pathname is normal.  If not, invoke the real
-     * normalizer on the part of the pathname that requires normalization.
-     * This way we iterate through the whole pathname string only once.
-     * @param  string $strPath
-     * @return string
+     * @param $c
+     * @return bool
      */
-    public function normalize($strPath)
+    public function isLetter($c)
     {
-        $strPath = $this->fixEncoding($strPath);
+        return ((ord($c) >= ord('a')) && (ord($c) <= ord('z')))
+            || ((ord($c) >= ord('A')) && (ord($c) <= ord('Z')));
+    }
 
-        if ($this->_isPharArchive($strPath)) {
-            return str_replace('\\', '/', $strPath);
-        }
+    /**
+     * @param $path
+     * @return null|string
+     */
+    public function _getDrive($path)
+    {
+        $path = (string)$path;
+        $pl = $this->prefixLength($path);
 
-        $n = strlen($strPath);
-        $slash = $this->slash;
-        $altSlash = $this->altSlash;
-        $prev = 0;
-        for ($i = 0; $i < $n; $i++) {
-            $c = $strPath{$i};
-            if ($c === $altSlash) {
-                return $this->normalizer($strPath, $n, ($prev === $slash) ? $i - 1 : $i);
-            }
-            if (($c === $slash) && ($prev === $slash) && ($i > 1)) {
-                return $this->normalizer($strPath, $n, $i - 1);
-            }
-            if (($c === ':') && ($i > 1)) {
-                return $this->normalizer($strPath, $n, 0);
-            }
-            $prev = $c;
-        }
-        if ($prev === $slash) {
-            return $this->normalizer($strPath, $n, $n - 1);
-        }
-
-        return $strPath;
+        return ($pl === 3) ? substr($path, 0, 2) : null;
     }
 
     /**
@@ -271,9 +467,9 @@ class Win32FileSystem extends FileSystem
             return 0;
         }
 
-        $path = (string) $strPath;
-        $slash = (string) $this->slash;
-        $n = (int) strlen($path);
+        $path = (string)$strPath;
+        $slash = (string)$this->slash;
+        $n = (int)strlen($path);
         if ($n === 0) {
             return 0;
         }
@@ -300,124 +496,13 @@ class Win32FileSystem extends FileSystem
     }
 
     /**
-     * @param string $parent
-     * @param string $child
-     * @return string
-     */
-    public function resolve($parent, $child)
-    {
-        $parent = (string) $parent;
-        $child = (string) $child;
-        $slash = (string) $this->slash;
-
-        $pn = (int) strlen($parent);
-        if ($pn === 0) {
-            return $child;
-        }
-        $cn = (int) strlen($child);
-        if ($cn === 0) {
-            return $parent;
-        }
-
-        $c = $child;
-        if (($cn > 1) && ($c{0} === $slash)) {
-            if ($c{1} === $slash) {
-                // drop prefix when child is a UNC pathname
-                $c = substr($c, 2);
-            } else {
-                //Drop prefix when child is drive-relative */
-                $c = substr($c, 1);
-            }
-        }
-
-        $p = $parent;
-        if ($p{$pn - 1} === $slash) {
-            $p = substr($p, 0, $pn - 1);
-        }
-
-        return $p . $this->slashify($c);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultParent()
-    {
-        return (string) ("" . $this->slash);
-    }
-
-    /**
-     * @param string $strPath
-     * @return string
-     */
-    public function fromURIPath($strPath)
-    {
-        $p = (string) $strPath;
-        if ((strlen($p) > 2) && ($p{2} === ':')) {
-
-            // "/c:/foo" --> "c:/foo"
-            $p = substr($p, 1);
-
-            // "c:/foo/" --> "c:/foo", but "c:/" --> "c:/"
-            if ((strlen($p) > 3) && StringHelper::endsWith('/', $p)) {
-                $p = substr($p, 0, strlen($p) - 1);
-            }
-        } elseif ((strlen($p) > 1) && StringHelper::endsWith('/', $p)) {
-            // "/foo/" --> "/foo"
-            $p = substr($p, 0, strlen($p) - 1);
-        }
-
-        return (string) $p;
-    }
-
-    /* -- Path operations -- */
-
-    /**
-     * @param PhingFile $f
-     * @return bool
-     */
-    public function isAbsolute(PhingFile $f)
-    {
-        $pl = (int) $f->getPrefixLength();
-        $p = (string) $f->getPath();
-
-        return ((($pl === 2) && ($p{0} === $this->slash)) || ($pl === 3) || ($pl === 1 && $p{0} === $this->slash));
-    }
-
-    /** private
-     * @param $d
-     * @return int
-     */
-    public function _driveIndex($d)
-    {
-        $d = (string) $d{0};
-        if ((ord($d) >= ord('a')) && (ord($d) <= ord('z'))) {
-            return ord($d) - ord('a');
-        }
-        if ((ord($d) >= ord('A')) && (ord($d) <= ord('Z'))) {
-            return ord($d) - ord('A');
-        }
-
-        return -1;
-    }
-
-    /** private
-     * @param $strPath
-     * @return bool
-     */
-    public function _isPharArchive($strPath)
-    {
-        return (strpos($strPath, 'phar://') === 0);
-    }
-
-    /**
      * @param $drive
      * @return null
      */
     public function _getDriveDirectory($drive)
     {
-        $drive = (string) $drive{0};
-        $i = (int) $this->_driveIndex($drive);
+        $drive = (string)$drive{0};
+        $i = (int)$this->_driveIndex($drive);
         if ($i < 0) {
             return null;
         }
@@ -434,95 +519,28 @@ class Win32FileSystem extends FileSystem
         return $s;
     }
 
-    /**
-     * @return string
-     */
-    public function _getUserPath()
-    {
-        //For both compatibility and security, we must look this up every time
-        return (string) $this->normalize(Phing::getProperty("user.dir"));
-    }
-
-    /**
-     * @param $path
-     * @return null|string
-     */
-    public function _getDrive($path)
-    {
-        $path = (string) $path;
-        $pl = $this->prefixLength($path);
-
-        return ($pl === 3) ? substr($path, 0, 2) : null;
-    }
-
-    /**
-     * @param PhingFile $f
-     */
-    public function resolveFile(PhingFile $f)
-    {
-        $path = $f->getPath();
-        $pl = (int) $f->getPrefixLength();
-
-        if (($pl === 2) && ($path{0} === $this->slash)) {
-            return $path; // UNC
-        }
-
-        if ($pl === 3) {
-            return $path; // Absolute local
-        }
-
-        if ($pl === 0) {
-            if ($this->_isPharArchive($path)) {
-                return $path;
-            }
-
-            return (string) ($this->_getUserPath() . $this->slashify($path)); //Completely relative
-        }
-
-        if ($pl === 1) { // Drive-relative
-            $up = (string) $this->_getUserPath();
-            $ud = (string) $this->_getDrive($up);
-            if ($ud !== null) {
-                return (string) $ud . $path;
-            }
-
-            return (string) $up . $path; //User dir is a UNC path
-        }
-
-        if ($pl === 2) { // Directory-relative
-            $up = (string) $this->_getUserPath();
-            $ud = (string) $this->_getDrive($up);
-            if (($ud !== null) && StringHelper::startsWith($ud, $path)) {
-                return (string) ($up . $this->slashify(substr($path, 2)));
-            }
-            $drive = (string) $path{0};
-            $dir = (string) $this->_getDriveDirectory($drive);
-
-            $np = (string) "";
-            if ($dir !== null) {
-                /* When resolving a directory-relative path that refers to a
-                drive other than the current drive, insist that the caller
-                have read permission on the result */
-                $p = (string) $drive . (':' . $dir . $this->slashify(substr($path, 2)));
-
-                if (!$this->checkAccess($p, false)) {
-                    // FIXME
-                    // throw security error
-                    die("Can't resolve path $p");
-                }
-
-                return $p;
-            }
-
-            return (string) $drive . ':' . $this->slashify(substr($path, 2)); //fake it
-        }
-
-        throw new InvalidArgumentException("Unresolvable path: " . $path);
-    }
-
     /* -- most of the following is mapped to the functions mapped th php natives in FileSystem */
 
     /* -- Attribute accessors -- */
+
+    /** private
+     * @param $d
+     * @return int
+     */
+    public function _driveIndex($d)
+    {
+        $d = (string)$d{0};
+        if ((ord($d) >= ord('a')) && (ord($d) <= ord('z'))) {
+            return ord($d) - ord('a');
+        }
+        if ((ord($d) >= ord('A')) && (ord($d) <= ord('Z'))) {
+            return ord($d) - ord('A');
+        }
+
+        return -1;
+    }
+
+    /* -- Filesystem interface -- */
 
     /**
      * @param PhingFile $f
@@ -534,7 +552,40 @@ class Win32FileSystem extends FileSystem
         throw new Exception("WIN32FileSystem doesn't support read-only yet.");
     }
 
-    /* -- Filesystem interface -- */
+    /**
+     * @return array
+     */
+    public function listRoots()
+    {
+        $ds = $this->_nativeListRoots();
+        $n = 0;
+        for ($i = 0; $i < 26; $i++) {
+            if ((($ds >> $i) & 1) !== 0) {
+                if (!$this->_access((string)(chr(ord('A') + $i) . ':' . $this->slash))) {
+                    $ds &= ~(1 << $i);
+                } else {
+                    $n++;
+                }
+            }
+        }
+        $fs = [];
+        $j = (int)0;
+
+        for ($i = 0; $i < 26; $i++) {
+            if ((($ds >> $i) & 1) !== 0) {
+                $fs[$j++] = new PhingFile(chr(ord('A') + $i) . ':' . $this->slash);
+            }
+        }
+
+        return $fs;
+    }
+
+    public function _nativeListRoots()
+    {
+        // FIXME
+    }
+
+    /* -- Basic infrastructure -- */
 
     /**
      * @param $path
@@ -550,41 +601,6 @@ class Win32FileSystem extends FileSystem
         return true;
     }
 
-    public function _nativeListRoots()
-    {
-        // FIXME
-    }
-
-    /**
-     * @return array
-     */
-    public function listRoots()
-    {
-        $ds = $this->_nativeListRoots();
-        $n = 0;
-        for ($i = 0; $i < 26; $i++) {
-            if ((($ds >> $i) & 1) !== 0) {
-                if (!$this->_access((string) (chr(ord('A') + $i) . ':' . $this->slash))) {
-                    $ds &= ~(1 << $i);
-                } else {
-                    $n++;
-                }
-            }
-        }
-        $fs = array();
-        $j = (int) 0;
-
-        for ($i = 0; $i < 26; $i++) {
-            if ((($ds >> $i) & 1) !== 0) {
-                $fs[$j++] = new PhingFile(chr(ord('A') + $i) . ':' . $this->slash);
-            }
-        }
-
-        return $fs;
-    }
-
-    /* -- Basic infrastructure -- */
-
     /** compares file paths lexicographically
      * @param PhingFile $f1
      * @param PhingFile $f2
@@ -595,14 +611,14 @@ class Win32FileSystem extends FileSystem
         $f1Path = $f1->getPath();
         $f2Path = $f2->getPath();
 
-        return strcasecmp((string) $f1Path, (string) $f2Path);
+        return strcasecmp((string)$f1Path, (string)$f2Path);
     }
 
     /**
      * returns the contents of a directory in an array
      * @param $f
-     * @throws Exception
      * @return array
+     * @throws Exception
      */
     public function lister($f)
     {
@@ -610,33 +626,16 @@ class Win32FileSystem extends FileSystem
         if (!$dir) {
             throw new Exception("Can't open directory " . $f->__toString());
         }
-        $vv = array();
+        $vv = [];
         while (($file = @readdir($dir)) !== false) {
             if ($file == "." || $file == "..") {
                 continue;
             }
-            $vv[] = (string) $file;
+            $vv[] = (string)$file;
         }
         @closedir($dir);
 
         return $vv;
-    }
-
-    /**
-     * On Windows platforms, PHP will mangle non-ASCII characters, see http://bugs.php.net/bug.php?id=47096
-     *
-     * @param $strPath
-     * @return mixed|string
-     */
-    private function fixEncoding($strPath)
-    {
-        $codepage = 'CP' . trim(strstr(setlocale(LC_CTYPE, ''), '.'), '.');
-        if (function_exists('iconv')) {
-            $strPath = iconv('UTF-8', $codepage . '//IGNORE', $strPath);
-        } elseif (function_exists('mb_convert_encoding')) {
-            $strPath = mb_convert_encoding($strPath, $codepage, 'UTF-8');
-        }
-        return $strPath;
     }
 
 }

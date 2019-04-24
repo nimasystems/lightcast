@@ -61,7 +61,7 @@ class DBPostgres extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -85,21 +85,11 @@ class DBPostgres extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::getIdMethod()
-     *
-     * @return integer
-     */
-    protected function getIdMethod()
-    {
-        return DBAdapter::ID_METHOD_SEQUENCE;
-    }
-
-    /**
      * Gets ID for specified sequence name.
      * Warning: duplicates logic from PgsqlPlatform::getIdentifierPhp().
      * Any code modification here must be ported there.
      *
-     * @param PDO    $con
+     * @param PDO $con
      * @param string $name
      *
      * @return integer
@@ -138,11 +128,11 @@ class DBPostgres extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::applyLimit()
-     *
-     * @param string  $sql
+     * @param string $sql
      * @param integer $offset
      * @param integer $limit
+     * @see       DBAdapter::applyLimit()
+     *
      */
     public function applyLimit(&$sql, $offset, $limit)
     {
@@ -155,11 +145,11 @@ class DBPostgres extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::random()
-     *
      * @param string $seed
      *
      * @return string
+     * @see       DBAdapter::random()
+     *
      */
     public function random($seed = null)
     {
@@ -167,12 +157,12 @@ class DBPostgres extends DBAdapter
     }
 
     /**
-     * @see        DBAdapter::getDeleteFromClause()
-     *
      * @param Criteria $criteria
-     * @param string   $tableName
+     * @param string $tableName
      *
      * @return string
+     * @see        DBAdapter::getDeleteFromClause()
+     *
      */
     public function getDeleteFromClause($criteria, $tableName)
     {
@@ -196,31 +186,31 @@ class DBPostgres extends DBAdapter
     }
 
     /**
-     * @see        DBAdapter::quoteIdentifierTable()
-     *
      * @param string $table
      *
      * @return string
+     * @see        DBAdapter::quoteIdentifierTable()
+     *
      */
     public function quoteIdentifierTable($table)
     {
         // e.g. 'database.table alias' should be escaped as '"database"."table" "alias"'
-        return '"' . strtr($table, array('.' => '"."', ' ' => '" "')) . '"';
+        return '"' . strtr($table, ['.' => '"."', ' ' => '" "']) . '"';
     }
 
     /**
      * Do Explain Plan for query object or query string
      *
-     * @param PropelPDO            $con   propel connection
+     * @param PropelPDO $con propel connection
      * @param ModelCriteria|string $query query the criteria or the query string
      *
-     * @throws PropelException
      * @return PDOStatement    A PDO statement executed using the connection, ready to be fetched
+     * @throws PropelException
      */
     public function doExplainPlan(PropelPDO $con, $query)
     {
         if ($query instanceof ModelCriteria) {
-            $params = array();
+            $params = [];
             $dbMap = Propel::getDatabaseMap($query->getDbName());
             $sql = BasePeer::createSelectSql($query, $params);
         } else {
@@ -248,5 +238,15 @@ class DBPostgres extends DBAdapter
     public function getExplainPlanQuery($query)
     {
         return 'EXPLAIN ' . $query;
+    }
+
+    /**
+     * @return integer
+     * @see       DBAdapter::getIdMethod()
+     *
+     */
+    protected function getIdMethod()
+    {
+        return DBAdapter::ID_METHOD_SEQUENCE;
     }
 }

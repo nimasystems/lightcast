@@ -40,7 +40,7 @@ class PhpDocumentor2Wrapper
      * List of filesets
      * @var FileSet[]
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Destination/target directory
@@ -118,7 +118,7 @@ class PhpDocumentor2Wrapper
      */
     public function setTemplate($template)
     {
-        $this->template = (string) $template;
+        $this->template = (string)$template;
     }
 
     /**
@@ -127,7 +127,7 @@ class PhpDocumentor2Wrapper
      */
     public function setTitle($title)
     {
-        $this->title = (string) $title;
+        $this->title = (string)$title;
     }
 
     /**
@@ -136,7 +136,7 @@ class PhpDocumentor2Wrapper
      */
     public function setDefaultPackageName($defaultPackageName)
     {
-        $this->defaultPackageName = (string) $defaultPackageName;
+        $this->defaultPackageName = (string)$defaultPackageName;
     }
 
     /**
@@ -145,6 +145,23 @@ class PhpDocumentor2Wrapper
     public function setPharLocation($pharLocation)
     {
         $this->pharLocation = $pharLocation;
+    }
+
+    /**
+     * Runs phpDocumentor 2
+     */
+    public function run()
+    {
+        $this->initializePhpDocumentor();
+
+        $cache = $this->app['descriptor.cache'];
+        $cache->getOptions()->setCacheDir($this->destDir->getAbsolutePath());
+
+        $this->parseFiles();
+
+        $this->project->log("Transforming...", Project::MSG_VERBOSE);
+
+        $this->transformFiles();
     }
 
     /**
@@ -162,7 +179,7 @@ class PhpDocumentor2Wrapper
                     $this->pharLocation . ' does not look like a phpDocumentor 2 .phar'
                 );
             }
-        } elseif (class_exists('Composer\\Autoload\\ClassLoader', false)) {
+        } else if (class_exists('Composer\\Autoload\\ClassLoader', false)) {
             if (!class_exists('phpDocumentor\\Bootstrap')) {
                 throw new BuildException('You need to install phpDocumentor 2 or add your include path to your composer installation.');
             }
@@ -184,6 +201,27 @@ class PhpDocumentor2Wrapper
     }
 
     /**
+     * Find the correct php documentor path
+     *
+     * @return null|string
+     */
+    private function findPhpDocumentorPath()
+    {
+        $phpDocumentorPath = null;
+        $directories = ['phpDocumentor', 'phpdocumentor'];
+        foreach ($directories as $directory) {
+            foreach (Phing::explodeIncludePath() as $path) {
+                $testPhpDocumentorPath = $path . DIRECTORY_SEPARATOR . $directory . DIRECTORY_SEPARATOR . 'src';
+                if (file_exists($testPhpDocumentorPath)) {
+                    $phpDocumentorPath = $testPhpDocumentorPath;
+                }
+            }
+        }
+
+        return $phpDocumentorPath;
+    }
+
+    /**
      * Build a list of files (from the fileset elements)
      * and call the phpDocumentor parser
      *
@@ -198,7 +236,7 @@ class PhpDocumentor2Wrapper
         $projectDescriptor = $builder->getProjectDescriptor();
         $projectDescriptor->setName($this->title);
 
-        $paths = array();
+        $paths = [];
 
         // filesets
         foreach ($this->filesets as $fs) {
@@ -246,43 +284,5 @@ class PhpDocumentor2Wrapper
         foreach ($compiler as $pass) {
             $pass->execute($projectDescriptor);
         }
-    }
-
-    /**
-     * Runs phpDocumentor 2
-     */
-    public function run()
-    {
-        $this->initializePhpDocumentor();
-
-        $cache = $this->app['descriptor.cache'];
-        $cache->getOptions()->setCacheDir($this->destDir->getAbsolutePath());
-
-        $this->parseFiles();
-
-        $this->project->log("Transforming...", Project::MSG_VERBOSE);
-
-        $this->transformFiles();
-    }
-
-    /**
-     * Find the correct php documentor path
-     *
-     * @return null|string
-     */
-    private function findPhpDocumentorPath()
-    {
-        $phpDocumentorPath = null;
-        $directories = array('phpDocumentor', 'phpdocumentor');
-        foreach ($directories as $directory) {
-            foreach (Phing::explodeIncludePath() as $path) {
-                $testPhpDocumentorPath = $path . DIRECTORY_SEPARATOR . $directory . DIRECTORY_SEPARATOR . 'src';
-                if (file_exists($testPhpDocumentorPath)) {
-                    $phpDocumentorPath = $testPhpDocumentorPath;
-                }
-            }
-        }
-
-        return $phpDocumentorPath;
     }
 }

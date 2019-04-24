@@ -63,7 +63,7 @@ class lcFrontConsoleController extends lcFrontController
         if (isset($params['help']) || ($controller_name && !$action_name)) {
             $this->displayControllerHelp($controller_name);
             return false;
-        } elseif (!$controller_name && !$action_name) {
+        } else if (!$controller_name && !$action_name) {
             // show console info
             $this->response->consoleDisplay($this->getConsoleIntro(), false);
             return false;

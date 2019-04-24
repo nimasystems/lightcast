@@ -134,9 +134,9 @@ class lcSpatialUtils
      * distance $radius (miles), returns a random point (latitude,longtitude)
      * which is within $radius miles of $centre.
      *
-     * @param  array $centre Numeric array of floats. First element is
+     * @param array $centre Numeric array of floats. First element is
      *                       latitude, second is longitude.
-     * @param  float $radius The radius (in miles).
+     * @param float $radius The radius (in miles).
      * @return array         Numeric array of floats (lat/lng). First
      *                       element is latitude, second is longitude.
      */

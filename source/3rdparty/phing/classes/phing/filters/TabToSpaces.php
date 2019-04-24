@@ -93,23 +93,19 @@ class TabToSpaces extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the tab length.
-     *
-     * @param int $tabLength The number of spaces to be used when converting a tab.
+     * Parses the parameters to set the tab length.
      */
-    public function setTablength($tabLength)
+    private function _initialize()
     {
-        $this->tabLength = (int) $tabLength;
-    }
-
-    /**
-     * Returns the tab length.
-     *
-     * @return int The number of spaces used when converting a tab
-     */
-    public function getTablength()
-    {
-        return $this->tabLength;
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0; $i < count($params); $i++) {
+                if (self::TAB_LENGTH_KEY === $params[$i]->getName()) {
+                    $this->tabLength = $params[$i]->getValue();
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -133,18 +129,22 @@ class TabToSpaces extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Parses the parameters to set the tab length.
+     * Returns the tab length.
+     *
+     * @return int The number of spaces used when converting a tab
      */
-    private function _initialize()
+    public function getTablength()
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0; $i < count($params); $i++) {
-                if (self::TAB_LENGTH_KEY === $params[$i]->getName()) {
-                    $this->tabLength = $params[$i]->getValue();
-                    break;
-                }
-            }
-        }
+        return $this->tabLength;
+    }
+
+    /**
+     * Sets the tab length.
+     *
+     * @param int $tabLength The number of spaces to be used when converting a tab.
+     */
+    public function setTablength($tabLength)
+    {
+        $this->tabLength = (int)$tabLength;
     }
 }

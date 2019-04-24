@@ -60,9 +60,9 @@ class OutputStreamWriter extends Writer
     /**
      * Write char data to stream.
      *
-     * @param  string $buf
-     * @param  int $off
-     * @param  int $len
+     * @param string $buf
+     * @param int $off
+     * @param int $len
      *
      * @return void
      */

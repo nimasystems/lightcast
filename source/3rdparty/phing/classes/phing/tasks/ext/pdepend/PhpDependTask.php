@@ -46,7 +46,7 @@ class PhpDependTask extends Task
      *
      * @var FileSet[]
      */
-    protected $filesets = array();
+    protected $filesets = [];
 
     /**
      * List of allowed file extensions. Default file extensions are <b>php</b>
@@ -54,7 +54,7 @@ class PhpDependTask extends Task
      *
      * @var array<string>
      */
-    protected $allowedFileExtensions = array('php', 'php5');
+    protected $allowedFileExtensions = ['php', 'php5'];
 
     /**
      * List of exclude directories. Default exclude dirs are <b>.git</b>,
@@ -62,14 +62,14 @@ class PhpDependTask extends Task
      *
      * @var array<string>
      */
-    protected $excludeDirectories = array('.git', '.svn', 'CVS');
+    protected $excludeDirectories = ['.git', '.svn', 'CVS'];
 
     /**
      * List of exclude packages
      *
      * @var array<string>
      */
-    protected $excludePackages = array();
+    protected $excludePackages = [];
 
     /**
      * Should the parse ignore doc comment annotations?
@@ -104,14 +104,14 @@ class PhpDependTask extends Task
      *
      * @var PhpDependLoggerElement[]
      */
-    protected $loggers = array();
+    protected $loggers = [];
 
     /**
      * Analyzer elements
      *
      * @var PhpDependAnalyzerElement[]
      */
-    protected $analyzers = array();
+    protected $analyzers = [];
 
     /**
      * Holds the PHP_Depend runner instance
@@ -126,57 +126,14 @@ class PhpDependTask extends Task
      * @var boolean
      */
     protected $haltonerror = false;
-
-    /**
-     * @var bool
-     */
-    private $oldVersion = false;
-
     /**
      * @var string
      */
     protected $pharLocation = "";
-
     /**
-     * Load the necessary environment for running PHP_Depend
-     *
-     * @throws BuildException
+     * @var bool
      */
-    protected function requireDependencies()
-    {
-        if (!empty($this->pharLocation)) {
-            include_once 'phar://' . $this->pharLocation . '/vendor/autoload.php';
-        }
-
-        // check 2.x version (composer/phar)
-        if (class_exists('PDepend\\TextUI\\Runner')) {
-            return;
-        }
-
-        $this->oldVersion = true;
-
-        // check 1.x version (composer)
-        if (class_exists('PHP_Depend_TextUI_Runner')) {
-            // include_path hack for PHP_Depend 1.1.3
-            $rc = new ReflectionClass('PHP_Depend');
-            set_include_path(get_include_path() . ":" . realpath(dirname($rc->getFileName()) . "/../"));
-
-            return;
-        }
-
-        @include_once 'PHP/Depend/Autoload.php';
-
-        if (!class_exists('PHP_Depend_Autoload')) {
-            throw new BuildException(
-                'PhpDependTask depends on PHP_Depend being installed and on include_path',
-                $this->getLocation()
-            );
-        }
-
-        // register PHP_Depend autoloader
-        $autoload = new PHP_Depend_Autoload();
-        $autoload->register();
-    }
+    private $oldVersion = false;
 
     /**
      * Set the input source file or directory
@@ -206,7 +163,7 @@ class PhpDependTask extends Task
      */
     public function setAllowedFileExtensions($fileExtensions)
     {
-        $this->allowedFileExtensions = array();
+        $this->allowedFileExtensions = [];
 
         $token = ' ,;';
         $ext = strtok($fileExtensions, $token);
@@ -224,7 +181,7 @@ class PhpDependTask extends Task
      */
     public function setExcludeDirectories($excludeDirectories)
     {
-        $this->excludeDirectories = array();
+        $this->excludeDirectories = [];
 
         $token = ' ,;';
         $pattern = strtok($excludeDirectories, $token);
@@ -242,7 +199,7 @@ class PhpDependTask extends Task
      */
     public function setExcludePackages($excludePackages)
     {
-        $this->excludePackages = array();
+        $this->excludePackages = [];
 
         $token = ' ,;';
         $pattern = strtok($excludePackages, $token);
@@ -426,6 +383,47 @@ class PhpDependTask extends Task
     }
 
     /**
+     * Load the necessary environment for running PHP_Depend
+     *
+     * @throws BuildException
+     */
+    protected function requireDependencies()
+    {
+        if (!empty($this->pharLocation)) {
+            include_once 'phar://' . $this->pharLocation . '/vendor/autoload.php';
+        }
+
+        // check 2.x version (composer/phar)
+        if (class_exists('PDepend\\TextUI\\Runner')) {
+            return;
+        }
+
+        $this->oldVersion = true;
+
+        // check 1.x version (composer)
+        if (class_exists('PHP_Depend_TextUI_Runner')) {
+            // include_path hack for PHP_Depend 1.1.3
+            $rc = new ReflectionClass('PHP_Depend');
+            set_include_path(get_include_path() . ":" . realpath(dirname($rc->getFileName()) . "/../"));
+
+            return;
+        }
+
+        @include_once 'PHP/Depend/Autoload.php';
+
+        if (!class_exists('PHP_Depend_Autoload')) {
+            throw new BuildException(
+                'PhpDependTask depends on PHP_Depend being installed and on include_path',
+                $this->getLocation()
+            );
+        }
+
+        // register PHP_Depend autoloader
+        $autoload = new PHP_Depend_Autoload();
+        $autoload->register();
+    }
+
+    /**
      * Validates the available loggers
      *
      * @throws BuildException
@@ -466,7 +464,7 @@ class PhpDependTask extends Task
      */
     private function getFilesToParse()
     {
-        $filesToParse = array();
+        $filesToParse = [];
 
         if ($this->file instanceof PhingFile) {
             $filesToParse[] = $this->file->__toString();
@@ -550,7 +548,7 @@ class PhpDependTask extends Task
     private function getConfiguration()
     {
         // Check for configuration option
-        if ($this->configFile == null || ! ($this->configFile instanceof PhingFile)) {
+        if ($this->configFile == null || !($this->configFile instanceof PhingFile)) {
             return null;
         }
 

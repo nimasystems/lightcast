@@ -26,7 +26,7 @@ include_once 'phing/mappers/FileNameMapper.php';
  */
 abstract class ContainerMapper implements FileNameMapper
 {
-    private $mappers = array();
+    private $mappers = [];
 
     /**
      * Add a <code>Mapper</code>.
@@ -35,20 +35,6 @@ abstract class ContainerMapper implements FileNameMapper
     public function addMapper(Mapper $mapper)
     {
         $this->add($mapper->getImplementation());
-    }
-
-    /**
-     * An add configured version of the add method.
-     * This class used to contain an add method and an
-     * addConfiguredMapper method. Dur to ordering,
-     * the add method was always called first. This
-     * addConfigured method has been added to allow
-     * chaining to work correctly.
-     * @param FileNameMapper $fileNameMapper a <code>FileNameMapper</code>.
-     */
-    public function addConfigured(FileNameMapper $fileNameMapper)
-    {
-        $this->add($fileNameMapper);
     }
 
     /**
@@ -71,7 +57,7 @@ abstract class ContainerMapper implements FileNameMapper
     /**
      * Return <code>true</code> if this <code>ContainerMapper</code> or any of
      * its sub-elements contains the specified <code>FileNameMapper</code>.
-     * @param FileNameMapper $fileNameMapper   the <code>FileNameMapper</code> to search for.
+     * @param FileNameMapper $fileNameMapper the <code>FileNameMapper</code> to search for.
      * @return boolean
      */
     protected function contains(FileNameMapper $fileNameMapper)
@@ -83,6 +69,20 @@ abstract class ContainerMapper implements FileNameMapper
             $foundit = ($next == $fileNameMapper || ($next instanceof ContainerMapper && $next->contains($fileNameMapper)));
         }
         return $foundit;
+    }
+
+    /**
+     * An add configured version of the add method.
+     * This class used to contain an add method and an
+     * addConfiguredMapper method. Dur to ordering,
+     * the add method was always called first. This
+     * addConfigured method has been added to allow
+     * chaining to work correctly.
+     * @param FileNameMapper $fileNameMapper a <code>FileNameMapper</code>.
+     */
+    public function addConfigured(FileNameMapper $fileNameMapper)
+    {
+        $this->add($fileNameMapper);
     }
 
     /**

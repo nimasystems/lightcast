@@ -2679,7 +2679,7 @@ class i18nHelper
 
         return [
             $all[0][$spl[0]][$spl[1]]['langcode'],
-            $all[0][$spl[0]][$spl[1]]['title_en']
+            $all[0][$spl[0]][$spl[1]]['title_en'],
         ];
     }
 }

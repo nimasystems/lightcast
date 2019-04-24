@@ -21,6 +21,7 @@
 
 require_once 'phing/Task.php';
 require_once 'phing/tasks/ext/git/GitBaseTask.php';
+
 /**
  * Wrapper around git-commit
  *
@@ -44,7 +45,7 @@ class GitCommitTask extends GitBaseTask
     /**
      * @var FileSet[]
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * The main entry point for the task
@@ -59,12 +60,12 @@ class GitCommitTask extends GitBaseTask
             throw new BuildException('"allFiles" cannot be false if no filesets are specified.');
         }
 
-        $options = array();
+        $options = [];
         if ($this->allFiles === true) {
             $options['all'] = true;
         }
 
-        $arguments = array();
+        $arguments = [];
         if ($this->allFiles !== true) {
             foreach ($this->filesets as $fs) {
                 $ds = $fs->getDirectoryScanner($this->project);
@@ -127,7 +128,7 @@ class GitCommitTask extends GitBaseTask
      */
     public function setAllFiles($flag)
     {
-        $this->allFiles = (bool) $flag;
+        $this->allFiles = (bool)$flag;
     }
 
     /**

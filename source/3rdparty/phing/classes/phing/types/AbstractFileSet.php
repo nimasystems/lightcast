@@ -77,22 +77,19 @@ class AbstractFileSet extends DataType implements SelectorContainer
      * @var boolean
      */
     public $useDefaultExcludes = true;
-
+    /**
+     * @var PatternSet
+     */
+    public $defaultPatterns;
+    public $additionalPatterns = [];
+    public $dir;
+    public $isCaseSensitive = true;
+    public $selectors = [];
     /**
      * Whether to expand/dereference symbolic links, default is false
      * @var boolean
      */
     protected $expandSymbolicLinks = false;
-
-    /**
-     * @var PatternSet
-     */
-    public $defaultPatterns;
-
-    public $additionalPatterns = array();
-    public $dir;
-    public $isCaseSensitive = true;
-    public $selectors = array();
 
     /**
      * @param null $fileset
@@ -142,21 +139,6 @@ class AbstractFileSet extends DataType implements SelectorContainer
     }
 
     /**
-     * @param $dir
-     * @throws BuildException
-     */
-    public function setDir($dir)
-    {
-        if ($this->isReference()) {
-            throw $this->tooManyAttributes();
-        }
-        if ($dir instanceof PhingFile) {
-            $dir = $dir->getPath();
-        }
-        $this->dir = new PhingFile((string) $dir);
-    }
-
-    /**
      * @param Project $p
      * @return mixed
      * @throws BuildException
@@ -171,6 +153,48 @@ class AbstractFileSet extends DataType implements SelectorContainer
     }
 
     /**
+     * @param $dir
+     * @throws BuildException
+     */
+    public function setDir($dir)
+    {
+        if ($this->isReference()) {
+            throw $this->tooManyAttributes();
+        }
+        if ($dir instanceof PhingFile) {
+            $dir = $dir->getPath();
+        }
+        $this->dir = new PhingFile((string)$dir);
+    }
+
+    /**
+     * Performs the check for circular references and returns the
+     * referenced FileSet.
+     *
+     * @param Project $p
+     *
+     * @return FileSet
+     * @throws BuildException
+     *
+     */
+    public function getRef(Project $p)
+    {
+        if (!$this->checked) {
+            $stk = [];
+            array_push($stk, $this);
+            $this->dieOnCircularReference($stk, $p);
+        }
+
+        $o = $this->ref->getReferencedObject($p);
+        if (!($o instanceof FileSet)) {
+            $msg = $this->ref->getRefId() . " doesn't denote a fileset";
+            throw new BuildException($msg);
+        } else {
+            return $o;
+        }
+    }
+
+    /**
      * @return mixed
      * @throws BuildException
      */
@@ -182,18 +206,6 @@ class AbstractFileSet extends DataType implements SelectorContainer
         $num = array_push($this->additionalPatterns, new PatternSet());
 
         return $this->additionalPatterns[$num - 1];
-    }
-
-    /**
-     * add a name entry on the include list
-     */
-    public function createInclude()
-    {
-        if ($this->isReference()) {
-            throw $this->noChildrenAllowed();
-        }
-
-        return $this->defaultPatterns->createInclude();
     }
 
     /**
@@ -236,6 +248,18 @@ class AbstractFileSet extends DataType implements SelectorContainer
     {
         $this->setDir($file->getParentFile());
         $this->createInclude()->setName($file->getName());
+    }
+
+    /**
+     * add a name entry on the include list
+     */
+    public function createInclude()
+    {
+        if ($this->isReference()) {
+            throw $this->noChildrenAllowed();
+        }
+
+        return $this->defaultPatterns->createInclude();
     }
 
     /**
@@ -300,8 +324,8 @@ class AbstractFileSet extends DataType implements SelectorContainer
      * @param $useDefaultExcludes "true"|"on"|"yes" when default exclusions
      *                           should be used, "false"|"off"|"no" when they
      *                           shouldn't be used.
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function setDefaultexcludes($useDefaultExcludes)
     {
@@ -322,9 +346,9 @@ class AbstractFileSet extends DataType implements SelectorContainer
 
     /** returns a reference to the dirscanner object belonging to this fileset
      * @param Project $p
-     * @throws BuildException
-     * @throws Exception
      * @return \DirectoryScanner
+     * @throws Exception
+     * @throws BuildException
      */
     public function getDirectoryScanner(Project $p)
     {
@@ -375,8 +399,7 @@ class AbstractFileSet extends DataType implements SelectorContainer
         $ds->setExcludes($this->defaultPatterns->getExcludePatterns($p));
 
         $p->log(
-            "FileSet: Setup file scanner in dir " . $this->dir->__toString(
-            ) . " with " . $this->defaultPatterns->toString(),
+            "FileSet: Setup file scanner in dir " . $this->dir->__toString() . " with " . $this->defaultPatterns->toString(),
             Project::MSG_DEBUG
         );
 
@@ -390,35 +413,29 @@ class AbstractFileSet extends DataType implements SelectorContainer
         $ds->setCaseSensitive($this->isCaseSensitive);
     }
 
+    // SelectorContainer methods
 
     /**
-     * Performs the check for circular references and returns the
-     * referenced FileSet.
+     * Returns the set of selectors as an array.
      *
      * @param Project $p
-     *
+     * @return array of selectors in this container
      * @throws BuildException
-     *
-     * @return FileSet
      */
-    public function getRef(Project $p)
+    public function getSelectors(Project $p)
     {
-        if (!$this->checked) {
-            $stk = array();
-            array_push($stk, $this);
-            $this->dieOnCircularReference($stk, $p);
-        }
-
-        $o = $this->ref->getReferencedObject($p);
-        if (!($o instanceof FileSet)) {
-            $msg = $this->ref->getRefId() . " doesn't denote a fileset";
-            throw new BuildException($msg);
+        if ($this->isReference()) {
+            return $this->getRef($p)->getSelectors($p);
         } else {
-            return $o;
+            // *copy* selectors
+            $result = [];
+            for ($i = 0, $size = count($this->selectors); $i < $size; $i++) {
+                $result[] = clone $this->selectors[$i];
+            }
+
+            return $result;
         }
     }
-
-    // SelectorContainer methods
 
     /**
      * Indicates whether there are any selectors here.
@@ -463,8 +480,8 @@ class AbstractFileSet extends DataType implements SelectorContainer
     /**
      * Gives the count of the number of selectors in this container
      *
-     * @throws Exception
      * @return int The number of selectors in this container
+     * @throws Exception
      */
     public function selectorCount()
     {
@@ -477,28 +494,6 @@ class AbstractFileSet extends DataType implements SelectorContainer
         }
 
         return count($this->selectors);
-    }
-
-    /**
-     * Returns the set of selectors as an array.
-     *
-     * @param Project $p
-     * @throws BuildException
-     * @return array of selectors in this container
-     */
-    public function getSelectors(Project $p)
-    {
-        if ($this->isReference()) {
-            return $this->getRef($p)->getSelectors($p);
-        } else {
-            // *copy* selectors
-            $result = array();
-            for ($i = 0, $size = count($this->selectors); $i < $size; $i++) {
-                $result[] = clone $this->selectors[$i];
-            }
-
-            return $result;
-        }
     }
 
     /**
@@ -516,25 +511,6 @@ class AbstractFileSet extends DataType implements SelectorContainer
     }
 
     /**
-     * Add a new selector into this container.
-     *
-     * @param FileSelector $selector new selector to add
-     *
-     * @throws BuildException
-     *
-     * @return void
-     */
-    public function appendSelector(FileSelector $selector)
-    {
-        if ($this->isReference()) {
-            throw $this->noChildrenAllowed();
-        }
-        $this->selectors[] = $selector;
-    }
-
-    /* Methods below all add specific selectors */
-
-    /**
      * add a "Select" selector entry on the selector list
      *
      * @return SelectSelector
@@ -545,6 +521,25 @@ class AbstractFileSet extends DataType implements SelectorContainer
         $this->appendSelector($o);
 
         return $o;
+    }
+
+    /* Methods below all add specific selectors */
+
+    /**
+     * Add a new selector into this container.
+     *
+     * @param FileSelector $selector new selector to add
+     *
+     * @return void
+     * @throws BuildException
+     *
+     */
+    public function appendSelector(FileSelector $selector)
+    {
+        if ($this->isReference()) {
+            throw $this->noChildrenAllowed();
+        }
+        $this->selectors[] = $selector;
     }
 
     /**

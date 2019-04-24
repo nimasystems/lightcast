@@ -107,90 +107,32 @@ class PHPUnitReportTask extends Task
      */
     public function setUseSortTable($useSortTable)
     {
-        $this->useSortTable = (boolean) $useSortTable;
+        $this->useSortTable = (boolean)$useSortTable;
     }
 
     /**
-     * Returns the path to the XSL stylesheet
-     * @throws BuildException
+     * Initialize the task
      */
-    protected function getStyleSheet()
+    public function init()
     {
-        $xslname = "phpunit-" . $this->format . ".xsl";
-
-        if ($this->styleDir) {
-            $file = new PhingFile($this->styleDir, $xslname);
-        } else {
-            $path = Phing::getResourcePath("phing/etc/$xslname");
-
-            if ($path === null) {
-                $path = Phing::getResourcePath("etc/$xslname");
-
-                if ($path === null) {
-                    throw new BuildException("Could not find $xslname in resource path");
-                }
-            }
-
-            $file = new PhingFile($path);
+        if (!class_exists('XSLTProcessor')) {
+            throw new BuildException("PHPUnitReportTask requires the XSL extension");
         }
-
-        if (!$file->exists()) {
-            throw new BuildException("Could not find file " . $file->getPath());
-        }
-
-        return $file;
     }
 
     /**
-     * Transforms the DOM document
-     * @param DOMDocument $document
+     * The main entry point
+     *
      * @throws BuildException
-     * @throws IOException
      */
-    protected function transform(DOMDocument $document)
+    public function main()
     {
-        if (!$this->toDir->exists()) {
-            throw new BuildException("Directory '" . $this->toDir . "' does not exist");
-        }
+        $testSuitesDoc = new DOMDocument();
+        $testSuitesDoc->load((string)$this->inFile);
 
-        $xslfile = $this->getStyleSheet();
+        $this->fixDocument($testSuitesDoc);
 
-        $xsl = new DOMDocument();
-        $xsl->load($xslfile->getAbsolutePath());
-
-        $proc = new XSLTProcessor();
-        if (defined('XSL_SECPREF_WRITE_FILE')) {
-            if (version_compare(PHP_VERSION, '5.4', "<")) {
-                ini_set("xsl.security_prefs", XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
-            } else {
-                $proc->setSecurityPrefs(XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
-            }
-        }
-
-        $proc->importStyleSheet($xsl);
-        $proc->setParameter('', 'output.sorttable', (string) $this->useSortTable);
-
-        if ($this->format == "noframes") {
-            $writer = new FileWriter(new PhingFile($this->toDir, "phpunit-noframes.html"));
-            $writer->write($proc->transformToXML($document));
-            $writer->close();
-        } else {
-            ExtendedFileStream::registerStream();
-
-            $toDir = (string) $this->toDir;
-
-            // urlencode() the path if we're on Windows
-            if (FileSystem::getFileSystem()->getSeparator() == '\\') {
-                $toDir = urlencode($toDir);
-            }
-
-            // no output for the framed report
-            // it's all done by extension...
-            $proc->setParameter('', 'output.dir', $toDir);
-            $proc->transformToXML($document);
-
-            ExtendedFileStream::unregisterStream();
-        }
+        $this->transform($testSuitesDoc);
     }
 
     /**
@@ -229,7 +171,7 @@ class PHPUnitReportTask extends Task
 
                     if (preg_match('/@package\s+(.*)\r?\n/m', $refClass->getDocComment(), $matches)) {
                         $package = end($matches);
-                    } elseif (method_exists($refClass, 'getNamespaceName')) {
+                    } else if (method_exists($refClass, 'getNamespaceName')) {
                         $namespace = $refClass->getNamespaceName();
 
                         if ($namespace !== '') {
@@ -246,27 +188,85 @@ class PHPUnitReportTask extends Task
     }
 
     /**
-     * Initialize the task
+     * Transforms the DOM document
+     * @param DOMDocument $document
+     * @throws BuildException
+     * @throws IOException
      */
-    public function init()
+    protected function transform(DOMDocument $document)
     {
-        if (!class_exists('XSLTProcessor')) {
-            throw new BuildException("PHPUnitReportTask requires the XSL extension");
+        if (!$this->toDir->exists()) {
+            throw new BuildException("Directory '" . $this->toDir . "' does not exist");
+        }
+
+        $xslfile = $this->getStyleSheet();
+
+        $xsl = new DOMDocument();
+        $xsl->load($xslfile->getAbsolutePath());
+
+        $proc = new XSLTProcessor();
+        if (defined('XSL_SECPREF_WRITE_FILE')) {
+            if (version_compare(PHP_VERSION, '5.4', "<")) {
+                ini_set("xsl.security_prefs", XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
+            } else {
+                $proc->setSecurityPrefs(XSL_SECPREF_WRITE_FILE | XSL_SECPREF_CREATE_DIRECTORY);
+            }
+        }
+
+        $proc->importStyleSheet($xsl);
+        $proc->setParameter('', 'output.sorttable', (string)$this->useSortTable);
+
+        if ($this->format == "noframes") {
+            $writer = new FileWriter(new PhingFile($this->toDir, "phpunit-noframes.html"));
+            $writer->write($proc->transformToXML($document));
+            $writer->close();
+        } else {
+            ExtendedFileStream::registerStream();
+
+            $toDir = (string)$this->toDir;
+
+            // urlencode() the path if we're on Windows
+            if (FileSystem::getFileSystem()->getSeparator() == '\\') {
+                $toDir = urlencode($toDir);
+            }
+
+            // no output for the framed report
+            // it's all done by extension...
+            $proc->setParameter('', 'output.dir', $toDir);
+            $proc->transformToXML($document);
+
+            ExtendedFileStream::unregisterStream();
         }
     }
 
     /**
-     * The main entry point
-     *
+     * Returns the path to the XSL stylesheet
      * @throws BuildException
      */
-    public function main()
+    protected function getStyleSheet()
     {
-        $testSuitesDoc = new DOMDocument();
-        $testSuitesDoc->load((string) $this->inFile);
+        $xslname = "phpunit-" . $this->format . ".xsl";
 
-        $this->fixDocument($testSuitesDoc);
+        if ($this->styleDir) {
+            $file = new PhingFile($this->styleDir, $xslname);
+        } else {
+            $path = Phing::getResourcePath("phing/etc/$xslname");
 
-        $this->transform($testSuitesDoc);
+            if ($path === null) {
+                $path = Phing::getResourcePath("etc/$xslname");
+
+                if ($path === null) {
+                    throw new BuildException("Could not find $xslname in resource path");
+                }
+            }
+
+            $file = new PhingFile($path);
+        }
+
+        if (!$file->exists()) {
+            throw new BuildException("Could not find file " . $file->getPath());
+        }
+
+        return $file;
     }
 }

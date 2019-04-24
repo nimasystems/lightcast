@@ -36,7 +36,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
     public function getCapabilities()
     {
         return [
-            'i18n'
+            'i18n',
         ];
     }
 
@@ -45,7 +45,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
         $debug = [
             'locale' => $this->getLocale(),
             'context_type' => $this->getTranslationContextType(),
-            'context_name' => $this->getTranslationContextName()
+            'context_name' => $this->getTranslationContextName(),
         ];
 
         return $debug;
@@ -155,7 +155,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
     public function getAllKeys()
     {
         $ret = [
-            'locale'
+            'locale',
         ];
         return $ret;
     }

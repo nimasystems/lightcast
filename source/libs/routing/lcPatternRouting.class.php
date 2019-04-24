@@ -67,11 +67,6 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $this->detectParameters();
     }
 
-    public function getContext()
-    {
-        return $this->context;
-    }
-
     protected function setConfigRoutes()
     {
         assert(!$this->routes_are_cached);
@@ -379,6 +374,11 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $uri = [$internal_uri[0] . $p, $internal_uri[1] . $p];
 
         $this->current_internal_uri = $uri;
+    }
+
+    public function getContext()
+    {
+        return $this->context;
     }
 
     public function shutdown()

@@ -36,8 +36,8 @@ class ValidationFailed
     /**
      * Construct a new ValidationFailed object.
      *
-     * @param string $colname   Column name.
-     * @param string $message   Message to display to user.
+     * @param string $colname Column name.
+     * @param string $message Message to display to user.
      * @param object $validator The Validator that caused this column to fail.
      */
     public function __construct($colname, $message, $validator = null)
@@ -68,23 +68,13 @@ class ValidationFailed
     }
 
     /**
-     * Set the message for the validation failure.
+     * Gets the validator object that caused this to fail.
      *
-     * @param string $v
+     * @return object
      */
-    public function setMessage($v)
+    public function getValidator()
     {
-        $this->message = $v;
-    }
-
-    /**
-     * Gets the message for the validation failure.
-     *
-     * @return string
-     */
-    public function getMessage()
-    {
-        return $this->message;
+        return $this->validator;
     }
 
     /**
@@ -98,16 +88,6 @@ class ValidationFailed
     }
 
     /**
-     * Gets the validator object that caused this to fail.
-     *
-     * @return object
-     */
-    public function getValidator()
-    {
-        return $this->validator;
-    }
-
-    /**
      * "magic" method to get string representation of object.
      * Maybe someday PHP5 will support the invoking this method automatically
      * on (string) cast.  Until then it's pretty useless.
@@ -117,5 +97,25 @@ class ValidationFailed
     public function __toString()
     {
         return $this->getMessage();
+    }
+
+    /**
+     * Gets the message for the validation failure.
+     *
+     * @return string
+     */
+    public function getMessage()
+    {
+        return $this->message;
+    }
+
+    /**
+     * Set the message for the validation failure.
+     *
+     * @param string $v
+     */
+    public function setMessage($v)
+    {
+        $this->message = $v;
     }
 }

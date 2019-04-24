@@ -23,31 +23,6 @@ class MssqlPlatform extends DefaultPlatform
 {
     protected static $dropCount = 0;
 
-    /**
-     * Initializes db specific domain mapping.
-     */
-    protected function initialize()
-    {
-        parent::initialize();
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::INTEGER, "INT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BOOLEAN, "INT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, "FLOAT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "VARCHAR(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "VARCHAR(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::DATE, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_DATE, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIME, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_TIMESTAMP, "DATETIME"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BINARY(7132)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "VARBINARY(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "VARBINARY(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BLOB, "VARBINARY(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, "VARCHAR(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, "VARCHAR(MAX)"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, "TINYINT"));
-    }
-
     public function getMaxColumnNameLength()
     {
         return 128;
@@ -108,6 +83,11 @@ END
 ";
 
         return $ret;
+    }
+
+    public function quoteIdentifier($text)
+    {
+        return $this->isIdentifierQuotingEnabled ? '[' . strtr($text, ['.' => '].[']) . ']' : $text;
     }
 
     public function getPrimaryKeyDDL(Table $table)
@@ -175,13 +155,33 @@ END
         return !("INT" == $sqlType || "TEXT" == $sqlType);
     }
 
-    public function quoteIdentifier($text)
-    {
-        return $this->isIdentifierQuotingEnabled ? '[' . strtr($text, array('.' => '].[')) . ']' : $text;
-    }
-
     public function getTimestampFormatter()
     {
         return 'Y-m-d H:i:s';
+    }
+
+    /**
+     * Initializes db specific domain mapping.
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::INTEGER, "INT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BOOLEAN, "INT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, "FLOAT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "VARCHAR(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "VARCHAR(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::DATE, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_DATE, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIME, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TIMESTAMP, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BU_TIMESTAMP, "DATETIME"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BINARY(7132)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "VARBINARY(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "VARBINARY(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BLOB, "VARBINARY(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, "VARCHAR(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, "VARCHAR(MAX)"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, "TINYINT"));
     }
 }

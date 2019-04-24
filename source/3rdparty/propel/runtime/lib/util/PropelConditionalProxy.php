@@ -53,6 +53,23 @@ class PropelConditionalProxy
         }
     }
 
+    protected function setConditionalState($cond)
+    {
+        $this->state = (bool)$cond;
+        $this->wasTrue = $this->wasTrue || $this->state;
+
+        return $this->getCriteriaOrProxy();
+    }
+
+    public function getCriteriaOrProxy()
+    {
+        if ($this->state && $this->parentState) {
+            return $this->criteria;
+        }
+
+        return $this;
+    }
+
     /**
      * Returns a new level PropelConditionalProxy instance.
      * Allows for conditional statements in a fluid interface.
@@ -99,6 +116,16 @@ class PropelConditionalProxy
         return $this->criteria->_endif();
     }
 
+    public function getParentProxy()
+    {
+        return $this->parent;
+    }
+
+    public function __call($name, $arguments)
+    {
+        return $this;
+    }
+
     /**
      * return the current conditional status
      *
@@ -107,32 +134,5 @@ class PropelConditionalProxy
     protected function getConditionalState()
     {
         return $this->state && $this->parentState;
-    }
-
-    protected function setConditionalState($cond)
-    {
-        $this->state = (bool) $cond;
-        $this->wasTrue = $this->wasTrue || $this->state;
-
-        return $this->getCriteriaOrProxy();
-    }
-
-    public function getParentProxy()
-    {
-        return $this->parent;
-    }
-
-    public function getCriteriaOrProxy()
-    {
-        if ($this->state && $this->parentState) {
-            return $this->criteria;
-        }
-
-        return $this;
-    }
-
-    public function __call($name, $arguments)
-    {
-        return $this;
     }
 }

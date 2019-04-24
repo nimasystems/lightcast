@@ -47,7 +47,7 @@ class ReplaceRegexpTask extends Task
      *
      * @var array $filesets
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Regular expression
@@ -69,6 +69,18 @@ class ReplaceRegexpTask extends Task
     }
 
     /**
+     * @param $regexp
+     *
+     * @return void
+     * @see setMatch()
+     *
+     */
+    public function setPattern($regexp)
+    {
+        $this->setMatch($regexp);
+    }
+
+    /**
      * Sets the regexp match pattern
      *
      * @param string $regexp
@@ -78,18 +90,6 @@ class ReplaceRegexpTask extends Task
     public function setMatch($regexp)
     {
         $this->_regexp->setPattern($regexp);
-    }
-
-    /**
-     * @see setMatch()
-     *
-     * @param $regexp
-     *
-     * @return void
-     */
-    public function setPattern($regexp)
-    {
-        $this->setMatch($regexp);
     }
 
     /**
@@ -166,14 +166,14 @@ class ReplaceRegexpTask extends Task
 
         // compile a list of all files to modify, both file attrib and fileset elements
         // can be used.
-        $files = array();
+        $files = [];
 
         if ($this->file !== null) {
             $files[] = $this->file;
         }
 
         if (!empty($this->filesets)) {
-            $filenames = array();
+            $filenames = [];
             foreach ($this->filesets as $fs) {
                 try {
                     $ds = $fs->getDirectoryScanner($this->project);
@@ -197,10 +197,10 @@ class ReplaceRegexpTask extends Task
         $filter = new FilterChain($this->project);
 
         $r = new ReplaceRegexp();
-        $r->setRegexps(array($this->_regexp));
+        $r->setRegexps([$this->_regexp]);
 
         $filter->addReplaceRegexp($r);
-        $filters = array($filter);
+        $filters = [$filter];
 
         foreach ($files as $file) {
             // set the register slots

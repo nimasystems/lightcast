@@ -38,10 +38,10 @@ class MailTask extends Task
     protected $msg = null;
     protected $from = null;
 
-    protected $filesets = array();
+    protected $filesets = [];
 
     protected $backend = 'mail';
-    protected $backendParams = array();
+    protected $backendParams = [];
 
     public function main()
     {
@@ -69,11 +69,11 @@ class MailTask extends Task
             throw new BuildException('Need the PEAR Mail_mime package to send attachments');
         }
 
-        $mime = new Mail_mime(array('text_charset' => 'UTF-8'));
-        $hdrs = array(
+        $mime = new Mail_mime(['text_charset' => 'UTF-8']);
+        $hdrs = [
             'From' => $this->from,
-            'Subject' => $this->subject
-        );
+            'Subject' => $this->subject,
+        ];
         $mime->setTXTBody($this->msg);
 
         foreach ($this->filesets as $fs) {
@@ -108,7 +108,7 @@ class MailTask extends Task
      */
     public function setMessage($msg)
     {
-        $this->msg = (string) $msg;
+        $this->msg = (string)$msg;
     }
 
     /**
@@ -117,7 +117,7 @@ class MailTask extends Task
      */
     public function setSubject($subject)
     {
-        $this->subject = (string) $subject;
+        $this->subject = (string)$subject;
     }
 
     /**
@@ -135,7 +135,7 @@ class MailTask extends Task
      */
     public function setRecipient($recipient)
     {
-        $this->tolist = (string) $recipient;
+        $this->tolist = (string)$recipient;
     }
 
     /**
@@ -144,7 +144,7 @@ class MailTask extends Task
      */
     public function setTo($to)
     {
-        $this->tolist = (string) $to;
+        $this->tolist = (string)$to;
     }
 
     /**
@@ -153,7 +153,7 @@ class MailTask extends Task
      */
     public function addText($msg)
     {
-        $this->msg = (string) $msg;
+        $this->msg = (string)$msg;
     }
 
     /**

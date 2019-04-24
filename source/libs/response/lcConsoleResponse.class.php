@@ -34,7 +34,7 @@ class lcConsoleResponse extends lcResponse
 
     private $output_formatters = [
         'fgcolor' => '_outputFormatFgColor',
-        'bgcolor' => '_outputFormatBgColor'
+        'bgcolor' => '_outputFormatBgColor',
     ];
 
     private $compiled_output_modifiers = [];

@@ -34,12 +34,12 @@ class PHPLocTask extends Task
     /**
      * @var array
      */
-    protected $suffixesToCheck = array('php');
+    protected $suffixesToCheck = ['php'];
 
     /**
      * @var array
      */
-    protected $acceptedReportTypes = array('cli', 'txt', 'xml', 'csv');
+    protected $acceptedReportTypes = ['cli', 'txt', 'xml', 'csv'];
 
     /**
      * @var null
@@ -69,17 +69,17 @@ class PHPLocTask extends Task
     /**
      * @var array
      */
-    protected $filesToCheck = array();
+    protected $filesToCheck = [];
 
     /**
      * @var FileSet[]
      */
-    protected $fileSets = array();
+    protected $fileSets = [];
 
     /**
      * @var PHPLocFormatterElement[]
      */
-    protected $formatterElements = array();
+    protected $formatterElements = [];
 
     /**
      * @var string
@@ -166,6 +166,31 @@ class PHPLocTask extends Task
         $this->formatterElements[] = $formatterElement;
     }
 
+    public function main()
+    {
+        $this->loadDependencies();
+
+        $this->validateProperties();
+
+        if (count($this->fileSets) > 0) {
+            foreach ($this->fileSets as $fileSet) {
+                $directoryScanner = $fileSet->getDirectoryScanner($this->project);
+                $files = $directoryScanner->getIncludedFiles();
+                $directory = $fileSet->getDir($this->project)->getPath();
+
+                foreach ($files as $file) {
+                    if ($this->isFileSuffixSet($file)) {
+                        $this->filesToCheck[] = $directory . DIRECTORY_SEPARATOR . $file;
+                    }
+                }
+            }
+
+            $this->filesToCheck = array_unique($this->filesToCheck);
+        }
+
+        $this->runPhpLocCheck();
+    }
+
     /**
      * @throws BuildException
      */
@@ -192,31 +217,6 @@ class Application
                 );
             }
         }
-    }
-
-    public function main()
-    {
-        $this->loadDependencies();
-
-        $this->validateProperties();
-
-        if (count($this->fileSets) > 0) {
-            foreach ($this->fileSets as $fileSet) {
-                $directoryScanner = $fileSet->getDirectoryScanner($this->project);
-                $files = $directoryScanner->getIncludedFiles();
-                $directory = $fileSet->getDir($this->project)->getPath();
-
-                foreach ($files as $file) {
-                    if ($this->isFileSuffixSet($file)) {
-                        $this->filesToCheck[] = $directory . DIRECTORY_SEPARATOR . $file;
-                    }
-                }
-            }
-
-            $this->filesToCheck = array_unique($this->filesToCheck);
-        }
-
-        $this->runPhpLocCheck();
     }
 
     /**
@@ -316,14 +316,14 @@ class Application
      */
     protected function getFilesToCheck()
     {
-        $files = array();
+        $files = [];
 
         if (count($this->filesToCheck) > 0) {
             foreach ($this->filesToCheck as $file) {
                 $files[] = new SplFileInfo($file);
             }
-        } elseif ($this->fileToCheck !== null) {
-            $files = array(new SplFileInfo($this->fileToCheck));
+        } else if ($this->fileToCheck !== null) {
+            $files = [new SplFileInfo($this->fileToCheck)];
         }
 
         return $files;

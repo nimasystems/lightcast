@@ -40,34 +40,13 @@ include_once 'phing/mappers/MergeMapper.php';
 class UpToDateTask extends Task implements Condition
 {
 
+    protected $mapperElement = null;
     private $_property;
     private $_value;
     private $_sourceFile;
     private $_targetFile;
-    private $sourceFileSets = array();
-    private $_filelists = array();
-
-    protected $mapperElement = null;
-
-    /**
-     * The property to set if the target file is more up-to-date than
-     * (each of) the source file(s).
-     *
-     * @param string $property the name of the property to set if Target is up-to-date.
-     */
-    public function setProperty($property)
-    {
-        $this->_property = $property;
-    }
-
-    /**
-     * Get property name
-     * @return string property the name of the property to set if Target is up-to-date.
-     */
-    public function getProperty()
-    {
-        return $this->_property;
-    }
+    private $sourceFileSets = [];
+    private $_filelists = [];
 
     /**
      * The value to set the named property to if the target file is more
@@ -79,14 +58,6 @@ class UpToDateTask extends Task implements Condition
     public function setValue($value)
     {
         $this->_value = $value;
-    }
-
-    /**
-     * Returns the value, or "true" if a specific value wasn't provided.
-     */
-    private function getValue()
-    {
-        return ($this->_value !== null) ? $this->_value : "true";
     }
 
     /**
@@ -167,10 +138,44 @@ class UpToDateTask extends Task implements Condition
     }
 
     /**
+     * Sets property to true if target file(s) have a more recent timestamp
+     * than (each of) the corresponding source file(s).
+     * @throws BuildException
+     */
+    public function main()
+    {
+        if ($this->_property === null) {
+            throw new BuildException("property attribute is required.",
+                $this->location);
+        }
+        $upToDate = $this->evaluate();
+        if ($upToDate) {
+            $property = $this->project->createTask('property');
+            $property->setName($this->getProperty());
+            $property->setValue($this->getValue());
+            $property->setOverride(true);
+            $property->main(); // execute
+
+            if ($this->mapperElement === null) {
+                $this->log(
+                    "File \"" . $this->_targetFile->getAbsolutePath()
+                    . "\" is up-to-date.",
+                    Project::MSG_VERBOSE
+                );
+            } else {
+                $this->log(
+                    "All target files are up-to-date.",
+                    Project::MSG_VERBOSE
+                );
+            }
+        }
+    }
+
+    /**
      * Evaluate (all) target and source file(s) to
      * see if the target(s) is/are up-to-date.
-     * @throws BuildException
      * @return boolean
+     * @throws BuildException
      */
     public function evaluate()
     {
@@ -241,41 +246,6 @@ class UpToDateTask extends Task implements Condition
         return $upToDate;
     }
 
-
-    /**
-     * Sets property to true if target file(s) have a more recent timestamp
-     * than (each of) the corresponding source file(s).
-     * @throws BuildException
-     */
-    public function main()
-    {
-        if ($this->_property === null) {
-            throw new BuildException("property attribute is required.",
-                $this->location);
-        }
-        $upToDate = $this->evaluate();
-        if ($upToDate) {
-            $property = $this->project->createTask('property');
-            $property->setName($this->getProperty());
-            $property->setValue($this->getValue());
-            $property->setOverride(true);
-            $property->main(); // execute
-
-            if ($this->mapperElement === null) {
-                $this->log(
-                    "File \"" . $this->_targetFile->getAbsolutePath()
-                    . "\" is up-to-date.",
-                    Project::MSG_VERBOSE
-                );
-            } else {
-                $this->log(
-                    "All target files are up-to-date.",
-                    Project::MSG_VERBOSE
-                );
-            }
-        }
-    }
-
     /**
      * @param PhingFile $srcDir
      * @param $files
@@ -296,5 +266,33 @@ class UpToDateTask extends Task implements Condition
         }
 
         return (count($sfs->restrict($files, $srcDir, $dir, $mapper)) === 0);
+    }
+
+    /**
+     * Get property name
+     * @return string property the name of the property to set if Target is up-to-date.
+     */
+    public function getProperty()
+    {
+        return $this->_property;
+    }
+
+    /**
+     * The property to set if the target file is more up-to-date than
+     * (each of) the source file(s).
+     *
+     * @param string $property the name of the property to set if Target is up-to-date.
+     */
+    public function setProperty($property)
+    {
+        $this->_property = $property;
+    }
+
+    /**
+     * Returns the value, or "true" if a specific value wasn't provided.
+     */
+    private function getValue()
+    {
+        return ($this->_value !== null) ? $this->_value : "true";
     }
 }

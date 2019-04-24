@@ -63,7 +63,7 @@ class ResolvePathTask extends Task
 
     /**
      * Set the name of the property to set.
-     * @param  string $v Property name
+     * @param string $v Property name
      * @return void
      */
     public function setPropertyName($v)
@@ -106,8 +106,8 @@ class ResolvePathTask extends Task
      *
      * @param string $level Log level
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function setLevel($level)
     {

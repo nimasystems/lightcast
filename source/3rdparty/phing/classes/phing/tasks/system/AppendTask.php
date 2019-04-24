@@ -60,13 +60,13 @@ class AppendTask extends Task
     private $file;
 
     /** Any filesets of files that should be appended. */
-    private $filesets = array();
+    private $filesets = [];
 
     /** Any filelists of files that should be appended. */
-    private $filelists = array();
+    private $filelists = [];
 
     /** Any filters to be applied before append happens. */
-    private $filterChains = array();
+    private $filterChains = [];
 
     /** Text to append. (cannot be used in conjunction w/ files or filesets) */
     private $text;
@@ -82,11 +82,11 @@ class AppendTask extends Task
     /**
      * Set target file to append to.
      *
-     * @deprecated Will be removed with final release.
-     *
      * @param PhingFile $f
      *
      * @return void
+     * @deprecated Will be removed with final release.
+     *
      */
     public function setTo(PhingFile $f)
     {
@@ -154,7 +154,7 @@ class AppendTask extends Task
      */
     public function setText($txt)
     {
-        $this->text = (string) $txt;
+        $this->text = (string)$txt;
     }
 
     /**
@@ -166,7 +166,7 @@ class AppendTask extends Task
      */
     public function addText($txt)
     {
-        $this->text = (string) $txt;
+        $this->text = (string)$txt;
     }
 
     /**
@@ -213,8 +213,7 @@ class AppendTask extends Task
                     $this->appendFile($writer, $this->file);
                 } catch (Exception $ioe) {
                     $this->log(
-                        "Unable to append contents of file " . $this->file->getAbsolutePath() . ": " . $ioe->getMessage(
-                        ),
+                        "Unable to append contents of file " . $this->file->getAbsolutePath() . ": " . $ioe->getMessage(),
                         Project::MSG_WARN
                     );
                 }
@@ -246,11 +245,26 @@ class AppendTask extends Task
     }
 
     /**
+     * @param FileWriter $writer
+     * @param PhingFile $f
+     *
+     * @return void
+     */
+    private function appendFile(FileWriter $writer, PhingFile $f)
+    {
+        $in = FileUtils::getChainedReader(new FileReader($f), $this->filterChains, $this->project);
+        while (-1 !== ($buffer = $in->read())) { // -1 indicates EOF
+            $writer->write($buffer);
+        }
+        $this->log("Appending contents of " . $f->getPath() . " to " . $this->to->getPath());
+    }
+
+    /**
      * Append an array of files in a directory.
      *
      * @param FileWriter $writer The FileWriter that is appending to target file.
-     * @param array      $files  array of files to delete; can be of zero length
-     * @param PhingFile  $dir    directory to work from
+     * @param array $files array of files to delete; can be of zero length
+     * @param PhingFile $dir directory to work from
      *
      * @return void
      */
@@ -278,20 +292,5 @@ class AppendTask extends Task
                 }
             }
         } // if !empty
-    }
-
-    /**
-     * @param FileWriter $writer
-     * @param PhingFile $f
-     *
-     * @return void
-     */
-    private function appendFile(FileWriter $writer, PhingFile $f)
-    {
-        $in = FileUtils::getChainedReader(new FileReader($f), $this->filterChains, $this->project);
-        while (-1 !== ($buffer = $in->read())) { // -1 indicates EOF
-            $writer->write($buffer);
-        }
-        $this->log("Appending contents of " . $f->getPath() . " to " . $this->to->getPath());
     }
 }

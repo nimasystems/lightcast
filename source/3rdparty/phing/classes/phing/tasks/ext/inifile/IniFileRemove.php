@@ -39,15 +39,13 @@ class IniFileRemove
     protected $section = null;
 
     /**
-     * Set Section name
+     * Get Property
      *
-     * @param string $section Name of section in ini file
-     *
-     * @return void
+     * @return string
      */
-    public function setSection($section)
+    public function getProperty()
     {
-        $this->section = $section;
+        return $this->property;
     }
 
     /**
@@ -63,16 +61,6 @@ class IniFileRemove
     }
 
     /**
-     * Get Property
-     *
-     * @return string
-     */
-    public function getProperty()
-    {
-        return $this->property;
-    }
-
-    /**
      * Get Section
      *
      * @return string
@@ -80,5 +68,17 @@ class IniFileRemove
     public function getSection()
     {
         return $this->section;
+    }
+
+    /**
+     * Set Section name
+     *
+     * @param string $section Name of section in ini file
+     *
+     * @return void
+     */
+    public function setSection($section)
+    {
+        $this->section = $section;
     }
 }

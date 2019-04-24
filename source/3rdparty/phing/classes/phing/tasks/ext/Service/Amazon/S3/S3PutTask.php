@@ -59,7 +59,7 @@ class S3PutTask extends Service_Amazon_S3
      *
      * @var array
      */
-    protected $_filesets = array();
+    protected $_filesets = [];
 
     /**
      * Whether to try to create buckets or not
@@ -110,7 +110,7 @@ class S3PutTask extends Service_Amazon_S3
      *
      * @var array
      */
-    protected $_extensionContentTypeMapper = array(
+    protected $_extensionContentTypeMapper = [
         'js' => 'application/x-javascript',
         'css' => 'text/css',
         'html' => 'text/html',
@@ -118,8 +118,8 @@ class S3PutTask extends Service_Amazon_S3
         'png' => 'image/png',
         'jpg' => 'image/jpeg',
         'jpeg' => 'image/jpeg',
-        'txt' => 'text/plain'
-    );
+        'txt' => 'text/plain',
+    ];
 
     /**
      * Whether filenames contain paths
@@ -129,58 +129,6 @@ class S3PutTask extends Service_Amazon_S3
      * @var bool
      */
     protected $_fileNameOnly = false;
-
-    /**
-     * @param $source
-     * @throws BuildException
-     */
-    public function setSource($source)
-    {
-        if (!is_readable($source)) {
-            throw new BuildException('Source is not readable: ' . $source);
-        }
-
-        $this->_source = $source;
-    }
-
-    /**
-     * @return string
-     * @throws BuildException
-     */
-    public function getSource()
-    {
-        if ($this->_source === null) {
-            throw new BuildException('Source is not set');
-        }
-
-        return $this->_source;
-    }
-
-    /**
-     * @param $content
-     * @throws BuildException
-     */
-    public function setContent($content)
-    {
-        if (empty($content) || !is_string($content)) {
-            throw new BuildException('Content must be a non-empty string');
-        }
-
-        $this->_content = $content;
-    }
-
-    /**
-     * @return mixed
-     * @throws BuildException
-     */
-    public function getContent()
-    {
-        if ($this->_content === null) {
-            throw new BuildException('Content is not set');
-        }
-
-        return $this->_content;
-    }
 
     /**
      * @param $object
@@ -195,76 +143,15 @@ class S3PutTask extends Service_Amazon_S3
         $this->_object = $object;
     }
 
-    public function getObject()
-    {
-        if ($this->_object === null) {
-            throw new BuildException('Object is not set');
-        }
-
-        return $this->_object;
-    }
-
     /**
-     * @param $permission
-     * @throws BuildException
+     * Get seconds in max-age or null.
+     *
+     * @return int
+     *             Number of seconds in maxage or null.
      */
-    public function setAcl($permission)
+    public function getMaxage()
     {
-        $valid_acl = array('private', 'public-read', 'public-read-write', 'authenticated-read');
-        if (empty($permission) || !is_string($permission) || !in_array($permission, $valid_acl)) {
-            throw new BuildException('Object must be one of the following values: ' . implode('|', $valid_acl));
-        }
-        $this->_acl = $permission;
-    }
-
-    /**
-     * @return string
-     */
-    public function getAcl()
-    {
-        return $this->_acl;
-    }
-
-    /**
-     * @param $contentType
-     */
-    public function setContentType($contentType)
-    {
-        $this->_contentType = $contentType;
-    }
-
-    /**
-     * @return string
-     * @throws BuildException
-     */
-    public function getContentType()
-    {
-        if ($this->_contentType === 'auto') {
-            $ext = strtolower(substr(strrchr($this->getSource(), '.'), 1));
-            if (isset($this->_extensionContentTypeMapper[$ext])) {
-                return $this->_extensionContentTypeMapper[$ext];
-            } else {
-                return 'binary/octet-stream';
-            }
-        } else {
-            return $this->_contentType;
-        }
-    }
-
-    /**
-     * @param $createBuckets
-     */
-    public function setCreateBuckets($createBuckets)
-    {
-        $this->_createBuckets = (bool) $createBuckets;
-    }
-
-    /**
-     * @return bool
-     */
-    public function getCreateBuckets()
-    {
-        return (bool) $this->_createBuckets;
+        return $this->_maxage;
     }
 
     /**
@@ -275,17 +162,6 @@ class S3PutTask extends Service_Amazon_S3
     public function setMaxage($seconds)
     {
         $this->_maxage = $seconds;
-    }
-
-    /**
-     * Get seconds in max-age or null.
-     *
-     * @return int
-     *             Number of seconds in maxage or null.
-     */
-    public function getMaxage()
-    {
-        return $this->_maxage;
     }
 
     /**
@@ -310,30 +186,11 @@ class S3PutTask extends Service_Amazon_S3
     }
 
     /**
-     * Generate HTTPHEader array sent to S3.
-     *
-     * @return array
-     *               HttpHeader to set in S3 Object.
-     */
-    protected function getHttpHeaders()
-    {
-        $headers = array();
-        if (!is_null($this->_maxage)) {
-            $headers['Cache-Control'] = 'max-age=' . $this->_maxage;
-        }
-        if ($this->_gzipped) {
-            $headers['Content-Encoding'] = 'gzip';
-        }
-
-        return $headers;
-    }
-
-    /**
      * @param $fileNameOnly
      */
     public function setFileNameOnly($fileNameOnly)
     {
-        $this->_fileNameOnly = (bool) $fileNameOnly;
+        $this->_fileNameOnly = (bool)$fileNameOnly;
     }
 
     /**
@@ -359,36 +216,10 @@ class S3PutTask extends Service_Amazon_S3
     }
 
     /**
-     * Determines what we're going to store in the object
-     *
-     * If _content has been set, this will get stored,
-     * otherwise, we read from _source
-     *
-     * @throws BuildException
-     * @return string
-     */
-    public function getObjectData()
-    {
-        try {
-            $content = $this->getContent();
-        } catch (BuildException $e) {
-            $source = $this->getSource();
-
-            if (!is_file($source)) {
-                throw new BuildException('Currently only files can be used as source');
-            }
-
-            $content = file_get_contents($source);
-        }
-
-        return $content;
-    }
-
-    /**
      * Store the object on S3
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     public function execute()
     {
@@ -404,7 +235,7 @@ class S3PutTask extends Service_Amazon_S3
 
         // Filesets take precedence
         if (!empty($this->_filesets)) {
-            $objects = array();
+            $objects = [];
 
             foreach ($this->_filesets as $fs) {
                 if (!($fs instanceof FileSet)) {
@@ -439,6 +270,22 @@ class S3PutTask extends Service_Amazon_S3
     }
 
     /**
+     * @return bool
+     */
+    public function getCreateBuckets()
+    {
+        return (bool)$this->_createBuckets;
+    }
+
+    /**
+     * @param $createBuckets
+     */
+    public function setCreateBuckets($createBuckets)
+    {
+        $this->_createBuckets = (bool)$createBuckets;
+    }
+
+    /**
      * @param $object
      * @param $data
      * @throws BuildException
@@ -455,5 +302,158 @@ class S3PutTask extends Service_Amazon_S3
         if (!$this->isObjectAvailable($object->key)) {
             throw new BuildException('Upload failed');
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcl()
+    {
+        return $this->_acl;
+    }
+
+    /**
+     * @param $permission
+     * @throws BuildException
+     */
+    public function setAcl($permission)
+    {
+        $valid_acl = ['private', 'public-read', 'public-read-write', 'authenticated-read'];
+        if (empty($permission) || !is_string($permission) || !in_array($permission, $valid_acl)) {
+            throw new BuildException('Object must be one of the following values: ' . implode('|', $valid_acl));
+        }
+        $this->_acl = $permission;
+    }
+
+    /**
+     * @return string
+     * @throws BuildException
+     */
+    public function getContentType()
+    {
+        if ($this->_contentType === 'auto') {
+            $ext = strtolower(substr(strrchr($this->getSource(), '.'), 1));
+            if (isset($this->_extensionContentTypeMapper[$ext])) {
+                return $this->_extensionContentTypeMapper[$ext];
+            } else {
+                return 'binary/octet-stream';
+            }
+        } else {
+            return $this->_contentType;
+        }
+    }
+
+    /**
+     * @param $contentType
+     */
+    public function setContentType($contentType)
+    {
+        $this->_contentType = $contentType;
+    }
+
+    /**
+     * @return string
+     * @throws BuildException
+     */
+    public function getSource()
+    {
+        if ($this->_source === null) {
+            throw new BuildException('Source is not set');
+        }
+
+        return $this->_source;
+    }
+
+    /**
+     * @param $source
+     * @throws BuildException
+     */
+    public function setSource($source)
+    {
+        if (!is_readable($source)) {
+            throw new BuildException('Source is not readable: ' . $source);
+        }
+
+        $this->_source = $source;
+    }
+
+    /**
+     * Generate HTTPHEader array sent to S3.
+     *
+     * @return array
+     *               HttpHeader to set in S3 Object.
+     */
+    protected function getHttpHeaders()
+    {
+        $headers = [];
+        if (!is_null($this->_maxage)) {
+            $headers['Cache-Control'] = 'max-age=' . $this->_maxage;
+        }
+        if ($this->_gzipped) {
+            $headers['Content-Encoding'] = 'gzip';
+        }
+
+        return $headers;
+    }
+
+    public function getObject()
+    {
+        if ($this->_object === null) {
+            throw new BuildException('Object is not set');
+        }
+
+        return $this->_object;
+    }
+
+    /**
+     * Determines what we're going to store in the object
+     *
+     * If _content has been set, this will get stored,
+     * otherwise, we read from _source
+     *
+     * @return string
+     * @throws BuildException
+     */
+    public function getObjectData()
+    {
+        try {
+            $content = $this->getContent();
+        } catch (BuildException $e) {
+            $source = $this->getSource();
+
+            if (!is_file($source)) {
+                throw new BuildException('Currently only files can be used as source');
+            }
+
+            $content = file_get_contents($source);
+        }
+
+        return $content;
+    }
+
+    /**
+     * @return mixed
+     * @throws BuildException
+     */
+    public function getContent()
+    {
+        if ($this->_content === null) {
+            throw new BuildException('Content is not set');
+        }
+
+        return $this->_content;
+    }
+
+    /**
+     * @param $content
+     * @throws BuildException
+     */
+    public function setContent($content)
+    {
+        if (empty($content) || !is_string($content)) {
+            throw new BuildException('Content must be a non-empty string');
+        }
+
+        $this->_content = $content;
     }
 }

@@ -56,6 +56,16 @@ class DocBlox_Parallel_WorkerPipe
     }
 
     /**
+     * Releases the pipe.
+     *
+     * @return void
+     */
+    protected function release()
+    {
+        @unlink($this->path);
+    }
+
+    /**
      * Pull the worker data into the named pipe.
      *
      * @return void
@@ -63,6 +73,28 @@ class DocBlox_Parallel_WorkerPipe
     public function pull()
     {
         $this->writePipeContents();
+    }
+
+    /**
+     * Convenience method to show relation to readPipeContents.
+     *
+     * @return void
+     */
+    protected function writePipeContents()
+    {
+        // push the gathered data onto a name pipe
+        $pipe = fopen($this->path, 'w');
+        fwrite(
+            $pipe,
+            serialize(
+                [
+                    $this->worker->getResult(),
+                    $this->worker->getError(),
+                    $this->worker->getReturnCode(),
+                ]
+            )
+        );
+        fclose($pipe);
     }
 
     /**
@@ -81,28 +113,6 @@ class DocBlox_Parallel_WorkerPipe
     }
 
     /**
-     * Convenience method to show relation to readPipeContents.
-     *
-     * @return void
-     */
-    protected function writePipeContents()
-    {
-        // push the gathered data onto a name pipe
-        $pipe = fopen($this->path, 'w');
-        fwrite(
-            $pipe,
-            serialize(
-                array(
-                    $this->worker->getResult(),
-                    $this->worker->getError(),
-                    $this->worker->getReturnCode()
-                )
-            )
-        );
-        fclose($pipe);
-    }
-
-    /**
      * Returns the unserialized contents of the pipe.
      *
      * @return array
@@ -111,28 +121,18 @@ class DocBlox_Parallel_WorkerPipe
     {
         $pipe = @fopen($this->path, 'r+');
 
-        if (! $pipe) {
+        if (!$pipe) {
             $arguments = $this->worker->getArguments();
-            return array(
+            return [
                 '',
                 'Worker died unexpectedly',
-                255
-            );
+                255,
+            ];
         }
 
         $result = unserialize(fread($pipe, filesize($this->path)));
         fclose($pipe);
 
         return $result;
-    }
-
-    /**
-     * Releases the pipe.
-     *
-     * @return void
-     */
-    protected function release()
-    {
-        @unlink($this->path);
     }
 }

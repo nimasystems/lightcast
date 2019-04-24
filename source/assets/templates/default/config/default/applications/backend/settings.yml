@@ -19,7 +19,7 @@ all:
       backend.access.log: info
   controller:
     filters:
-    - lcAppSecurityActionFilter
+      - lcAppSecurityActionFilter
     max_forwards: 10
   storage:
     enabled: true
@@ -48,9 +48,9 @@ all:
         img: src
         script: src
     skip_append_for:
-    - ^\/img
-    - ^\/files
-    - ^\/images
+      - ^\/img
+      - ^\/files
+      - ^\/images
     lang_code_match: ^\/(([a-z]{2}(_[A-Z]{2})?\/)|([a-z]{2}(_[A-Z]{2})?)$)\/*
     autodetect: true
   mailer:

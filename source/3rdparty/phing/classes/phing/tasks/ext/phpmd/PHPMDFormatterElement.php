@@ -63,6 +63,16 @@ class PHPMDFormatterElement
     protected $outfile = null;
 
     /**
+     * Get the formatter type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Sets the formatter type.
      *
      * @param string $type Type of the formatter
@@ -88,56 +98,6 @@ class PHPMDFormatterElement
             default:
                 throw new BuildException('Formatter "' . $this->type . '" not implemented');
         }
-    }
-
-    /**
-     * Get the formatter type
-     *
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
-    }
-
-    /**
-     * Set whether to write formatter results to file or not.
-     *
-     * @param boolean $useFile True or false.
-     */
-    public function setUseFile($useFile)
-    {
-        $this->useFile = StringHelper::booleanValue($useFile);
-    }
-
-    /**
-     * Return whether to write formatter results to file or not.
-     *
-     * @return boolean
-     */
-    public function getUseFile()
-    {
-        return $this->useFile;
-    }
-
-    /**
-     * Sets the output file for the formatter results.
-     *
-     * @param PhingFile $outfile The output file
-     */
-    public function setOutfile(PhingFile $outfile)
-    {
-        $this->outfile = $outfile;
-    }
-
-    /**
-     * Get the output file.
-     *
-     * @return PhingFile
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
     }
 
     /**
@@ -170,5 +130,45 @@ class PHPMDFormatterElement
         $renderer->setWriter(new $writerClass($stream));
 
         return $renderer;
+    }
+
+    /**
+     * Return whether to write formatter results to file or not.
+     *
+     * @return boolean
+     */
+    public function getUseFile()
+    {
+        return $this->useFile;
+    }
+
+    /**
+     * Set whether to write formatter results to file or not.
+     *
+     * @param boolean $useFile True or false.
+     */
+    public function setUseFile($useFile)
+    {
+        $this->useFile = StringHelper::booleanValue($useFile);
+    }
+
+    /**
+     * Get the output file.
+     *
+     * @return PhingFile
+     */
+    public function getOutfile()
+    {
+        return $this->outfile;
+    }
+
+    /**
+     * Sets the output file for the formatter results.
+     *
+     * @param PhingFile $outfile The output file
+     */
+    public function setOutfile(PhingFile $outfile)
+    {
+        $this->outfile = $outfile;
     }
 }

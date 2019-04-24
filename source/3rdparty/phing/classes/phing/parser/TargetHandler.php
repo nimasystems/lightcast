@@ -64,7 +64,8 @@ class TargetHandler extends AbstractHandler
         AbstractHandler $parentHandler,
         ProjectConfigurator $configurator,
         PhingXMLContext $context
-    ) {
+    )
+    {
         parent::__construct($parser, $parentHandler);
         $this->configurator = $configurator;
         $this->context = $context;
@@ -103,25 +104,25 @@ class TargetHandler extends AbstractHandler
         foreach ($attrs as $key => $value) {
             switch ($key) {
                 case "name":
-                    $name = (string) $value;
+                    $name = (string)$value;
                     break;
                 case "depends":
-                    $depends = (string) $value;
+                    $depends = (string)$value;
                     break;
                 case "if":
-                    $ifCond = (string) $value;
+                    $ifCond = (string)$value;
                     break;
                 case "unless":
-                    $unlessCond = (string) $value;
+                    $unlessCond = (string)$value;
                     break;
                 case "id":
-                    $id = (string) $value;
+                    $id = (string)$value;
                     break;
                 case "hidden":
                     $isHidden = ($value == 'true' || $value == '1') ? true : false;
                     break;
                 case "description":
-                    $description = (string) $value;
+                    $description = (string)$value;
                     break;
                 case "logskipped":
                     $logskipped = $value;
@@ -132,8 +133,7 @@ class TargetHandler extends AbstractHandler
         }
 
         if ($name === null) {
-            throw new ExpatParseException("target element appears without a name attribute", $this->parser->getLocation(
-            ));
+            throw new ExpatParseException("target element appears without a name attribute", $this->parser->getLocation());
         }
 
         // shorthand
@@ -195,8 +195,8 @@ class TargetHandler extends AbstractHandler
      * Checks for nested tags within the current one. Creates and calls
      * handlers respectively.
      *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
      */
     public function startElement($name, $attrs)
     {

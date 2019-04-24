@@ -29,13 +29,13 @@
  */
 class PHPUnitUtil
 {
-    protected static $definedClasses = array();
+    protected static $definedClasses = [];
 
     /**
-     * Returns the package of a class as defined in the docblock of the class using @package
-     *
-     * @param string the name of the class
+     * Returns the package of a class as defined in the docblock of the class using @param string the name of the class
      * @return string the name of the package
+     * @package
+     *
      */
     public static function getPackageName($classname)
     {
@@ -58,12 +58,12 @@ class PHPUnitUtil
 
     /**
      * Returns the subpackage of a class as defined in the docblock of the class
-     * using @subpackage
+     * using @param string $classname the name of the class
      *
-     * @param string $classname the name of the class
-     *
-     * @author Benjamin Schultz <bschultz@proqrent.de>
      * @return string|null the name of the subpackage
+     * @author Benjamin Schultz <bschultz@proqrent.de>
+     * @subpackage
+     *
      */
     public static function getSubpackageName($classname)
     {
@@ -100,10 +100,10 @@ class PHPUnitUtil
     /**
      * @param $filename
      * @param null $classpath
-     * @throws Exception
-     * @internal param the $string filename
-     * @internal param optional $Path classpath
      * @return array list of classes defined in the file
+     * @throws Exception
+     * @internal param optional $Path classpath
+     * @internal param the $string filename
      */
     public static function getDefinedClasses($filename, $classpath = null)
     {
@@ -136,7 +136,7 @@ class PHPUnitUtil
         if (isset(self::$definedClasses[$filename])) {
             return self::$definedClasses[$filename];
         } else {
-            return array();
+            return [];
         }
     }
 }

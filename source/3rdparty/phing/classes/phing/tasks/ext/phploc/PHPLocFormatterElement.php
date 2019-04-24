@@ -47,6 +47,14 @@ class PHPLocFormatterElement
     protected $outfile = "phploc-report";
 
     /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Loads a specific formatter type
      * @param string $type
      */
@@ -56,11 +64,11 @@ class PHPLocFormatterElement
     }
 
     /**
-     * @return string
+     * Returns whether to store formatting results in a file
      */
-    public function getType()
+    public function getUseFile()
     {
-        return $this->type;
+        return $this->useFile;
     }
 
     /**
@@ -73,11 +81,12 @@ class PHPLocFormatterElement
     }
 
     /**
-     * Returns whether to store formatting results in a file
+     * Returns output directory
+     * @return string
      */
-    public function getUseFile()
+    public function getToDir()
     {
-        return $this->useFile;
+        return $this->toDir;
     }
 
     /**
@@ -90,12 +99,12 @@ class PHPLocFormatterElement
     }
 
     /**
-     * Returns output directory
+     * Returns output filename
      * @return string
      */
-    public function getToDir()
+    public function getOutfile()
     {
-        return $this->toDir;
+        return $this->outfile;
     }
 
     /**
@@ -105,14 +114,5 @@ class PHPLocFormatterElement
     public function setOutfile($outfile)
     {
         $this->outfile = $outfile;
-    }
-
-    /**
-     * Returns output filename
-     * @return string
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
     }
 }

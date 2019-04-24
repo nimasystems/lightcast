@@ -39,8 +39,8 @@ class lcAppSecurityConfigHandler extends lcEnvConfigHandler
             'secure_login' => false,
             'password' => [
                 'encryption' => 'sha1',
-                'salt' => ''
-            ]
+                'salt' => '',
+            ],
         ]];
     }
 

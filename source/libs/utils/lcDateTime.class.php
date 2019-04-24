@@ -53,11 +53,6 @@ class lcDateTime
         return self::hoursToMinutes($hours) * 60;
     }
 
-    public static function isValidTimezone($timezone)
-    {
-        return in_array($timezone, timezone_identifiers_list());
-    }
-
     public static function hoursToMinutes($hours)
     {
         $minutes = 0;
@@ -68,6 +63,11 @@ class lcDateTime
         }
 
         return (int)$hours * 60 + $minutes;
+    }
+
+    public static function isValidTimezone($timezone)
+    {
+        return in_array($timezone, timezone_identifiers_list());
     }
 
     public static function minutesToHours($minutes)
@@ -218,13 +218,6 @@ class lcDateTime
         }, $datetime_format));
     }
 
-    public static function convertStrftimeToJsFormat($datetime_format)
-    {
-        return trim(preg_replace_callback("/%(.?)/", function ($y) {
-            return self::convertStrtftimePartToMomentjsFormat($y);
-        }, $datetime_format));
-    }
-
     private static function convertPhpDatePartToMomentjsFormat($part)
     {
         $part = is_array($part) ? (count($part) ? $part[0] : null) : $part;
@@ -284,6 +277,13 @@ class lcDateTime
             default:
                 return null;
         }
+    }
+
+    public static function convertStrftimeToJsFormat($datetime_format)
+    {
+        return trim(preg_replace_callback("/%(.?)/", function ($y) {
+            return self::convertStrtftimePartToMomentjsFormat($y);
+        }, $datetime_format));
     }
 
     private static function convertStrtftimePartToMomentjsFormat($part)

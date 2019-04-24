@@ -43,7 +43,7 @@ class CapsuleTask extends Task
      * Any vars assigned via the build file.
      * @var array AssignedVar[]
      */
-    protected $assignedVars = array();
+    protected $assignedVars = [];
 
     /**
      * This is the control template that governs the output.
@@ -116,9 +116,19 @@ class CapsuleTask extends Task
     // -----------------------------------------------------------------------
 
     /**
+     * Get the control template for the
+     * generating process.
+     * @return string
+     */
+    public function getControlTemplate()
+    {
+        return $this->controlTemplate;
+    }
+
+    /**
      * [REQUIRED] Set the control template for the
      * generating process.
-     * @param  string $controlTemplate
+     * @param string $controlTemplate
      * @return void
      */
     public function setControlTemplate($controlTemplate)
@@ -127,13 +137,14 @@ class CapsuleTask extends Task
     }
 
     /**
-     * Get the control template for the
-     * generating process.
+     * Get the path where Velocity will look
+     * for templates using the file template
+     * loader.
      * @return string
      */
-    public function getControlTemplate()
+    public function getTemplatePath()
     {
-        return $this->controlTemplate;
+        return $this->templatePath;
     }
 
     /**
@@ -166,20 +177,18 @@ class CapsuleTask extends Task
     }
 
     /**
-     * Get the path where Velocity will look
-     * for templates using the file template
-     * loader.
+     * Get the output directory.
      * @return string
      */
-    public function getTemplatePath()
+    public function getOutputDirectory()
     {
-        return $this->templatePath;
+        return $this->outputDirectory;
     }
 
     /**
      * [REQUIRED] Set the output directory. It will be
      * created if it doesn't exist.
-     * @param  PhingFile $outputDirectory
+     * @param PhingFile $outputDirectory
      * @return void
      * @throws Exception
      */
@@ -202,26 +211,6 @@ class CapsuleTask extends Task
     }
 
     /**
-     * Get the output directory.
-     * @return string
-     */
-    public function getOutputDirectory()
-    {
-        return $this->outputDirectory;
-    }
-
-    /**
-     * [REQUIRED] Set the output file for the
-     * generation process.
-     * @param  string $outputFile (TODO: change this to File)
-     * @return void
-     */
-    public function setOutputFile($outputFile)
-    {
-        $this->outputFile = $outputFile;
-    }
-
-    /**
      * Get the output file for the
      * generation process.
      * @return string
@@ -232,12 +221,34 @@ class CapsuleTask extends Task
     }
 
     /**
+     * [REQUIRED] Set the output file for the
+     * generation process.
+     * @param string $outputFile (TODO: change this to File)
+     * @return void
+     */
+    public function setOutputFile($outputFile)
+    {
+        $this->outputFile = $outputFile;
+    }
+
+    /**
+     * Get the context properties that will be
+     * fed into the initial context be the
+     * generating process starts.
+     * @return Properties
+     */
+    public function getContextProperties()
+    {
+        return $this->contextProperties;
+    }
+
+    /**
      * Set the context properties that will be
      * fed into the initial context be the
      * generating process starts.
-     * @param  string $file
-     * @throws BuildException
+     * @param string $file
      * @return void
+     * @throws BuildException
      */
     public function setContextProperties($file)
     {
@@ -279,17 +290,6 @@ class CapsuleTask extends Task
     }
 
     /**
-     * Get the context properties that will be
-     * fed into the initial context be the
-     * generating process starts.
-     * @return Properties
-     */
-    public function getContextProperties()
-    {
-        return $this->contextProperties;
-    }
-
-    /**
      * Creates an "AssignedVar" class.
      */
     public function createAssign()
@@ -303,23 +303,6 @@ class CapsuleTask extends Task
     // ---------------------------------------------------------------
     // End of XML setters & getters
     // ---------------------------------------------------------------
-
-    /**
-     * Creates a Smarty object.
-     *
-     * @return Capsule   initialized (cleared) Smarty context.
-     * @throws Exception the execute method will catch
-     *                   and rethrow as a <code>BuildException</code>
-     */
-    public function initControlContext()
-    {
-        $this->context->clear();
-        foreach ($this->assignedVars as $var) {
-            $this->context->put($var->getName(), $var->getValue());
-        }
-
-        return $this->context;
-    }
 
     /**
      * Execute the input script with Velocity
@@ -438,10 +421,27 @@ class CapsuleTask extends Task
     }
 
     /**
+     * Creates a Smarty object.
+     *
+     * @return Capsule   initialized (cleared) Smarty context.
+     * @throws Exception the execute method will catch
+     *                   and rethrow as a <code>BuildException</code>
+     */
+    public function initControlContext()
+    {
+        $this->context->clear();
+        foreach ($this->assignedVars as $var) {
+            $this->context->put($var->getName(), $var->getValue());
+        }
+
+        return $this->context;
+    }
+
+    /**
      * Place useful objects into the initial context.
      *
      *
-     * @param  Capsule   $context The context to populate, as retrieved from
+     * @param Capsule $context The context to populate, as retrieved from
      *                            {@link #initControlContext()}.
      * @return void
      * @throws Exception Error while populating context.  The {@link
@@ -479,22 +479,6 @@ class AssignedVar
     private $value;
 
     /**
-     * @param string $v
-     */
-    public function setName($v)
-    {
-        $this->name = $v;
-    }
-
-    /**
-     * @param mixed $v
-     */
-    public function setValue($v)
-    {
-        $this->value = $v;
-    }
-
-    /**
      * @return string
      */
     public function getName()
@@ -503,10 +487,26 @@ class AssignedVar
     }
 
     /**
+     * @param string $v
+     */
+    public function setName($v)
+    {
+        $this->name = $v;
+    }
+
+    /**
      * @return mixed
      */
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * @param mixed $v
+     */
+    public function setValue($v)
+    {
+        $this->value = $v;
     }
 }

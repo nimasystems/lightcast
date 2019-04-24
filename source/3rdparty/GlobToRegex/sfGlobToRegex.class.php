@@ -43,7 +43,7 @@ class sfGlobToRegex
     /**
      * Returns a compiled regex which is the equiavlent of the globbing pattern.
      *
-     * @param  string $glob pattern
+     * @param string $glob pattern
      * @return string regex
      */
     public static function glob_to_regex($glob)
@@ -69,19 +69,19 @@ class sfGlobToRegex
 
             if ($car === '.' || $car === '(' || $car === ')' || $car === '|' || $car === '+' || $car === '^' || $car === '$') {
                 $regex .= "\\$car";
-            } elseif ($car === '*') {
+            } else if ($car === '*') {
                 $regex .= ($escaping ? '\\*' : (self::$strict_wildcard_slash ? '[^/]*' : '.*'));
-            } elseif ($car === '?') {
+            } else if ($car === '?') {
                 $regex .= ($escaping ? '\\?' : (self::$strict_wildcard_slash ? '[^/]' : '.'));
-            } elseif ($car === '{') {
+            } else if ($car === '{') {
                 $regex .= ($escaping ? '\\{' : '(');
                 if (!$escaping) ++$in_curlies;
-            } elseif ($car === '}' && $in_curlies) {
+            } else if ($car === '}' && $in_curlies) {
                 $regex .= ($escaping ? '}' : ')');
                 if (!$escaping) --$in_curlies;
-            } elseif ($car === ',' && $in_curlies) {
+            } else if ($car === ',' && $in_curlies) {
                 $regex .= ($escaping ? ',' : '|');
-            } elseif ($car === '\\') {
+            } else if ($car === '\\') {
                 if ($escaping) {
                     $regex .= '\\\\';
                     $escaping = false;

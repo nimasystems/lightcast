@@ -41,8 +41,8 @@ abstract class AbstractHandler
      *
      * The constructor must be called by all derived classes.
      *
-     * @param   object  the parser object
-     * @param   object  the parent handler of this handler
+     * @param object  the parser object
+     * @param object  the parent handler of this handler
      */
     protected function __construct($parser, $parentHandler)
     {
@@ -69,20 +69,12 @@ abstract class AbstractHandler
     }
 
     /**
-     * Gets invoked when element closes method.
-     *
-     */
-    protected function finished()
-    {
-    }
-
-    /**
      * Gets invoked when a XML element ends.
      *
      * Can be overloaded by the child class. But should not. It hands
      * over control to the parentHandler of this.
      *
-     * @param  string  the name of the XML element
+     * @param string  the name of the XML element
      */
     public function endElement($name)
     {
@@ -91,9 +83,17 @@ abstract class AbstractHandler
     }
 
     /**
+     * Gets invoked when element closes method.
+     *
+     */
+    protected function finished()
+    {
+    }
+
+    /**
      * Invoked by occurrence of #PCDATA.
      *
-     * @param     string  the name of the XML element
+     * @param string  the name of the XML element
      * @throws ExpatParseException
      * @exception ExpatParserException if there is no CDATA but method
      *            was called

@@ -73,7 +73,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
             'cache_enabled' => $this->getIsCacheEnabled(),
-            'cache_timeout' => $this->getCacheTimeout()
+            'cache_timeout' => $this->getCacheTimeout(),
         ];
 
         return $debug;
@@ -160,7 +160,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         $debug = [
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
-            'cache_enabled' => $this->getIsCacheEnabled()
+            'cache_enabled' => $this->getIsCacheEnabled(),
         ];
 
         return $debug;

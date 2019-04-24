@@ -112,7 +112,7 @@ class FailTask extends Task
      */
     public function setStatus($int)
     {
-        $this->status = (int) $int;
+        $this->status = (int)$int;
     }
 
     /**
@@ -124,7 +124,7 @@ class FailTask extends Task
      */
     public function main()
     {
-        $fail =  $this->nestedConditionPresent() ? $this->testNestedCondition() :
+        $fail = $this->nestedConditionPresent() ? $this->testNestedCondition() :
             $this->testIfCondition() && $this->testUnlessCondition();
 
         if ($fail) {
@@ -162,32 +162,28 @@ class FailTask extends Task
     }
 
     /**
-     * Add a condition element.
-     * @return NestedCondition
-     * @throws BuildException
+     * test whether there is a nested condition.
+     * @return boolean
      */
-    public function createCondition()
+    private function nestedConditionPresent()
     {
-        if ($this->nestedCondition !== null) {
-            throw new BuildException("Only one nested condition is allowed.");
-        }
-        $this->nestedCondition = new NestedCondition();
-        return $this->nestedCondition;
+        return (bool)$this->nestedCondition;
     }
 
     /**
-     * Set a multiline message.
-     *
-     * @param string $msg
-     *
-     * @return void
+     * test the nested condition
+     * @return bool true if there is none, or it evaluates to true
+     * @throws BuildException
      */
-    public function addText($msg)
+    private function testNestedCondition()
     {
-        if ($this->message === null) {
-            $this->message = "";
+        $result = $this->nestedConditionPresent();
+
+        if ($result && $this->ifCondition !== null || $this->unlessCondition !== null) {
+            throw new BuildException("Nested conditions not permitted in conjunction with if/unless attributes");
         }
-        $this->message .= $this->project->replaceProperties($msg);
+
+        return $result && $this->nestedCondition->evaluate();
     }
 
     /**
@@ -215,27 +211,31 @@ class FailTask extends Task
     }
 
     /**
-     * test the nested condition
-     * @return bool true if there is none, or it evaluates to true
+     * Add a condition element.
+     * @return NestedCondition
      * @throws BuildException
      */
-    private function testNestedCondition()
+    public function createCondition()
     {
-        $result = $this->nestedConditionPresent();
-
-        if ($result && $this->ifCondition !== null || $this->unlessCondition !== null) {
-            throw new BuildException("Nested conditions not permitted in conjunction with if/unless attributes");
+        if ($this->nestedCondition !== null) {
+            throw new BuildException("Only one nested condition is allowed.");
         }
-
-        return $result && $this->nestedCondition->evaluate();
+        $this->nestedCondition = new NestedCondition();
+        return $this->nestedCondition;
     }
 
     /**
-     * test whether there is a nested condition.
-     * @return boolean
+     * Set a multiline message.
+     *
+     * @param string $msg
+     *
+     * @return void
      */
-    private function nestedConditionPresent()
+    public function addText($msg)
     {
-        return (bool) $this->nestedCondition;
+        if ($this->message === null) {
+            $this->message = "";
+        }
+        $this->message .= $this->project->replaceProperties($msg);
     }
 }

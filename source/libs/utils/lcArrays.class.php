@@ -151,7 +151,7 @@ class lcArrays
 
                 if (isset($base[$key]) && (is_array($value) || is_array($base[$key]))) {
                     $base[$key] = lcArrays::mergeRecursiveDistinct($base[$key], $append[$key]);
-                } elseif (is_numeric($key)) {
+                } else if (is_numeric($key)) {
                     if (!in_array($value, $base)) {
                         $base[] = $value;
                     }

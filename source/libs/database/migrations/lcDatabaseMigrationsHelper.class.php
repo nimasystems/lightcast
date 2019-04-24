@@ -39,28 +39,48 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $this->dbc = $dbc;
     }
 
-    /**
-     * @param iDatabaseMigrationSchema $target
-     * @return lcDatabaseMigrationsHelper
-     * @throws lcSystemException
-     */
-    protected function prepareTarget(iDatabaseMigrationSchema $target)
+    public function uninstallSchema(iDatabaseMigrationSchema $target)
     {
+        // check and create migration table if missing
+        $this->createSchemaTables();
+
         // validate it
-        $this->validateMigrationsTarget($target);
+        $this->prepareTarget($target);
 
-        return $this;
-    }
+        if (!$this->isSchemaInstalled($target)) {
+            return true;
+        }
 
-    protected function createTableFromDDL($table_name, $ddl)
-    {
-        // check if it exists first
-        $query = 'SHOW TABLES LIKE ' . $this->dbc->quote($table_name);
-        $ret = $this->dbc->query($query)->fetch(PDO::FETCH_ASSOC);
+        $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
+        $schema_id = (int)$schema_info['schema_id'];
+        $current_version = (int)$schema_info['schema_version'];
 
-        if (!$ret) {
-            $this->info('Creating schema migrations table (' . $table_name . ')');
-            return $this->dbc->exec($ddl);
+        $this->info('Uninstalling schema (' . $target->getSchemaIdentifier() . '): currently installed version: ' . $current_version);
+
+        /// Execute schema uninstall
+
+        $this->dbc->beginTransaction();
+
+        try {
+            /// Execute data uninstall
+            $this->uninstallData($target);
+
+            // execute before
+            $target->beforeExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
+
+            // call the migration method
+            $target->schemaUninstall($this->dbc);
+
+            // execute after
+            $target->afterExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
+
+            // remove the schema record
+            $this->removeSchemaFromMigrationTable($schema_id, $target->getSchemaIdentifier());
+
+            $this->dbc->commit();
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            throw $e;
         }
 
         return true;
@@ -105,173 +125,31 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return ($schemac && $schemah);
     }
 
-    public function getInstalledSchemaVersionsFromMigrationTable($schema_identifier)
+    protected function createTableFromDDL($table_name, $ddl)
     {
-        $sql = 'SELECT to_schema_version FROM ' . $this->dbc->quoteTableName($this->schema_migrations_history_table_name) .
-            ' th INNER JOIN ' . $this->dbc->quoteTableName($this->schema_table_name) . ' ts ON ts.schema_id = th.schema_id ' .
-            ' WHERE ts.schema_identifier = ' . $this->dbc->quote($schema_identifier) . ' AND th.update_type = \'schema_up\'';
-        return $this->dbc->query($sql)->fetchAll(PDO::FETCH_COLUMN);
-    }
+        // check if it exists first
+        $query = 'SHOW TABLES LIKE ' . $this->dbc->quote($table_name);
+        $ret = $this->dbc->query($query)->fetch(PDO::FETCH_ASSOC);
 
-    public function getSchemaInfoFromMigrationTable($schema_identifier)
-    {
-        $sql = 'SELECT * FROM ' . $this->dbc->quoteTableName($this->schema_table_name) .
-            ' WHERE schema_identifier = ' . $this->dbc->quote($schema_identifier);
-        return $this->dbc->query($sql)->fetch(PDO::FETCH_ASSOC);
-    }
-
-    protected function getSchemaVersionFromMigrationTable($schema_identifier)
-    {
-        $info = $this->getSchemaInfoFromMigrationTable($schema_identifier);
-        return ($info && (int)$info['schema_version'] ? (int)$info['schema_version'] : null);
-    }
-
-    protected function addSchemaToMigrationTable($schema_identifier, $initial_version = null)
-    {
-        $initial_version = ($initial_version ? (int)$initial_version : 1);
-
-        $this->dbc->beginTransaction();
-
-        $schema_id = null;
-
-        try {
-            $sql = 'INSERT INTO ' . $this->dbc->quoteTableName($this->schema_table_name) .
-                ' (schema_identifier, schema_version, last_updated) ' .
-                ' VALUES( ' .
-                $this->dbc->quote($schema_identifier) . ', ' .
-                $initial_version . ', ' .
-                'Now()' .
-                ')';
-            $this->dbc->exec($sql);
-
-            $schema_id = $this->dbc->lastInsertId();
-
-            // history
-            $this->addSchemaUpdateHistory(
-                $schema_id,
-                'schema_in',
-                null,
-                $initial_version
-            );
-
-            if (DO_DEBUG) {
-                $this->debug('Schema table updated (Installed schema: ' . $schema_identifier . ')');
-            }
-
-            $this->dbc->commit();
-        } catch (Exception $e) {
-            $this->dbc->rollback();
-            throw $e;
+        if (!$ret) {
+            $this->info('Creating schema migrations table (' . $table_name . ')');
+            return $this->dbc->exec($ddl);
         }
 
-        return $schema_id;
+        return true;
     }
 
-    protected function removeSchemaFromMigrationTable($schema_id, $schema_identifier)
+    /**
+     * @param iDatabaseMigrationSchema $target
+     * @return lcDatabaseMigrationsHelper
+     * @throws lcSystemException
+     */
+    protected function prepareTarget(iDatabaseMigrationSchema $target)
     {
-        $schema_id = (int)$schema_id;
+        // validate it
+        $this->validateMigrationsTarget($target);
 
-        $this->dbc->beginTransaction();
-
-        try {
-            $sql = 'DELETE FROM ' . $this->dbc->quoteTableName($this->schema_table_name) .
-                ' WHERE schema_id = ' . $schema_id;
-            $this->dbc->exec($sql);
-
-            if (DO_DEBUG) {
-                $this->debug('Schema table updated (Removed schema: ' . $schema_identifier . ')');
-            }
-
-            $this->dbc->commit();
-        } catch (Exception $e) {
-            $this->dbc->rollback();
-            throw $e;
-        }
-    }
-
-    protected function updateSchemaDataInstalledToMigrationTable($schema_id, $schema_identifier, $data_installed)
-    {
-        $schema_id = (int)$schema_id;
-        $data_installed = (bool)$data_installed;
-
-        $this->dbc->beginTransaction();
-
-        try {
-            // add or updte
-            $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
-            data_installed = \'' . ($data_installed ? 'yes' : 'no') . '\',
-            last_updated = Now()
-            WHERE 
-            schema_id = ' . $schema_id;
-            $this->dbc->exec($sql);
-
-            // history
-            $this->addSchemaUpdateHistory(
-                $schema_id,
-                ($data_installed ? 'data_in' : 'data_out')
-            );
-
-            if (DO_DEBUG) {
-                $this->debug('Schema table updated (Data ' . ($data_installed ? 'installed' : 'uninstalled') . ': ' . $schema_identifier . ')');
-            }
-
-            $this->dbc->commit();
-        } catch (Exception $e) {
-            $this->dbc->rollback();
-            throw $e;
-        }
-    }
-
-    protected function updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from_version, $to_version, $add_history = true)
-    {
-        $schema_id = (int)$schema_id;
-        $from_version = (int)$from_version;
-        $to_version = (int)$to_version;
-
-        $this->dbc->beginTransaction();
-
-        try {
-            // add or updte
-            $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
-            schema_version = ' . $to_version . ',
-            last_updated = Now()
-            WHERE 
-            schema_id = ' . $schema_id;
-            $this->dbc->exec($sql);
-
-            if ($add_history) {
-                // history
-                $this->addSchemaUpdateHistory(
-                    $schema_id,
-                    ($to_version >= $from_version ? 'schema_up' : 'schema_down'),
-                    $from_version,
-                    $to_version
-                );
-            }
-
-            if (DO_DEBUG) {
-                $this->debug('Schema table updated (Changed version: ' . $schema_identifier . ', ' . $from_version . ' -> ' . $to_version . ')');
-            }
-
-            $this->dbc->commit();
-        } catch (Exception $e) {
-            $this->dbc->rollback();
-            throw $e;
-        }
-    }
-
-    protected function addSchemaUpdateHistory($schema_id, $update_type, $from_ver = null, $to_ver = null)
-    {
-        $sql = 'INSERT INTO ' . $this->dbc->quoteTableName($this->schema_migrations_history_table_name) .
-            ' (schema_id, created_on, update_type, from_schema_version, to_schema_version) ' .
-            ' VALUES(' .
-            (int)$schema_id . ', ' .
-            'Now(), ' .
-            $this->dbc->quote($update_type) . ', ' .
-            ((int)$from_ver ? (int)$from_ver : 'NULL') . ', ' .
-            ((int)$to_ver ? (int)$to_ver : 'NULL') . ' ' .
-            ')';
-        $this->dbc->exec($sql);
+        return $this;
     }
 
     /**
@@ -298,6 +176,79 @@ class lcDatabaseMigrationsHelper extends lcSysObj
     public function getSchemaInstalledVersion(iDatabaseMigrationSchema $target)
     {
         return $this->getSchemaVersionFromMigrationTable($target->getSchemaIdentifier());
+    }
+
+    protected function getSchemaVersionFromMigrationTable($schema_identifier)
+    {
+        $info = $this->getSchemaInfoFromMigrationTable($schema_identifier);
+        return ($info && (int)$info['schema_version'] ? (int)$info['schema_version'] : null);
+    }
+
+    public function getSchemaInfoFromMigrationTable($schema_identifier)
+    {
+        $sql = 'SELECT * FROM ' . $this->dbc->quoteTableName($this->schema_table_name) .
+            ' WHERE schema_identifier = ' . $this->dbc->quote($schema_identifier);
+        return $this->dbc->query($sql)->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function uninstallData(iDatabaseMigrationSchema $target)
+    {
+        return $this->installUninstallData($target, false);
+    }
+
+    protected function installUninstallData(iDatabaseMigrationSchema $target, $install = true)
+    {
+        // check and create migration table if missing
+        $this->createSchemaTables();
+
+        // validate it
+        $this->prepareTarget($target);
+
+        // install the schema if not done yet
+        if (!$this->isSchemaInstalled($target)) {
+            $this->installSchema($target);
+        }
+
+        $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
+        $schema_id = (int)$schema_info['schema_id'];
+        $data_installed = ($schema_info['data_installed'] == 'yes');
+
+        if ($install && $data_installed) {
+            return true;
+        } else if (!$install && !$data_installed) {
+            throw new lcNotAvailableException('Data has not been installed');
+        }
+
+        $this->info(($install ? 'Installing' : 'Uninstalling') . ' schema data (' . $target->getSchemaIdentifier() . ')');
+
+        $this->dbc->beginTransaction();
+
+        try {
+            $action = ($install ? iDatabaseMigrationSchema::ACTION_DATA_INSTALL :
+                iDatabaseMigrationSchema::ACTION_DATA_UNINSTALL);
+
+            // execute before
+            $target->beforeExecute($this->dbc, $action);
+
+            // execute the migration method
+            if ($install) {
+                $target->dataInstall($this->dbc);
+            } else {
+                $target->dataUninstall($this->dbc);
+            }
+
+            // execute after
+            $target->afterExecute($this->dbc, $action);
+
+            $this->updateSchemaDataInstalledToMigrationTable($schema_id, $target->getSchemaIdentifier(), $install);
+
+            $this->dbc->commit();
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            throw $e;
+        }
+
+        return true;
     }
 
     public function installSchema(iDatabaseMigrationSchema $target)
@@ -346,43 +297,37 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function uninstallSchema(iDatabaseMigrationSchema $target)
+    protected function addSchemaToMigrationTable($schema_identifier, $initial_version = null)
     {
-        // check and create migration table if missing
-        $this->createSchemaTables();
-
-        // validate it
-        $this->prepareTarget($target);
-
-        if (!$this->isSchemaInstalled($target)) {
-            return true;
-        }
-
-        $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
-        $schema_id = (int)$schema_info['schema_id'];
-        $current_version = (int)$schema_info['schema_version'];
-
-        $this->info('Uninstalling schema (' . $target->getSchemaIdentifier() . '): currently installed version: ' . $current_version);
-
-        /// Execute schema uninstall
+        $initial_version = ($initial_version ? (int)$initial_version : 1);
 
         $this->dbc->beginTransaction();
 
+        $schema_id = null;
+
         try {
-            /// Execute data uninstall
-            $this->uninstallData($target);
+            $sql = 'INSERT INTO ' . $this->dbc->quoteTableName($this->schema_table_name) .
+                ' (schema_identifier, schema_version, last_updated) ' .
+                ' VALUES( ' .
+                $this->dbc->quote($schema_identifier) . ', ' .
+                $initial_version . ', ' .
+                'Now()' .
+                ')';
+            $this->dbc->exec($sql);
 
-            // execute before
-            $target->beforeExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
+            $schema_id = $this->dbc->lastInsertId();
 
-            // call the migration method
-            $target->schemaUninstall($this->dbc);
+            // history
+            $this->addSchemaUpdateHistory(
+                $schema_id,
+                'schema_in',
+                null,
+                $initial_version
+            );
 
-            // execute after
-            $target->afterExecute($this->dbc, iDatabaseMigrationSchema::ACTION_SCHEMA_UNINSTALL);
-
-            // remove the schema record
-            $this->removeSchemaFromMigrationTable($schema_id, $target->getSchemaIdentifier());
+            if (DO_DEBUG) {
+                $this->debug('Schema table updated (Installed schema: ' . $schema_identifier . ')');
+            }
 
             $this->dbc->commit();
         } catch (Exception $e) {
@@ -390,7 +335,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             throw $e;
         }
 
-        return true;
+        return $schema_id;
     }
 
     public function installData(iDatabaseMigrationSchema $target)
@@ -398,64 +343,73 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return $this->installUninstallData($target, true);
     }
 
-    public function uninstallData(iDatabaseMigrationSchema $target)
+    protected function updateSchemaDataInstalledToMigrationTable($schema_id, $schema_identifier, $data_installed)
     {
-        return $this->installUninstallData($target, false);
-    }
-
-    protected function installUninstallData(iDatabaseMigrationSchema $target, $install = true)
-    {
-        // check and create migration table if missing
-        $this->createSchemaTables();
-
-        // validate it
-        $this->prepareTarget($target);
-
-        // install the schema if not done yet
-        if (!$this->isSchemaInstalled($target)) {
-            $this->installSchema($target);
-        }
-
-        $schema_info = $this->getSchemaInfoFromMigrationTable($target->getSchemaIdentifier());
-        $schema_id = (int)$schema_info['schema_id'];
-        $data_installed = ($schema_info['data_installed'] == 'yes');
-
-        if ($install && $data_installed) {
-            return true;
-        } elseif (!$install && !$data_installed) {
-            throw new lcNotAvailableException('Data has not been installed');
-        }
-
-        $this->info(($install ? 'Installing' : 'Uninstalling') . ' schema data (' . $target->getSchemaIdentifier() . ')');
+        $schema_id = (int)$schema_id;
+        $data_installed = (bool)$data_installed;
 
         $this->dbc->beginTransaction();
 
         try {
-            $action = ($install ? iDatabaseMigrationSchema::ACTION_DATA_INSTALL :
-                iDatabaseMigrationSchema::ACTION_DATA_UNINSTALL);
+            // add or updte
+            $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
+            data_installed = \'' . ($data_installed ? 'yes' : 'no') . '\',
+            last_updated = Now()
+            WHERE 
+            schema_id = ' . $schema_id;
+            $this->dbc->exec($sql);
 
-            // execute before
-            $target->beforeExecute($this->dbc, $action);
+            // history
+            $this->addSchemaUpdateHistory(
+                $schema_id,
+                ($data_installed ? 'data_in' : 'data_out')
+            );
 
-            // execute the migration method
-            if ($install) {
-                $target->dataInstall($this->dbc);
-            } else {
-                $target->dataUninstall($this->dbc);
+            if (DO_DEBUG) {
+                $this->debug('Schema table updated (Data ' . ($data_installed ? 'installed' : 'uninstalled') . ': ' . $schema_identifier . ')');
             }
-
-            // execute after
-            $target->afterExecute($this->dbc, $action);
-
-            $this->updateSchemaDataInstalledToMigrationTable($schema_id, $target->getSchemaIdentifier(), $install);
 
             $this->dbc->commit();
         } catch (Exception $e) {
             $this->dbc->rollback();
             throw $e;
         }
+    }
 
-        return true;
+    protected function addSchemaUpdateHistory($schema_id, $update_type, $from_ver = null, $to_ver = null)
+    {
+        $sql = 'INSERT INTO ' . $this->dbc->quoteTableName($this->schema_migrations_history_table_name) .
+            ' (schema_id, created_on, update_type, from_schema_version, to_schema_version) ' .
+            ' VALUES(' .
+            (int)$schema_id . ', ' .
+            'Now(), ' .
+            $this->dbc->quote($update_type) . ', ' .
+            ((int)$from_ver ? (int)$from_ver : 'NULL') . ', ' .
+            ((int)$to_ver ? (int)$to_ver : 'NULL') . ' ' .
+            ')';
+        $this->dbc->exec($sql);
+    }
+
+    protected function removeSchemaFromMigrationTable($schema_id, $schema_identifier)
+    {
+        $schema_id = (int)$schema_id;
+
+        $this->dbc->beginTransaction();
+
+        try {
+            $sql = 'DELETE FROM ' . $this->dbc->quoteTableName($this->schema_table_name) .
+                ' WHERE schema_id = ' . $schema_id;
+            $this->dbc->exec($sql);
+
+            if (DO_DEBUG) {
+                $this->debug('Schema table updated (Removed schema: ' . $schema_identifier . ')');
+            }
+
+            $this->dbc->commit();
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            throw $e;
+        }
     }
 
     public function migrateSchema(iDatabaseMigrationSchema $target, $to_custom_schema_version = null)
@@ -582,5 +536,51 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $this->info('Schema migrate ' . ($is_migrate_up ? 'UP' : 'DOWN') . ' complete (from: ' . $from . ', to: ' . $to);
 
         return true;
+    }
+
+    protected function updateSchemaVersionToMigrationTable($schema_id, $schema_identifier, $from_version, $to_version, $add_history = true)
+    {
+        $schema_id = (int)$schema_id;
+        $from_version = (int)$from_version;
+        $to_version = (int)$to_version;
+
+        $this->dbc->beginTransaction();
+
+        try {
+            // add or updte
+            $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
+            schema_version = ' . $to_version . ',
+            last_updated = Now()
+            WHERE 
+            schema_id = ' . $schema_id;
+            $this->dbc->exec($sql);
+
+            if ($add_history) {
+                // history
+                $this->addSchemaUpdateHistory(
+                    $schema_id,
+                    ($to_version >= $from_version ? 'schema_up' : 'schema_down'),
+                    $from_version,
+                    $to_version
+                );
+            }
+
+            if (DO_DEBUG) {
+                $this->debug('Schema table updated (Changed version: ' . $schema_identifier . ', ' . $from_version . ' -> ' . $to_version . ')');
+            }
+
+            $this->dbc->commit();
+        } catch (Exception $e) {
+            $this->dbc->rollback();
+            throw $e;
+        }
+    }
+
+    public function getInstalledSchemaVersionsFromMigrationTable($schema_identifier)
+    {
+        $sql = 'SELECT to_schema_version FROM ' . $this->dbc->quoteTableName($this->schema_migrations_history_table_name) .
+            ' th INNER JOIN ' . $this->dbc->quoteTableName($this->schema_table_name) . ' ts ON ts.schema_id = th.schema_id ' .
+            ' WHERE ts.schema_identifier = ' . $this->dbc->quote($schema_identifier) . ' AND th.update_type = \'schema_up\'';
+        return $this->dbc->query($sql)->fetchAll(PDO::FETCH_COLUMN);
     }
 }

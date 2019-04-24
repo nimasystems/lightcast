@@ -36,9 +36,9 @@ class HasFreeSpaceCondition implements Condition
     /**
      * {@inheritdoc}
      *
+     * @return boolean
      * @throws BuildException
      *
-     * @return boolean
      */
     public function evaluate()
     {
@@ -64,6 +64,34 @@ class HasFreeSpaceCondition implements Condition
     }
 
     /**
+     * @param string $humanSize
+     *
+     * @return float
+     */
+    private function parseHumanSizes($humanSize)
+    {
+        if (ctype_alpha($char = $humanSize[strlen($humanSize - 1)])) {
+            $value = (float)substr($humanSize, 0, strlen($humanSize - 1));
+            switch ($char) {
+                case 'K':
+                    return $value * 1024;
+                case 'M':
+                    return $value * 1024 * 1024;
+                case 'G':
+                    return $value * 1024 * 1024 * 1024;
+                case 'T':
+                    return $value * 1024 * 1024 * 1024 * 1024;
+                case 'P':
+                    return $value * 1024 * 1024 * 1024 * 1024 * 1024;
+                default:
+                    return $value;
+            }
+        } else {
+            return (float)$humanSize;
+        }
+    }
+
+    /**
      * Set the partition/device to check.
      *
      * @param $partition
@@ -83,33 +111,5 @@ class HasFreeSpaceCondition implements Condition
     public function setNeeded($needed)
     {
         $this->needed = $needed;
-    }
-
-    /**
-     * @param string $humanSize
-     *
-     * @return float
-     */
-    private function parseHumanSizes($humanSize)
-    {
-        if (ctype_alpha($char = $humanSize[strlen($humanSize - 1)])) {
-            $value = (float) substr($humanSize, 0, strlen($humanSize - 1));
-            switch ($char) {
-                case 'K':
-                    return $value * 1024;
-                case 'M':
-                    return $value * 1024 * 1024;
-                case 'G':
-                    return $value * 1024 * 1024 * 1024;
-                case 'T':
-                    return $value * 1024 * 1024 * 1024 * 1024;
-                case 'P':
-                    return $value * 1024 * 1024 * 1024 * 1024 * 1024;
-                default:
-                    return $value;
-            }
-        } else {
-            return (float) $humanSize;
-        }
     }
 }

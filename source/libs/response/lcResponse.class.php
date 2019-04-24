@@ -31,7 +31,7 @@ abstract class lcResponse extends lcResidentObj implements iProvidesCapabilities
     public function getCapabilities()
     {
         return [
-            'response'
+            'response',
         ];
     }
 

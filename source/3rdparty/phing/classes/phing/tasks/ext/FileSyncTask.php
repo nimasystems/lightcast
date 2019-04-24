@@ -226,7 +226,7 @@ class FileSyncTask extends Task
 
         $command = $this->getCommand();
 
-        $output = array();
+        $output = [];
         $return = null;
         exec($command, $output, $return);
 
@@ -251,6 +251,17 @@ class FileSyncTask extends Task
         }
 
         return $return;
+    }
+
+    /**
+     * Sets the isRemoteConnection property.
+     *
+     * @param boolean $isRemote
+     * @return void
+     */
+    protected function setIsRemoteConnection($isRemote)
+    {
+        $this->isRemoteConnection = $isRemote;
     }
 
     /**
@@ -318,9 +329,20 @@ class FileSyncTask extends Task
     }
 
     /**
+     * Sets the command options.
+     *
+     * @param string $options
+     * @return void
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+    }
+
+    /**
      * Returns an error message based on a given error code.
      *
-     * @param  int         $code Error code
+     * @param int $code Error code
      * @return null|string
      */
     public function getErrorMessage($code)
@@ -355,7 +377,7 @@ class FileSyncTask extends Task
     /**
      * Sets the path to the rsync command.
      *
-     * @param  string $path
+     * @param string $path
      * @return void
      */
     public function setRsyncPath($path)
@@ -364,20 +386,9 @@ class FileSyncTask extends Task
     }
 
     /**
-     * Sets the isRemoteConnection property.
-     *
-     * @param  boolean $isRemote
-     * @return void
-     */
-    protected function setIsRemoteConnection($isRemote)
-    {
-        $this->isRemoteConnection = $isRemote;
-    }
-
-    /**
      * Sets the source directory.
      *
-     * @param  string $dir
+     * @param string $dir
      * @return void
      */
     public function setSourceDir($dir)
@@ -386,21 +397,10 @@ class FileSyncTask extends Task
     }
 
     /**
-     * Sets the command options.
-     *
-     * @param  string $options
-     * @return void
-     */
-    public function setOptions($options)
-    {
-        $this->options = $options;
-    }
-
-    /**
      * Sets the destination directory. If the option remotehost is not included
      * in the build.xml file, rsync will point to a local directory instead.
      *
-     * @param  string $dir
+     * @param string $dir
      * @return void
      */
     public function setDestinationDir($dir)
@@ -411,7 +411,7 @@ class FileSyncTask extends Task
     /**
      * Sets the remote host.
      *
-     * @param  string $host
+     * @param string $host
      * @return void
      */
     public function setRemoteHost($host)
@@ -423,7 +423,7 @@ class FileSyncTask extends Task
      * Specifies the user to log in as on the remote machine. This also may be
      * specified in the properties file.
      *
-     * @param  string $user
+     * @param string $user
      * @return void
      */
     public function setRemoteUser($user)
@@ -436,7 +436,7 @@ class FileSyncTask extends Task
      * daemon. Note that this option is only useful when accessing an rsync daemon
      * using the built in transport, not when using a remote shell as the transport.
      *
-     * @param  string $pass
+     * @param string $pass
      * @return void
      */
     public function setRemotePass($pass)
@@ -450,7 +450,7 @@ class FileSyncTask extends Task
      * rsync is configured to use ssh by default, but you may prefer to use rsh
      * on a local network.
      *
-     * @param  string $shell
+     * @param string $shell
      * @return void
      */
     public function setRemoteShell($shell)
@@ -464,12 +464,12 @@ class FileSyncTask extends Task
      * information about what files are being transferred and a brief summary at
      * the end.
      *
-     * @param  boolean $verbose
+     * @param boolean $verbose
      * @return void
      */
     public function setVerbose($verbose)
     {
-        $this->verbose = (bool) $verbose;
+        $this->verbose = (bool)$verbose;
     }
 
     /**
@@ -478,12 +478,12 @@ class FileSyncTask extends Task
      * size and time of last modification match between the sender and receiver.
      * This option changes this to compare a 128-bit checksum for each file that has a matching size.
      *
-     * @param  boolean $checksum
+     * @param boolean $checksum
      * @return void
      */
     public function setChecksum($checksum)
     {
-        $this->checksum = (bool) $checksum;
+        $this->checksum = (bool)$checksum;
     }
 
     /**
@@ -491,23 +491,23 @@ class FileSyncTask extends Task
      * output as a real run).  It is  most commonly used in combination with the -v, --verbose and/or
      * -i, --itemize-changes options to see what an rsync command is going to do before one actually runs it.
      *
-     * @param  boolean $dryRun
+     * @param boolean $dryRun
      * @return void
      */
     public function setDryRun($dryRun)
     {
-        $this->dryRun = (bool) $dryRun;
+        $this->dryRun = (bool)$dryRun;
     }
 
     /**
      * Requests a simple itemized list of the changes that are being made to each file, including attribute changes.
      *
-     * @param  boolean $itemizeChanges
+     * @param boolean $itemizeChanges
      * @return void
      */
     public function setItemizeChanges($itemizeChanges)
     {
-        $this->itemizeChanges = (bool) $itemizeChanges;
+        $this->itemizeChanges = (bool)$itemizeChanges;
     }
 
     /**
@@ -515,19 +515,19 @@ class FileSyncTask extends Task
      * for the directories that are being synchronized. Files that are excluded
      * from transfer are also excluded from being deleted.
      *
-     * @param  boolean $delete
+     * @param boolean $delete
      * @return void
      */
     public function setDelete($delete)
     {
-        $this->delete = (bool) $delete;
+        $this->delete = (bool)$delete;
     }
 
     /**
      * Exclude files matching patterns from $file, Blank lines in $file and
      * lines starting with ';' or '#' are ignored.
      *
-     * @param  string $file
+     * @param string $file
      * @return void
      */
     public function setExcludeFile($file)

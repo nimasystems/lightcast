@@ -36,11 +36,6 @@ class lcTagParam extends lcHtmlBaseTag
         $this->setValueType($valuetype);
     }
 
-    public static function create()
-    {
-        return new lcTagParam();
-    }
-
     public function setName($value)
     {
         $this->setAttribute('name', $value);
@@ -73,6 +68,11 @@ class lcTagParam extends lcHtmlBaseTag
 
         $this->setAttribute('valuetype', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagParam();
     }
 
     public static function getRequiredAttributes()

@@ -50,7 +50,7 @@ abstract class BaseObject
      *
      * @var        array
      */
-    protected $modifiedColumns = array();
+    protected $modifiedColumns = [];
 
     /**
      * The (virtual) columns that are added at runtime
@@ -58,7 +58,7 @@ abstract class BaseObject
      *
      * @var        array
      */
-    protected $virtualColumns = array();
+    protected $virtualColumns = [];
 
     /**
      * Empty constructor (this allows people with their own BaseObject implementation to use its constructor)
@@ -115,12 +115,12 @@ abstract class BaseObject
      * Setter for the isNew attribute.  This method will be called
      * by Propel-generated children and Peers.
      *
-     * @param  boolean $b the state of the object.
+     * @param boolean $b the state of the object.
      * @return self
      */
     public function setNew($b)
     {
-        $this->_new = (boolean) $b;
+        $this->_new = (boolean)$b;
 
         return $this;
     }
@@ -144,7 +144,7 @@ abstract class BaseObject
      */
     public function setDeleted($b)
     {
-        $this->_deleted = (boolean) $b;
+        $this->_deleted = (boolean)$b;
 
         return $this;
     }
@@ -256,7 +256,7 @@ abstract class BaseObject
                 array_splice($this->modifiedColumns, $offset, 1);
             }
         } else {
-            $this->modifiedColumns = array();
+            $this->modifiedColumns = [];
         }
 
         return $this;
@@ -267,7 +267,7 @@ abstract class BaseObject
      * <code>obj</code> is an instance of <code>BaseObject</code>, delegates to
      * <code>equals(BaseObject)</code>.  Otherwise, returns <code>false</code>.
      *
-     * @param      obj The object to compare to.
+     * @param obj The object to compare to.
      *
      * @return Whether equal to the object specified.
      */
@@ -277,7 +277,7 @@ abstract class BaseObject
         if (is_object($obj) && $obj instanceof $thisclass) {
             if ($this === $obj) {
                 return true;
-            } elseif ($this->getPrimaryKey() === null || $obj->getPrimaryKey() === null) {
+            } else if ($this->getPrimaryKey() === null || $obj->getPrimaryKey() === null) {
                 return false;
             } else {
                 return ($this->getPrimaryKey() === $obj->getPrimaryKey());
@@ -315,6 +315,69 @@ abstract class BaseObject
     }
 
     /**
+     * Set the value of a virtual column in this object
+     *
+     * @param string $name The virtual column name
+     * @param mixed $value The value to give to the virtual column
+     *
+     * @return BaseObject The current object, for fluid interface
+     */
+    public function setVirtualColumn($name, $value)
+    {
+        $this->virtualColumns[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Clean up internal collections prior to serializing
+     * Avoids recursive loops that turn into segmentation faults when serializing
+     */
+    public function __sleep()
+    {
+        $this->clearAllReferences();
+
+        return array_keys(get_object_vars($this));
+    }
+
+    /**
+     * Catches calls to undefined methods.
+     *
+     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
+     * Allows to define default __call() behavior if you use a custom BaseObject
+     *
+     * @param string $name
+     * @param mixed $params
+     *
+     * @return array|string
+     *
+     * @throws PropelException
+     */
+    public function __call($name, $params)
+    {
+        if (preg_match('/get(\w+)/', $name, $matches)) {
+            $virtualColumn = $matches[1];
+            if ($this->hasVirtualColumn($virtualColumn)) {
+                return $this->getVirtualColumn($virtualColumn);
+            }
+
+            $virtualColumn = lcfirst($virtualColumn);
+            if ($this->hasVirtualColumn($virtualColumn)) {
+                return $this->getVirtualColumn($virtualColumn);
+            }
+        }
+        if (preg_match('/^from(\w+)$/', $name, $matches)) {
+            return $this->importFrom($matches[1], reset($params));
+        }
+        if (preg_match('/^to(\w+)$/', $name, $matches)) {
+            $includeLazyLoadColumns = isset($params[0]) ? $params[0] : true;
+
+            return $this->exportTo($matches[1], $includeLazyLoadColumns);
+        }
+        throw new PropelException('Call to undefined method: ' . $name);
+    }
+
+    /**
      * Checks the existence of a virtual column in this object
      *
      * @return boolean
@@ -338,34 +401,6 @@ abstract class BaseObject
         }
 
         return $this->virtualColumns[$name];
-    }
-
-    /**
-     * Set the value of a virtual column in this object
-     *
-     * @param string $name  The virtual column name
-     * @param mixed  $value The value to give to the virtual column
-     *
-     * @return BaseObject The current object, for fluid interface
-     */
-    public function setVirtualColumn($name, $value)
-    {
-        $this->virtualColumns[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Logs a message using Propel::log().
-     *
-     * @param string $msg
-     * @param int    $priority One of the Propel::LOG_* logging levels
-     *
-     * @return boolean
-     */
-    protected function log($msg, $priority = Propel::LOG_INFO)
-    {
-        return Propel::log(get_class($this) . ': ' . $msg, $priority);
     }
 
     /**
@@ -398,7 +433,7 @@ abstract class BaseObject
      *  => {"Id":9012,"Title":"Don Juan","ISBN":"0140422161","Price":12.99,"PublisherId":1234,"AuthorId":5678}');
      * </code>
      *
-     * @param mixed   $parser                 A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
+     * @param mixed $parser A PropelParser instance, or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param boolean $includeLazyLoadColumns (optional) Whether to include lazy load(ed) columns. Defaults to TRUE.
      *
      * @return string The exported data
@@ -409,54 +444,19 @@ abstract class BaseObject
             $parser = PropelParser::getParser($parser);
         }
 
-        return $parser->fromArray($this->toArray(BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns, array(), true));
+        return $parser->fromArray($this->toArray(BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns, [], true));
     }
 
     /**
-     * Clean up internal collections prior to serializing
-     * Avoids recursive loops that turn into segmentation faults when serializing
+     * Logs a message using Propel::log().
+     *
+     * @param string $msg
+     * @param int $priority One of the Propel::LOG_* logging levels
+     *
+     * @return boolean
      */
-    public function __sleep()
+    protected function log($msg, $priority = Propel::LOG_INFO)
     {
-        $this->clearAllReferences();
-
-        return array_keys(get_object_vars($this));
-    }
-
-    /**
-     * Catches calls to undefined methods.
-     *
-     * Provides magic import/export method support (fromXML()/toXML(), fromYAML()/toYAML(), etc.).
-     * Allows to define default __call() behavior if you use a custom BaseObject
-     *
-     * @param string $name
-     * @param mixed  $params
-     *
-     * @return array|string
-     *
-     * @throws PropelException
-     */
-    public function __call($name, $params)
-    {
-        if (preg_match('/get(\w+)/', $name, $matches)) {
-            $virtualColumn = $matches[1];
-            if ($this->hasVirtualColumn($virtualColumn)) {
-                return $this->getVirtualColumn($virtualColumn);
-            }
-
-            $virtualColumn = lcfirst($virtualColumn);
-            if ($this->hasVirtualColumn($virtualColumn)) {
-                return $this->getVirtualColumn($virtualColumn);
-            }
-        }
-        if (preg_match('/^from(\w+)$/', $name, $matches)) {
-            return $this->importFrom($matches[1], reset($params));
-        }
-        if (preg_match('/^to(\w+)$/', $name, $matches)) {
-            $includeLazyLoadColumns = isset($params[0]) ? $params[0] : true;
-
-            return $this->exportTo($matches[1], $includeLazyLoadColumns);
-        }
-        throw new PropelException('Call to undefined method: ' . $name);
+        return Propel::log(get_class($this) . ': ' . $msg, $priority);
     }
 }

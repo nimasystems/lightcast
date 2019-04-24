@@ -47,15 +47,12 @@ include_once 'phing/tasks/system/PropertyTask.php';
 class PhingTask extends Task
 {
 
-    /** the basedir where is executed the build file */
-    private $dir;
-
-    /** build.xml (can be absolute) in this case dir will be ignored */
-    private $phingFile;
-
     /** the target to call if any */
     protected $newTarget;
-
+    /** the basedir where is executed the build file */
+    private $dir;
+    /** build.xml (can be absolute) in this case dir will be ignored */
+    private $phingFile;
     /** should we inherit properties from the parent ? */
     private $inheritAll = true;
 
@@ -63,13 +60,13 @@ class PhingTask extends Task
     private $inheritRefs = false;
 
     /** the properties to pass to the new project */
-    private $properties = array();
+    private $properties = [];
 
     /** the references to pass to the new project */
-    private $references = array();
+    private $references = [];
 
     /** The filesets that contain the files PhingTask is to be run on. */
-    private $filesets = array();
+    private $filesets = [];
 
     /** the temporary project created to run the build file */
     private $newProject;
@@ -85,61 +82,7 @@ class PhingTask extends Task
      */
     public function setHaltOnFailure($hof)
     {
-        $this->haltOnFailure = (boolean) $hof;
-    }
-
-    /**
-     * Creates a Project instance for the project to call.
-     * @return void
-     */
-    public function init()
-    {
-        $this->newProject = new Project();
-        $tdf = $this->project->getTaskDefinitions();
-        $this->newProject->addTaskDefinition("property", $tdf["property"]);
-    }
-
-    /**
-     * Called in execute or createProperty if newProject is null.
-     *
-     * <p>This can happen if the same instance of this task is run
-     * twice as newProject is set to null at the end of execute (to
-     * save memory and help the GC).</p>
-     *
-     * <p>Sets all properties that have been defined as nested
-     * property elements.</p>
-     */
-    private function reinit()
-    {
-        $this->init();
-        $count = count($this->properties);
-        for ($i = 0; $i < $count; $i++) {
-            $p = $this->properties[$i];
-            $newP = $this->newProject->createTask("property");
-            $newP->setName($p->getName());
-            if ($p->getValue() !== null) {
-                $newP->setValue($p->getValue());
-            }
-            if ($p->getFile() !== null) {
-                $newP->setFile($p->getFile());
-            }
-            if ($p->getPrefix() !== null) {
-                $newP->setPrefix($p->getPrefix());
-            }
-            if ($p->getRefid() !== null) {
-                $newP->setRefid($p->getRefid());
-            }
-            if ($p->getEnvironment() !== null) {
-                $newP->setEnvironment($p->getEnvironment());
-            }
-            if ($p->getUserProperty() !== null) {
-                $newP->setUserProperty($p->getUserProperty());
-            }
-            if ($p->getOverride() !== null) {
-                $newP->setOverride($p->getOverride());
-            }
-            $this->properties[$i] = $newP;
-        }
+        $this->haltOnFailure = (boolean)$hof;
     }
 
     /**
@@ -202,8 +145,8 @@ class PhingTask extends Task
     /**
      * Execute phing file.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     private function processFile()
     {
@@ -319,6 +262,60 @@ class PhingTask extends Task
     }
 
     /**
+     * Called in execute or createProperty if newProject is null.
+     *
+     * <p>This can happen if the same instance of this task is run
+     * twice as newProject is set to null at the end of execute (to
+     * save memory and help the GC).</p>
+     *
+     * <p>Sets all properties that have been defined as nested
+     * property elements.</p>
+     */
+    private function reinit()
+    {
+        $this->init();
+        $count = count($this->properties);
+        for ($i = 0; $i < $count; $i++) {
+            $p = $this->properties[$i];
+            $newP = $this->newProject->createTask("property");
+            $newP->setName($p->getName());
+            if ($p->getValue() !== null) {
+                $newP->setValue($p->getValue());
+            }
+            if ($p->getFile() !== null) {
+                $newP->setFile($p->getFile());
+            }
+            if ($p->getPrefix() !== null) {
+                $newP->setPrefix($p->getPrefix());
+            }
+            if ($p->getRefid() !== null) {
+                $newP->setRefid($p->getRefid());
+            }
+            if ($p->getEnvironment() !== null) {
+                $newP->setEnvironment($p->getEnvironment());
+            }
+            if ($p->getUserProperty() !== null) {
+                $newP->setUserProperty($p->getUserProperty());
+            }
+            if ($p->getOverride() !== null) {
+                $newP->setOverride($p->getOverride());
+            }
+            $this->properties[$i] = $newP;
+        }
+    }
+
+    /**
+     * Creates a Project instance for the project to call.
+     * @return void
+     */
+    public function init()
+    {
+        $this->newProject = new Project();
+        $tdf = $this->project->getTaskDefinitions();
+        $this->newProject->addTaskDefinition("property", $tdf["property"]);
+    }
+
+    /**
      * Configure the Project, i.e. make intance, attach build listeners
      * (copy from father project), add Task and Datatype definitions,
      * copy properties and references from old project if these options
@@ -416,7 +413,7 @@ class PhingTask extends Task
 
         $newReferences = $this->newProject->getReferences();
 
-        $subprojRefKeys = array();
+        $subprojRefKeys = [];
 
         if (count($this->references) > 0) {
             for ($i = 0, $count = count($this->references); $i < $count; $i++) {
@@ -470,10 +467,10 @@ class PhingTask extends Task
      * <p>If we cannot clone it, copy the referenced object itself and
      * keep our fingers crossed.</p>
      *
-     * @param  string $oldKey
-     * @param  string $newKey
-     * @throws BuildException
+     * @param string $oldKey
+     * @param string $newKey
      * @return void
+     * @throws BuildException
      */
     private function copyReference($oldKey, $newKey)
     {
@@ -492,9 +489,9 @@ class PhingTask extends Task
 
         if ($copy instanceof ProjectComponent) {
             $copy->setProject($this->newProject);
-        } elseif (in_array('setProject', get_class_methods(get_class($copy)))) {
+        } else if (in_array('setProject', get_class_methods(get_class($copy)))) {
             $copy->setProject($this->newProject);
-        } elseif ($copy instanceof Project) {
+        } else if ($copy instanceof Project) {
             // don't copy the old "Project" itself
         } else {
             $msg = "Error setting new project instance for "
@@ -513,7 +510,7 @@ class PhingTask extends Task
      */
     public function setInheritAll($value)
     {
-        $this->inheritAll = (boolean) $value;
+        $this->inheritAll = (boolean)$value;
     }
 
     /**
@@ -524,7 +521,7 @@ class PhingTask extends Task
      */
     public function setInheritRefs($value)
     {
-        $this->inheritRefs = (boolean) $value;
+        $this->inheritRefs = (boolean)$value;
     }
 
     /**
@@ -545,6 +542,16 @@ class PhingTask extends Task
     }
 
     /**
+     * Alias function for setPhingfile
+     *
+     * @param $s
+     */
+    public function setBuildfile($s)
+    {
+        $this->setPhingFile($s);
+    }
+
+    /**
      * The build file to use.
      * Defaults to "build.xml". This file is expected to be a filename relative
      * to the dir attribute given.
@@ -557,16 +564,6 @@ class PhingTask extends Task
         // otherwise a relative file will be resolved based on the current
         // basedir.
         $this->phingFile = $s;
-    }
-
-    /**
-     * Alias function for setPhingfile
-     *
-     * @param $s
-     */
-    public function setBuildfile($s)
-    {
-        $this->setPhingFile($s);
     }
 
     /**

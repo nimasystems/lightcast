@@ -92,6 +92,16 @@ class TaskdefTask extends Task
     }
 
     /**
+     * Reference to a classpath to use when loading the files.
+     * @param Reference $r
+     */
+    public function setClasspathRef(Reference $r)
+    {
+        $this->classpathId = $r->getRefId();
+        $this->createClasspath()->setRefid($r);
+    }
+
+    /**
      * Create the classpath to be used when searching for component being defined
      *
      * @return Path
@@ -103,16 +113,6 @@ class TaskdefTask extends Task
         }
 
         return $this->classpath->createPath();
-    }
-
-    /**
-     * Reference to a classpath to use when loading the files.
-     * @param Reference $r
-     */
-    public function setClasspathRef(Reference $r)
-    {
-        $this->classpathId = $r->getRefId();
-        $this->createClasspath()->setRefid($r);
     }
 
     /**
@@ -156,7 +156,7 @@ class TaskdefTask extends Task
         } else {
             try { // try to load taskdefs given in file
                 $props = new Properties();
-                $in = new PhingFile((string) $this->typeFile);
+                $in = new PhingFile((string)$this->typeFile);
 
                 if ($in === null) {
                     throw new BuildException("Can't load task list {$this->typeFile}");

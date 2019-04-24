@@ -22,30 +22,6 @@ require_once dirname(__FILE__) . '/DefaultPlatform.php';
 class PgsqlPlatform extends DefaultPlatform
 {
 
-    /**
-     * Initializes db specific domain mapping.
-     */
-    protected function initialize()
-    {
-        parent::initialize();
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BOOLEAN, "BOOLEAN"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::TINYINT, "INT2"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::SMALLINT, "INT2"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BIGINT, "INT8"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::REAL, "FLOAT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, "DOUBLE PRECISION"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::FLOAT, "DOUBLE PRECISION"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "TEXT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BYTEA"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "BYTEA"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "BYTEA"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::BLOB, "BYTEA"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "TEXT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, "TEXT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, "TEXT"));
-        $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, "INT2"));
-    }
-
     public function getNativeIdMethod()
     {
         return PropelPlatformInterface::SERIAL;
@@ -91,68 +67,28 @@ class PgsqlPlatform extends DefaultPlatform
         return true;
     }
 
-    /**
-     * Override to provide sequence names that conform to postgres' standard when
-     * no id-method-parameter specified.
-     *
-     * @param Table $table
-     *
-     * @return string
-     */
-    public function getSequenceName(Table $table)
+    public function getAddTablesDDL(Database $database)
     {
-        static $longNamesMap = array();
-        $result = null;
-        if ($table->getIdMethod() == IDMethod::NATIVE) {
-            $idMethodParams = $table->getIdMethodParameters();
-            if (empty($idMethodParams)) {
-                $result = null;
-                // We're going to ignore a check for max length (mainly
-                // because I'm not sure how Postgres would handle this w/ SERIAL anyway)
-                foreach ($table->getColumns() as $col) {
-                    if ($col->isAutoIncrement()) {
-                        $result = $table->getName() . '_' . $col->getName() . '_seq';
-                        break; // there's only one auto-increment column allowed
-                    }
-                }
-            } else {
-                $result = $idMethodParams[0]->getValue();
-            }
+        $ret = $this->getBeginDDL();
+        $ret .= $this->getAddSchemasDDL($database);
+        foreach ($database->getTablesForSql() as $table) {
+            $ret .= $this->getCommentBlockDDL($table->getName());
+            $ret .= $this->getDropTableDDL($table);
+            $ret .= $this->getAddTableDDL($table);
+            $ret .= $this->getAddIndicesDDL($table);
         }
-
-        return $result;
-    }
-
-    protected function getAddSequenceDDL(Table $table)
-    {
-        if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters() != null) {
-            $pattern = "
-CREATE SEQUENCE %s;
-";
-
-            return sprintf($pattern,
-                $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
-            );
+        foreach ($database->getTablesForSql() as $table) {
+            $ret .= $this->getAddForeignKeysDDL($table);
         }
-    }
+        $ret .= $this->getEndDDL();
 
-    protected function getDropSequenceDDL(Table $table)
-    {
-        if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters() != null) {
-            $pattern = "
-DROP SEQUENCE %s;
-";
-
-            return sprintf($pattern,
-                $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
-            );
-        }
+        return $ret;
     }
 
     public function getAddSchemasDDL(Database $database)
     {
         $ret = '';
-        $schemas = array();
+        $schemas = [];
         foreach ($database->getTables() as $table) {
             $vi = $table->getVendorInfoForType('pgsql');
             if ($vi->hasParameter('schema') && !isset($schemas[$vi->getParameter('schema')])) {
@@ -176,6 +112,20 @@ CREATE SCHEMA %s;
         };
     }
 
+    public function getDropTableDDL(Table $table)
+    {
+        $ret = '';
+        $ret .= $this->getUseSchemaDDL($table);
+        $pattern = "
+DROP TABLE IF EXISTS %s CASCADE;
+";
+        $ret .= sprintf($pattern, $this->quoteIdentifier($table->getName()));
+        $ret .= $this->getDropSequenceDDL($table);
+        $ret .= $this->getResetSchemaDDL($table);
+
+        return $ret;
+    }
+
     public function getUseSchemaDDL(Table $table)
     {
         $vi = $table->getVendorInfoForType('pgsql');
@@ -185,6 +135,19 @@ SET search_path TO %s;
 ";
 
             return sprintf($pattern, $this->quoteIdentifier($vi->getParameter('schema')));
+        }
+    }
+
+    protected function getDropSequenceDDL(Table $table)
+    {
+        if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters() != null) {
+            $pattern = "
+DROP SEQUENCE %s;
+";
+
+            return sprintf($pattern,
+                $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
+            );
         }
     }
 
@@ -198,31 +161,13 @@ SET search_path TO public;
         }
     }
 
-    public function getAddTablesDDL(Database $database)
-    {
-        $ret = $this->getBeginDDL();
-        $ret .= $this->getAddSchemasDDL($database);
-        foreach ($database->getTablesForSql() as $table) {
-            $ret .= $this->getCommentBlockDDL($table->getName());
-            $ret .= $this->getDropTableDDL($table);
-            $ret .= $this->getAddTableDDL($table);
-            $ret .= $this->getAddIndicesDDL($table);
-        }
-        foreach ($database->getTablesForSql() as $table) {
-            $ret .= $this->getAddForeignKeysDDL($table);
-        }
-        $ret .= $this->getEndDDL();
-
-        return $ret;
-    }
-
     public function getAddTableDDL(Table $table)
     {
         $ret = '';
         $ret .= $this->getUseSchemaDDL($table);
         $ret .= $this->getAddSequenceDDL($table);
 
-        $lines = array();
+        $lines = [];
 
         foreach ($table->getColumns() as $column) {
             $lines[] = $this->getColumnDDL($column);
@@ -265,6 +210,92 @@ COMMENT ON TABLE %s IS %s;
         return $ret;
     }
 
+    protected function getAddSequenceDDL(Table $table)
+    {
+        if ($table->getIdMethod() == IDMethod::NATIVE && $table->getIdMethodParameters() != null) {
+            $pattern = "
+CREATE SEQUENCE %s;
+";
+
+            return sprintf($pattern,
+                $this->quoteIdentifier(strtolower($this->getSequenceName($table)))
+            );
+        }
+    }
+
+    /**
+     * Override to provide sequence names that conform to postgres' standard when
+     * no id-method-parameter specified.
+     *
+     * @param Table $table
+     *
+     * @return string
+     */
+    public function getSequenceName(Table $table)
+    {
+        static $longNamesMap = [];
+        $result = null;
+        if ($table->getIdMethod() == IDMethod::NATIVE) {
+            $idMethodParams = $table->getIdMethodParameters();
+            if (empty($idMethodParams)) {
+                $result = null;
+                // We're going to ignore a check for max length (mainly
+                // because I'm not sure how Postgres would handle this w/ SERIAL anyway)
+                foreach ($table->getColumns() as $col) {
+                    if ($col->isAutoIncrement()) {
+                        $result = $table->getName() . '_' . $col->getName() . '_seq';
+                        break; // there's only one auto-increment column allowed
+                    }
+                }
+            } else {
+                $result = $idMethodParams[0]->getValue();
+            }
+        }
+
+        return $result;
+    }
+
+    public function getColumnDDL(Column $col)
+    {
+        $domain = $col->getDomain();
+
+        $ddl = [$this->quoteIdentifier($col->getName())];
+        $sqlType = $domain->getSqlType();
+        $table = $col->getTable();
+        if ($col->isAutoIncrement() && $table && $table->getIdMethodParameters() == null) {
+            $sqlType = $col->getType() === PropelTypes::BIGINT ? 'bigserial' : 'serial';
+        }
+        if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
+            $ddl[] = $sqlType . $domain->printSize();
+        } else {
+            $ddl[] = $sqlType;
+        }
+        if ($default = $this->getColumnDefaultValueDDL($col)) {
+            $ddl[] = $default;
+        }
+        if ($notNull = $this->getNullString($col->isNotNull())) {
+            $ddl[] = $notNull;
+        }
+        if ($autoIncrement = $col->getAutoIncrementString()) {
+            $ddl[] = $autoIncrement;
+        }
+
+        return implode(' ', $ddl);
+    }
+
+    public function hasSize($sqlType)
+    {
+        return !("BYTEA" == $sqlType || "TEXT" == $sqlType || "DOUBLE PRECISION" == $sqlType);
+    }
+
+    public function getUniqueDDL(Unique $unique)
+    {
+        return sprintf('CONSTRAINT %s UNIQUE (%s)',
+            $this->quoteIdentifier($unique->getName()),
+            $this->getColumnListDDL($unique->getColumns())
+        );
+    }
+
     protected function getAddColumnsComments(Table $table)
     {
         $ret = '';
@@ -289,61 +320,11 @@ COMMENT ON COLUMN %s.%s IS %s;
         }
     }
 
-    public function getDropTableDDL(Table $table)
-    {
-        $ret = '';
-        $ret .= $this->getUseSchemaDDL($table);
-        $pattern = "
-DROP TABLE IF EXISTS %s CASCADE;
-";
-        $ret .= sprintf($pattern, $this->quoteIdentifier($table->getName()));
-        $ret .= $this->getDropSequenceDDL($table);
-        $ret .= $this->getResetSchemaDDL($table);
-
-        return $ret;
-    }
-
     public function getPrimaryKeyName(Table $table)
     {
         $tableName = $table->getName();
 
         return $tableName . '_pkey';
-    }
-
-    public function getColumnDDL(Column $col)
-    {
-        $domain = $col->getDomain();
-
-        $ddl = array($this->quoteIdentifier($col->getName()));
-        $sqlType = $domain->getSqlType();
-        $table = $col->getTable();
-        if ($col->isAutoIncrement() && $table && $table->getIdMethodParameters() == null) {
-            $sqlType = $col->getType() === PropelTypes::BIGINT ? 'bigserial' : 'serial';
-        }
-        if ($this->hasSize($sqlType) && $col->isDefaultSqlType($this)) {
-            $ddl[] = $sqlType . $domain->printSize();
-        } else {
-            $ddl[] = $sqlType;
-        }
-        if ($default = $this->getColumnDefaultValueDDL($col)) {
-            $ddl[] = $default;
-        }
-        if ($notNull = $this->getNullString($col->isNotNull())) {
-            $ddl[] = $notNull;
-        }
-        if ($autoIncrement = $col->getAutoIncrementString()) {
-            $ddl[] = $autoIncrement;
-        }
-
-        return implode(' ', $ddl);
-    }
-
-    public function getUniqueDDL(Unique $unique)
-    {
-        return sprintf('CONSTRAINT %s UNIQUE (%s)',
-            $this->quoteIdentifier($unique->getName()),
-            $this->getColumnListDDL($unique->getColumns())
-        );
     }
 
     /**
@@ -352,11 +333,6 @@ DROP TABLE IF EXISTS %s CASCADE;
     public function supportsSchemas()
     {
         return true;
-    }
-
-    public function hasSize($sqlType)
-    {
-        return !("BYTEA" == $sqlType || "TEXT" == $sqlType || "DOUBLE PRECISION" == $sqlType);
     }
 
     public function hasStreamBlobImpl()
@@ -372,8 +348,25 @@ DROP TABLE IF EXISTS %s CASCADE;
     /**
      * Overrides the implementation from DefaultPlatform
      *
-     * @author     Niklas Närhinen <niklas@narhinen.net>
      * @return string
+     * @author     Niklas Närhinen <niklas@narhinen.net>
+     * @see        DefaultPlatform::getModifyColumnsDDL
+     */
+    public function getModifyColumnsDDL($columnDiffs)
+    {
+        $ret = '';
+        foreach ($columnDiffs as $columnDiff) {
+            $ret .= $this->getModifyColumnDDL($columnDiff);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * Overrides the implementation from DefaultPlatform
+     *
+     * @return string
+     * @author     Niklas Närhinen <niklas@narhinen.net>
      * @see        DefaultPlatform::getModifyColumnDDL
      */
     public function getModifyColumnDDL(PropelColumnDiff $columnDiff)
@@ -429,25 +422,8 @@ ALTER TABLE %s ALTER COLUMN %s;
     /**
      * Overrides the implementation from DefaultPlatform
      *
-     * @author     Niklas Närhinen <niklas@narhinen.net>
      * @return string
-     * @see        DefaultPlatform::getModifyColumnsDDL
-     */
-    public function getModifyColumnsDDL($columnDiffs)
-    {
-        $ret = '';
-        foreach ($columnDiffs as $columnDiff) {
-            $ret .= $this->getModifyColumnDDL($columnDiff);
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Overrides the implementation from DefaultPlatform
-     *
      * @author     Niklas Närhinen <niklas@narhinen.net>
-     * @return string
      * @see        DefaultPlatform::getAddColumnsDLL
      */
     public function getAddColumnsDDL($columns)
@@ -463,8 +439,8 @@ ALTER TABLE %s ALTER COLUMN %s;
     /**
      * Overrides the implementation from DefaultPlatform
      *
-     * @author     Niklas Närhinen <niklas@narhinen.net>
      * @return string
+     * @author     Niklas Närhinen <niklas@narhinen.net>
      * @see        DefaultPlatform::getDropIndexDDL
      */
     public function getDropIndexDDL(Index $index)
@@ -504,5 +480,29 @@ ALTER TABLE %s ALTER COLUMN %s;
         );
 
         return preg_replace('/^/m', $tab, $script);
+    }
+
+    /**
+     * Initializes db specific domain mapping.
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BOOLEAN, "BOOLEAN"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::TINYINT, "INT2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::SMALLINT, "INT2"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BIGINT, "INT8"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::REAL, "FLOAT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::DOUBLE, "DOUBLE PRECISION"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::FLOAT, "DOUBLE PRECISION"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARCHAR, "TEXT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BINARY, "BYTEA"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::VARBINARY, "BYTEA"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::LONGVARBINARY, "BYTEA"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::BLOB, "BYTEA"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::CLOB, "TEXT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::OBJECT, "TEXT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::PHP_ARRAY, "TEXT"));
+        $this->setSchemaDomainMapping(new Domain(PropelTypes::ENUM, "INT2"));
     }
 }

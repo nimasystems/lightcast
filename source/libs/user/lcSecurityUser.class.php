@@ -125,20 +125,20 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
 
             $this->event_dispatcher->notify(new lcEvent('user.session_will_expire', $this,
                 ['user_id' => $user_id,
-                    'last_request' => $last_request,
-                    'timeout' => $timeout,
-                    'overtime' => $diff
+                 'last_request' => $last_request,
+                 'timeout' => $timeout,
+                 'overtime' => $diff,
                 ]));
 
             $this->setAuthenticated(false);
 
             $this->event_dispatcher->notify(new lcEvent('user.session_expired', $this,
                 ['user_id' => $user_id,
-                    'authentication_data' => $auth_data,
-                    'credentials' => $credentials,
-                    'last_request' => $last_request,
-                    'timeout' => $timeout,
-                    'overtime' => $diff
+                 'authentication_data' => $auth_data,
+                 'credentials' => $credentials,
+                 'last_request' => $last_request,
+                 'timeout' => $timeout,
+                 'overtime' => $diff,
                 ]));
 
             /*
@@ -184,7 +184,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             $this->event_dispatcher->notify(new lcEvent('user.session_refresh', $this,
                 [
                     'is_authenticated' => $this->is_authenticated,
-                    'forced_by_user' => $forced_by_user
+                    'forced_by_user' => $forced_by_user,
                 ]));
         }
 
@@ -202,7 +202,7 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             $this->event_dispatcher->notify(new lcEvent('user.session_refresh', $this,
                 [
                     'is_authenticated' => $this->is_authenticated,
-                    'forced_by_user' => $forced_by_user
+                    'forced_by_user' => $forced_by_user,
                 ]));
         }
 
@@ -216,8 +216,8 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             new lcEvent('user.should_authenticate',
                 $this,
                 ['user_id' => $this->user_id,
-                    'forced_by_user' => $forced_by_user,
-                    'authentication_data' => $this->authentication_data]
+                 'forced_by_user' => $forced_by_user,
+                 'authentication_data' => $this->authentication_data]
             ), []);
 
         $should_authenticate = $event->isProcessed() ? $event->getReturnValue() : true;
@@ -254,13 +254,13 @@ abstract class lcSecurityUser extends lcUser implements iDebuggable
             $this->event_dispatcher->notify(new lcEvent('user.authenticate', $this,
                 [
                     'is_authenticated' => false,
-                    'forced_by_user' => $forced_by_user
+                    'forced_by_user' => $forced_by_user,
                 ]));
 
             $this->event_dispatcher->notify(new lcEvent('user.session_refresh', $this,
                 [
                     'is_authenticated' => false,
-                    'forced_by_user' => $forced_by_user
+                    'forced_by_user' => $forced_by_user,
                 ]));
         }
 

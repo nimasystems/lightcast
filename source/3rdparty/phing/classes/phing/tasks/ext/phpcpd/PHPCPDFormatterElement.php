@@ -76,6 +76,16 @@ class PHPCPDFormatterElement
     }
 
     /**
+     * Get the formatter type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Sets the formatter type.
      *
      * @param string $type Type of the formatter
@@ -109,13 +119,13 @@ class PHPCPDFormatterElement
     }
 
     /**
-     * Get the formatter type
+     * Return whether to write formatter results to file or not.
      *
-     * @return string
+     * @return boolean
      */
-    public function getType()
+    public function getUseFile()
     {
-        return $this->type;
+        return $this->useFile;
     }
 
     /**
@@ -129,13 +139,13 @@ class PHPCPDFormatterElement
     }
 
     /**
-     * Return whether to write formatter results to file or not.
+     * Get the output file.
      *
-     * @return boolean
+     * @return PhingFile
      */
-    public function getUseFile()
+    public function getOutfile()
     {
-        return $this->useFile;
+        return $this->outfile;
     }
 
     /**
@@ -146,16 +156,6 @@ class PHPCPDFormatterElement
     public function setOutfile(PhingFile $outfile)
     {
         $this->outfile = $outfile;
-    }
-
-    /**
-     * Get the output file.
-     *
-     * @return PhingFile
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
     }
 
     /**

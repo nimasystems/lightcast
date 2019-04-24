@@ -34,11 +34,6 @@ class lcTagIns extends lcHtmlTag
         $this->setDateTime($datetime);
     }
 
-    public static function create()
-    {
-        return new lcTagIns();
-    }
-
     public function setCite($cite = null)
     {
         $this->setAttribute('cite', $cite);
@@ -49,6 +44,11 @@ class lcTagIns extends lcHtmlTag
     {
         $this->setAttribute('datetime', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagIns();
     }
 
     public static function getRequiredAttributes()

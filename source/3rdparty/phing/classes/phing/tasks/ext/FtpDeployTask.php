@@ -47,6 +47,7 @@ require_once 'phing/Task.php';
  */
 class FtpDeployTask extends Task
 {
+    protected $logLevel = Project::MSG_VERBOSE;
     private $host = null;
     private $port = 21;
     private $ssl = false;
@@ -64,15 +65,13 @@ class FtpDeployTask extends Task
     private $rawDataFallback = false;
     private $skipOnSameSize = false;
 
-    protected $logLevel = Project::MSG_VERBOSE;
-
     /**
      *
      */
     public function __construct()
     {
-        $this->filesets = array();
-        $this->completeDirMap = array();
+        $this->filesets = [];
+        $this->completeDirMap = [];
     }
 
     /**
@@ -88,7 +87,7 @@ class FtpDeployTask extends Task
      */
     public function setPort($port)
     {
-        $this->port = (int) $port;
+        $this->port = (int)$port;
     }
 
     /**
@@ -96,7 +95,7 @@ class FtpDeployTask extends Task
      */
     public function setSsl($ssl)
     {
-        $this->ssl = (bool) $ssl;
+        $this->ssl = (bool)$ssl;
     }
 
     /**
@@ -144,7 +143,7 @@ class FtpDeployTask extends Task
      */
     public function setPassive($passive)
     {
-        $this->passive = (bool) $passive;
+        $this->passive = (bool)$passive;
     }
 
     /**
@@ -152,7 +151,7 @@ class FtpDeployTask extends Task
      */
     public function setClearFirst($clearFirst)
     {
-        $this->clearFirst = (bool) $clearFirst;
+        $this->clearFirst = (bool)$clearFirst;
     }
 
     /**
@@ -160,7 +159,7 @@ class FtpDeployTask extends Task
      */
     public function setDepends($depends)
     {
-        $this->depends = (bool) $depends;
+        $this->depends = (bool)$depends;
     }
 
     /**
@@ -184,7 +183,7 @@ class FtpDeployTask extends Task
      */
     public function setRawdatafallback($fallback)
     {
-        $this->rawDataFallback = (bool) $fallback;
+        $this->rawDataFallback = (bool)$fallback;
     }
 
     /**
@@ -259,24 +258,21 @@ class FtpDeployTask extends Task
         if ($this->ssl) {
             $ret = $ftp->setSsl();
             if (@PEAR::isError($ret)) {
-                throw new BuildException('SSL connection not supported by php' . ': ' . $ret->getMessage(
-                    ));
+                throw new BuildException('SSL connection not supported by php' . ': ' . $ret->getMessage());
             } else {
                 $this->log('Use SSL connection', $this->logLevel);
             }
         }
         $ret = $ftp->connect();
         if (@PEAR::isError($ret)) {
-            throw new BuildException('Could not connect to FTP server ' . $this->host . ' on port ' . $this->port . ': ' . $ret->getMessage(
-                ));
+            throw new BuildException('Could not connect to FTP server ' . $this->host . ' on port ' . $this->port . ': ' . $ret->getMessage());
         } else {
             $this->log('Connected to FTP server ' . $this->host . ' on port ' . $this->port, $this->logLevel);
         }
 
         $ret = $ftp->login($this->username, $this->password);
         if (@PEAR::isError($ret)) {
-            throw new BuildException('Could not login to FTP server ' . $this->host . ' on port ' . $this->port . ' with username ' . $this->username . ': ' . $ret->getMessage(
-                ));
+            throw new BuildException('Could not login to FTP server ' . $this->host . ' on port ' . $this->port . ' with username ' . $this->username . ': ' . $ret->getMessage());
         } else {
             $this->log('Logged in to FTP server with username ' . $this->username, $this->logLevel);
         }
@@ -319,7 +315,7 @@ class FtpDeployTask extends Task
 
         foreach ($this->filesets as $fs) {
             // Array for holding directory content informations
-            $remoteFileInformations = array();
+            $remoteFileInformations = [];
 
             $ds = $fs->getDirectoryScanner($project);
             $fromDir = $fs->getDir($project);
@@ -437,14 +433,14 @@ class FtpDeployTask extends Task
     private function parseRawFtpContent($content, $directory = null)
     {
         if (!is_array($content)) {
-            return array();
+            return [];
         }
 
         $this->log('Start parsing FTP_RAW_DATA in ' . $directory);
-        $retval = array();
+        $retval = [];
         foreach ($content as $rawInfo) {
             $rawInfo = explode(' ', $rawInfo);
-            $rawInfo2 = array();
+            $rawInfo2 = [];
             foreach ($rawInfo as $part) {
                 $part = trim($part);
                 if (!empty($part)) {
@@ -465,7 +461,7 @@ class FtpDeployTask extends Task
                 $date['year']
             );
 
-            $retval[] = array(
+            $retval[] = [
                 'name' => $rawInfo2[8],
                 'rights' => substr($rawInfo2[0], 1),
                 'user' => $rawInfo2[2],
@@ -473,9 +469,9 @@ class FtpDeployTask extends Task
                 'date' => $date,
                 'stamp' => $date,
                 'is_dir' => strpos($rawInfo2[0], 'd') === 0,
-                'files_inside' => (int) $rawInfo2[1],
-                'size' => (int) $rawInfo2[4],
-            );
+                'files_inside' => (int)$rawInfo2[1],
+                'size' => (int)$rawInfo2[4],
+            ];
         }
 
         $this->log('Finished parsing FTP_RAW_DATA in ' . $directory);

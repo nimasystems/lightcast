@@ -44,22 +44,6 @@ abstract class Service_Amazon_S3 extends Service_Amazon
     protected $_client = null;
 
     /**
-     * We only instantiate the client once per task call
-     *
-     * @return Services_Amazon_S3
-     */
-    public function getClient()
-    {
-        require_once "Services/Amazon/S3.php";
-
-        if ($this->_client === null) {
-            $this->_client = Services_Amazon_S3::getAccount($this->getKey(), $this->getSecret());
-        }
-
-        return $this->_client;
-    }
-
-    /**
      * @param $bucket
      * @throws BuildException
      */
@@ -69,69 +53,15 @@ abstract class Service_Amazon_S3 extends Service_Amazon
             throw new BuildException('Bucket must be a non-empty string');
         }
 
-        $this->bucket = (string) $bucket;
-    }
-
-    /**
-     * @throws BuildException
-     */
-    public function getBucket()
-    {
-        if (!($bucket = $this->bucket)) {
-            throw new BuildException('Bucket is not set');
-        }
-
-        return $this->bucket;
-    }
-
-    /**
-     * Returns an instance of Services_Amazon_S3_Resource_Object
-     *
-     * @param  mixed                              $object
-     * @return Services_Amazon_S3_Resource_Object
-     */
-    public function getObjectInstance($object)
-    {
-        return $this->getBucketInstance()->getObject($object);
-    }
-
-    /**
-     * Check if the object already exists in the current bucket
-     *
-     * @param  mixed $object
-     * @return bool
-     */
-    public function isObjectAvailable($object)
-    {
-        return (bool) $this->getObjectInstance($object)->load(Services_Amazon_S3_Resource_Object::LOAD_METADATA_ONLY);
-    }
-
-    /**
-     * Returns an instance of Services_Amazon_S3_Resource_Bucket
-     *
-     * @return Services_Amazon_S3_Resource_Bucket
-     */
-    public function getBucketInstance()
-    {
-        return $this->getClient()->getBucket($this->getBucket());
-    }
-
-    /**
-     * Check if the current bucket is available
-     *
-     * @return bool
-     */
-    public function isBucketAvailable()
-    {
-        return (bool) $this->getBucketInstance($this->getBucket())->load();
+        $this->bucket = (string)$bucket;
     }
 
     /**
      * Get the contents of an object (by it's name)
      *
-     * @param  string $object
-     * @throws BuildException
+     * @param string $object
      * @return mixed
+     * @throws BuildException
      */
     public function getObjectContents($object)
     {
@@ -148,6 +78,76 @@ abstract class Service_Amazon_S3 extends Service_Amazon
         $object->load();
 
         return $object->data;
+    }
+
+    /**
+     * Check if the current bucket is available
+     *
+     * @return bool
+     */
+    public function isBucketAvailable()
+    {
+        return (bool)$this->getBucketInstance($this->getBucket())->load();
+    }
+
+    /**
+     * Returns an instance of Services_Amazon_S3_Resource_Bucket
+     *
+     * @return Services_Amazon_S3_Resource_Bucket
+     */
+    public function getBucketInstance()
+    {
+        return $this->getClient()->getBucket($this->getBucket());
+    }
+
+    /**
+     * We only instantiate the client once per task call
+     *
+     * @return Services_Amazon_S3
+     */
+    public function getClient()
+    {
+        require_once "Services/Amazon/S3.php";
+
+        if ($this->_client === null) {
+            $this->_client = Services_Amazon_S3::getAccount($this->getKey(), $this->getSecret());
+        }
+
+        return $this->_client;
+    }
+
+    /**
+     * @throws BuildException
+     */
+    public function getBucket()
+    {
+        if (!($bucket = $this->bucket)) {
+            throw new BuildException('Bucket is not set');
+        }
+
+        return $this->bucket;
+    }
+
+    /**
+     * Check if the object already exists in the current bucket
+     *
+     * @param mixed $object
+     * @return bool
+     */
+    public function isObjectAvailable($object)
+    {
+        return (bool)$this->getObjectInstance($object)->load(Services_Amazon_S3_Resource_Object::LOAD_METADATA_ONLY);
+    }
+
+    /**
+     * Returns an instance of Services_Amazon_S3_Resource_Object
+     *
+     * @param mixed $object
+     * @return Services_Amazon_S3_Resource_Object
+     */
+    public function getObjectInstance($object)
+    {
+        return $this->getBucketInstance()->getObject($object);
     }
 
     /**

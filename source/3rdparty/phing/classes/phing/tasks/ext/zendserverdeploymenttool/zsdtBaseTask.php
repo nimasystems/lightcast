@@ -40,11 +40,11 @@ abstract class zsdtBaseTask extends Task
     protected $schema;
 
     /** @var array $path */
-    private $path = array(
+    private $path = [
         'NIX' => '/usr/local/zend/bin/zdpack',
         'WIN' => 'C:\Program Files (x86)\Zend\ZendServer\bin\zdpack',
-        'USR' => ''
-    );
+        'USR' => '',
+    ];
 
     /**
      * The package descriptor file.
@@ -90,7 +90,7 @@ abstract class zsdtBaseTask extends Task
         $command = '';
         if ($this->path['USR'] !== '') {
             $command .= $this->path['USR'];
-        } elseif (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+        } else if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
             $command .= escapeshellarg($this->path['WIN']);
         } else {
             $command .= $this->path['NIX'];

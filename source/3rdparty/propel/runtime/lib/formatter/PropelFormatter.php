@@ -21,10 +21,10 @@ abstract class PropelFormatter
         $dbName,
         $class,
         $peer,
-        $with = array(),
-        $asColumns = array(),
+        $with = [],
+        $asColumns = [],
         $hasLimit = false,
-        $currentObjects = array();
+        $currentObjects = [];
 
     public function __construct(ModelCriteria $criteria = null)
     {
@@ -54,9 +54,15 @@ abstract class PropelFormatter
 
     // DataObject getters & setters
 
-    public function setDbName($dbName)
+    public function setClass($class)
     {
-        $this->dbName = $dbName;
+        $this->class = $class;
+        $this->peer = constant($this->class . '::PEER');
+    }
+
+    public function setWith($withs = [])
+    {
+        $this->with = $withs;
     }
 
     public function getDbName()
@@ -64,10 +70,9 @@ abstract class PropelFormatter
         return $this->dbName;
     }
 
-    public function setClass($class)
+    public function setDbName($dbName)
     {
-        $this->class = $class;
-        $this->peer = constant($this->class . '::PEER');
+        $this->dbName = $dbName;
     }
 
     public function getClass()
@@ -85,17 +90,12 @@ abstract class PropelFormatter
         return $this->peer;
     }
 
-    public function setWith($withs = array())
-    {
-        $this->with = $withs;
-    }
-
     public function getWith()
     {
         return $this->with;
     }
 
-    public function setAsColumns($asColumns = array())
+    public function setAsColumns($asColumns = [])
     {
         $this->asColumns = $asColumns;
     }
@@ -145,15 +145,22 @@ abstract class PropelFormatter
         return Propel::getDatabaseMap($this->dbName)->getTableByPhpName($this->class);
     }
 
-    protected function isWithOneToMany()
+    /**
+     * Gets a Propel object hydrated from a selection of columns in statement row
+     *
+     * @param array $row associative array indexed by column number,
+     *                   as returned by PDOStatement::fetch(PDO::FETCH_NUM)
+     * @param string $class The classname of the object to create
+     * @param int $col The start column for the hydration (modified)
+     *
+     * @return BaseObject
+     */
+    public function getSingleObjectFromRow($row, $class, &$col = 0)
     {
-        foreach ($this->with as $modelWith) {
-            if ($modelWith->isWithOneToMany()) {
-                return true;
-            }
-        }
+        $obj = $this->getWorkerObject($col, $class);
+        $col = $obj->hydrate($row, $col);
 
-        return false;
+        return $obj;
     }
 
     /**
@@ -163,7 +170,7 @@ abstract class PropelFormatter
      * The column offset in the row is used to index the array of classes
      * As there may be more than one object of the same class in the chain
      *
-     * @param int    $col   Offset of the object in the list of objects to hydrate
+     * @param int $col Offset of the object in the list of objects to hydrate
      * @param string $class Propel model object class
      *
      * @return BaseObject
@@ -181,21 +188,14 @@ abstract class PropelFormatter
         return $this->currentObjects[$key];
     }
 
-    /**
-     * Gets a Propel object hydrated from a selection of columns in statement row
-     *
-     * @param array $row associative array indexed by column number,
-     *                   as returned by PDOStatement::fetch(PDO::FETCH_NUM)
-     * @param string $class The classname of the object to create
-     * @param int    $col   The start column for the hydration (modified)
-     *
-     * @return BaseObject
-     */
-    public function getSingleObjectFromRow($row, $class, &$col = 0)
+    protected function isWithOneToMany()
     {
-        $obj = $this->getWorkerObject($col, $class);
-        $col = $obj->hydrate($row, $col);
+        foreach ($this->with as $modelWith) {
+            if ($modelWith->isWithOneToMany()) {
+                return true;
+            }
+        }
 
-        return $obj;
+        return false;
     }
 }

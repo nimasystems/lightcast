@@ -34,20 +34,12 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
      *
      * @var        array Fileset[]
      */
-    protected $schemaFilesets = array();
+    protected $schemaFilesets = [];
 
     /**
      * Data models that we collect. One from each XML schema file.
      */
-    protected $dataModels = array();
-
-    /**
-     * Have datamodels been initialized?
-     *
-     * @var        boolean
-     */
-    private $dataModelsLoaded = false;
-
+    protected $dataModels = [];
     /**
      * Map of data model name to database name.
      * Should probably stick to the convention
@@ -55,7 +47,6 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
      * in a lot of cases they won't be.
      */
     protected $dataModelDbMap;
-
     /**
      * The target database(s) we are generating SQL
      * for. Right now we can only deal with a single
@@ -63,57 +54,54 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
      * soon.
      */
     protected $targetDatabase;
-
     /**
      * DB encoding to use for XmlToAppData object
      */
     protected $dbEncoding = 'iso-8859-1';
-
     /**
      * Target PHP package to place the generated files in.
      */
     protected $targetPackage;
-
     /**
      * @var        Mapper
      */
     protected $mapperElement;
-
     /**
      * Destination directory for results of template scripts.
      *
      * @var        PhingFile
      */
     protected $outputDirectory;
-
     /**
      * Whether to package the datamodels or not
      *
      * @var        PhingFile
      */
     protected $packageObjectModel;
-
     /**
      * Whether to perform validation (XSD) on the schema.xml file(s).
      *
      * @var        boolean
      */
     protected $validate;
-
     /**
      * The XSD schema file to use for validation.
      *
      * @var        PhingFile
      */
     protected $xsdFile;
-
     /**
      * XSL file to use to normalize (or otherwise transform) schema before validation.
      *
      * @var        PhingFile
      */
     protected $xslFile;
-
+    /**
+     * Have datamodels been initialized?
+     *
+     * @var        boolean
+     */
+    private $dataModelsLoaded = false;
     /**
      * Optional database connection url.
      *
@@ -165,264 +153,6 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
     }
 
     /**
-     * Return the data model to database name map.
-     *
-     * @return Hashtable data model name to database name map.
-     */
-    public function getDataModelDbMap()
-    {
-        if (!$this->dataModelsLoaded) {
-            $this->loadDataModels();
-        }
-
-        return $this->dataModelDbMap;
-    }
-
-    /**
-     * Adds a set of xml schema files (nested fileset attribute).
-     *
-     * @param      set a Set of xml schema files
-     */
-    public function addSchemaFileset(Fileset $set)
-    {
-        $this->schemaFilesets[] = $set;
-    }
-
-    /**
-     * Get the current target database.
-     *
-     * @return String target database(s)
-     */
-    public function getTargetDatabase()
-    {
-        return $this->targetDatabase;
-    }
-
-    /**
-     * Set the current target database. (e.g. mysql, oracle, ..)
-     *
-     * @param   $v target database(s)
-     */
-    public function setTargetDatabase($v)
-    {
-        $this->targetDatabase = $v;
-    }
-
-    /**
-     * Get the current target package.
-     *
-     * @return string target PHP package.
-     */
-    public function getTargetPackage()
-    {
-        return $this->targetPackage;
-    }
-
-    /**
-     * Set the current target package. This is where generated PHP classes will
-     * live.
-     *
-     * @param string $v target PHP package.
-     */
-    public function setTargetPackage($v)
-    {
-        $this->targetPackage = $v;
-    }
-
-    /**
-     * Set the packageObjectModel switch on/off
-     *
-     * @param boolean $v The build.property packageObjectModel
-     */
-    public function setPackageObjectModel($v)
-    {
-        $this->packageObjectModel = (boolean) $v;
-    }
-
-    /**
-     * Set whether to perform validation on the datamodel schema.xml file(s).
-     *
-     * @param boolean $v
-     */
-    public function setValidate($v)
-    {
-        $this->validate = (boolean) $v;
-    }
-
-    /**
-     * Set the XSD schema to use for validation of any datamodel schema.xml file(s).
-     *
-     * @param   $v PhingFile
-     */
-    public function setXsd(PhingFile $v)
-    {
-        $this->xsdFile = $v;
-    }
-
-    /**
-     * Set the normalization XSLT to use to transform datamodel schema.xml file(s) before validation and parsing.
-     *
-     * @param   $v PhingFile
-     */
-    public function setXsl(PhingFile $v)
-    {
-        $this->xslFile = $v;
-    }
-
-    /**
-     * [REQUIRED] Set the output directory. It will be
-     * created if it doesn't exist.
-     *
-     * @param PhingFile $outputDirectory
-     *
-     * @return void
-     * @throws BuildException
-     */
-    public function setOutputDirectory(PhingFile $outputDirectory)
-    {
-        try {
-            if (!$outputDirectory->exists()) {
-                $this->log("Output directory does not exist, creating: " . $outputDirectory->getPath(), Project::MSG_VERBOSE);
-                if (!$outputDirectory->mkdirs()) {
-                    throw new IOException("Unable to create Output directory: " . $outputDirectory->getAbsolutePath());
-                }
-            }
-            $this->outputDirectory = $outputDirectory->getCanonicalPath();
-        } catch (IOException $ioe) {
-            throw new BuildException($ioe);
-        }
-    }
-
-    /**
-     * Set the current target database encoding.
-     *
-     * @param   $v target database encoding
-     */
-    public function setDbEncoding($v)
-    {
-        $this->dbEncoding = $v;
-    }
-
-    /**
-     * Set the DB connection url.
-     *
-     * @param string $url connection url
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Set the user name for the DB connection.
-     *
-     * @param string $userId database user
-     */
-    public function setUserid($userId)
-    {
-        $this->userId = $userId;
-    }
-
-    /**
-     * Set the password for the DB connection.
-     *
-     * @param string $password database password
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    /**
-     * Get the output directory.
-     *
-     * @return string
-     */
-    public function getOutputDirectory()
-    {
-        return $this->outputDirectory;
-    }
-
-    /**
-     * Nested creator, creates one Mapper for this task.
-     *
-     * @return Mapper         The created Mapper type object.
-     * @throws BuildException
-     */
-    public function createMapper()
-    {
-        if ($this->mapperElement !== null) {
-            throw new BuildException("Cannot define more than one mapper.", $this->location);
-        }
-        $this->mapperElement = new Mapper($this->project);
-
-        return $this->mapperElement;
-    }
-
-    /**
-     * Maps the passed in name to a new filename & returns resolved File object.
-     *
-     * @param string $from
-     *
-     * @return PhingFile      Resolved File object.
-     * @throws BuildException - if no Mapper element se
-     *                          - if unable to map new filename.
-     */
-    protected function getMappedFile($from)
-    {
-        if (!$this->mapperElement) {
-            throw new BuildException("This task requires you to use a <mapper/> element to describe how filename changes should be handled.");
-        }
-
-        $mapper = $this->mapperElement->getImplementation();
-        $mapped = $mapper->main($from);
-        if (!$mapped) {
-            throw new BuildException("Cannot create new filename based on: " . $from);
-        }
-        // Mappers always return arrays since it's possible for some mappers to map to multiple names.
-        $outFilename = array_shift($mapped);
-        $outFile = new PhingFile($this->getOutputDirectory(), $outFilename);
-
-        return $outFile;
-    }
-
-    /**
-     * Gets the PDO connection, if URL specified.
-     *
-     * @return PDO Connection to use (for quoting, Platform class, etc.) or NULL if no connection params were specified.
-     */
-    public function getConnection()
-    {
-        if ($this->conn === false) {
-            $this->conn = null;
-            if ($this->url) {
-                $buf = "Using database settings:\n"
-                    . " URL: " . $this->url . "\n"
-                    . ($this->userId ? " user: " . $this->userId . "\n" : "")
-                . ($this->password ? " password: " . $this->password . "\n" : "");
-
-                $this->log($buf, Project::MSG_VERBOSE);
-
-                // Set user + password to null if they are empty strings
-                if (!$this->userId) {
-                    $this->userId = null;
-                }
-                if (!$this->password) {
-                    $this->password = null;
-                }
-                try {
-                    $this->conn = new PDO($this->url, $this->userId, $this->password);
-                    $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                } catch (PDOException $x) {
-                    $this->log("Unable to create a PDO connection: " . $x->getMessage(), Project::MSG_WARN);
-                }
-            }
-        }
-
-        return $this->conn;
-    }
-
-    /**
      * Gets all matching XML schema files and loads them into data models for class.
      *
      * @return void
@@ -431,7 +161,7 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
      */
     protected function loadDataModels()
     {
-        $ads = array();
+        $ads = [];
         $totalNbTables = 0;
         $this->log('Loading XML schema files...');
         // Get all matched files from schemaFilesets
@@ -503,7 +233,7 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
 
         if (count($ads) > 1 && $this->packageObjectModel) {
             $ad = $this->joinDataModels($ads);
-            $this->dataModels = array($ad);
+            $this->dataModels = [$ad];
         } else {
             $this->dataModels = $ads;
         }
@@ -525,6 +255,21 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
     }
 
     /**
+     * Gets the GeneratorConfig object for this task or creates it on-demand.
+     *
+     * @return GeneratorConfig
+     */
+    protected function getGeneratorConfig()
+    {
+        if ($this->generatorConfig === null) {
+            $this->generatorConfig = new GeneratorConfig();
+            $this->generatorConfig->setBuildProperties($this->getProject()->getProperties());
+        }
+
+        return $this->generatorConfig;
+    }
+
+    /**
      * Replaces all external-schema nodes with the content of xml schema that node refers to
      *
      * Recurses to include any external schema referenced from in an included xml (and deeper)
@@ -532,7 +277,7 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
      * users don't have those and adding some more informative exceptions would be better
      *
      * @param DomDocument $dom
-     * @param string      $srcDir
+     * @param string $srcDir
      *
      * @return void (objects, DomDocument, are references by default in PHP 5, so returning it is useless)
      **/
@@ -565,6 +310,27 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
     }
 
     /**
+     * Get the current target package.
+     *
+     * @return string target PHP package.
+     */
+    public function getTargetPackage()
+    {
+        return $this->targetPackage;
+    }
+
+    /**
+     * Set the current target package. This is where generated PHP classes will
+     * live.
+     *
+     * @param string $v target PHP package.
+     */
+    public function setTargetPackage($v)
+    {
+        $this->targetPackage = $v;
+    }
+
+    /**
      * Joins the datamodels collected from schema.xml files into one big datamodel.
      *  We need to join the datamodels in this case to allow for foreign keys
      * that point to tables in different packages.
@@ -582,18 +348,240 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
     }
 
     /**
-     * Gets the GeneratorConfig object for this task or creates it on-demand.
+     * Return the data model to database name map.
      *
-     * @return GeneratorConfig
+     * @return Hashtable data model name to database name map.
      */
-    protected function getGeneratorConfig()
+    public function getDataModelDbMap()
     {
-        if ($this->generatorConfig === null) {
-            $this->generatorConfig = new GeneratorConfig();
-            $this->generatorConfig->setBuildProperties($this->getProject()->getProperties());
+        if (!$this->dataModelsLoaded) {
+            $this->loadDataModels();
         }
 
-        return $this->generatorConfig;
+        return $this->dataModelDbMap;
+    }
+
+    /**
+     * Adds a set of xml schema files (nested fileset attribute).
+     *
+     * @param set a Set of xml schema files
+     */
+    public function addSchemaFileset(Fileset $set)
+    {
+        $this->schemaFilesets[] = $set;
+    }
+
+    /**
+     * Get the current target database.
+     *
+     * @return String target database(s)
+     */
+    public function getTargetDatabase()
+    {
+        return $this->targetDatabase;
+    }
+
+    /**
+     * Set the current target database. (e.g. mysql, oracle, ..)
+     *
+     * @param   $v target database(s)
+     */
+    public function setTargetDatabase($v)
+    {
+        $this->targetDatabase = $v;
+    }
+
+    /**
+     * Set the packageObjectModel switch on/off
+     *
+     * @param boolean $v The build.property packageObjectModel
+     */
+    public function setPackageObjectModel($v)
+    {
+        $this->packageObjectModel = (boolean)$v;
+    }
+
+    /**
+     * Set whether to perform validation on the datamodel schema.xml file(s).
+     *
+     * @param boolean $v
+     */
+    public function setValidate($v)
+    {
+        $this->validate = (boolean)$v;
+    }
+
+    /**
+     * Set the XSD schema to use for validation of any datamodel schema.xml file(s).
+     *
+     * @param   $v PhingFile
+     */
+    public function setXsd(PhingFile $v)
+    {
+        $this->xsdFile = $v;
+    }
+
+    /**
+     * Set the normalization XSLT to use to transform datamodel schema.xml file(s) before validation and parsing.
+     *
+     * @param   $v PhingFile
+     */
+    public function setXsl(PhingFile $v)
+    {
+        $this->xslFile = $v;
+    }
+
+    /**
+     * Set the current target database encoding.
+     *
+     * @param   $v target database encoding
+     */
+    public function setDbEncoding($v)
+    {
+        $this->dbEncoding = $v;
+    }
+
+    /**
+     * Set the DB connection url.
+     *
+     * @param string $url connection url
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+    }
+
+    /**
+     * Set the user name for the DB connection.
+     *
+     * @param string $userId database user
+     */
+    public function setUserid($userId)
+    {
+        $this->userId = $userId;
+    }
+
+    /**
+     * Set the password for the DB connection.
+     *
+     * @param string $password database password
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
+    }
+
+    /**
+     * Nested creator, creates one Mapper for this task.
+     *
+     * @return Mapper         The created Mapper type object.
+     * @throws BuildException
+     */
+    public function createMapper()
+    {
+        if ($this->mapperElement !== null) {
+            throw new BuildException("Cannot define more than one mapper.", $this->location);
+        }
+        $this->mapperElement = new Mapper($this->project);
+
+        return $this->mapperElement;
+    }
+
+    /**
+     * Gets the PDO connection, if URL specified.
+     *
+     * @return PDO Connection to use (for quoting, Platform class, etc.) or NULL if no connection params were specified.
+     */
+    public function getConnection()
+    {
+        if ($this->conn === false) {
+            $this->conn = null;
+            if ($this->url) {
+                $buf = "Using database settings:\n"
+                    . " URL: " . $this->url . "\n"
+                    . ($this->userId ? " user: " . $this->userId . "\n" : "")
+                    . ($this->password ? " password: " . $this->password . "\n" : "");
+
+                $this->log($buf, Project::MSG_VERBOSE);
+
+                // Set user + password to null if they are empty strings
+                if (!$this->userId) {
+                    $this->userId = null;
+                }
+                if (!$this->password) {
+                    $this->password = null;
+                }
+                try {
+                    $this->conn = new PDO($this->url, $this->userId, $this->password);
+                    $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                } catch (PDOException $x) {
+                    $this->log("Unable to create a PDO connection: " . $x->getMessage(), Project::MSG_WARN);
+                }
+            }
+        }
+
+        return $this->conn;
+    }
+
+    /**
+     * Maps the passed in name to a new filename & returns resolved File object.
+     *
+     * @param string $from
+     *
+     * @return PhingFile      Resolved File object.
+     * @throws BuildException - if no Mapper element se
+     *                          - if unable to map new filename.
+     */
+    protected function getMappedFile($from)
+    {
+        if (!$this->mapperElement) {
+            throw new BuildException("This task requires you to use a <mapper/> element to describe how filename changes should be handled.");
+        }
+
+        $mapper = $this->mapperElement->getImplementation();
+        $mapped = $mapper->main($from);
+        if (!$mapped) {
+            throw new BuildException("Cannot create new filename based on: " . $from);
+        }
+        // Mappers always return arrays since it's possible for some mappers to map to multiple names.
+        $outFilename = array_shift($mapped);
+        $outFile = new PhingFile($this->getOutputDirectory(), $outFilename);
+
+        return $outFile;
+    }
+
+    /**
+     * Get the output directory.
+     *
+     * @return string
+     */
+    public function getOutputDirectory()
+    {
+        return $this->outputDirectory;
+    }
+
+    /**
+     * [REQUIRED] Set the output directory. It will be
+     * created if it doesn't exist.
+     *
+     * @param PhingFile $outputDirectory
+     *
+     * @return void
+     * @throws BuildException
+     */
+    public function setOutputDirectory(PhingFile $outputDirectory)
+    {
+        try {
+            if (!$outputDirectory->exists()) {
+                $this->log("Output directory does not exist, creating: " . $outputDirectory->getPath(), Project::MSG_VERBOSE);
+                if (!$outputDirectory->mkdirs()) {
+                    throw new IOException("Unable to create Output directory: " . $outputDirectory->getAbsolutePath());
+                }
+            }
+            $this->outputDirectory = $outputDirectory->getCanonicalPath();
+        } catch (IOException $ioe) {
+            throw new BuildException($ioe);
+        }
     }
 
     /**

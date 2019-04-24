@@ -69,7 +69,7 @@ class WaitForTask extends ConditionBase
      */
     public function setMaxWait($maxWait)
     {
-        $this->maxWait = (int) $maxWait;
+        $this->maxWait = (int)$maxWait;
     }
 
     /**
@@ -82,12 +82,58 @@ class WaitForTask extends ConditionBase
     }
 
     /**
+     * Convert the unit to a multipler.
+     * @param string $unit
+     * @return int
+     * @throws BuildException
+     */
+    protected function _convertUnit($unit)
+    {
+        switch ($unit) {
+            case "week":
+                {
+                    return self::ONE_WEEK;
+                }
+
+            case "day":
+                {
+                    return self::ONE_DAY;
+                }
+
+            case "hour":
+                {
+                    return self::ONE_HOUR;
+                }
+
+            case "minute":
+                {
+                    return self::ONE_MINUTE;
+                }
+
+            case "second":
+                {
+                    return self::ONE_SECOND;
+                }
+
+            case "millisecond":
+                {
+                    return self::ONE_MILLISECOND;
+                }
+
+            default:
+                {
+                    throw new BuildException("Illegal unit '$unit'");
+                }
+        }
+    }
+
+    /**
      * Set the time between each check
      * @param int $checkEvery
      */
     public function setCheckEvery($checkEvery)
     {
-        $this->checkEvery = (int) $checkEvery;
+        $this->checkEvery = (int)$checkEvery;
     }
 
     /**
@@ -108,52 +154,6 @@ class WaitForTask extends ConditionBase
     public function setTimeoutProperty($timeoutProperty)
     {
         $this->timeoutProperty = $timeoutProperty;
-    }
-
-    /**
-     * Convert the unit to a multipler.
-     * @param string $unit
-     * @throws BuildException
-     * @return int
-     */
-    protected function _convertUnit($unit)
-    {
-        switch ($unit) {
-            case "week":
-            {
-                return self::ONE_WEEK;
-            }
-
-            case "day":
-            {
-                return self::ONE_DAY;
-            }
-
-            case "hour":
-            {
-                return self::ONE_HOUR;
-            }
-
-            case "minute":
-            {
-                return self::ONE_MINUTE;
-            }
-
-            case "second":
-            {
-                return self::ONE_SECOND;
-            }
-
-            case "millisecond":
-            {
-                return self::ONE_MILLISECOND;
-            }
-
-            default:
-                {
-                throw new BuildException("Illegal unit '$unit'");
-                }
-        }
     }
 
     /**

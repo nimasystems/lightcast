@@ -20,11 +20,11 @@ class DelegateBehavior extends Behavior
     const MANY_TO_ONE = 2;
 
     // default parameters value
-    protected $parameters = array(
-        'to' => ''
-    );
+    protected $parameters = [
+        'to' => '',
+    ];
 
-    protected $delegates = array();
+    protected $delegates = [];
 
     /**
      * Lists the delegates and checks that the behavior can use them,
@@ -63,6 +63,11 @@ class DelegateBehavior extends Behavior
         }
     }
 
+    protected function getDelegateTable($delegateTableName)
+    {
+        return $this->getTable()->getDatabase()->getTable($delegateTableName);
+    }
+
     protected function relateDelegateToMainTable($delegateTable, $mainTable)
     {
         $pks = $mainTable->getPrimaryKey();
@@ -85,11 +90,6 @@ class DelegateBehavior extends Behavior
             $fk->addReference($column->getName(), $column->getName());
         }
         $delegateTable->addForeignKey($fk);
-    }
-
-    protected function getDelegateTable($delegateTableName)
-    {
-        return $this->getTable()->getDatabase()->getTable($delegateTableName);
     }
 
     public function objectCall($builder)

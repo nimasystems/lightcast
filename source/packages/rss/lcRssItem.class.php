@@ -43,18 +43,9 @@ class lcRssItem extends lcObj
         $this->setDescription($descr);
     }
 
-    public function setTitle($title)
+    public function setDescription($descr)
     {
-        $this->title = $title;
-    }
-
-    public function setEnclosure($url, $length = null, $type = null)
-    {
-        $this->enclosure = array(
-            'url' => $url,
-            'length' => $length,
-            'type' => $type
-        );
+        $this->descr = $descr;
     }
 
     public function getEnclosure()
@@ -62,25 +53,13 @@ class lcRssItem extends lcObj
         return $this->enclosure;
     }
 
-    public function setLink($link)
+    public function setEnclosure($url, $length = null, $type = null)
     {
-        $this->link = $link;
-    }
-
-    public function setDescription($descr)
-    {
-        $this->descr = $descr;
-    }
-
-    public function setGUID($guid, $permlink = false)
-    {
-        $this->guid = $guid;
-        $this->permlink = $permlink;
-    }
-
-    public function setPublishDate($pdate)
-    {
-        $this->publishdate = $pdate;
+        $this->enclosure = [
+            'url' => $url,
+            'length' => $length,
+            'type' => $type,
+        ];
     }
 
     public function getTitle()
@@ -88,9 +67,9 @@ class lcRssItem extends lcObj
         return $this->fFixTags($this->title);
     }
 
-    public function getLink()
+    public function setTitle($title)
     {
-        return $this->link;
+        $this->title = $title;
     }
 
     private function fFixTags($content)
@@ -98,6 +77,16 @@ class lcRssItem extends lcObj
         $content = str_replace('<', '&lt;', $content);
         $content = str_replace('>', '&gt;', $content);
         return $content;
+    }
+
+    public function getLink()
+    {
+        return $this->link;
+    }
+
+    public function setLink($link)
+    {
+        $this->link = $link;
     }
 
     public function getDescription()
@@ -114,6 +103,12 @@ class lcRssItem extends lcObj
         }
     }
 
+    public function setGUID($guid, $permlink = false)
+    {
+        $this->guid = $guid;
+        $this->permlink = $permlink;
+    }
+
     public function isGuidPermanent()
     {
         return $this->permlink;
@@ -122,5 +117,10 @@ class lcRssItem extends lcObj
     public function getPublishDate()
     {
         return $this->publishdate;
+    }
+
+    public function setPublishDate($pdate)
+    {
+        $this->publishdate = $pdate;
     }
 }

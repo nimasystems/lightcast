@@ -32,12 +32,23 @@ class SvnCopyTask extends SvnBaseTask
     private $message = "";
 
     /**
-     * Sets the message
-     * @param $message
+     * The main entry point
+     *
+     * @throws BuildException
      */
-    public function setMessage($message)
+    public function main()
     {
-        $this->message = $message;
+        $this->setup('copy');
+
+        $this->log("Copying SVN repository from '" . $this->getRepositoryUrl() . "' to '" . $this->getToDir() . "'");
+
+        $options = [];
+
+        if (strlen($this->getMessage()) > 0) {
+            $options['message'] = $this->getMessage();
+        }
+
+        $this->run([$this->getToDir()], $options);
     }
 
     /**
@@ -49,22 +60,11 @@ class SvnCopyTask extends SvnBaseTask
     }
 
     /**
-     * The main entry point
-     *
-     * @throws BuildException
+     * Sets the message
+     * @param $message
      */
-    public function main()
+    public function setMessage($message)
     {
-        $this->setup('copy');
-
-        $this->log("Copying SVN repository from '" . $this->getRepositoryUrl() . "' to '" . $this->getToDir() . "'");
-
-        $options = array();
-
-        if (strlen($this->getMessage()) > 0) {
-            $options['message'] = $this->getMessage();
-        }
-
-        $this->run(array($this->getToDir()), $options);
+        $this->message = $message;
     }
 }

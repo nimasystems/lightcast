@@ -143,20 +143,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->loaded_components = $loaded_components;
     }
 
-    protected function preparePluginSystemObject(lcSysObj $object)
-    {
-        $object->setPluginManager($this->getPluginManager());
-        $object->setEventDispatcher($this->getEventDispatcher());
-        $object->setConfiguration($this->getConfiguration());
-        $object->setClassAutoloader($this->getClassAutoloader());
-        $object->setContextName($this->getContextName());
-        $object->setContextType($this->getContextType());
-        $object->setLogger($this->getLogger());
-        $object->setI18n($this->getI18n());
-        $object->setParentPlugin($this);
-        $object->setTranslationContext(lcSysObj::CONTEXT_PLUGIN, $this->getPluginName());
-    }
-
     protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
     {
         if (!$this->app_context || !$this->app_context->getIsInitialized()) {
@@ -238,7 +224,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $debug = [
             'name' => $this->controller_name,
             'configuration' => ($this->plugin_configuration && $this->plugin_configuration instanceof iDebuggable ?
-                $this->plugin_configuration->getDebugInfo() : null)
+                $this->plugin_configuration->getDebugInfo() : null),
         ];
 
         return $debug;
@@ -309,32 +295,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->controller_filename = $controller_filename;
     }
 
-    public function getContextType()
-    {
-        return $this->context_type;
-    }
-
-    public function setContextType($context_type)
-    {
-        $this->context_type = $context_type;
-    }
-
-    public function getContextName()
-    {
-        return $this->context_name;
-    }
-
-    public function setContextName($context_name)
-    {
-        $this->context_name = $context_name;
-    }
-
     public function getName()
-    {
-        return $this->controller_name;
-    }
-
-    public function getPluginName()
     {
         return $this->controller_name;
     }
@@ -349,27 +310,15 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $this->plugin_configuration->getPluginDir();
     }
 
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-
     public function getComponentsDir()
     {
         return $this->getPluginDir() . DS . self::COMPONENTS_PATH;
     }
 
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-
     public function getModelsDir()
     {
         return $this->getPluginDir() . DS . self::MODELS_PATH;
     }
-
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
 
     public function getModulesDir()
     {
@@ -389,6 +338,67 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     public function getWebPath()
     {
         return $this->plugin_configuration->getWebPath();
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    public function setPluginManager(lcPluginManager $plugin_manager = null)
+    {
+        $this->plugin_manager = $plugin_manager;
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    protected function preparePluginSystemObject(lcSysObj $object)
+    {
+        $object->setPluginManager($this->getPluginManager());
+        $object->setEventDispatcher($this->getEventDispatcher());
+        $object->setConfiguration($this->getConfiguration());
+        $object->setClassAutoloader($this->getClassAutoloader());
+        $object->setContextName($this->getContextName());
+        $object->setContextType($this->getContextType());
+        $object->setLogger($this->getLogger());
+        $object->setI18n($this->getI18n());
+        $object->setParentPlugin($this);
+        $object->setTranslationContext(lcSysObj::CONTEXT_PLUGIN, $this->getPluginName());
+    }
+
+    /*
+     * @deprecated The method is used by LC 1.4 projects
+    */
+
+    protected function getPluginManager()
+    {
+        return $this->plugin_manager;
+    }
+
+    public function getContextName()
+    {
+        return $this->context_name;
+    }
+
+    public function setContextName($context_name)
+    {
+        $this->context_name = $context_name;
+    }
+
+    public function getContextType()
+    {
+        return $this->context_type;
+    }
+
+    public function setContextType($context_type)
+    {
+        $this->context_type = $context_type;
+    }
+
+    public function getPluginName()
+    {
+        return $this->controller_name;
     }
 
     protected function getComponent($component_name)
@@ -413,16 +423,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         }
 
         return $component_instance;
-    }
-
-    protected function getPluginManager()
-    {
-        return $this->plugin_manager;
-    }
-
-    public function setPluginManager(lcPluginManager $plugin_manager = null)
-    {
-        $this->plugin_manager = $plugin_manager;
     }
 
     protected function tryPlugin($plugin_name)

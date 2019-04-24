@@ -99,13 +99,41 @@ class PearPackage2Task extends PearPackageTask
         }
     }
 
+    /**
+     * Main entry point.
+     * @return void
+     * @throws BuildException
+     */
+    public function main()
+    {
+        if ($this->dir === null) {
+            throw new BuildException("You must specify the \"dir\" attribute for PEAR package 2 task.");
+        }
+
+        if ($this->package === null) {
+            throw new BuildException("You must specify the \"name\" attribute for PEAR package 2 task.");
+        }
+
+        $this->pkg = new PEAR_PackageFileManager2();
+
+        $this->setVersion2Options();
+        $this->setOptions();
+
+        $this->pkg->addRelease();
+        $this->pkg->generateContents();
+        $e = $this->pkg->writePackageFile();
+        if (PEAR::isError($e)) {
+            throw new BuildException("Unable to write package file.", new Exception($e->getMessage()));
+        }
+    }
+
     protected function setVersion2Options()
     {
         $this->pkg->setPackage($this->package);
         $this->pkg->setDate(strftime('%Y-%m-%d'));
         $this->pkg->setTime(strftime('%H:%M:%S'));
 
-        $newopts = array();
+        $newopts = [];
         foreach ($this->options as $opt) {
             switch ($opt->getName()) {
                 case 'summary':
@@ -167,7 +195,7 @@ class PearPackage2Task extends PearPackageTask
         }
         $this->options = $newopts;
 
-        $newmaps = array();
+        $newmaps = [];
         foreach ($this->mappings as $map) {
             switch ($map->getName()) {
                 case 'deps':
@@ -189,7 +217,7 @@ class PearPackage2Task extends PearPackageTask
                                 $max,
                                 $rec
                             );
-                        } elseif (!empty($uri)) {
+                        } else if (!empty($uri)) {
                             $this->pkg->addPackageDepWithUri(
                                 $type,
                                 $dep['name'],
@@ -260,34 +288,6 @@ class PearPackage2Task extends PearPackageTask
             }
         }
         $this->mappings = $newmaps;
-    }
-
-    /**
-     * Main entry point.
-     * @throws BuildException
-     * @return void
-     */
-    public function main()
-    {
-        if ($this->dir === null) {
-            throw new BuildException("You must specify the \"dir\" attribute for PEAR package 2 task.");
-        }
-
-        if ($this->package === null) {
-            throw new BuildException("You must specify the \"name\" attribute for PEAR package 2 task.");
-        }
-
-        $this->pkg = new PEAR_PackageFileManager2();
-
-        $this->setVersion2Options();
-        $this->setOptions();
-
-        $this->pkg->addRelease();
-        $this->pkg->generateContents();
-        $e = $this->pkg->writePackageFile();
-        if (PEAR::isError($e)) {
-            throw new BuildException("Unable to write package file.", new Exception($e->getMessage()));
-        }
     }
 
 }

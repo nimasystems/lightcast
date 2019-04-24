@@ -66,18 +66,20 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         $replacement_policy = $holder->getReplacementPolicy();
 
         switch ($replacement_policy) {
-            case lcIterateParamHolder::REPLACE_DEEP: {
-                $template = $this->parseTemplateCycle($holder, $template);
-                $template = $this->parseSubnodesCycle($holder, $template);
+            case lcIterateParamHolder::REPLACE_DEEP:
+                {
+                    $template = $this->parseTemplateCycle($holder, $template);
+                    $template = $this->parseSubnodesCycle($holder, $template);
 
-                break;
-            }
-            case lcIterateParamHolder::REPLACE_LEVEL: {
-                $template = $this->parseSubnodesCycle($holder, $template);
-                $template = $this->parseTemplateCycle($holder, $template);
+                    break;
+                }
+            case lcIterateParamHolder::REPLACE_LEVEL:
+                {
+                    $template = $this->parseSubnodesCycle($holder, $template);
+                    $template = $this->parseTemplateCycle($holder, $template);
 
-                break;
-            }
+                    break;
+                }
         }
 
         // clear template
@@ -235,7 +237,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             } else {
                 return $param_default;
             }
-        } elseif ($param_two) {
+        } else if ($param_two) {
             // check with a custom modifier method
             $internal_value = isset($all_params[$param_one]) ? $all_params[$param_one] : null;
             $value = $this->parsedParamValue($param_one, $param_two, $internal_value);
@@ -259,36 +261,36 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
                 $ret = lcStrings::keyLink($ret);
                 return $ret;
             }
-        } elseif ($category == 'seopath') {
+        } else if ($category == 'seopath') {
             if ($ret) {
                 $ret = preg_replace('/\s{2,}/', '', $ret);
                 $ret = preg_replace('/\s{1,}/', '-', $ret);
                 $ret = str_replace('/', '_', $ret);
                 return $ret;
             }
-        } elseif ($category == 'sp') {
+        } else if ($category == 'sp') {
             if ($ret) {
                 $ret = htmlspecialchars($ret);
                 return $ret;
             }
-        } elseif ($category == '*') {
+        } else if ($category == '*') {
             return '*';
-        } elseif ($category == 'urlencode' || $category == 'encode') {
+        } else if ($category == 'urlencode' || $category == 'encode') {
             return urlencode($name);
-        } elseif ($category == 'urldecode' || $category == 'decode') {
+        } else if ($category == 'urldecode' || $category == 'decode') {
             return urldecode($name);
-        } elseif ($category == 'env') {
+        } else if ($category == 'env') {
             /** @var lcWebRequest $request */
             $request = $this->view->getController()->getRequest();
             $env = $request->getEnv();
             $value = strtoupper($name);
             $ret = isset($env[$value]) ? (string)$env[$value] : null;
             return $ret;
-        } elseif ($category == 'config') {
+        } else if ($category == 'config') {
             $config = $this->configuration;
             $r = $config[$name];
             return $r;
-        } elseif ($category == 'controller') {
+        } else if ($category == 'controller') {
             $ctrl = $this->view->getController();
 
             if ($ctrl && ($ctrl instanceof iKeyValueProvider)) {
@@ -308,7 +310,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
                 'storage' => $controller->getStorage(),
                 'data_storage' => $controller->getDataStorage(),
                 'cache' => $controller->getCache(),
-                'mailer' => $controller->getMailer()
+                'mailer' => $controller->getMailer(),
             ];
 
             $loader = isset($loaders[$category]) ? $loaders[$category] : null;

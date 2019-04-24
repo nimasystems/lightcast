@@ -39,14 +39,6 @@ class lcTagA extends lcHtmlTag
         $this->setTabIndex($tabindex);
     }
 
-    /**
-     * @return lcTagA
-     */
-    public static function create()
-    {
-        return new lcTagA();
-    }
-
     public function setHref($href = null)
     {
         $this->setAttribute('href', $href);
@@ -81,6 +73,14 @@ class lcTagA extends lcHtmlTag
     {
         $this->setAttribute('tabindex', $tabindex);
         return $this;
+    }
+
+    /**
+     * @return lcTagA
+     */
+    public static function create()
+    {
+        return new lcTagA();
     }
 
     public static function getRequiredAttributes()

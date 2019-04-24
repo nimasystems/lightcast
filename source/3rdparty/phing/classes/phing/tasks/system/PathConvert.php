@@ -33,6 +33,12 @@ class PathConvert extends Task
 {
     // Members
     /**
+     * Set if we're running on windows
+     */
+    public $onWindows = false;
+    public $from = null;
+    public $to = null;
+    /**
      * Path to be converted
      */
     private $path = null;
@@ -50,10 +56,6 @@ class PathConvert extends Task
      */
     private $targetWindows = false;
     /**
-     * Set if we're running on windows
-     */
-    public $onWindows = false;
-    /**
      * Set if we should create a new property even if the result is empty
      */
     private $setonempty = true;
@@ -65,7 +67,7 @@ class PathConvert extends Task
      * Path prefix map
      * @var MapEntry[]
      */
-    private $prefixMap = array();
+    private $prefixMap = [];
     /**
      * User override on path sep char
      */
@@ -74,9 +76,6 @@ class PathConvert extends Task
      * User override on directory sep char
      */
     private $dirSep = null;
-
-    public $from = null;
-    public $to = null;
 
     /**
      * constructor
@@ -100,6 +99,24 @@ class PathConvert extends Task
         return $this->path->createPath();
     }
 
+    /**
+     * Has the refid attribute of this element been set?
+     * @return true if refid is valid
+     */
+    public function isReference()
+    {
+        return $this->refid !== null;
+    }
+
+    /**
+     * Creates an exception that indicates that this XML element must not have
+     * child elements if the refid attribute is set.
+     */
+    private function noChildrenAllowed()
+    {
+        return new BuildException("You must not specify nested <path> "
+            . "elements when using the refid attribute.");
+    }
 
     /**
      * Create a nested MAP element
@@ -113,7 +130,6 @@ class PathConvert extends Task
 
         return $entry;
     }
-
 
     /**
      * Set targetos to a platform to one of
@@ -162,7 +178,6 @@ class PathConvert extends Task
         $this->refid = $r;
     }
 
-
     /**
      * Set the default path separator string;
      * defaults to current JVM
@@ -174,7 +189,6 @@ class PathConvert extends Task
         $this->pathSep = $sep;
     }
 
-
     /**
      * Set the default directory separator string
      *
@@ -184,17 +198,6 @@ class PathConvert extends Task
     {
         $this->dirSep = $sep;
     }
-
-
-    /**
-     * Has the refid attribute of this element been set?
-     * @return true if refid is valid
-     */
-    public function isReference()
-    {
-        return $this->refid !== null;
-    }
-
 
     /** Do the execution.
      * @throws BuildException if something is invalid
@@ -214,11 +217,11 @@ class PathConvert extends Task
 
             if ($obj instanceof Path) {
                 $this->path->setRefid($this->refid);
-            } elseif ($obj instanceof FileSet) {
+            } else if ($obj instanceof FileSet) {
                 $fs = $obj;
 
                 $this->path->addFileset($fs);
-            } elseif ($obj instanceof DirSet) {
+            } else if ($obj instanceof DirSet) {
                 $ds = $obj;
 
                 $this->path->addDirset($ds);
@@ -283,39 +286,6 @@ class PathConvert extends Task
     }
 
     /**
-     * Apply the configured map to a path element. The map is used to convert
-     * between Windows drive letters and Unix paths. If no map is configured,
-     * then the input string is returned unchanged.
-     *
-     * @param string $elem The path element to apply the map to
-     * @return String Updated element
-     */
-    private function mapElement(Path $elem)
-    {
-        $size = count($this->prefixMap);
-
-        if ($size !== 0) {
-
-            // Iterate over the map entries and apply each one.
-            // Stop when one of the entries actually changes the element.
-
-            foreach ($this->prefixMap as $entry) {
-                $newElem = $entry->apply((string) $elem);
-
-                // Note I'm using "!=" to see if we got a new object back from
-                // the apply method.
-
-                if ($newElem !== (string) $elem) {
-                    $elem = $newElem;
-                    break;// We applied one, so we're done
-                }
-            }
-        }
-
-        return $elem;
-    }
-
-    /**
      * Validate that all our parameters have been properly initialized.
      *
      * @throws BuildException if something is not setup properly
@@ -360,15 +330,37 @@ class PathConvert extends Task
         $this->dirSep = $dsep;
     }
 
-
     /**
-     * Creates an exception that indicates that this XML element must not have
-     * child elements if the refid attribute is set.
+     * Apply the configured map to a path element. The map is used to convert
+     * between Windows drive letters and Unix paths. If no map is configured,
+     * then the input string is returned unchanged.
+     *
+     * @param string $elem The path element to apply the map to
+     * @return String Updated element
      */
-    private function noChildrenAllowed()
+    private function mapElement(Path $elem)
     {
-        return new BuildException("You must not specify nested <path> "
-            . "elements when using the refid attribute.");
+        $size = count($this->prefixMap);
+
+        if ($size !== 0) {
+
+            // Iterate over the map entries and apply each one.
+            // Stop when one of the entries actually changes the element.
+
+            foreach ($this->prefixMap as $entry) {
+                $newElem = $entry->apply((string)$elem);
+
+                // Note I'm using "!=" to see if we got a new object back from
+                // the apply method.
+
+                if ($newElem !== (string)$elem) {
+                    $elem = $newElem;
+                    break;// We applied one, so we're done
+                }
+            }
+        }
+
+        return $elem;
     }
 
 }

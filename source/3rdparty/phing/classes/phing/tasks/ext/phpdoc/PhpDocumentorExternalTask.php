@@ -49,20 +49,20 @@ class PhpDocumentorExternalTask extends PhpDocumentorTask
     protected $ignoresymlinks = false;
 
     /**
+     * Returns the path to the phpDocumentor executable
+     */
+    public function getProgramPath()
+    {
+        return $this->programPath;
+    }
+
+    /**
      * Sets the path to the phpDocumentor executable
      * @param $programPath
      */
     public function setProgramPath($programPath)
     {
         $this->programPath = $programPath;
-    }
-
-    /**
-     * Returns the path to the phpDocumentor executable
-     */
-    public function getProgramPath()
-    {
-        return $this->programPath;
     }
 
     /**
@@ -111,12 +111,39 @@ class PhpDocumentorExternalTask extends PhpDocumentorTask
     }
 
     /**
+     * Validates that necessary minimum options have been set. Based on
+     * PhpDocumentorTask::validate().
+     */
+    protected function validate()
+    {
+        if (!$this->destdir) {
+            throw new BuildException("You must specify a destdir for phpdoc.",
+                $this->getLocation());
+        }
+        if (!$this->output) {
+            throw new BuildException("You must specify an output format for " .
+                "phpdoc (e.g. HTML:frames:default).", $this->getLocation());
+        }
+        if (empty($this->filesets) && !$this->sourcepath) {
+            throw new BuildException("You have not specified any files to " .
+                "include (<fileset> or sourcepath attribute) for phpdoc.",
+                $this->getLocation());
+        }
+        if ($this->configdir) {
+            $this->log(
+                'Ignoring unsupported configdir-Attribute',
+                Project::MSG_VERBOSE
+            );
+        }
+    }
+
+    /**
      * Constructs an argument string for phpDocumentor
      * @return array
      */
     protected function constructArguments()
     {
-        $aArgs = array();
+        $aArgs = [];
         if ($this->title) {
             $aArgs[] = '--title "' . $this->title . '"';
         }
@@ -146,7 +173,7 @@ class PhpDocumentorExternalTask extends PhpDocumentorTask
         }
 
         // append any files in filesets
-        $filesToParse = array();
+        $filesToParse = [];
         foreach ($this->filesets as $fs) {
             $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
             foreach ($files as $filename) {
@@ -159,7 +186,7 @@ class PhpDocumentorExternalTask extends PhpDocumentorTask
         }
 
         // append any files in filesets
-        $ricFiles = array();
+        $ricFiles = [];
         foreach ($this->projDocFilesets as $fs) {
             $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
             foreach ($files as $filename) {
@@ -228,33 +255,6 @@ class PhpDocumentorExternalTask extends PhpDocumentorTask
      */
     public function init()
     {
-    }
-
-    /**
-     * Validates that necessary minimum options have been set. Based on
-     * PhpDocumentorTask::validate().
-     */
-    protected function validate()
-    {
-        if (!$this->destdir) {
-            throw new BuildException("You must specify a destdir for phpdoc.",
-                $this->getLocation());
-        }
-        if (!$this->output) {
-            throw new BuildException("You must specify an output format for " .
-                "phpdoc (e.g. HTML:frames:default).", $this->getLocation());
-        }
-        if (empty($this->filesets) && !$this->sourcepath) {
-            throw new BuildException("You have not specified any files to " .
-                "include (<fileset> or sourcepath attribute) for phpdoc.",
-                $this->getLocation());
-        }
-        if ($this->configdir) {
-            $this->log(
-                'Ignoring unsupported configdir-Attribute',
-                Project::MSG_VERBOSE
-            );
-        }
     }
 }
 

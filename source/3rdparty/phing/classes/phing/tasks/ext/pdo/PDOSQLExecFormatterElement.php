@@ -100,7 +100,7 @@ class PDOSQLExecFormatterElement
      * Parameters for a custom formatter.
      * @var array Parameter[]
      */
-    private $formatterParams = array();
+    private $formatterParams = [];
 
     /**
      * @var PDOSQLExecTask
@@ -128,24 +128,6 @@ class PDOSQLExecFormatterElement
     }
 
     /**
-     * Gets a configured output writer.
-     * @return Writer
-     */
-    private function getOutputWriter()
-    {
-        if ($this->useFile) {
-            $of = $this->getOutfile();
-            if (!$of) {
-                $of = new PhingFile($this->formatter->getPreferredOutfile());
-            }
-
-            return new FileWriter($of, $this->append);
-        } else {
-            return $this->getDefaultOutput();
-        }
-    }
-
-    /**
      * Configures wrapped formatter class with any attributes on this element.
      */
     public function prepare()
@@ -165,7 +147,7 @@ class PDOSQLExecFormatterElement
             $this->formatter->setShowheaders($this->showheaders);
             $this->formatter->setRowdelim($this->rowdelimiter);
             $this->formatter->setColdelim($this->coldelimiter);
-        } elseif ($this->formatter instanceof XMLPDOResultFormatter) {
+        } else if ($this->formatter instanceof XMLPDOResultFormatter) {
             // set any options that apply to the xml formatter
             $this->formatter->setEncoding($this->encoding);
             $this->formatter->setFormatOutput($this->formatoutput);
@@ -179,8 +161,58 @@ class PDOSQLExecFormatterElement
                         $this->formatter
                     ) . " does not have a $method method.", $this->getLocation());
             }
-            call_user_func(array($this->formatter, $method), $param->getValue());
+            call_user_func([$this->formatter, $method], $param->getValue());
         }
+    }
+
+    /**
+     * Gets a configured output writer.
+     * @return Writer
+     */
+    private function getOutputWriter()
+    {
+        if ($this->useFile) {
+            $of = $this->getOutfile();
+            if (!$of) {
+                $of = new PhingFile($this->formatter->getPreferredOutfile());
+            }
+
+            return new FileWriter($of, $this->append);
+        } else {
+            return $this->getDefaultOutput();
+        }
+    }
+
+    /**
+     * Get the output file.
+     * @return PhingFile
+     */
+    public function getOutfile()
+    {
+        return $this->outfile;
+        /*
+        } else {
+            return new PhingFile($this->formatter->getPreferredOutfile());
+        }*/
+    }
+
+    /**
+     * Sets the output file for the formatter results.
+     * @param PhingFile $outfile
+     * @internal param PhingFile $outFile
+     */
+    public function setOutfile(PhingFile $outfile)
+    {
+        $this->outfile = $outfile;
+    }
+
+    /**
+     * Gets a default output writer for this task.
+     * @return Writer
+     */
+    private function getDefaultOutput()
+    {
+        return new LogWriter($this->parentTask);
     }
 
     /**
@@ -193,7 +225,7 @@ class PDOSQLExecFormatterElement
         $this->type = $type;
         if ($this->type == "xml") {
             $this->formatter = new XMLPDOResultFormatter();
-        } elseif ($this->type == "plain") {
+        } else if ($this->type == "plain") {
             $this->formatter = new PlainPDOResultFormatter();
         } else {
             throw new BuildException("Formatter '" . $this->type . "' not implemented");
@@ -211,15 +243,6 @@ class PDOSQLExecFormatterElement
     }
 
     /**
-     * Set whether to write formatter results to file.
-     * @param boolean $useFile
-     */
-    public function setUseFile($useFile)
-    {
-        $this->useFile = (boolean) $useFile;
-    }
-
-    /**
      * Return whether to write formatter results to file.
      * @return boolean
      */
@@ -229,36 +252,12 @@ class PDOSQLExecFormatterElement
     }
 
     /**
-     * Sets the output file for the formatter results.
-     * @param PhingFile $outfile
-     * @internal param PhingFile $outFile
+     * Set whether to write formatter results to file.
+     * @param boolean $useFile
      */
-    public function setOutfile(PhingFile $outfile)
+    public function setUseFile($useFile)
     {
-        $this->outfile = $outfile;
-    }
-
-    /**
-     * Get the output file.
-     * @return PhingFile
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
-        /*
-        } else {
-            return new PhingFile($this->formatter->getPreferredOutfile());
-        }*/
-    }
-
-    /**
-     * whether output should be appended to or overwrite
-     * an existing file.  Defaults to false.
-     * @param boolean $append
-     */
-    public function setAppend($append)
-    {
-        $this->append = (boolean) $append;
+        $this->useFile = (boolean)$useFile;
     }
 
     /**
@@ -271,13 +270,23 @@ class PDOSQLExecFormatterElement
     }
 
     /**
+     * whether output should be appended to or overwrite
+     * an existing file.  Defaults to false.
+     * @param boolean $append
+     */
+    public function setAppend($append)
+    {
+        $this->append = (boolean)$append;
+    }
+
+    /**
      * Print headers for result sets from the
      * statements; optional, default true.
      * @param boolean $showheaders
      */
     public function setShowheaders($showheaders)
     {
-        $this->showheaders = (boolean) $showheaders;
+        $this->showheaders = (boolean)$showheaders;
     }
 
     /**
@@ -312,16 +321,7 @@ class PDOSQLExecFormatterElement
      */
     public function setFormatOutput($v)
     {
-        $this->formatOutput = (boolean) $v;
-    }
-
-    /**
-     * Gets a default output writer for this task.
-     * @return Writer
-     */
-    private function getDefaultOutput()
-    {
-        return new LogWriter($this->parentTask);
+        $this->formatOutput = (boolean)$v;
     }
 
     /**

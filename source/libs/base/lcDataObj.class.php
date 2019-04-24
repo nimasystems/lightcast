@@ -28,6 +28,13 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
      */
     protected $data;
 
+    public function __construct(array $data = null)
+    {
+        parent::__construct();
+
+        $this->setData($data);
+    }
+
     public function __call($method, array $params = null)
     {
         $sub = substr($method, 0, 3);
@@ -46,7 +53,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
 
                 return true;
 
-            } elseif ($sub == 'get') {
+            } else if ($sub == 'get') {
                 return (isset($this->data[$subp]) ? $this->data[$subp] : null);
             }
 
@@ -55,37 +62,6 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
         parent::__call($method, $params);
 
         return true;
-    }
-
-    public function __construct(array $data = null)
-    {
-        parent::__construct();
-
-        $this->setData($data);
-    }
-
-    /**
-     * @param mixed $data
-     * @param null $value
-     * @return lcDataObj
-     */
-    public function setData($data = null, $value = null)
-    {
-        if (!$data || is_array($data)) {
-            $this->data = $data;
-        } else {
-            $this->data[$data] = $value;
-        }
-        return $this;
-    }
-
-    /**
-     * @param null $key
-     * @return mixed
-     */
-    public function getData($key = null)
-    {
-        return ($key ? (isset($this->data[$key]) ? $this->data[$key] : null) : $this->data);
     }
 
     /**
@@ -160,5 +136,29 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
     function jsonSerialize()
     {
         return (array)$this->getData();
+    }
+
+    /**
+     * @param null $key
+     * @return mixed
+     */
+    public function getData($key = null)
+    {
+        return ($key ? (isset($this->data[$key]) ? $this->data[$key] : null) : $this->data);
+    }
+
+    /**
+     * @param mixed $data
+     * @param null $value
+     * @return lcDataObj
+     */
+    public function setData($data = null, $value = null)
+    {
+        if (!$data || is_array($data)) {
+            $this->data = $data;
+        } else {
+            $this->data[$data] = $value;
+        }
+        return $this;
     }
 }

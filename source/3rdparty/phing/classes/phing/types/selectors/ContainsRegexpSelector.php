@@ -34,24 +34,20 @@ include_once 'phing/types/RegularExpression.php';
  */
 class ContainsRegexpSelector extends BaseExtendSelector
 {
+    const EXPRESSION_KEY = "expression";
+    const CASE_KEY = "casesensitive";
     /**
      * The expression set from XML.
      *
      * @var string $userProvidedExpression
      */
     private $userProvidedExpression;
-
     /** @var Regexp $myExpression */
     private $myExpression;
-
     /** @var bool $casesensitive */
     private $casesensitive = true;
-
     /** @var RegularExpression $myRegExp */
     private $myRegExp;
-
-    const EXPRESSION_KEY = "expression";
-    const CASE_KEY = "casesensitive";
 
     /**
      * @return string
@@ -69,26 +65,6 @@ class ContainsRegexpSelector extends BaseExtendSelector
         $buf .= "}";
 
         return $buf;
-    }
-
-    /**
-     * The expression to match on within a file.
-     *
-     * @param string $exp the string that a file must contain to be selected.
-     */
-    public function setExpression($exp)
-    {
-        $this->userProvidedExpression = $exp;
-    }
-
-    /**
-     * Whether to ignore case in the regex match.
-     *
-     * @param boolean $casesensitive whether to pay attention to case sensitivity
-     */
-    public function setCasesensitive($casesensitive)
-    {
-        $this->casesensitive = $casesensitive;
     }
 
     /**
@@ -120,6 +96,26 @@ class ContainsRegexpSelector extends BaseExtendSelector
     }
 
     /**
+     * The expression to match on within a file.
+     *
+     * @param string $exp the string that a file must contain to be selected.
+     */
+    public function setExpression($exp)
+    {
+        $this->userProvidedExpression = $exp;
+    }
+
+    /**
+     * Whether to ignore case in the regex match.
+     *
+     * @param boolean $casesensitive whether to pay attention to case sensitivity
+     */
+    public function setCasesensitive($casesensitive)
+    {
+        $this->casesensitive = $casesensitive;
+    }
+
+    /**
      * Checks to make sure all settings are kosher. In this case, it
      * means that the pattern attribute has been set.
      *
@@ -139,9 +135,9 @@ class ContainsRegexpSelector extends BaseExtendSelector
      * @param string $filename the name of the file to check
      * @param PhingFile $file PhingFile object the selector can use
      *
+     * @return bool whether the file should be selected or not
      * @throws BuildException
      *
-     * @return bool whether the file should be selected or not
      */
     public function isSelected(PhingFile $basedir, $filename, PhingFile $file)
     {

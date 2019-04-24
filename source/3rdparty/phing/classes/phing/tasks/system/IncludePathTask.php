@@ -80,6 +80,17 @@ class IncludePathTask extends Task
     }
 
     /**
+     * Reference to a classpath to use when loading the files.
+     * @param Reference $r
+     * @throws BuildException
+     */
+    public function setClasspathRef(Reference $r)
+    {
+        $this->classpathId = $r->getRefId();
+        $this->createClasspath()->setRefid($r);
+    }
+
+    /**
      * Create the classpath to be used when searching for component being defined
      */
     public function createClasspath()
@@ -92,23 +103,12 @@ class IncludePathTask extends Task
     }
 
     /**
-     * Reference to a classpath to use when loading the files.
-     * @param Reference $r
-     * @throws BuildException
-     */
-    public function setClasspathRef(Reference $r)
-    {
-        $this->classpathId = $r->getRefId();
-        $this->createClasspath()->setRefid($r);
-    }
-
-    /**
      * @param $mode
      * @throws BuildException
      */
     public function setMode($mode)
     {
-        if (!in_array($mode, array('append', 'prepend', 'replace'))) {
+        if (!in_array($mode, ['append', 'prepend', 'replace'])) {
             throw new BuildException("Illegal mode: needs to be either append, prepend or replace");
         }
 
@@ -143,7 +143,7 @@ class IncludePathTask extends Task
      */
     private function updateIncludePath($new_parts, $curr_parts)
     {
-        $includePath = array();
+        $includePath = [];
         $verb = "";
 
         switch ($this->mode) {

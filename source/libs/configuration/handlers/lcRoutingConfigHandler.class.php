@@ -50,20 +50,20 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
         $routes = [
             'view_item' => [
                 'url' => '/:module/view/:id',
-                'params' => ['action' => 'view']
+                'params' => ['action' => 'view'],
             ],
             'default' => ['url' => '/:module/:action'],
             'module_default' => [
                 'url' => '/:module',
-                'params' => ['action' => 'index']
+                'params' => ['action' => 'index'],
             ],
             'homepage' => [
                 'url' => '/',
                 'params' => [
                     'module' => 'home',
-                    'action' => 'index'
-                ]
-            ]
+                    'action' => 'index',
+                ],
+            ],
         ];
 
         return $routes;

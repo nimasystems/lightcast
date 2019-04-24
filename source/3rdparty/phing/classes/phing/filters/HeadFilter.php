@@ -15,7 +15,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information please see
  * <http://phing.info>.
-*/
+ */
 
 include_once 'phing/filters/BaseParamFilterReader.php';
 include_once 'phing/filters/ChainableReader.php';
@@ -106,25 +106,22 @@ class HeadFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Sets the number of lines to be returned in the filtered stream.
-     *
-     * @param integer $lines the number of lines to be returned in the filtered stream.
+     * Scans the parameters list for the "lines" parameter and uses
+     * it to set the number of lines to be returned in the filtered stream.
      *
      * @return void
      */
-    public function setLines($lines)
+    private function _initialize()
     {
-        $this->_lines = (int) $lines;
-    }
-
-    /**
-     * Returns the number of lines to be returned in the filtered stream.
-     *
-     * @return integer The number of lines to be returned in the filtered stream.
-     */
-    public function getLines()
-    {
-        return $this->_lines;
+        $params = $this->getParameters();
+        if ($params !== null) {
+            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
+                if (self::LINES_KEY == $params[$i]->getName()) {
+                    $this->_lines = (int)$params[$i]->getValue();
+                    break;
+                }
+            }
+        }
     }
 
     /**
@@ -148,21 +145,24 @@ class HeadFilter extends BaseParamFilterReader implements ChainableReader
     }
 
     /**
-     * Scans the parameters list for the "lines" parameter and uses
-     * it to set the number of lines to be returned in the filtered stream.
+     * Returns the number of lines to be returned in the filtered stream.
+     *
+     * @return integer The number of lines to be returned in the filtered stream.
+     */
+    public function getLines()
+    {
+        return $this->_lines;
+    }
+
+    /**
+     * Sets the number of lines to be returned in the filtered stream.
+     *
+     * @param integer $lines the number of lines to be returned in the filtered stream.
      *
      * @return void
      */
-    private function _initialize()
+    public function setLines($lines)
     {
-        $params = $this->getParameters();
-        if ($params !== null) {
-            for ($i = 0, $_i = count($params); $i < $_i; $i++) {
-                if (self::LINES_KEY == $params[$i]->getName()) {
-                    $this->_lines = (int) $params[$i]->getValue();
-                    break;
-                }
-            }
-        }
+        $this->_lines = (int)$lines;
     }
 }

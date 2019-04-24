@@ -2,10 +2,10 @@
 all:
   plugins:
     enabled:
-    - app_security
-    - ajax_rpc
-    - cache
-    - languages
-    - jquery
-    - simple_cms
+      - app_security
+      - ajax_rpc
+      - cache
+      - languages
+      - jquery
+      - simple_cms
 ...

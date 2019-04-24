@@ -38,11 +38,6 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
         $this->setLang($lang);
     }
 
-    public static function create()
-    {
-        return new lcTagMeta();
-    }
-
     public function setContent($value)
     {
         $this->setAttribute('content', $value);
@@ -83,6 +78,11 @@ class lcTagMeta extends lcHtmlBaseTag implements iI18nAttributes
     {
         $this->setAttribute('lang', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagMeta();
     }
 
     public static function getRequiredAttributes()

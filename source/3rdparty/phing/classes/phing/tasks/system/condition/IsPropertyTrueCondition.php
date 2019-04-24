@@ -54,6 +54,6 @@ class IsPropertyTrueCondition extends ConditionBase implements Condition
             throw new BuildException("Property name must be set.");
         }
 
-        return (bool) $this->getProject()->getProperty($this->property);
+        return (bool)$this->getProject()->getProperty($this->property);
     }
 }

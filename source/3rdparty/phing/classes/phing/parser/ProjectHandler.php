@@ -49,9 +49,9 @@ class ProjectHandler extends AbstractHandler
     /**
      * Constructs a new ProjectHandler
      *
-     * @param  object  the ExpatParser object
-     * @param  object  the parent handler that invoked this handler
-     * @param  ProjectConfigurator $configurator the ProjectConfigurator object
+     * @param object  the ExpatParser object
+     * @param object  the parent handler that invoked this handler
+     * @param ProjectConfigurator $configurator the ProjectConfigurator object
      * @param PhingXMLContext $context
      */
     public function __construct($parser, $parentHandler, $configurator, PhingXMLContext $context)
@@ -66,8 +66,8 @@ class ProjectHandler extends AbstractHandler
      * Executes initialization actions required to setup the project. Usually
      * this method handles the attributes of a tag.
      *
-     * @param  string $tag the tag that comes in
-     * @param  array  $attrs attributes the tag carries
+     * @param string $tag the tag that comes in
+     * @param array $attrs attributes the tag carries
      * @throws ExpatParseException if attributes are incomplete or invalid
      */
     public function init($tag, $attrs)
@@ -86,15 +86,15 @@ class ProjectHandler extends AbstractHandler
         foreach ($attrs as $key => $value) {
             if ($key === "default") {
                 $def = $value;
-            } elseif ($key === "name") {
+            } else if ($key === "name") {
                 $name = $value;
-            } elseif ($key === "id") {
+            } else if ($key === "id") {
                 $id = $value;
-            } elseif ($key === "basedir") {
+            } else if ($key === "basedir") {
                 $baseDir = $value;
-            } elseif ($key === "description") {
+            } else if ($key === "description") {
                 $desc = $value;
-            } elseif ($key === "phingVersion") {
+            } else if ($key === "phingVersion") {
                 $ver = $value;
             } else {
                 throw new ExpatParseException("Unexpected attribute '$key'");
@@ -107,7 +107,7 @@ class ProjectHandler extends AbstractHandler
 
         $canonicalName = self::canonicalName($name);
         $this->configurator->setCurrentProjectName($canonicalName);
-        $path = (string) $this->configurator->getBuildFile();
+        $path = (string)$this->configurator->getBuildFile();
         $project->setUserProperty("phing.file.{$canonicalName}", $path);
         $project->setUserProperty("phing.dir.{$canonicalName}", dirname($path));
 
@@ -159,11 +159,20 @@ class ProjectHandler extends AbstractHandler
     }
 
     /**
+     * @param $name
+     * @return mixed
+     */
+    public static function canonicalName($name)
+    {
+        return preg_replace('/\W/', '_', strtolower($name));
+    }
+
+    /**
      * Handles start elements within the <project> tag by creating and
      * calling the required handlers for the detected element.
      *
-     * @param  string  the tag that comes in
-     * @param  array   attributes the tag carries
+     * @param string  the tag that comes in
+     * @param array   attributes the tag carries
      * @throws ExpatParseException if a unxepected element occurs
      */
     public function startElement($name, $attrs)
@@ -176,18 +185,8 @@ class ProjectHandler extends AbstractHandler
             $tf = new TargetHandler($this->parser, $this, $this->configurator, $this->context);
             $tf->init($name, $attrs);
         } else {
-            $tf = new ElementHandler($this->parser, $this, $this->configurator, null, null, $this->context->getImplicitTarget(
-            ));
+            $tf = new ElementHandler($this->parser, $this, $this->configurator, null, null, $this->context->getImplicitTarget());
             $tf->init($name, $attrs);
         }
-    }
-
-    /**
-     * @param $name
-     * @return mixed
-     */
-    public static function canonicalName($name)
-    {
-        return preg_replace('/\W/', '_', strtolower($name));
     }
 }

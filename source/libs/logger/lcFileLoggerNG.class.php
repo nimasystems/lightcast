@@ -583,6 +583,14 @@ class lcFileLoggerNG extends lcLogger
     }
 
     /**
+     * @return string
+     */
+    public function getDefaultChannel()
+    {
+        return $this->default_channel;
+    }
+
+    /**
      * @param string $default_channel
      * @return lcFileLoggerNG
      */
@@ -590,13 +598,5 @@ class lcFileLoggerNG extends lcLogger
     {
         $this->default_channel = $default_channel;
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultChannel()
-    {
-        return $this->default_channel;
     }
 }

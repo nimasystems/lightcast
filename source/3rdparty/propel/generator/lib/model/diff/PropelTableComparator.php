@@ -31,56 +31,11 @@ class PropelTableComparator
         $this->tableDiff = (null === $tableDiff) ? new PropelTableDiff() : $tableDiff;
     }
 
-    public function getTableDiff()
-    {
-        return $this->tableDiff;
-    }
-
-    /**
-     * Set the table the comparator starts from
-     *
-     * @param Table $fromTable
-     */
-    public function setFromTable(Table $fromTable)
-    {
-        $this->tableDiff->setFromTable($fromTable);
-    }
-
-    /**
-     * Get the table the comparator starts from
-     *
-     * @return Table
-     */
-    public function getFromTable()
-    {
-        return $this->tableDiff->getFromTable();
-    }
-
-    /**
-     * Set the table the comparator goes to
-     *
-     * @param Table $toTable
-     */
-    public function setToTable(Table $toTable)
-    {
-        $this->tableDiff->setToTable($toTable);
-    }
-
-    /**
-     * Get the table the comparator goes to
-     *
-     * @return Table
-     */
-    public function getToTable()
-    {
-        return $this->tableDiff->getToTable();
-    }
-
     /**
      * Compute and return the difference between two table objects
      *
-     * @param Table   $fromTable
-     * @param Table   $toTable
+     * @param Table $fromTable
+     * @param Table $toTable
      * @param boolean $caseInsensitive Whether the comparison is case insensitive.
      *                                 False by default.
      *
@@ -98,6 +53,26 @@ class PropelTableComparator
         $differences += $tc->compareForeignKeys($caseInsensitive);
 
         return ($differences > 0) ? $tc->getTableDiff() : false;
+    }
+
+    /**
+     * Set the table the comparator starts from
+     *
+     * @param Table $fromTable
+     */
+    public function setFromTable(Table $fromTable)
+    {
+        $this->tableDiff->setFromTable($fromTable);
+    }
+
+    /**
+     * Set the table the comparator goes to
+     *
+     * @param Table $toTable
+     */
+    public function setToTable(Table $toTable)
+    {
+        $this->tableDiff->setToTable($toTable);
     }
 
     /**
@@ -160,6 +135,26 @@ class PropelTableComparator
         }
 
         return $columnDifferences;
+    }
+
+    /**
+     * Get the table the comparator starts from
+     *
+     * @return Table
+     */
+    public function getFromTable()
+    {
+        return $this->tableDiff->getFromTable();
+    }
+
+    /**
+     * Get the table the comparator goes to
+     *
+     * @return Table
+     */
+    public function getToTable()
+    {
+        return $this->tableDiff->getToTable();
     }
 
     /**
@@ -312,5 +307,10 @@ class PropelTableComparator
         }
 
         return $fkDifferences;
+    }
+
+    public function getTableDiff()
+    {
+        return $this->tableDiff;
     }
 }

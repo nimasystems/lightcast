@@ -25,38 +25,6 @@ class NestedSetBehaviorPeerBuilderModifier
         $this->table = $behavior->getTable();
     }
 
-    protected function getParameter($key)
-    {
-        return $this->behavior->getParameter($key);
-    }
-
-    protected function getColumn($name)
-    {
-        return $this->behavior->getColumnForParameter($name);
-    }
-
-    protected function getColumnAttribute($name)
-    {
-        return strtolower($this->getColumn($name)->getName());
-    }
-
-    protected function getColumnConstant($name)
-    {
-        return $this->getColumn($name)->getName();
-    }
-
-    protected function getColumnPhpName($name)
-    {
-        return $this->getColumn($name)->getPhpName();
-    }
-
-    protected function setBuilder($builder)
-    {
-        $this->builder = $builder;
-        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
-        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
-    }
-
     public function staticAttributes($builder)
     {
         $tableName = $this->table->getName();
@@ -90,6 +58,11 @@ const SCOPE_COL = '" . $tableName . '.' . $this->getColumnConstant('scope_column
         return $script;
     }
 
+    protected function getColumnConstant($name)
+    {
+        return $this->getColumn($name)->getName();
+    }
+
     public function staticMethods($builder)
     {
         $this->setBuilder($builder);
@@ -112,29 +85,16 @@ const SCOPE_COL = '" . $tableName . '.' . $this->getColumnConstant('scope_column
         return $script;
     }
 
-    protected function addSetNegativeScope(&$script)
+    protected function setBuilder($builder)
     {
+        $this->builder = $builder;
+        $this->objectClassname = $builder->getStubObjectBuilder()->getClassname();
+        $this->peerClassname = $builder->getStubPeerBuilder()->getClassname();
+    }
 
-        $peerClassname = $this->peerClassname;
-        $script .= "
-/**
- * Updates all scope values for items that has negative left (<=0) values.
- *
- * @param      mixed     \$scope
- * @param      PropelPDO \$con	Connection to use.
- */
-public static function setNegativeScope(\$scope, PropelPDO \$con = null)
-{
-    //adjust scope value to \$scope
-    \$whereCriteria = new Criteria($peerClassname::DATABASE_NAME);
-    \$whereCriteria->add($peerClassname::LEFT_COL, 0, Criteria::LESS_EQUAL);
-
-    \$valuesCriteria = new Criteria($peerClassname::DATABASE_NAME);
-    \$valuesCriteria->add($peerClassname::SCOPE_COL, \$scope, Criteria::EQUAL);
-
-    {$this->builder->getBasePeerClassname()}::doUpdate(\$whereCriteria, \$valuesCriteria, \$con);
-}
-";
+    protected function getParameter($key)
+    {
+        return $this->behavior->getParameter($key);
     }
 
     protected function addRetrieveRoots(&$script)
@@ -417,7 +377,7 @@ public static function updateLoadedNodes(\$prune = null, PropelPDO \$con = null)
             $script .= "
             \$criteria->add(" . $this->builder->getColumnConstant($col) . ", \$keys, Criteria::IN);";
         } else {
-            $fields = array();
+            $fields = [];
             foreach ($this->table->getPrimaryKey() as $k => $col) {
                 $fields[] = $this->builder->getColumnConstant($col);
             };
@@ -456,13 +416,13 @@ public static function updateLoadedNodes(\$prune = null, PropelPDO \$con = null)
             if ($col->getPhpName() == $this->getColumnPhpName('left_column')) {
                 $script .= "
                     \$object->setLeftValue(\$row[$n]);";
-            } elseif ($col->getPhpName() == $this->getColumnPhpName('right_column')) {
+            } else if ($col->getPhpName() == $this->getColumnPhpName('right_column')) {
                 $script .= "
                     \$object->setRightValue(\$row[$n]);";
-            } elseif ($this->getParameter('use_scope') == 'true' && $col->getPhpName() == $this->getColumnPhpName('scope_column')) {
+            } else if ($this->getParameter('use_scope') == 'true' && $col->getPhpName() == $this->getColumnPhpName('scope_column')) {
                 $script .= "
                     \$object->setScopeValue(\$row[$n]);";
-            } elseif ($col->getPhpName() == $this->getColumnPhpName('level_column')) {
+            } else if ($col->getPhpName() == $this->getColumnPhpName('level_column')) {
                 $script .= "
                     \$object->setLevel(\$row[$n]);
                     \$object->clearNestedSetChildren();";
@@ -477,6 +437,11 @@ public static function updateLoadedNodes(\$prune = null, PropelPDO \$con = null)
     }
 }
 ";
+    }
+
+    protected function getColumnPhpName($name)
+    {
+        return $this->getColumn($name)->getPhpName();
     }
 
     protected function addMakeRoomForLeaf(&$script)
@@ -588,5 +553,40 @@ public static function fixLevels(" . ($useScope ? "\$scope, " : "") . "PropelPDO
     \$stmt->closeCursor();
 }
 ";
+    }
+
+    protected function addSetNegativeScope(&$script)
+    {
+
+        $peerClassname = $this->peerClassname;
+        $script .= "
+/**
+ * Updates all scope values for items that has negative left (<=0) values.
+ *
+ * @param      mixed     \$scope
+ * @param      PropelPDO \$con	Connection to use.
+ */
+public static function setNegativeScope(\$scope, PropelPDO \$con = null)
+{
+    //adjust scope value to \$scope
+    \$whereCriteria = new Criteria($peerClassname::DATABASE_NAME);
+    \$whereCriteria->add($peerClassname::LEFT_COL, 0, Criteria::LESS_EQUAL);
+
+    \$valuesCriteria = new Criteria($peerClassname::DATABASE_NAME);
+    \$valuesCriteria->add($peerClassname::SCOPE_COL, \$scope, Criteria::EQUAL);
+
+    {$this->builder->getBasePeerClassname()}::doUpdate(\$whereCriteria, \$valuesCriteria, \$con);
+}
+";
+    }
+
+    protected function getColumnAttribute($name)
+    {
+        return strtolower($this->getColumn($name)->getName());
+    }
+
+    protected function getColumn($name)
+    {
+        return $this->behavior->getColumnForParameter($name);
     }
 }

@@ -46,12 +46,12 @@ class PhpDocumentorTask extends Task
     /**
      * @var array FileSet[] Filesets for files to parse.
      */
-    protected $filesets = array();
+    protected $filesets = [];
 
     /**
      * @var array FileSet[] Project documentation (README/INSTALL/CHANGELOG) files.
      */
-    protected $projDocFilesets = array();
+    protected $projDocFilesets = [];
 
     /**
      * @var string Package output format.
@@ -146,22 +146,22 @@ class PhpDocumentorTask extends Task
     }
 
     /**
+     * Alias for {@link setDestdir()}.
+     * @param PhingFile $destdir
+     * @see setDestdir()
+     */
+    public function setTarget(PhingFile $destdir)
+    {
+        $this->setDestdir($destdir);
+    }
+
+    /**
      * Set the destination directory for the generated documentation
      * @param PhingFile $destdir
      */
     public function setDestdir(PhingFile $destdir)
     {
         $this->destdir = $destdir;
-    }
-
-    /**
-     * Alias for {@link setDestdir()}.
-     * @see setDestdir()
-     * @param PhingFile $destdir
-     */
-    public function setTarget(PhingFile $destdir)
-    {
-        $this->setDestdir($destdir);
     }
 
     /**
@@ -348,32 +348,6 @@ class PhpDocumentorTask extends Task
     }
 
     /**
-     * Searches include_path for PhpDocumentor install and adjusts include_path appropriately.
-     * @throws BuildException - if unable to find PhpDocumentor on include_path
-     */
-    protected function findPhpDocumentorInstall()
-    {
-        $found = null;
-        foreach (Phing::explodeIncludePath() as $path) {
-            $testpath = $path . DIRECTORY_SEPARATOR . 'PhpDocumentor';
-            if (file_exists($testpath)) {
-                $found = $testpath;
-                break;
-            }
-        }
-        if (!$found) {
-            throw new BuildException("PhpDocumentor task depends on PhpDocumentor being installed and on include_path.", $this->getLocation(
-            ));
-        }
-        // otherwise, adjust the include_path to path to include the PhpDocumentor directory ...
-        set_include_path(get_include_path() . PATH_SEPARATOR . $found);
-        include_once "phpDocumentor/Setup.inc.php";
-        if (!class_exists('phpDocumentor_setup')) {
-            throw new BuildException("Error including PhpDocumentor setup class file.");
-        }
-    }
-
-    /**
      * Main entrypoint of the task
      * Loads the necessary environment for running PhpDoc, then runs PhpDoc
      *
@@ -394,6 +368,31 @@ class PhpDocumentorTask extends Task
     }
 
     /**
+     * Searches include_path for PhpDocumentor install and adjusts include_path appropriately.
+     * @throws BuildException - if unable to find PhpDocumentor on include_path
+     */
+    protected function findPhpDocumentorInstall()
+    {
+        $found = null;
+        foreach (Phing::explodeIncludePath() as $path) {
+            $testpath = $path . DIRECTORY_SEPARATOR . 'PhpDocumentor';
+            if (file_exists($testpath)) {
+                $found = $testpath;
+                break;
+            }
+        }
+        if (!$found) {
+            throw new BuildException("PhpDocumentor task depends on PhpDocumentor being installed and on include_path.", $this->getLocation());
+        }
+        // otherwise, adjust the include_path to path to include the PhpDocumentor directory ...
+        set_include_path(get_include_path() . PATH_SEPARATOR . $found);
+        include_once "phpDocumentor/Setup.inc.php";
+        if (!class_exists('phpDocumentor_setup')) {
+            throw new BuildException("Error including PhpDocumentor setup class file.");
+        }
+    }
+
+    /**
      * Validates that necessary minimum options have been set.
      * @throws BuildException if validation doesn't pass
      */
@@ -403,12 +402,10 @@ class PhpDocumentorTask extends Task
             throw new BuildException("You must specify a destdir for phpdoc.", $this->getLocation());
         }
         if (!$this->output) {
-            throw new BuildException("You must specify an output format for phpdoc (e.g. HTML:frames:default).", $this->getLocation(
-            ));
+            throw new BuildException("You must specify an output format for phpdoc (e.g. HTML:frames:default).", $this->getLocation());
         }
         if (empty($this->filesets)) {
-            throw new BuildException("You have not specified any files to include (<fileset>) for phpdoc.", $this->getLocation(
-            ));
+            throw new BuildException("You have not specified any files to include (<fileset>) for phpdoc.", $this->getLocation());
         }
     }
 
@@ -477,7 +474,7 @@ class PhpDocumentorTask extends Task
         }
 
         // append any files in filesets
-        $filesToParse = array();
+        $filesToParse = [];
         foreach ($this->filesets as $fs) {
             $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
             foreach ($files as $filename) {
@@ -489,7 +486,7 @@ class PhpDocumentorTask extends Task
         $phpdoc->setFilesToParse(implode(",", $filesToParse));
 
         // append any files in filesets
-        $ricFiles = array();
+        $ricFiles = [];
         foreach ($this->projDocFilesets as $fs) {
             $files = $fs->getDirectoryScanner($this->project)->getIncludedFiles();
             foreach ($files as $filename) {

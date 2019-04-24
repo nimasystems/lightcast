@@ -32,15 +32,15 @@ class lcTagOl extends lcHtmlTag
         $this->setContent($content);
     }
 
-    public static function create()
-    {
-        return new lcTagOl();
-    }
-
     public function setContent($content = null)
     {
         parent::setContent($content);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagOl();
     }
 
     public static function getRequiredAttributes()

@@ -123,49 +123,57 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
     }
 
-    public function getPluginDatabaseMigrationSchema($plugin_name)
+    protected function tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name)
     {
-        $plugin_config = $this->getPluginConfiguration($plugin_name);
-        $schema = null;
+        if (isset($this->plugin_autoload_configurations[$plugin_name])) {
+            return $this->plugin_autoload_configurations[$plugin_name];
+        }
 
-        if ($plugin_config) {
-            $schema = $plugin_config->getDatabaseMigrationSchema();
+        $filename = $root_dir . DS . 'config' . DS . 'autoload.php';
 
-            if ($schema instanceof lcSysObj) {
-                $schema->setLogger($this->logger);
-                $schema->setI18n($this->i18n);
-                $schema->setConfiguration($this->configuration);
-                $schema->setEventDispatcher($this->event_dispatcher);
+        $autoload_file_exists_cached = isset($this->autoload_class_map_file_exists_map[$plugin_name]) &&
+            $this->autoload_class_map_file_exists_map[$plugin_name];
 
-                // start it up
-                $schema->initialize();
-            }
+        if (!$autoload_file_exists_cached && !file_exists($filename)) {
+            return false;
+        }
 
-            if ($schema instanceof lcPackageDatabaseMigrationSchema) {
-                $schema->setPluginConfiguration($plugin_config);
+        if (!$autoload_file_exists_cached) {
+            $this->autoload_class_map_file_exists_map[$plugin_name] = true;
+        }
+
+        $ret = include_once($filename);
+
+        if (!$ret) {
+            return null;
+        }
+
+        $camelized_class_name = $plugin_name . '_autoload_plugin_configuration';
+        $class_name = lcInflector::camelize($camelized_class_name, false);
+
+        if (class_exists($class_name, false)) {
+            $obj = new $class_name();
+
+            if ($obj instanceof iSupportsAutoload) {
+                $this->plugin_autoload_configurations[$plugin_name] = $obj;
+
+                $this->getSystemComponentFactory()->getClassAutoloader()->addFromObject($obj, $root_dir);
+
+                return $obj;
             }
         }
 
-        return $schema;
+        return null;
     }
 
-    public function getPluginConfiguration($plugin_name)
+    public function getSystemComponentFactory()
     {
-        if (!isset($this->plugin_configurations[$plugin_name])) {
-            $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
+        return $this->system_component_factory;
+    }
 
-            foreach ($available_plugins as $plugin_name => $plugin_details) {
-                $path = $plugin_details['path'];
-                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
-                    (isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null);
-
-                // initialize and store plugin configuration
-                $this->plugin_configurations[$plugin_name] =
-                    isset($this->plugin_configurations[$plugin_name]) ? $this->plugin_configurations[$plugin_name] :
-                        $this->getInstanceOfPluginConfiguration($path, $plugin_name, $web_path);
-            }
-        }
-        return $this->plugin_configurations[$plugin_name];
+    public function setSystemComponentFactory(lcSystemComponentFactory $component_factory = null)
+    {
+        $this->system_component_factory = $component_factory;
     }
 
     protected function initializeEnabledPlugins()
@@ -216,7 +224,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugin_configuration_loaded', $this, [
                     'name' => $plugin_name,
                     'is_enabled' => $is_plugin_enabled,
-                    'configuration' => &$plugin_config
+                    'configuration' => &$plugin_config,
                 ]));
 
                 // check if plugin should be started automatically, it should be if:
@@ -260,49 +268,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugins_initialized', $this));
     }
 
-    protected function tryIncludePluginAutoloadClassMapFile($root_dir, $plugin_name)
-    {
-        if (isset($this->plugin_autoload_configurations[$plugin_name])) {
-            return $this->plugin_autoload_configurations[$plugin_name];
-        }
-
-        $filename = $root_dir . DS . 'config' . DS . 'autoload.php';
-
-        $autoload_file_exists_cached = isset($this->autoload_class_map_file_exists_map[$plugin_name]) &&
-            $this->autoload_class_map_file_exists_map[$plugin_name];
-
-        if (!$autoload_file_exists_cached && !file_exists($filename)) {
-            return false;
-        }
-
-        if (!$autoload_file_exists_cached) {
-            $this->autoload_class_map_file_exists_map[$plugin_name] = true;
-        }
-
-        $ret = include_once($filename);
-
-        if (!$ret) {
-            return null;
-        }
-
-        $camelized_class_name = $plugin_name . '_autoload_plugin_configuration';
-        $class_name = lcInflector::camelize($camelized_class_name, false);
-
-        if (class_exists($class_name, false)) {
-            $obj = new $class_name();
-
-            if ($obj instanceof iSupportsAutoload) {
-                $this->plugin_autoload_configurations[$plugin_name] = $obj;
-
-                $this->getSystemComponentFactory()->getClassAutoloader()->addFromObject($obj, $root_dir);
-
-                return $obj;
-            }
-        }
-
-        return null;
-    }
-
     protected function tryIncludePluginConfigurationFile($root_dir, $plugin_name, $verify = false)
     {
         $ret = null;
@@ -340,7 +305,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             lcInflector::camelize($plugin_name . '_plugin_configuration', false),
             lcInflector::camelize($plugin_name . '_config_configuration', false),
             lcInflector::camelize($plugin_name . '_config', false),
-            lcfirst(lcInflector::camelize($plugin_name . '_config', false))
+            lcfirst(lcInflector::camelize($plugin_name . '_config', false)),
         ];
 
         // cache this so we don't need to call subcamelize several times
@@ -414,6 +379,53 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     }
 
     // @codingStandardsIgnoreStart
+
+    public function getPluginDatabaseMigrationSchema($plugin_name)
+    {
+        $plugin_config = $this->getPluginConfiguration($plugin_name);
+        $schema = null;
+
+        if ($plugin_config) {
+            $schema = $plugin_config->getDatabaseMigrationSchema();
+
+            if ($schema instanceof lcSysObj) {
+                $schema->setLogger($this->logger);
+                $schema->setI18n($this->i18n);
+                $schema->setConfiguration($this->configuration);
+                $schema->setEventDispatcher($this->event_dispatcher);
+
+                // start it up
+                $schema->initialize();
+            }
+
+            if ($schema instanceof lcPackageDatabaseMigrationSchema) {
+                $schema->setPluginConfiguration($plugin_config);
+            }
+        }
+
+        return $schema;
+    }
+
+    public function getPluginConfiguration($plugin_name)
+    {
+        if (!isset($this->plugin_configurations[$plugin_name])) {
+            $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
+
+            foreach ($available_plugins as $plugin_name => $plugin_details) {
+                $path = $plugin_details['path'];
+                $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
+                    (isset($plugin_details['web_path']) ? $plugin_details['web_path'] : null);
+
+                // initialize and store plugin configuration
+                $this->plugin_configurations[$plugin_name] =
+                    isset($this->plugin_configurations[$plugin_name]) ? $this->plugin_configurations[$plugin_name] :
+                        $this->getInstanceOfPluginConfiguration($path, $plugin_name, $web_path);
+            }
+        }
+        return $this->plugin_configurations[$plugin_name];
+    }
+
+    // @codingStandardsIgnoreEnd
 
     public function shutdown()
     {
@@ -494,8 +506,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $debug;
     }
 
-    // @codingStandardsIgnoreEnd
-
     public function getShortDebugInfo()
     {
         return false;
@@ -530,39 +540,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
             unset($idx, $plugin_name);
         }
-    }
-
-    public function validatePluginConfigMeetsPlatformConstraints(lcPluginConfiguration $plugin_configuration)
-    {
-        // verify if the target / minimum versions are met
-        $target_version = $plugin_configuration->getTargetFrameworkVersion();
-        $minimum_version = $plugin_configuration->getMinimumFrameworkVersion();
-
-        if ($target_version) {
-            if (version_compare($target_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
-            }
-        }
-
-        if ($minimum_version) {
-            if (version_compare($minimum_version, LC_VER, '>=')) {
-                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
-            }
-        }
-
-        $is_15 = $this->configuration->isTargetingLC15();
-
-        if ($is_15) {
-            if (!$plugin_configuration->getIdentifier()) {
-                throw new lcSystemRequirementException('LC 1.5 plugins are required to define an unique GUID');
-            }
-
-            if (!$plugin_configuration->getPackageName()) {
-                throw new lcSystemRequirementException('LC 1.5 plugins are required to define a package name');
-            }
-        }
-
-        return true;
     }
 
     public function initializePlugin($plugin_name, $load_dependancies = true, $throw_if_missing = true)
@@ -638,7 +615,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $plugin_params = [
                 'name' => $plugin_object->getPluginName(),
                 'path' => $plugin_object->getRootDir(),
-                'plugin_instance' => &$plugin_object
+                'plugin_instance' => &$plugin_object,
             ];
 
             if ($plugin_object instanceof lcResidentObj) {
@@ -679,6 +656,39 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
 
         return isset($this->plugins[$plugin_name]);
+    }
+
+    public function validatePluginConfigMeetsPlatformConstraints(lcPluginConfiguration $plugin_configuration)
+    {
+        // verify if the target / minimum versions are met
+        $target_version = $plugin_configuration->getTargetFrameworkVersion();
+        $minimum_version = $plugin_configuration->getMinimumFrameworkVersion();
+
+        if ($target_version) {
+            if (version_compare($target_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application is targeting LC ver ' . $target_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        if ($minimum_version) {
+            if (version_compare($minimum_version, LC_VER, '>=')) {
+                throw new lcUnsupportedException('The application requires at least Lightcast ver ' . $minimum_version . ' (current LC version: ' . LC_VER . ')');
+            }
+        }
+
+        $is_15 = $this->configuration->isTargetingLC15();
+
+        if ($is_15) {
+            if (!$plugin_configuration->getIdentifier()) {
+                throw new lcSystemRequirementException('LC 1.5 plugins are required to define an unique GUID');
+            }
+
+            if (!$plugin_configuration->getPackageName()) {
+                throw new lcSystemRequirementException('LC 1.5 plugins are required to define a package name');
+            }
+        }
+
+        return true;
     }
 
     protected function loadPluginDependancies(lcPlugin $plugin_object)
@@ -776,9 +786,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // initialize web / console based methods
         if ($this->configuration instanceof lcConsoleConfiguration) {
             $plugin->initializeConsoleComponents();
-        } elseif ($this->configuration instanceof lcWebConfiguration) {
+        } else if ($this->configuration instanceof lcWebConfiguration) {
             $plugin->initializeWebComponents();
-        } elseif ($this->configuration instanceof lcWebServiceConfiguration) {
+        } else if ($this->configuration instanceof lcWebServiceConfiguration) {
             $plugin->initializeWebServiceComponents();
         }
     }
@@ -809,16 +819,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     public function setDatabaseModelManager(lcDatabaseModelManager $database_model_manager = null)
     {
         $this->database_model_manager = $database_model_manager;
-    }
-
-    public function getSystemComponentFactory()
-    {
-        return $this->system_component_factory;
-    }
-
-    public function setSystemComponentFactory(lcSystemComponentFactory $component_factory = null)
-    {
-        $this->system_component_factory = $component_factory;
     }
 
     public function getShouldLoadPlugins()

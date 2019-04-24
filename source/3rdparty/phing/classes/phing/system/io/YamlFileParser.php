@@ -62,16 +62,16 @@ class YamlFileParser implements FileParserInterface
 
     /**
      * Flattens an array to key => value.
+     * @param array $arrayToFlatten
      * @todo: milo - 20142901 - If you plan to extend phing and add a new fileparser, please move this to an abstract
      * class.
      *
-     * @param array $arrayToFlatten
      */
     private function flattenArray(array $arrayToFlatten, $separator = '.', $flattenedKey = '')
     {
-        $flattenedArray = array();
+        $flattenedArray = [];
         foreach ($arrayToFlatten as $key => $value) {
-            $tmpFlattendKey = (!empty($flattenedKey) ? $flattenedKey.$separator : '') . $key;
+            $tmpFlattendKey = (!empty($flattenedKey) ? $flattenedKey . $separator : '') . $key;
             // only append next value if is array and is an associative array
             if (is_array($value) && array_keys($value) !== range(0, count($value) - 1)) {
                 $flattenedArray = array_merge(

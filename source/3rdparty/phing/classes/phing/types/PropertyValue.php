@@ -33,7 +33,7 @@ class PropertyValue
 
     /**
      * Constructor optionaly sets a the value of property component.
-     * @param    mixed      Value of name, all scalars allowed
+     * @param mixed      Value of name, all scalars allowed
      */
     public function __construct($value = null)
     {
@@ -43,12 +43,11 @@ class PropertyValue
     }
 
     /**
-     * Sets a the value of property component.
-     * @param    mixed      Value of name, all scalars allowed
+     * @return string
      */
-    public function setValue($value)
+    public function toString()
     {
-        $this->value = (string) $value;
+        return $this->getValue();
     }
 
     /** Get the value of property component. */
@@ -58,10 +57,11 @@ class PropertyValue
     }
 
     /**
-     * @return string
+     * Sets a the value of property component.
+     * @param mixed      Value of name, all scalars allowed
      */
-    public function toString()
+    public function setValue($value)
     {
-        return $this->getValue();
+        $this->value = (string)$value;
     }
 }

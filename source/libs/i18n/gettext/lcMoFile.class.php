@@ -58,18 +58,21 @@ class lcMoFile extends lcObj
             $magic = array_shift($unpacked);
 
             switch ($magic) {
-                case -34: {
-                    $big_endian = false;
-                    break;
-                }
-                case -107: {
-                    $big_endian = true;
-                    break;
-                }
-                default: {
-                    throw new lcIOException('Invalid MO File. Error on finding endian type');
-                    break;
-                }
+                case -34:
+                    {
+                        $big_endian = false;
+                        break;
+                    }
+                case -107:
+                    {
+                        $big_endian = true;
+                        break;
+                    }
+                default:
+                    {
+                        throw new lcIOException('Invalid MO File. Error on finding endian type');
+                        break;
+                    }
             }
 
             unset($unpacked, $magic);
@@ -94,7 +97,7 @@ class lcMoFile extends lcObj
             for ($i = 0; $i < $count; $i++) {
                 $original[$i] = [
                     'length' => $this->readInt($big_endian),
-                    'offset' => $this->readInt($big_endian)
+                    'offset' => $this->readInt($big_endian),
                 ];
             }
 
@@ -107,7 +110,7 @@ class lcMoFile extends lcObj
             for ($i = 0; $i < $count; $i++) {
                 $translat[$i] = [
                     'length' => $this->readInt($big_endian),
-                    'offset' => $this->readInt($big_endian)
+                    'offset' => $this->readInt($big_endian),
                 ];
             }
 

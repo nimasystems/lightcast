@@ -24,53 +24,43 @@ class PgsqlSchemaParser extends BaseSchemaParser
      * Map PostgreSQL native types to Propel types.
      * @var        array
      */
-     /** Map MySQL native types to Propel (JDBC) types. */
-    private static $pgsqlTypeMap = array(
-                'bool' => PropelTypes::BOOLEAN,
-                'boolean' => PropelTypes::BOOLEAN,
-                'tinyint' => PropelTypes::TINYINT,
-                'smallint' => PropelTypes::SMALLINT,
-                'mediumint' => PropelTypes::SMALLINT,
-                'int2' => PropelTypes::SMALLINT,
-                'int' => PropelTypes::INTEGER,
-                'int4' => PropelTypes::INTEGER,
-                'serial4' => PropelTypes::INTEGER,
-                'integer' => PropelTypes::INTEGER,
-                'int8' => PropelTypes::BIGINT,
-                'bigint' => PropelTypes::BIGINT,
-                'bigserial' => PropelTypes::BIGINT,
-                'serial8' => PropelTypes::BIGINT,
-                'int24' => PropelTypes::BIGINT,
-                'real' => PropelTypes::REAL,
-                'float' => PropelTypes::FLOAT,
-                'float4' => PropelTypes::FLOAT,
-                'decimal' => PropelTypes::DECIMAL,
-                'numeric' => PropelTypes::DECIMAL,
-                'double' => PropelTypes::DOUBLE,
-                'float8' => PropelTypes::DOUBLE,
-                'char' => PropelTypes::CHAR,
-                'character' => PropelTypes::CHAR,
-                'varchar' => PropelTypes::VARCHAR,
-                'date' => PropelTypes::DATE,
-                'time' => PropelTypes::TIME,
-                'timetz' => PropelTypes::TIME,
-                //'year' => PropelTypes::YEAR,  PropelTypes::YEAR does not exist... does this need to be mapped to a different propel type?
-                'datetime' => PropelTypes::TIMESTAMP,
-                'timestamp' => PropelTypes::TIMESTAMP,
-                'timestamptz' => PropelTypes::TIMESTAMP,
-                'bytea' => PropelTypes::BLOB,
-                'text' => PropelTypes::LONGVARCHAR,
-    );
-
-    /**
-     * Gets a type mapping from native types to Propel types
-     *
-     * @return array
-     */
-    protected function getTypeMapping()
-    {
-        return self::$pgsqlTypeMap;
-    }
+    /** Map MySQL native types to Propel (JDBC) types. */
+    private static $pgsqlTypeMap = [
+        'bool' => PropelTypes::BOOLEAN,
+        'boolean' => PropelTypes::BOOLEAN,
+        'tinyint' => PropelTypes::TINYINT,
+        'smallint' => PropelTypes::SMALLINT,
+        'mediumint' => PropelTypes::SMALLINT,
+        'int2' => PropelTypes::SMALLINT,
+        'int' => PropelTypes::INTEGER,
+        'int4' => PropelTypes::INTEGER,
+        'serial4' => PropelTypes::INTEGER,
+        'integer' => PropelTypes::INTEGER,
+        'int8' => PropelTypes::BIGINT,
+        'bigint' => PropelTypes::BIGINT,
+        'bigserial' => PropelTypes::BIGINT,
+        'serial8' => PropelTypes::BIGINT,
+        'int24' => PropelTypes::BIGINT,
+        'real' => PropelTypes::REAL,
+        'float' => PropelTypes::FLOAT,
+        'float4' => PropelTypes::FLOAT,
+        'decimal' => PropelTypes::DECIMAL,
+        'numeric' => PropelTypes::DECIMAL,
+        'double' => PropelTypes::DOUBLE,
+        'float8' => PropelTypes::DOUBLE,
+        'char' => PropelTypes::CHAR,
+        'character' => PropelTypes::CHAR,
+        'varchar' => PropelTypes::VARCHAR,
+        'date' => PropelTypes::DATE,
+        'time' => PropelTypes::TIME,
+        'timetz' => PropelTypes::TIME,
+        //'year' => PropelTypes::YEAR,  PropelTypes::YEAR does not exist... does this need to be mapped to a different propel type?
+        'datetime' => PropelTypes::TIMESTAMP,
+        'timestamp' => PropelTypes::TIMESTAMP,
+        'timestamptz' => PropelTypes::TIMESTAMP,
+        'bytea' => PropelTypes::BLOB,
+        'text' => PropelTypes::LONGVARCHAR,
+    ];
 
     /**
      *
@@ -99,7 +89,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
                                       AND n.nspname NOT LIKE 'pg_toast%'
                                     ORDER BY relname");
 
-        $tableWraps = array();
+        $tableWraps = [];
 
         // First load the tables (important that this happen before filling out details of tables)
         if ($task) {
@@ -157,11 +147,11 @@ class PgsqlSchemaParser extends BaseSchemaParser
         return count($tableWraps);
     }
 
-    /**
+/**
      * Adds Columns to the specified table.
      *
-     * @param Table  $table   The Table model class to add columns to.
-     * @param int    $oid     The table OID
+     * @param Table $table The Table model class to add columns to.
+     * @param int $oid The table OID
      * @param string $version The database version.
      *
      * @throws EngineException
@@ -203,7 +193,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
             $scale = null;
 
             // Check to ensure that this column isn't an array data type
-            if (((int) $row['isarray']) === 1) {
+            if (((int)$row['isarray']) === 1) {
                 throw new EngineException (sprintf("Array datatypes are not currently supported [%s.%s]", $this->name, $row['attname']));
             } // if (((int) $row['isarray']) === 1)
 
@@ -260,7 +250,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
             $column->getDomain()->replaceSize($size);
             $column->getDomain()->replaceScale($scale);
             if ($default !== null) {
-                if (in_array($default, array('now()'))) {
+                if (in_array($default, ['now()'])) {
                     $type = ColumnDefaultValue::TYPE_EXPR;
                 } else {
                     $type = ColumnDefaultValue::TYPE_VALUE;
@@ -272,38 +262,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
 
             $table->addColumn($column);
         }
-    } // addColumn()
-
-    private function processLengthScale($intTypmod, $strName)
-    {
-        // Define the return array
-        $arrRetVal = array('length' => null, 'scale' => null);
-
-        // Some datatypes don't have a Typmod
-        if ($intTypmod == -1) {
-            return $arrRetVal;
-        } // if ($intTypmod == -1)
-
-        // Decimal Datatype?
-        if ($strName == $this->getMappedNativeType(PropelTypes::DECIMAL)) {
-            $intLen = ($intTypmod - 4) >> 16;
-            $intPrec = ($intTypmod - 4) & 0xffff;
-            $intLen = sprintf("%ld", $intLen);
-            if ($intPrec) {
-                $intPrec = sprintf("%ld", $intPrec);
-            } // if ($intPrec)
-            $arrRetVal['length'] = $intLen;
-            $arrRetVal['scale'] = $intPrec;
-        } // if ($strName == $this->getMappedNativeType(PropelTypes::NUMERIC))
-        elseif ($strName == $this->getMappedNativeType(PropelTypes::TIME) || $strName == 'timetz' || $strName == $this->getMappedNativeType(PropelTypes::TIMESTAMP) || $strName == 'timestamptz' || $strName == 'interval' || $strName == 'bit') {
-            $arrRetVal['length'] = sprintf("%ld", $intTypmod);
-        } // elseif (TIME, TIMESTAMP, INTERVAL, BIT)
-        else {
-            $arrRetVal['length'] = sprintf("%ld", ($intTypmod - 4));
-        } // else
-
-        return $arrRetVal;
-    } // private function processLengthScale ($intTypmod, $strName)
+    }
 
     private function processDomain($strDomain)
     {
@@ -332,7 +291,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
             throw new EngineException ("Domain [" . $strDomain . "] not found.");
         }
 
-        $arrDomain = array();
+        $arrDomain = [];
         $arrDomain['type'] = $row['basetype'];
         $arrLengthPrecision = $this->processLengthScale($row['typtypmod'], $row['basetype']);
         $arrDomain['length'] = $arrLengthPrecision['length'];
@@ -344,9 +303,40 @@ class PgsqlSchemaParser extends BaseSchemaParser
         $stmt = null; // cleanup
 
         return $arrDomain;
-    } // private function processDomain($strDomain)
+    } // addColumn()
 
-    /**
+    private function processLengthScale($intTypmod, $strName)
+    {
+        // Define the return array
+        $arrRetVal = ['length' => null, 'scale' => null];
+
+        // Some datatypes don't have a Typmod
+        if ($intTypmod == -1) {
+            return $arrRetVal;
+        } // if ($intTypmod == -1)
+
+        // Decimal Datatype?
+        if ($strName == $this->getMappedNativeType(PropelTypes::DECIMAL)) {
+            $intLen = ($intTypmod - 4) >> 16;
+            $intPrec = ($intTypmod - 4) & 0xffff;
+            $intLen = sprintf("%ld", $intLen);
+            if ($intPrec) {
+                $intPrec = sprintf("%ld", $intPrec);
+            } // if ($intPrec)
+            $arrRetVal['length'] = $intLen;
+            $arrRetVal['scale'] = $intPrec;
+        } // if ($strName == $this->getMappedNativeType(PropelTypes::NUMERIC))
+        else if ($strName == $this->getMappedNativeType(PropelTypes::TIME) || $strName == 'timetz' || $strName == $this->getMappedNativeType(PropelTypes::TIMESTAMP) || $strName == 'timestamptz' || $strName == 'interval' || $strName == 'bit') {
+            $arrRetVal['length'] = sprintf("%ld", $intTypmod);
+        } // elseif (TIME, TIMESTAMP, INTERVAL, BIT)
+        else {
+            $arrRetVal['length'] = sprintf("%ld", ($intTypmod - 4));
+        } // else
+
+        return $arrRetVal;
+    } // private function processLengthScale ($intTypmod, $strName)
+
+        /**
      * Load foreign keys for this table.
      */
     protected function addForeignKeys(Table $table, $oid, $version)
@@ -377,7 +367,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
         $stmt->bindValue(1, $oid);
         $stmt->execute();
 
-        $foreignKeys = array(); // local store to avoid duplicates
+        $foreignKeys = []; // local store to avoid duplicates
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
@@ -448,7 +438,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
                 );
             }
         }
-    }
+    } // private function processDomain($strDomain)
 
     /**
      * Load indexes for this table
@@ -473,7 +463,7 @@ class PgsqlSchemaParser extends BaseSchemaParser
                                         WHERE c.oid = ? AND a.attnum = ? AND NOT a.attisdropped
                                         ORDER BY a.attnum");
 
-        $indexes = array();
+        $indexes = [];
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $name = $row["idxname"];
@@ -537,6 +527,16 @@ class PgsqlSchemaParser extends BaseSchemaParser
                 $table->getColumn($row2['attname'])->setPrimaryKey(true);
             } // foreach ($arrColumns as $intColNum)
         }
+    }
+
+    /**
+     * Gets a type mapping from native types to Propel types
+     *
+     * @return array
+     */
+    protected function getTypeMapping()
+    {
+        return self::$pgsqlTypeMap;
     }
 
     /**

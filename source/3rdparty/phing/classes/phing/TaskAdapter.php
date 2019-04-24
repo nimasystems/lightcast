@@ -38,9 +38,9 @@ class TaskAdapter extends Task
 
     /**
      * Main entry point.
-     * @throws BuildException
-     * @throws Exception
      * @return void
+     * @throws Exception
+     * @throws BuildException
      */
     public function main()
     {
@@ -73,22 +73,22 @@ class TaskAdapter extends Task
     }
 
     /**
-     * Set the target object.
-     * @param  object $o
-     * @return void
-     */
-    public function setProxy($o)
-    {
-        $this->proxy = $o;
-    }
-
-    /**
      * Gets the target object.
      * @return object
      */
     public function getProxy()
     {
         return $this->proxy;
+    }
+
+    /**
+     * Set the target object.
+     * @param object $o
+     * @return void
+     */
+    public function setProxy($o)
+    {
+        $this->proxy = $o;
     }
 
 }

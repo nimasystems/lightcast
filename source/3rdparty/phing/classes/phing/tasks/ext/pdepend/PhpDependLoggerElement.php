@@ -46,6 +46,16 @@ class PhpDependLoggerElement
     protected $outfile = null;
 
     /**
+     * Get the logger type
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Sets the logger type.
      *
      * @param string $type Type of the logger
@@ -70,13 +80,13 @@ class PhpDependLoggerElement
     }
 
     /**
-     * Get the logger type
+     * Get the output file.
      *
-     * @return string
+     * @return PhingFile
      */
-    public function getType()
+    public function getOutfile()
     {
-        return $this->type;
+        return $this->outfile;
     }
 
     /**
@@ -87,15 +97,5 @@ class PhpDependLoggerElement
     public function setOutfile(PhingFile $outfile)
     {
         $this->outfile = $outfile;
-    }
-
-    /**
-     * Get the output file.
-     *
-     * @return PhingFile
-     */
-    public function getOutfile()
-    {
-        return $this->outfile;
     }
 }

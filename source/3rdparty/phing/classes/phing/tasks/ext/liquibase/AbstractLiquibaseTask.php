@@ -30,48 +30,42 @@ require_once 'phing/tasks/system/ExecTask.php';
 abstract class AbstractLiquibaseTask extends Task
 {
 
-    /**
-     * Used for liquibase -Dname=value properties.
-     */
-    private $properties = array();
-
-    /**
-     * Used to set liquibase --name=value parameters
-     */
-    private $parameters = array();
-
     protected $jar;
     protected $changeLogFile;
     protected $username;
     protected $password;
     protected $url;
     protected $classpathref;
-
     /**
      * Whether to display the output of the command.
      * True by default to preserve old behaviour
      * @var boolean
      */
     protected $display = true;
-
     /**
      * Whether liquibase return code can cause a Phing failure.
      * @var boolean
      */
     protected $checkreturn = false;
-
     /**
      * Set true if we should run liquibase with PHP passthru
      * instead of exec.
      */
     protected $passthru = true;
-
     /**
      * Property name to set with output value from exec call.
      *
      * @var string
      */
     protected $outputProperty;
+    /**
+     * Used for liquibase -Dname=value properties.
+     */
+    private $properties = [];
+    /**
+     * Used to set liquibase --name=value parameters
+     */
+    private $parameters = [];
 
     /**
      * Sets the absolute path to liquibase jar.
@@ -208,8 +202,8 @@ abstract class AbstractLiquibaseTask extends Task
     /**
      * Ensure that correct parameters were passed in.
      *
-     * @throws BuildException
      * @return void
+     * @throws BuildException
      */
     protected function checkParams()
     {
@@ -241,13 +235,35 @@ abstract class AbstractLiquibaseTask extends Task
         }
     }
 
+    protected function checkChangeLogFile()
+    {
+        if (null === $this->changeLogFile) {
+            throw new BuildException('Specify the name of the changelog file.');
+        }
+
+        foreach (explode(":", $this->classpathref) as $path) {
+            if (file_exists($path . DIRECTORY_SEPARATOR . $this->changeLogFile)) {
+                return;
+            }
+        }
+
+        if (!file_exists($this->changeLogFile)) {
+            throw new BuildException(
+                sprintf(
+                    'The changelog file "%s" does not exist!',
+                    $this->changeLogFile
+                )
+            );
+        }
+    }
+
     /**
      * Executes the given command and returns the output.
      *
      * @param $lbcommand
      * @param string $lbparams the command to execute
-     * @throws BuildException
      * @return string the output of the executed command
+     * @throws BuildException
      */
     protected function execute($lbcommand, $lbparams = '')
     {
@@ -277,7 +293,7 @@ abstract class AbstractLiquibaseTask extends Task
         if ($this->passthru) {
             passthru($command);
         } else {
-            $output = array();
+            $output = [];
             $return = null;
             exec($command, $output, $return);
             $output = implode(PHP_EOL, $output);
@@ -296,28 +312,6 @@ abstract class AbstractLiquibaseTask extends Task
         }
 
         return;
-    }
-
-    protected function checkChangeLogFile()
-    {
-        if (null === $this->changeLogFile) {
-            throw new BuildException('Specify the name of the changelog file.');
-        }
-
-        foreach (explode(":", $this->classpathref) as $path) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . $this->changeLogFile)) {
-                return;
-            }
-        }
-
-        if (!file_exists($this->changeLogFile)) {
-            throw new BuildException(
-                sprintf(
-                    'The changelog file "%s" does not exist!',
-                    $this->changeLogFile
-                )
-            );
-        }
     }
 }
 
@@ -370,7 +364,7 @@ class LiquibaseParameter extends DataType
     public function getRef(Project $p)
     {
         if (!$this->checked) {
-            $stk = array();
+            $stk = [];
             array_push($stk, $this);
             $this->dieOnCircularReference($stk, $p);
         }
@@ -434,7 +428,7 @@ class LiquibaseProperty extends DataType
     public function getRef(Project $p)
     {
         if (!$this->checked) {
-            $stk = array();
+            $stk = [];
             array_push($stk, $this);
             $this->dieOnCircularReference($stk, $p);
         }

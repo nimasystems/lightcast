@@ -35,15 +35,8 @@ include_once 'phing/util/StringHelper.php';
 class CvsPassTask extends Task
 {
 
-    /** CVS Root */
-    private $cvsRoot;
-    /** Password file to add password to */
-    private $passFile;
-    /** Password to add to file */
-    private $password;
-
     /** Array contain char conversion data */
-    private static $shifts = array(
+    private static $shifts = [
         0,
         1,
         2,
@@ -299,8 +292,14 @@ class CvsPassTask extends Task
         163,
         242,
         178,
-        152
-    );
+        152,
+    ];
+    /** CVS Root */
+    private $cvsRoot;
+    /** Password file to add password to */
+    private $passFile;
+    /** Password to add to file */
+    private $password;
 
     /**
      * Create a CVS task using the default cvspass file location.

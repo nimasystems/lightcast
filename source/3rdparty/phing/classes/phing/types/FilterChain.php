@@ -55,7 +55,7 @@ include_once 'phing/filters/XsltFilter.php';
 class FilterChain extends DataType
 {
 
-    private $filterReaders = array();
+    private $filterReaders = [];
 
     /**
      * @param null $project
@@ -65,14 +65,6 @@ class FilterChain extends DataType
         if ($project) {
             $this->project = $project;
         }
-    }
-
-    /**
-     * @return array
-     */
-    public function getFilterReaders()
-    {
-        return $this->filterReaders;
     }
 
     /**
@@ -300,16 +292,6 @@ class FilterChain extends DataType
         $this->filterReaders[] = $o;
     }
 
-    /*
-     * Makes this instance in effect a reference to another FilterChain
-     * instance.
-     *
-     * <p>You must not set another attribute or nest elements inside
-     * this element if you make it a reference.</p>
-     *
-     * @param  $r the reference to which this instance is associated
-     * @throws BuildException if this instance already has been configured.
-    */
     /**
      * @param Reference $r
      * @throws BuildException
@@ -329,5 +311,24 @@ class FilterChain extends DataType
             throw new BuildException($r->getRefId() . " doesn't refer to a FilterChain");
         }
         parent::setRefid($r);
+    }
+
+    /*
+     * Makes this instance in effect a reference to another FilterChain
+     * instance.
+     *
+     * <p>You must not set another attribute or nest elements inside
+     * this element if you make it a reference.</p>
+     *
+     * @param  $r the reference to which this instance is associated
+     * @throws BuildException if this instance already has been configured.
+    */
+
+    /**
+     * @return array
+     */
+    public function getFilterReaders()
+    {
+        return $this->filterReaders;
     }
 }

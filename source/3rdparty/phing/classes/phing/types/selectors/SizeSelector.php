@@ -27,27 +27,13 @@
  */
 class SizeSelector extends BaseExtendSelector
 {
-    /** @var int $size */
-    private $size = -1;
-
-    /** @var int $multiplier */
-    private $multiplier = 1;
-
-    /** @var int $sizelimit */
-    private $sizelimit = -1;
-
-    /** @var int $cmp */
-    private $cmp = 2;
-
     const SIZE_KEY = "value";
     const UNITS_KEY = "units";
     const WHEN_KEY = "when";
-
     /** @var array $sizeComparisons */
-    private static $sizeComparisons = array("less", "more", "equal");
-
+    private static $sizeComparisons = ["less", "more", "equal"];
     /** @var array $byteUnits */
-    private static $byteUnits = array(
+    private static $byteUnits = [
         "K",
         "k",
         "kilo",
@@ -84,8 +70,16 @@ class SizeSelector extends BaseExtendSelector
         "TI",
         "ti",
         "tebi",
-        "TEBI"
-    );
+        "TEBI",
+    ];
+    /** @var int $size */
+    private $size = -1;
+    /** @var int $multiplier */
+    private $multiplier = 1;
+    /** @var int $sizelimit */
+    private $sizelimit = -1;
+    /** @var int $cmp */
+    private $cmp = 2;
 
     /**
      * @return string
@@ -97,7 +91,7 @@ class SizeSelector extends BaseExtendSelector
         $buf .= "compare: ";
         if ($this->cmp === 0) {
             $buf .= "less";
-        } elseif ($this->cmp === 1) {
+        } else if ($this->cmp === 1) {
             $buf .= "more";
         } else {
             $buf .= "equal";
@@ -105,6 +99,48 @@ class SizeSelector extends BaseExtendSelector
         $buf .= "}";
 
         return $buf;
+    }
+
+    /**
+     * When using this as a custom selector, this method will be called.
+     * It translates each parameter into the appropriate setXXX() call.
+     *
+     * {@inheritdoc}
+     *
+     * @param array $parameters the complete set of parameters for this selector
+     *
+     * @return void
+     *
+     * @throws BuildException
+     */
+    public function setParameters($parameters)
+    {
+        parent::setParameters($parameters);
+        if ($parameters !== null) {
+            for ($i = 0, $size = count($parameters); $i < $size; $i++) {
+                $paramname = $parameters[$i]->getName();
+                switch (strtolower($paramname)) {
+                    case self::SIZE_KEY:
+                        try {
+                            $this->setValue($parameters[$i]->getValue());
+                        } catch (Exception $nfe) {
+                            $this->setError(
+                                "Invalid size setting "
+                                . $parameters[$i]->getValue()
+                            );
+                        }
+                        break;
+                    case self::UNITS_KEY:
+                        $this->setUnits($parameters[$i]->getValue());
+                        break;
+                    case self::WHEN_KEY:
+                        $this->setWhen($parameters[$i]->getValue());
+                        break;
+                    default:
+                        $this->setError("Invalid parameter " . $paramname);
+                }
+            }
+        }
     }
 
     /**
@@ -161,19 +197,19 @@ class SizeSelector extends BaseExtendSelector
         $this->multiplier = 0;
         if (($i > -1) && ($i < 4)) {
             $this->multiplier = 1000;
-        } elseif (($i > 3) && ($i < 9)) {
+        } else if (($i > 3) && ($i < 9)) {
             $this->multiplier = 1024;
-        } elseif (($i > 8) && ($i < 13)) {
+        } else if (($i > 8) && ($i < 13)) {
             $this->multiplier = 1000000;
-        } elseif (($i > 12) && ($i < 18)) {
+        } else if (($i > 12) && ($i < 18)) {
             $this->multiplier = 1048576;
-        } elseif (($i > 17) && ($i < 22)) {
+        } else if (($i > 17) && ($i < 22)) {
             $this->multiplier = 1000000000;
-        } elseif (($i > 21) && ($i < 27)) {
+        } else if (($i > 21) && ($i < 27)) {
             $this->multiplier = 1073741824;
-        } elseif (($i > 26) && ($i < 31)) {
+        } else if (($i > 26) && ($i < 31)) {
             $this->multiplier = 1000000000000;
-        } elseif (($i > 30) && ($i < 36)) {
+        } else if (($i > 30) && ($i < 36)) {
             $this->multiplier = 1099511627776;
         }
         if (($this->multiplier > 0) && ($this->size > -1)) {
@@ -199,48 +235,6 @@ class SizeSelector extends BaseExtendSelector
     }
 
     /**
-     * When using this as a custom selector, this method will be called.
-     * It translates each parameter into the appropriate setXXX() call.
-     *
-     * {@inheritdoc}
-     *
-     * @param array $parameters the complete set of parameters for this selector
-     *
-     * @return void
-     *
-     * @throws BuildException
-     */
-    public function setParameters($parameters)
-    {
-        parent::setParameters($parameters);
-        if ($parameters !== null) {
-            for ($i = 0, $size = count($parameters); $i < $size; $i++) {
-                $paramname = $parameters[$i]->getName();
-                switch (strtolower($paramname)) {
-                    case self::SIZE_KEY:
-                        try {
-                            $this->setValue($parameters[$i]->getValue());
-                        } catch (Exception $nfe) {
-                            $this->setError(
-                                "Invalid size setting "
-                                . $parameters[$i]->getValue()
-                            );
-                        }
-                        break;
-                    case self::UNITS_KEY:
-                        $this->setUnits($parameters[$i]->getValue());
-                        break;
-                    case self::WHEN_KEY:
-                        $this->setWhen($parameters[$i]->getValue());
-                        break;
-                    default:
-                        $this->setError("Invalid parameter " . $paramname);
-                }
-            }
-        }
-    }
-
-    /**
      * <p>Checks to make sure all settings are kosher. In this case, it
      * means that the size attribute has been set (to a positive value),
      * that the multiplier has a valid setting, and that the size limit
@@ -258,9 +252,9 @@ class SizeSelector extends BaseExtendSelector
     {
         if ($this->size < 0) {
             $this->setError("The value attribute is required, and must be positive");
-        } elseif ($this->multiplier < 1) {
+        } else if ($this->multiplier < 1) {
             $this->setError("Invalid Units supplied, must be K,Ki,M,Mi,G,Gi,T,or Ti");
-        } elseif ($this->sizelimit < 0) {
+        } else if ($this->sizelimit < 0) {
             $this->setError("Internal error: Code is not setting sizelimit correctly");
         }
     }
@@ -287,7 +281,7 @@ class SizeSelector extends BaseExtendSelector
         }
         if ($this->cmp === 0) {
             return ($file->length() < $this->sizelimit);
-        } elseif ($this->cmp === 1) {
+        } else if ($this->cmp === 1) {
             return ($file->length() > $this->sizelimit);
         } else {
             return ($file->length() === $this->sizelimit);

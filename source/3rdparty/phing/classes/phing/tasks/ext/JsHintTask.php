@@ -46,7 +46,7 @@ class JsHintTask extends Task
      *
      * @var FileSet[]
      */
-    protected $filesets = array();
+    protected $filesets = [];
 
     /**
      * Should the build fail on JSHint errors
@@ -137,22 +137,22 @@ class JsHintTask extends Task
 
         switch ($this->reporter) {
             case 'jslint':
-                $this->xmlAttributes = array(
-                    'severity' => array('error' => 'E', 'warning' => 'W', 'info' => 'I'),
+                $this->xmlAttributes = [
+                    'severity' => ['error' => 'E', 'warning' => 'W', 'info' => 'I'],
                     'fileError' => 'issue',
                     'line' => 'line',
                     'column' => 'char',
                     'message' => 'reason',
-                );
+                ];
                 break;
             default:
-                $this->xmlAttributes = array(
-                    'severity' => array('error' => 'error', 'warning' => 'warning', 'info' => 'info'),
+                $this->xmlAttributes = [
+                    'severity' => ['error' => 'error', 'warning' => 'warning', 'info' => 'info'],
                     'fileError' => 'error',
                     'line' => 'line',
                     'column' => 'column',
                     'message' => 'message',
-                );
+                ];
                 break;
         }
     }
@@ -164,7 +164,7 @@ class JsHintTask extends Task
         }
 
         if (!isset($this->file)) {
-            $fileList = array();
+            $fileList = [];
             $project = $this->getProject();
             foreach ($this->filesets as $fs) {
                 $ds = $fs->getDirectoryScanner($project);
@@ -175,14 +175,14 @@ class JsHintTask extends Task
                 }
             }
         } else {
-            $fileList = array($this->file);
+            $fileList = [$this->file];
         }
 
         $this->_checkJsHintIsInstalled();
 
         $fileList = array_map('escapeshellarg', $fileList);
         $command = sprintf('jshint --reporter=%s %s', $this->reporter, implode(' ', $fileList));
-        $output = array();
+        $output = [];
         exec($command, $output);
         $output = implode(PHP_EOL, $output);
         $xml = simplexml_load_string($output);
@@ -192,16 +192,16 @@ class JsHintTask extends Task
         $warningsCount = 0;
         foreach ($xml->file as $file) {
             $fileAttributes = $file->attributes();
-            $fileName = (string) $fileAttributes['name'];
+            $fileName = (string)$fileAttributes['name'];
             foreach ($file->error as $error) {
-                $errAttr = (array) $error->attributes();
+                $errAttr = (array)$error->attributes();
                 $attrs = current($errAttr);
 
                 if ($attrs['severity'] === $this->xmlAttributes['severity']['error']) {
                     $errorsCount++;
-                } elseif ($attrs['severity'] === $this->xmlAttributes['severity']['warning']) {
+                } else if ($attrs['severity'] === $this->xmlAttributes['severity']['warning']) {
                     $warningsCount++;
-                } elseif ($attrs['severity'] !== $this->xmlAttributes['severity']['info']) {
+                } else if ($attrs['severity'] !== $this->xmlAttributes['severity']['info']) {
                     throw new BuildException(sprintf('Unknown severity "%s"', $attrs['severity']));
                 }
                 $e = sprintf(
@@ -222,7 +222,7 @@ class JsHintTask extends Task
         );
         if ($this->haltOnError && $errorsCount) {
             throw new BuildException($message);
-        } elseif ($this->haltOnWarning && $warningsCount) {
+        } else if ($this->haltOnWarning && $warningsCount) {
             throw new BuildException($message);
         } else {
             $this->log('');
@@ -237,14 +237,6 @@ class JsHintTask extends Task
     }
 
     /**
-     * @return Path to the project basedir
-     */
-    private function _getProjectBasedir()
-    {
-        return $this->getProject()->getBaseDir()->getAbsolutePath() . DIRECTORY_SEPARATOR;
-    }
-
-    /**
      * Checks, wheter the JSHint can be executed
      */
     private function _checkJsHintIsInstalled()
@@ -253,5 +245,13 @@ class JsHintTask extends Task
         if ($return !== 0) {
             throw new BuildException('JSHint is not installed!');
         }
+    }
+
+    /**
+     * @return Path to the project basedir
+     */
+    private function _getProjectBasedir()
+    {
+        return $this->getProject()->getBaseDir()->getAbsolutePath() . DIRECTORY_SEPARATOR;
     }
 }

@@ -48,24 +48,22 @@ class PearLogListener implements BuildListener
      * @var int
      */
     const LEFT_COLUMN_SIZE = 12;
-
+    /**
+     * Maps Phing Project::MSG_* constants to PEAR_LOG_* constants.
+     * @var array
+     */
+    protected static $levelMap = [
+        Project::MSG_DEBUG => PEAR_LOG_DEBUG,
+        Project::MSG_INFO => PEAR_LOG_INFO,
+        Project::MSG_VERBOSE => PEAR_LOG_NOTICE,
+        Project::MSG_WARN => PEAR_LOG_WARNING,
+        Project::MSG_ERR => PEAR_LOG_ERR,
+    ];
     /**
      *  Time that the build started
      * @var int
      */
     protected $startTime;
-
-    /**
-     * Maps Phing Project::MSG_* constants to PEAR_LOG_* constants.
-     * @var array
-     */
-    protected static $levelMap = array(
-        Project::MSG_DEBUG => PEAR_LOG_DEBUG,
-        Project::MSG_INFO => PEAR_LOG_INFO,
-        Project::MSG_VERBOSE => PEAR_LOG_NOTICE,
-        Project::MSG_WARN => PEAR_LOG_WARNING,
-        Project::MSG_ERR => PEAR_LOG_ERR
-    );
     /**
      * Whether logging has been configured.
      * @var boolean
@@ -76,6 +74,33 @@ class PearLogListener implements BuildListener
      * @var Log PEAR Log object.
      */
     protected $logger;
+
+    /**
+     *  Sets the start-time when the build started. Used for calculating
+     *  the build-time.
+     *
+     * @param BuildEvent  The BuildEvent
+     */
+    public function buildStarted(BuildEvent $event)
+    {
+        $this->startTime = Phing::currentTimeMillis();
+        $this->logger()->setIdent($event->getProject()->getName());
+        $this->logger()->info("Starting build with buildfile: " . $event->getProject()->getProperty("phing.file"));
+    }
+
+    /**
+     * Get the configured PEAR logger to use.
+     * This method just ensures that logging has been configured and returns the configured logger.
+     * @return Log
+     */
+    protected function logger()
+    {
+        if (!$this->logConfigured) {
+            $this->configureLogging();
+        }
+
+        return $this->logger;
+    }
 
     /**
      * Configure the logger.
@@ -98,7 +123,7 @@ class PearLogListener implements BuildListener
             $ident = 'phing';
         }
         if ($conf === null) {
-            $conf = array();
+            $conf = [];
         }
 
         include_once 'Log.php';
@@ -110,37 +135,10 @@ class PearLogListener implements BuildListener
     }
 
     /**
-     * Get the configured PEAR logger to use.
-     * This method just ensures that logging has been configured and returns the configured logger.
-     * @return Log
-     */
-    protected function logger()
-    {
-        if (!$this->logConfigured) {
-            $this->configureLogging();
-        }
-
-        return $this->logger;
-    }
-
-    /**
-     *  Sets the start-time when the build started. Used for calculating
-     *  the build-time.
-     *
-     * @param  BuildEvent  The BuildEvent
-     */
-    public function buildStarted(BuildEvent $event)
-    {
-        $this->startTime = Phing::currentTimeMillis();
-        $this->logger()->setIdent($event->getProject()->getName());
-        $this->logger()->info("Starting build with buildfile: " . $event->getProject()->getProperty("phing.file"));
-    }
-
-    /**
      *  Logs whether the build succeeded or failed, and any errors that
      *  occurred during the build. Also outputs the total build-time.
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getException()
      */
     public function buildFinished(BuildEvent $event)
@@ -159,7 +157,7 @@ class PearLogListener implements BuildListener
     /**
      * Logs the current target name
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getTarget()
      */
     public function targetStarted(BuildEvent $event)
@@ -170,7 +168,7 @@ class PearLogListener implements BuildListener
      *  Fired when a target has finished. We don't need specific action on this
      *  event. So the methods are empty.
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getException()
      */
     public function targetFinished(BuildEvent $event)
@@ -181,7 +179,7 @@ class PearLogListener implements BuildListener
      *  Fired when a task is started. We don't need specific action on this
      *  event. So the methods are empty.
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getTask()
      */
     public function taskStarted(BuildEvent $event)
@@ -192,7 +190,7 @@ class PearLogListener implements BuildListener
      *  Fired when a task has finished. We don't need specific action on this
      *  event. So the methods are empty.
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getException()
      */
     public function taskFinished(BuildEvent $event)
@@ -202,7 +200,7 @@ class PearLogListener implements BuildListener
     /**
      *  Logs a message to the configured PEAR logger.
      *
-     * @param  BuildEvent  The BuildEvent
+     * @param BuildEvent  The BuildEvent
      * @see    BuildEvent::getMessage()
      */
     public function messageLogged(BuildEvent $event)

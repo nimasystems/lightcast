@@ -165,8 +165,8 @@ class lcSys
 
         $network = str_replace(' ', '', $network);
 
-        if (strpos($network, '*') !== FALSE) {
-            if (strpos($network, '/') !== FALSE) {
+        if (strpos($network, '*') !== false) {
+            if (strpos($network, '/') !== false) {
                 $asParts = explode('/', $network);
                 $network = @ $asParts[0];
             }
@@ -186,7 +186,7 @@ class lcSys
         //echo "from original network($orig_network), used network ($network) for ($ip)\n";
 
         $d = strpos($network, '-');
-        if ($d === FALSE) {
+        if ($d === false) {
             $ip_arr = explode('/', $network);
             if (!preg_match("@\d*\.\d*\.\d*\.\d*@", $ip_arr[0], $matches)) {
                 $ip_arr[0] .= '.0';    // Alternate form 194.1.4/24
@@ -310,13 +310,13 @@ class lcSys
 
         if (stristr($input, 'b')) {
             $ret = $input;
-        } elseif (stristr($input, 'k')) {
+        } else if (stristr($input, 'k')) {
             $ret = (int)$input * 1024;
-        } elseif (stristr($input, 'm')) {
+        } else if (stristr($input, 'm')) {
             $ret = (int)$input * 1048576;
-        } elseif (stristr($input, 'g')) {
+        } else if (stristr($input, 'g')) {
             $ret = (int)$input * 1073741824;
-        } elseif (stristr($input, 't')) {
+        } else if (stristr($input, 't')) {
             $ret = (int)$input * 1099511627776;
         }
 
@@ -347,31 +347,36 @@ class lcSys
         } else {
 
             switch ($size_in) {
-                case 'kb': {
-                    return round($object_size / 1024, $precision) . ' kb';
+                case 'kb':
+                    {
+                        return round($object_size / 1024, $precision) . ' kb';
 
-                    break;
-                }
-                case 'mb': {
-                    return round($object_size / 1048576, $precision) . ' mb';
+                        break;
+                    }
+                case 'mb':
+                    {
+                        return round($object_size / 1048576, $precision) . ' mb';
 
-                    break;
-                }
-                case 'gb': {
-                    return round($object_size / 1073741824, $precision) . ' gb';
+                        break;
+                    }
+                case 'gb':
+                    {
+                        return round($object_size / 1073741824, $precision) . ' gb';
 
-                    break;
-                }
-                case 'pb': {
-                    return round($object_size / 1099511627776, $precision) . ' pb';
+                        break;
+                    }
+                case 'pb':
+                    {
+                        return round($object_size / 1099511627776, $precision) . ' pb';
 
-                    break;
-                }
-                default: {
-                    return round($object_size / 1125899906842624, $precision) . ' mb';
+                        break;
+                    }
+                default:
+                    {
+                        return round($object_size / 1125899906842624, $precision) . ' mb';
 
-                    break;
-                }
+                        break;
+                    }
             }
         }
 

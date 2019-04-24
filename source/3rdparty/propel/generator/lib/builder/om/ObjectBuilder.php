@@ -33,6 +33,39 @@ abstract class ObjectBuilder extends OMBuilder
     }
 
     /**
+     * Checks whether any registered behavior on that table has a modifier for a hook
+     *
+     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
+     *
+     * @return boolean
+     */
+    public function hasBehaviorModifier($hookName, $modifier = null)
+    {
+        return parent::hasBehaviorModifier($hookName, 'ObjectBuilderModifier');
+    }
+
+    /**
+     * Checks whether any registered behavior on that table has a modifier for a hook
+     *
+     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
+     * @param string &$script The script will be modified in this method.
+     */
+    public function applyBehaviorModifier($hookName, &$script, $tab = "		")
+    {
+        return $this->applyBehaviorModifierBase($hookName, 'ObjectBuilderModifier', $script, $tab);
+    }
+
+    /**
+     * Checks whether any registered behavior content creator on that table exists a contentName
+     *
+     * @param string $contentName The name of the content as called from one of this class methods, e.g. "parentClassname"
+     */
+    public function getBehaviorContent($contentName)
+    {
+        return $this->getBehaviorContentBase($contentName, 'ObjectBuilderModifier');
+    }
+
+    /**
      * This method adds the contents of the generated class to the script.
      *
      * This method is abstract and should be overridden by the subclasses.
@@ -60,14 +93,14 @@ abstract class ObjectBuilder extends OMBuilder
             // if they're not using the DateTime class than we will generate "compatibility" accessor method
             if ($col->getType() === PropelTypes::DATE || $col->getType() === PropelTypes::TIME || $col->getType() === PropelTypes::TIMESTAMP) {
                 $this->addTemporalAccessor($script, $col);
-            } elseif ($col->getType() === PropelTypes::OBJECT) {
+            } else if ($col->getType() === PropelTypes::OBJECT) {
                 $this->addObjectAccessor($script, $col);
-            } elseif ($col->getType() === PropelTypes::PHP_ARRAY) {
+            } else if ($col->getType() === PropelTypes::PHP_ARRAY) {
                 $this->addArrayAccessor($script, $col);
                 if ($col->isNamePlural()) {
                     $this->addHasArrayElement($script, $col);
                 }
-            } elseif ($col->isEnumType()) {
+            } else if ($col->isEnumType()) {
                 $this->addEnumAccessor($script, $col);
             } else {
                 $this->addDefaultAccessor($script, $col);
@@ -91,26 +124,25 @@ abstract class ObjectBuilder extends OMBuilder
         foreach ($this->getTable()->getColumns() as $col) {
             if ($col->isLobType()) {
                 $this->addLobMutator($script, $col);
-            } elseif ($col->getType() === PropelTypes::DATE || $col->getType() === PropelTypes::TIME || $col->getType() === PropelTypes::TIMESTAMP) {
+            } else if ($col->getType() === PropelTypes::DATE || $col->getType() === PropelTypes::TIME || $col->getType() === PropelTypes::TIMESTAMP) {
                 $this->addTemporalMutator($script, $col);
-            } elseif ($col->getType() === PropelTypes::OBJECT) {
+            } else if ($col->getType() === PropelTypes::OBJECT) {
                 $this->addObjectMutator($script, $col);
-            } elseif ($col->getType() === PropelTypes::PHP_ARRAY) {
+            } else if ($col->getType() === PropelTypes::PHP_ARRAY) {
                 $this->addArrayMutator($script, $col);
                 if ($col->isNamePlural()) {
                     $this->addAddArrayElement($script, $col);
                     $this->addRemoveArrayElement($script, $col);
                 }
-            } elseif ($col->isEnumType()) {
+            } else if ($col->isEnumType()) {
                 $this->addEnumMutator($script, $col);
-            } elseif ($col->isBooleanType()) {
+            } else if ($col->isBooleanType()) {
                 $this->addBooleanMutator($script, $col);
             } else {
                 $this->addDefaultMutator($script, $col);
             }
         }
     }
-
 
     /**
      * Gets the baseClass path if specified for table/db.
@@ -186,38 +218,5 @@ abstract class ObjectBuilder extends OMBuilder
         }
 
         return false;
-    }
-
-    /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
-     *
-     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     *
-     * @return boolean
-     */
-    public function hasBehaviorModifier($hookName, $modifier = null)
-    {
-        return parent::hasBehaviorModifier($hookName, 'ObjectBuilderModifier');
-    }
-
-    /**
-     * Checks whether any registered behavior on that table has a modifier for a hook
-     *
-     * @param string $hookName The name of the hook as called from one of this class methods, e.g. "preSave"
-     * @param string &$script  The script will be modified in this method.
-     */
-    public function applyBehaviorModifier($hookName, &$script, $tab = "		")
-    {
-        return $this->applyBehaviorModifierBase($hookName, 'ObjectBuilderModifier', $script, $tab);
-    }
-
-    /**
-     * Checks whether any registered behavior content creator on that table exists a contentName
-     *
-     * @param string $contentName The name of the content as called from one of this class methods, e.g. "parentClassname"
-     */
-    public function getBehaviorContent($contentName)
-    {
-        return $this->getBehaviorContentBase($contentName, 'ObjectBuilderModifier');
     }
 }

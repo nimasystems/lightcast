@@ -57,11 +57,6 @@ class lcTagButton extends lcHtmlTag
         }
     }
 
-    public static function create()
-    {
-        return new lcTagButton();
-    }
-
     public function setContent($content)
     {
         parent::setContent($content);
@@ -106,6 +101,11 @@ class lcTagButton extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $accesskey);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagButton();
     }
 
     public static function getRequiredAttributes()

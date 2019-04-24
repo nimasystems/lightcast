@@ -2,14 +2,14 @@
 
 class FrontendConfiguration extends lcWebConfiguration
 {
-	public function getApplicationName()
-	{
-		return 'frontend';
-	}
+    public function getApplicationName()
+    {
+        return 'frontend';
+    }
 
-	public function getProjectName()
-	{
-		throw new lcConfigException('Set a proper project name');
-	}
+    public function getProjectName()
+    {
+        throw new lcConfigException('Set a proper project name');
+    }
 }
 

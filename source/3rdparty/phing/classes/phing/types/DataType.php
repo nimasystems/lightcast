@@ -61,19 +61,6 @@ class DataType extends ProjectComponent
     protected $checked = true;
 
     /**
-     * Sets a description of the current data type. It will be useful
-     * in commenting what we are doing.
-     *
-     * @param string $desc
-     *
-     * @return void
-     */
-    public function setDescription($desc)
-    {
-        $this->description = (string) $desc;
-    }
-
-    /**
      * Return the description for the current data type.
      *
      * @retujrn string
@@ -84,13 +71,16 @@ class DataType extends ProjectComponent
     }
 
     /**
-     * Has the refid attribute of this element been set?
+     * Sets a description of the current data type. It will be useful
+     * in commenting what we are doing.
      *
-     * @return bool
+     * @param string $desc
+     *
+     * @return void
      */
-    public function isReference()
+    public function setDescription($desc)
     {
-        return ($this->ref !== null);
+        $this->description = (string)$desc;
     }
 
     /**
@@ -100,7 +90,7 @@ class DataType extends ProjectComponent
      * have been set as well or child elements have been created and
      * thus override this method. if they do they must call parent::setRefid()
      *
-     * @param  Reference $r
+     * @param Reference $r
      *
      * @return void
      */
@@ -108,6 +98,33 @@ class DataType extends ProjectComponent
     {
         $this->ref = $r;
         $this->checked = false;
+    }
+
+    /**
+     * Performs the check for circular references and returns the referenced object.
+     *
+     * @param $requiredClass
+     * @param $dataTypeName
+     *
+     * @return mixed
+     * @throws BuildException
+     *
+     */
+    public function getCheckedRef($requiredClass, $dataTypeName)
+    {
+        if (!$this->checked) {
+            // should be in stack
+            $stk = [];
+            $stk[] = $this;
+            $this->dieOnCircularReference($stk, $this->getProject());
+        }
+
+        $o = $this->ref->getReferencedObject($this->getProject());
+        if (!($o instanceof $requiredClass)) {
+            throw new BuildException($this->ref->getRefId() . " doesn't denote a " . $dataTypeName);
+        } else {
+            return $o;
+        }
     }
 
     /**
@@ -165,30 +182,24 @@ class DataType extends ProjectComponent
     }
 
     /**
-     * Performs the check for circular references and returns the referenced object.
+     * Has the refid attribute of this element been set?
      *
-     * @param $requiredClass
-     * @param $dataTypeName
-     *
-     * @throws BuildException
-     *
-     * @return mixed
+     * @return bool
      */
-    public function getCheckedRef($requiredClass, $dataTypeName)
+    public function isReference()
     {
-        if (!$this->checked) {
-            // should be in stack
-            $stk = array();
-            $stk[] = $this;
-            $this->dieOnCircularReference($stk, $this->getProject());
-        }
+        return ($this->ref !== null);
+    }
 
-        $o = $this->ref->getReferencedObject($this->getProject());
-        if (!($o instanceof $requiredClass)) {
-            throw new BuildException($this->ref->getRefId() . " doesn't denote a " . $dataTypeName);
-        } else {
-            return $o;
-        }
+    /**
+     * Creates an exception that indicates the user has generated a
+     * loop of data types referencing each other.
+     *
+     * @return BuildException
+     */
+    public function circularReference()
+    {
+        return new BuildException("This data type contains a circular reference.");
     }
 
     /**
@@ -211,17 +222,6 @@ class DataType extends ProjectComponent
     public function noChildrenAllowed()
     {
         return new BuildException("You must not specify nested elements when using refid");
-    }
-
-    /**
-     * Creates an exception that indicates the user has generated a
-     * loop of data types referencing each other.
-     *
-     * @return BuildException
-     */
-    public function circularReference()
-    {
-        return new BuildException("This data type contains a circular reference.");
     }
 
     /**

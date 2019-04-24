@@ -35,28 +35,26 @@ require_once 'phing/Task.php';
  */
 class VersionTask extends Task
 {
+    const RELEASETYPE_MAJOR = 'MAJOR';
+    const RELEASETYPE_MINOR = 'MINOR';
+    const RELEASETYPE_BUGFIX = 'BUGFIX';
+
+    /* Allowed Releastypes */
     /**
      * Property for Releasetype
      * @var string $releasetype
      */
     private $releasetype;
-
     /**
      * Property for File
      * @var PhingFile file
      */
     private $file;
-
     /**
      * Property to be set
      * @var string $property
      */
     private $property;
-
-    /* Allowed Releastypes */
-    const RELEASETYPE_MAJOR = 'MAJOR';
-    const RELEASETYPE_MINOR = 'MINOR';
-    const RELEASETYPE_BUGFIX = 'BUGFIX';
 
     /**
      * Set Property for Releasetype (Minor, Major, Bugfix)
@@ -114,53 +112,6 @@ class VersionTask extends Task
     }
 
     /**
-     * Returns new version number corresponding to Release type
-     *
-     * @param  string $filecontent
-     * @return string
-     */
-    private function getVersion($filecontent)
-    {
-        // init
-        $newVersion = '';
-
-        // Extract version
-        list($major, $minor, $bugfix) = explode(".", $filecontent);
-
-        // Return new version number
-        switch ($this->releasetype) {
-            case self::RELEASETYPE_MAJOR:
-                $newVersion = sprintf(
-                    "%d.%d.%d",
-                    ++$major,
-                    0,
-                    0
-                );
-                break;
-
-            case self::RELEASETYPE_MINOR:
-                $newVersion = sprintf(
-                    "%d.%d.%d",
-                    $major,
-                    ++$minor,
-                    0
-                );
-                break;
-
-            case self::RELEASETYPE_BUGFIX:
-                $newVersion = sprintf(
-                    "%d.%d.%d",
-                    $major,
-                    $minor,
-                    ++$bugfix
-                );
-                break;
-        }
-
-        return $newVersion;
-    }
-
-    /**
      * checks releasetype attribute
      * @return void
      * @throws BuildException
@@ -172,11 +123,11 @@ class VersionTask extends Task
             throw new BuildException('releasetype attribute is required', $this->location);
         }
         // known releasetypes
-        $releaseTypes = array(
+        $releaseTypes = [
             self::RELEASETYPE_MAJOR,
             self::RELEASETYPE_MINOR,
-            self::RELEASETYPE_BUGFIX
-        );
+            self::RELEASETYPE_BUGFIX,
+        ];
 
         if (!in_array($this->releasetype, $releaseTypes)) {
             throw new BuildException(sprintf(
@@ -225,5 +176,52 @@ class VersionTask extends Task
         ) {
             throw new BuildException('Property for publishing version number is not set', $this->location);
         }
+    }
+
+    /**
+     * Returns new version number corresponding to Release type
+     *
+     * @param string $filecontent
+     * @return string
+     */
+    private function getVersion($filecontent)
+    {
+        // init
+        $newVersion = '';
+
+        // Extract version
+        list($major, $minor, $bugfix) = explode(".", $filecontent);
+
+        // Return new version number
+        switch ($this->releasetype) {
+            case self::RELEASETYPE_MAJOR:
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    ++$major,
+                    0,
+                    0
+                );
+                break;
+
+            case self::RELEASETYPE_MINOR:
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    $major,
+                    ++$minor,
+                    0
+                );
+                break;
+
+            case self::RELEASETYPE_BUGFIX:
+                $newVersion = sprintf(
+                    "%d.%d.%d",
+                    $major,
+                    $minor,
+                    ++$bugfix
+                );
+                break;
+        }
+
+        return $newVersion;
     }
 }

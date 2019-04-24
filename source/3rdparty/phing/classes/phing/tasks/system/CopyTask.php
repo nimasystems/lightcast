@@ -46,13 +46,13 @@ class CopyTask extends Task
     protected $flatten = false; // apply the FlattenMapper right way (from XML)
     protected $mapperElement = null;
 
-    protected $fileCopyMap = array(); // asoc array containing mapped file names
-    protected $dirCopyMap = array(); // asoc array containing mapped file names
-    protected $completeDirMap = array(); // asoc array containing complete dir names
+    protected $fileCopyMap = []; // asoc array containing mapped file names
+    protected $dirCopyMap = []; // asoc array containing mapped file names
+    protected $completeDirMap = []; // asoc array containing complete dir names
     protected $fileUtils = null; // a instance of fileutils
-    protected $filesets = array(); // all fileset objects assigned to this task
-    protected $filelists = array(); // all filelist objects assigned to this task
-    protected $filterChains = array(); // all filterchains objects assigned to this task
+    protected $filesets = []; // all fileset objects assigned to this task
+    protected $filelists = []; // all filelist objects assigned to this task
+    protected $filterChains = []; // all filterchains objects assigned to this task
 
     protected $verbosity = Project::MSG_VERBOSE;
 
@@ -79,13 +79,13 @@ class CopyTask extends Task
      * booleans in set* methods so we can assume that the right
      * value (boolean primitive) is coming in here.
      *
-     * @param  boolean $bool Overwrite the destination file(s) if it/they already exist
+     * @param boolean $bool Overwrite the destination file(s) if it/they already exist
      *
      * @return void
      */
     public function setOverwrite($bool)
     {
-        $this->overwrite = (boolean) $bool;
+        $this->overwrite = (boolean)$bool;
     }
 
     /**
@@ -102,8 +102,8 @@ class CopyTask extends Task
     }
 
     /**
-     * @see CopyTask::setPreserveLastModified
      * @param $bool
+     * @see CopyTask::setPreserveLastModified
      */
     public function setTstamp($bool)
     {
@@ -115,25 +115,12 @@ class CopyTask extends Task
      * booleans in set* methods so we can assume that the right
      * value (boolean primitive) is coming in here.
      *
-     * @param  boolean  Preserve the timestamp on the destination file
+     * @param boolean  Preserve the timestamp on the destination file
      * @return void
      */
     public function setPreserveLastModified($bool)
     {
-        $this->preserveLMT = (boolean) $bool;
-    }
-
-    /**
-     * Set the preserve permissions flag. IntrospectionHelper takes care of
-     * booleans in set* methods so we can assume that the right
-     * value (boolean primitive) is coming in here.
-     *
-     * @param  boolean $bool Preserve the timestamp on the destination file
-     * @return void
-     */
-    public function setPreservepermissions($bool)
-    {
-        $this->preservePermissions = (boolean) $bool;
+        $this->preserveLMT = (boolean)$bool;
     }
 
     /**
@@ -145,16 +132,29 @@ class CopyTask extends Task
     }
 
     /**
+     * Set the preserve permissions flag. IntrospectionHelper takes care of
+     * booleans in set* methods so we can assume that the right
+     * value (boolean primitive) is coming in here.
+     *
+     * @param boolean $bool Preserve the timestamp on the destination file
+     * @return void
+     */
+    public function setPreservepermissions($bool)
+    {
+        $this->preservePermissions = (boolean)$bool;
+    }
+
+    /**
      * Set the include empty dirs flag. IntrospectionHelper takes care of
      * booleans in set* methods so we can assume that the right
      * value (boolean primitive) is coming in here.
      *
-     * @param  boolean $bool Flag if empty dirs should be cpoied too
+     * @param boolean $bool Flag if empty dirs should be cpoied too
      * @return void
      */
     public function setIncludeEmptyDirs($bool)
     {
-        $this->includeEmpty = (boolean) $bool;
+        $this->includeEmpty = (boolean)$bool;
     }
 
     /**
@@ -195,7 +195,7 @@ class CopyTask extends Task
      */
     public function setMode($mode)
     {
-        $this->mode = (int) base_convert($mode, 8, 10);
+        $this->mode = (int)base_convert($mode, 8, 10);
     }
 
     /**
@@ -214,7 +214,7 @@ class CopyTask extends Task
 
     public function setEnableMultipleMappings($enableMultipleMappings)
     {
-        $this->enableMultipleMappings = (boolean) $enableMultipleMappings;
+        $this->enableMultipleMappings = (boolean)$enableMultipleMappings;
     }
 
     public function isEnabledMultipleMappings()
@@ -232,7 +232,7 @@ class CopyTask extends Task
      */
     public function setHaltonerror($haltonerror)
     {
-        $this->haltonerror = (boolean) $haltonerror;
+        $this->haltonerror = (boolean)$haltonerror;
     }
 
     /**
@@ -301,7 +301,7 @@ class CopyTask extends Task
         if ($this->file !== null) {
             if ($this->file->exists()) {
                 if ($this->destFile === null) {
-                    $this->destFile = new PhingFile($this->destDir, (string) $this->file->getName());
+                    $this->destFile = new PhingFile($this->destDir, (string)$this->file->getName());
                 }
                 if ($this->overwrite === true || ($this->file->lastModified() > $this->destFile->lastModified())) {
                     $this->fileCopyMap[$this->file->getAbsolutePath()] = $this->destFile->getAbsolutePath();
@@ -320,7 +320,7 @@ class CopyTask extends Task
         foreach ($this->filelists as $fl) {
             $fromDir = $fl->getDir($project);
             $srcFiles = $fl->getFiles($project);
-            $srcDirs = array($fl->getDir($project));
+            $srcDirs = [$fl->getDir($project)];
 
             if (!$this->flatten && $this->mapperElement === null) {
                 $this->completeDirMap[$fromDir->getAbsolutePath()] = $this->destDir->getAbsolutePath();
@@ -396,6 +396,21 @@ class CopyTask extends Task
     }
 
     /**
+     * @param string $message
+     * @param null $location
+     *
+     * @throws BuildException
+     */
+    protected function logError($message, $location = null)
+    {
+        if ($this->haltonerror) {
+            throw new BuildException($message, $location);
+        } else {
+            $this->log($message, Project::MSG_ERR);
+        }
+    }
+
+    /**
      * Compares source files to destination files to see if they
      * should be copied.
      *
@@ -411,9 +426,9 @@ class CopyTask extends Task
         /* mappers should be generic, so we get the mappers here and
         pass them on to builMap. This method is not redundan like it seems */
         $mapper = $this->getMapper();
-        
+
         $this->buildMap($fromDir, $toDir, $files, $mapper, $this->fileCopyMap);
-        
+
         if ($this->includeEmpty) {
             $this->buildMap($fromDir, $toDir, $dirs, $mapper, $this->dirCopyMap);
         }
@@ -424,7 +439,7 @@ class CopyTask extends Task
         $mapper = null;
         if ($this->mapperElement !== null) {
             $mapper = $this->mapperElement->getImplementation();
-        } elseif ($this->flatten) {
+        } else if ($this->flatten) {
             $mapper = new FlattenMapper();
         } else {
             $mapper = new IdentityMapper();
@@ -447,7 +462,7 @@ class CopyTask extends Task
     {
         $toCopy = null;
         if ($this->overwrite) {
-            $v = array();
+            $v = [];
             foreach ($names as $name) {
                 $result = $mapper->main($name);
                 if ($result !== null) {
@@ -502,8 +517,8 @@ class CopyTask extends Task
         if ($this->includeEmpty) {
             $count = 0;
             foreach ($this->dirCopyMap as $srcdir => $destdir) {
-                $s = new PhingFile((string) $srcdir);
-                $d = new PhingFile((string) $destdir);
+                $s = new PhingFile((string)$srcdir);
+                $d = new PhingFile((string)$destdir);
                 if (!$d->exists()) {
 
                     // Setting source directory permissions to target
@@ -526,8 +541,7 @@ class CopyTask extends Task
             }
             if ($count > 0) {
                 $this->log(
-                    "Created " . $count . " empty director" . ($count == 1 ? "y" : "ies") . " in " . $this->destDir->getAbsolutePath(
-                    )
+                    "Created " . $count . " empty director" . ($count == 1 ? "y" : "ies") . " in " . $this->destDir->getAbsolutePath()
                 );
             }
         }
@@ -537,8 +551,7 @@ class CopyTask extends Task
         }
 
         $this->log(
-            "Copying " . $mapSize . " file" . (($mapSize) === 1 ? '' : 's') . " to " . $this->destDir->getAbsolutePath(
-            )
+            "Copying " . $mapSize . " file" . (($mapSize) === 1 ? '' : 's') . " to " . $this->destDir->getAbsolutePath()
         );
         // walks the map and actually copies the files
         $count = 0;
@@ -586,21 +599,6 @@ class CopyTask extends Task
             $count++;
         } catch (IOException $ioe) {
             $this->logError("Failed to copy " . $from . " to " . $to . ": " . $ioe->getMessage());
-        }
-    }
-
-    /**
-     * @param string $message
-     * @param null $location
-     *
-     * @throws BuildException
-     */
-    protected function logError($message, $location = null)
-    {
-        if ($this->haltonerror) {
-            throw new BuildException($message, $location);
-        } else {
-            $this->log($message, Project::MSG_ERR);
         }
     }
 }

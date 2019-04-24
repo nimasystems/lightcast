@@ -53,7 +53,7 @@ class lcFinder
 
         if ($type == 'dir') {
             $this->find_type = 'directory';
-        } elseif ($type == 'directory') {
+        } else if ($type == 'directory') {
             $this->find_type = 'directory';
         } else {
             $this->find_type = 'file';

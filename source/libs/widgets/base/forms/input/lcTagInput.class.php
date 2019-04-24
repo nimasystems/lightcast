@@ -40,11 +40,6 @@ class lcTagInput extends lcHtmlTag
         $this->setAccessKey($accesskey);
     }
 
-    public static function create()
-    {
-        return new lcTagInput();
-    }
-
     public function setType($value = null)
     {
         $this->setAttribute('type', $value);
@@ -97,6 +92,11 @@ class lcTagInput extends lcHtmlTag
     {
         $this->setAttribute('accesskey', $value);
         return $this;
+    }
+
+    public static function create()
+    {
+        return new lcTagInput();
     }
 
     public static function getRequiredAttributes()

@@ -195,6 +195,11 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
         return $this->configuration;
     }
 
+    public function setConfiguration(lcConfiguration $configuration)
+    {
+        $this->configuration = $configuration;
+    }
+
     /**
      * New style config getter
      * @return lcApplicationConfiguration|lcProjectConfiguration
@@ -202,11 +207,6 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     public function getConfig()
     {
         return $this->configuration;
-    }
-
-    public function setConfiguration(lcConfiguration $configuration)
-    {
-        $this->configuration = $configuration;
     }
 
     public function getEventDispatcher()

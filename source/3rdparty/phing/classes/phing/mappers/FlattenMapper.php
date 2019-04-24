@@ -34,14 +34,14 @@ class FlattenMapper implements FileNameMapper
      * The mapper implementation. Returns string with source filename
      * but without leading directory information
      *
-     * @param  string $sourceFileName The data the mapper works on
+     * @param string $sourceFileName The data the mapper works on
      * @return array  The data after the mapper has been applied
      */
     public function main($sourceFileName)
     {
         $f = new PhingFile($sourceFileName);
 
-        return array($f->getName());
+        return [$f->getName()];
     }
 
     /**

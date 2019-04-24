@@ -29,7 +29,7 @@ class PropelSimpleArrayFormatter extends PropelFormatter
             $collection->setModel($this->class);
             $collection->setFormatter($this);
         } else {
-            $collection = array();
+            $collection = [];
         }
         if ($this->isWithOneToMany() && $this->hasLimit) {
             throw new PropelException('Cannot use limit() in conjunction with with() on a one-to-many relationship. Please remove the with() call, or the limit() call.');
@@ -40,6 +40,21 @@ class PropelSimpleArrayFormatter extends PropelFormatter
         $stmt->closeCursor();
 
         return $collection;
+    }
+
+    public function getStructuredArrayFromRow($row)
+    {
+        $columnNames = array_keys($this->getAsColumns());
+        if (count($columnNames) > 1 && count($row) > 1) {
+            $finalRow = [];
+            foreach ($row as $index => $value) {
+                $finalRow[str_replace('"', '', $columnNames[$index])] = $value;
+            }
+        } else {
+            $finalRow = $row[0];
+        }
+
+        return $finalRow;
     }
 
     public function formatOne(PDOStatement $stmt)
@@ -57,20 +72,5 @@ class PropelSimpleArrayFormatter extends PropelFormatter
     public function isObjectFormatter()
     {
         return false;
-    }
-
-    public function getStructuredArrayFromRow($row)
-    {
-        $columnNames = array_keys($this->getAsColumns());
-        if (count($columnNames) > 1 && count($row) > 1) {
-            $finalRow = array();
-            foreach ($row as $index => $value) {
-                $finalRow[str_replace('"', '', $columnNames[$index])] = $value;
-            }
-        } else {
-            $finalRow = $row[0];
-        }
-
-        return $finalRow;
     }
 }

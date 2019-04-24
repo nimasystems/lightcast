@@ -19,16 +19,16 @@
 class SluggableBehavior extends Behavior
 {
     // default parameters value
-    protected $parameters = array(
-        'add_cleanup'     => 'true',
-        'slug_column'     => 'slug',
-        'slug_pattern'    => '',
+    protected $parameters = [
+        'add_cleanup' => 'true',
+        'slug_column' => 'slug',
+        'slug_pattern' => '',
         'replace_pattern' => '/\W+/', // Tip: use '/[^\\pL\\d]+/u' instead if you're in PHP5.3
-        'replacement'     => '-',
-        'separator'       => '-',
-        'permanent'       => 'false',
-        'scope_column'    => ''
-    );
+        'replacement' => '-',
+        'separator' => '-',
+        'permanent' => 'false',
+        'scope_column' => '',
+    ];
 
     /**
      * Add the slug_column to the current table
@@ -36,11 +36,11 @@ class SluggableBehavior extends Behavior
     public function modifyTable()
     {
         if (!$this->getTable()->containsColumn($this->getParameter('slug_column'))) {
-            $this->getTable()->addColumn(array(
+            $this->getTable()->addColumn([
                 'name' => $this->getParameter('slug_column'),
                 'type' => 'VARCHAR',
-                'size' => 255
-            ));
+                'size' => 255,
+            ]);
             // add a unique to column
             $unique = new Unique($this->getColumnForParameter('slug_column'));
             $unique->setName($this->getTable()->getCommonName() . '_slug');
@@ -50,26 +50,6 @@ class SluggableBehavior extends Behavior
             }
             $this->getTable()->addUnique($unique);
         }
-    }
-
-    /**
-     * Get the getter of the column of the behavior
-     *
-     * @return string The related getter, e.g. 'getSlug'
-     */
-    protected function getColumnGetter()
-    {
-        return 'get' . $this->getColumnForParameter('slug_column')->getPhpName();
-    }
-
-    /**
-     * Get the setter of the column of the behavior
-     *
-     * @return string The related setter, e.g. 'setSlug'
-     */
-    protected function getColumnSetter()
-    {
-        return 'set' . $this->getColumnForParameter('slug_column')->getPhpName();
     }
 
     /**
@@ -121,6 +101,36 @@ if (\$this->isColumnModified($const) && \$this->{$this->getColumnGetter()}()) {
         }
 
         return $script;
+    }
+
+    /**
+     * Get the getter of the column of the behavior
+     *
+     * @return string The related getter, e.g. 'getSlug'
+     */
+    protected function getColumnGetter()
+    {
+        return 'get' . $this->getColumnForParameter('slug_column')->getPhpName();
+    }
+
+    /**
+     * Get the setter of the column of the behavior
+     *
+     * @return string The related setter, e.g. 'setSlug'
+     */
+    protected function getColumnSetter()
+    {
+        return 'set' . $this->getColumnForParameter('slug_column')->getPhpName();
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    protected function underscore($string)
+    {
+        return strtolower(preg_replace(['/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'], ['\\1_\\2', '\\1_\\2'], strtr($string, '_', '.')));
     }
 
     public function objectMethods(PHP5ObjectBuilder $builder)
@@ -205,7 +215,7 @@ protected function createRawSlug()
 {
     ";
         if ($pattern) {
-            $script .= "return '" . str_replace(array('{', '}'), array('\' . $this->cleanupSlugPart($this->get', '()) . \''), $pattern) . "';";
+            $script .= "return '" . str_replace(['{', '}'], ['\' . $this->cleanupSlugPart($this->get', '()) . \''], $pattern) . "';";
         } else {
             $script .= "return \$this->cleanupSlugPart(\$this->__toString());";
         }
@@ -326,15 +336,15 @@ protected function makeSlugUnique(\$slug, \$separator = '" . $this->getParameter
         $platform = $this->getTable()->getDatabase()->getPlatform();
         if ($platform instanceof PgsqlPlatform) {
             $script .= "->where('q." . $this->getColumnForParameter('slug_column')->getPhpName() . " ' . (\$alreadyExists ? '~*' : '=') . ' ?', \$alreadyExists ? '^' . \$slug2 . '[0-9]+$' : \$slug2)";
-        } elseif ($platform instanceof MssqlPlatform) {
+        } else if ($platform instanceof MssqlPlatform) {
             $script .= "->where('q." . $this->getColumnForParameter('slug_column')->getPhpName() . " ' . (\$alreadyExists ? 'like' : '=') . ' ?', \$alreadyExists ? '^' . \$slug2 . '[0-9]+$' : \$slug2)";
-        } elseif ($platform instanceof OraclePlatform) {
+        } else if ($platform instanceof OraclePlatform) {
             $script .= "->where((\$alreadyExists ? 'REGEXP_LIKE(' : '') . 'q." . $this->getColumnForParameter('slug_column')->getPhpName() . " ' . (\$alreadyExists ? ',' : '=') . ' ?' . (\$alreadyExists ? ')' : ''), \$alreadyExists ? '^' . \$slug2 . '[0-9]+$' : \$slug2)";
         } else {
             $script .= "->where('q." . $this->getColumnForParameter('slug_column')->getPhpName() . " ' . (\$alreadyExists ? 'REGEXP' : '=') . ' ?', \$alreadyExists ? '^' . \$slug2 . '[0-9]+$' : \$slug2)";
         }
 
-        $script .="->prune(\$this)";
+        $script .= "->prune(\$this)";
 
         if ($this->getParameter('scope_column')) {
             $scopeGetter = 'get' . $this->getColumnForParameter('scope_column')->getPhpName();
@@ -425,15 +435,5 @@ public function findOneBySlug(\$slug, \$con = null)
     return \$this->filterBySlug(\$slug)->findOne(\$con);
 }
 ";
-    }
-
-    /**
-     * @param string $string
-     *
-     * @return string
-     */
-    protected function underscore($string)
-    {
-        return strtolower(preg_replace(array('/([A-Z]+)([A-Z][a-z])/', '/([a-z\d])([A-Z])/'), array('\\1_\\2', '\\1_\\2'), strtr($string, '_', '.')));
     }
 }

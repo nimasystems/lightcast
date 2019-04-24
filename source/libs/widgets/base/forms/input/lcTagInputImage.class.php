@@ -33,11 +33,6 @@ class lcTagInputImage extends lcTagInput
         $this->setAlt($alt);
     }
 
-    public static function create()
-    {
-        return new lcTagInputImage();
-    }
-
     public function setSrc($value = null)
     {
         $this->setAttribute('src', $value);
@@ -47,6 +42,11 @@ class lcTagInputImage extends lcTagInput
     public function setAlt($value = null)
     {
         $this->setAttribute('alt', $value);
+    }
+
+    public static function create()
+    {
+        return new lcTagInputImage();
     }
 
     public static function getRequiredAttributes()

@@ -55,22 +55,19 @@ include_once 'phing/tasks/ext/pdo/PDOSQLExecFormatterElement.php';
 class PDOSQLExecTask extends PDOTask
 {
 
+    const DELIM_ROW = "row";
+    const DELIM_NORMAL = "normal";
+    const DELIM_NONE = "none";
     /**
      * Count of how many statements were executed successfully.
      * @var int
      */
     private $goodSql = 0;
-
     /**
      * Count of total number of SQL statements.
      * @var int
      */
     private $totalSql = 0;
-
-    const DELIM_ROW = "row";
-    const DELIM_NORMAL = "normal";
-    const DELIM_NONE = "none";
-
     /**
      * Database connection
      * @var PDO
@@ -81,19 +78,19 @@ class PDOSQLExecTask extends PDOTask
      * Files to load
      * @var array FileSet[]
      */
-    private $filesets = array();
+    private $filesets = [];
 
     /**
      * Files to load
      * @var array FileList[]
      */
-    private $filelists = array();
+    private $filelists = [];
 
     /**
      * Formatter elements.
      * @var array PDOSQLExecFormatterElement[]
      */
-    private $formatters = array();
+    private $formatters = [];
 
     /**
      * SQL statement
@@ -116,7 +113,7 @@ class PDOSQLExecTask extends PDOTask
     /**
      * SQL transactions to perform
      */
-    private $transactions = array();
+    private $transactions = [];
 
     /**
      * SQL Statement delimiter (for parsing files)
@@ -197,17 +194,6 @@ class PDOSQLExecTask extends PDOTask
     }
 
     /**
-     * Add a SQL transaction to execute
-     */
-    public function createTransaction()
-    {
-        $t = new PDOSQLExecTransaction($this);
-        $this->transactions[] = $t;
-
-        return $t;
-    }
-
-    /**
      * Set the file encoding to use on the SQL files read in
      *
      * @param the $encoding
@@ -216,6 +202,16 @@ class PDOSQLExecTask extends PDOTask
     public function setEncoding($encoding)
     {
         $this->encoding = $encoding;
+    }
+
+    /**
+     * Get the statement delimiter.
+     *
+     * @return string
+     */
+    public function getDelimiter()
+    {
+        return $this->delimiter;
     }
 
     /**
@@ -229,16 +225,6 @@ class PDOSQLExecTask extends PDOTask
     public function setDelimiter($delimiter)
     {
         $this->delimiter = $delimiter;
-    }
-
-    /**
-     * Get the statement delimiter.
-     *
-     * @return string
-     */
-    public function getDelimiter()
-    {
-        return $this->delimiter;
     }
 
     /**
@@ -272,7 +258,7 @@ class PDOSQLExecTask extends PDOTask
     public function setFetchmode($mode)
     {
         if (is_numeric($mode)) {
-            $this->fetchMode = (int) $mode;
+            $this->fetchMode = (int)$mode;
         } else {
             if (defined($mode)) {
                 $this->fetchMode = constant($mode);
@@ -280,16 +266,6 @@ class PDOSQLExecTask extends PDOTask
                 throw new BuildException("Invalid PDO fetch mode specified: " . $mode, $this->getLocation());
             }
         }
-    }
-
-    /**
-     * Gets a default output writer for this task.
-     *
-     * @return Writer
-     */
-    private function getDefaultOutput()
-    {
-        return new LogWriter($this);
     }
 
     /**
@@ -314,7 +290,7 @@ class PDOSQLExecTask extends PDOTask
             $fe->prepare();
         }
 
-        $savedTransaction = array();
+        $savedTransaction = [];
         for ($i = 0, $size = count($this->transactions); $i < $size; $i++) {
             $savedTransaction[] = clone $this->transactions[$i];
         }
@@ -434,6 +410,67 @@ class PDOSQLExecTask extends PDOTask
     }
 
     /**
+     * Add a SQL transaction to execute
+     */
+    public function createTransaction()
+    {
+        $t = new PDOSQLExecTransaction($this);
+        $this->transactions[] = $t;
+
+        return $t;
+    }
+
+    /**
+     * Initialize the formatters.
+     */
+    protected function initFormatters()
+    {
+        $formatters = $this->getConfiguredFormatters();
+        foreach ($formatters as $formatter) {
+            $formatter->initialize();
+        }
+
+    }
+
+    /**
+     * Returns configured PDOResultFormatter objects
+     * (which were created from PDOSQLExecFormatterElement objects).
+     *
+     * @return array PDOResultFormatter[]
+     */
+    protected function getConfiguredFormatters()
+    {
+        $formatters = [];
+        foreach ($this->formatters as $fe) {
+            $formatters[] = $fe->getFormatter();
+        }
+
+        return $formatters;
+    }
+
+    /**
+     * Closes current connection
+     */
+    protected function closeConnection()
+    {
+        if ($this->conn) {
+            unset($this->conn);
+            $this->conn = null;
+        }
+    }
+
+    /**
+     * Run cleanup and close formatters.
+     */
+    protected function closeFormatters()
+    {
+        $formatters = $this->getConfiguredFormatters();
+        foreach ($formatters as $formatter) {
+            $formatter->close();
+        }
+    }
+
+    /**
      * read in lines and execute them
      * @param Reader $reader
      * @throws BuildException
@@ -444,7 +481,7 @@ class PDOSQLExecTask extends PDOTask
         if (self::DELIM_NONE == $this->delimiterType) {
             require_once 'phing/tasks/ext/pdo/DummyPDOQuerySplitter.php';
             $splitter = new DummyPDOQuerySplitter($this, $reader);
-        } elseif (self::DELIM_NORMAL == $this->delimiterType && 0 === strpos($this->getUrl(), 'pgsql:')) {
+        } else if (self::DELIM_NORMAL == $this->delimiterType && 0 === strpos($this->getUrl(), 'pgsql:')) {
             require_once 'phing/tasks/ext/pdo/PgsqlPDOQuerySplitter.php';
             $splitter = new PgsqlPDOQuerySplitter($this, $reader);
         } else {
@@ -461,22 +498,6 @@ class PDOSQLExecTask extends PDOTask
         } catch (PDOException $e) {
             throw $e;
         }
-    }
-
-    /**
-     * Whether the passed-in SQL statement is a SELECT statement.
-     * This does a pretty simple match, checking to see if statement starts with
-     * 'select' (but not 'select into').
-     *
-     * @param  string  $sql
-     *
-     * @return boolean Whether specified SQL looks like a SELECT query.
-     */
-    protected function isSelectSql($sql)
-    {
-        $sql = trim($sql);
-
-        return (stripos($sql, 'select') === 0 && stripos($sql, 'select into ') !== 0);
     }
 
     /**
@@ -521,45 +542,6 @@ class PDOSQLExecTask extends PDOTask
     }
 
     /**
-     * Returns configured PDOResultFormatter objects
-     * (which were created from PDOSQLExecFormatterElement objects).
-     *
-     * @return array PDOResultFormatter[]
-     */
-    protected function getConfiguredFormatters()
-    {
-        $formatters = array();
-        foreach ($this->formatters as $fe) {
-            $formatters[] = $fe->getFormatter();
-        }
-
-        return $formatters;
-    }
-
-    /**
-     * Initialize the formatters.
-     */
-    protected function initFormatters()
-    {
-        $formatters = $this->getConfiguredFormatters();
-        foreach ($formatters as $formatter) {
-            $formatter->initialize();
-        }
-
-    }
-
-    /**
-     * Run cleanup and close formatters.
-     */
-    protected function closeFormatters()
-    {
-        $formatters = $this->getConfiguredFormatters();
-        foreach ($formatters as $formatter) {
-            $formatter->close();
-        }
-    }
-
-    /**
      * Passes results from query to any formatters.
      *
      * @throws PDOException
@@ -590,14 +572,29 @@ class PDOSQLExecTask extends PDOTask
     }
 
     /**
-     * Closes current connection
+     * Whether the passed-in SQL statement is a SELECT statement.
+     * This does a pretty simple match, checking to see if statement starts with
+     * 'select' (but not 'select into').
+     *
+     * @param string $sql
+     *
+     * @return boolean Whether specified SQL looks like a SELECT query.
      */
-    protected function closeConnection()
+    protected function isSelectSql($sql)
     {
-        if ($this->conn) {
-            unset($this->conn);
-            $this->conn = null;
-        }
+        $sql = trim($sql);
+
+        return (stripos($sql, 'select') === 0 && stripos($sql, 'select into ') !== 0);
+    }
+
+    /**
+     * Gets a default output writer for this task.
+     *
+     * @return Writer
+     */
+    private function getDefaultOutput()
+    {
+        return new LogWriter($this);
     }
 }
 

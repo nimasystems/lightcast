@@ -78,37 +78,6 @@ abstract class PDOTask extends Task
     }
 
     /**
-     * Caching loaders / driver. This is to avoid
-     * getting an OutOfMemoryError when calling this task
-     * multiple times in a row; default: true
-     * @param $enable
-     */
-    public function setCaching($enable)
-    {
-        $this->caching = $enable;
-    }
-
-    /**
-     * Sets the database connection URL; required.
-     * @param The $url
-     * @internal param The $url url to set
-     */
-    public function setUrl($url)
-    {
-        $this->url = $url;
-    }
-
-    /**
-     * Sets the password; required.
-     * @param The $password
-     * @internal param The $password password to set
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
-    /**
      * Auto commit flag for database connection;
      * optional, default false.
      * @param The $autocommit
@@ -128,6 +97,34 @@ abstract class PDOTask extends Task
     public function setVersion($version)
     {
         $this->version = $version;
+    }
+
+    /**
+     * @param $value
+     */
+    public function isCaching($value)
+    {
+        $this->caching = $value;
+    }
+
+    /**
+     * Caching loaders / driver. This is to avoid
+     * getting an OutOfMemoryError when calling this task
+     * multiple times in a row; default: true
+     * @param $enable
+     */
+    public function setCaching($enable)
+    {
+        $this->caching = $enable;
+    }
+
+    /**
+     * Gets the autocommit.
+     * @return Returns a boolean
+     */
+    public function isAutocommit()
+    {
+        return $this->autocommit;
     }
 
     /**
@@ -187,29 +184,22 @@ abstract class PDOTask extends Task
     }
 
     /**
-     * @param $value
-     */
-    public function isCaching($value)
-    {
-        $this->caching = $value;
-    }
-
-    /**
-     * Gets the autocommit.
-     * @return Returns a boolean
-     */
-    public function isAutocommit()
-    {
-        return $this->autocommit;
-    }
-
-    /**
      * Gets the url.
      * @return string
      */
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Sets the database connection URL; required.
+     * @param The $url
+     * @internal param The $url url to set
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
     }
 
     /**
@@ -237,5 +227,15 @@ abstract class PDOTask extends Task
     public function getPassword()
     {
         return $this->password;
+    }
+
+    /**
+     * Sets the password; required.
+     * @param The $password
+     * @internal param The $password password to set
+     */
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 }

@@ -38,14 +38,6 @@ class Reference
     }
 
     /**
-     * @param $id
-     */
-    public function setRefId($id)
-    {
-        $this->refid = (string) $id;
-    }
-
-    /**
      * @return string
      */
     public function getRefId()
@@ -54,13 +46,21 @@ class Reference
     }
 
     /**
+     * @param $id
+     */
+    public function setRefId($id)
+    {
+        $this->refid = (string)$id;
+    }
+
+    /**
      * returns reference to object in references container of project
      *
      * @param Project $project
      *
+     * @return Reference
      * @throws BuildException
      *
-     * @return Reference
      */
     public function getReferencedObject(Project $project)
     {

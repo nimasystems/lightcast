@@ -20,10 +20,10 @@ class DBMSSQL extends DBAdapter
     /**
      * MS SQL Server does not support SET NAMES
      *
+     * @param PDO $con
+     * @param string $charset
      * @see       DBAdapter::setCharset()
      *
-     * @param PDO    $con
-     * @param string $charset
      */
     public function setCharset(PDO $con, $charset)
     {
@@ -69,7 +69,7 @@ class DBMSSQL extends DBAdapter
     /**
      * Returns SQL which extracts a substring.
      *
-     * @param string  $s   String to extract from.
+     * @param string $s String to extract from.
      * @param integer $pos Offset to start from.
      * @param integer $len Number of characters to extract.
      *
@@ -93,40 +93,28 @@ class DBMSSQL extends DBAdapter
     }
 
     /**
-     * @see       DBAdapter::quoteIdentifier()
-     *
-     * @param string $text
-     *
-     * @return string
-     */
-    public function quoteIdentifier($text)
-    {
-        return '[' . $text . ']';
-    }
-
-    /**
-     * @see       DBAdapter::quoteIdentifierTable()
-     *
      * @param string $table
      *
      * @return string
+     * @see       DBAdapter::quoteIdentifierTable()
+     *
      */
     public function quoteIdentifierTable($table)
     {
         // e.g. 'database.table alias' should be escaped as '[database].[table] [alias]'
-        return '[' . strtr($table, array('.' => '].[', ' ' => '] [')) . ']';
+        return '[' . strtr($table, ['.' => '].[', ' ' => '] [']) . ']';
     }
 
     /**
-     * @see       DBAdapter::random()
-     *
      * @param string $seed
      *
      * @return string
+     * @see       DBAdapter::random()
+     *
      */
     public function random($seed = null)
     {
-        return 'RAND(' . ((int) $seed) . ')';
+        return 'RAND(' . ((int)$seed) . ')';
     }
 
     /**
@@ -135,10 +123,7 @@ class DBMSSQL extends DBAdapter
      * This rewrites the $sql query to apply the offset and limit.
      * some of the ORDER BY logic borrowed from Doctrine MsSqlPlatform
      *
-     * @see       DBAdapter::applyLimit()
-     * @author    Benjamin Runnels <kraven@kraven.org>
-     *
-     * @param string  $sql
+     * @param string $sql
      * @param integer $offset
      * @param integer $limit
      *
@@ -146,6 +131,9 @@ class DBMSSQL extends DBAdapter
      *
      * @throws PropelException
      * @throws Exception
+     * @see       DBAdapter::applyLimit()
+     * @author    Benjamin Runnels <kraven@kraven.org>
+     *
      */
     public function applyLimit(&$sql, $offset, $limit)
     {
@@ -155,7 +143,7 @@ class DBMSSQL extends DBAdapter
         }
 
         //split the select and from clauses out of the original query
-        $selectSegment = array();
+        $selectSegment = [];
 
         $selectText = 'SELECT ';
 
@@ -192,10 +180,10 @@ class DBMSSQL extends DBAdapter
             $orders = array_map('trim', explode(',', $order));
 
             for ($i = 0; $i < count($orders); $i++) {
-                $orderArr[trim(preg_replace('/\s+(ASC|DESC)$/i', '', $orders[$i]))] = array(
+                $orderArr[trim(preg_replace('/\s+(ASC|DESC)$/i', '', $orders[$i]))] = [
                     'sort' => (stripos($orders[$i], ' DESC') !== false) ? 'DESC' : 'ASC',
-                    'key' => $i
-                );
+                    'key' => $i,
+                ];
             }
         }
 
@@ -215,7 +203,7 @@ class DBMSSQL extends DBAdapter
                 // we replace it with the original Table.Column designation.
                 if ($selColCount) {
                     // column with alias
-                    foreach (array(' ASC', ' DESC') as $sort) {
+                    foreach ([' ASC', ' DESC'] as $sort) {
                         $index = array_search($selColArr[2] . $sort, $orders);
                         if ($index !== false) {
                             // replace alias with "Table.Column ASC/DESC"
@@ -287,17 +275,29 @@ class DBMSSQL extends DBAdapter
     }
 
     /**
+     * @param string $text
+     *
+     * @return string
+     * @see       DBAdapter::quoteIdentifier()
+     *
+     */
+    public function quoteIdentifier($text)
+    {
+        return '[' . $text . ']';
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @param Criteria $values
+     * @param DatabaseMap $dbMap
      * @see       parent::cleanupSQL()
      *
-     * @param string      $sql
-     * @param array       $params
-     * @param Criteria    $values
-     * @param DatabaseMap $dbMap
      */
     public function cleanupSQL(&$sql, array &$params, Criteria $values, DatabaseMap $dbMap)
     {
         $i = 1;
-        $paramCols = array();
+        $paramCols = [];
         foreach ($params as $param) {
             if (null !== $param['table']) {
                 $column = $dbMap->getTable($param['table'])->getColumn($param['column']);

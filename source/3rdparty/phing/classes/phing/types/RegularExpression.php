@@ -90,6 +90,27 @@ class RegularExpression extends DataType
 
     /**
      * @param Project $p
+     * @return mixed
+     * @throws BuildException
+     */
+    public function getRef(Project $p)
+    {
+        if (!$this->checked) {
+            $stk = [];
+            array_push($stk, $this);
+            $this->dieOnCircularReference($stk, $p);
+        }
+
+        $o = $this->ref->getReferencedObject($p);
+        if (!($o instanceof RegularExpression)) {
+            throw new BuildException($this->ref->getRefId() . " doesn't denote a RegularExpression");
+        } else {
+            return $o;
+        }
+    }
+
+    /**
+     * @param Project $p
      * @return string
      * @throws BuildException
      */
@@ -121,6 +142,14 @@ class RegularExpression extends DataType
     }
 
     /**
+     * @return bool
+     */
+    public function getIgnoreCase()
+    {
+        return $this->regexp->getIgnoreCase();
+    }
+
+    /**
      * @param $bit
      */
     public function setIgnoreCase($bit)
@@ -131,9 +160,9 @@ class RegularExpression extends DataType
     /**
      * @return bool
      */
-    public function getIgnoreCase()
+    public function getMultiline()
     {
-        return $this->regexp->getIgnoreCase();
+        return $this->regexp->getMultiline();
     }
 
     /**
@@ -142,14 +171,6 @@ class RegularExpression extends DataType
     public function setMultiline($multiline)
     {
         $this->regexp->setMultiline($multiline);
-    }
-
-    /**
-     * @return bool
-     */
-    public function getMultiline()
-    {
-        return $this->regexp->getMultiline();
     }
 
     /**
@@ -166,26 +187,5 @@ class RegularExpression extends DataType
         }
 
         return $this->regexp;
-    }
-
-    /**
-     * @param Project $p
-     * @return mixed
-     * @throws BuildException
-     */
-    public function getRef(Project $p)
-    {
-        if (!$this->checked) {
-            $stk = array();
-            array_push($stk, $this);
-            $this->dieOnCircularReference($stk, $p);
-        }
-
-        $o = $this->ref->getReferencedObject($p);
-        if (!($o instanceof RegularExpression)) {
-            throw new BuildException($this->ref->getRefId() . " doesn't denote a RegularExpression");
-        } else {
-            return $o;
-        }
     }
 }

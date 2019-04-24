@@ -40,7 +40,7 @@ class TouchTask extends Task
     private $file;
     private $millis = -1;
     private $dateTime;
-    private $filesets = array();
+    private $filesets = [];
     private $fileUtils;
 
     /**
@@ -64,18 +64,6 @@ class TouchTask extends Task
 
     /**
      * the new modification time of the file
-     * in milliseconds since midnight Jan 1 1970.
-     * Optional, default=now
-     * @param $millis
-     * @return void
-     */
-    public function setMillis($millis)
-    {
-        $this->millis = (int) $millis;
-    }
-
-    /**
-     * the new modification time of the file
      * in the format MM/DD/YYYY HH:MM AM or PM;
      * Optional, default=now
      * @param $dateTime
@@ -83,7 +71,7 @@ class TouchTask extends Task
      */
     public function setDatetime($dateTime)
     {
-        $this->dateTime = (string) $dateTime;
+        $this->dateTime = (string)$dateTime;
     }
 
     /**
@@ -130,6 +118,18 @@ class TouchTask extends Task
     }
 
     /**
+     * the new modification time of the file
+     * in milliseconds since midnight Jan 1 1970.
+     * Optional, default=now
+     * @param $millis
+     * @return void
+     */
+    public function setMillis($millis)
+    {
+        $this->millis = (int)$millis;
+    }
+
+    /**
      * Does the actual work.
      */
     public function _touch()
@@ -140,8 +140,7 @@ class TouchTask extends Task
                 try { // try to create file
                     $this->file->createNewFile();
                 } catch (IOException  $ioe) {
-                    throw new BuildException("Error creating new file " . $this->file->__toString(
-                        ), $ioe, $this->location);
+                    throw new BuildException("Error creating new file " . $this->file->__toString(), $ioe, $this->location);
                 }
             }
         }
@@ -166,11 +165,11 @@ class TouchTask extends Task
             $srcDirs = $ds->getIncludedDirectories();
 
             for ($j = 0, $_j = count($srcFiles); $j < $_j; $j++) {
-                $this->touchFile(new PhingFile($fromDir, (string) $srcFiles[$j]));
+                $this->touchFile(new PhingFile($fromDir, (string)$srcFiles[$j]));
             }
 
             for ($j = 0, $_j = count($srcDirs); $j < $_j; $j++) {
-                $this->touchFile(new PhingFile($fromDir, (string) $srcDirs[$j]));
+                $this->touchFile(new PhingFile($fromDir, (string)$srcDirs[$j]));
             }
         }
 

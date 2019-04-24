@@ -32,13 +32,13 @@ class Join
     const INNER_JOIN = 'INNER JOIN';
 
     // the left parts of the join condition
-    protected $left = array();
+    protected $left = [];
 
     // the right parts of the join condition
-    protected $right = array();
+    protected $right = [];
 
     // the comparison operators for each pair of columns in the join condition
-    protected $operator = array();
+    protected $operator = [];
 
     // the type of the join (LEFT JOIN, ...)
     protected $joinType;
@@ -85,6 +85,25 @@ class Join
     }
 
     /**
+     * Join condition definition, for several conditions
+     *
+     * @param array $lefts The left columns of the join condition
+     * @param array $rights The right columns of the join condition
+     * @param array $operators The comparison operators of the join condition, default Join::EQUAL
+     *
+     * @throws PropelException
+     */
+    public function addConditions($lefts, $rights, $operators = [])
+    {
+        if (count($lefts) != count($rights)) {
+            throw new PropelException("Unable to create join because the left column count isn't equal to the right column count");
+        }
+        foreach ($lefts as $key => $left) {
+            $this->addCondition($left, $rights[$key], isset($operators[$key]) ? $operators[$key] : self::EQUAL);
+        }
+    }
+
+    /**
      * Join condition definition.
      * Warning: doesn't support table aliases. Use the explicit methods to use aliases.
      *
@@ -111,27 +130,15 @@ class Join
     }
 
     /**
-     * Join condition definition, for several conditions
-     *
-     * @param array $lefts     The left columns of the join condition
-     * @param array $rights    The right columns of the join condition
-     * @param array $operators The comparison operators of the join condition, default Join::EQUAL
-     *
-     * @throws PropelException
-     */
-    public function addConditions($lefts, $rights, $operators = array())
-    {
-        if (count($lefts) != count($rights)) {
-            throw new PropelException("Unable to create join because the left column count isn't equal to the right column count");
-        }
-        foreach ($lefts as $key => $left) {
-            $this->addCondition($left, $rights[$key], isset($operators[$key]) ? $operators[$key] : self::EQUAL);
-        }
-    }
-
-    /**
      * Join condition definition.
      *
+     * @param string $leftTableName
+     * @param string $leftColumnName
+     * @param string $leftTableAlias
+     * @param string $rightTableName
+     * @param string $rightColumnName
+     * @param string $rightTableAlias
+     * @param string $operator The comparison operator of the join condition, default Join::EQUAL
      * @example
      * <code>
      * $join = new Join();
@@ -141,13 +148,6 @@ class Join
      * // LEFT JOIN author a ON (book.AUTHOR_ID=a.ID)
      * </code>
      *
-     * @param string $leftTableName
-     * @param string $leftColumnName
-     * @param string $leftTableAlias
-     * @param string $rightTableName
-     * @param string $rightColumnName
-     * @param string $rightTableAlias
-     * @param string $operator        The comparison operator of the join condition, default Join::EQUAL
      */
     public function addExplicitCondition($leftTableName, $leftColumnName, $leftTableAlias, $rightTableName, $rightColumnName, $rightTableAlias = null, $operator = self::EQUAL)
     {
@@ -172,40 +172,11 @@ class Join
     }
 
     /**
-     * Return an array of the join conditions
-     *
-     * @return array An array of arrays representing (left, comparison, right) for each condition
-     */
-    public function getConditions()
-    {
-        $conditions = array();
-        for ($i = 0; $i < $this->count; $i++) {
-            $conditions[] = array(
-                'left'     => $this->getLeftColumn($i),
-                'operator' => $this->getOperator($i),
-                'right'    => $this->getRightColumn($i)
-            );
-        }
-
-        return $conditions;
-    }
-
-    /**
      * @param string $operator the comparison operator for the join condition
      */
     public function addOperator($operator = null)
     {
         $this->operator [] = $operator;
-    }
-
-    /**
-     * @param int $index
-     *
-     * @return string the comparison operator for the join condition
-     */
-    public function getOperator($index = 0)
-    {
-        return $this->operator[$index];
     }
 
     public function getOperators()
@@ -214,37 +185,15 @@ class Join
     }
 
     /**
-     * Set the join type
-     *
-     * @param string $joinType The type of the join. Valid join types are
-     *        null (adding the join condition to the where clause),
-     *        Criteria::LEFT_JOIN(), Criteria::RIGHT_JOIN(), and Criteria::INNER_JOIN()
-     */
-    public function setJoinType($joinType = null)
-    {
-        $this->joinType = $joinType;
-    }
-
-    /**
-     * Get the join type
-     *
-     * @return string The type of the join, i.e. Criteria::LEFT_JOIN()
-     */
-    public function getJoinType()
-    {
-        return null === $this->joinType ? self::INNER_JOIN : $this->joinType;
-    }
-
-    /**
      * Add a left column name to the join condition
      *
+     * @param string $left The name of the left column to add
      * @example
      * <code>
      * $join->setLeftTableName('book');
      * $join->addLeftColumnName('AUTHOR_ID');
      * </code>
      *
-     * @param string $left The name of the left column to add
      */
     public function addLeftColumnName($left)
     {
@@ -252,37 +201,17 @@ class Join
     }
 
     /**
-     * Get the fully qualified name of the left column of the join condition
-     *
-     * @example
-     * <code>
-     * $join->addCondition('book.AUTHOR_ID', 'author.ID');
-     * echo $join->getLeftColumn(); // 'book.AUTHOR_ID'
-     * </code>
+     * Get the left column name of the join condition
      *
      * @param integer $index The number of the condition to use
      *
      * @return string
-     */
-    public function getLeftColumn($index = 0)
-    {
-        $tableName = $this->getLeftTableAliasOrName();
-
-        return $tableName ? $tableName . '.' . $this->left[$index] : $this->left[$index];
-    }
-
-    /**
-     * Get the left column name of the join condition
-     *
      * @example
      * <code>
      * $join->addCondition('book.AUTHOR_ID', 'author.ID');
      * echo $join->getLeftColumnName(); // 'AUTHOR_ID'
      * </code>
      *
-     * @param integer $index The number of the condition to use
-     *
-     * @return string
      */
     public function getLeftColumnName($index = 0)
     {
@@ -296,12 +225,42 @@ class Join
      */
     public function getLeftColumns()
     {
-        $columns = array();
+        $columns = [];
         foreach ($this->left as $index => $column) {
             $columns[] = $this->getLeftColumn($index);
         }
 
         return $columns;
+    }
+
+    /**
+     * Get the fully qualified name of the left column of the join condition
+     *
+     * @param integer $index The number of the condition to use
+     *
+     * @return string
+     * @example
+     * <code>
+     * $join->addCondition('book.AUTHOR_ID', 'author.ID');
+     * echo $join->getLeftColumn(); // 'book.AUTHOR_ID'
+     * </code>
+     *
+     */
+    public function getLeftColumn($index = 0)
+    {
+        $tableName = $this->getLeftTableAliasOrName();
+
+        return $tableName ? $tableName . '.' . $this->left[$index] : $this->left[$index];
+    }
+
+    public function getLeftTableAliasOrName()
+    {
+        return $this->leftTableAlias ? $this->leftTableAlias : $this->leftTableName;
+    }
+
+    public function getLeftTableName()
+    {
+        return $this->leftTableName;
     }
 
     public function setLeftTableName($leftTableName)
@@ -311,9 +270,9 @@ class Join
         return $this;
     }
 
-    public function getLeftTableName()
+    public function getLeftTableAlias()
     {
-        return $this->leftTableName;
+        return $this->leftTableAlias;
     }
 
     public function setLeftTableAlias($leftTableAlias)
@@ -323,19 +282,9 @@ class Join
         return $this;
     }
 
-    public function getLeftTableAlias()
-    {
-        return $this->leftTableAlias;
-    }
-
     public function hasLeftTableAlias()
     {
         return null !== $this->leftTableAlias;
-    }
-
-    public function getLeftTableAliasOrName()
-    {
-        return $this->leftTableAlias ? $this->leftTableAlias : $this->leftTableName;
     }
 
     public function getLeftTableWithAlias()
@@ -346,13 +295,13 @@ class Join
     /**
      * Add a right column name to the join condition
      *
+     * @param string $right The name of the right column to add
      * @example
      * <code>
      * $join->setRightTableName('author');
      * $join->addRightColumnName('ID');
      * </code>
      *
-     * @param string $right The name of the right column to add
      */
     public function addRightColumnName($right)
     {
@@ -360,37 +309,17 @@ class Join
     }
 
     /**
-     * Get the fully qualified name of the right column of the join condition
-     *
-     * @example
-     * <code>
-     * $join->addCondition('book.AUTHOR_ID', 'author.ID');
-     * echo $join->getLeftColumn(); // 'author.ID'
-     * </code>
+     * Get the right column name of the join condition
      *
      * @param integer $index The number of the condition to use
      *
      * @return string
-     */
-    public function getRightColumn($index = 0)
-    {
-        $tableName = $this->getRightTableAliasOrName();
-
-        return $tableName ? $tableName . '.' . $this->right[$index] : $this->right[$index];
-    }
-
-    /**
-     * Get the right column name of the join condition
-     *
      * @example
      * <code>
      * $join->addCondition('book.AUTHOR_ID', 'author.ID');
      * echo $join->getLeftColumn(); // 'ID'
      * </code>
      *
-     * @param integer $index The number of the condition to use
-     *
-     * @return string
      */
     public function getRightColumnName($index = 0)
     {
@@ -402,12 +331,42 @@ class Join
      */
     public function getRightColumns()
     {
-        $columns = array();
+        $columns = [];
         foreach ($this->right as $index => $column) {
             $columns[] = $this->getRightColumn($index);
         }
 
         return $columns;
+    }
+
+    /**
+     * Get the fully qualified name of the right column of the join condition
+     *
+     * @param integer $index The number of the condition to use
+     *
+     * @return string
+     * @example
+     * <code>
+     * $join->addCondition('book.AUTHOR_ID', 'author.ID');
+     * echo $join->getLeftColumn(); // 'author.ID'
+     * </code>
+     *
+     */
+    public function getRightColumn($index = 0)
+    {
+        $tableName = $this->getRightTableAliasOrName();
+
+        return $tableName ? $tableName . '.' . $this->right[$index] : $this->right[$index];
+    }
+
+    public function getRightTableAliasOrName()
+    {
+        return $this->rightTableAlias ? $this->rightTableAlias : $this->rightTableName;
+    }
+
+    public function getRightTableName()
+    {
+        return $this->rightTableName;
     }
 
     public function setRightTableName($rightTableName)
@@ -417,9 +376,9 @@ class Join
         return $this;
     }
 
-    public function getRightTableName()
+    public function getRightTableAlias()
     {
-        return $this->rightTableName;
+        return $this->rightTableAlias;
     }
 
     public function setRightTableAlias($rightTableAlias)
@@ -429,24 +388,9 @@ class Join
         return $this;
     }
 
-    public function getRightTableAlias()
-    {
-        return $this->rightTableAlias;
-    }
-
     public function hasRightTableAlias()
     {
         return null !== $this->rightTableAlias;
-    }
-
-    public function getRightTableAliasOrName()
-    {
-        return $this->rightTableAlias ? $this->rightTableAlias : $this->rightTableName;
-    }
-
-    public function getRightTableWithAlias()
-    {
-        return $this->rightTableAlias ? $this->rightTableName . ' ' . $this->rightTableAlias : $this->rightTableName;
     }
 
     /**
@@ -475,26 +419,6 @@ class Join
     }
 
     /**
-     * Set a custom join condition
-     *
-     * @param Criterion $joinCondition a Join condition
-     */
-    public function setJoinCondition(Criterion $joinCondition)
-    {
-        $this->joinCondition = $joinCondition;
-    }
-
-    /**
-     * Get the custom join condition, if previously set
-     *
-     * @return Criterion
-     */
-    public function getJoinCondition()
-    {
-        return $this->joinCondition;
-    }
-
-    /**
      * Set the custom join condition Criterion based on the conditions of this join
      *
      * @param Criteria $c A Criteria object to get Criterions from
@@ -514,9 +438,80 @@ class Join
     }
 
     /**
+     * @param int $index
+     *
+     * @return string the comparison operator for the join condition
+     */
+    public function getOperator($index = 0)
+    {
+        return $this->operator[$index];
+    }
+
+    /**
+     * @param Join $join
+     *
+     * @return bool
+     */
+    public function equals($join)
+    {
+        $parametersOfThisClauses = [];
+        $parametersOfJoinClauses = [];
+
+        return $join !== null
+            && $join instanceof Join
+            && $this->getJoinType() == $join->getJoinType()
+            && $this->getConditions() == $join->getConditions()
+            && $this->getClause($parametersOfThisClauses) == $join->getClause($parametersOfJoinClauses);
+    }
+
+    /**
+     * Get the join type
+     *
+     * @return string The type of the join, i.e. Criteria::LEFT_JOIN()
+     */
+    public function getJoinType()
+    {
+        return null === $this->joinType ? self::INNER_JOIN : $this->joinType;
+    }
+
+    /**
+     * Set the join type
+     *
+     * @param string $joinType The type of the join. Valid join types are
+     *        null (adding the join condition to the where clause),
+     *        Criteria::LEFT_JOIN(), Criteria::RIGHT_JOIN(), and Criteria::INNER_JOIN()
+     */
+    public function setJoinType($joinType = null)
+    {
+        $this->joinType = $joinType;
+    }
+
+    /**
+     * Return an array of the join conditions
+     *
+     * @return array An array of arrays representing (left, comparison, right) for each condition
+     */
+    public function getConditions()
+    {
+        $conditions = [];
+        for ($i = 0; $i < $this->count; $i++) {
+            $conditions[] = [
+                'left' => $this->getLeftColumn($i),
+                'operator' => $this->getOperator($i),
+                'right' => $this->getRightColumn($i),
+            ];
+        }
+
+        return $conditions;
+    }
+
+    /**
      * Get the join clause for this Join.
      * If the join condition needs binding, uses the passed params array.
      *
+     * @param array &$params
+     *
+     * @return string SQL join clause with join condition
      * @example
      * <code>
      * $join = new Join();
@@ -526,14 +521,11 @@ class Join
      * // 'LEFT JOIN author ON (book.AUTHOR_ID=author.ID)'
      * </code>
      *
-     * @param array &$params
-     *
-     * @return string SQL join clause with join condition
      */
     public function getClause(&$params)
     {
         if (null === $this->joinCondition) {
-            $conditions = array();
+            $conditions = [];
             for ($i = 0; $i < $this->count; $i++) {
                 $conditions [] = $this->getLeftColumn($i) . $this->getOperator($i) . $this->getRightColumn($i);
             }
@@ -557,20 +549,33 @@ class Join
     }
 
     /**
-     * @param Join $join
+     * Get the custom join condition, if previously set
      *
-     * @return bool
+     * @return Criterion
      */
-    public function equals($join)
+    public function getJoinCondition()
     {
-        $parametersOfThisClauses = array();
-        $parametersOfJoinClauses = array();
+        return $this->joinCondition;
+    }
 
-        return $join !== null
-                && $join instanceof Join
-                && $this->getJoinType() == $join->getJoinType()
-                && $this->getConditions() == $join->getConditions()
-                && $this->getClause($parametersOfThisClauses) == $join->getClause($parametersOfJoinClauses);
+    /**
+     * Set a custom join condition
+     *
+     * @param Criterion $joinCondition a Join condition
+     */
+    public function setJoinCondition(Criterion $joinCondition)
+    {
+        $this->joinCondition = $joinCondition;
+    }
+
+    public function getRightTableWithAlias()
+    {
+        return $this->rightTableAlias ? $this->rightTableName . ' ' . $this->rightTableAlias : $this->rightTableName;
+    }
+
+    public function __toString()
+    {
+        return $this->toString();
     }
 
     /**
@@ -580,13 +585,8 @@ class Join
      */
     public function toString()
     {
-        $params = array();
+        $params = [];
 
         return $this->getClause($params);
-    }
-
-    public function __toString()
-    {
-        return $this->toString();
     }
 }

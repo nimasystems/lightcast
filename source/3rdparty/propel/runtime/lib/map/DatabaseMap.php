@@ -30,10 +30,10 @@ class DatabaseMap
     protected $name;
 
     /** @var array TableMap[] Tables in the database, using table name as key */
-    protected $tables = array();
+    protected $tables = [];
 
     /** @var array TableMap[] Tables in the database, using table phpName as key */
-    protected $tablesByPhpName = array();
+    protected $tablesByPhpName = [];
 
     /**
      * Constructor.
@@ -70,66 +70,6 @@ class DatabaseMap
     }
 
     /**
-     * Add a new table object to the database.
-     *
-     * @param TableMap $table The table to add
-     */
-    public function addTableObject(TableMap $table)
-    {
-        $table->setDatabaseMap($this);
-        $this->tables[$table->getName()] = $table;
-        $this->tablesByPhpName[$table->getClassname()] = $table;
-    }
-
-    /**
-     * Add a new table to the database, using the tablemap class name.
-     *
-     * @param string $tableMapClass The name of the table map to add
-     *
-     * @return TableMap The TableMap object
-     */
-    public function addTableFromMapClass($tableMapClass)
-    {
-        $table = new $tableMapClass();
-        if (!$this->hasTable($table->getName())) {
-            $this->addTableObject($table);
-
-            return $table;
-        } else {
-            return $this->getTable($table->getName());
-        }
-    }
-
-    /**
-     * Does this database contain this specific table?
-     *
-     * @param string $name The String representation of the table.
-     *
-     * @return boolean True if the database contains the table.
-     */
-    public function hasTable($name)
-    {
-        return array_key_exists($name, $this->tables);
-    }
-
-    /**
-     * Get a TableMap for the table by name.
-     *
-     * @param string $name Name of the table.
-     *
-     * @return TableMap        A TableMap
-     * @throws PropelException if the table is undefined
-     */
-    public function getTable($name)
-    {
-        if (!isset($this->tables[$name])) {
-            throw new PropelException("Cannot fetch TableMap for undefined table: " . $name);
-        }
-
-        return $this->tables[$name];
-    }
-
-    /**
      * Get a TableMap[] of all of the tables in the database.
      *
      * @return array A TableMap[].
@@ -155,27 +95,54 @@ class DatabaseMap
         return $this->getTable($tableName)->getColumn($columnName, false);
     }
 
-    // deprecated methods
+    /**
+     * Get a TableMap for the table by name.
+     *
+     * @param string $name Name of the table.
+     *
+     * @return TableMap        A TableMap
+     * @throws PropelException if the table is undefined
+     */
+    public function getTable($name)
+    {
+        if (!isset($this->tables[$name])) {
+            throw new PropelException("Cannot fetch TableMap for undefined table: " . $name);
+        }
+
+        return $this->tables[$name];
+    }
 
     /**
      * Does this database contain this specific table?
      *
-     * @deprecated Use hasTable() instead
-     *
      * @param string $name The String representation of the table.
      *
      * @return boolean True if the database contains the table.
+     * @deprecated Use hasTable() instead
+     *
      */
     public function containsTable($name)
     {
         return $this->hasTable($name);
     }
 
+    /**
+     * Does this database contain this specific table?
+     *
+     * @param string $name The String representation of the table.
+     *
+     * @return boolean True if the database contains the table.
+     */
+    public function hasTable($name)
+    {
+        return array_key_exists($name, $this->tables);
+    }
+
     public function getTableByPhpName($phpName)
     {
         if (array_key_exists($phpName, $this->tablesByPhpName)) {
             return $this->tablesByPhpName[$phpName];
-        } elseif (defined($phpName . '::PEER')) {
+        } else if (defined($phpName . '::PEER')) {
             $peerClass = constant($phpName . '::PEER');
             $tmClass = constant($peerClass . '::TM_CLASS');
 
@@ -185,6 +152,39 @@ class DatabaseMap
         } else {
             throw new PropelException("Cannot fetch TableMap for undefined table phpName: " . $phpName);
         }
+    }
+
+    // deprecated methods
+
+    /**
+     * Add a new table to the database, using the tablemap class name.
+     *
+     * @param string $tableMapClass The name of the table map to add
+     *
+     * @return TableMap The TableMap object
+     */
+    public function addTableFromMapClass($tableMapClass)
+    {
+        $table = new $tableMapClass();
+        if (!$this->hasTable($table->getName())) {
+            $this->addTableObject($table);
+
+            return $table;
+        } else {
+            return $this->getTable($table->getName());
+        }
+    }
+
+    /**
+     * Add a new table object to the database.
+     *
+     * @param TableMap $table The table to add
+     */
+    public function addTableObject(TableMap $table)
+    {
+        $table->setDatabaseMap($this);
+        $this->tables[$table->getName()] = $table;
+        $this->tablesByPhpName[$table->getClassname()] = $table;
     }
 
     /**

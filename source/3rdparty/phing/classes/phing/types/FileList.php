@@ -50,7 +50,7 @@ class FileList extends DataType
     // public for "cloning" purposes
 
     /** Array containing all filenames. */
-    public $filenames = array();
+    public $filenames = [];
 
     /** Base directory for this file list. */
     public $dir;
@@ -86,6 +86,23 @@ class FileList extends DataType
     }
 
     /**
+     * Get the basedir for files in list.
+     * @param Project $p
+     * @return PhingFile
+     * @throws BuildException
+     */
+    public function getDir(Project $p)
+    {
+        if ($this->isReference()) {
+            $ref = $this->getRef($p);
+
+            return $ref->getDir($p);
+        }
+
+        return $this->dir;
+    }
+
+    /**
      * Base directory for files in list.
      * @param PhingFile $dir
      * @throws BuildException
@@ -102,20 +119,28 @@ class FileList extends DataType
     }
 
     /**
-     * Get the basedir for files in list.
+     * Performs the check for circular references and returns the
+     * referenced FileSet.
      * @param Project $p
+     *
+     * @return FileList
      * @throws BuildException
-     * @return PhingFile
+     *
      */
-    public function getDir(Project $p)
+    public function getRef(Project $p)
     {
-        if ($this->isReference()) {
-            $ref = $this->getRef($p);
-
-            return $ref->getDir($p);
+        if (!$this->checked) {
+            $stk = [];
+            array_push($stk, $this);
+            $this->dieOnCircularReference($stk, $p);
         }
 
-        return $this->dir;
+        $o = $this->ref->getReferencedObject($p);
+        if (!($o instanceof FileList)) {
+            throw new BuildException($this->ref->getRefId() . " doesn't denote a filelist");
+        } else {
+            return $o;
+        }
     }
 
     /**
@@ -141,6 +166,22 @@ class FileList extends DataType
     }
 
     /**
+     * Get the source "list" file that contains file names.
+     * @param Project $p
+     * @return PhingFile
+     */
+    public function getListFile(Project $p)
+    {
+        if ($this->isReference()) {
+            $ref = $this->getRef($p);
+
+            return $ref->getListFile($p);
+        }
+
+        return $this->listfile;
+    }
+
+    /**
      * Sets a source "list" file that contains filenames to add -- one per line.
      * @param string $file
      * @throws BuildException
@@ -157,24 +198,8 @@ class FileList extends DataType
     }
 
     /**
-     * Get the source "list" file that contains file names.
-     * @param  Project   $p
-     * @return PhingFile
-     */
-    public function getListFile(Project $p)
-    {
-        if ($this->isReference()) {
-            $ref = $this->getRef($p);
-
-            return $ref->getListFile($p);
-        }
-
-        return $this->listfile;
-    }
-
-    /**
      * Returns the list of files represented by this FileList.
-     * @param  Project $p
+     * @param Project $p
      * @return array
      */
     public function getFiles(Project $p)
@@ -192,31 +217,6 @@ class FileList extends DataType
         }
 
         return $this->filenames;
-    }
-
-    /**
-     * Performs the check for circular references and returns the
-     * referenced FileSet.
-     * @param Project $p
-     *
-     * @throws BuildException
-     *
-     * @return FileList
-     */
-    public function getRef(Project $p)
-    {
-        if (!$this->checked) {
-            $stk = array();
-            array_push($stk, $this);
-            $this->dieOnCircularReference($stk, $p);
-        }
-
-        $o = $this->ref->getReferencedObject($p);
-        if (!($o instanceof FileList)) {
-            throw new BuildException($this->ref->getRefId() . " doesn't denote a filelist");
-        } else {
-            return $o;
-        }
     }
 
     /**
@@ -245,8 +245,7 @@ class FileList extends DataType
             if ($listReader) {
                 $listReader->close();
             }
-            throw new BuildException("An error occurred while reading from list file " . $this->listfile->__toString(
-                ) . ": " . $e->getMessage());
+            throw new BuildException("An error occurred while reading from list file " . $this->listfile->__toString() . ": " . $e->getMessage());
         }
 
         $listReader->close();

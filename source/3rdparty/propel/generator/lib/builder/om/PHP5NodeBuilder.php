@@ -23,16 +23,6 @@ class PHP5NodeBuilder extends ObjectBuilder
 {
 
     /**
-     * Gets the package for the [base] object classes.
-     *
-     * @return string
-     */
-    public function getPackage()
-    {
-        return parent::getPackage() . ".om";
-    }
-
-    /**
      * Returns the name of the current class being built.
      *
      * @return string
@@ -42,16 +32,16 @@ class PHP5NodeBuilder extends ObjectBuilder
         return $this->getBuildProperty('basePrefix') . $this->getStubNodeBuilder()->getUnprefixedClassname();
     }
 
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
      */
     protected function addIncludes(&$script)
     {
-    } // addIncludes()
+    }
 
-    /**
+        /**
      * Adds class phpdoc comment and opening of class.
      *
      * @param string &$script The script will be modified in this method.
@@ -82,6 +72,16 @@ class PHP5NodeBuilder extends ObjectBuilder
  */
 abstract class " . $this->getClassname() . " implements IteratorAggregate {
 ";
+    } // addIncludes()
+
+    /**
+     * Gets the package for the [base] object classes.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return parent::getPackage() . ".om";
     }
 
     /**
@@ -135,18 +135,6 @@ abstract class " . $this->getClassname() . " implements IteratorAggregate {
 
         $this->addAdjustStatus($script);
         $this->addAdjustNodePath($script);
-    }
-
-    /**
-     * Closes class.
-     *
-     * @param string &$script The script will be modified in this method.
-     */
-    protected function addClassClose(&$script)
-    {
-        $script .= "
-} // " . $this->getClassname() . "
-";
     }
 
     /**
@@ -898,7 +886,7 @@ abstract class " . $this->getClassname() . " implements IteratorAggregate {
     /**
      * This method is used internally when deleting nodes. It is used to break
      * the link to this between this node and the specified child.
-     * @param  " .             $this->getStubNodeBuilder()->getClassname() . " \$node Child node to detach.
+     * @param  " . $this->getStubNodeBuilder()->getClassname() . " \$node Child node to detach.
      * @return void
      * @throws PropelException
      */
@@ -1070,6 +1058,18 @@ abstract class " . $this->getClassname() . " implements IteratorAggregate {
         foreach (\$this->childNodes as \$childNode)
             \$childNode->adjustNodePath(\$oldBasePath, \$newBasePath);
     }
+";
+    }
+
+    /**
+     * Closes class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addClassClose(&$script)
+    {
+        $script .= "
+} // " . $this->getClassname() . "
 ";
     }
 } // PHP5NodeObjectBuilder

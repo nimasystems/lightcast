@@ -38,7 +38,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Adds the lazy loader method.
      *
      * @param string &$script The script will be modified in this method.
-     * @param Column $col     The current column.
+     * @param Column $col The current column.
      *
      * @see        parent::addColumnAccessors()
      */
@@ -54,7 +54,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Adds the comment for the lazy loader method
      *
      * @param string &$script The script will be modified in this method.
-     * @param Column $col     The current column.
+     * @param Column $col The current column.
      *
      * @see        addLazyLoader()
      **/
@@ -80,7 +80,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Adds the function declaration for the lazy loader method
      *
      * @param string &$script The script will be modified in this method.
-     * @param Column $col     The current column.
+     * @param Column $col The current column.
      *
      * @see        addLazyLoader()
      **/
@@ -96,7 +96,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Adds the function body for the lazy loader method
      *
      * @param string &$script The script will be modified in this method.
-     * @param Column $col     The current column.
+     * @param Column $col The current column.
      *
      * @see        addLazyLoader()
      **/
@@ -117,7 +117,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
             // PDO_OCI returns a stream for CLOB objects, while other PDO adapters return a string...
             $script .= "
             \$this->$clo = stream_get_contents(\$row[0]);";
-        } elseif ($col->isLobType() && !$platform->hasStreamBlobImpl()) {
+        } else if ($col->isLobType() && !$platform->hasStreamBlobImpl()) {
             $script .= "
             if (\$row[0] !== null) {
                 \$this->$clo = fopen('php://memory', 'r+');
@@ -126,10 +126,10 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
             } else {
                 \$this->$clo = null;
             }";
-        } elseif ($col->isPhpPrimitiveType()) {
+        } else if ($col->isPhpPrimitiveType()) {
             $script .= "
             \$this->$clo = (\$row[0] !== null) ? (" . $col->getPhpType() . ") \$row[0] : null;";
-        } elseif ($col->isPhpObjectType()) {
+        } else if ($col->isPhpObjectType()) {
             $script .= "
             \$this->$clo = (\$row[0] !== null) ? new " . $col->getPhpType() . "(\$row[0]) : null;";
         } else {
@@ -148,7 +148,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
      * Adds the function close for the lazy loader
      *
      * @param string &$script The script will be modified in this method.
-     * @param Column $col     The current column.
+     * @param Column $col The current column.
      *
      * @see        addLazyLoader()
      **/
@@ -492,8 +492,8 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
 
         $and = "";
         $conditional = "";
-        $localColumns = array(); // foreign key local attributes names
-        $argmap = array(); // foreign -> local mapping
+        $localColumns = []; // foreign key local attributes names
+        $argmap = []; // foreign -> local mapping
 
         // If the related columns are a primary key on the foreign table
         // then use retrieveByPk() instead of doSelect() to take advantage
@@ -514,13 +514,13 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
 
             if ($cptype == "integer" || $cptype == "float" || $cptype == "double") {
                 $conditional .= $and . "\$this->" . $clo . " != 0";
-            } elseif ($cptype == "string") {
+            } else if ($cptype == "string") {
                 $conditional .= $and . "(\$this->" . $clo . " !== \"\" && \$this->" . $clo . " !== null)";
             } else {
                 $conditional .= $and . "\$this->" . $clo . " !== null";
             }
 
-            $argmap[] = array('foreign' => $foreignColumn, 'local' => $localColumn);
+            $argmap[] = ['foreign' => $foreignColumn, 'local' => $localColumn];
             $and = " && ";
         }
 
@@ -998,7 +998,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
         // we know that at least every column in the primary key of the foreign table
         // is represented in this foreign key
 
-        $params = array();
+        $params = [];
         foreach ($tblFK->getPrimaryKey() as $col) {
             $localColumn = $table->getColumn($lfmap[$col->getName()]);
             $clo = strtolower($localColumn->getName());

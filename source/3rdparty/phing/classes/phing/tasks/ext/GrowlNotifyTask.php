@@ -148,7 +148,7 @@ class GrowlNotifyTask extends Task
      */
     public function setSticky($sticky = true)
     {
-        $this->sticky = (bool) $sticky;
+        $this->sticky = (bool)$sticky;
     }
 
     /**
@@ -251,7 +251,7 @@ class GrowlNotifyTask extends Task
         if (strpos($icon, '..') === 0) {
             $icon = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . $icon);
 
-        } elseif (strpos($icon, '.') === 0) {
+        } else if (strpos($icon, '.') === 0) {
             $icon = dirname(__FILE__) . substr($icon, 1);
         }
 
@@ -412,7 +412,7 @@ class GrowlNotifyTask extends Task
         if (strpos($icon, '..') === 0) {
             $icon = realpath(dirname(__FILE__) . DIRECTORY_SEPARATOR . $icon);
 
-        } elseif (strpos($icon, '.') === 0) {
+        } else if (strpos($icon, '.') === 0) {
             $icon = dirname(__FILE__) . substr($icon, 1);
         }
 
@@ -433,13 +433,13 @@ class GrowlNotifyTask extends Task
             );
         }
 
-        $notifications = array(
-            $this->notification
-        );
-        $options = array(
+        $notifications = [
+            $this->notification,
+        ];
+        $options = [
             'host' => $this->host,
             'protocol' => $this->protocol,
-        );
+        ];
         if (!empty($this->appicon)) {
             $options['AppIcon'] = $this->appicon;
         }
@@ -470,7 +470,7 @@ class GrowlNotifyTask extends Task
                 Project::MSG_VERBOSE
             );
 
-            $logRequest = array(
+            $logRequest = [
                 'Application-Name' => $this->name,
                 'Application-Icon' => $this->appicon,
                 'Notification-Name' => $this->notification,
@@ -479,17 +479,17 @@ class GrowlNotifyTask extends Task
                 'Notification-Priority' => $this->priority,
                 'Notification-Icon' => $this->icon,
                 'Notification-Sticky' => $this->sticky,
-            );
+            ];
             foreach ($logRequest as $key => $value) {
                 $this->log($key . ': ' . $value, Project::MSG_DEBUG);
 
             }
 
-            $options = array(
+            $options = [
                 'sticky' => $this->sticky,
                 'priority' => $this->priority,
                 'icon' => $this->icon,
-            );
+            ];
             $response = $growl->publish(
                 $this->notification,
                 $this->title,

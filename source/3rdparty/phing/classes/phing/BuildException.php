@@ -50,9 +50,9 @@ class BuildException extends RuntimeException
      *         throw new BuildException($msg, $causeExc);
      *         throw new BuildException($msg, $loc);
      *         throw new BuildException($msg, $causeExc, $loc);
-     * @param Exception|string        $p1
+     * @param Exception|string $p1
      * @param Location|Exception|null $p2
-     * @param Location|null           $p3
+     * @param Location|null $p3
      */
     public function __construct($p1 = "", $p2 = null, $p3 = null)
     {
@@ -65,11 +65,11 @@ class BuildException extends RuntimeException
             $cause = $p2;
             $loc = $p3;
             $msg = $p1;
-        } elseif ($p2 !== null) {
+        } else if ($p2 !== null) {
             if ($p2 instanceof Exception) {
                 $cause = $p2;
                 $msg = $p1;
-            } elseif ($p2 instanceof Location) {
+            } else if ($p2 instanceof Location) {
                 $loc = $p2;
                 if ($p1 instanceof Exception) {
                     $cause = $p1;
@@ -77,7 +77,7 @@ class BuildException extends RuntimeException
                     $msg = $p1;
                 }
             }
-        } elseif ($p1 instanceof Exception) {
+        } else if ($p1 instanceof Exception) {
             $cause = $p1;
         } else {
             $msg = $p1;
@@ -88,7 +88,7 @@ class BuildException extends RuntimeException
         if ($cause !== null) {
             $this->cause = $cause;
             $this->message .= "\n" . $this->getTraceAsString();
-            $this->message .= "\n\nPrevious " . (string) $cause;
+            $this->message .= "\n\nPrevious " . (string)$cause;
         }
 
         if ($loc !== null) {

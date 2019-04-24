@@ -38,13 +38,18 @@ class PHP5MultiExtendObjectBuilder extends ObjectBuilder
     }
 
     /**
-     * Override method to return child package, if specified.
+     * Returns the child object we're operating on currently.
      *
-     * @return string
+     * @return Inheritance
+     * @throws BuildException - if child was not set.
      */
-    public function getPackage()
+    public function getChild()
     {
-        return ($this->child->getPackage() ? $this->child->getPackage() : parent::getPackage());
+        if (!$this->child) {
+            throw new BuildException("The PHP5MultiExtendObjectBuilder needs to be told which child class to build (via setChild() method) before it can build the stub class.");
+        }
+
+        return $this->child;
     }
 
     /**
@@ -58,18 +63,13 @@ class PHP5MultiExtendObjectBuilder extends ObjectBuilder
     }
 
     /**
-     * Returns the child object we're operating on currently.
+     * Gets the file path to the parent class.
      *
-     * @return Inheritance
-     * @throws BuildException - if child was not set.
+     * @return string
      */
-    public function getChild()
+    protected function getParentClassFilePath()
     {
-        if (!$this->child) {
-            throw new BuildException("The PHP5MultiExtendObjectBuilder needs to be told which child class to build (via setChild() method) before it can build the stub class.");
-        }
-
-        return $this->child;
+        return ClassTools::getFilePath($this->getParentClasspath());
     }
 
     /**
@@ -86,34 +86,14 @@ class PHP5MultiExtendObjectBuilder extends ObjectBuilder
         }
     }
 
-    /**
-     * Returns classname of parent class.
-     *
-     * @return string
-     */
-    protected function getParentClassname()
-    {
-        return ClassTools::classname($this->getParentClasspath());
-    }
-
-    /**
-     * Gets the file path to the parent class.
-     *
-     * @return string
-     */
-    protected function getParentClassFilePath()
-    {
-        return ClassTools::getFilePath($this->getParentClasspath());
-    }
-
-    /**
+/**
      * Adds the include() statements for files that this class depends on or utilizes.
      *
      * @param string &$script The script will be modified in this method.
      */
     protected function addIncludes(&$script)
     {
-    } // addIncludes()
+    }
 
     /**
      * Adds class phpdoc comment and opening of class.
@@ -162,6 +142,26 @@ class PHP5MultiExtendObjectBuilder extends ObjectBuilder
  */
 class " . $this->getClassname() . " extends " . $this->getParentClassname() . " {
 ";
+    }
+
+        /**
+     * Override method to return child package, if specified.
+     *
+     * @return string
+     */
+    public function getPackage()
+    {
+        return ($this->child->getPackage() ? $this->child->getPackage() : parent::getPackage());
+    } // addIncludes()
+
+    /**
+     * Returns classname of parent class.
+     *
+     * @return string
+     */
+    protected function getParentClassname()
+    {
+        return ClassTools::classname($this->getParentClasspath());
     }
 
     /**

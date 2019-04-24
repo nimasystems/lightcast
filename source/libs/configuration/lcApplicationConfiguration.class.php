@@ -349,7 +349,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
         $cache = [
             'parent_cache' => $parent_cache,
-            'project_cache' => $project_cache
+            'project_cache' => $project_cache,
         ];
 
         return $cache;

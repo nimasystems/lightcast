@@ -59,12 +59,12 @@ class PropelOnDemandFormatter extends PropelObjectFormatter
     {
         $col = 0;
         // main object
-        $class = $this->isSingleTableInheritance ? call_user_func(array($this->peer, 'getOMClass'), $row, $col) : $this->class;
+        $class = $this->isSingleTableInheritance ? call_user_func([$this->peer, 'getOMClass'], $row, $col) : $this->class;
         $obj = $this->getSingleObjectFromRow($row, $class, $col);
         // related objects using 'with'
         foreach ($this->getWith() as $modelWith) {
             if ($modelWith->isSingleTableInheritance()) {
-                $class = call_user_func(array($modelWith->getModelPeerName(), 'getOMClass'), $row, $col);
+                $class = call_user_func([$modelWith->getModelPeerName(), 'getOMClass'], $row, $col);
                 $refl = new ReflectionClass($class);
                 if ($refl->isAbstract()) {
                     $col += constant($class . 'Peer::NUM_COLUMNS');
@@ -76,7 +76,7 @@ class PropelOnDemandFormatter extends PropelObjectFormatter
             $endObject = $this->getSingleObjectFromRow($row, $class, $col);
             if ($modelWith->isPrimary()) {
                 $startObject = $obj;
-            } elseif (isset($hydrationChain)) {
+            } else if (isset($hydrationChain)) {
                 $startObject = $hydrationChain[$modelWith->getLeftPhpName()];
             } else {
                 continue;
@@ -85,16 +85,16 @@ class PropelOnDemandFormatter extends PropelObjectFormatter
             // in which case it should not be related to the previous object
             if (null === $endObject || $endObject->isPrimaryKeyNull()) {
                 if ($modelWith->isAdd()) {
-                    call_user_func(array($startObject, $modelWith->getInitMethod()), false);
+                    call_user_func([$startObject, $modelWith->getInitMethod()], false);
                 }
                 continue;
             }
             if (isset($hydrationChain)) {
                 $hydrationChain[$modelWith->getRightPhpName()] = $endObject;
             } else {
-                $hydrationChain = array($modelWith->getRightPhpName() => $endObject);
+                $hydrationChain = [$modelWith->getRightPhpName() => $endObject];
             }
-            call_user_func(array($startObject, $modelWith->getRelationMethod()), $endObject);
+            call_user_func([$startObject, $modelWith->getRelationMethod()], $endObject);
         }
         foreach ($this->getAsColumns() as $alias => $clause) {
             $obj->setVirtualColumn($alias, $row[$col]);

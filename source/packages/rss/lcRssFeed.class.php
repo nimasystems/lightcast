@@ -27,7 +27,7 @@ class lcRssFeed extends lcObj
     const RSS_TIME_FORMAT = 'D, d M Y H:i:s O';
 
     /** @var lcRssItem[] */
-    private $items = array(); //of RSSItem
+    private $items = []; //of RSSItem
 
     private $language = 'en';
     private $encoding = 'utf-8';
@@ -44,42 +44,13 @@ class lcRssFeed extends lcObj
     {
         parent::__construct();
 
-        $this->items = array();
+        $this->items = [];
 
         $this->setFeedTitle($feed_title);
         $this->setFeedLink($feed_link);
         $this->setBuildDate($builddate);
         $this->setLanguage($language);
         $this->setFeedDescription($feed_descr);
-    }
-
-    public function setFeedTitle($title)
-    {
-        $this->feed_title = $title;
-    }
-
-    public function setFeedLink($link)
-    {
-        $this->feed_link = $link;
-    }
-
-    public function setBuildDate($bdate)
-    {
-        if ($bdate < 1) {
-            $bdate = time();
-        }
-
-        $this->builddate = (int)$bdate;
-    }
-
-    public function setLanguage($lang = 'en')
-    {
-        $this->language = $lang;
-    }
-
-    public function setEncoding($encoding = 'utf-8')
-    {
-        $this->encoding = $encoding;
     }
 
     public function setFeedDescription($descr)
@@ -107,18 +78,19 @@ class lcRssFeed extends lcObj
         return $this->feed_title;
     }
 
+    public function setFeedTitle($title)
+    {
+        $this->feed_title = $title;
+    }
+
     public function getFeedLink()
     {
         return $this->feed_link;
     }
 
-    public function getBuildDate($format = self::RSS_TIME_FORMAT)
+    public function setFeedLink($link)
     {
-        if ($format) {
-            return date($format, $this->builddate);
-        } else {
-            return (int)$this->builddate;
-        }
+        $this->feed_link = $link;
     }
 
     public function getLanguage()
@@ -126,9 +98,19 @@ class lcRssFeed extends lcObj
         return $this->language;
     }
 
+    public function setLanguage($lang = 'en')
+    {
+        $this->language = $lang;
+    }
+
     public function getEncoding()
     {
         return $this->encoding;
+    }
+
+    public function setEncoding($encoding = 'utf-8')
+    {
+        $this->encoding = $encoding;
     }
 
     public function getFeedDescription()
@@ -195,5 +177,23 @@ class lcRssFeed extends lcObj
         $rss .= "</rss>";
 
         return $rss;
+    }
+
+    public function getBuildDate($format = self::RSS_TIME_FORMAT)
+    {
+        if ($format) {
+            return date($format, $this->builddate);
+        } else {
+            return (int)$this->builddate;
+        }
+    }
+
+    public function setBuildDate($bdate)
+    {
+        if ($bdate < 1) {
+            $bdate = time();
+        }
+
+        $this->builddate = (int)$bdate;
     }
 }

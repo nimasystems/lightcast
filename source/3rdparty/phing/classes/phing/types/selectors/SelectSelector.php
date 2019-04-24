@@ -54,17 +54,6 @@ class SelectSelector extends AndSelector
     }
 
     /**
-     * Performs the check for circular references and returns the
-     * referenced Selector.
-     */
-    private function getRef()
-    {
-        $o = $this->getCheckedRef(get_class($this), "SelectSelector");
-
-        return $o;
-    }
-
-    /**
      * Indicates whether there are any selectors here.
      */
     public function hasSelectors()
@@ -77,15 +66,14 @@ class SelectSelector extends AndSelector
     }
 
     /**
-     * Gives the count of the number of selectors in this container
+     * Performs the check for circular references and returns the
+     * referenced Selector.
      */
-    public function selectorCount()
+    private function getRef()
     {
-        if ($this->isReference()) {
-            return $this->getRef()->selectorCount();
-        }
+        $o = $this->getCheckedRef(get_class($this), "SelectSelector");
 
-        return parent::selectorCount();
+        return $o;
     }
 
     /**
@@ -118,9 +106,9 @@ class SelectSelector extends AndSelector
      * Add a new selector into this container.
      *
      * @param FileSelector|the $selector
+     * @return the selector that was added
      * @throws BuildException
      * @internal param the $selector new selector to add
-     * @return the selector that was added
      */
     public function appendSelector(FileSelector $selector)
     {
@@ -142,6 +130,18 @@ class SelectSelector extends AndSelector
                 . "<selector> tag"
             );
         }
+    }
+
+    /**
+     * Gives the count of the number of selectors in this container
+     */
+    public function selectorCount()
+    {
+        if ($this->isReference()) {
+            return $this->getRef()->selectorCount();
+        }
+
+        return parent::selectorCount();
     }
 
 }

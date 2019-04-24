@@ -57,15 +57,6 @@ class InputRequest
     }
 
     /**
-     * Sets the user provided input.
-     * @param $input
-     */
-    public function setInput($input)
-    {
-        $this->input = $input;
-    }
-
-    /**
      * Is the user input valid?
      */
     public function isInputValid()
@@ -82,12 +73,12 @@ class InputRequest
     }
 
     /**
-     * Set the default value to use.
-     * @param mixed $v
+     * Sets the user provided input.
+     * @param $input
      */
-    public function setDefaultValue($v)
+    public function setInput($input)
     {
-        $this->defaultValue = $v;
+        $this->input = $input;
     }
 
     /**
@@ -101,11 +92,11 @@ class InputRequest
 
     /**
      * Set the default value to use.
-     * @param string $c
+     * @param mixed $v
      */
-    public function setPromptChar($c)
+    public function setDefaultValue($v)
     {
-        $this->promptChar = $c;
+        $this->defaultValue = $v;
     }
 
     /**
@@ -115,5 +106,14 @@ class InputRequest
     public function getPromptChar()
     {
         return $this->promptChar;
+    }
+
+    /**
+     * Set the default value to use.
+     * @param string $c
+     */
+    public function setPromptChar($c)
+    {
+        $this->promptChar = $c;
     }
 }

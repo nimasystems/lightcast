@@ -53,7 +53,7 @@ class SmartyTask extends Task
      * Variables that are assigned to the context on parse/compile.
      * @var array
      */
-    protected $properties = array();
+    protected $properties = [];
 
     /**
      * This is the control template that governs the output.
@@ -175,9 +175,19 @@ class SmartyTask extends Task
     }
 
     /**
+     * Get the control template for the
+     * generating process.
+     * @return string
+     */
+    public function getControlTemplate()
+    {
+        return $this->controlTemplate;
+    }
+
+    /**
      * [REQUIRED] Set the control template for the
      * generating process.
-     * @param  string $controlTemplate
+     * @param string $controlTemplate
      * @return void
      */
     public function setControlTemplate($controlTemplate)
@@ -186,13 +196,14 @@ class SmartyTask extends Task
     }
 
     /**
-     * Get the control template for the
-     * generating process.
+     * Get the path where Smarty will look
+     * for templates using the file template
+     * loader.
      * @return string
      */
-    public function getControlTemplate()
+    public function getTemplatePath()
     {
-        return $this->controlTemplate;
+        return $this->templatePath;
     }
 
     /**
@@ -225,20 +236,18 @@ class SmartyTask extends Task
     }
 
     /**
-     * Get the path where Smarty will look
-     * for templates using the file template
-     * loader.
+     * Get the output directory.
      * @return string
      */
-    public function getTemplatePath()
+    public function getOutputDirectory()
     {
-        return $this->templatePath;
+        return $this->outputDirectory;
     }
 
     /**
      * [REQUIRED] Set the output directory. It will be
      * created if it doesn't exist.
-     * @param  PhingFile $outputDirectory
+     * @param PhingFile $outputDirectory
      * @return void
      * @throws Exception
      */
@@ -261,12 +270,13 @@ class SmartyTask extends Task
     }
 
     /**
-     * Get the output directory.
+     * Get the output file for the
+     * generation process.
      * @return string
      */
-    public function getOutputDirectory()
+    public function getOutputFile()
     {
-        return $this->outputDirectory;
+        return $this->outputFile;
     }
 
     /**
@@ -281,13 +291,12 @@ class SmartyTask extends Task
     }
 
     /**
-     * Get the output file for the
-     * generation process.
+     * Get the path Smarty uses for compiling templates.
      * @return string
      */
-    public function getOutputFile()
+    public function getCompilePath()
     {
-        return $this->outputFile;
+        return $this->compilePath;
     }
 
     /**
@@ -300,25 +309,6 @@ class SmartyTask extends Task
     }
 
     /**
-     * Get the path Smarty uses for compiling templates.
-     * @return string
-     */
-    public function getCompilePath()
-    {
-        return $this->compilePath;
-    }
-
-    /**
-     * Set whether Smarty should always recompile templates.
-     * @param  boolean $force
-     * @return void
-     */
-    public function setForceCompile($force)
-    {
-        $this->forceCompile = (boolean) $force;
-    }
-
-    /**
      * Get whether Smarty should always recompile template.
      * @return boolean
      */
@@ -328,13 +318,13 @@ class SmartyTask extends Task
     }
 
     /**
-     * Set where Smarty looks for config files.
-     * @param  string $configPath
+     * Set whether Smarty should always recompile templates.
+     * @param boolean $force
      * @return void
      */
-    public function setConfigPath($configPath)
+    public function setForceCompile($force)
     {
-        $this->configPath = $configPath;
+        $this->forceCompile = (boolean)$force;
     }
 
     /**
@@ -347,13 +337,13 @@ class SmartyTask extends Task
     }
 
     /**
-     * Set Smarty template left delimiter.
-     * @param  string $delim
+     * Set where Smarty looks for config files.
+     * @param string $configPath
      * @return void
      */
-    public function setLeftDelimiter($delim)
+    public function setConfigPath($configPath)
     {
-        $this->leftDelimiter = $delim;
+        $this->configPath = $configPath;
     }
 
     /**
@@ -366,13 +356,13 @@ class SmartyTask extends Task
     }
 
     /**
-     * Set Smarty template right delimiter.
-     * @param  string $delim
+     * Set Smarty template left delimiter.
+     * @param string $delim
      * @return void
      */
-    public function setRightDelimiter($delim)
+    public function setLeftDelimiter($delim)
     {
-        $this->rightDelimiter = $delim;
+        $this->leftDelimiter = $delim;
     }
 
     /**
@@ -385,12 +375,33 @@ class SmartyTask extends Task
     }
 
     /**
+     * Set Smarty template right delimiter.
+     * @param string $delim
+     * @return void
+     */
+    public function setRightDelimiter($delim)
+    {
+        $this->rightDelimiter = $delim;
+    }
+
+    /**
+     * Get the context properties that will be
+     * fed into the initial context be the
+     * generating process starts.
+     * @return Properties
+     */
+    public function getContextProperties()
+    {
+        return $this->contextProperties;
+    }
+
+    /**
      * Set the context properties that will be
      * fed into the initial context be the
      * generating process starts.
-     * @param  string $file
-     * @throws BuildException
+     * @param string $file
      * @return void
+     * @throws BuildException
      */
     public function setContextProperties($file)
     {
@@ -432,34 +443,9 @@ class SmartyTask extends Task
         }
     }
 
-    /**
-     * Get the context properties that will be
-     * fed into the initial context be the
-     * generating process starts.
-     * @return Properties
-     */
-    public function getContextProperties()
-    {
-        return $this->contextProperties;
-    }
-
     // ---------------------------------------------------------------
     // End of XML setters & getters
     // ---------------------------------------------------------------
-
-    /**
-     * Creates a Smarty object.
-     *
-     * @return Smarty    initialized (cleared) Smarty context.
-     * @throws Exception the execute method will catch
-     *                   and rethrow as a <code>BuildException</code>
-     */
-    public function initControlContext()
-    {
-        $this->context->clear_all_assign();
-
-        return $this->context;
-    }
 
     /**
      * Execute the input script with Smarty
@@ -621,6 +607,20 @@ class SmartyTask extends Task
     }
 
     /**
+     * Creates a Smarty object.
+     *
+     * @return Smarty    initialized (cleared) Smarty context.
+     * @throws Exception the execute method will catch
+     *                   and rethrow as a <code>BuildException</code>
+     */
+    public function initControlContext()
+    {
+        $this->context->clear_all_assign();
+
+        return $this->context;
+    }
+
+    /**
      * <p>Place useful objects into the initial context.</p>
      *
      * <p>TexenTask places <code>Date().toString()</code> into the
@@ -631,9 +631,9 @@ class SmartyTask extends Task
      * method.</p>
      *
      * @param Smarty|The $context
+     * @return void
      * @internal param The $context context to populate, as retrieved from
      * {@link #initControlContext()}.
-     * @return void
      */
     protected function populateInitialContext(Smarty $context)
     {
