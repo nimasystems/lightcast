@@ -395,4 +395,3 @@ class JSMinException extends Exception
 {
 }
 
-?>
