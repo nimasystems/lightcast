@@ -148,6 +148,8 @@ class lcFrontWebServiceController extends lcFrontWebController
         if (DO_DEBUG) {
             $err_ar['exception'] = get_class($e);
             $err_ar['trace'] = $e->getTraceAsString();
+            $err_ar['line'] = $e->getLine();
+            $err_ar['file'] = $e->getFile();
 
             if ($e instanceof lcException && $e->getCause()) {
                 $err_ar['previous_exception'] = get_class($e->getCause());
