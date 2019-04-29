@@ -145,6 +145,21 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         unset($extra_data);
 
+        if ($validation_failures) {
+            $fails = [];
+
+            foreach ($validation_failures as $failure) {
+                $fails[] = array_filter([
+                    'name' => $failure->getName(),
+                    'message' => $failure->getMessage(),
+                    'extra_data' => $failure->getExtraData(),
+                ]);
+            }
+
+            $err_ar['validation_failures'] = $fails;
+            unset($fails);
+        }
+
         if (DO_DEBUG) {
             $err_ar['exception'] = get_class($e);
             $err_ar['trace'] = $e->getTraceAsString();
@@ -167,21 +182,6 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         if ($custom_message) {
             $err_ar['message'] = $custom_message;
-        }
-
-        if ($validation_failures) {
-            $fails = [];
-
-            foreach ($validation_failures as $failure) {
-                $fails[] = array_filter([
-                    'name' => $failure->getName(),
-                    'message' => $failure->getMessage(),
-                    'extra_data' => $failure->getExtraData(),
-                ]);
-            }
-
-            $err_ar['validation_failures'] = $fails;
-            unset($fails);
         }
 
         // send it
