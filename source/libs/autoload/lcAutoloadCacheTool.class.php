@@ -133,7 +133,7 @@ class lcAutoloadCacheTool extends lcObj
     {
         $class_dirs = $this->class_dirs;
 
-        assert($class_dirs);
+        assert($class_dirs != null);
 
         $found_classes_all = [];
 

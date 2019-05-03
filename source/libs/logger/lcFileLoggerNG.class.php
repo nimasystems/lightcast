@@ -86,7 +86,7 @@ class lcFileLoggerNG extends lcLogger
     {
         $log_files = array_filter($log_files);
 
-        assert($log_files);
+        assert(count($log_files) > 0);
 
         foreach ($log_files as $filename => $log_info) {
             try {

@@ -534,8 +534,8 @@ class lcPropelConnection extends PropelPDO
     {
         assert(isset($namespace));
         assert(isset($cache_key));
-        assert(count($rows));
-        assert((int)$timeout);
+        assert(count($rows) > 0);
+        assert((int)$timeout > 0);
 
         $this->query_cache_backend->setDbCache($namespace, $cache_key, $rows, $timeout);
 

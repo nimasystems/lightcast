@@ -384,7 +384,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public function setConfigVersion($config_version)
     {
         $this->config_version = (int)$config_version;
-        assert($this->config_version);
+        assert($this->config_version > 0);
     }
 
     public function isTargetingLC15()
