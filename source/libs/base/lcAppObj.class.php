@@ -112,33 +112,33 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         $this->setRouting($routing);
     }
 
+    /**
+     * @return lcRouting
+     */
     public function getRouter()
     {
         return $this->getRouting();
     }
 
+    /**
+     * @return lcRouting
+     */
     public function getRouting()
     {
         return $this->routing;
     }
 
-    /*
-     * Returns an instance of the Routing loader
-    *
-    * @returns object lcRouting
-    */
-
+    /**
+     * @param lcRouting|null $routing
+     */
     public function setRouting(lcRouting $routing = null)
     {
         $this->routing = $routing;
     }
 
-    /*
-     * Returns an instance of the Mailer loader
-    *
-    * @returns object lcMailer
-    */
-
+    /**
+     * @return lcMailer
+     */
     public function getMailer()
     {
         return $this->mailer;
@@ -149,11 +149,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         $this->mailer = $mailer;
     }
 
-    /*
-     * Returns an instance of the DatabaseManager loader
-    *
-    * @returns object lcDatabaseManager
-    */
+    /**
+     * @return lcDatabaseManager
+     */
     public function getDatabaseManager()
     {
         return $this->database_manager;
@@ -165,21 +163,18 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         $this->dbc = $this->database_manager ? $this->database_manager->getConnection() : null;
     }
 
-    /*
-     * Returns an instance of the first instantiated database connection
-    *
-    * @returns object lcDatabase
-    */
+    /**
+     * @param null $name
+     * @return PDO|null
+     */
     public function getDatabase($name = null)
     {
         return $this->database_manager->getConnection($name);
     }
 
-    /*
-     * Returns an instance of the Storage loader
-    *
-    * @returns object lcStorage
-    */
+    /**
+     * @return lcStorage
+     */
     public function getStorage()
     {
         return $this->storage;
@@ -190,11 +185,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         $this->storage = $storage;
     }
 
-    /*
-     * Returns an instance of the User loader
-    *
-    * @returns object lcUser
-    */
+    /**
+     * @return lcAppSecurityUser
+     */
     public function getUser()
     {
         return $this->user;
@@ -212,11 +205,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         }
     }
 
-    /*
-     * Returns an instance of the DataStorage loader
-    *
-    * @returns object lcDataStorage
-    */
+    /**
+     * @return lcDataStorage
+     */
     public function getDataStorage()
     {
         return $this->data_storage;
@@ -227,11 +218,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         $this->data_storage = $data_storage;
     }
 
-    /*
-     * Returns an instance of the Cache loader
-    *
-    * @returns object lcCache
-    */
+    /**
+     * @return iCacheStorage
+     */
     public function getCache()
     {
         return $this->cache;
