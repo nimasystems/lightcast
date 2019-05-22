@@ -172,7 +172,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
         return $this->cache;
     }
 
-    public function setCache(iCacheStorage $cache = null)
+    public function setCache(iCacheStore $cache = null)
     {
         $this->cache = $cache;
     }

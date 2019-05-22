@@ -21,9 +21,9 @@
 * E-Mail: info@nimasystems.com
 */
 
-interface iCacheStorage
+interface iCacheStore
 {
-    public function set($key, $value = null, $lifetime = null);
+    public function set($key, $value = null, array $options = []);
 
     public function remove($key);
 

@@ -58,7 +58,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
      */
     protected $data_storage;
 
-    /** @var iCacheStorage */
+    /** @var lcCacheStore */
     protected $cache;
 
     /**
@@ -219,7 +219,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     }
 
     /**
-     * @return iCacheStorage
+     * @return lcCacheStore
      */
     public function getCache()
     {

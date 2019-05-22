@@ -21,14 +21,12 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvider, ArrayAccess, iDebuggable
+class lcDefaultCacheStore extends lcCacheStore implements iDatabaseCacheProvider, ArrayAccess, iDebuggable
 {
-    const DEFAULT_MEMCACHE_STORE = 'memcache';
+    const DEFAULT_CACHE_BACKEND = 'memcache';
 
-    const MAX_KEY_SIZE = 250;
-
-    /** @var lcMemcache */
-    protected $memcache;
+    /** @var lcCacheStore */
+    protected $cache_backend;
 
     private $namespace_prefix;
 
@@ -39,72 +37,31 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
     {
         parent::initialize();
 
-        $memcache_store = isset($this->configuration['cache.memcache_store']) ? (string)$this->configuration['cache.memcache_store'] : self::DEFAULT_MEMCACHE_STORE;
+        $cache_backend = isset($this->configuration['cache.backend']) ? (string)$this->configuration['cache.backend'] : self::DEFAULT_CACHE_BACKEND;
 
-        if (!$memcache_store) {
+        if (!$cache_backend) {
             throw new lcConfigException('Invalid memcache store set in configuration', 1);
         }
 
-        $memcache_store = 'lc' . lcInflector::camelize($memcache_store);
+        $cache_backend_cls = 'lc' . lcInflector::camelize($cache_backend);
 
-        if (!class_exists($memcache_store)) {
-            throw new lcConfigException('Invalid memcache store set in configuration', 2);
+        if (!class_exists($cache_backend_cls)) {
+            throw new lcConfigException('Invalid cache backend set in configuration', 2);
         }
 
-        $this->memcache = new $memcache_store();
+        $this->cache_backend = new $cache_backend_cls();
 
-        if (!($this->memcache instanceof iCacheStorage)) {
-            throw new lcConfigException('Invalid memcache store set in configuration', 3);
+        if (!($this->cache_backend instanceof lcCacheStore)) {
+            throw new lcConfigException('Invalid cache backend set in configuration', 3);
         }
 
         // internal storage
         $this->internal_storage = [];
-        $this->should_use_internal_storage = isset($this->configuration['cache.use_internal_storage']) ? (bool)$this->configuration['cache.use_internal_storage'] : true;
+        $this->should_use_internal_storage = isset($this->configuration['cache.use_internal_storage']) ?
+            (bool)$this->configuration['cache.use_internal_storage'] : false;
 
         // init from the current configuration
-        $servers_array = $this->configuration['cache.servers'];
-
-        if (!$servers_array || !is_array($servers_array)) {
-            throw new lcConfigException('No memcached servers configured');
-        }
-
-        $c = 0;
-
-        foreach ($servers_array as $server) {
-            $ex = array_filter(explode(':', $server));
-
-            if (!isset($ex[0])) {
-                throw new lcConfigException('Invalid server at position ' . $c);
-            }
-
-            $y = 0;
-
-            // check for dups - memcached does not do this!
-            foreach ($servers_array as $server2) {
-                $ex2 = array_filter(explode(':', $server2));
-
-                if (!isset($ex2[0])) {
-                    continue;
-                }
-
-                if ($ex2[0] === $ex[0] && $c != $y) {
-                    throw new lcConfigException('Duplicate server detected: ' . $ex2[0]);
-                }
-
-                $y++;
-                unset($ex2, $server2);
-            }
-
-            if (!isset($ex[1])) {
-                $ex[1] = lcMemcache::DEFAULT_PORT;
-            }
-
-            // set the server to memcached
-            $this->memcache->addServer($ex[0], $ex[1]);
-
-            $c++;
-            unset($server, $ex);
-        }
+        $this->cache_backend->setOptions((array)$this->configuration['cache']);
 
         // global application / project namespace prefix
         $this->namespace_prefix = isset($this->configuration['cache.namespace']) ? ((string)$this->configuration['cache.namespace']) . '_' : 'lc_';
@@ -117,7 +74,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function shutdown()
     {
-        $this->memcache = null;
+        $this->cache_backend = null;
 
         parent::shutdown();
     }
@@ -138,7 +95,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function clear()
     {
-        $this->memcache->clear();
+        $this->cache_backend->clear();
 
         // internal storage
         $use_internal_storage = $this->should_use_internal_storage;
@@ -158,25 +115,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $this->count();
     }
 
-    public function count()
-    {
-        if (!$stats = $this->memcache->getStats()) {
-            return false;
-        }
-
-        if (!isset($stats['total_items'])) {
-            return false;
-        }
-
-        return (int)$stats['total_items'];
-    }
-
-    // lifetime passed in seconds!
-    // max object size: 1 MB!
-
     public function getCachingSystem()
     {
-        return $this->memcache->getBackend();
+        return $this->cache_backend->getBackend();
     }
 
     public function setDbCache($namespace, $key, $value = null, $lifetime = null)
@@ -185,9 +126,13 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         return $this->set($key, $value, $lifetime);
     }
 
-    public function set($key, $value = null, $lifetime = null, $flags = null)
+    public function set($key, $value = null, array $options = [])
     {
         $all_kv = [];
+
+        if ($this->default_lifetime && !isset($options['lifetime'])) {
+            $options['lifetime'] = $this->default_lifetime;
+        }
 
         if (is_array($key)) {
 
@@ -201,10 +146,6 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                 }
 
                 $kk = $this->keyWithNamespace($kk);
-
-                if (strlen($kk) > self::MAX_KEY_SIZE) {
-                    throw new lcInvalidArgumentException('Invalid key size for memcached object: ' . $kk);
-                }
 
                 $val = (($value && is_array($value) && isset($value[$kk_prev])) ? $value[$kk_prev] : $value);
 
@@ -222,25 +163,8 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
             $key = $this->keyWithNamespace($key);
 
-            if (strlen($key) > self::MAX_KEY_SIZE) {
-                throw new lcInvalidArgumentException('Invalid key size for memcached object: ' . $key);
-            }
-
             $all_kv[$key] = $value;
         }
-
-        /* Set the flags to current unixtime
-         * to allow proper caching with nginx / memc module
-        * which is able to return 304 Not Modified
-        * - if not flags already set!
-        */
-        // Disabled as it conflicts with memcache internal usage of this flag
-        // until we figure out what to do with this...
-        //'PHP Error: MemcachePool::set() [memcachepool.set]: The lowest two bytes of the flags array is reserved for pecl/memcache internal use'
-        /*if (!$flags)
-        {
-        $flags = time();
-        }*/
 
         // internal storage
         $use_internal_storage = $this->should_use_internal_storage;
@@ -250,7 +174,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
         foreach ($all_kv as $akey => $avalue) {
 
             $flags = isset($flags) ? $flags : 0;
-            $res = $this->memcache->set($akey, $avalue, (isset($lifetime) ? (time() + $lifetime) : 0), $flags);
+            $res = $this->cache_backend->set($akey, $avalue, $options);
 
             if ($use_internal_storage) {
                 $this->internal_storage[$akey] = $avalue;
@@ -261,7 +185,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
         // throw an exception only if debugging
         if (!$res && DO_DEBUG) {
-            throw new lcSystemException('Cannot write data to Memcache, key: ' . $key . ', life: ' . $lifetime);
+            throw new lcSystemException('Cannot write data to cache, key: ' . $key);
         }
 
         return $res;
@@ -283,7 +207,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
     {
         $namespaced_key = $this->keyWithNamespace($key);
 
-        $this->memcache->remove($namespaced_key);
+        $this->cache_backend->remove($namespaced_key);
 
         // internal storage
         $use_internal_storage = $this->should_use_internal_storage;
@@ -362,12 +286,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
             }
         }
 
-        // try to fetch from memcache then
-        // if we have more than one requests to fetch
-        // use getMulti
         try {
             if (count($keys) > 1) {
-                if ($this->memcache instanceof iCacheMultiStorage) {
+                if ($this->cache_backend instanceof iCacheMultiStorage) {
                     // clear out the keys which we already have
                     foreach ($keys as $key1) {
                         if (isset($results[$unnamespaced_keys[$key1]])) {
@@ -377,9 +298,9 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                         unset($key1);
                     }
 
-                    // fetch from memcached
+                    // fetch from cache
                     $cas = null;
-                    $values = $this->memcache->getMulti($keys);
+                    $values = $this->cache_backend->getMulti($keys);
 
                     // parse the results
                     if ($values) {
@@ -399,7 +320,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
                 } else {
                     foreach ($keys as $key1) {
 
-                        $value = $this->memcache->get($key1);
+                        $value = $this->cache_backend->get($key1);
 
                         // internal storage writeback
                         if ($use_internal_storage) {
@@ -416,7 +337,7 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
             } else if (!isset($results[$unnamespaced_keys[$keys[0]]])) {
                 $key1 = $keys[0];
 
-                $value = $this->memcache->get($key1);
+                $value = $this->cache_backend->get($key1);
 
                 // internal storage writeback
                 if ($use_internal_storage) {
@@ -453,11 +374,16 @@ class lcMemcacheCacheStorage extends lcCacheStore implements iDatabaseCacheProvi
 
     public function has($key)
     {
-        return $this->memcache->has($key);
+        return $this->cache_backend->has($key);
     }
 
     protected function makeSafeKey($key)
     {
         return md5($key);
+    }
+
+    public function count()
+    {
+        //
     }
 }
