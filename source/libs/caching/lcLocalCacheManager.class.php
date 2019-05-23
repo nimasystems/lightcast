@@ -91,7 +91,9 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
                     $cached_data = $object->writeClassCache();
 
                     if ($cached_data && is_array($cached_data)) {
-                        $set = $cache->set($key, $cached_data, $this->cache_ttl);
+                        $set = $cache->set($key, $cached_data, [
+                            'lifetime' => $this->cache_ttl,
+                        ]);
 
                         if (!$set) {
                             throw new lcIOException('Setting cache to store failed');
