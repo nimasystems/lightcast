@@ -123,7 +123,9 @@ class lcDefaultCacheStore extends lcCacheStore implements iDatabaseCacheProvider
     public function setDbCache($namespace, $key, $value = null, $lifetime = null)
     {
         $key = $namespace . ':' . $key;
-        return $this->set($key, $value, $lifetime);
+        return $this->set($key, $value, [
+            'lifetime' => $lifetime,
+        ]);
     }
 
     public function set($key, $value = null, array $options = [])
