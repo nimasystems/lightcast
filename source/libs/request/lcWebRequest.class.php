@@ -495,7 +495,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getContentLength()
     {
-        return $this->env('HTTP_CONTENT_LENGTH');
+        return $this->env('CONTENT_LENGTH');
     }
 
     /*
@@ -504,7 +504,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getContentType()
     {
-        return $this->env('HTTP_CONTENT_TYPE');
+        $r = explode(';', $this->env('CONTENT_TYPE'));
+        return $r ? $r[0] : null;
     }
 
     /*
@@ -859,17 +860,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         unset($proto_expl);
 
-        // disable magic quotes and set input vars
-        $get = (array)$_GET;
-        $post = (array)$_POST;
-
-        // get_magic_quotes_gpc is deprecated from 5.4
-        //$get = get_magic_quotes_gpc() ? lcStrings::slashStrip($get) : $get;
-        //$post = get_magic_quotes_gpc() ? lcStrings::slashStrip($post) : $post;
-
         // reset globals $_GET / $_POST
-        $_GET = $get;
-        $_POST = $post;
+        $_GET = (array)$_GET;
+        $_POST = (array)$_POST;
 
         if ($this->isPut()) {
             parse_str(file_get_contents('php://input'), $_PUT);
@@ -878,12 +871,17 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             parse_str(file_get_contents('php://input'), $_PUT);
             $this->delete_params = new lcArrayCollection($_PUT);
         } else if ($this->isPost()) {
-            $this->post_params = new lcArrayCollection((array)$post);
+
+            $is_json = $this->getContentType() == 'application/json';
+
+            if ($is_json) {
+                $_POST = json_decode(file_get_contents('php://input'), true);
+            }
+
+            $this->post_params = new lcArrayCollection($_POST);
         }
 
-        $this->get_params = new lcArrayCollection((array)$get);
-
-        unset($get, $post);
+        $this->get_params = new lcArrayCollection((array)$_GET);
 
         // init context
         $this->initContext();
