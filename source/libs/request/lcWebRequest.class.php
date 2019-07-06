@@ -864,21 +864,42 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         $_GET = (array)$_GET;
         $_POST = (array)$_POST;
 
-        if ($this->isPut()) {
-            parse_str(file_get_contents('php://input'), $_PUT);
-            $this->put_params = new lcArrayCollection($_PUT);
-        } else if ($this->isDelete()) {
-            parse_str(file_get_contents('php://input'), $_PUT);
-            $this->delete_params = new lcArrayCollection($_PUT);
-        } else if ($this->isPost()) {
+        $is_put = $this->isPut();
+        $is_del = $this->isDelete();
+        $is_post = $this->isPost();
 
+        $handled = false;
+
+        if ($is_put || $is_del || $is_post) {
             $is_json = $this->getContentType() == 'application/json';
 
             if ($is_json) {
-                $_POST = json_decode(file_get_contents('php://input'), true);
-            }
+                $handled = true;
 
-            $this->post_params = new lcArrayCollection($_POST);
+                $d = json_decode(file_get_contents('php://input'), true);
+
+                if ($is_put) {
+                    $this->put_params = new lcArrayCollection($d);
+                } else if ($is_del) {
+                    $_PUT = $d;
+                    $this->delete_params = new lcArrayCollection($_PUT);
+                } else if ($is_post) {
+                    $_POST = $d;
+                    $this->post_params = new lcArrayCollection($_POST);
+                }
+            }
+        }
+
+        if (!$handled) {
+            if ($is_put) {
+                parse_str(file_get_contents('php://input'), $_PUT);
+                $this->put_params = new lcArrayCollection($_PUT);
+            } else if ($is_del) {
+                parse_str(file_get_contents('php://input'), $_PUT);
+                $this->delete_params = new lcArrayCollection($_PUT);
+            } else if ($is_post) {
+                $this->post_params = new lcArrayCollection($_POST);
+            }
         }
 
         $this->get_params = new lcArrayCollection((array)$_GET);
