@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcAPC extends lcSysObj implements iCacheStorage
+class lcAPC extends lcCacheStore
 {
     /**
      * @var string
@@ -64,11 +64,10 @@ class lcAPC extends lcSysObj implements iCacheStorage
     /**
      * @param $key
      * @param null $value
-     * @param null $lifetime
-     * @param null $other_flags
+     * @param array $options
      * @return bool
      */
-    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    public function set($key, $value = null, array $options = [])
     {
         $key_prefixed = $this->prefix . $key;
 
@@ -78,7 +77,9 @@ class lcAPC extends lcSysObj implements iCacheStorage
             $this->remove($key);
         }
 
-        return apc_add($key_prefixed, $value, $lifetime);
+        return apc_add($key_prefixed, $value,
+            isset($options['lifetime']) ? $options['lifetime'] : null
+        );
     }
 
     /**
@@ -129,5 +130,20 @@ class lcAPC extends lcSysObj implements iCacheStorage
     public function getBackend()
     {
         return null;
+    }
+
+    public function hasValues()
+    {
+        // TODO: Implement hasValues() method.
+    }
+
+    public function count()
+    {
+        // TODO: Implement count() method.
+    }
+
+    public function getCachingSystem()
+    {
+        return false;
     }
 }

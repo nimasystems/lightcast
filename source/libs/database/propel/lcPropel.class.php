@@ -32,7 +32,7 @@ class lcPropel extends Propel
     const CONTEXT_TYPE_ATTR = 'lcContextType';
     const CONTEXT_NAME_ATTR = 'lcContextName';
 
-    /** @var iCacheStorage */
+    /** @var iCacheStore */
     protected static $cache;
 
     protected static $cache_key;
@@ -61,7 +61,7 @@ class lcPropel extends Propel
         self::$i18n = $i18n;
     }
 
-    public static function setCache(iCacheStorage $cache = null, $cache_key = null)
+    public static function setCache(iCacheStore $cache = null, $cache_key = null)
     {
         self::$cache = $cache;
         self::$cache_key = $cache_key;

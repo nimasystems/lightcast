@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcMemcache extends lcSysObj implements iCacheStorage
+class lcMemcache extends lcCacheStore
 {
     const DEFAULT_PORT = 11211;
     /** @var Memcache */
@@ -69,10 +69,11 @@ class lcMemcache extends lcSysObj implements iCacheStorage
         return $ret;
     }
 
-    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    public function set($key, $value = null, array $options = [])
     {
+        $other_flags = isset($options['flags']) ? $options['flags'] : null;
+        $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
         $ret = $this->memcache_backend->set($key, $value, $other_flags, $lifetime);
-
         return $ret;
     }
 
@@ -102,5 +103,20 @@ class lcMemcache extends lcSysObj implements iCacheStorage
         $ret = $this->memcache_backend->flush();
 
         return $ret;
+    }
+
+    public function hasValues()
+    {
+        // TODO: Implement hasValues() method.
+    }
+
+    public function count()
+    {
+        // TODO: Implement count() method.
+    }
+
+    public function getCachingSystem()
+    {
+        return $this->memcache_backend;
     }
 }

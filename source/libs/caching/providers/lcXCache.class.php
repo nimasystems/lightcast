@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpUndefinedFunctionInspection */
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcXCache extends lcSysObj implements iCacheStorage
+class lcXCache extends lcCacheStore
 {
     private $prefix;
 
@@ -37,9 +37,10 @@ class lcXCache extends lcSysObj implements iCacheStorage
         $this->prefix = 'lc_';
     }
 
-    public function set($key, $value = null, $lifetime = null)
+    public function set($key, $value = null, array $options = [])
     {
         $key = $this->prefix . $key;
+        $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
         return xcache_set($key, $value, $lifetime);
     }
 
@@ -71,5 +72,20 @@ class lcXCache extends lcSysObj implements iCacheStorage
     public function getBackend()
     {
         return null;
+    }
+
+    public function hasValues()
+    {
+        // TODO: Implement hasValues() method.
+    }
+
+    public function count()
+    {
+        // TODO: Implement count() method.
+    }
+
+    public function getCachingSystem()
+    {
+        return false;
     }
 }

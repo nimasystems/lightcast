@@ -180,11 +180,12 @@ abstract class lcWebBaseController extends lcController
                     ($arg == self::VGET && !$this->request->isGet()) ||
                     ($arg == self::VDELETE && !$this->request->isDelete()) ||
                     ($arg == self::VAJAX && !$this->request->isAjax()) ||
-                    ($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
-                    ($arg == self::VNAUTH && $this->user->isAuthenticated()) ||
                     !$arg
                 ) {
                     throw new lcInvalidRequestException($this->t('Invalid Request'));
+                } else if (($arg == self::VAUTH && !$this->user->isAuthenticated()) ||
+                    ($arg == self::VNAUTH && $this->user->isAuthenticated())) {
+                    throw new lcAuthException($this->t('Authentication is not valid'));
                 }
             }
         }

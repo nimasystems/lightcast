@@ -23,8 +23,16 @@
 
 */
 
-abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCacheStorage
+abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCacheStore
 {
+    /**
+     * @var string[]
+     */
+    protected $options = [];
+
+    /**
+     * @var int|null
+     */
     protected $default_lifetime;
 
     public function initialize()
@@ -76,4 +84,14 @@ abstract class lcCacheStore extends lcResidentObj implements ArrayAccess, iCache
     }
 
     abstract public function getCachingSystem();
+
+    /**
+     * @param string[] $options
+     * @return lcCacheStore
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+        return $this;
+    }
 }

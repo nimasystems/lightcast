@@ -31,8 +31,9 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
         return $this->memcache_backend->getMulti($key);
     }
 
-    public function set($key, $value = null, $lifetime = null, $other_flags = null)
+    public function set($key, $value = null, array $options = null)
     {
+        $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
         $ret = $this->memcache_backend->set($key, $value, $lifetime);
 
         return $ret;

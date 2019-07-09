@@ -495,7 +495,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getContentLength()
     {
-        return $this->env('HTTP_CONTENT_LENGTH');
+        return $this->env('CONTENT_LENGTH');
     }
 
     /*
@@ -504,7 +504,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getContentType()
     {
-        return $this->env('HTTP_CONTENT_TYPE');
+        $r = explode(';', $this->env('CONTENT_TYPE'));
+        return $r ? $r[0] : null;
     }
 
     /*
@@ -859,31 +860,49 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
         unset($proto_expl);
 
-        // disable magic quotes and set input vars
-        $get = (array)$_GET;
-        $post = (array)$_POST;
-
-        // get_magic_quotes_gpc is deprecated from 5.4
-        //$get = get_magic_quotes_gpc() ? lcStrings::slashStrip($get) : $get;
-        //$post = get_magic_quotes_gpc() ? lcStrings::slashStrip($post) : $post;
-
         // reset globals $_GET / $_POST
-        $_GET = $get;
-        $_POST = $post;
+        $_GET = (array)$_GET;
+        $_POST = (array)$_POST;
 
-        if ($this->isPut()) {
-            parse_str(file_get_contents('php://input'), $_PUT);
-            $this->put_params = new lcArrayCollection($_PUT);
-        } else if ($this->isDelete()) {
-            parse_str(file_get_contents('php://input'), $_PUT);
-            $this->delete_params = new lcArrayCollection($_PUT);
-        } else if ($this->isPost()) {
-            $this->post_params = new lcArrayCollection((array)$post);
+        $is_put = $this->isPut();
+        $is_del = $this->isDelete();
+        $is_post = $this->isPost();
+
+        $handled = false;
+
+        if ($is_put || $is_del || $is_post) {
+            $is_json = $this->getContentType() == 'application/json';
+
+            if ($is_json) {
+                $handled = true;
+
+                $d = json_decode(file_get_contents('php://input'), true);
+
+                if ($is_put) {
+                    $this->put_params = new lcArrayCollection($d);
+                } else if ($is_del) {
+                    $_PUT = $d;
+                    $this->delete_params = new lcArrayCollection($_PUT);
+                } else if ($is_post) {
+                    $_POST = $d;
+                    $this->post_params = new lcArrayCollection($_POST);
+                }
+            }
         }
 
-        $this->get_params = new lcArrayCollection((array)$get);
+        if (!$handled) {
+            if ($is_put) {
+                parse_str(file_get_contents('php://input'), $_PUT);
+                $this->put_params = new lcArrayCollection($_PUT);
+            } else if ($is_del) {
+                parse_str(file_get_contents('php://input'), $_PUT);
+                $this->delete_params = new lcArrayCollection($_PUT);
+            } else if ($is_post) {
+                $this->post_params = new lcArrayCollection($_POST);
+            }
+        }
 
-        unset($get, $post);
+        $this->get_params = new lcArrayCollection((array)$_GET);
 
         // init context
         $this->initContext();

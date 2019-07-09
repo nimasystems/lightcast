@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcFileCacheStore extends lcCacheStore implements iDebuggable
+class lcFileCache extends lcCacheStore
 {
     const FILE_MODE = 0777;
     const FILES_PER_BUCKET = 30;
@@ -63,9 +63,9 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
     *
     */
 
-    public function initialize()
+    public function __construct()
     {
-        parent::initialize();
+        parent::__construct();
 
         // cache folder must be relative to app_root_dir
         $this->cache_folder = (string)$this->configuration->getCacheDir();
@@ -376,12 +376,10 @@ class lcFileCacheStore extends lcCacheStore implements iDebuggable
         return $this->read($key, self::READ_DATA);
     }
 
-    public function set($key, $value = null, $lifetime = null)
+    public function set($key, $value = null, array $options = null)
     {
-        if (!$lifetime) {
-            $lifetime = $this->default_lifetime;
-        }
-        return $this->write($key, $value, self::WRITE_DATA, $lifetime);
+        return $this->write($key, $value, self::WRITE_DATA,
+            isset($options['lifetime']) ? $options['lifetime'] : null);
     }
 
     private function write($key, $data = null, $write_type = self::WRITE_DATA, $lifetime = null)

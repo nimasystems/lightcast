@@ -27,6 +27,7 @@
  * @method lcController getController
  * @method lcI18n getI18n
  * @method lcLogger getLogger
+ * @method iCacheStore getCache
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj
@@ -1182,7 +1183,7 @@ class lcApp extends lcObj
         $ctrl->dispatch();
     }
 
-    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars)
+    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null)
     {
         if (!$this->error_handler) {
             throw new lcPHPException($errmsg, $errno, $filename, $linenum);
