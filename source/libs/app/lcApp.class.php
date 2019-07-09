@@ -1183,7 +1183,7 @@ class lcApp extends lcObj
         $ctrl->dispatch();
     }
 
-    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars)
+    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null)
     {
         if (!$this->error_handler) {
             throw new lcPHPException($errmsg, $errno, $filename, $linenum);
