@@ -31,7 +31,7 @@ interface iErrorHandler
      */
     public function handleException($exception);
 
-    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars);
+    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null);
 
     public function handleAssertion($file, $line, $code);
 

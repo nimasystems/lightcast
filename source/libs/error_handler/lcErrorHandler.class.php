@@ -941,7 +941,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         throw new lcAssertException($file, $line, $code);
     }
 
-    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars)
+    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null)
     {
         if (error_reporting() == 0) {
             return true;
