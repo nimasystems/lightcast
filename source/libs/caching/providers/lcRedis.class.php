@@ -23,8 +23,6 @@
 
 class lcRedis extends lcCacheStore
 {
-    const DEFAULT_PORT = 6379;
-
     /**
      * @var string[]
      */
@@ -61,7 +59,7 @@ class lcRedis extends lcCacheStore
             $config_servers = isset($this->options['servers']) ? (array)$this->options['servers'] : [];
             $servers = array_merge((array)$this->servers, $config_servers);
             $this->backend = new Predis\Client(count($servers) > 1 ? $servers : $servers[0],
-                $this->options);
+                (isset($this->options['backend_options']) ? $this->options['backend_options'] : null));
         }
         return $this->backend;
     }
