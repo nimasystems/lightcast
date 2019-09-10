@@ -5,7 +5,6 @@ class lcMath
     public static function bigRand($length)
     {
         $length = (int)$length;
-
         $ret = '';
 
         srand();
@@ -15,5 +14,11 @@ class lcMath
         }
 
         return $ret;
+    }
+
+    public static function roundUp($value, $precision)
+    {
+        $pow = pow(10, $precision);
+        return (ceil($pow * $value) + ceil($pow * $value - ceil($pow * $value))) / $pow;
     }
 }
