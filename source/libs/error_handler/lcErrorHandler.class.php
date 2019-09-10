@@ -438,6 +438,10 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             );
         }
 
+        $this->event_dispatcher->notify(new lcEvent('error_handler.exception', $this, [
+            'exception' => $exception,
+        ]));
+
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
         $exception_min_severity = (int)$this->configuration['exceptions.mail.severity'];
 
@@ -677,46 +681,46 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
         switch ($content_type) {
             case 'text/html':
-                {
-                    $fname = 'html.err';
-                    break;
-                }
+            {
+                $fname = 'html.err';
+                break;
+            }
             case 'text/xml':
-                {
-                    $fname = 'xml.err';
-                    break;
-                }
+            {
+                $fname = 'xml.err';
+                break;
+            }
             case 'text/plain':
-                {
-                    $fname = 'txt.err';
-                    break;
-                }
+            {
+                $fname = 'txt.err';
+                break;
+            }
             case 'text/javascript':
-                {
-                    $fname = 'js.err';
-                    break;
-                }
+            {
+                $fname = 'js.err';
+                break;
+            }
             case 'text/css':
-                {
-                    $fname = 'css.err';
-                    break;
-                }
+            {
+                $fname = 'css.err';
+                break;
+            }
             case 'application/json':
-                {
-                    $fname = null;
-                    $error_output = @json_encode(['error' => $this->getExceptionDetails($exception)]);
+            {
+                $fname = null;
+                $error_output = @json_encode(['error' => $this->getExceptionDetails($exception)]);
 
-                    if ($error_output && DO_DEBUG) {
-                        $error_output = lcVars::indentJson($error_output);
-                    }
-
-                    break;
+                if ($error_output && DO_DEBUG) {
+                    $error_output = lcVars::indentJson($error_output);
                 }
+
+                break;
+            }
             default:
-                {
-                    $fname = 'txt.err';
-                    break;
-                }
+            {
+                $fname = 'txt.err';
+                break;
+            }
         }
 
         $libs_dir = $this->configuration->getLibsDir();
