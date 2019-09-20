@@ -79,7 +79,7 @@ class lcRedis extends lcCacheStore
 
     public function has($key)
     {
-        return $this->has($key);
+        return $this->get($key) != null;
     }
 
     public function get($key)
