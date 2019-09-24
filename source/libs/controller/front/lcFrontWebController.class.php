@@ -71,7 +71,26 @@ class lcFrontWebController extends lcFrontController
     protected function shouldDispatch($controller_name, $action_name, array $params = null)
     {
         // handler called just before dispatching by front controller
-        return true;
+        return $this->isRequestSuported();
+    }
+
+    protected function isRequestSuported()
+    {
+        /** @var lcWebRequest $request */
+        $request = $this->request;
+
+        // we do not handle
+        return in_array($request->getMethod(), $this->getSupportedRequestMethods());
+    }
+
+    protected function getSupportedRequestMethods()
+    {
+        return [
+            lcHttpMethod::METHOD_GET,
+            lcHttpMethod::METHOD_PUT,
+            lcHttpMethod::METHOD_POST,
+            lcHttpMethod::METHOD_DELETE,
+        ];
     }
 
     protected function prepareDispatchParams(lcRequest $request)
