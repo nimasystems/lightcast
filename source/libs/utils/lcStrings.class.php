@@ -104,6 +104,13 @@ class lcStrings
         ];
     }
 
+    public static function findWords($string, $min_length = 3)
+    {
+        $match_arr = [];
+        $n_words = preg_match_all('/([a-zA-Z]|\xC3[\x80-\x96\x98-\xB6\xB8-\xBF]|\xC5[\x92\x93\xA0\xA1\xB8\xBD\xBE]){' . (int)$min_length . ',}/', $string, $match_arr);
+        return $n_words ? $match_arr[0] : [];
+    }
+
     public static function splitEmail($str)
     {
         $regex = '/(("([^"]*)"|[^",]*)\\s*<(.*?)>|[^",\\s]+)(?=(,|$))/';
