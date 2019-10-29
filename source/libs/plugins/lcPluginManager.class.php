@@ -747,6 +747,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return;
         }
 
+        if (!$plugin->getHasInitialized()) {
+            return;
+        }
+
         // set loader objects onto plugin
         if ($plugin->getHasAppInitialized()) {
             // skip plugins which have already been notified
