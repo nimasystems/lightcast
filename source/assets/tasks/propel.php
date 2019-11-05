@@ -138,60 +138,60 @@ class tPropel extends lcTaskController
 
         switch ($this->getRequest()->getParam('action')) {
             case 'models' :
-                {
-                    $ret = $this->propelOm();
-                    break;
-                }
+            {
+                $ret = $this->propelOm();
+                break;
+            }
             case 'sql' :
-                {
-                    $ret = $this->propelSql();
-                    break;
-                }
+            {
+                $ret = $this->propelSql();
+                break;
+            }
             case 'graphviz' :
-                {
-                    $ret = $this->propelGraphviz();
-                    break;
-                }
+            {
+                $ret = $this->propelGraphviz();
+                break;
+            }
             case 'create-db' :
-                {
-                    $ret = $this->propelCreateDb();
-                    break;
-                }
+            {
+                $ret = $this->propelCreateDb();
+                break;
+            }
             case 'insert-sql' :
-                {
-                    $ret = $this->propelInsertSql();
-                    break;
-                }
+            {
+                $ret = $this->propelInsertSql();
+                break;
+            }
             case 'build-sql' :
-                {
-                    $ret = $this->propelBuildSql();
-                    break;
-                }
+            {
+                $ret = $this->propelBuildSql();
+                break;
+            }
             case 'reverse' :
-                {
-                    $ret = $this->propelReverse();
-                    break;
-                }
+            {
+                $ret = $this->propelReverse();
+                break;
+            }
             case 'flush' :
-                {
-                    $ret = $this->propelFlush();
-                    break;
-                }
+            {
+                $ret = $this->propelFlush();
+                break;
+            }
             case 'rebuild' :
-                {
-                    $ret = $this->propelRebuild();
-                    break;
-                }
+            {
+                $ret = $this->propelRebuild();
+                break;
+            }
             case 'migrate' :
-                {
-                    $this->propelMigrate();
-                    break;
-                }
+            {
+                $this->propelMigrate();
+                break;
+            }
             default :
-                {
-                    $ret = $this->displayHelp();
-                    break;
-                }
+            {
+                $ret = $this->displayHelp();
+                break;
+            }
         }
 
         if (!$ret) {
@@ -218,10 +218,11 @@ class tPropel extends lcTaskController
     }
 
     /* Remove propel temporary stuff, oms, maps, sql files */
-
     private function propelFlush()
     {
-        $this->display('Flushing runtime data...');
+        if (!$this->request->getIsSilent()) {
+            $this->display('Flushing runtime data...');
+        }
 
         /** @var lcProjectConfiguration $cfg */
         $cfg = $this->configuration;
@@ -639,9 +640,9 @@ class tPropel extends lcTaskController
 
         $build_properties_filename = $wd . 'build.properties';
 
-        if (DO_DEBUG) {
+        /*if (DO_DEBUG) {
             echo print_r($build_properties_contents, true);
-        }
+        }*/
 
         if (!@file_put_contents($build_properties_filename, $build_properties_str)) {
             throw new lcIOException('Could not copy the generated build.properties file: ' . $build_properties_filename);
@@ -674,8 +675,8 @@ class tPropel extends lcTaskController
         //$args[] = '-listener';
         //$args[] = 'propel';
 
-        $args[] = '-logger';
-        $args[] = 'AnsiColorLogger';
+        //$args[] = '-logger';
+        //$args[] = 'AnsiColorLogger';
 
         if ($request->getIsSilent()) {
             $args[] = '-logfile';
@@ -699,14 +700,17 @@ class tPropel extends lcTaskController
         }
 
         try {
-            $php_output = $request->getIsSilent() ? fopen('/dev/null', 'w') : fopen('php://output', 'w');
-            $stream = new OutputStream($php_output);
+            $descr_ok = fopen('/dev/null', 'w');
+            $descr_err = fopen('php://output', 'w');
 
-            Phing::setOutputStream($stream);
-            PropelPhing::setOutputStream($stream);
+            $stream_ok = new OutputStream($descr_ok);
+            $stream_err = new OutputStream($descr_err);
 
-            Phing::setErrorStream($stream);
-            PropelPhing::setErrorStream($stream);
+            Phing::setOutputStream($stream_ok);
+            PropelPhing::setOutputStream($stream_ok);
+
+            Phing::setErrorStream($stream_err);
+            PropelPhing::setErrorStream($stream_err);
 
             Phing::startup();
             PropelPhing::startup();
@@ -728,7 +732,11 @@ class tPropel extends lcTaskController
             Phing::shutdown();
             PropelPhing::shutdown();
 
-            @fclose($php_output);
+            $stream_ok->close();
+            $stream_err->close();
+
+            @fclose($descr_ok);
+            @fclose($descr_err);
 
             $captured_errors = PropelPhing::getCapturedPhpErrors();
 
