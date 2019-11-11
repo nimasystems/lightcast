@@ -1099,7 +1099,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $content = $this->output_content;
 
         if ($content && is_resource($content)) {
-            fpassthru($content);
+            //fpassthru($content);
+            echo stream_get_contents($content);
             fclose($content);
         } else {
             // notify with an event

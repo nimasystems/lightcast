@@ -1161,6 +1161,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             'format' => $this->isSecure() ? 'https' : 'http',
             'host' => $this->getHostname(),
             'is_secure' => $this->isSecure(),
+            'query' => $this->getQueryString(),
             'is_xml_http_request' => $this->isXmlHttpRequest(),
             'request_uri' => parent::getRequestUri(),
             'real_request_uri' => $this->generateRealRequestUri(),
