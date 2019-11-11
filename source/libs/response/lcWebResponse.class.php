@@ -402,6 +402,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
         }
 
+        // notify with an event
+        $this->event_dispatcher->notify(
+            new lcEvent('response.will_send_response', $this, []));
+
         // notify listeners
         if ($this->content_should_be_processed) {
             $event = $this->event_dispatcher->filter(
@@ -413,10 +417,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
             unset($event);
         }
-
-        // notify with an event
-        $this->event_dispatcher->notify(
-            new lcEvent('response.will_send_response', $this, []));
 
         if ($this->content_should_be_processed && !$this->request->isAjax()) {
             // set html customizations
@@ -597,7 +597,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // content language
         if ($this->content_lang && $this->htmlver == 5) {
-            $content = preg_replace("/\<html/i", '<html ' . 'lang="' . $this->content_lang . '"', $content);
+            $content = preg_replace("/<html/i", '<html ' . 'lang="' . $this->content_lang . '"', $content);
         }
 
         // stylesheets
@@ -743,14 +743,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // that there is no <body> tag usually in there.. this must be fixed!
 
         if (isset($html_body_custom['end'])) {
-            $content = preg_replace("/\<\/body\>/i", "\n" . implode("\n", $html_body_custom['end']) . "\n" . '</body>', $content);
+            $content = preg_replace("/<\/body>/i", "\n" . implode("\n", $html_body_custom['end']) . "\n" . '</body>', $content);
         }
 
         // head parts
         $imploded = implode("\n", $head);
 
         if ($imploded) {
-            $content = preg_replace("/\<head\>/i", '<head>' . $imploded, $content);
+            $content = preg_replace("/<head>/i", '<head>' . $imploded, $content);
         }
 
         unset($head);
@@ -767,7 +767,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 unset($name, $value);
             }
 
-            $content = preg_replace("/\<body/i", '<body ' . implode(' ', $body_tags), $content);
+            $content = preg_replace("/<body/i", '<body ' . implode(' ', $body_tags), $content);
 
             unset($body_tags);
         }
@@ -787,11 +787,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace("/\<head\>/i", '<head>' . $start, $content);
+                $content = preg_replace("/<head>/i", '<head>' . $start, $content);
             }
 
             if ($end) {
-                $content = preg_replace("/\<\/head\>/i", $end . '</head>', $content);
+                $content = preg_replace("/<\/head>/i", $end . '</head>', $content);
             }
 
             unset($start, $end);
@@ -814,11 +814,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace("/\<body(.*?)\>/i", '<body>' . "\n" . $start, $content);
+                $content = preg_replace("/<body(.*?)>/i", '<body>' . "\n" . $start, $content);
             }
 
             if ($end) {
-                $content = preg_replace("/\<\/body\>/i", $end . "\n" . '</body>', $content);
+                $content = preg_replace("/<\/body>/i", $end . "\n" . '</body>', $content);
             }
 
             unset($start, $end);
@@ -1264,10 +1264,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->javascript_code[$tag] = $code;
     }
 
-    /*
-     * Set Title Suffix
-    */
-
     public function removeStylesheet($css_src)
     {
         if (isset($this->stylesheets[$css_src])) {
@@ -1275,23 +1271,17 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /*
-     * Get Title Suffix
-    */
-
-    public function javascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    public function javascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
     {
         $at_end = ($this->js_at_end_forced ? true : $at_end);
 
         $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
     }
 
-    /*
-     * Set Title
-    */
-
-    public function setJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    public function setJavascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
     {
+        $type = $type ?: 'text/javascript';
+        $language = $language ?: 'javascript';
         $at_end = ($this->js_at_end_forced ? true : $at_end);
 
         if (is_array($src)) {
@@ -1312,12 +1302,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /*
-     * Get Title
-    */
-
-    public function prependJavascript($src, $type = 'text/javascript', $language = 'javascript', $at_end = false, array $other_attribs = null)
+    public function prependJavascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
     {
+        $type = $type ?: 'text/javascript';
+        $language = $language ?: 'javascript';
         $at_end = ($this->js_at_end_forced ? true : $at_end);
 
         $new = [];
@@ -1334,21 +1322,22 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /*
-     * Set body tags
-    */
-
-    public function css($href, $media = 'all', $type = 'text/css')
+    /**
+     * @param $href
+     * @param string $media
+     * @param string $type
+     * @deprecated Use setStylesheet instead
+     */
+    public function css($href, $media = null, $type = null)
     {
         $this->setStylesheet($href, $media, $type);
     }
 
-    /*
-     * Set <head> custom
-    */
-
-    public function setStylesheet($href, $media = 'all', $type = 'text/css')
+    public function setStylesheet($href, $media = null, $type = null)
     {
+        $media = $media ?: 'all';
+        $type = $type ?: 'text/css';
+
         if (is_array($href)) {
             foreach ($href as $h) {
                 $this->setStylesheet($h, $media, $type);
@@ -1363,18 +1352,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    /*
-     * Set <body> custom
-    */
-
     public function clearMetatags()
     {
         $this->metatags = [];
     }
-
-    /*
-     * Insert/Append a Response Cookie
-    */
 
     public function getMetatag($name)
     {

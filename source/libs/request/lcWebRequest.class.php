@@ -672,6 +672,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
                 $ret = $cached_headers;
             }
         } else {
+            /** @noinspection PhpComposerExtensionStubsInspection */
             $ret = apache_request_headers();
         }
 

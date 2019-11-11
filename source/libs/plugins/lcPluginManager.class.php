@@ -142,6 +142,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $this->autoload_class_map_file_exists_map[$plugin_name] = true;
         }
 
+        /** @noinspection PhpIncludeInspection */
         $ret = include_once($filename);
 
         if (!$ret) {
@@ -276,9 +277,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $filename = $root_dir . DS . 'config' . DS . $plugin_name . '_config.php';
 
         if (!$verify) {
+            /** @noinspection PhpIncludeInspection */
             $ret = include_once($filename);
         } else {
             if (file_exists($filename)) {
+                /** @noinspection PhpIncludeInspection */
                 $ret = include_once($filename);
             }
         }
@@ -289,9 +292,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $filename = $root_dir . DS . 'config' . DS . 'config.php';
 
             if (!$verify) {
+                /** @noinspection PhpIncludeInspection */
                 $ret = include_once($filename);
             } else {
                 if (file_exists($filename)) {
+                    /** @noinspection PhpIncludeInspection */
                     $ret = include_once($filename);
                 }
             }
@@ -386,6 +391,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $schema = null;
 
         if ($plugin_config) {
+            /** @noinspection PhpUndefinedMethodInspection */
             $schema = $plugin_config->getDatabaseMigrationSchema();
 
             if ($schema instanceof lcSysObj) {
@@ -859,56 +865,119 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
             if ($plugins) {
                 foreach ($plugins as $plugin) {
-                    $plugin_configuration = $plugin->getPluginConfiguration();
-
-                    // stylesheets
-                    if ($t = $plugin_configuration['view.stylesheets']) {
-                        foreach ($t as $media => $files) {
-                            if ($files && is_array($files)) {
-                                foreach ($files as $file) {
-                                    $href = $plugin->getAssetsWebpath() . 'css/' . $file;
-                                    $response->setStylesheet($href, $media);
-
-                                    unset($file, $href);
-                                }
-                            }
-
-                            unset($media, $files);
-                        }
-
-                        unset($t);
-                    }
-
-                    // javascripts
-                    $t = $plugin_configuration['view.javascripts'];
-
-                    if ($t && is_array($t)) {
-                        foreach ($t as $file) {
-                            $response->setJavascript($plugin->getAssetsWebpath() . 'js/' . $file);
-
-                            unset($file);
-                        }
-
-                        unset($t);
-                    }
-
-                    // metatags
-                    $t = $plugin_configuration['view.metatags'];
-
-                    if ($t && is_array($t)) {
-                        foreach ($t as $title => $value1) {
-                            $response->setMetatag($title, $value1);
-                            unset($title, $value1);
-                        }
-                        unset($t);
-                    }
-
-                    unset($plugin);
+                    $this->processPluginResponse($plugin, $response);
                 }
             }
         }
 
         return $value;
+    }
+
+    private function processPluginResponse(lcPlugin $plugin, lcWebResponse $response)
+    {
+        $plugin_configuration = $plugin->getPluginConfiguration();
+        $css_assets_webpath = $plugin->getAssetsWebpath('css');
+        $js_assets_webpath = $plugin->getAssetsWebpath('js');
+
+        // included stylesheets
+        $this->renderIncludedStylesheets($plugin, $plugin->getIncludedStylesheets(), $response, [
+            'assets_webpath' => $css_assets_webpath,
+        ]);
+
+        // config stylesheets
+        $t = $plugin_configuration['view.stylesheets'];
+
+        if ($t) {
+            foreach ($t as $media => $files) {
+                if ($files && is_array($files)) {
+                    foreach ($files as $file) {
+                        $src = lcStrings::isAbsolutePath($file) ? $file : $css_assets_webpath . $file;
+                        $response->setStylesheet($src, $media);
+                        unset($file, $src);
+                    }
+                }
+
+                unset($media, $files);
+            }
+
+            unset($t);
+        }
+
+        // included javascripts
+        $this->renderIncludedJavascript($plugin, $plugin->getIncludedJavascripts(), $response, [
+            'assets_webpath' => $js_assets_webpath,
+        ]);
+
+        // javascripts
+        $t = $plugin_configuration['view.javascripts'];
+
+        if ($t && is_array($t)) {
+            foreach ($t as $file) {
+                $src = lcStrings::isAbsolutePath($file) ? $file : $css_assets_webpath . $file;
+                $response->setJavascript($src);
+                unset($file, $src);
+            }
+
+            unset($t);
+        }
+
+        // metatags
+        $t = $plugin_configuration['view.metatags'];
+
+        if ($t && is_array($t)) {
+            foreach ($t as $title => $value1) {
+                $response->setMetatag($title, $value1);
+                unset($title, $value1);
+            }
+            unset($t);
+        }
+
+        unset($plugin);
+    }
+
+    private function renderIncludedStylesheets(lcPlugin $plugin, array $included_stylesheets, lcWebResponse $response, array $options = null)
+    {
+        $assets_webpath = isset($options['assets_webpath']) ? $options['assets_webpath'] : null;
+
+        foreach ($included_stylesheets as $tag => $data) {
+            $opts = isset($data['options']) ? $data['options'] : [];
+            $src = !$assets_webpath || lcStrings::isAbsolutePath($data['src']) ? $data['src'] : $assets_webpath . $data['src'];
+
+            $response->setStylesheet($src,
+                isset($opts['media']) ? $opts['media'] : null,
+                isset($opts['type']) ? $opts['type'] : null
+            );
+            unset($tag, $data, $src, $opts);
+        }
+    }
+
+    private function renderIncludedJavascript(lcPlugin $plugin, array $included_javascripts, lcWebResponse $response, array $options = null)
+    {
+        $assets_webpath = isset($options['assets_webpath']) ? $options['assets_webpath'] : null;
+
+        foreach ($included_javascripts as $tag => $data) {
+            $opts = isset($data['options']) ? $data['options'] : [];
+            $prepend = isset($opts['prepend']) && $opts['prepend'];
+            $src = !$assets_webpath || lcStrings::isAbsolutePath($data['src']) ? $data['src'] : $assets_webpath . $data['src'];
+
+            if ($prepend) {
+                $response->prependJavascript($src,
+                    isset($opts['type']) ? $opts['type'] : null,
+                    isset($opts['language']) ? $opts['language'] : null,
+                    isset($opts['at_end']) ? $opts['at_end'] : null,
+                    isset($opts['attribs']) ? $opts['attribs'] : null
+                );
+            } else {
+                $response->setJavascript($src,
+                    isset($opts['type']) ? $opts['type'] : null,
+                    isset($opts['language']) ? $opts['language'] : null,
+                    isset($opts['at_end']) ? $opts['at_end'] : null,
+                    isset($opts['attribs']) ? $opts['attribs'] : null
+                );
+            }
+
+            unset($tag, $data, $opts);
+        }
     }
 
     public function initializePluginsForAppStartup()

@@ -18,24 +18,56 @@ abstract class lcWebComponent extends lcComponent
      */
     protected $controller;
 
-    protected $required_js_includes;
-    protected $required_css_includes;
+    private $included_javascripts = [];
+    private $included_stylesheets = [];
 
-    protected $required_javascript_code;
-
-    public function getRequiredJavascriptIncludes()
-    {
-        return $this->required_js_includes;
-    }
-
-    public function getRequiredCssIncludes()
-    {
-        return $this->required_css_includes;
-    }
+    private $required_javascript_code = [];
 
     public function getRequiredJavascriptCode()
     {
         return $this->required_javascript_code;
+    }
+
+    /**
+     * @param $src
+     * @param array|null $options
+     * @param null $tag
+     * @return $this
+     */
+    protected function includeJavascript($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'js_' . $this->getRandomIdentifier();
+        $this->included_javascripts[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedJavascripts()
+    {
+        return $this->included_javascripts;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedStylesheets()
+    {
+        return $this->included_stylesheets;
+    }
+
+    protected function includeStylesheet($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'css_' . $this->getRandomIdentifier();
+        $this->included_stylesheets[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
     }
 
     public function renderJavascriptCode()
@@ -51,21 +83,9 @@ abstract class lcWebComponent extends lcComponent
         return null;
     }
 
-    protected function addJavascriptInclude($location, $identifier = null)
+    protected function getRandomIdentifier()
     {
-        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_js_includes[$identifier] = $location;
-    }
-
-    private function getRandomIdentifier()
-    {
-        return 'anon_' . $this->getControllerName() . '_' . lcStrings::randomString(15);
-    }
-
-    protected function addCssInclude($location, $identifier = null)
-    {
-        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_css_includes[$identifier] = $location;
+        return 'component_' . $this->getControllerName() . '_' . $this->getClassName() . '_' . lcStrings::randomString(15);
     }
 
     protected function addJavascriptCode($code, $identifier = null)

@@ -61,6 +61,9 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     protected $context_type;
     protected $context_name;
 
+    private $included_javascripts = [];
+    private $included_stylesheets = [];
+
     public function initialize()
     {
         parent::initialize();
@@ -141,6 +144,53 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         }
 
         $this->loaded_components = $loaded_components;
+    }
+
+    protected function getRandomIdentifier()
+    {
+        return 'plugin_' . $this->getPluginName() . '_' . $this->getClassName() . '_' . lcStrings::randomString(15);
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedJavascripts()
+    {
+        return $this->included_javascripts;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedStylesheets()
+    {
+        return $this->included_stylesheets;
+    }
+
+    /**
+     * @param $src
+     * @param array|null $options
+     * @param null $tag
+     * @return $this
+     */
+    protected function includeJavascript($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'js_' . $this->getRandomIdentifier();
+        $this->included_javascripts[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
+    }
+
+    protected function includeStylesheet($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'css_' . $this->getRandomIdentifier();
+        $this->included_stylesheets[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
     }
 
     protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
@@ -330,9 +380,9 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $this->getPluginDir() . DS . self::ASSETS_PATH;
     }
 
-    public function getAssetsWebPath()
+    public function getAssetsWebPath($type = null)
     {
-        return $this->getWebPath() . self::ASSETS_PATH . '/';
+        return $this->getWebPath() . self::ASSETS_PATH . '/' . ($type ? $type . '/' : null);
     }
 
     public function getWebPath()

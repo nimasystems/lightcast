@@ -34,10 +34,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
      */
     protected $view;
 
-    protected $required_js_includes;
-    protected $required_css_includes;
-
-    protected $required_javascript_code;
+    private $included_javascripts = [];
+    private $included_stylesheets = [];
+    private $required_javascript_code = [];
 
     protected $web_path;
 
@@ -49,33 +48,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     private $show_extra_debugging;
     private $default_decorator;
     private $default_decorator_extension;
-
-    public function addJavascriptInclude($location, $identifier = null)
-    {
-        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_js_includes[$identifier] = $location;
-    }
-
-    private function getRandomIdentifier()
-    {
-        return 'anon_' . $this->getControllerName() . '/' . $this->getActionName() . '_' . lcStrings::randomString(15);
-    }
-
-    public function addCssInclude($location, $identifier = null)
-    {
-        $identifier = $identifier ? $identifier : $this->getRandomIdentifier();
-        $this->required_css_includes[$identifier] = $location;
-    }
-
-    public function getRequiredJavascriptIncludes()
-    {
-        return $this->required_js_includes;
-    }
-
-    public function getRequiredCssIncludes()
-    {
-        return $this->required_css_includes;
-    }
 
     public function getRequiredJavascriptCode()
     {
@@ -103,6 +75,48 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             return $this->getMyActionPath();
         }
         return null;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedJavascripts()
+    {
+        return $this->included_javascripts;
+    }
+
+    /**
+     * @return array
+     */
+    public function getIncludedStylesheets()
+    {
+        return $this->included_stylesheets;
+    }
+
+    /**
+     * @param $src
+     * @param array|null $options
+     * @param null $tag
+     * @return $this
+     */
+    protected function includeJavascript($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'js_' . $this->getRandomIdentifier();
+        $this->included_javascripts[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
+    }
+
+    protected function includeStylesheet($src, array $options = null, $tag = null)
+    {
+        $tag = $tag ?: 'css_' . $this->getRandomIdentifier();
+        $this->included_stylesheets[$tag] = [
+            'src' => $src,
+            'options' => $options,
+        ];
+        return $this;
     }
 
     public function getWebPath($suffixed = true)
@@ -393,8 +407,34 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $view;
     }
 
+    private function processWebComponentResponse(lcWebComponent $component, lcWebResponse $response)
+    {
+        // js code
+        $js_code = $component->getRequiredJavascriptCode();
+
+        if ($js_code) {
+            foreach ($js_code as $identifier => $code2) {
+                // append the component name before the identifier - to prevent overlapping of identifiers
+                $identifier = $component->getControllerName() . '-' . $identifier;
+                $code[$identifier] = $code2;
+                unset($identifier, $code2);
+            }
+        }
+
+        $parent_plugin = $component->getParentPlugin();
+
+        // javascript includes
+        $this->renderIncludedJavascript($component->getIncludedJavascripts(), $response, $parent_plugin);
+
+        // css includes
+        $this->renderIncludedStylesheets($component->getIncludedStylesheets(), $response, $parent_plugin);
+    }
+
     public function renderJavascriptCode($with_children = true, $with_script_tag = true)
     {
+        /** @var lcWebResponse $response */
+        $response = $this->getResponse();
+
         $code = (array)$this->required_javascript_code;
 
         if ($with_children) {
@@ -406,6 +446,8 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                     $component = $component_data['instance'];
 
                     if ($component instanceof lcWebComponent) {
+                        $this->processWebComponentResponse($component, $response);
+
                         $js_codes = $component->getRequiredJavascriptCode();
 
                         if ($js_codes) {
@@ -416,6 +458,8 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                                 unset($identifier, $code2);
                             }
                         }
+
+                        unset($js_codes);
                     }
                 }
             }
@@ -613,10 +657,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->getControllerDirectory() . DS . self::ASSETS_DIR;
     }
 
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-
     protected function processViewResponse(lcWebController $controller)
     {
         $this->outputViewContents($controller, $this->view->render(), $this->view->getContentType());
@@ -648,36 +688,104 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
             $response->setContentType($content_type);
         }
 
+        $this->event_dispatcher->notify(new lcEvent('controller.will_process_view', $this, [
+            'content' => $content,
+            'content_type' => $content_type,
+        ]));
+
         if ($controller instanceof lcWebController) {
-            /* page metadata */
-            $title = $controller->getTitle();
-
-            if ($title) {
-                $response->setTitle($title);
-                //$response->setMetatag('title', $title);
-            }
-
-            $description = $controller->getDescription();
-
-            if ($description) {
-                $response->setMetatag('description', $description);
-            }
-
-            $keywords = $controller->getKeywords();
-
-            if ($keywords) {
-                $response->setMetatag('keywords', $keywords);
-            }
-
-            $javascript_code = $controller->renderJavascriptCode(true, false);
-
-            if ($javascript_code) {
-                $response->setJavascriptCode($javascript_code);
-            }
+            $this->processWebControllerResponse($controller, $response);
         }
+
+        $this->event_dispatcher->notify(new lcEvent('controller.did_process_view', $this, [
+            'content' => $content,
+            'content_type' => $content_type,
+        ]));
 
         $response->setContent($content);
         $response->sendResponse();
+    }
+
+    private function processWebControllerResponse(lcWebController $controller, lcWebResponse $response)
+    {
+        /* page metadata */
+        $title = $controller->getTitle();
+
+        if ($title) {
+            $response->setTitle($title);
+            //$response->setMetatag('title', $title);
+        }
+
+        $description = $controller->getDescription();
+
+        if ($description) {
+            $response->setMetatag('description', $description);
+        }
+
+        $keywords = $controller->getKeywords();
+
+        if ($keywords) {
+            $response->setMetatag('keywords', $keywords);
+        }
+
+        $parent_plugin = $controller->getParentPlugin();
+
+        // javascript includes
+        $this->renderIncludedJavascript($controller->getIncludedJavascripts(), $response, $parent_plugin);
+
+        // css includes
+        $this->renderIncludedStylesheets($controller->getIncludedStylesheets(), $response, $parent_plugin);
+
+        // javascript code
+        $javascript_code = $controller->renderJavascriptCode(true, false);
+
+        if ($javascript_code) {
+            $response->setJavascriptCode($javascript_code);
+        }
+    }
+
+    private function renderIncludedStylesheets(array $included_stylesheets, lcWebResponse $response, lcPlugin $parent_plugin)
+    {
+        $assets_webpath = $parent_plugin ? $parent_plugin->getAssetsWebPath('css') : null;
+
+        foreach ($included_stylesheets as $tag => $data) {
+            $opts = isset($data['options']) ? $data['options'] : [];
+            $src = !$assets_webpath || lcStrings::isAbsolutePath($data['src']) ? $data['src'] : $assets_webpath . $data['src'];
+            $response->setStylesheet($src,
+                isset($opts['media']) ? $opts['media'] : null,
+                isset($opts['type']) ? $opts['type'] : null
+            );
+            unset($tag, $data, $src, $opts);
+        }
+    }
+
+    private function renderIncludedJavascript(array $included_javascripts, lcWebResponse $response, lcPlugin $parent_plugin)
+    {
+        $assets_webpath = $parent_plugin ? $parent_plugin->getAssetsWebPath('js') : null;
+
+        foreach ($included_javascripts as $tag => $data) {
+            $opts = isset($data['options']) ? $data['options'] : [];
+            $prepend = isset($opts['prepend']) && $opts['prepend'];
+            $src = !$assets_webpath || lcStrings::isAbsolutePath($data['src']) ? $data['src'] : $assets_webpath . $data['src'];
+
+            if ($prepend) {
+                $response->prependJavascript($src,
+                    isset($opts['type']) ? $opts['type'] : null,
+                    isset($opts['language']) ? $opts['language'] : null,
+                    isset($opts['at_end']) ? $opts['at_end'] : null,
+                    isset($opts['attribs']) ? $opts['attribs'] : null
+                );
+            } else {
+                $response->setJavascript($src,
+                    isset($opts['type']) ? $opts['type'] : null,
+                    isset($opts['language']) ? $opts['language'] : null,
+                    isset($opts['at_end']) ? $opts['at_end'] : null,
+                    isset($opts['attribs']) ? $opts['attribs'] : null
+                );
+            }
+
+            unset($tag, $data, $opts);
+        }
     }
 
     public function getTitle()

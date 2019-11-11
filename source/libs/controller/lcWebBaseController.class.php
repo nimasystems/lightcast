@@ -169,6 +169,11 @@ abstract class lcWebBaseController extends lcController
         $this->view = $view;
     }
 
+    protected function getRandomIdentifier()
+    {
+        return 'controller_' . $this->getControllerName() . '_' . $this->getClassName() . '_' . lcStrings::randomString(15);
+    }
+
     protected function validateRequestAndThrow()
     {
         $args = func_get_args();

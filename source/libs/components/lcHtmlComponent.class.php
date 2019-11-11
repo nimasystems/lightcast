@@ -13,7 +13,6 @@
 
 abstract class lcHtmlComponent extends lcWebComponent
 {
-
     public function initialize()
     {
         parent::initialize();

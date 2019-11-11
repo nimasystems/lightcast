@@ -208,6 +208,16 @@ class lcStrings
         return 'javascript:location=\'ma\'+\'il\'+\'to:' . implode('\'+ \'', $par) . '\'';
     }
 
+    public static function isAbsolutePath($file)
+    {
+        return strspn($file, '/\\', 0, 1)
+            || (strlen($file) > 3 && ctype_alpha($file[0])
+                && substr($file, 1, 1) === ':'
+                && strspn($file, '/\\', 2, 1)
+            )
+            || null !== parse_url($file, PHP_URL_SCHEME);
+    }
+
     public static function getTopKeywords($string, $min_word_len = 3, $max_words = 30, $imploded = false)
     {
         $skipwords = [
