@@ -603,6 +603,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // stylesheets
         $stylesheets = $this->stylesheets;
 
+        // filter javascripts start
+        $event = $this->event_dispatcher->filter(
+            new lcEvent('response.filter.stylesheets', $this, []), $stylesheets);
+
+        if ($event->isProcessed()) {
+            $stylesheets = $event->getReturnValue();
+        }
+
         if ($stylesheets) {
             foreach ($stylesheets as $href => $data) {
                 $head[] =
@@ -617,6 +625,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // javascripts start
         $javascripts = $this->javascripts;
+
+        // filter javascripts start
+        $event = $this->event_dispatcher->filter(
+            new lcEvent('response.filter.javascripts_start', $this, []), $javascripts);
+
+        if ($event->isProcessed()) {
+            $javascripts = $event->getReturnValue();
+        }
+
+        unset($event);
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
@@ -641,6 +659,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         // javascripts end
         $javascripts = $this->javascripts_end;
+
+        // filter javascripts start
+        $event = $this->event_dispatcher->filter(
+            new lcEvent('response.filter.javascripts_end', $this, []), $javascripts);
+
+        if ($event->isProcessed()) {
+            $javascripts = $event->getReturnValue();
+        }
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
