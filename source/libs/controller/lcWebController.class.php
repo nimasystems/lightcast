@@ -744,7 +744,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
     }
 
-    private function renderIncludedStylesheets(array $included_stylesheets, lcWebResponse $response, lcPlugin $parent_plugin)
+    private function renderIncludedStylesheets(array $included_stylesheets, lcWebResponse $response, lcPlugin $parent_plugin = null)
     {
         $assets_webpath = $parent_plugin ? $parent_plugin->getAssetsWebPath('css') : null;
 
@@ -759,7 +759,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
     }
 
-    private function renderIncludedJavascript(array $included_javascripts, lcWebResponse $response, lcPlugin $parent_plugin)
+    private function renderIncludedJavascript(array $included_javascripts, lcWebResponse $response, lcPlugin $parent_plugin = null)
     {
         $assets_webpath = $parent_plugin ? $parent_plugin->getAssetsWebPath('js') : null;
 
