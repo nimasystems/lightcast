@@ -422,7 +422,7 @@ class lcStrings
         return $params;
     }
 
-    public static function toAlphaNum($string, array $allowed = [])
+    public static function toAlphaNum($string, array $allowed = [], $unicode = false)
     {
         $allow = null;
 
@@ -436,10 +436,10 @@ class lcStrings
 
         if (is_array($string)) {
             foreach ($string as $key => $clean) {
-                $cleaned[$key] = preg_replace("/[^{$allow}a-zA-Z0-9]/", '', $clean);
+                $cleaned[$key] = preg_replace($unicode ? "/[^{$allow}\pL\pN]/u" : "/[^{$allow}a-zA-Z0-9]/", '', $clean);
             }
         } else {
-            $cleaned = preg_replace("/[^{$allow}a-zA-Z0-9]/", '', $string);
+            $cleaned = preg_replace($unicode ? "/[^{$allow}\pL\pN]/u" : "/[^{$allow}a-zA-Z0-9]/", '', $string);
         }
 
         return $cleaned;
