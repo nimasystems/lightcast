@@ -537,10 +537,6 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $this->getWebPath($suffixed);
     }
 
-    /*
-     * @deprecated The method is used by LC 1.4 projects
-    */
-
     protected function execute($action_name, array $action_params)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
@@ -571,12 +567,24 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         // run before execute
         call_user_func_array([$this, 'beforeExecute'], $action_params);
 
+        $req = $this->getRequest();
+
+        $should_use_reqresp = self::checkShouldUseRequestArgument($this, $action, 'lcWebRequest');
+
+        $call_params = $action_params;
+
+        if ($should_use_reqresp) {
+            $reqr = clone $req;
+            $reqr->setCallStyle(lcController::CALL_STYLE_REQRESP);
+            $call_params = [$reqr];
+        }
+
         // call the action
         // unfortunately the way we are handling variables at the moment
         // we can't use the fast calling as args need to be expanded with their names (actions are looking for them)
         // so we fall back to the default way
         //$call_result = $this->__call($action, $params);
-        $this->action_result = call_user_func_array([$this, $action], $action_params);
+        $this->action_result = call_user_func_array([$this, $action], $call_params);
 
         // run after execute
         call_user_func_array([$this, 'afterExecute'], $action_params);
