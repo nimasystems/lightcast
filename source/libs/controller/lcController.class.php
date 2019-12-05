@@ -78,7 +78,7 @@ abstract class lcController extends lcBaseController
     protected $render_time;
 
     /**
-     * @var lcView, iSupportsLayoutDecoration
+     * @var iSupportsLayoutDecoration|lcView
      */
     protected $layout_view;
 
@@ -779,6 +779,22 @@ abstract class lcController extends lcBaseController
         return false;
     }
 
+    private static $req_arguments_chk = [];
+
+    protected static function checkShouldUseRequestArgument(lcWebController $controller, $action, $request_cls_name)
+    {
+        $controller_name = get_class($controller);
+
+        if (!isset(self::$req_arguments_chk[$controller_name])) {
+            $r = new ReflectionMethod($controller_name, $action);
+            $params = $r->getParameters();
+            self::$req_arguments_chk[$controller_name] =
+                $params && $params[0]->getType()->getName() == $request_cls_name;
+        }
+
+        return self::$req_arguments_chk[$controller_name];
+    }
+
     public function shouldApplyActionFilters($action_name, $action_type)
     {
         $action_filters = $this->action_filters;
@@ -855,6 +871,7 @@ abstract class lcController extends lcBaseController
         }
 
         $layout_view->setDecorateContent($layout_content, $layout_content_type);
+        /** @noinspection PhpParamsInspection */
         $render_result = $this->renderControllerView($this, $layout_view);
 
         // unset / shutdown the view after we are done with it to preserve memory
@@ -1006,6 +1023,7 @@ abstract class lcController extends lcBaseController
             $saved_exception = null;
 
             try {
+                /** @noinspection PhpIncludeInspection */
                 if (!include($url)) {
                     throw new lcIOException('Cannot include file');
                 }

@@ -31,6 +31,9 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     protected $request_data;
 
+    /**
+     * @var string
+     */
     protected $call_style;
 
     /**
@@ -183,6 +186,14 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         } else {
             return isset($this->env[$name]);
         }
+    }
+
+    /**
+     * @param string $call_style
+     */
+    public function setCallStyle($call_style)
+    {
+        $this->call_style = $call_style;
     }
 
     public function offsetGet($name)
