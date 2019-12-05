@@ -182,7 +182,7 @@ class lcAutoloadCacheTool extends lcObj
                                 if ($file != "." && $file != "..") {
                                     if (file_exists($file_path . DS . self::NOINDEX_SUFFIX)) {
                                         //then we should not index
-                                        continue;
+                                        break;
                                     }
 
                                     /* parse on recursively */
