@@ -224,6 +224,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         }
 
         $error_message = null;
+        $send_res = false;
 
         try {
             // filter event to allow stop the sending / change the email's contents
@@ -272,7 +273,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
             }
 
             // send the email now
-            $res = $this->sendMailInternal();
+            $send_res = $this->sendMailInternal();
         } catch (Exception $e) {
             $error_message = $e->getMessage() . ' (' . $e->getCode() . ')';
         }
@@ -285,7 +286,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
             unset($email, $recipient);
         }
 
-        $logstr = 'Mail sent ' . ($res ? 'successfully' : 'unsuccessfully') .
+        $logstr = 'Mail sent ' . ($send_res ? 'successfully' : 'unsuccessfully') .
             ': subject: \'' . $this->subject . '\', From: ' . $this->sender->getEmail() . ', Recipient(s): ' .
             $logstr . (isset($error_message) ? ' | Error: ' . $error_message : null);
 
@@ -293,7 +294,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
         $this->clear();
 
-        return $res;
+        return $send_res;
     }
 
     public function getDefaultSender()

@@ -172,9 +172,11 @@ require ROOT . DS . 'source' . DS . 'libs' . DS . 'exceptions' . DS . 'lcInvalid
 // 3rdParty widely used libraries
 
 // PHPMailer
-require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.phpmailer.php';
-require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.pop3.php';
-require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'class.smtp.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'Exception.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'OAuth.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'PHPMailer.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'POP3.php';
+require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'SMTP.php';
 
 // Browser Detection
 require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'browser_detection' . DS . 'Browser.php';

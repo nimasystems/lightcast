@@ -21,6 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
+use PHPMailer\PHPMailer\PHPMailer;
+
 class lcPHPMailer extends lcMailer
 {
     const DEFAULT_LANGUAGE = 'en';
@@ -41,7 +43,7 @@ class lcPHPMailer extends lcMailer
     {
         parent::initialize();
 
-        if (!class_exists('PHPMailer')) {
+        if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
             throw new lcSystemException('SystemMailer requires PHPMailer');
         }
 
@@ -106,7 +108,7 @@ class lcPHPMailer extends lcMailer
         ///////// PHP Mailer extension
         $mailer = new PHPMailer(true /* exceptions instead of echo - die; */);
 
-        if (isset($this->configuration['mailer.language']) && is_string($this->configuration['mailer.language'])) {
+        if (isset($this->configuration['mailer.language']) && ($this->configuration['mailer.language'])) {
             $mailer->SetLanguage(
                 (string)$this->configuration['mailer.language'],
                 $this->configuration->getThirdPartyDir() . DS .
@@ -114,15 +116,15 @@ class lcPHPMailer extends lcMailer
         }
 
         // set configuration
-        if (isset($this->configuration['mailer.charset']) && is_string($this->configuration['mailer.charset'])) {
+        if (isset($this->configuration['mailer.charset']) && ($this->configuration['mailer.charset'])) {
             $mailer->CharSet = (string)$this->configuration['mailer.charset'];
         }
 
-        if (isset($this->configuration['mailer.content_type']) && is_string($this->configuration['mailer.content_type'])) {
+        if (isset($this->configuration['mailer.content_type']) && ($this->configuration['mailer.content_type'])) {
             $mailer->ContentType = (string)$this->configuration['mailer.content_type'];
         }
 
-        if (isset($this->configuration['mailer.encoding']) && is_string($this->configuration['mailer.encoding'])) {
+        if (isset($this->configuration['mailer.encoding']) && ($this->configuration['mailer.encoding'])) {
             $mailer->Encoding = (string)$this->configuration['mailer.encoding'];
         }
 
@@ -132,7 +134,10 @@ class lcPHPMailer extends lcMailer
         $mailer->Subject = $this->getSubject();
         $mailer->IsHTML(true);
         $mailer->AltBody = ($this->alt_body ? $this->alt_body : strip_tags($this->getBody()));
-        $mailer->Mailer = $this->getMailerType();
+
+        $mailer_type = $this->getMailerType();
+        $mailer_type = $mailer_type == 'php' || $mailer_type == 'phpmail' ? 'mail' : $mailer_type;
+        $mailer->Mailer = $mailer_type;
 
         // check mail type
         if ($mailer->Mailer == 'smtp' && !function_exists('socket_create')) {
@@ -142,7 +147,7 @@ class lcPHPMailer extends lcMailer
         }
 
         // set confirmation to
-        $mailer->ConfirmReadingTo = isset($this->configuration['mailer.confirm_to']) && is_string($this->configuration['mailer.confirm_to']) ?
+        $mailer->ConfirmReadingTo = isset($this->configuration['mailer.confirm_to']) && ($this->configuration['mailer.confirm_to']) ?
             $this->configuration['mailer.confirm_to'] :
             null;
 
@@ -165,15 +170,17 @@ class lcPHPMailer extends lcMailer
                 (string)$this->configuration['mailer.security'] :
                 null;
 
-            $mailer->Host = isset($this->configuration['mailer.smtp_host']) && is_string($this->configuration['mailer.smtp_host']) ? (string)$this->configuration['mailer.smtp_host'] : self::DEFAULT_SMTP_HOST;
-            $mailer->Port = isset($this->configuration['mailer.smtp_port']) && is_string($this->configuration['mailer.smtp_port']) ? (int)$this->configuration['mailer.smtp_port'] : self::DEFAULT_SMTP_PORT;
+            $mailer->Host = isset($this->configuration['mailer.smtp_host']) && $this->configuration['mailer.smtp_host'] ?
+                (string)$this->configuration['mailer.smtp_host'] : self::DEFAULT_SMTP_HOST;
+            $mailer->Port = isset($this->configuration['mailer.smtp_port']) && $this->configuration['mailer.smtp_port'] ?
+                (int)$this->configuration['mailer.smtp_port'] : self::DEFAULT_SMTP_PORT;
 
-            if (isset($this->configuration['mailer.smtp_user']) && is_string($this->configuration['mailer.smtp_user'])) {
+            if (isset($this->configuration['mailer.smtp_user']) && $this->configuration['mailer.smtp_user']) {
                 $mailer->SMTPAuth = true;
                 $mailer->Username = (string)$this->configuration['mailer.smtp_user'];
 
                 // check if there is an username which is required in this case
-                $mailer->Password = $mailer->Username && isset($this->configuration['mailer.smtp_pass']) && is_string($this->configuration['mailer.smtp_pass']) ?
+                $mailer->Password = $mailer->Username && isset($this->configuration['mailer.smtp_pass']) && ($this->configuration['mailer.smtp_pass']) ?
                     (string)$this->configuration['mailer.smtp_pass'] : null;
             }
         }
@@ -182,7 +189,7 @@ class lcPHPMailer extends lcMailer
 
         # add attachments if any
         if ($attachments = $this->getAttachments()) {
-            $attachment_encoding = isset($this->configuration['mailer.attachment_encoding']) && is_string($this->configuration['mailer.attachment_encoding']) ?
+            $attachment_encoding = isset($this->configuration['mailer.attachment_encoding']) && ($this->configuration['mailer.attachment_encoding']) ?
                 (string)$this->configuration['mailer.attachment_encoding'] :
                 'base64';
 
