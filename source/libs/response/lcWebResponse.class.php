@@ -710,7 +710,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     if (is_array($jscode)) {
                         foreach ($jscode as $key => $code) {
 
-                            $jscode[$key] = '/** ' . $key . ' */' . "\n" . $code;
+                            $jscode[$key] = '/** ' . $key . ' */' . "\n" .
+                                (is_array($code) ? implode("\n", $code) : $code);
 
                             unset($key, $code);
                         }

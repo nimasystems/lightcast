@@ -685,12 +685,14 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $is_15 = $this->configuration->isTargetingLC15();
 
         if ($is_15) {
-            if (!$plugin_configuration->getIdentifier()) {
-                throw new lcSystemRequirementException('LC 1.5 plugins are required to define an unique GUID');
-            }
+            if ($plugin_configuration->isTargetingLC15()) {
+                if (!$plugin_configuration->getIdentifier()) {
+                    throw new lcSystemRequirementException('LC 1.5 plugins are required to define an unique GUID');
+                }
 
-            if (!$plugin_configuration->getPackageName()) {
-                throw new lcSystemRequirementException('LC 1.5 plugins are required to define a package name');
+                if (!$plugin_configuration->getPackageName()) {
+                    throw new lcSystemRequirementException('LC 1.5 plugins are required to define a package name');
+                }
             }
         }
 
