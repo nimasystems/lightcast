@@ -50,7 +50,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
         // create the default instance of project configuration which
         // may be overriden before initialization
-        $this->project_configuration = $project_configuration ?: new lcProjectConfiguration();
+        $this->project_configuration = $project_configuration ? $project_configuration : new lcProjectConfiguration();
         $this->project_configuration->setProjectDir($project_dir);
 
         parent::__construct();
@@ -182,11 +182,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
 
         // disable caching the configuration if debugging
-        /*if ($debug) {
+        if ($debug) {
             $this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
         } else {
             $this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
-        }*/
+        }
     }
 
     public function setEnvironment($environment)
@@ -264,14 +264,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
     }
 
-    /**
-     * @return array
-     */
-    public function getObjectOverrides()
-    {
-        return (array)$this['overrides'];
-    }
-
     public function getAdminEmail()
     {
         $email = $this->get('admin_email');
@@ -298,10 +290,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $ret = $this->getProjectName() .
             ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
             $this->getEnvironment() .
-            $this->getEnvironment() .
+            $this->getConfigEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ?: null);
+            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
         $ret = md5($ret);
 
@@ -316,9 +308,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $ret = $this->getProjectAppName($this->getApplicationName()) .
             ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
             $this->getEnvironment() .
+            $this->getConfigEnvironment() .
             ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ?: null);
+            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
         $ret = md5($ret);
 
@@ -328,11 +321,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getUniqueIdSuffix()
     {
         return $this->unique_id_suffix;
-    }
-
-    public function getDefaultViewClass()
-    {
-        return 'lcHTMLTemplateView';
     }
 
     public function setUniqueIdSuffix($unique_id_suffx)
@@ -354,14 +342,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this['plugins.enabled'];
     }
 
-    /**
-     * @return array
-     */
-    public function getViewTypes()
-    {
-        return (array)$this['view.types'];
-    }
-
     public function writeClassCache()
     {
         $parent_cache = (array)parent::writeClassCache();
@@ -381,10 +361,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             parent::readClassCache($cached_data['parent_cache']);
         }
 
-        if ($this->project_configuration && ($this->project_configuration instanceof iCacheable) &&
-            isset($cached_data['project_cache'])
-        ) {
-            $this->project_configuration->readClassCache($cached_data['project_cache']);
+        if ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) {
+            if (isset($cached_data['project_cache'])) {
+                $this->project_configuration->readClassCache($cached_data['project_cache']);
+            }
         }
     }
 
@@ -401,6 +381,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
      */
     public function getConfigParserVars()
     {
-        return $this->project_configuration->getConfigParserVars();
+        return [];
     }
 }

@@ -56,5 +56,4 @@ class lcIniConfigDataProvider extends lcObj implements iConfigDataProvider
         $ini_parser = new lcIniFileParser($filename);
         return $ini_parser->writeData($config_data, $options);
     }
-
 }

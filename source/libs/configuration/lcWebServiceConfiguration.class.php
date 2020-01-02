@@ -75,4 +75,12 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
     {
         return $this->getProjectDir() . DS . 'config';
     }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [];
+    }
 }

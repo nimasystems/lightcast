@@ -132,4 +132,12 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
 
         return $config_data;
     }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [];
+    }
 }
