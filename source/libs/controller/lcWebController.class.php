@@ -561,7 +561,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         // configure the default view
         if (!$this->getView()) {
-            $this->configureControllerView();
+            $view = $this->getDefaultViewInstance();
+
+            if ($view) {
+                $this->configureControllerView($view);
+            }
         }
 
         // run before execute
@@ -626,15 +630,8 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         return $callable_check;
     }
 
-    protected function configureControllerView()
+    protected function configureControllerView(lcView $view)
     {
-        // create and set a view to the controller
-        $view = $this->getDefaultViewInstance();
-
-        if (!$view) {
-            return;
-        }
-
         $view->setOptions([
             'action_name' => $this->getActionName(),
             'action_params' => $this->getActionParams(),

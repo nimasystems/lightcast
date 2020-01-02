@@ -44,6 +44,11 @@ class lcViewConfigHandler extends lcEnvConfigHandler
             'google_analytics' => null,
             'replacement_policy' => 'level',
             'clientside_js' => false,
+            'types' => [
+                'handlebars' => 'lcHandlebarsView',
+                'htm' => 'lcHtmlTemplateView',
+                'html' => 'lcHtmlTemplateView',
+            ],
         ]];
     }
 }

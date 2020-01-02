@@ -342,6 +342,14 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this['plugins.enabled'];
     }
 
+    /**
+     * @return array
+     */
+    public function getViewTypes()
+    {
+        return (array)$this['view.types'];
+    }
+
     public function writeClassCache()
     {
         $parent_cache = (array)parent::writeClassCache();

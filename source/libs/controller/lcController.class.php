@@ -265,6 +265,52 @@ abstract class lcController extends lcBaseController
         return $this->root_controller->getControllerInstance($controller_name, $context_type, $context_name);
     }
 
+    /**
+     * @param $filename
+     * @return lcView
+     * @throws lcUnsupportedException
+     */
+    public function loadView($filename)
+    {
+        $view_types = $this->configuration->getViewTypes();
+
+        $fext = lcFiles::splitFileName($filename);
+        $fext['ext'] = $fext['ext'] ?: '.htm';
+        $fext['ext'] = $fext['ext']{0} == '.' ? substr($fext['ext'], 1, strlen($fext['ext']) - 1) : $fext['ext'];
+
+        $cls = isset($view_types[$fext['ext']]) ? $view_types[$fext['ext']] : null;
+
+        if (!$cls || !class_exists($cls)) {
+            throw new lcUnsupportedException($this->t('Unsupported view type: ' . $fext['ext']));
+        }
+
+        /** @var lcView $view */
+        $view = new $cls();
+
+        if (!($view instanceof lcView)) {
+            throw new lcUnsupportedException('Unsupported view');
+        }
+
+        $this->configureControllerView($view);
+        $view->initialize();
+
+        $this->setView($view);
+
+        return $view;
+    }
+
+    protected function configureControllerView(lcView $view)
+    {
+        $view->setOptions([
+            'action_name' => $this->getActionName(),
+            'action_params' => $this->getActionParams(),
+        ]);
+        $view->setConfiguration($this->getConfiguration());
+        $view->setEventDispatcher($this->getEventDispatcher());
+
+        $view->setController($this);
+    }
+
     public function renderControllerAction(lcController $controller, $action_name, array $action_params = null)
     {
         if (!$controller || !$action_name) {

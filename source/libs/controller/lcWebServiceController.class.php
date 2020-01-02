@@ -96,7 +96,11 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         }
 
         // configure the view
-        $this->configureControllerView();
+        $view = $this->getDefaultViewInstance();
+
+        if ($view) {
+            $this->configureControllerView($view);
+        }
 
         // run before execute
         call_user_func_array([$this, 'beforeExecute'], $action_params);
@@ -168,15 +172,8 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         return $callable_check;
     }
 
-    protected function configureControllerView()
+    protected function configureControllerView(lcView $view)
     {
-        // create and set a view to the controller
-        $view = $this->getDefaultViewInstance();
-
-        if (!$view) {
-            return;
-        }
-
         $view->setOptions([
             'action_name' => $this->getActionName(),
             'action_params' => $this->getActionParams(),
