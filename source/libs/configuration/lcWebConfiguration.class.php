@@ -128,9 +128,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
                                      'path' => $this->app_dir . DS . 'forms',
                                  ],];
 
-        $locations = array_merge((array)$parent_locations, $controller_locations);
-
-        return $locations;
+        return array_merge((array)$parent_locations, $controller_locations);
     }
 
     public function getControllerModuleLocations()
@@ -144,9 +142,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
                                      'path' => $this->app_dir . DS . 'modules',
                                  ],];
 
-        $locations = array_merge((array)$parent_locations, $controller_locations);
-
-        return $locations;
+        return array_merge((array)$parent_locations, $controller_locations);
     }
 
     public function getAppDir()

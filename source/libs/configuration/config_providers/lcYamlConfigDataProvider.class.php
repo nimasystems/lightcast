@@ -20,7 +20,7 @@
  * E-Mail: info@nimasystems.com
  */
 
-require_once('parsers' . DS . 'lcYamlFileParser.class.php');
+require_once 'parsers' . DS . 'lcYamlFileParser.class.php';
 
 class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
 {
@@ -28,7 +28,7 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
     const INDENT_VALUE = 2;
     const WORD_WRAP_VALUE = 0;
 
-    public function readConfigData($config_key, array $options = null)
+    public function readConfigData($config_key, array $options = null, array $config_vars = null)
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
 
@@ -39,7 +39,9 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
         $filename = $dir . DS . $config_key . self::DEFAULT_EXT;
 
         $yaml_parser = new lcYamlFileParser($filename);
-        return $yaml_parser->parse();
+        return $yaml_parser->parse([
+            'config_vars' => $config_vars
+        ]);
     }
 
     public function writeConfigData($config_key, array $config_data, array $options = null)

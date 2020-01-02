@@ -138,9 +138,8 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
                 /** @var lcComponent $cinstance */
                 $cinstance = $component['instance'];
                 $cinstance->shutdown();
-                unset($this->loaded_components[$idx]);
+                unset($this->loaded_components[$idx], $component, $idx);
 
-                unset($component, $idx);
             }
         }
 
@@ -229,11 +228,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         return $this->plugin_manager;
     }
 
-    public function setPluginManager(lcPluginManager $plugin_manager)
-    {
-        $this->plugin_manager = $plugin_manager;
-    }
-
     public function getDatabaseModelManager()
     {
         return $this->database_model_manager;
@@ -316,8 +310,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function getControllerDirectory()
     {
-        $ret = $this->controller_filename ? dirname($this->controller_filename) : null;
-        return $ret;
+        return $this->controller_filename ? dirname($this->controller_filename) : null;
     }
 
     public function getflash()
@@ -327,7 +320,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function setFlash($flash)
     {
-        return $this->user->setFlash($flash);
+        $this->user->setFlash($flash);
     }
 
     public function sendMail($to, $message, $subject = null, $from = null)
@@ -350,16 +343,14 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $mailer->addRecipient(new lcMailRecipient($to));
         }
 
-        $from = $from ? $from : (string)$this->configuration->getAdminEmail();
+        $from = $from ?: (string)$this->configuration->getAdminEmail();
 
         $mailer->setBody($message);
         $mailer->setSubject($subject);
         $mailer->setSender(new lcMailRecipient($from));
 
         try {
-            $res = $mailer->send();
-
-            return $res;
+            return $mailer->send();
         } catch (Exception $e) {
             if (DO_DEBUG) {
                 throw $e;
@@ -459,7 +450,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
             $validator = new $cl_name();
 
-            if (!($validator instanceof lcValidator)) {
+            if (!($validator instanceof lcCoreValidator)) {
                 assert(false);
                 $is_validated = false;
                 continue;
@@ -503,7 +494,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $usage_count = isset($this->loaded_components_usage[$component_name]) ? (int)$this->loaded_components_usage[$component_name] : null;
 
             // check if component is loaded and has been initialized once (dependancies)
-            if (is_null($usage_count)) {
+            if (null === $usage_count) {
                 throw new lcRequirementException('Component has not been required');
             }
 
@@ -640,7 +631,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             // check if the controller is contained within a plugin
             // load it first - so all it's dependancies are loaded prior doing anything else
             if ($this->context_type == self::CONTEXT_PLUGIN) {
-                assert(!is_null($context_plugin_name));
+                assert(null !== $context_plugin_name);
 
                 if ($context_plugin_name) {
                     try {
@@ -810,7 +801,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             throw new lcNotAvailableException('User not available');
         }
 
-        return $this->user->setFlash($flash);
+        $this->user->setFlash($flash);
     }
 
     #pragma mark - iCacheable

@@ -23,8 +23,6 @@
 
 abstract class lcBaseCollection extends lcObj
 {
-    const MAX_LOGGED_VAR_VAL_LEN = 500;
-
     const SPL_OBJECT_NAME = 'ArrayIterator';
     /**
      * @var ArrayIterator
@@ -45,7 +43,7 @@ abstract class lcBaseCollection extends lcObj
         }
 
         $splclass = self::SPL_OBJECT_NAME;
-        $this->list = new $splclass($data ? $data : []);
+        $this->list = new $splclass($data ?: array());
     }
 
     public function __destruct()
@@ -136,11 +134,6 @@ abstract class lcBaseCollection extends lcObj
      * Manage Position of List
     */
 
-    public function key()
-    {
-        return $this->list->key();
-    }
-
     public function count()
     {
         return $this->list->count();
@@ -161,14 +154,11 @@ abstract class lcBaseCollection extends lcObj
         $out = '';
 
         if ($this->count()) {
-            $a = [];
+            $a = array();
             $list = $this->list;
 
             if ($list && is_array($list)) {
                 foreach ($list as $val) {
-                    $val = is_string($val) && strlen($val) > self::MAX_LOGGED_VAR_VAL_LEN ?
-                        substr($val, 0, self::MAX_LOGGED_VAR_VAL_LEN) : $val;
-
                     $a[] = (is_string($val) ? $val : var_export($val, true));
 
                     unset($val);
@@ -180,12 +170,6 @@ abstract class lcBaseCollection extends lcObj
         }
 
         return $out;
-    }
-
-    public function clear()
-    {
-        $spl = self::SPL_OBJECT_NAME;
-        $this->list = new $spl;
     }
 
     protected function appendColl($value)
@@ -203,18 +187,29 @@ abstract class lcBaseCollection extends lcObj
         $this->list->offsetUnset($index);
     }
 
-    /*
-     * Sorting functions
-    */
-
     protected function setColl($value, $offset = null)
     {
-        $this->list->offsetSet($offset ? $offset : $this->list->key(), $value);
+        $this->list->offsetSet($offset ?: $this->list->key(), $value);
     }
 
     protected function delete($offset = null)
     {
-        $this->list->offsetUnset($offset ? $offset : $this->key());
+        $this->list->offsetUnset($offset ?: $this->key());
+    }
+
+    /*
+     * Sorting functions
+    */
+
+    public function key()
+    {
+        return $this->list->key();
+    }
+
+    protected function clear()
+    {
+        $spl = self::SPL_OBJECT_NAME;
+        $this->list = new $spl;
     }
 
     protected function asort()

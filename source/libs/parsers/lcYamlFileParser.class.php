@@ -28,12 +28,30 @@ class lcYamlFileParser extends lcFileParser
     const INDENT_VALUE = 2;
     const WORD_WRAP_VALUE = 0;
 
-    public function parse()
+    /**
+     * @param string $content
+     * @param array $vars
+     * @return string
+     */
+    protected function parseConfigVars($content, array $vars)
+    {
+        if ($vars) {
+            foreach ($vars as $key => $value) {
+                $content = str_replace('{{' . $key . '}}', $value, $content);
+            }
+        }
+
+        return $content;
+    }
+
+    public function parse(array $options = null)
     {
         $filename = $this->filename;
 
         try {
             require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'spyc' . DS . DS . 'spyc.php');
+
+            $config_vars = isset($options['config_vars']) ? (array)$options['config_vars'] : array();
 
             // syck / yaml are MUCH FASTER!
             if (function_exists('yaml_parse')) {
@@ -42,6 +60,8 @@ class lcYamlFileParser extends lcFileParser
                 if (!$contents) {
                     return false;
                 }
+
+                $contents = $this->parseConfigVars($contents, $config_vars);
 
                 $data = yaml_parse($contents);
             } else if (function_exists('syck_load')) {
@@ -59,6 +79,9 @@ class lcYamlFileParser extends lcFileParser
                 // before array members it messes them up - so we add them
                 // ourselves!
                 $data = @file_get_contents($filename);
+
+                $data = $this->parseConfigVars($data, $config_vars);
+
                 $data = $data ? $this->fixSpycContent($data) : null;
                 $data = $data ? Spyc::YAMLLoadString($data) : null;
             } else {
@@ -127,9 +150,7 @@ class lcYamlFileParser extends lcFileParser
                 throw new lcSystemException('YAML Dump error: ' . $ee->getMessage(), $ee->getCode(), $ee);
             }
 
-            $ret = lcFiles::putFile($filename, $data);
-
-            return $ret;
+            return lcFiles::putFile($filename, $data);
         } catch (Exception $e) {
             throw new lcSystemException('Error while trying to save data to config file (' . $filename . '): ' . $e->getMessage(), $e->getCode(), $e);
         }

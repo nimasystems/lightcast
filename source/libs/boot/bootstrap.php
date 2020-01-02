@@ -32,17 +32,17 @@ if (defined('DO_DEBUG')) {
 }
 
 // check the PHP Version Requirement
-if (!version_compare(PHP_VERSION, '5.3.0', '>=')) {
-    echo 'Lightcast PHP Framework requires PHP Version 5.3.0 or higher';
+if (!version_compare(PHP_VERSION, '5.6.0', '>=')) {
+    echo 'Lightcast PHP Framework requires PHP Version 5.6.0 or higher';
     exit(2);
 }
 
 // define the current lightcast version
-define('LIGHTCAST_VER', '1.5.1.1469');
+define('LIGHTCAST_VER', '1.5.2');
 define('LC_VER_MAJOR', 1);
 define('LC_VER_MINOR', 5);
-define('LC_VER_BUILD', 1);
-define('LC_VER_REVISION', 1469);
+define('LC_VER_BUILD', 2);
+define('LC_VER_REVISION', 1);
 define('LC_VER', LIGHTCAST_VER);
 
 // check min allowed framework version
@@ -117,6 +117,7 @@ require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcVm.class.php
 
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iProvidesCapabilities.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iRequiresCapabilities.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iSupportsComposer.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'logger' . DS . 'iLoggable.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'i18n' . DS . 'iI18nProvider.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModelOperations.class.php';

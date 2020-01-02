@@ -45,6 +45,7 @@ function __($string, $context_type = null, $context_name = null)
 function e($param, $return = false)
 {
     if (!$return) {
+        /** @noinspection ForgottenDebugOutputInspection */
         var_dump($param);
         return null;
     }
@@ -81,12 +82,13 @@ function ee($param, $return = false)
 
 function vd($val)
 {
-    if (is_array($val) OR is_object($val)) {
+    if (is_array($val) || is_object($val)) {
         echo
             '<pre>' .
             print_r($val, true) .
             '</pre>';
     } else {
+        /** @noinspection ForgottenDebugOutputInspection */
         var_dump($val);
     }
 }

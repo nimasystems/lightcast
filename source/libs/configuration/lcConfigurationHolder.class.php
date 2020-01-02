@@ -48,7 +48,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function set($namespace, $name, $value = null)
     {
-        if (!isset($this->config_namespaces[$namespace]) || !isset($this->config_namespaces[$namespace][$name])) {
+        if (!isset($this->config_namespaces[$namespace], $this->config_namespaces[$namespace][$name])) {
             $this->config_namespaces[$namespace][$name] = $value;
         } else {
             $this->config_namespaces[$namespace][$name] = $value;
@@ -66,7 +66,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
     {
         $this->config_namespaces[$namespace] = $values ? $values : [];
 
-        if (isset($values)) {
+        if (null !== $values) {
             foreach ($values as $key => $val) {
                 $this->idx[$namespace . '.' . $key] = [
                     $namespace,
@@ -84,8 +84,7 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
             return;
         }
 
-        unset($this->config_namespaces[$namespace]);
-        unset($this->idx[$namespace . '.' . $name]);
+        unset($this->config_namespaces[$namespace], $this->idx[$namespace . '.' . $name]);
     }
 
     public function clear()

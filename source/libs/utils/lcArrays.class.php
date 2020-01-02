@@ -29,9 +29,7 @@ class lcArrays
             return $array;
         }
 
-        $ret = array_filter(array_filter($array, 'is_numeric'));
-
-        return $ret;
+        return array_filter(array_filter($array, 'is_numeric'));
     }
 
     public static function arrayContainsArrayValues(array $needle, array $haystack)
@@ -43,9 +41,12 @@ class lcArrays
     {
         foreach ($input as &$value) {
             if (is_array($value)) {
+                /** @noinspection ReferenceMismatchInspection */
                 $value = self::arrayFilterDeep($value, $null_only);
             }
         }
+
+        unset($value);
 
         $ret = null;
 
@@ -58,6 +59,25 @@ class lcArrays
         }
 
         return $ret;
+    }
+
+    /**
+     * @param array $array
+     * @return stdClass
+     */
+    public static function arrayToObject(array $array)
+    {
+        $obj = new stdClass;
+        foreach ($array as $k => $v) {
+            if ($k) {
+                $obj->{$k} = $v;
+
+                if (is_array($v)) {
+                    $obj->{$k} = lcArrays::arrayToObject($v); //RECURSION
+                }
+            }
+        }
+        return $obj;
     }
 
     /*
@@ -100,6 +120,7 @@ class lcArrays
                 } else {
                     return $args[1];
                 }
+                break;
             default:
                 $args = func_get_args();
                 $args[1] = lcArrays::arrayDeepMerge($args[0], $args[1]);
@@ -143,8 +164,8 @@ class lcArrays
                 $append = array_filter([$append]);
             }
 
-            foreach ($append as $key => $value) {
-                if (!array_key_exists($key, $base) and !is_numeric($key)) {
+            foreach ((array)$append as $key => $value) {
+                if (!array_key_exists($key, $base) && !is_numeric($key)) {
                     $base[$key] = $append[$key];
                     continue;
                 }

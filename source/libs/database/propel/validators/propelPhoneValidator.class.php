@@ -24,6 +24,6 @@ class propelPhoneValidator implements BasicValidator
 {
     public function isValid(ValidatorMap $map, $str)
     {
-        return lcValidator::validatePhone($str);
+        return lcCoreValidator::getValidator('phone_number')->validate($str);
     }
 }

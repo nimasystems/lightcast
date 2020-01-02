@@ -21,7 +21,7 @@
 * E-Mail: info@nimasystems.com
 */
 
-class lcRawContentView extends lcView implements iDebuggable
+class lcRawContentView extends lcView
 {
     const DEFAULT_CONTENT_TYPE = 'text/html';
 
@@ -67,7 +67,7 @@ class lcRawContentView extends lcView implements iDebuggable
 
     protected function getViewContent()
     {
-        assert(($this->content && (is_null($this->content) || is_string($this->content))) || !$this->content);
+        assert(($this->content && (null === $this->content || is_string($this->content))) || !$this->content);
         return $this->content;
     }
 }

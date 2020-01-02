@@ -997,4 +997,12 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         // do not load the configuration yet - allow application configurations to do it
     }
+
+    /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [];
+    }
 }

@@ -27,16 +27,6 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
 {
     protected $classes = [];
 
-    public function __construct($tagname, $is_closed = false)
-    {
-        parent::__construct($tagname, $is_closed);
-    }
-
-    public function asHtml()
-    {
-        return parent::asHtml();
-    }
-
     public function getClasses()
     {
         return $this->classes;
@@ -54,7 +44,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
     }
 
     /**
-     * @param $name
+     * @param string $name
      * @param null $value
      * @return lcHtmlTag
      */
@@ -69,7 +59,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
     }
 
     /**
-     * @param null $value
+     * @param string|array|null $value
      * @return lcHtmlTag
      */
     public function setClass($value = null)
@@ -77,7 +67,7 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         if ($value) {
             $classes = is_array($value) ? $value : array_filter(explode(' ', $value));
 
-            foreach ($classes as $class) {
+            foreach ((array)$classes as $class) {
                 $this->classes[$class] = $class;
                 unset($class);
             }
@@ -95,6 +85,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return implode(' ', (array)$this->classes);
     }
 
+    /**
+     * @param string $class_name
+     * @return lcHtmlTag
+     */
     public function removeClass($class_name)
     {
         if ($this->hasClass($class_name)) {
@@ -114,6 +108,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('id');
     }
 
+    /**
+     * @param string $value
+     * @return lcHtmlTag
+     */
     public function setId($value)
     {
         $this->setAttribute('id', $value);
@@ -125,6 +123,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->attributes->get('title');
     }
 
+    /**
+     * @param string|null $value
+     * @return lcHtmlTag
+     */
     public function setTitle($value = null)
     {
         $this->setAttribute('title', $value);
@@ -136,6 +138,10 @@ abstract class lcHtmlTag extends lcHtmlBaseTag implements iCoreAttributes, iEven
         return $this->getAttribute('disabled');
     }
 
+    /**
+     * @param bool $disabled
+     * @return lcHtmlTag
+     */
     public function setDisabled($disabled = true)
     {
         if ($disabled) {

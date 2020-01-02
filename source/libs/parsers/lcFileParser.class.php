@@ -38,7 +38,7 @@ abstract class lcFileParser extends lcObj
         $this->filename = $filename;
     }
 
-    abstract public function parse();
+    abstract public function parse(array $options = null);
 
     abstract public function writeData($data, array $options = null);
 

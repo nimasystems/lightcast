@@ -208,7 +208,7 @@ class lcCurl extends lcObj
 
     public function makeRequest($url = null)
     {
-        if (isset($url)) {
+        if ($url) {
             $this->url = $url;
         }
 

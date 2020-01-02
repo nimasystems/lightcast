@@ -51,6 +51,13 @@ abstract class lcObj
         throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' does not exist');
     }
 
+    public function __isset($property)
+    {
+        if (DO_DEBUG) {
+            throw new Exception('Class Property \'' . get_class($this) . '::' . $property . '\' is not set');
+        }
+    }
+
     public function methodExists($methodname)
     {
         return method_exists($this, $methodname);
@@ -83,7 +90,7 @@ abstract class lcObj
 
     public function getReflection()
     {
-        $reflection = $this->_reflection ? $this->_reflection : new ReflectionClass($this);
+        $reflection = $this->_reflection ?: new ReflectionClass($this);
 
         if (!$this->_reflection) {
             $this->_reflection = $reflection;
@@ -109,7 +116,7 @@ abstract class lcObj
 
     public function getClassEndLine()
     {
-        return $this->getReflection()->getEndline();
+        return $this->getReflection()->getEndLine();
     }
 
     public function getClassModifiers()
@@ -158,7 +165,7 @@ abstract class lcObj
 
     public function __toString()
     {
-        return e($this, true);
+        return (string)e($this, true);
     }
 
     public function getTag()

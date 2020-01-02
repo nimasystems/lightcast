@@ -31,15 +31,14 @@ class lcDirs
         }
 
         // If the destination directory does not exist create it
-        if (!is_dir($dest)) {
-            if (!mkdir($dest)) {
-                // If the destination directory could not be created stop processing
-                return false;
-            }
+        if (!is_dir($dest) && !mkdir($dest)) {
+            // If the destination directory could not be created stop processing
+            return false;
         }
 
         // Open the source directory to read in files
         $i = new DirectoryIterator($src);
+
         foreach ($i as $f) {
             if ($f->isFile()) {
                 rename($f->getRealPath(), $dest . DS . $f->getFilename());
@@ -47,6 +46,7 @@ class lcDirs
                 self::recursiveMove($f->getRealPath(), $dest . DS . $f);
             }
         }
+
         rmdir($src);
 
         return true;
@@ -56,14 +56,14 @@ class lcDirs
     {
 
         // If source is not a directory stop processing
-        if (!is_dir($src)) return false;
+        if (!is_dir($src)) {
+            return false;
+        }
 
         // If the destination directory does not exist create it
-        if (!is_dir($dest)) {
-            if (!mkdir($dest)) {
-                // If the destination directory could not be created stop processing
-                return false;
-            }
+        if (!is_dir($dest) && !mkdir($dest)) {
+            // If the destination directory could not be created stop processing
+            return false;
         }
 
         // Open the source directory to read in files
@@ -83,7 +83,7 @@ class lcDirs
     {
         // Check if the path exists
         if (!file_exists($path)) {
-            return (false);
+            return false;
         }
 
         // See whether this is a file
@@ -102,7 +102,7 @@ class lcDirs
             // Parse every result...
             foreach ($entries as $entry) {
                 // And call this function again recursively, with the same permissions
-                self::recursiveChmod($path . " / " . $entry, $filePerm, $dirPerm);
+                self::recursiveChmod($path . ' / ' . $entry, $filePerm, $dirPerm);
             }
 
             // When we are done with the contents of the directory, we chmod the directory itself
@@ -110,14 +110,14 @@ class lcDirs
         }
 
         // Everything seemed to work out well, return true
-        return (true);
+        return true;
     }
 
     public static function removeDirDelimiter($dirname)
     {
         /** @noinspection PhpExpressionResultUnusedInspection */
         ($dirname{strlen($dirname) - 1} == DS) ?
-            $dirname = substr($dirname, 0, strlen($dirname) - 1) :
+            $dirname = substr($dirname, 0, -1) :
             $dirname;
 
         return $dirname;
@@ -169,8 +169,7 @@ class lcDirs
     public static function isDirEmpty($dir)
     {
         $iterator = new \FilesystemIterator($dir);
-        $is_dir_empty = !$iterator->valid();
-        return $is_dir_empty;
+        return !$iterator->valid();
     }
 
     public static function checkCreateDir($dirname, $trycreate = false)
@@ -179,7 +178,7 @@ class lcDirs
             $dirname .= DS;
         }
 
-        if (((!is_dir($dirname)) || (!is_readable($dirname))) && (!$trycreate)) {
+        if (!$trycreate && ((!is_dir($dirname)) || (!is_readable($dirname)))) {
             return false;
         }
 
@@ -233,7 +232,7 @@ class lcDirs
 
             while (false !== ($item = readdir($handle))) {
                 if ($item != '.' && $item != '..') {
-                    if ($empty && $skipHidden && (substr($item, 0, 1) == '.')) {
+                    if ($empty && $skipHidden && 0 === strpos($item, '.')) {
                         continue;
                     }
 
@@ -324,7 +323,7 @@ class lcDirs
 
             $t = filetype($dir . $file);
 
-            if (($onlyfiles) && ($t != 'file')) {
+            if ($onlyfiles && ($t != 'file')) {
                 continue;
             }
 
@@ -357,7 +356,9 @@ class lcDirs
         $dirs = [];
 
         while (false !== ($entry = $d->read())) {
-            if (($entry == '.') || ($entry == '..') || !is_dir($dir . DS . $entry) || substr($entry, 0, 1) == '.' || ((isset($skip)) && ($entry == $skip))) {
+            if (($entry == '.') || ($entry == '..') || !is_dir($dir . DS . $entry) ||
+                (null !== $skip && ($entry == $skip) || 0 === strpos($entry, '.'))
+            ) {
                 continue;
             }
 
@@ -371,7 +372,7 @@ class lcDirs
 
     public static function getFileCountInDir($dir)
     {
-        return count(glob($dir . "*"));
+        return count(glob($dir . '*'));
     }
 
     public static function getRandomFileDirName()
@@ -380,10 +381,10 @@ class lcDirs
             md5(
                 md5(time()) .
                 md5(microtime()) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000)) .
-                md5(rand(1, 10000000))
+                md5(mt_rand(1, 10000000)) .
+                md5(mt_rand(1, 10000000)) .
+                md5(mt_rand(1, 10000000)) .
+                md5(mt_rand(1, 10000000))
             );
     }
 

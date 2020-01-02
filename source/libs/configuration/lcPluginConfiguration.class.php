@@ -22,7 +22,7 @@
 
  */
 
-class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
+class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions, iSupportsComposer
 {
     const STARTUP_TYPE_AUTOMATIC = 'auto';
     const STARTUP_TYPE_MANUAL = 'manual';
@@ -392,7 +392,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             $filename = $this->getConfigDir() . DS . self::DB_MIGRATIONS_FILENAME;
 
             if (file_exists($filename)) {
-                include_once($filename);
+                include_once $filename;
             }
         }
 
@@ -413,7 +413,32 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return null;
     }
 
+    public function getVendorDir()
+    {
+        return $this->getPluginDir() . DS . 'vendor';
+    }
+
+    public function getComposerAutoloadFilename()
+    {
+        return $this->getVendorDir() . DS . 'autoload.php';
+    }
+
+    public function shouldAutoloadComposer()
+    {
+        return false;
+    }
+
     /**
+     * @return array
+     */
+    public function getConfigParserVars()
+    {
+        return [];
+    }
+
+    /**
+    {
+        return $this->getPluginDir() . DS . 'vendor';
      * @return string
      */
     public function getConfigDir()
@@ -429,6 +454,9 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return $this->root_dir;
     }
 
+    /**
+     * @return array
+     */
     public function setRootDir($root_dir)
     {
         $this->root_dir = $root_dir;
