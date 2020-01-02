@@ -56,19 +56,19 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
                 $this->project_configuration->setIsDebugging(true);
             }
 
-            // pick a different environment
-            foreach ((array)$_SERVER['argv'] as $v) {
-                if (false !== strpos($v, '--config-env=')) {
-                    $env = substr($v, strpos($v, '=') + 1, strlen($v));
-
-                    if ($env) {
-                        $this->setConfigEnvironment($env);
-                    }
-
-                    break;
-                }
-                unset($v);
-            }
+//            // pick a different environment
+//            foreach ((array)$_SERVER['argv'] as $v) {
+//                if (false !== strpos($v, '--config-env=')) {
+//                    $env = substr($v, strpos($v, '=') + 1, strlen($v));
+//
+//                    if ($env) {
+//                        $this->setConfigEnvironment($env);
+//                    }
+//
+//                    break;
+//                }
+//                unset($v);
+//            }
         }
     }
 

@@ -47,6 +47,7 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
             throw new Exception('Memcached is not available');
         }
 
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $this->memcache_backend = new Memcached();
     }
 }

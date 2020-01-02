@@ -450,7 +450,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
             $validator = new $cl_name();
 
-            if (!($validator instanceof lcCoreValidator)) {
+            if (!($validator instanceof lcValidator)) {
                 assert(false);
                 $is_validated = false;
                 continue;

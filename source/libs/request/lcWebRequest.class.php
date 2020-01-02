@@ -27,6 +27,7 @@
  * @method getHttpUserAgent()
  * @method getRequestMethod()
  * @method getRequestTime()
+ * @method getQueryString()
  */
 class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyValueProvider
 {

@@ -7,7 +7,7 @@ class lcValidatorFailure implements Serializable, JsonSerializable
     protected $message;
     protected $extra_data;
 
-    public function __construct($name, $failure_message, lcCoreValidator $validator = null, array $extra_data = null)
+    public function __construct($name, $failure_message, lcValidator $validator = null, array $extra_data = null)
     {
         $this->name = $name;
         $this->message = $failure_message;

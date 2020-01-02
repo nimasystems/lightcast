@@ -21,6 +21,10 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * @method getServerPort()
+ * @method getPath()
+ */
 abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities, Serializable,
     ArrayAccess, iKeyValueProvider, iDebuggable, iArrayable
 {
