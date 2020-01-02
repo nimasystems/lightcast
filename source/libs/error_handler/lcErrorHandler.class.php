@@ -690,11 +690,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 $fname = 'xml.err';
                 break;
             }
-            case 'text/plain':
-            {
-                $fname = 'txt.err';
-                break;
-            }
             case 'text/javascript':
             {
                 $fname = 'js.err';

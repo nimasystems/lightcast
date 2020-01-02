@@ -36,4 +36,25 @@ class lcNamedRoute extends lcRoute
     {
         $this->name = $name;
     }
+
+    public function __construct($name = null, $route = null, array $params = null, array $requirements = null)
+    {
+        parent::__construct();
+
+        if ($name) {
+            $this->setName($name);
+        }
+
+        if ($route) {
+            $this->setRoute($route);
+        }
+
+        if ($params) {
+            $this->setDefaultParams($params);
+        }
+
+        if ($requirements) {
+            $this->setRequirements($requirements);
+        }
+    }
 }

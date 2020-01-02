@@ -1456,6 +1456,7 @@ class PropelPhing
         // try to detect machine dependent information
         $sysInfo = array();
         if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN' && function_exists("posix_uname")) {
+            /** @noinspection PhpComposerExtensionStubsInspection */
             $sysInfo = posix_uname();
         } else {
             $sysInfo['nodename'] = php_uname('n');

@@ -32,6 +32,7 @@ class lcStrings
      */
     public static function uuid()
     {
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $arr = array_values(unpack('N1a/n4b/N1c', openssl_random_pseudo_bytes(16)));
         $arr[2] = ($arr[2] & 0x0fff) | 0x4000;
         $arr[3] = ($arr[3] & 0x3fff) | 0x8000;

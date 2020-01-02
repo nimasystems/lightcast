@@ -32,7 +32,7 @@ class lcFrontWebController extends lcFrontController
             throw new lcNotAvailableException('System Component Factory not available');
         }
 
-        $controller_instance = $this->system_component_factory->getControllerModuleInstance($controller_name, $action_name, $action_type, $context_type, $context_name);
+        $controller_instance = $this->system_component_factory->getControllerModuleInstance($controller_name, $context_type, $context_name);
 
         if (!$controller_instance) {
             return null;
@@ -179,7 +179,7 @@ class lcFrontWebController extends lcFrontController
 
     protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
-        parent::handleControllerNotReachable($controller_name, $action_name, $action_params, $options);
+        parent::handleControllerNotReachable($controller_name, $action_params, $options);
 
         /** @var lcWebResponse $response */
         $response = $this->response;

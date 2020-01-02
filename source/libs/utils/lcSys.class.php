@@ -100,6 +100,7 @@ class lcSys
             return false;
         }
 
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $processUser = posix_getpwuid(posix_geteuid());
         return $processUser['name'];
     }

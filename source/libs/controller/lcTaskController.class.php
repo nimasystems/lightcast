@@ -207,6 +207,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
             return true;
         }
 
+        /** @noinspection PhpComposerExtensionStubsInspection */
         $ret = readline($message . ' ');
         $input = strtolower(trim($ret));
 

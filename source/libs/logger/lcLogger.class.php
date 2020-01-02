@@ -70,41 +70,37 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     {
         switch ($error_type) {
             case self::LOG_EMERG:
-                {
-                    return 'emerg';
-                }
+            {
+                return 'emerg';
+            }
             case self::LOG_ALERT:
-                {
-                    return 'alert';
-                }
+            {
+                return 'alert';
+            }
             case self::LOG_CRIT:
-                {
-                    return 'crit';
-                }
+            {
+                return 'crit';
+            }
             case self::LOG_ERR:
-                {
-                    return 'err';
-                }
+            {
+                return 'err';
+            }
             case self::LOG_WARNING:
-                {
-                    return 'warning';
-                }
+            {
+                return 'warning';
+            }
             case self::LOG_NOTICE:
-                {
-                    return 'notice';
-                }
-            case self::LOG_INFO:
-                {
-                    return 'info';
-                }
+            {
+                return 'notice';
+            }
             case self::LOG_DEBUG:
-                {
-                    return 'debug';
-                }
+            {
+                return 'debug';
+            }
             default:
-                {
-                    return 'info';
-                }
+            {
+                return 'info';
+            }
         }
     }
 
@@ -128,45 +124,38 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
     {
         switch ($error_type_str) {
             case 'emerg':
-                {
-                    return self::LOG_EMERG;
-                }
+            {
+                return self::LOG_EMERG;
+            }
             case 'alert':
-                {
-                    return self::LOG_ALERT;
-                }
+            {
+                return self::LOG_ALERT;
+            }
             case 'crit':
-                {
-                    return self::LOG_CRIT;
-                }
-            case 'err':
-                {
-                    return self::LOG_ERR;
-                }
+            {
+                return self::LOG_CRIT;
+            }
             case 'error':
-                {
-                    return self::LOG_ERR;
-                }
+            case 'err':
+            {
+                return self::LOG_ERR;
+            }
             case 'warning':
-                {
-                    return self::LOG_WARNING;
-                }
+            {
+                return self::LOG_WARNING;
+            }
             case 'notice':
-                {
-                    return self::LOG_NOTICE;
-                }
-            case 'info':
-                {
-                    return self::LOG_INFO;
-                }
+            {
+                return self::LOG_NOTICE;
+            }
             case 'debug':
-                {
-                    return self::LOG_DEBUG;
-                }
+            {
+                return self::LOG_DEBUG;
+            }
             default:
-                {
-                    return self::LOG_INFO;
-                }
+            {
+                return self::LOG_INFO;
+            }
         }
     }
 

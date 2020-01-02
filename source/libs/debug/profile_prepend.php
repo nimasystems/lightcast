@@ -43,6 +43,7 @@ if (!function_exists('xhprof_enable')) {
  * Enable xhprof
 * Extra flags can be passed by defining PROFILER_XHPROF_EXTRA_FLAGS
 */
+/** @noinspection PhpComposerExtensionStubsInspection */
 xhprof_enable(XHPROF_FLAGS_MEMORY | XHPROF_FLAGS_CPU | (defined('PROFILER_XHPROF_EXTRA_FLAGS') ? PROFILER_XHPROF_EXTRA_FLAGS : null));
 
 register_shutdown_function(function () {
@@ -50,6 +51,7 @@ register_shutdown_function(function () {
     // I make sure that all execution data, including that of the earlier
     // registered register_shutdown_function, is collected.
 
+    /** @noinspection PhpComposerExtensionStubsInspection */
     $xhprof_data = xhprof_disable();
 
     if (function_exists('fastcgi_finish_request')) {

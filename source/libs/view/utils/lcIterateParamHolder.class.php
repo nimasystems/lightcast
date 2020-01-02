@@ -105,11 +105,6 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     public function setReplacementPolicyStr($policy_str)
     {
         switch ($policy_str) {
-            case 'level':
-            {
-                $this->setReplacementPolicy(self::REPLACE_LEVEL);
-                break;
-            }
             case 'deep':
             {
                 $this->setReplacementPolicy(self::REPLACE_DEEP);

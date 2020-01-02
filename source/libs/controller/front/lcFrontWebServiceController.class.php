@@ -212,7 +212,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         exit(0);
     }
 
-    public function getControllerInstance($controller_name, $context_type = null, $context_name = null)
+    public function getControllerInstance($controller_name, $action_name = null, $action_type = null, $context_type = null, $context_name = null)
     {
         if (!$this->system_component_factory) {
             throw new lcNotAvailableException('System Component Factory not available');
@@ -308,7 +308,7 @@ class lcFrontWebServiceController extends lcFrontWebController
         return $res;
     }
 
-    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
+    protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
         // final stop - we need to handle it as json
         throw new lcControllerForwardException('Could not forward to controller action');

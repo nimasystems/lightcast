@@ -23,6 +23,7 @@
 
 class lcMemcached extends lcMemcache implements iCacheMultiStorage
 {
+    /** @noinspection PhpComposerExtensionStubsInspection */
     /** @var Memcached */
     protected $memcache_backend;
 

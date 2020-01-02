@@ -23,6 +23,8 @@
 
 abstract class lcBaseCollection extends lcObj
 {
+    const MAX_LOGGED_VAR_VAL_LEN = 500;
+
     const SPL_OBJECT_NAME = 'ArrayIterator';
     /**
      * @var ArrayIterator
@@ -43,7 +45,7 @@ abstract class lcBaseCollection extends lcObj
         }
 
         $splclass = self::SPL_OBJECT_NAME;
-        $this->list = new $splclass($data ?: array());
+        $this->list = new $splclass($data ?: []);
     }
 
     public function __destruct()
@@ -154,7 +156,7 @@ abstract class lcBaseCollection extends lcObj
         $out = '';
 
         if ($this->count()) {
-            $a = array();
+            $a = [];
             $list = $this->list;
 
             if ($list && is_array($list)) {

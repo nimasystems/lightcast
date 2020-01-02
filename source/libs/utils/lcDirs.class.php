@@ -168,7 +168,7 @@ class lcDirs
 
     public static function isDirEmpty($dir)
     {
-        $iterator = new \FilesystemIterator($dir);
+        $iterator = new FilesystemIterator($dir);
         return !$iterator->valid();
     }
 

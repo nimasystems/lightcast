@@ -14,6 +14,7 @@ class PidSingleton
             if (file_exists($this->filename)) {
                 $pid = (int)trim(file_get_contents($this->filename));
 
+                /** @noinspection PhpComposerExtensionStubsInspection */
                 if (posix_kill($pid, 0)) {
                     $this->already_running = true;
                 }

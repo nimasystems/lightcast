@@ -36,7 +36,7 @@ class lcDateTime
 
     public static function utcDateTime($timestamp = false)
     {
-        $d = new \DateTime('now', new \DateTimeZone('UTC'));
+        $d = new DateTime('now', new DateTimeZone('UTC'));
         return $timestamp ? $d->getTimestamp() : $d;
     }
 
@@ -213,7 +213,7 @@ class lcDateTime
 
     public static function convertPhpDateToJsFormat($datetime_format)
     {
-        return trim(preg_replace_callback("/\\(.?)/", function ($y) {
+        return trim(preg_replace_callback("/\\(.?)", function ($y) {
             return self::convertPhpDatePartToMomentjsFormat($y) . ' ';
         }, $datetime_format));
     }

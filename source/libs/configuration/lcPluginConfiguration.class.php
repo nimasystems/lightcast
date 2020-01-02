@@ -437,8 +437,8 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
-    {
-        return $this->getPluginDir() . DS . 'vendor';
+     * {
+     * return $this->getPluginDir() . DS . 'vendor';
      * @return string
      */
     public function getConfigDir()
@@ -455,7 +455,8 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     }
 
     /**
-     * @return array
+     * @param $root_dir
+     * @return lcPluginConfiguration
      */
     public function setRootDir($root_dir)
     {

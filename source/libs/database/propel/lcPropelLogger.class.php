@@ -63,8 +63,6 @@ class lcPropelLogger extends lcSysObj
                 return lcLogger::LOG_NOTICE;
             case Propel::LOG_INFO:
                 return lcLogger::LOG_INFO;
-            case Propel::LOG_DEBUG:
-                return lcLogger::LOG_DEBUG;
             default:
                 return lcLogger::LOG_DEBUG;
         }

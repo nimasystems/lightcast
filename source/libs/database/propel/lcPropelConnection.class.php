@@ -254,7 +254,7 @@ class lcPropelConnection extends PropelPDO
         return $this->exec('UNLOCK TABLES');
     }
 
-    public function prepare($sql, $driver_options = [])
+    public function prepare($sql, /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */ $driver_options = [])
     {
         if (!$sql) {
             throw new lcInvalidArgumentException('Invalid params');

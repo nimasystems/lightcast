@@ -42,6 +42,7 @@ class lcVars
         }
 
         if ($has_openssl) {
+            /** @noinspection PhpComposerExtensionStubsInspection */
             $ret = self::opensslGuidGenerator(openssl_random_pseudo_bytes(16));
         } else {
             $ret = sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',

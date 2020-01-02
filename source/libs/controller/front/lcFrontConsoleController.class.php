@@ -107,7 +107,7 @@ class lcFrontConsoleController extends lcFrontController
             throw new lcNotAvailableException('System Component Factory not available');
         }
 
-        $controller_instance = $this->system_component_factory->getControllerTaskInstance($controller_name, $action_name, $action_type, $context_type, $context_name);
+        $controller_instance = $this->system_component_factory->getControllerTaskInstance($controller_name, $context_type, $context_name);
 
         if (!$controller_instance) {
             return null;
