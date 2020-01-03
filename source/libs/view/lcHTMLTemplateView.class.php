@@ -43,11 +43,11 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
     {
         parent::initialize();
 
-        if (!$this->controller) {
-            throw new lcNotAvailableException('Controller not set');
-        }
+//        if (!$this->controller) {
+//            throw new lcNotAvailableException('Controller not set');
+//        }
 
-        if (!$this->template_filename) {
+        if ($this->controller && !$this->template_filename) {
             // set the view template
             $action_name = isset($this->options['action_name']) ? $this->options['action_name'] : null;
 
