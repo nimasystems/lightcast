@@ -187,14 +187,12 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // allow customized first-time initialization
         $this->beforeDispatch();
 
-        // prepare the dispatch params
-        $controller = $request->getParam('module');
-        $action = $request->getParam('action');
-
         $request_params = $this->prepareDispatchParams($request);
 
+        $this->fixDispatchParams($request_params);
+
         // allow customized functionality before dispatching
-        if (!$this->shouldDispatch($controller, $action, $request_params)) {
+        if (!$this->shouldDispatch($request_params['module'], $request_params['action'], $request_params)) {
             return;
         }
 
@@ -203,15 +201,28 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // but an access denied instead.
 
         $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, [
-            'module_name' => $controller,
-            'action_name' => $action,
+            'module_name' => $request_params['module'],
+            'action_name' => $request_params['action'],
             'request_params' => (array)$request_params,
         ]));
 
         $request->setRequestData($request_params);
 
         // forward the request
-        $this->forward($controller, $action, ['request' => $request_params]);
+        $this->forward($request_params['module'], $request_params['action'], ['request' => $request_params]);
+    }
+
+    protected function fixDispatchParams(& $data)
+    {
+        foreach ($data as $key => $val) {
+            if ($key == 'module' || $key == 'action') {
+                $val = str_replace('-', '_', $val);
+                $data[$key] = $val;
+            }
+            unset($key, $val);
+        }
+
+        return $data;
     }
 
     abstract protected function beforeDispatch();

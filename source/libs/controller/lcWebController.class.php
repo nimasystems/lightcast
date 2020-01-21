@@ -136,7 +136,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     public function setCustomTemplate($filename)
     {
-        $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . $filename . '.htm';
+        $full_filename = dirname($this->controller_filename) . DS . 'templates' . DS . basename($filename) . '.htm';
         $this->view->setTemplateFilename($full_filename);
     }
 
@@ -632,15 +632,17 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     protected function configureControllerView(lcView $view)
     {
+        $action_name = $this->getActionName();
+
         $view->setOptions([
-            'action_name' => $this->getActionName(),
+            'action_name' => $action_name,
             'action_params' => $this->getActionParams(),
         ]);
         $view->setConfiguration($this->getConfiguration());
         $view->setEventDispatcher($this->getEventDispatcher());
 
         // set the view template
-        $template_filename = $this->getAssetsPath() . DS . $this->getActionName() . '.htm';
+        $template_filename = $this->getAssetsPath() . DS . basename($action_name) . '.htm';
 
         $view->setTemplateFilename($template_filename);
         $view->setController($this);
