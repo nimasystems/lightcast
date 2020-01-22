@@ -834,7 +834,7 @@ abstract class lcController extends lcBaseController
         if (!isset(self::$req_arguments_chk[$controller_name])) {
             $r = new ReflectionMethod($controller_name, $action);
             $params = $r->getParameters();
-            $ptype = $params[0]->getType();
+            $ptype = $params ? $params[0]->getType() : null;
             self::$req_arguments_chk[$controller_name] =
                 $params && $ptype && $ptype->getName() == $request_cls_name;
         }
