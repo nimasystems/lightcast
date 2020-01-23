@@ -382,6 +382,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->config_version;
     }
 
+    public function getRevisionVersion() {
+        return 1;
+    }
+
     public function setConfigVersion($config_version)
     {
         $this->config_version = (int)$config_version;
