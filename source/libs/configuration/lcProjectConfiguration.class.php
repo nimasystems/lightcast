@@ -72,7 +72,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     protected $config_variation;
     protected $config_environment;
-    protected $config_version;
 
     protected $app_root_dir;
     protected $root_dir;
@@ -377,19 +376,31 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $this->getProjectDir() . DS . 'config';
     }
 
+    /**
+     * @return string
+     * @deprecated
+     */
     public function getConfigVersion()
     {
-        return $this->config_version;
+        return $this->getVersion();
     }
 
-    public function getRevisionVersion() {
-        return 1;
+    /**
+     * @return int
+     * @deprecated
+     */
+    public function getRevisionVersion()
+    {
+        return $this->getBuildVersion();
     }
 
+    /**
+     * @param $config_version
+     * @deprecated
+     */
     public function setConfigVersion($config_version)
     {
-        $this->config_version = (int)$config_version;
-        assert($this->config_version > 0);
+        //
     }
 
     public function isTargetingLC15()

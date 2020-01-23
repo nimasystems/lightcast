@@ -288,10 +288,9 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // is_debugging setting
         // it is used as the unique cache key
         $ret = $this->getProjectName() .
-            ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
+            ($this->project_configuration ? $this->project_configuration->getVersion() : null) .
             $this->getEnvironment() .
             $this->getConfigEnvironment() .
-            ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
             ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
@@ -306,10 +305,9 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // is_debugging setting
         // it is used as the unique cache key
         $ret = $this->getProjectAppName($this->getApplicationName()) .
-            ($this->project_configuration ? $this->project_configuration->getConfigVersion() : null) .
+            ($this->project_configuration ? $this->project_configuration->getVersion() : null) .
             $this->getEnvironment() .
             $this->getConfigEnvironment() .
-            ($this->project_configuration ? 'rev' . $this->project_configuration->getRevisionVersion() : null) .
             $this->project_configuration->getProjectDir() .
             ($this->unique_id_suffix ? $this->unique_id_suffix : null);
 
