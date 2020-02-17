@@ -323,6 +323,20 @@ class lcFileLoggerNG extends lcLogger
                 $buffer[] = 'Post: {' . $tmpstr . '}';
             }
 
+            // PUT
+            $tmpstr = (string)$this->request->getPutParams();
+
+            if ($tmpstr) {
+                $buffer[] = 'Put: {' . $tmpstr . '}';
+            }
+
+            // DEL
+            $tmpstr = (string)$this->request->getDeleteParams();
+
+            if ($tmpstr) {
+                $buffer[] = 'Del: {' . $tmpstr . '}';
+            }
+
             // COOKIES
             $tmpstr = (string)$this->request->getCookies();
 
