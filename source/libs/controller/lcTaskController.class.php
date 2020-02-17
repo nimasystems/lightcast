@@ -70,6 +70,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $data .= "\n\n";
         $data .= lcConsolePainter::formatColoredConsoleText($exception->getTraceAsString(), 'yellow');
         $data .= "\n\n";
+        $this->err($data);
         $this->consoleDisplay($data, $prefixed, $return);
     }
 
@@ -92,12 +93,14 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function display($data, $prefixed = true, $return = false)
     {
+        $this->info($data);
         $this->consoleDisplay($data, $prefixed, $return);
     }
 
     public function displayDebug($data, $prefixed = true, $return = false)
     {
         if ($this->configuration->isDebugging()) {
+            $this->debug($data);
             $data = lcConsolePainter::formatColoredConsoleText($data, 'gray');
             $this->consoleDisplay($data, $prefixed, $return);
         }
@@ -105,6 +108,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function displayWarning($data, $prefixed = true, $return = false)
     {
+        $this->warn($data);
         $data = lcConsolePainter::formatColoredConsoleText($data, 'yellow');
         $this->consoleDisplay($data, $prefixed, $return);
     }
@@ -139,6 +143,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     public function displayError($data, $prefixed = true, $return = false)
     {
+        $this->info($data);
         $data = lcConsolePainter::formatColoredConsoleText($data, 'red');
         $this->consoleDisplay($data, $prefixed, $return);
     }
