@@ -72,7 +72,8 @@ class lcFrontWebServiceController extends lcFrontWebController
                 $e->getCode(),
                 E_ERROR,
                 $e->getFile(),
-                $e->getLine()
+                $e->getLine(),
+                $e->getPrevious()
             );
         }
 
