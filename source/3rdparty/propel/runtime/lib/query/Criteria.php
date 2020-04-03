@@ -876,13 +876,13 @@ class Criteria implements IteratorAggregate
         $dotpos = strrpos($left, '.');
         $leftTableAlias = substr($left, 0, $dotpos);
         $leftColumnName = substr($left, $dotpos + 1);
-        list($leftTableName, $leftTableAlias) = $this->getTableNameAndAlias($leftTableAlias);
+        [$leftTableName, $leftTableAlias] = $this->getTableNameAndAlias($leftTableAlias);
 
         // is the right table an alias ?
         $dotpos = strrpos($right, '.');
         $rightTableAlias = substr($right, 0, $dotpos);
         $rightColumnName = substr($right, $dotpos + 1);
-        list($rightTableName, $rightTableAlias) = $this->getTableNameAndAlias($rightTableAlias);
+        [$rightTableName, $rightTableAlias] = $this->getTableNameAndAlias($rightTableAlias);
 
         $join->addExplicitCondition(
             $leftTableName, $leftColumnName, $leftTableAlias,
@@ -927,15 +927,15 @@ class Criteria implements IteratorAggregate
             if ($pos = strrpos($left, '.')) {
                 $leftTableAlias = substr($left, 0, $pos);
                 $leftColumnName = substr($left, $pos + 1);
-                list($leftTableName, $leftTableAlias) = $this->getTableNameAndAlias($leftTableAlias);
+                [$leftTableName, $leftTableAlias] = $this->getTableNameAndAlias($leftTableAlias);
             } else {
-                list($leftTableName, $leftTableAlias) = [null, null];
+                [$leftTableName, $leftTableAlias] = [null, null];
                 $leftColumnName = $left;
             }
             if (is_string($right) && $pos = strrpos($right, '.')) {
                 $rightTableAlias = substr($right, 0, $pos);
                 $rightColumnName = substr($right, $pos + 1);
-                list($rightTableName, $rightTableAlias) = $this->getTableNameAndAlias($rightTableAlias);
+                [$rightTableName, $rightTableAlias] = $this->getTableNameAndAlias($rightTableAlias);
                 $conditionClause = $leftTableAlias ? $leftTableAlias . '.' : ($leftTableName ? $leftTableName . '.' : '');
                 $conditionClause .= $leftColumnName;
                 $conditionClause .= $operator;
@@ -943,7 +943,7 @@ class Criteria implements IteratorAggregate
                 $conditionClause .= $rightColumnName;
                 $comparison = Criteria::CUSTOM;
             } else {
-                list($rightTableName, $rightTableAlias) = [null, null];
+                [$rightTableName, $rightTableAlias] = [null, null];
                 $conditionClause = $right;
                 $comparison = $operator;
             }
@@ -1339,7 +1339,8 @@ class Criteria implements IteratorAggregate
             $sb .= "\nParams: ";
             $paramstr = [];
             foreach ($params as $param) {
-                $paramstr[] = $param['table'] . '.' . $param['column'] . ' => ' . var_export($param['value'], true);
+                $paramstr[] = $param['table'] . '.' . (isset($param['column']) ? $param['column'] : '-unknown-column-') .
+                    ' => ' . var_export($param['value'], true);
             }
             $sb .= implode(", ", $paramstr);
         } catch (Exception $exc) {
