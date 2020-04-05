@@ -24,43 +24,45 @@
 class lcSystemComponentFactory extends lcSysObj implements iCacheable
 {
     /** @var array */
-    protected $controllers;
+    protected $controllers = null;
 
     /** @var array */
-    protected $web_services;
+    protected $web_services = null;
 
     /** @var array */
-    protected $tasks;
+    protected $tasks = null;
 
     /** @var array */
-    protected $components;
+    protected $components = null;
 
     /** @var array */
-    protected $action_forms;
+    protected $action_forms = null;
 
     // store the ones from configuration separately and merge them later
     // so they can be cached (as we need to scan folder / files to acquire them the first time)
 
     /** @var array */
-    private $config_system_loaders;
+    private $config_system_loaders = null;
 
     /** @var array */
-    private $config_system_plugins;
+    private $config_system_plugins = null;
 
     /** @var array */
-    private $config_controller_modules;
+    private $config_controller_modules = null;
 
     /** @var array */
-    private $config_controller_web_services;
+    private $config_controller_web_services = null;
 
     /** @var array */
-    private $config_controller_tasks;
+    private $config_controller_tasks = null;
 
     /** @var array */
-    private $config_controller_components;
+    private $config_controller_components = null;
 
     /** @var array */
-    private $config_controller_action_forms;
+    private $config_controller_action_forms = null;
+
+    private $plugin_roots = [];
 
     public function initialize()
     {
@@ -928,14 +930,40 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         return $instance;
     }
 
+    protected function getPluginRoot(array $details)
+    {
+        $path = $details['path'];
+        $plugin_class = $details['class'];
+
+        $filenames = [$details['filename']];
+
+        if (isset($details['additional_filenames'])) {
+            $filenames = array_merge($details['additional_filenames'], $filenames);
+        }
+
+        $found_filename = null;
+
+        foreach ($filenames as $filename) {
+            $p = $path . DS . $filename;
+            if (file_exists($p)) {
+                $found_filename = $p;
+                break;
+            }
+            unset($filename);
+        }
+
+        $this->plugin_roots[$plugin_class] = $found_filename;
+
+        return $found_filename;
+    }
+
     protected function getSystemPlugin(array $details)
     {
-        // include / validate component
-        $filename = $details['path'] . DS . $details['filename'];
         $class_name = $details['class'];
         $controller_name = $details['name'];
         $context_type = isset($details['context_type']) ? $details['context_type'] : null;
         $context_name = isset($details['context_name']) ? $details['context_name'] : null;
+        $filename = $this->getPluginRoot($details);
 
         // add to class autoloader
         if (!$this->class_autoloader) {
@@ -1008,16 +1036,15 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     public function writeClassCache()
     {
-        $cached_data = [
+        return [
             'config_controller_modules' => $this->config_controller_modules,
             'config_controller_action_forms' => $this->config_controller_action_forms,
             'config_controller_web_services' => $this->config_controller_web_services,
             'config_controller_tasks' => $this->config_controller_tasks,
             'config_controller_components' => $this->config_controller_components,
             'config_system_plugins' => $this->config_system_plugins,
+            'plugin_roots' => $this->plugin_roots,
         ];
-
-        return $cached_data;
     }
 
     public function readClassCache(array $cached_data)
@@ -1028,5 +1055,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         $this->config_controller_tasks = isset($cached_data['config_controller_tasks']) ? $cached_data['config_controller_tasks'] : null;
         $this->config_controller_components = isset($cached_data['config_controller_components']) ? $cached_data['config_controller_components'] : null;
         $this->config_system_plugins = isset($cached_data['config_system_plugins']) ? $cached_data['config_system_plugins'] : null;
+        $this->plugin_roots = isset($cached_data['plugin_roots']) ? $cached_data['plugin_roots'] : [];
     }
 }

@@ -269,12 +269,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugins_initialized', $this));
     }
 
-    protected function tryIncludePluginConfigurationFile($root_dir, $plugin_name, $verify = false)
+    private function includePluginConfigNon15($root_dir, $plugin_name, $verify)
     {
-        $ret = null;
-        $is_15 = $this->configuration->isTargetingLC15();
-
         $filename = $root_dir . DS . 'config' . DS . $plugin_name . '_config.php';
+
+        $ret = null;
 
         if (!$verify) {
             /** @noinspection PhpIncludeInspection */
@@ -286,23 +285,46 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
         }
 
-        if (!$ret && $is_15) {
-            // try LC 1.5 config
+        return $ret;
+    }
 
-            $filename = $root_dir . DS . 'config' . DS . 'config.php';
+    private function includePluginConfig($root_dir, $plugin_name, $verify)
+    {
+        $filename = $root_dir . DS . 'config' . DS . 'config.php';
+        $ret = null;
 
-            if (!$verify) {
+        if (!$verify) {
+            /** @noinspection PhpIncludeInspection */
+            $ret = include_once($filename);
+        } else {
+            if (file_exists($filename)) {
                 /** @noinspection PhpIncludeInspection */
                 $ret = include_once($filename);
-            } else {
-                if (file_exists($filename)) {
-                    /** @noinspection PhpIncludeInspection */
-                    $ret = include_once($filename);
-                }
             }
         }
 
+        return $ret;
+    }
+
+    protected function tryIncludePluginConfigurationFile($root_dir, $plugin_name, $verify = false)
+    {
+        $ret = null;
+        $is_15 = $this->configuration->isTargetingLC15();
+
+        if ($is_15) {
+            $ret = @$this->includePluginConfig($root_dir, $plugin_name, $verify);
+
+            if (!$ret) {
+                $ret = @$this->includePluginConfigNon15($root_dir, $plugin_name, $verify);
+            }
+        } else {
+            $ret = @$this->includePluginConfigNon15($root_dir, $plugin_name, $verify);
+        }
+
         if (!$ret) {
+            if (DO_DEBUG) {
+                throw new lcPluginException('Plugin cannot be loaded - configuration file missing (' . $plugin_name . ')');
+            }
             return false;
         }
 
@@ -507,9 +529,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
         }
 
-        $debug = $dbg;
-
-        return $debug;
+        return $dbg;
     }
 
     public function getShortDebugInfo()
@@ -1080,8 +1100,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $this->initializePlugin($plugin_name, true, $throw_if_missing);
         }
 
-        $plugin_instance = isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
-        return $plugin_instance;
+        return isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
     }
 
     public function getPlugins()
@@ -1103,22 +1122,18 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return false;
         }
 
-        $instance = isset($this->plugins[$plugin]) ? $this->plugins[$plugin] : null;
-
-        return $instance;
+        return isset($this->plugins[$plugin]) ? $this->plugins[$plugin] : null;
     }
 
     public function writeClassCache()
     {
         // we need to store them serialized and read them later on - when all classes are made available
         // otherwise when expanding them into objects - they won't be found!
-        $cached_data = [
+        return [
             'plugin_configurations' => ($this->plugin_configurations ? serialize($this->plugin_configurations) : null),
             'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null),
             'autoload_class_map_file_exists_map' => $this->autoload_class_map_file_exists_map,
         ];
-
-        return $cached_data;
     }
 
     public function readClassCache(array $cached_data)

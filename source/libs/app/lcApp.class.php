@@ -815,7 +815,6 @@ class lcApp extends lcObj
 
                 // register into local class cache
                 if ($local_cache_manager && ($obj instanceof iCacheable)) {
-                    /** @noinspection PhpParamsInspection */
                     $local_cache_manager->registerCacheableObject($obj, self::LOADERS_OBJECT_CACHE_PREFIX . $loader);
                 }
 
