@@ -46,6 +46,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     protected $no_http_errors_processing;
 
+    /**
+     * @var bool
+     */
+    protected $add_ref_canonical = true;
+
     protected $content;
     protected $output_content;
     /**
@@ -217,7 +222,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             unset($c);
         }
 
-        $debug = [
+        return [
             'status_code' => $this->status_code,
             'http_response_message' => $this->reason_string,
             'http_version' => $this->http_version,
@@ -226,8 +231,6 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             'content_type' => $this->content_type,
             'cookies' => ($ca ? $ca : null),
         ];
-
-        return $debug;
     }
 
     #pragma mark - iKeyValueProvider
@@ -239,11 +242,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function getAllKeys()
     {
-        $ret = [
+        return [
             'page_title',
             'page_description',
         ];
-        return $ret;
     }
 
     public function getValueForKey($key)
@@ -273,6 +275,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (DO_DEBUG) {
             $this->debug('set title: ' . $title);
         }
+    }
+
+    /**
+     * @param bool $add_ref_canonical
+     */
+    public function setAddRefCanonical($add_ref_canonical)
+    {
+        $this->add_ref_canonical = $add_ref_canonical;
     }
 
     public function sendChunkedStream($uri, $mimetype = 'application/binary', array $options = null)
@@ -535,7 +545,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
 
         // hreflang(s) - do not show if there is a canonical present
-        if (true || !$has_canonical) {
+        if ($this->add_ref_canonical || !$has_canonical) {
             $content_hreflangs = $this->content_hreflangs;
 
             if ($content_hreflangs) {
