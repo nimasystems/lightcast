@@ -122,9 +122,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
     private function getICacheableCacheKey($class_name, $key_prefix)
     {
         $unique_id = $this->configuration->getUniqueId();
-        $key = $unique_id . '_' . $key_prefix . '_' . $class_name;
-
-        return $key;
+        return $unique_id . '_' . $key_prefix . '_' . $class_name;
     }
 
     public function getCapabilities()
@@ -136,12 +134,10 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'cache_type' => ($this->cache ? get_class($this->cache) : null),
             'cacheable_objects' => (is_array($this->cacheable_objects) ? array_keys($this->cacheable_objects) : null),
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()

@@ -308,7 +308,6 @@ class lcApp extends lcObj
         $configuration = $this->configuration;
 
         $cache = $configuration->getCache();
-        $local_cache_manager = $configuration->getLocalCacheManager();
 
         // initialize cache first
         if ($cache) {
@@ -317,12 +316,34 @@ class lcApp extends lcObj
             $cache->initialize();
         }
 
-        // initialize local cache manager
+        $local_cache_manager = $configuration->getLocalCacheManager();
+
+        // initialize local cache manager - use a separate cache for this one (fast internal var based cache)
         if ($local_cache_manager) {
+            $use_cache = $this->configuration->getUseClassCache();
+
+            if ($use_cache) {
+                // reset cache when version changes
+                $cache_prefix = sha1('lc_local_class_cache_' .
+                    $this->configuration->getProjectName() . '_' .
+                    $this->configuration->getApplicationName() . '_' .
+                    $this->configuration->getVersion());
+
+                $local_cache = $configuration->getDefaultCacheInstance();
+
+                if ($local_cache) {
+                    $local_cache->setEventDispatcher($this->event_dispatcher);
+                    $local_cache->setConfiguration($this->configuration);
+                    $local_cache->setPrefix($cache_prefix);
+                    $local_cache->initialize();
+
+                    $local_cache_manager->setCache($local_cache);
+                }
+            }
+
             $local_cache_manager->setEventDispatcher($this->event_dispatcher);
             $local_cache_manager->setConfiguration($this->configuration);
-            $local_cache_manager->setCache($cache);
-            $local_cache_manager->setCacheEnabled($this->configuration->getUseClassCache());
+            $local_cache_manager->setCacheEnabled($use_cache);
             $local_cache_manager->initialize();
 
             $this->local_cache_manager = $local_cache_manager;
@@ -927,16 +948,27 @@ class lcApp extends lcObj
             return;
         }
 
+        /** @var lcRequest $request */
         $request = isset($loader_instances['request']) ? $loader_instances['request'] : null;
+        /** @var lcResponse $response */
         $response = isset($loader_instances['response']) ? $loader_instances['response'] : null;
+        /** @var lcRouting $routing */
         $routing = isset($loader_instances['router']) ? $loader_instances['router'] : null;
+        /** @var lcDatabaseManager $database_manager */
         $database_manager = isset($loader_instances['database_manager']) ? $loader_instances['database_manager'] : null;
+        /** @var lcStorage $storage */
         $storage = isset($loader_instances['storage']) ? $loader_instances['storage'] : null;
+        /** @var lcUser $user */
         $user = isset($loader_instances['user']) ? $loader_instances['user'] : null;
+        /** @var lcLogger $logger */
         $logger = isset($loader_instances['logger']) ? $loader_instances['logger'] : null;
+        /** @var lcI18n $i18n */
         $i18n = isset($loader_instances['i18n']) ? $loader_instances['i18n'] : null;
+        /** @var lcMailer $mailer */
         $mailer = isset($loader_instances['mailer']) ? $loader_instances['mailer'] : null;
+        /** @var lcDataStorage $data_storage */
         $data_storage = isset($loader_instances['data_storage']) ? $loader_instances['data_storage'] : null;
+        /** @var lcCacheStore $cache */
         $cache = isset($loader_instances['cache']) ? $loader_instances['cache'] : null;
 
         // this is a lot faster manually rather than dynamically calling
@@ -1305,8 +1337,7 @@ class lcApp extends lcObj
             $str = substr($method, 3, strlen($method));
             $obj_name = lcInflector::underscore($str);
 
-            $obj = isset($this->initialized_objects[$obj_name]) ? $this->initialized_objects[$obj_name] : null;
-            return $obj;
+            return isset($this->initialized_objects[$obj_name]) ? $this->initialized_objects[$obj_name] : null;
         }
 
         /** @noinspection PhpVoidFunctionResultUsedInspection */
@@ -1387,8 +1418,6 @@ class lcApp extends lcObj
             return false;
         }
 
-        $loader = $this->initialized_objects[$loader_name];
-
-        return $loader;
+        return $this->initialized_objects[$loader_name];
     }
 }

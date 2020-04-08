@@ -197,32 +197,29 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->database_model_manager = $this->getDefaultModelManager();
     }
 
-    protected function getDefaultClassAutoloader()
+    public function getDefaultClassAutoloader()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'lcClassAutoloader.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'autoload' . DS . 'lcClassAutoloader.class.php');
 
-        $autoloader = new lcClassAutoloader();
-        return $autoloader;
+        return new lcClassAutoloader();
     }
 
-    protected function getDefaultEventDispatcher()
+    public function getDefaultEventDispatcher()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEvent.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'iEventObserver.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEventDispatcher.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEvent.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'iEventObserver.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'events' . DS . 'lcEventDispatcher.class.php');
 
-        $event_dispatcher = new lcEventDispatcher();
-
-        return $event_dispatcher;
+        return new lcEventDispatcher();
     }
 
-    protected function getDefaultCacheInstance($skip_cli_check = false)
+    public function getDefaultCacheInstance($skip_cli_check = false)
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheStore.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'lcCacheStore.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheMultiStorage.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcAPC.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcXCache.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheStore.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'lcCacheStore.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'stores' . DS . 'iCacheMultiStorage.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcAPC.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'providers' . DS . 'lcXCache.class.php');
 
         $object = null;
 
@@ -234,7 +231,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         } else if (function_exists('xcache_get')) {
             // xcache
             $object = new lcXCache();
-        } else if (function_exists('apc_fetch')) {
+        } else if (function_exists('apc_fetch') || function_exists('apcu_fetch')) {
             // apc
             $object = new lcAPC();
         }
@@ -242,48 +239,40 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return $object;
     }
 
-    protected function getDefaultPluginManager()
+    public function getDefaultPluginManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'lcPluginManager.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'plugins' . DS . 'lcPluginManager.class.php');
 
-        $plugin_manager = new lcPluginManager();
-
-        return $plugin_manager;
+        return new lcPluginManager();
     }
 
-    protected function getDefaultErrorHandler()
+    public function getDefaultErrorHandler()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'iErrorHandler.class.php');
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'lcErrorHandler.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'iErrorHandler.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'error_handler' . DS . 'lcErrorHandler.class.php');
 
-        $error_handler = new lcErrorHandler();
-
-        return $error_handler;
+        return new lcErrorHandler();
     }
 
-    protected function getDefaultLocalCacheManager()
+    public function getDefaultLocalCacheManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'lcLocalCacheManager.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'lcLocalCacheManager.class.php');
 
-        $cache_manager = new lcLocalCacheManager();
-
-        return $cache_manager;
+        return new lcLocalCacheManager();
     }
 
-    protected function getDefaultSystemComponentFactory()
+    public function getDefaultSystemComponentFactory()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcSystemComponentFactory.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'lcSystemComponentFactory.class.php');
 
-        $factory = new lcSystemComponentFactory();
-        return $factory;
+        return new lcSystemComponentFactory();
     }
 
-    protected function getDefaultModelManager()
+    public function getDefaultModelManager()
     {
-        require(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'lcDatabaseModelManager.class.php');
+        require_once(ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'lcDatabaseModelManager.class.php');
 
-        $manager = new lcDatabaseModelManager();
-        return $manager;
+        return new lcDatabaseModelManager();
     }
 
     public function getDebugInfo()

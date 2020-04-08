@@ -288,9 +288,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             unset($trace);
         }
 
-        $str = !$return_array ? implode("\n", $txt_trace) : $txt_trace;
-
-        return $str;
+        return !$return_array ? implode("\n", $txt_trace) : $txt_trace;
     }
 
     private function showTextTrace($_trace, $_i)

@@ -26,12 +26,17 @@ class lcAPC extends lcCacheStore
     /**
      * @var string
      */
-    private $prefix;
+    protected $prefix;
 
     /**
      * @var bool
      */
     private $apc_exists_available;
+
+    /**
+     * @var bool
+     */
+    private $has_apcu;
 
     /**
      * @throws lcSystemException
@@ -41,16 +46,31 @@ class lcAPC extends lcCacheStore
         parent::__construct();
 
         // check for apc
-        if (!function_exists('apc_fetch')) {
-            throw new lcSystemException('APC is not available');
+        $has_apc = false;
+
+        if (function_exists('apc_fetch')) {
+            $has_apc = true;
+        } else if (function_exists('apcu_fetch')) {
+            $has_apc = true;
+            $this->has_apcu = true;
+        }
+
+        if (!$has_apc) {
+            throw new lcSystemException('APC/APCU is not available');
         }
 
         // apc_exists is available after (PECL apc >= 3.1.4)
-        if (function_exists('apc_exists')) {
+        if (function_exists('apc_exists') ||
+            function_exists('apcu_exists')) {
             $this->apc_exists_available = true;
         }
 
         $this->prefix = 'lc_';
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
     }
 
     /**
@@ -59,6 +79,51 @@ class lcAPC extends lcCacheStore
     public function getStats()
     {
         return false;
+    }
+
+    protected function apcAdd($key, $value, $ttl = null)
+    {
+        if ($this->has_apcu) {
+            return apcu_add($key, $value, $ttl);
+        } else {
+            return apc_add($key, $value, $ttl);
+        }
+    }
+
+    protected function apcDelete($key)
+    {
+        if ($this->has_apcu) {
+            return apcu_delete($key);
+        } else {
+            return apc_delete($key);
+        }
+    }
+
+    protected function apcFetch($key)
+    {
+        if ($this->has_apcu) {
+            return apcu_fetch($key);
+        } else {
+            return apc_fetch($key);
+        }
+    }
+
+    protected function apcExists($key)
+    {
+        if ($this->has_apcu) {
+            return $this->apc_exists_available ? apcu_exists($key) : apcu_fetch($key);
+        } else {
+            return $this->apc_exists_available ? apc_exists($key) : apc_fetch($key);
+        }
+    }
+
+    protected function apcClearCache()
+    {
+        if ($this->has_apcu) {
+            return apcu_clear_cache();
+        } else {
+            return apc_clear_cache();
+        }
     }
 
     /**
@@ -77,7 +142,7 @@ class lcAPC extends lcCacheStore
             $this->remove($key);
         }
 
-        return apc_add($key_prefixed, $value,
+        return $this->apcAdd($key_prefixed, $value,
             isset($options['lifetime']) ? $options['lifetime'] : null
         );
     }
@@ -89,7 +154,7 @@ class lcAPC extends lcCacheStore
     public function remove($key)
     {
         $key = $this->prefix . $key;
-        return apc_delete($key);
+        return $this->apcDelete($key);
     }
 
     /**
@@ -99,7 +164,7 @@ class lcAPC extends lcCacheStore
     public function get($key)
     {
         $key = $this->prefix . $key;
-        return apc_fetch($key);
+        return $this->apcFetch($key);
     }
 
     /**
@@ -108,12 +173,8 @@ class lcAPC extends lcCacheStore
      */
     public function has($key)
     {
-        $apc_exists_available = $this->apc_exists_available;
-
         $key = $this->prefix . $key;
-        $has = $apc_exists_available ? apc_exists($key) : (bool)apc_fetch($key);
-
-        return $has;
+        return $this->apcExists($key);
     }
 
     /**
@@ -121,7 +182,7 @@ class lcAPC extends lcCacheStore
      */
     public function clear()
     {
-        return apc_clear_cache();
+        return $this->apcClearCache();
     }
 
     /**
