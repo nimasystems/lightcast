@@ -271,11 +271,9 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function writeClassCache()
     {
-        $cached_data = [
+        return [
             'db_select_column_mappings' => $this->db_select_column_mappings,
         ];
-
-        return $cached_data;
     }
 
     public function readClassCache(array $cached_data)
