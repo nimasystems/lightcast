@@ -67,10 +67,14 @@ function e($param, $return = false)
 
 function ee($param, $return = false)
 {
-    $param =
-        '<pre>' .
-        print_r($param, true) .
-        '</pre>';
+    if (lcSys::isRunningCLI()) {
+        $param = print_r($param, true) . "\n";
+    } else {
+        $param =
+            '<pre>' .
+            print_r($param, true) .
+            '</pre>';
+    }
 
     if ($return) {
         return $param;
