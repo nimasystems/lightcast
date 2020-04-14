@@ -76,7 +76,7 @@ class CustomJoin extends Join
                 }
             }
             // bindValue(PDOStatement $stmt, $parameter, $value, ColumnMap $cMap, $position = null)
-            $joinCondition = sprintf('(%s)', implode($conditions, ' AND '));
+            $joinCondition = sprintf('(%s)', implode(' AND ', $conditions));
         } else {
             $joinCondition = '';
             $this->getJoinCondition()->appendPsTo($joinCondition, $params);
