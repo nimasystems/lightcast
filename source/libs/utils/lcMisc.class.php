@@ -28,7 +28,7 @@ class lcMisc
     public static function appendPathPrefix($path)
     {
         if ($path) {
-            if ((string)$path{0} == DS) {
+            if ((string)$path[0] == DS) {
                 return $path;
             } else {
                 $path = DS . $path;
@@ -45,11 +45,11 @@ class lcMisc
         }
 
         if (
-            $path{0} == '/' ||
-            $path{0} == '\\' ||
+            $path[0] == '/' ||
+            $path[0] == '\\' ||
             (
-                strlen($path) > 3 && ctype_alpha($path{0}) &&
-                $path{1} == ':' && ($path{2} == '\\' || $path{2} == '/')
+                strlen($path) > 3 && ctype_alpha($path[0]) &&
+                $path[1] == ':' && ($path[2] == '\\' || $path[2] == '/')
             )
         ) {
             return true;

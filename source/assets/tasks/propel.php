@@ -819,7 +819,7 @@ class tPropel extends lcTaskController
         $filename = self::DEFAULT_REVERSE_TARGET_NAME . '-' . date('Y_m_d_H_i_s');
 
         /** @noinspection PhpUndefinedMethodInspection */
-        $dir = ($dir{0} == '/') ? $dir : $this->configuration->getAppRootDir() . DS . $dir;
+        $dir = ($dir[0] == '/') ? $dir : $this->configuration->getAppRootDir() . DS . $dir;
 
         if (isset($output_filename)) {
             $dir = dirname($output_filename);

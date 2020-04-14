@@ -41,7 +41,7 @@ class lcStrings
 
     public static function startsWith($haystack, $needle)
     {
-        return ($haystack && $needle && $haystack{0} == $needle{0}) ? 0 === lcUnicode::strpos($haystack, $needle) : false;
+        return ($haystack && $needle && $haystack[0] == $needle[0]) ? 0 === lcUnicode::strpos($haystack, $needle) : false;
     }
 
     public static function endsWith($haystack, $needle, $case = true)
@@ -152,7 +152,7 @@ class lcStrings
     public static function permaLink(array $key_cols, array $keywords, $prefix = null)
     {
         if (isset($prefix)) {
-            if ($prefix{0} != '/') {
+            if ($prefix[0] != '/') {
                 $prefix = '/' . $prefix;
             }
         }
@@ -258,10 +258,10 @@ class lcStrings
             $len = strlen($token);
 
             for ($i = 0; $i < $len; $i++) {
-                if (!in_array(lcUnicode::strtolower($token{$i}), $latinchars)) {
+                if (!in_array(lcUnicode::strtolower($token[$i]), $latinchars)) {
                     continue;
                 }
-                $str .= $token{$i};
+                $str .= $token[$i];
             }
 
             $token = $str;
@@ -327,7 +327,7 @@ class lcStrings
         $str = self::LATIN_CHARS;
 
         for ($i = 0; $i < strlen($str); $i++) {
-            $narr[] = $str{$i};
+            $narr[] = $str[$i];
         }
 
         return $narr;
@@ -489,7 +489,7 @@ class lcStrings
         $t = 0;
         $len = strlen($string);
         for ($i = 0; $i < $len; $i++) {
-            $tmp = $string{$i};
+            $tmp = $string[$i];
             if (strtoupper($tmp) === $tmp) {
                 ++$t;
             }

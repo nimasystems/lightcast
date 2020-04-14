@@ -68,7 +68,7 @@ function utf8_decodeFN($file)
 function utf8_isASCII($str)
 {
     for ($i = 0; $i < strlen($str); $i++) {
-        if (ord($str{$i}) > 127) return false;
+        if (ord($str[$i]) > 127) return false;
     }
     return true;
 }
@@ -84,8 +84,8 @@ function utf8_strip($str)
 {
     $ascii = '';
     for ($i = 0; $i < strlen($str); $i++) {
-        if (ord($str{$i}) < 128) {
-            $ascii .= $str{$i};
+        if (ord($str[$i]) < 128) {
+            $ascii .= $str[$i];
         }
     }
     return $ascii;
@@ -509,7 +509,7 @@ function utf8_tohtml($str)
  *
  * @param string $str UTF-8 encoded string
  * @param boolean $entities Flag controlling decoding of named entities.
- * @return UTF-8 encoded string with numeric (and named) entities replaced.
+ * @return string|string[]
  * @author Tom N Harris <tnharris@whoopdedo.org>
  */
 function utf8_unhtml($str, $entities = null)
@@ -543,7 +543,7 @@ class utf8_entity_decoder
 {
     var $table;
 
-    function utf8_entity_decoder()
+    function __construct()
     {
         $table = get_html_translation_table(HTML_ENTITIES);
         $table = array_flip($table);
@@ -602,7 +602,7 @@ function utf8_to_unicode($str, $strict = false)
 
     for ($i = 0; $i < $len; $i++) {
 
-        $in = ord($str{$i});
+        $in = ord($str[$i]);
 
         if ($mState == 0) {
 

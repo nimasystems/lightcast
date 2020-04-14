@@ -166,7 +166,7 @@ class lcAutoloadCacheTool extends lcObj
         assert(isset($directory_path));
         $directory_path = (string)$directory_path;
 
-        if ($directory_path{strlen($directory_path) - 1} != DS) {
+        if ($directory_path[strlen($directory_path) - 1] != DS) {
             $directory_path .= DS;
         }
 
@@ -175,7 +175,7 @@ class lcAutoloadCacheTool extends lcObj
                 while (($file = readdir($dh)) !== false) {
                     $file_path = $directory_path . $file;
 
-                    if (!$this->ignore_hidden_files || $file{0} != '.') {
+                    if (!$this->ignore_hidden_files || $file[0] != '.') {
                         switch (filetype($file_path)) {
                             case 'dir':
 
@@ -262,7 +262,7 @@ class lcAutoloadCacheTool extends lcObj
         if ($found_classes && is_array($found_classes)) {
             foreach ($found_classes as $path => $classes) {
                 foreach ($classes as $class_name => $filename) {
-                    $filename = ($filename{0} == '/') ? substr($filename, 1, strlen($filename)) : $filename;
+                    $filename = ($filename[0] == '/') ? substr($filename, 1, strlen($filename)) : $filename;
                     $class_array_data[] = '\'' . $class_name . '\' => \'' . (($this->write_base_path ? $path . DS : null) . $filename) . '\'';
                     unset($class_name, $filename);
                 }
@@ -283,8 +283,8 @@ class lcAutoloadCacheTool extends lcObj
 <?php
 // Lightcast $ver autoload class cache
 // Generated at: $generate_time
-\${$cache_version_suffix} = $cache_version;
-\${$cache_var_name} = array($class_array_data);
+\$[$cache_version_suffix] = $cache_version;
+\$[$cache_var_name] = array($class_array_data);
 EOT;
         lcFiles::putFile($full_path, $php_data);
     }

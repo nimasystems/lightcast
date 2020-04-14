@@ -116,7 +116,7 @@ class lcDirs
     public static function removeDirDelimiter($dirname)
     {
         /** @noinspection PhpExpressionResultUnusedInspection */
-        ($dirname{strlen($dirname) - 1} == DS) ?
+        ($dirname[strlen($dirname) - 1] == DS) ?
             $dirname = substr($dirname, 0, -1) :
             $dirname;
 
@@ -293,7 +293,7 @@ class lcDirs
 
     public static function fixDirDelimiter($dirname)
     {
-        if ($dirname{strlen($dirname) - 1} != DS) {
+        if ($dirname[strlen($dirname) - 1] != DS) {
             $dirname .= DS;
         }
 

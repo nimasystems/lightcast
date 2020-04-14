@@ -308,7 +308,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         } else {
             // if relative - search for the file within the assets folder of the module
             // otherwise try to include it directly
-            $res = ($url{0} == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
+            $res = ($url[0] == '/') ? $url : $this->controller->getAssetsPath() . DS . $url;
 
             $do_include = lcFiles::getFileExt($res) == '.php';
 

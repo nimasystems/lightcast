@@ -99,7 +99,7 @@ class QuickGeneratorConfig implements GeneratorConfigInterface
         }
         foreach ($lines as $line) {
             $line = trim($line);
-            if ($line == "" || $line{0} == '#' || $line{0} == ';') {
+            if ($line == "" || $line[0] == '#' || $line[0] == ';') {
                 continue;
             }
             $pos = strpos($line, '=');

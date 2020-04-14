@@ -178,11 +178,11 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
 
     public function getDeepNode($node_deep_name)
     {
-        if ($node_deep_name{0} == '/') {
+        if ($node_deep_name[0] == '/') {
             $node_deep_name = substr($node_deep_name, 1, strlen($node_deep_name));
         }
 
-        if ($node_deep_name{strlen($node_deep_name) - 1} == '/') {
+        if ($node_deep_name[strlen($node_deep_name) - 1] == '/') {
             $node_deep_name = substr($node_deep_name, 0, strlen($node_deep_name) - 1);
         }
 

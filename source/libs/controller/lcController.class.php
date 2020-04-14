@@ -276,7 +276,7 @@ abstract class lcController extends lcBaseController
 
         $fext = lcFiles::splitFileName($filename);
         $fext['ext'] = $fext['ext'] ?: '.htm';
-        $fext['ext'] = $fext['ext']{0} == '.' ? substr($fext['ext'], 1, strlen($fext['ext']) - 1) : $fext['ext'];
+        $fext['ext'] = $fext['ext'][0] == '.' ? substr($fext['ext'], 1, strlen($fext['ext']) - 1) : $fext['ext'];
 
         $cls = isset($view_types[$fext['ext']]) ? $view_types[$fext['ext']] : null;
 

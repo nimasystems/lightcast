@@ -449,7 +449,7 @@ class lcApp extends lcObj
 
         if ($autoload_classes && is_array($autoload_classes)) {
             foreach ($autoload_classes as $class_name => $filename) {
-                $filename = ($filename{0} == '/') ? $filename : DIR_APP . DS . $filename;
+                $filename = ($filename[0] == '/') ? $filename : DIR_APP . DS . $filename;
                 $class_autoloader->addClass($class_name, $filename);
                 unset($class_name, $filename);
             }

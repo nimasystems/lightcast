@@ -320,7 +320,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         $l = mb_strlen($path);
 
         // add first
-        if ($l > 0 && $path{0} != '/') {
+        if ($l > 0 && $path[0] != '/') {
             $path = '/' . $path;
         } else if ($l == 0) {
             $path = '/';

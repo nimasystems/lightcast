@@ -150,7 +150,7 @@ abstract class lcRoute extends lcObj
         // remove / from the start of the route
         if (mb_strlen($this->fixed_route) < 1) {
             $this->fixed_route = self::DEFAULT_TOKENIZER;
-        } else if ($this->fixed_route{0} != self::DEFAULT_TOKENIZER) {
+        } else if ($this->fixed_route[0] != self::DEFAULT_TOKENIZER) {
             $this->fixed_route = self::DEFAULT_TOKENIZER . $this->fixed_route;
         }
 
@@ -247,7 +247,7 @@ abstract class lcRoute extends lcObj
             }
 
             // if it is a named param
-            if ($route_param{0} == self::PARAM_MATCH) {
+            if ($route_param[0] == self::PARAM_MATCH) {
                 $type = self::SEP_TYPE_PARAM;
                 $route_param = lcUnicode::substr($route_param, 1, mb_strlen($route_param));
 
@@ -298,7 +298,7 @@ abstract class lcRoute extends lcObj
                 $compare_regex[] = ".*";
 
                 $new_route .= self::ANY_TOKEN;
-            } else if ($route_param{0} == '@') {
+            } else if ($route_param[0] == '@') {
                 // if it is a regular expression match
 
                 $type = self::SEP_TYPE_REGEX;
@@ -562,7 +562,7 @@ abstract class lcRoute extends lcObj
 
         unset($merged);
 
-        if ($route{mb_strlen($route) - 1} == '/') {
+        if ($route[mb_strlen($route) - 1] == '/') {
             $route = lcUnicode::substr($route, 0, mb_strlen($route) - 1);
         }
 
@@ -570,7 +570,7 @@ abstract class lcRoute extends lcObj
             return '/';
         }
 
-        $ret = ($route{0} != '/' ? '/' : null) . $route . ($params ? '?' . http_build_query($params) : null);
+        $ret = ($route[0] != '/' ? '/' : null) . $route . ($params ? '?' . http_build_query($params) : null);
 
         return $ret;
     }

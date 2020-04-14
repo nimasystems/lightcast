@@ -35,7 +35,7 @@ abstract class lcBasePropelObject extends BaseObject
 
     public function __get($name)
     {
-        $m = 'get' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+        $m = 'get' . (ctype_upper($name[0]) ? $name : lcInflector::camelize($name));
 
         if (method_exists($this, $m)) {
             return $this->$m();
@@ -44,7 +44,7 @@ abstract class lcBasePropelObject extends BaseObject
 
     public function __set($name, $value)
     {
-        $m = 'set' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+        $m = 'set' . (ctype_upper($name[0]) ? $name : lcInflector::camelize($name));
 
         if (method_exists($this, $m)) {
             $this->$m($value);
@@ -53,7 +53,7 @@ abstract class lcBasePropelObject extends BaseObject
 
     public function __isset($name)
     {
-        $m = 'get' . (ctype_upper($name{0}) ? $name : lcInflector::camelize($name));
+        $m = 'get' . (ctype_upper($name[0]) ? $name : lcInflector::camelize($name));
         return method_exists($this, $m);
     }
 

@@ -101,7 +101,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             $defaults = isset($options['defaults']) ? (array)$options['defaults'] : null;
 
             $project_config_dir = $this->getProjectConfigDir();
-            $project_config_key_dir = $project_config_dir ? ($project_config_dir{0} == '/' ? $project_config_dir : ($base_config_dir ? $base_config_dir . DS . $project_config_dir : null)) : null;
+            $project_config_key_dir = $project_config_dir ? ($project_config_dir[0] == '/' ? $project_config_dir : ($base_config_dir ? $base_config_dir . DS . $project_config_dir : null)) : null;
 
             // merge some additional configuration based options
             $nd = array_filter([

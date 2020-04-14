@@ -103,7 +103,7 @@ abstract class lcTranslationsParser extends lcObj
         $fbase = basename($filename);
 
         // skip hidden files
-        if ($fbase{0} == '.') {
+        if ($fbase[0] == '.') {
             return false;
         }
 

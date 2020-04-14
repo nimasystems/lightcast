@@ -67,7 +67,7 @@ class lcIniFileParser extends lcFileParser
                 continue;
             }
 
-            if ($line{0} == '#') {
+            if ($line[0] == '#') {
                 continue;
             }
 

@@ -29,7 +29,7 @@ class lcInflector
     public static function subcamelize($underscored_subject, $sanitize = true)
     {
         $underscored_subject = self::camelize($underscored_subject, $sanitize);
-        $underscored_subject{0} = strtolower($underscored_subject{0});
+        $underscored_subject[0] = strtolower($underscored_subject[0]);
         return $underscored_subject;
     }
 
@@ -75,7 +75,7 @@ class lcInflector
         $input = lcStrings::toAlphaNum($input, ['-', '_', '.', ':']);
         $input = self::camelize($input);
 
-        $input{0} = strtolower($input{0});
+        $input[0] = strtolower($input[0]);
 
         return $input;
     }
@@ -85,7 +85,7 @@ class lcInflector
         $input = lcStrings::toAlphaNum($input, ['-', '_', '.', ':']);
         $input = self::camelize($input);
 
-        $input{0} = strtolower($input{0});
+        $input[0] = strtolower($input[0]);
 
         return $input;
     }
