@@ -966,7 +966,12 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $display_errors = (int)$this->isDebugging();
 
         // setup error reporting
-        error_reporting(E_ALL | E_STRICT | error_reporting());
+        if ($display_errors) {
+            error_reporting(E_ALL | E_STRICT);
+        } else {
+            error_reporting((E_ALL | E_STRICT) ^ E_DEPRECATED);
+        }
+
         ini_set('display_errors', $display_errors);
 
         assert_options(ASSERT_WARNING, 0);
