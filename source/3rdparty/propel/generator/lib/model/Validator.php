@@ -172,7 +172,7 @@ class Validator extends XMLElement
     protected function setupObject()
     {
         $this->column = $this->getTable()->getColumn($this->getAttribute("column"));
-        $this->translate = $this->getAttribute("translate", $this->getTable()->getDatabase()->getDefaultTranslateMethod());;
+        $this->translate = $this->getAttribute("translate", $this->getTable()->getDatabase()->getDefaultTranslateMethod());
     }
 
     /**

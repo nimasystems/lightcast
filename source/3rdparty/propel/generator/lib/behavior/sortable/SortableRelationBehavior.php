@@ -77,10 +77,8 @@ public function {$this->getObjectMoveRelatedToNullScopeMethodName()}(PropelPDO \
     {
         $this->builder = $builder;
 
-        $script = "\$this->{$this->getObjectMoveRelatedToNullScopeMethodName()}(\$con);
+        return "\$this->{$this->getObjectMoveRelatedToNullScopeMethodName()}(\$con);
 ";
-
-        return $script;
     }
 
     protected function getForeignColumnForParameter($param)

@@ -214,10 +214,9 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
 
     public function writeClassCache()
     {
-        $cache = [
+        return [
             'registered_classes' => $this->registered_classes,
         ];
-        return $cache;
     }
 
     public function readClassCache(array $cached_data)

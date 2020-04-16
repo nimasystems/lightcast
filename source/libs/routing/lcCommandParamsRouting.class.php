@@ -177,9 +177,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
             return $params;
         }
 
-        $pars = array_merge((array)$params, (array)$params_ret);
-
-        return $pars;
+        return array_merge((array)$params, (array)$params_ret);
     }
 
     // TODO: Finish this implementation

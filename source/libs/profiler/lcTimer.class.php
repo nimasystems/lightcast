@@ -27,7 +27,7 @@ class lcTimer extends lcObj
 {
     private $start_time = null;
     private $total_time = null;
-    private $name = '';
+    private $name;
     private $calls = 0;
 
     public function __construct($name = '')

@@ -81,11 +81,9 @@ class lcDefaultCacheStore extends lcCacheStore implements iDatabaseCacheProvider
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'namespace_prefix' => $this->namespace_prefix,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()
@@ -195,8 +193,7 @@ class lcDefaultCacheStore extends lcCacheStore implements iDatabaseCacheProvider
 
     protected function keyWithNamespace($key)
     {
-        $k = $this->namespace_prefix . $key;
-        return $k;
+        return $this->namespace_prefix . $key;
     }
 
     public function removeDbCache($namespace, $key)

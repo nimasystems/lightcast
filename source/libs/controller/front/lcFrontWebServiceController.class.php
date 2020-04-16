@@ -191,7 +191,6 @@ class lcFrontWebServiceController extends lcFrontWebController
         $response_content_type = 'application/json; charset=' . $response->getServerCharset();
 
         if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-            /** @noinspection PhpComposerExtensionStubsInspection */
             $output = @json_encode($response_result, JSON_UNESCAPED_UNICODE);
         } else {
             $output = @json_encode($response_result);
@@ -304,9 +303,7 @@ class lcFrontWebServiceController extends lcFrontWebController
 
         ksort($extraction);
 
-        $res = $this->use_actual_get_params ? $arr2 : array_values($extraction);
-
-        return $res;
+        return $this->use_actual_get_params ? $arr2 : array_values($extraction);
     }
 
     protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)

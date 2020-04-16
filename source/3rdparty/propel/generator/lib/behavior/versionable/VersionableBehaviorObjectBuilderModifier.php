@@ -97,12 +97,10 @@ class VersionableBehaviorObjectBuilderModifier
     {
         $this->builder = $builder;
         if (!$builder->getPlatform()->supportsNativeDeleteTrigger() && !$builder->getBuildProperty('emulateForeignKeyConstraints')) {
-            $script = "// emulate delete cascade
+            return "// emulate delete cascade
 {$this->getVersionQueryClassName()}::create()
     ->filterBy{$this->table->getPhpName()}(\$this)
     ->delete(\$con);";
-
-            return $script;
         }
     }
 

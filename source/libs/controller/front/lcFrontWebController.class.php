@@ -76,7 +76,6 @@ class lcFrontWebController extends lcFrontController
 
     protected function isRequestSuported()
     {
-        /** @var lcWebRequest $request */
         $request = $this->request;
 
         // we do not handle

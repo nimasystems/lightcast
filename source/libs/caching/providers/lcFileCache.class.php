@@ -278,14 +278,11 @@ class lcFileCache extends lcCacheStore
 
     private function getMetadataInternal()
     {
-        $data =
-            self::META_IDENT . ',' .
-            (int)$this->total_entries . ',' .
-            (int)$this->next_dir . ',' .
-            (int)$this->next_subdir . ',' .
-            (int)$this->next_file . "\n";
-
-        return $data;
+        return self::META_IDENT . ',' .
+        (int)$this->total_entries . ',' .
+        (int)$this->next_dir . ',' .
+        (int)$this->next_subdir . ',' .
+        (int)$this->next_file . "\n";
     }
 
     public function shutdown()
@@ -295,21 +292,17 @@ class lcFileCache extends lcCacheStore
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'cache_folder' => $this->cache_folder,
             'total_entries' => $this->total_entries,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()
     {
-        $debug = [
+        return [
             'total_entries' => $this->total_entries,
         ];
-
-        return $debug;
     }
 
     public function compact()

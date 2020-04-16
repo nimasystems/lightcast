@@ -287,7 +287,6 @@ class lcFileLoggerNG extends lcLogger
         assert(isset($this->request));
 
         if ($this->request instanceof lcWebRequest) {
-            /** @var lcWebRequest $request */
             $request = $this->request;
 
             // initialize new log buffer

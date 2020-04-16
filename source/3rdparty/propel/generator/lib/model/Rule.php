@@ -154,9 +154,7 @@ class Rule extends XMLElement
      */
     public function getMessage()
     {
-        $message = str_replace('${value}', $this->getValue(), $this->message);
-
-        return $message;
+        return str_replace('${value}', $this->getValue(), $this->message);
     }
 
     /**

@@ -156,12 +156,10 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'translation_context_type' => $this->translation_context_type,
             'translation_context_name' => $this->translation_context_name,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()
@@ -817,7 +815,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
         if (!$plugin) {
             $plugin = $this->internalLoadPlugin($plugin_name, !$optional);
-            /** @noinspection PhpToStringImplementationInspection */
             //throw new lcNotAvailableException('Plugin \'' . $plugin_name . '\' has not been required');
         }
 

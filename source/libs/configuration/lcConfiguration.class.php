@@ -72,8 +72,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     protected function loadConfigurationData()
     {
-        $config_data = $this->loadConfigurationFromHandleMap($this->getConfigHandleMap());
-        return $config_data;
+        return $this->loadConfigurationFromHandleMap($this->getConfigHandleMap());
     }
 
     protected function loadConfigurationFromHandleMap(array $config_handle_map)
@@ -179,15 +178,12 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function getDebugInfo()
     {
-        $debug = ['configuration' => $this->configuration,];
-
-        return $debug;
+        return ['configuration' => $this->configuration,];
     }
 
     public function getShortDebugInfo()
     {
-        $debug = ['environment' => $this->environment,];
-        return $debug;
+        return ['environment' => $this->environment,];
     }
 
     public function getEnvironment()
@@ -317,9 +313,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
 
     public function writeClassCache()
     {
-        $cache = ['configuration' => $this->configuration];
-
-        return $cache;
+        return ['configuration' => $this->configuration];
     }
 
     public function readClassCache(array $cached_data)

@@ -187,9 +187,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
 
         $this->setSender($sender);
 
-        $res = $this->send();
-
-        return $res;
+        return $this->send();
     }
 
     // TODO: Add a capability to test sending emails!

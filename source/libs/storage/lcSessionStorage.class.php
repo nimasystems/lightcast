@@ -170,9 +170,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
 
         $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-        $res = isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
-
-        return $res;
+        return isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
     }
 
     /**
@@ -254,9 +252,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $has = count($this->storage) ? true : false;
-
-        return $has;
+        return count($this->storage) ? true : false;
     }
 
     public function count($namespace = null)
@@ -267,9 +263,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $count = count($this->storage[$n]);
-
-        return $count;
+        return count($this->storage[$n]);
     }
 
     public function getAll($namespace = null)
@@ -280,9 +274,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $res = $this->storage[$n];
-
-        return $res;
+        return $this->storage[$n];
     }
 
     public function getBackendData()
@@ -299,13 +291,11 @@ class lcSessionStorage extends lcStorage implements iDebuggable
     {
         $p = (string)parent::__toString();
 
-        $res = 'Session ID: ' . $this->session_id . "\n" .
+        return 'Session ID: ' . $this->session_id . "\n" .
             'Timeout: ' . $this->timeout . " min(s)\n\n" .
             'Seconds to timeout: ' . $this->diff_to_expire . "\n" .
             'Data: ' . "\n\n" .
             $p;
-
-        return $res;
     }
 
     protected function trackTime()
@@ -396,9 +386,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
         $new_time = time() - ($timeout * 60);
         $old_time = $last_request;
 
-        $diff = $old_time - $new_time;
-
-        return $diff;
+        return $old_time - $new_time;
     }
 
     protected function writeToStorage()

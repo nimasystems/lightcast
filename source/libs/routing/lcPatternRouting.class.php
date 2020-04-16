@@ -620,11 +620,9 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
 
     public function writeClassCache()
     {
-        $cached_data = [
+        return [
             'routes' => $this->routes,
         ];
-
-        return $cached_data;
     }
 
     public function readClassCache(array $cached_data)

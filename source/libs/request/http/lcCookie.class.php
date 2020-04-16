@@ -116,14 +116,12 @@ class lcCookie extends lcObj
 
     public function __toString()
     {
-        $str = "lcCookie: \n" .
+        return "lcCookie: \n" .
             "Name: " . $this->name . "\n" .
             "Value: " . $this->value . "\n" .
             "Path: " . $this->path . "\n" .
             "Domain: " . $this->domain . "\n" .
             "Expires: " . $this->expires . "\n" .
             "Is Secure: " . $this->secure . "\n\n";
-
-        return $str;
     }
 }

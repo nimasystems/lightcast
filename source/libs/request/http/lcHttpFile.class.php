@@ -105,7 +105,7 @@ class lcHttpFile extends lcObj
     /*
      * Value: 8; File upload stopped by extension. Introduced in PHP 5.2.0
     */
-    private $size = 0;
+    private $size;
 
     public function __construct($form_filename, $name, $tmpname, $error = self::UPLOAD_ERR_OK, $size = 0, $mimetype = null)
     {
@@ -184,16 +184,19 @@ class lcHttpFile extends lcObj
 
     public function & getUploadFilePointer()
     {
+        $v = false;
+
         if ($this->is_moved) {
-            return false;
+            return $v;
         }
 
-        return fopen($this->tmpname, 'rb');
+        $v = fopen($this->tmpname, 'rb');
+        return $v;
     }
 
     public function __toString()
     {
-        $str = "lcHttpFile: \n" .
+        return "lcHttpFile: \n" .
             "Name: " . $this->name . "\n" .
             "Mimetype: " . $this->mimetype . "\n" .
             "Tmp Name: " . $this->tmpname . "\n" .
@@ -201,7 +204,5 @@ class lcHttpFile extends lcObj
             "Has Moved: " . $this->is_moved . "\n" .
             "Error: " . $this->error . "\n" .
             "Size: " . $this->size . "\n\n";
-
-        return $str;
     }
 }

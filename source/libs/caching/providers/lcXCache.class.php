@@ -59,9 +59,7 @@ class lcXCache extends lcCacheStore
     public function has($key)
     {
         $key = $this->prefix . $key;
-        $has = (bool)xcache_get($key) ? true : false;
-
-        return $has;
+        return (bool)xcache_get($key) ? true : false;
     }
 
     public function clear()

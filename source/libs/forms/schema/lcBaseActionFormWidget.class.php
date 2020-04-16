@@ -122,8 +122,7 @@ abstract class lcBaseActionFormWidget extends lcObj
 
     public function getFieldClassesMerged(array $additional_classes = null)
     {
-        $classes = implode(' ', array_filter(array_merge([$this->getFieldClass(), $this->default_class], (array)$additional_classes)));
-        return $classes;
+        return implode(' ', array_filter(array_merge([$this->getFieldClass(), $this->default_class], (array)$additional_classes)));
     }
 
     /**
@@ -295,14 +294,13 @@ abstract class lcBaseActionFormWidget extends lcObj
         $container_form_name = $this->getContainerFormName();
         $field_is_prefixed = ($container || $container_form_name && !($this->getNamePrefix() || $this->getNameSuffix()));
 
-        $full_name = $container_form_name .
+        return $container_form_name .
             ($container ? '[' . $container . ']' : null) .
             ($this->getNamePrefix() .
                 ($field_is_prefixed ? '[' : null) .
                 $this->getFieldName() .
                 ($field_is_prefixed ? ']' : null) .
                 $this->getNameSuffix());
-        return $full_name;
     }
 
     public function getContainer()
@@ -389,9 +387,8 @@ abstract class lcBaseActionFormWidget extends lcObj
     public function getFieldId()
     {
         $container_prefix = $this->container_name ? strtolower($this->container_name) . '_' : null;
-        $id = ($this->field_tag_id ? (string)$this->field_tag_id : ($this->field_tag_id_prefix ? $this->field_tag_id_prefix : null)) .
+        return ($this->field_tag_id ? (string)$this->field_tag_id : ($this->field_tag_id_prefix ? $this->field_tag_id_prefix : null)) .
             $container_prefix . $this->getFieldName();
-        return $id;
     }
 
     public function getIsReadOnly()

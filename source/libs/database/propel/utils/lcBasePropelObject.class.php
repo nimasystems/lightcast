@@ -137,7 +137,6 @@ abstract class lcBasePropelObject extends BaseObject
 
     protected function translate($t)
     {
-        /** @noinspection PhpUndefinedMethodInspection */
         return $this->getPeer()->getTableMap()->translate($t);
     }
 

@@ -97,9 +97,7 @@ class lcSpatialUtils
         $lat = $maxlat - (($maxlat - $minlat) / 2);
         $lng = $maxlng - (($maxlng - $minlng) / 2);
 
-        $pt = new lcLatLng($lat, $lng);
-
-        return $pt;
+        return new lcLatLng($lat, $lng);
     }
 
     public static function calcDistance(lcLatLng $p1, lcLatLng $p2)
@@ -115,8 +113,7 @@ class lcSpatialUtils
 
         $angle = 2 * asin(sqrt(pow(sin($latDelta / 2), 2) +
                 cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
-        $ret = $angle * self::EARTH_RADIUS;
-        return $ret;
+        return $angle * self::EARTH_RADIUS;
     }
 
     public static function generateRandomPointKm($centre, $radius)
@@ -124,9 +121,7 @@ class lcSpatialUtils
         // 1km = 0.621371192 miles
         $radius_miles = $radius * self::MILE_KM;
 
-        $ret = self::generateRandomPoint($centre, $radius_miles);
-
-        return $ret;
+        return self::generateRandomPoint($centre, $radius_miles);
     }
 
     /**

@@ -135,11 +135,9 @@ abstract class lcView extends lcSysObj implements iViewRenderer, iDebuggable
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'options' => $this->options,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()

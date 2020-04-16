@@ -62,12 +62,10 @@ abstract class lcRouting extends lcResidentObj implements iProvidesCapabilities,
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'default_module' => $this->default_module,
             'default_action' => $this->default_action,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()

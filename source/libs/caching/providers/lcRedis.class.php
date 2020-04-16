@@ -48,9 +48,7 @@ class lcRedis extends lcCacheStore
 
     public function addServer($connect_string)
     {
-        $ret = $this->servers[] = $connect_string;
-
-        return $ret;
+        return $this->servers[] = $connect_string;
     }
 
     public function getBackend()
@@ -67,9 +65,7 @@ class lcRedis extends lcCacheStore
     public function set($key, $value = null, array $options = [])
     {
         $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
-        $ret = $this->getBackend()->setex($key, $lifetime, $value ? serialize($value) : '');
-
-        return $ret;
+        return $this->getBackend()->setex($key, $lifetime, $value ? serialize($value) : '');
     }
 
     public function remove($key)

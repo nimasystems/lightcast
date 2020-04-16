@@ -42,8 +42,7 @@ class lcMailRecipient extends lcObj
             return null;
         }
 
-        $obj = new lcMailRecipient($email, $name);
-        return $obj;
+        return new lcMailRecipient($email, $name);
     }
 
     public function __toString()

@@ -225,12 +225,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function getFullHostname()
     {
-        $res =
-            $this->getProtoPrefix() .
-            $this->getHostname() .
-            $this->prefix;
-
-        return $res;
+        return $this->getProtoPrefix() .
+        $this->getHostname() .
+        $this->prefix;
     }
 
     public function getProtoPrefix()
@@ -255,9 +252,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getRealRemoteAddr($first = true)
     {
         if ($this->real_remote_addr) {
-            $addr = ($first && is_array($this->real_remote_addr) && count($this->real_remote_addr) ?
+            return ($first && is_array($this->real_remote_addr) && count($this->real_remote_addr) ?
                 $this->real_remote_addr[0] : $this->real_remote_addr);
-            return $addr;
         }
 
         if ($this->env('HTTP_CLIENT_IP')) {
@@ -290,8 +286,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         } else if ($key == 'remote_addr') {
             return $this->getRealRemoteAddr();
         } else {
-            $ret = parent::getValueForKey($key);
-            return $ret;
+            return parent::getValueForKey($key);
         }
     }
 
@@ -316,7 +311,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     public function unserialize($serialized)
     {
-        list(
+        [
             $this->files,
             $this->post_params,
             $this->put_params,
@@ -330,7 +325,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $this->accept_charset,
             $this->cookies,
             $this->context
-            ) = unserialize($serialized);
+            ] = unserialize($serialized);
     }
 
     public function onRouterDetectParameters(lcEvent $event)
@@ -743,8 +738,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getCookieValue($name)
     {
         $cookie = $this->cookies->get($name);
-        $value = $cookie ? $cookie->getValue() : null;
-        return $value;
+        return $cookie ? $cookie->getValue() : null;
     }
 
     /*
@@ -1025,7 +1019,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         }
 
         if (strpos($uri, 'index.php') !== false) {
-            list(, $uri) = explode('index.php', $uri, 2);
+            [, $uri] = explode('index.php', $uri, 2);
         }
 
         if (empty($uri) || $uri == '/' || $uri == '//') {

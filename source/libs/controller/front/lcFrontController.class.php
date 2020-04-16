@@ -343,8 +343,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         // get the top controller on the stack
         $controller_instance = $this->controller_stack->first();
-        $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
-        return $controller;
+        return $controller_instance ? $controller_instance->getControllerInstance() : null;
     }
 
     public function getLastController()
@@ -355,8 +354,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         // get the top controller on the stack
         $controller_instance = $this->controller_stack->last();
-        $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
-        return $controller;
+        return $controller_instance ? $controller_instance->getControllerInstance() : null;
     }
 
     public function filterForwardParams(array &$forward_params)
@@ -378,11 +376,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
     protected static function forwardReservedParams()
     {
-        $ret = [
+        return [
             'type',
             'request',
         ];
-        return $ret;
     }
 
     public function getSystemComponentFactory()

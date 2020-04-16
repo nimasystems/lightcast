@@ -66,7 +66,7 @@ class MysqlSchemaParser extends BaseSchemaParser
     /**
      * @var        boolean
      */
-    private $addVendorInfo = false;
+    protected $addVendorInfo = false;
 
     /**
      *

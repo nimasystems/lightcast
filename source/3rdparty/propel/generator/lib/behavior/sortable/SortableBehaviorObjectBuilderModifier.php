@@ -96,14 +96,12 @@ class SortableBehaviorObjectBuilderModifier
 
             $condition = implode(' OR ', $condition);
 
-            $script = "// if scope has changed and rank was not modified (if yes, assuming superior action)
+            return "// if scope has changed and rank was not modified (if yes, assuming superior action)
 // insert object to the end of new scope and cleanup old one
 if (($condition) && !\$this->isColumnModified({$this->peerClassname}::RANK_COL)) { {$this->peerClassname}::shiftRank(-1, \$this->{$this->getColumnGetter()}() + 1, null, \$this->oldScope, \$con);
     \$this->insertAtBottom(\$con);
 }
 ";
-
-            return $script;
         }
     }
 

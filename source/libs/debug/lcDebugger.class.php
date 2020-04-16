@@ -61,8 +61,7 @@ class lcDebugger
             unset($trace);
         }
 
-        $ret = implode("\n", $traces);
-        return $ret;
+        return implode("\n", $traces);
     }
 
     private function showTextTrace($_trace, $_i)

@@ -32,10 +32,8 @@ class lcUsernameValidator extends lcStringValidator
         $default_chars = '-_.';
         $allowed_chars = isset($this->options['allowed_chars']) ? (string)$this->options['allowed_chars'] : $default_chars;
 
-        $ret = (bool)preg_match("/^[\w\d" . preg_quote($allowed_chars) . "]+$/", $data);
-
         //$ret = (bool)preg_match("/^[\w\d-_\.]+$/", $data);
 
-        return $ret;
+        return (bool)preg_match("/^[\w\d" . preg_quote($allowed_chars) . "]+$/", $data);
     }
 }

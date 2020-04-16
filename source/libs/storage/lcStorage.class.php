@@ -107,11 +107,9 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
             }
         }
 
-        $debug = [
+        return [
             'items' => $out,
         ];
-
-        return $debug;
     }
 
     abstract public function getNamespaces();

@@ -612,8 +612,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     protected function classMethodForAction($action_name, array $action_params = null)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $method_name = $action_type . ucfirst(lcInflector::camelize($action_name));
-        return $method_name;
+        return $action_type . ucfirst(lcInflector::camelize($action_name));
     }
 
     protected function actionExists($action_name, array $action_params = null)
@@ -625,9 +624,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         *  in this tree - throws an exception!
         */
         $method_name = $this->classMethodForAction($action_name, $action_params);
-        $callable_check = is_callable([$this, $method_name]) && method_exists($this, $method_name);
-
-        return $callable_check;
+        return is_callable([$this, $method_name]) && method_exists($this, $method_name);
     }
 
     protected function configureControllerView(lcView $view)
@@ -655,8 +652,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
     public function getDefaultViewInstance()
     {
-        $instance = new lcHTMLTemplateView();
-        return $instance;
+        return new lcHTMLTemplateView();
     }
 
     public function getAssetsPath()

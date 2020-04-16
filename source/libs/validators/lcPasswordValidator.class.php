@@ -43,13 +43,10 @@ class lcPasswordValidator extends lcStringValidator
         $min_numbers = !$min_numbers || (preg_match_all("/[0-9]/", $data, $tmp) >= $min_numbers);
         $min_letters = !$min_letters || (preg_match_all("/[a-zA-Z]/", $data, $tmp) >= $min_letters);
 
-        $ret =
-            $min_uppercase_symbols_valid &&
-            $min_lowercase_symbols &&
-            $min_special_symbols &&
-            $min_numbers &&
-            $min_letters;
-
-        return $ret;
+        return $min_uppercase_symbols_valid &&
+        $min_lowercase_symbols &&
+        $min_special_symbols &&
+        $min_numbers &&
+        $min_letters;
     }
 }

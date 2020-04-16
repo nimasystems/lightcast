@@ -66,13 +66,11 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'env' => $this->env,
             'sapi' => $this->sapi,
             'in_cli' => $this->is_running_cli,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()
@@ -83,10 +81,8 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function __toString()
     {
         // TODO: Fix this
-        $str = "lcReqest: \n\n" .
+        return "lcReqest: \n\n" .
             e($this->env, true) . "\n\n";
-
-        return $str;
     }
 
     abstract public function getRequestContext();
@@ -211,9 +207,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function env($name = false)
     {
-        $res = isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
-
-        return $res;
+        return isset($name) ? (isset($this->env[$name]) ? $this->env[$name] : null) : $this->env;
     }
 
     /*
@@ -374,7 +368,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
 
     public function unserialize($serialized)
     {
-        list($this->env) = unserialize($serialized);
+        [$this->env] = unserialize($serialized);
     }
 
     /*
@@ -409,7 +403,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         // fix broken HTTP_AUTHORIZATION for phpfcgi
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             if (isset($_SERVER['Authorization']) && (strlen($_SERVER['Authorization']) > 0)) {
-                list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['Authorization'], 6)));
+                [$_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']] = explode(':', base64_decode(substr($_SERVER['Authorization'], 6)));
                 if (strlen($_SERVER['PHP_AUTH_USER']) == 0 || strlen($_SERVER['PHP_AUTH_PW']) == 0) {
                     unset($_SERVER['PHP_AUTH_USER']);
                     unset($_SERVER['PHP_AUTH_PW']);

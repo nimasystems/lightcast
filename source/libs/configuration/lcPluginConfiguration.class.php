@@ -322,7 +322,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function getConfigHandleMap()
     {
         // maps the configuration values to handlers
-        $config_map = [
+        return [
             [
                 'handler' => 'plugin',
                 'config_key' => 'settings',
@@ -339,8 +339,6 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
                 'defaults' => $this->getDefaultViewConfiguration(),
             ],
         ];
-
-        return $config_map;
     }
 
     /**

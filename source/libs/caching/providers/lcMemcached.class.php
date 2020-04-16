@@ -23,7 +23,6 @@
 
 class lcMemcached extends lcMemcache implements iCacheMultiStorage
 {
-    /** @noinspection PhpComposerExtensionStubsInspection */
     /** @var Memcached */
     protected $memcache_backend;
 
@@ -35,9 +34,7 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
     public function set($key, $value = null, array $options = null)
     {
         $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
-        $ret = $this->memcache_backend->set($key, $value, $lifetime);
-
-        return $ret;
+        return $this->memcache_backend->set($key, $value, $lifetime);
     }
 
     protected function initBackend()
@@ -47,7 +44,6 @@ class lcMemcached extends lcMemcache implements iCacheMultiStorage
             throw new Exception('Memcached is not available');
         }
 
-        /** @noinspection PhpComposerExtensionStubsInspection */
         $this->memcache_backend = new Memcached();
     }
 }

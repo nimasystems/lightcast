@@ -75,9 +75,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
 
         $n = isset($namespace) ? (string)$namespace : self::DEFAULT_NAMESPACE;
 
-        $res = isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
-
-        return $res;
+        return isset($this->storage[$n][$key]) ? $this->storage[$n][$key] : null;
     }
 
     /**
@@ -142,9 +140,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $has = count($this->storage) ? true : false;
-
-        return $has;
+        return count($this->storage) ? true : false;
     }
 
     public function count($namespace = null)
@@ -155,9 +151,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $count = count($this->storage[$n]);
-
-        return $count;
+        return count($this->storage[$n]);
     }
 
     public function getAll($namespace = null)
@@ -168,9 +162,7 @@ class lcInternalStorage extends lcStorage implements iDebuggable
             return false;
         }
 
-        $res = $this->storage[$n];
-
-        return $res;
+        return $this->storage[$n];
     }
 
     public function getBackendData()

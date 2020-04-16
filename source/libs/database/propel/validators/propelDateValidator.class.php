@@ -24,8 +24,6 @@ class propelDateValidator implements BasicValidator
 {
     public function isValid(ValidatorMap $map, $str)
     {
-        $res = lcValidator::validateDate($str);
-
-        return $res;
+        return lcValidator::validateDate($str);
     }
 }

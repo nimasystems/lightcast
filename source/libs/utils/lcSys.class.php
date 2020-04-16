@@ -55,7 +55,7 @@ class lcSys
 
     public static function microtime_float()
     {
-        list($usec, $sec) = explode(" ", microtime());
+        [$usec, $sec] = explode(" ", microtime());
         return ((float)$usec + (float)$sec);
     }
 
@@ -75,8 +75,7 @@ class lcSys
 
     public static function getOSType($basic = false)
     {
-        $ostype = $basic ? PHP_OS : php_uname();
-        return $ostype;
+        return $basic ? PHP_OS : php_uname();
     }
 
     public static function isOSLinux()
@@ -300,9 +299,7 @@ class lcSys
         $max_fs = self::getPHPVarBytesRepresentation(ini_get('upload_max_filesize'));
         $post_max_size = self::getPHPVarBytesRepresentation(ini_get('post_max_size'));
 
-        $max = ($max_fs > $post_max_size) ? $max_fs : $post_max_size;
-
-        return $max;
+        return ($max_fs > $post_max_size) ? $max_fs : $post_max_size;
     }
 
     public static function getPHPVarBytesRepresentation($input)
@@ -435,9 +432,7 @@ class lcSys
         $result = null;
         lcSys::execCmd('ps -p ' . $pid, $result, false);
 
-        $ret = ($result == '0');
-
-        return $ret;
+        return ($result == '0');
     }
 
     public static function execCmd($cmd, &$result = null, $dont_implode = false)

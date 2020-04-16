@@ -53,9 +53,8 @@ class lcActionFilterChain extends lcSysObj
             return false;
         }
 
-        $ret = $this->first_filter->filterAction($parent_controller, $controller_name, $action_name,
+        return $this->first_filter->filterAction($parent_controller, $controller_name, $action_name,
             $request_params, $controller_context, $skip_filter_categories);
-        return $ret;
     }
 
     public function addFilter(lcActionFilter $filter)

@@ -52,13 +52,11 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'argv' => $this->argv,
             'argc' => $this->argc,
             'params' => $this->params,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()

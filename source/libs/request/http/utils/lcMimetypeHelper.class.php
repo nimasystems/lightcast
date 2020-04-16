@@ -41,7 +41,7 @@ class lcMimetypeHelper
     public static function getList()
     {
 
-        $mimetypes = [
+        return [
             'application/andrew-inset' =>
                 [
                     0 => 'ez',
@@ -2164,8 +2164,6 @@ class lcMimetypeHelper
                     0 => 'ice',
                 ],
         ];
-
-        return $mimetypes;
     }
 
     public static function findMimeByExt($ext)

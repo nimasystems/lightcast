@@ -42,10 +42,8 @@ class lcDateTime
 
     public static function getMicrotimeFloat()
     {
-        list($usec, $sec) = explode(" ", microtime());
-        $res = ((float)$usec + (float)$sec);
-
-        return $res;
+        [$usec, $sec] = explode(" ", microtime());
+        return ((float)$usec + (float)$sec);
     }
 
     public static function hoursToSeconds($hours)
@@ -59,7 +57,7 @@ class lcDateTime
 
         if (strpos($hours, ':') !== false) {
             // Split hours and minutes.
-            list($hours, $minutes) = explode(':', $hours);
+            [$hours, $minutes] = explode(':', $hours);
         }
 
         return (int)$hours * 60 + $minutes;
@@ -81,8 +79,7 @@ class lcDateTime
     {
         $firstTime = strtotime($firstTime);
         $lastTime = strtotime($lastTime);
-        $timeDiff = $lastTime - $firstTime;
-        return $timeDiff;
+        return $lastTime - $firstTime;
     }
 
     public static function humanizeDateDifference($now, $otherDate = null, $offset = null, $config = [])

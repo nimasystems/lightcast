@@ -156,7 +156,7 @@ class lcIterateParamHolder extends lcObj implements ArrayAccess
     {
         $rep = count($this->node_repeats);
 
-        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);;
+        $this->node_repeats[$rep] = new lcIterateParamHolder($name, $params);
 
         return $this->node_repeats[$rep];
     }

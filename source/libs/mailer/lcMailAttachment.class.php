@@ -40,8 +40,7 @@ class lcMailAttachment extends lcObj
 
     public static function create($filepath, $mimetype, $filename = null)
     {
-        $obj = new lcMailAttachment($filepath, $mimetype, $filename);
-        return $obj;
+        return new lcMailAttachment($filepath, $mimetype, $filename);
     }
 
     public function getFilePath()

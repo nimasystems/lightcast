@@ -167,9 +167,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
             return false;
         }
 
-        $callable_check = is_callable([$this, $method_name]) && method_exists($this, $method_name);
-
-        return $callable_check;
+        return is_callable([$this, $method_name]) && method_exists($this, $method_name);
     }
 
     protected function configureControllerView(lcView $view)

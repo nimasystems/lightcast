@@ -92,8 +92,7 @@ class lcInflector
 
     public static function underscore($camelCasedWord)
     {
-        $replace = strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $camelCasedWord));
-        return $replace;
+        return strtolower(preg_replace('/(?<=\\w)([A-Z])/', '_\\1', $camelCasedWord));
     }
 
     public static function humanize($camelCasedWord)

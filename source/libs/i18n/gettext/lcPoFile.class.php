@@ -602,9 +602,7 @@ class lcPoFile extends lcObj
 
         $fmt = new lcMsgFmt();
 
-        $res = $fmt->process($filename);
-
-        return $res;
+        return $fmt->process($filename);
     }
 
     public function __toString()

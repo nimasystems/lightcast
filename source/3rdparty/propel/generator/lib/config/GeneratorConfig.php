@@ -230,9 +230,7 @@ class GeneratorConfig implements GeneratorConfigInterface
             throw new BuildException("Unable to find class path for '$propname' property.");
         }
 
-        $clazz = Phing::import($classpath);
-
-        return $clazz;
+        return Phing::import($classpath);
     }
 
     /**
@@ -296,9 +294,7 @@ class GeneratorConfig implements GeneratorConfigInterface
     public function getConfiguredPluralizer()
     {
         $classname = $this->getBuilderClassname('pluralizer');
-        $pluralizer = new $classname();
-
-        return $pluralizer;
+        return new $classname();
     }
 
     /**

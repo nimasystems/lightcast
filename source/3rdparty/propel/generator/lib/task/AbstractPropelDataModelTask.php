@@ -545,9 +545,7 @@ abstract class AbstractPropelDataModelTask extends AbstractPropelTask
         }
         // Mappers always return arrays since it's possible for some mappers to map to multiple names.
         $outFilename = array_shift($mapped);
-        $outFile = new PhingFile($this->getOutputDirectory(), $outFilename);
-
-        return $outFile;
+        return new PhingFile($this->getOutputDirectory(), $outFilename);
     }
 
     /**

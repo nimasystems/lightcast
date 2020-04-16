@@ -132,13 +132,10 @@ class lcFiles
 
         $ext = ($ext != '.') ? $ext : null;
 
-        $ret =
-            [
-                'name' => $fname,
-                'ext' => $ext,
-            ];
-
-        return $ret;
+        return [
+            'name' => $fname,
+            'ext' => $ext,
+        ];
     }
 
     public static function getMimetype($filename)

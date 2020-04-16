@@ -69,14 +69,12 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
             'cache_enabled' => $this->getIsCacheEnabled(),
             'cache_timeout' => $this->getCacheTimeout(),
         ];
-
-        return $debug;
     }
 
     public function getSQLCount()
@@ -157,13 +155,11 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     public function getShortDebugInfo()
     {
-        $debug = [
+        return [
             'sql_count' => $this->getSQLCount(),
             'cached_sql_count' => $this->getCachedSQLCount(),
             'cache_enabled' => $this->getIsCacheEnabled(),
         ];
-
-        return $debug;
     }
 
     public function getDatabaseCache()

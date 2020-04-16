@@ -42,8 +42,7 @@ class lcRand
 
     public static function randomIp()
     {
-        $str = rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254);
-        return $str;
+        return rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254) . '.' . rand(1, 254);
     }
 
     public static function randomWords($len)
@@ -75,14 +74,12 @@ class lcRand
 
     public static function randomTimestamp()
     {
-        $t = mktime(rand(0, 24), rand(0, 59), rand(0, 59), rand(1, 12), rand(1, 28), rand(2005, 2014));
-        return $t;
+        return mktime(rand(0, 24), rand(0, 59), rand(0, 59), rand(1, 12), rand(1, 28), rand(2005, 2014));
     }
 
     public static function randomArrayVal(array $arr)
     {
         $r = rand(0, count($arr) - 1);
-        $ret = $arr[$r];
-        return $ret;
+        return $arr[$r];
     }
 }

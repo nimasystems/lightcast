@@ -179,12 +179,9 @@ class lcStrings
             $keywords_ = implode($segment_separator, $keys);
         }
 
-        $url =
-            (isset($prefix) ? $prefix . '/' : null) .
-            (($key_ && $keywords_) ? $key_ . '/' : null) .
-            ($keywords_ ? $keywords_ : null);
-
-        return $url;
+        return (isset($prefix) ? $prefix . '/' : null) .
+        (($key_ && $keywords_) ? $key_ . '/' : null) .
+        ($keywords_ ? $keywords_ : null);
     }
 
     public static function keyLink($txt)
@@ -375,8 +372,7 @@ class lcStrings
     public static function slashStrip($value)
     {
         if (is_array($value)) {
-            $return = array_map('lcStrings::slashStrip', $value);
-            return $return;
+            return array_map('lcStrings::slashStrip', $value);
         } else {
             $return = stripslashes($value);
             return $return;
@@ -386,8 +382,7 @@ class lcStrings
     public static function slashAdd($value)
     {
         if (is_array($value)) {
-            $return = array_map('lcStrings::slashAdd', $value);
-            return $return;
+            return array_map('lcStrings::slashAdd', $value);
         } else {
             $return = addslashes($value);
             return $return;
@@ -744,8 +739,7 @@ class lcStrings
 
     public static function shorten($string, $max_len)
     {
-        $str = (strlen($string) > $max_len) ? lcUnicode::substr($string, 0, $max_len) : $string;
-        return $str;
+        return (strlen($string) > $max_len) ? lcUnicode::substr($string, 0, $max_len) : $string;
     }
 
     /**

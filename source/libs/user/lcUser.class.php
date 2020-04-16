@@ -79,11 +79,9 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
             }
         }
 
-        $debug = [
+        return [
             'attributes' => $out,
         ];
-
-        return $debug;
     }
 
     public function getAttributes()
@@ -123,9 +121,8 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function getAttribute($name)
     {
-        $value = isset($this->attributes[$name]) ?
+        return isset($this->attributes[$name]) ?
             $this->attributes[$name] : null;
-        return $value;
     }
 
     public function offsetSet($offset, $value)
@@ -152,16 +149,13 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function __toString()
     {
-        $str = "lcUser: " .
+        return "lcUser: " .
             "Attributes: " . var_export($this->attributes, true) . "\n\n";
-
-        return $str;
     }
 
     public function getAllKeys()
     {
-        $ret = $this->getAttributeNames();
-        return $ret;
+        return $this->getAttributeNames();
     }
 
     #pragma mark - iKeyValueProvider
@@ -172,9 +166,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
             return false;
         }
 
-        $ret = array_keys($this->attributes);
-
-        return $ret;
+        return array_keys($this->attributes);
     }
 
     public function getValueForKey($key)
@@ -183,7 +175,6 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
             throw new lcInvalidArgumentException('Invalid params');
         }
 
-        $ret = $this->getAttribute($key);
-        return $ret;
+        return $this->getAttribute($key);
     }
 }

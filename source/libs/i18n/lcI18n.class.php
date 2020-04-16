@@ -42,13 +42,11 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'locale' => $this->getLocale(),
             'context_type' => $this->getTranslationContextType(),
             'context_name' => $this->getTranslationContextName(),
         ];
-
-        return $debug;
     }
 
     abstract public function getLocale();
@@ -59,11 +57,9 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getShortDebugInfo()
     {
-        $debug = [
+        return [
             'locale' => $this->getLocale(),
         ];
-
-        return $debug;
     }
 
     abstract public function setLocale($locale);
@@ -154,10 +150,9 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     public function getAllKeys()
     {
-        $ret = [
+        return [
             'locale',
         ];
-        return $ret;
     }
 
     public function getValueForKey($key)

@@ -570,9 +570,7 @@ abstract class lcRoute extends lcObj
             return '/';
         }
 
-        $ret = ($route[0] != '/' ? '/' : null) . $route . ($params ? '?' . http_build_query($params) : null);
-
-        return $ret;
+        return ($route[0] != '/' ? '/' : null) . $route . ($params ? '?' . http_build_query($params) : null);
     }
 
     public function getDefaultParams()

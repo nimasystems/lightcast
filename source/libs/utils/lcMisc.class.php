@@ -58,6 +58,12 @@ class lcMisc
         return false;
     }
 
+    /**
+     * @param string $filename
+     * @param null $content
+     * @return string
+     * @throws lcSystemException
+     */
     public static function minifyJs($filename = null, $content = null)
     {
         if (!isset($filename) && !isset($content)) {

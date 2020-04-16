@@ -20,8 +20,7 @@ abstract class lcComponent extends lcBaseController
 
     public function getDefaultViewInstance()
     {
-        $view = new lcRawContentView();
-        return $view;
+        return new lcRawContentView();
     }
 
     public function getProfilingData()
@@ -38,8 +37,7 @@ abstract class lcComponent extends lcBaseController
             return false;
         }
 
-        $content = $rendered_contents['content'];
-        return $content;
+        return $rendered_contents['content'];
     }
 
     public function shutdown()
@@ -114,11 +112,9 @@ abstract class lcComponent extends lcBaseController
             throw new lcViewRenderException('Could not render view: ' . $e->getMessage(), $e->getCode(), $e);
         }
 
-        $ret = [
+        return [
             'content_type' => $content_type,
             'content' => $output,
         ];
-
-        return $ret;
     }
 }

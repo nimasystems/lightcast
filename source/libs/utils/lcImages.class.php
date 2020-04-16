@@ -106,9 +106,7 @@ class lcImages
             throw new Exception();
         }
 
-        $img = imagejpeg($im, $save_dir . $save_name);
-
-        return $img;
+        return imagejpeg($im, $save_dir . $save_name);
     }
 
     public static function calcImageSize($input_width, $input_height, $max_width = 0, $max_height = 0)

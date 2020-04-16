@@ -295,7 +295,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         // $this->propel_class_release;
         $propel_class = lcPropelDatabase::PROPEL_CONNECTION_CLASS;
 
-        $ret = [
+        return [
             'datasource' => $db_config['datasource'],
             'config' => [
                 'adapter' => $params['phptype'],
@@ -310,8 +310,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                 ],
             ],
         ];
-
-        return $ret;
     }
 
     public function getMigrationsHelper()
@@ -421,12 +419,10 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'databases' => array_keys($this->dbs),
             'primary' => self::DEFAULT_DB,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()

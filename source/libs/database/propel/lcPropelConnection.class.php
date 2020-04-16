@@ -510,8 +510,7 @@ class lcPropelConnection extends PropelPDO
 
     private function cacheLookup($namespace, $cache_key)
     {
-        $cached_data = $this->query_cache_backend->getDbCache($namespace, $cache_key);
-        return $cached_data;
+        return $this->query_cache_backend->getDbCache($namespace, $cache_key);
     }
 
     public function query()

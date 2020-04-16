@@ -117,22 +117,18 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
 
     public function getDebugInfo()
     {
-        $debug = [
+        return [
             'notifications_sent' => $this->total_notifications_sent,
             'filter_processors' => $this->filter_processors,
             'notifications' => $this->notifications,
         ];
-
-        return $debug;
     }
 
     public function getShortDebugInfo()
     {
-        $debug = [
+        return [
             'notifications_sent' => $this->total_notifications_sent,
         ];
-
-        return $debug;
     }
 
     public function getFilterProcessors()

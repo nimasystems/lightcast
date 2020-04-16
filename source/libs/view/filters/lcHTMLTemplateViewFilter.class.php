@@ -288,8 +288,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             return $ret;
         } else if ($category == 'config') {
             $config = $this->configuration;
-            $r = $config[$name];
-            return $r;
+            return $config[$name];
         } else if ($category == 'controller') {
             $ctrl = $this->view->getController();
 

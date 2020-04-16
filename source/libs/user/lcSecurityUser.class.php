@@ -220,9 +220,7 @@ abstract class lcSecurityUser extends lcUser
                  'authentication_data' => $this->authentication_data]
             ), []);
 
-        $should_authenticate = $event->isProcessed() ? $event->getReturnValue() : true;
-
-        return $should_authenticate;
+        return $event->isProcessed() ? $event->getReturnValue() : true;
     }
 
     protected function clearAuthentication($forced_by_user = false, $no_events = false)
@@ -283,9 +281,7 @@ abstract class lcSecurityUser extends lcUser
         $new_time = time() - ($timeout * 60);
         $old_time = $last_request;
 
-        $diff = $old_time - $new_time;
-
-        return $diff;
+        return $old_time - $new_time;
     }
 
     public function shutdown()
@@ -387,7 +383,7 @@ abstract class lcSecurityUser extends lcUser
 
     public function __toString()
     {
-        $str = 'lcSecurityUser: ' .
+        return 'lcSecurityUser: ' .
             'Is Authenticated: ' . (int)$this->is_authenticated . "\n" .
             'User ID: ' . (string)$this->user_id . "\n" .
             'Timeout: ' . (int)$this->timeout . ' minute(s)' . "\n" .
@@ -395,8 +391,6 @@ abstract class lcSecurityUser extends lcUser
             'Authentication Data: ' . var_export($this->authentication_data, true) . "\n" .
             'Last Request: ' . $this->last_request . "\n\n" .
             parent::__toString();
-
-        return $str;
     }
 
     protected function getStorage()

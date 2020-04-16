@@ -52,9 +52,7 @@ class lcMemcache extends lcCacheStore
 
     public function addServer($hostname, $port = self::DEFAULT_PORT)
     {
-        $ret = $this->memcache_backend->addServer($hostname, $port);
-
-        return $ret;
+        return $this->memcache_backend->addServer($hostname, $port);
     }
 
     public function getStats()
@@ -64,45 +62,34 @@ class lcMemcache extends lcCacheStore
 
     public function getBackend()
     {
-        $ret = $this->memcache_backend;
-
-        return $ret;
+        return $this->memcache_backend;
     }
 
     public function set($key, $value = null, array $options = [])
     {
         $other_flags = isset($options['flags']) ? $options['flags'] : null;
         $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
-        $ret = $this->memcache_backend->set($key, $value, $other_flags, $lifetime);
-        return $ret;
+        return $this->memcache_backend->set($key, $value, $other_flags, $lifetime);
     }
 
     public function remove($key)
     {
-        $ret = $this->memcache_backend->delete($key);
-
-        return $ret;
+        return $this->memcache_backend->delete($key);
     }
 
     public function has($key)
     {
-        $has = (bool)$this->get($key) ? true : false;
-
-        return $has;
+        return (bool)$this->get($key) ? true : false;
     }
 
     public function get($key)
     {
-        $ret = $this->memcache_backend->get($key);
-
-        return $ret;
+        return $this->memcache_backend->get($key);
     }
 
     public function clear()
     {
-        $ret = $this->memcache_backend->flush();
-
-        return $ret;
+        return $this->memcache_backend->flush();
     }
 
     public function hasValues()

@@ -119,8 +119,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getConfigHandleMap()
     {
         // we load the project's config map ourselves
-        $config_map_project = $this->project_configuration ? $this->project_configuration->getConfigHandleMap() : [];
-        return $config_map_project;
+        return $this->project_configuration ? $this->project_configuration->getConfigHandleMap() : [];
     }
 
     public function executeBefore()
@@ -157,9 +156,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     {
         $project_models = ($this->project_configuration && $this->project_configuration instanceof iSupportsDbModelOperations) ? $this->project_configuration->getUsedDbModels() : [];
 
-        $models = array_unique(array_merge((array)$this->use_models, (array)$project_models));
-
-        return $models;
+        return array_unique(array_merge((array)$this->use_models, (array)$project_models));
     }
 
     public function getDebugInfo()
@@ -345,12 +342,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $parent_cache = (array)parent::writeClassCache();
         $project_cache = ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) ? $this->project_configuration->writeClassCache() : [];
 
-        $cache = [
+        return [
             'parent_cache' => $parent_cache,
             'project_cache' => $project_cache,
         ];
-
-        return $cache;
     }
 
     public function readClassCache(array $cached_data)

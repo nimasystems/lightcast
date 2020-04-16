@@ -66,10 +66,10 @@ class lcControllerStack extends lcSysObj
 
     public function & get($index)
     {
-        return
-            ($index > -1 && $index < count($this->stack)) ?
+        $v = ($index > -1 && $index < count($this->stack)) ?
                 $this->stack[$index] :
                 null;
+        return $v;
     }
 
     public function pop()

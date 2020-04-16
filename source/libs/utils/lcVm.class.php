@@ -65,12 +65,11 @@ class lcVm
                 $str = preg_replace_callback(
                     '/\\\\u([0-9a-f]{4})/i',
                     function ($matches) {
-                        $sym = mb_convert_encoding(
+                        return mb_convert_encoding(
                             pack('H*', $matches[1]),
                             'UTF-8',
                             'UTF-16'
                         );
-                        return $sym;
                     },
                     $data
                 );

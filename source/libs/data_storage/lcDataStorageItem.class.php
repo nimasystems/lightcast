@@ -47,9 +47,7 @@ class lcDataStorageItem extends lcObj
 
     public static function itemWithAttributes($attributes = [], $data_location_attribute_name = null)
     {
-        $tmp = new lcDataStorageItem($attributes, $data_location_attribute_name);
-
-        return $tmp;
+        return new lcDataStorageItem($attributes, $data_location_attribute_name);
     }
 
     public function __destruct()
@@ -115,10 +113,8 @@ class lcDataStorageItem extends lcObj
             return null;
         }
 
-        $location = isset($this->attributes[$this->data_location_attribute_name]) ?
+        return isset($this->attributes[$this->data_location_attribute_name]) ?
             $this->attributes[$this->data_location_attribute_name] : null;
-
-        return $location;
     }
 
     private function cleanup()

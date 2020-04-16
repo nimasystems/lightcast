@@ -219,7 +219,7 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
         foreach ($tableColumns as $num => $col) {
             // if title is not set - fake it
             $lc_title = $col->getAttribute(self::LC_TITLE_ATTR) ? $col->getAttribute(self::LC_TITLE_ATTR) : lcInflector::humanize($col->getAttribute($phpcol_name));
-            $script .= $num . " => '" . $lc_title . "', ";;
+            $script .= $num . " => '" . $lc_title . "', ";
         }
         $script .= ")
     );

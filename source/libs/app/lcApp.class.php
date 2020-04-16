@@ -427,7 +427,6 @@ class lcApp extends lcObj
     {
         $fname = ROOT . DS . self::FRAMEWORK_CACHE_FILENAME;
 
-        /** @noinspection PhpIncludeInspection */
         require_once(ROOT . DS . 'source/libs/autoload/lcAutoloadCacheTool.class.php');
 
         $dirs = [
@@ -1008,7 +1007,6 @@ class lcApp extends lcObj
             return $string;
         }
 
-        /** @var lcI18n $i18n */
         $i18n = lcApp::getInstance()->getI18n();
         return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
     }
@@ -1366,7 +1364,6 @@ class lcApp extends lcObj
 
     public function getPlugin($plugin_name)
     {
-        /** @var lcPluginManager $plugin_manager */
         $plugin_manager = $this->getPluginManager();
         return $plugin_manager ? $plugin_manager->getPlugin($plugin_name) : null;
     }

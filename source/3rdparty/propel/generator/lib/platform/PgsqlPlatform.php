@@ -109,7 +109,7 @@ CREATE SCHEMA %s;
 ";
 
             return sprintf($pattern, $this->quoteIdentifier($vi->getParameter('schema')));
-        };
+        }
     }
 
     public function getDropTableDDL(Table $table)

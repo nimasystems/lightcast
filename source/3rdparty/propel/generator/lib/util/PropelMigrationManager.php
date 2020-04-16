@@ -296,7 +296,7 @@ class PropelMigrationManager
         $migrationClassName = $this->getMigrationClassName($timestamp);
         $migrationUpString = var_export($migrationsUp, true);
         $migrationDownString = var_export($migrationsDown, true);
-        $migrationClassBody = <<<EOP
+        return <<<EOP
 <?php
 
 /**
@@ -351,8 +351,6 @@ class $migrationClassName
 
 }
 EOP;
-
-        return $migrationClassBody;
     }
 
     public static function getUser()

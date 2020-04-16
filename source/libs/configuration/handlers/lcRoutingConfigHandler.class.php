@@ -47,7 +47,7 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
 
     public function getDefaultRoutes()
     {
-        $routes = [
+        return [
             'view_item' => [
                 'url' => '/:module/view/:id',
                 'params' => ['action' => 'view'],
@@ -65,7 +65,5 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
                 ],
             ],
         ];
-
-        return $routes;
     }
 }

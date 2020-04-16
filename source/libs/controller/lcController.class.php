@@ -426,7 +426,7 @@ abstract class lcController extends lcBaseController
         return $this->parent_controller;
     }
 
-    public function setParentController(lcController & $parent_controller = null)
+    public function setParentController(lcController $parent_controller = null)
     {
         $this->parent_controller = $parent_controller;
     }
@@ -454,8 +454,7 @@ abstract class lcController extends lcBaseController
 
         // get the top controller on the stack
         $controller_instance = $this->controller_stack->last();
-        $controller = $controller_instance ? $controller_instance->getControllerInstance() : null;
-        return $controller;
+        return $controller_instance ? $controller_instance->getControllerInstance() : null;
     }
 
     abstract protected function classMethodForAction($action_name, array $action_params = null);
@@ -545,7 +544,7 @@ abstract class lcController extends lcBaseController
      * @deprecated The method is used by LC 1.4 projects
     */
 
-    public function setRootController(iFrontController & $controller = null)
+    public function setRootController(iFrontController $controller = null)
     {
         $this->root_controller = $controller;
     }
@@ -633,7 +632,7 @@ abstract class lcController extends lcBaseController
             // render the action
             $rendered_view_contents = $this->renderControllerAction($controller_instance, $action_name, $action_params);
 
-            $content_type = $rendered_view_contents['content_type'];
+            $content_type = isset($rendered_view_contents) ? $rendered_view_contents['content_type'] : null;
             $content = isset($rendered_view_contents['content']) ? $rendered_view_contents['content'] : null;
 
             unset($rendered_view_contents);
@@ -875,14 +874,12 @@ abstract class lcController extends lcBaseController
                                                     $action_name, array $action_params = null,
                                                     array $skip_filter_categories = null)
     {
-        $filter_results = $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, [
+        return $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, [
             'controller_context_name' => $controller_context_name,
             'controller_context_type' => $controller_context_type,
             'controller_filename' => $controller_filename,
             'controller_parent_plugin' => $controller_parent_plugin_name,
         ], $skip_filter_categories);
-
-        return $filter_results;
     }
 
     protected function renderLayoutView($layout_content, $layout_content_type = null)
@@ -1021,12 +1018,10 @@ abstract class lcController extends lcBaseController
                 $e);
         }
 
-        $ret = [
+        return [
             'content_type' => $content_type,
             'content' => $output,
         ];
-
-        return $ret;
     }
 
     abstract protected function outputViewContents(lcController $controller, $content = null, $content_type = null);

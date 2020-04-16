@@ -1076,7 +1076,6 @@ class PropelPhing
         // find the target with the longest name
         $maxLength = 0;
         $targets = $project->getTargets();
-        $targetNames = array_keys($targets);
         $targetName = null;
         $targetDescription = null;
         $currentTarget = null;
