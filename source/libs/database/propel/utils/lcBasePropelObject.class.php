@@ -152,6 +152,12 @@ abstract class lcBasePropelObject extends BaseObject
         return (isset($this->virtualColumns[$name]) ? $this->virtualColumns[$name] : null);
     }
 
+    protected function log($msg, $priority = Propel::LOG_INFO)
+    {
+        parent::log($msg, $priority);
+        lcApp::getInstance()->getLogger()->log($msg, $priority);
+    }
+
     protected function logError($msg)
     {
         return $this->log($msg, Propel::LOG_ERR);
