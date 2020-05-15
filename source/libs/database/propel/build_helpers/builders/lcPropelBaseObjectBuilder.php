@@ -44,6 +44,58 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
     }
 
     /**
+     * Adds a setter method for date/time/timestamp columns.
+     *
+     * @param string &$script The script will be modified in this method.
+     * @param Column $col The current column.
+     *
+     * @see        parent::addColumnMutators()
+     */
+    protected function addTemporalMutator(&$script, Column $col)
+    {
+        //$cfc = $col->getPhpName();
+        $clo = strtolower($col->getName());
+        //$visibility = $col->getMutatorVisibility();
+
+        $dateTimeClass = $this->getBuildProperty('dateTimeClass');
+        if (!$dateTimeClass) {
+            $dateTimeClass = 'DateTime';
+        }
+        $this->declareClasses($dateTimeClass, 'DateTimeZone', 'PropelDateTime');
+
+        $this->addTemporalMutatorComment($script, $col);
+        $this->addMutatorOpenOpen($script, $col);
+        $this->addMutatorOpenBody($script, $col);
+
+        $fmt = var_export($this->getTemporalFormatter($col), true);
+
+        $script .= "
+        \$dt = lcPropelDateTime::newInstance(\$v, null, '$dateTimeClass');
+        if (\$this->$clo !== null || \$dt !== null) {
+            \$currentDateAsString = (\$this->$clo !== null && \$tmpDt = new $dateTimeClass(\$this->$clo)) ? \$tmpDt->format($fmt) : null;
+            \$newDateAsString = \$dt ? \$dt->format($fmt) : null;";
+
+        if (($def = $col->getDefaultValue()) !== null && !$def->isExpression()) {
+            $defaultValue = $this->getDefaultValueString($col);
+            $script .= "
+            if ( (\$currentDateAsString !== \$newDateAsString) // normalized values don't match
+                || (\$dt->format($fmt) === $defaultValue) // or the entered value matches the default
+                 ) {";
+        } else {
+            $script .= "
+            if (\$currentDateAsString !== \$newDateAsString) {";
+        }
+
+        $script .= "
+                \$this->$clo = \$newDateAsString;
+                \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ";
+            }
+        } // if either are not null
+";
+        $this->addMutatorClose($script, $col);
+    }
+
+    /**
      * Adds setter method for "normal" columns.
      *
      * This is a fix for converting decimals to string while on a locale different than C (floating point value gets lost)
