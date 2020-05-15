@@ -12,13 +12,25 @@ abstract class lcBasePropelObject extends BaseObject
      */
     protected $application_configuration;
 
+    /** @var DateTimeZone */
+    private $client_timezone;
+
     abstract public function getPrimaryKey();
 
     public function __construct()
     {
         parent::__construct();
         $this->application_configuration = $GLOBALS['configuration'];
+        $this->client_timezone = lcApp::getInstance()->getDefaultTimezone();
         $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
+    }
+
+    protected function getDateTimeWithClientTimezone(DateTime $date_time)
+    {
+        if ($this->client_timezone) {
+            $date_time->setTimezone($this->client_timezone);
+        }
+        return $date_time;
     }
 
     public function __call($name, $params)
@@ -65,6 +77,22 @@ abstract class lcBasePropelObject extends BaseObject
     public function setApplicationConfiguration(lcApplicationConfiguration $configuration)
     {
         $this->application_configuration = $configuration;
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getClientTimezone()
+    {
+        return $this->client_timezone;
+    }
+
+    /**
+     * @param DateTimeZone $client_timezone
+     */
+    public function setClientTimezone(DateTimeZone $client_timezone)
+    {
+        $this->client_timezone = $client_timezone;
     }
 
     public function postSave(PropelPDO $con = null)

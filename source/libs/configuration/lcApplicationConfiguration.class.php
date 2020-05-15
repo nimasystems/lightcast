@@ -25,6 +25,7 @@
  * @method getProjectDir()
  * @method getProjectName()
  * @method getConfigEnvironment()
+ * @method getDefaultTimezone()
  * @method getProjectAppName($getApplicationName)
  */
 abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
