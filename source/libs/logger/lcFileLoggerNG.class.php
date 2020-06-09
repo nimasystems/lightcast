@@ -233,6 +233,7 @@ class lcFileLoggerNG extends lcLogger
             $max_len = (int)ini_get('log_errors_max_len');
 
             foreach ($logs as $filename => $logs1) {
+
                 $str = implode('', $logs1);
                 $last_pos = 0;
 

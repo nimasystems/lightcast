@@ -1133,6 +1133,9 @@ class lcApp extends lcObj
                 return;
             }
 
+            // shutdown plugin manager and all plugins
+            $this->getPluginManager()->shutdown();
+
             // shutdown all loader objects as we created them
             $this->shutdownLoaderInstances();
 
@@ -1206,13 +1209,19 @@ class lcApp extends lcObj
                 $obj->shutdown();
                 unset($this->loader_instances[$obj_type]);
             } catch (Exception $e) {
-                if (DO_DEBUG) {
-                    // this cannot be handled otherwise
-                    // we cannot be certain of what will happen after all objects start taking off
-                    // and if errorHandler is available at all
-                    // so in release mode - we silently skip this error
-                    die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
-                }
+//                $logger = $this->getLogger();
+//
+//                if ($logger) {
+//                    $logger->warn('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+//                }
+
+                //if (DO_DEBUG) {
+                // this cannot be handled otherwise
+                // we cannot be certain of what will happen after all objects start taking off
+                // and if errorHandler is available at all
+                // so in release mode - we silently skip this error
+                //die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+                //}
             }
 
             unset($obj_type, $obj);
