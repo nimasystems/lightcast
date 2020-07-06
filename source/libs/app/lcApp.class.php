@@ -98,6 +98,11 @@ class lcApp extends lcObj
      */
     protected $platform_capabilities;
 
+    /**
+     * @var DateTimeZone
+     */
+    protected $default_timezone;
+
     private $initialized;
     private $no_shutdown;
 
@@ -280,6 +285,39 @@ class lcApp extends lcObj
 
         // lib dir path
         set_include_path(get_include_path() . PATH_SEPARATOR . $configuration->getProjectDir() . DS . 'lib');
+    }
+
+    /**
+     * @return DateTimeZone
+     */
+    public function getDefaultTimezone()
+    {
+        return $this->default_timezone;
+    }
+
+    /**
+     * @param DateTimeZone $default_timezone
+     */
+    public function setDefaultTimezone(DateTimeZone $default_timezone)
+    {
+        if (!$default_timezone) {
+            throw new lcInvalidArgumentException('Invalid timezone');
+        }
+
+        $tz_current_name = $this->default_timezone ? $this->default_timezone->getName() : null;
+        $tz_new_name = $default_timezone->getName();
+
+        if ($tz_current_name != $tz_new_name) {
+            $this->default_timezone = $default_timezone;
+
+            if (!lcVm::date_default_timezone_set($tz_new_name)) {
+                throw new lcSystemException('Cannot set system timezone: ' . $tz_new_name);
+            }
+        }
+
+        if ($this->logger) {
+            $this->logger->info('Timezone changed: ' . $tz_new_name);
+        }
     }
 
     private function initErrorHandler()
@@ -600,14 +638,8 @@ class lcApp extends lcObj
     protected function setSystemTimezone()
     {
         // set timezone
-        $tz = $this->configuration['settings.timezone'] ? (string)$this->configuration['settings.timezone'] :
-            lcVm::date_default_timezone_get();
-
-        if (!lcVm::date_default_timezone_set($tz)) {
-            throw new lcSystemException('Cannot set system timezone: ' . $tz);
-        }
-
-        unset($tz);
+        $tz = $this->configuration['settings.timezone'] ?: lcVm::date_default_timezone_get();
+        return $this->setDefaultTimezone(new DateTimeZone($tz));
     }
 
     private function initDatabaseModelManager()
@@ -1101,6 +1133,9 @@ class lcApp extends lcObj
                 return;
             }
 
+            // shutdown plugin manager and all plugins
+            $this->getPluginManager()->shutdown();
+
             // shutdown all loader objects as we created them
             $this->shutdownLoaderInstances();
 
@@ -1174,13 +1209,19 @@ class lcApp extends lcObj
                 $obj->shutdown();
                 unset($this->loader_instances[$obj_type]);
             } catch (Exception $e) {
-                if (DO_DEBUG) {
-                    // this cannot be handled otherwise
-                    // we cannot be certain of what will happen after all objects start taking off
-                    // and if errorHandler is available at all
-                    // so in release mode - we silently skip this error
-                    die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
-                }
+//                $logger = $this->getLogger();
+//
+//                if ($logger) {
+//                    $logger->warn('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+//                }
+
+                //if (DO_DEBUG) {
+                // this cannot be handled otherwise
+                // we cannot be certain of what will happen after all objects start taking off
+                // and if errorHandler is available at all
+                // so in release mode - we silently skip this error
+                //die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+                //}
             }
 
             unset($obj_type, $obj);

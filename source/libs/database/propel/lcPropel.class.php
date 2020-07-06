@@ -21,6 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
+require_once('lcPropelDateTime.class.php');
+
 class lcPropel extends Propel
 {
     const TRANSLATION_DOMAIN = 'database_models';

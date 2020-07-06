@@ -112,6 +112,7 @@ require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcArrays.class
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcMisc.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcDirs.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'lcVm.class.php';
+require ROOT . DS . 'source' . DS . 'libs' . DS . 'utils' . DS . 'UtcDateTime.class.php';
 
 // interfaces
 

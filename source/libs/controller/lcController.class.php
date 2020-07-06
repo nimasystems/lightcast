@@ -632,8 +632,10 @@ abstract class lcController extends lcBaseController
             // render the action
             $rendered_view_contents = $this->renderControllerAction($controller_instance, $action_name, $action_params);
 
-            $content_type = isset($rendered_view_contents) ? $rendered_view_contents['content_type'] : null;
-            $content = isset($rendered_view_contents['content']) ? $rendered_view_contents['content'] : null;
+            $content_type = $rendered_view_contents && is_array($rendered_view_contents) && isset($rendered_view_contents['content_type']) ?
+                $rendered_view_contents['content_type'] : null;
+            $content = $rendered_view_contents && is_array($rendered_view_contents) && isset($rendered_view_contents['content']) ?
+                $rendered_view_contents['content'] : null;
 
             unset($rendered_view_contents);
 

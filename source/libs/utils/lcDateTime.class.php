@@ -34,9 +34,14 @@ class lcDateTime
         return strftime($format, $timestamp);
     }
 
+    public static function utcTimeZone()
+    {
+        return new DateTimeZone('UTC');
+    }
+
     public static function utcDateTime($timestamp = false)
     {
-        $d = new DateTime('now', new DateTimeZone('UTC'));
+        $d = new DateTime('now', self::utcTimeZone());
         return $timestamp ? $d->getTimestamp() : $d;
     }
 
