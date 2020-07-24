@@ -46,6 +46,7 @@ abstract class lcActionFilter extends lcSysObj
                                  array $request_params = null, array $controller_context = null, array $skip_filter_categories = null)
     {
         $filter_category = $this->getFilterCategory();
+        $filter_result = null;
 
         if ($this->getShouldApplyFilter() &&
             (!$filter_category ||
@@ -56,13 +57,6 @@ abstract class lcActionFilter extends lcSysObj
                 // if a filter returns true it means it takes responsibility
                 // over the action and we stop further processing
                 $filter_result = $this->applyFilter($parent_controller, $controller_name, $action_name, $request_params, $controller_context);
-
-                if ($filter_result) {
-                    return [
-                        'filter' => &$this,
-                        'result' => $filter_result,
-                    ];
-                }
             } catch (Exception $e) {
                 throw new lcFilterException('Could not apply action filter (' . get_class($this) . '): ' .
                     $e->getMessage(),
@@ -72,14 +66,18 @@ abstract class lcActionFilter extends lcSysObj
             }
         }
 
-        // process the next filter
-        if ($this->next) {
+        $filter_result_ret = $filter_result && isset($filter_result['allow_forward']) && $filter_result['allow_forward'];
+
+        if (!$filter_result_ret && $this->next) {
+            // process the next filter
             return $this->next->filterAction($parent_controller, $controller_name, $action_name,
                 $request_params, $controller_context, $skip_filter_categories);
+        } else {
+            return [
+                'filter' => &$this,
+                'result' => $filter_result,
+            ];
         }
-
-        // no filter has taken responsibility - take no further action
-        return false;
     }
 
     abstract public function getFilterCategory();
