@@ -27,7 +27,16 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
     /** @var lcHTMLTemplateView */
     protected $view;
-    private $tmp_node_params;
+
+    /** @var pCore */
+    protected $pcore;
+
+    public function initialize()
+    {
+        parent::initialize();
+
+        $this->pcore = lcApp::getInstance()->getPlugin('core');
+    }
 
     protected function getShouldApplyFilter()
     {
@@ -67,19 +76,19 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         switch ($replacement_policy) {
             case lcIterateParamHolder::REPLACE_DEEP:
-                {
-                    $template = $this->parseTemplateCycle($holder, $template);
-                    $template = $this->parseSubnodesCycle($holder, $template);
+            {
+                $template = $this->parseTemplateCycle($holder, $template);
+                $template = $this->parseSubnodesCycle($holder, $template);
 
-                    break;
-                }
+                break;
+            }
             case lcIterateParamHolder::REPLACE_LEVEL:
-                {
-                    $template = $this->parseSubnodesCycle($holder, $template);
-                    $template = $this->parseTemplateCycle($holder, $template);
+            {
+                $template = $this->parseSubnodesCycle($holder, $template);
+                $template = $this->parseTemplateCycle($holder, $template);
 
-                    break;
-                }
+                break;
+            }
         }
 
         // clear template
@@ -185,7 +194,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
     protected function parseTemplate($template, lcIterateParamHolder $node)
     {
-        $this->tmp_node_params = $node->getParams();
+        $tmp_node_params1 = $node->getParams();
 
         // parse node params
         // do not count on the number of params in $node_params
@@ -193,26 +202,25 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         // we must parse it always!
 
         $self = $this;
-        $tmp_node_params = $this->tmp_node_params;
-        $template = preg_replace_callback("/\{[\$]([\w\d\s\:]+)\}/i", function ($m) use ($self, $tmp_node_params) {
-            return $self->parseParam(@$m[1], $tmp_node_params);
+        $tmp_node_params = $tmp_node_params1;
+        $template = preg_replace_callback(["/{{(.*?)}}/i", "/{[\$]([\w\d\s:]+)}/i"], function ($m) use ($self, $tmp_node_params) {
+            return $m && isset($m[0]) && isset($m[1]) ? $self->parseParam($m[0], $m[1], $tmp_node_params) : null;
         }, $template);
 
-        $this->tmp_node_params = null;
+        $tmp_node_params1 = null;
 
         return $template;
     }
 
     /**
+     * @param $query
      * @param $param
      * @param array|null $all_params
-     * @warning Leave as public for PHP 5.3x compatibility (some methods are calling from lambdas below)
      * @return bool|mixed|null|string
+     * @warning Leave as public for PHP 5.3x compatibility (some methods are calling from lambdas below)
      */
-    public function parseParam($param, array $all_params = null)
+    public function parseParam($query, $param, array $all_params = null)
     {
-        assert(isset($param));
-
         $p = explode(':', $param);
 
         $param_default = '{$' . $param . '}';
@@ -222,9 +230,13 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         $param_one = $p[0];
         $param_two = isset($p[1]) ? (string)$p[1] : null;
 
+        $is_var = $param_one && lcStrings::startsWith($query, '{$');
+
         // normal / asis
         if (!$param_two || $param_two == 'asis') {
-            if (isset($all_params[$param_one])) {
+            if (!$is_var) {
+                return $param_one;
+            } else if (isset($all_params[$param_one])) {
                 $param_one_set = isset($all_params[$param_one]) ? $all_params[$param_one] : null;
                 $val = null;
 
@@ -239,7 +251,12 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             }
         } else if ($param_two) {
             // check with a custom modifier method
-            $internal_value = isset($all_params[$param_one]) ? $all_params[$param_one] : null;
+            if ($is_var) {
+                $internal_value = isset($all_params[$param_one]) ? $all_params[$param_one] : null;
+            } else {
+                $internal_value = $param_one;
+            }
+
             $value = $this->parsedParamValue($param_one, $param_two, $internal_value);
             $value = $this->debug ? '{' . $value . '}' : $value;
 
@@ -260,6 +277,10 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             if ($ret) {
                 $ret = lcStrings::keyLink($ret);
                 return $ret;
+            }
+        } else if ($category == 'res-img') {
+            if ($ret) {
+                return $this->pcore->getImageResourceUrl($default_value);
             }
         } else if ($category == 'seopath') {
             if ($ret) {
@@ -391,7 +412,8 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
     protected function postCompile($data)
     {
         // clear template
-        $data = preg_replace("/\{\\$(.*?)\}/i", '', $data);
+        $data = preg_replace("/{\\$(.*?)}/i", '', $data);
+        $data = preg_replace("/{{(.*?)}}/i", '', $data);
 
         // clear empty lines
         // TODO: Test the speed of this!

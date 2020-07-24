@@ -181,10 +181,17 @@ class lcPDODatabase extends lcDatabase
             $pdo_class = 'PDO';
 
             $this->conn = new $pdo_class($this->connection_url, $this->username, $this->password, $options);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
             if ($this->charset) {
                 $this->conn->exec('SET NAMES ' . $this->charset .
                     ($this->collation ? ' COLLATE ' . $this->collation : null));
+            }
+
+            $tz = isset($this->options['timezone']) ? (string)$this->options['timezone'] : null;
+
+            if ($tz) {
+                $this->conn->exec('SET time_zone = ' . $this->conn->quote($tz));
             }
 
         } catch (Exception $e) {

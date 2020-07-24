@@ -44,6 +44,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $server_charset = 'utf-8';
     protected $content_type = 'text/html';
 
+    protected $output_open_graph_data = true;
+
     protected $no_http_errors_processing;
 
     /**
@@ -575,12 +577,18 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
 
         // metatags
+        $meta_description = null;
+
         if ($metatags) {
             foreach ($metatags as $name => $value) {
 
                 // this is deprecated now
                 if ($name == 'title') {
                     continue;
+                }
+
+                if ($name == 'description') {
+                    $meta_description = $value;
                 }
 
                 if (!$value) {
@@ -595,6 +603,17 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
 
         unset($metatags);
+
+        // open graph
+        if ($this->output_open_graph_data) {
+            if ($title) {
+                $head[] = '<meta property="og:title" content="' . htmlspecialchars($title) . '" />';
+            }
+
+            if ($meta_description) {
+                $head[] = '<meta property="og:description" content="' . htmlspecialchars($meta_description) . '" />';
+            }
+        }
 
         // icon
         $icon = $this->icon;
