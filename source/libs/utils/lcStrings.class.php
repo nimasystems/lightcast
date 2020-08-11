@@ -180,8 +180,8 @@ class lcStrings
         }
 
         return (isset($prefix) ? $prefix . '/' : null) .
-        (($key_ && $keywords_) ? $key_ . '/' : null) .
-        ($keywords_ ? $keywords_ : null);
+            (($key_ && $keywords_) ? $key_ . '/' : null) .
+            ($keywords_ ? $keywords_ : null);
     }
 
     public static function keyLink($txt)
