@@ -23,6 +23,13 @@
 
 abstract class lcWebServiceController extends lcWebBaseController implements iPluginContained, iDebuggable
 {
+    const HTTP_CODE_OK = '200';
+    const HTTP_CODE_NOT_FOUND = '404';
+    const HTTP_CODE_FORBIDDEN = '403';
+    const HTTP_CODE_BAD_REQUEST = '400';
+    const HTTP_CODE_SYSTEM_ERROR = '500';
+    const HTTP_CODE_APP_ERROR = '422';
+
     const TIMEZONE_RESPONSE_HEADER = 'X-TZ';
 
     protected $send_direct_response;
@@ -46,6 +53,108 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     {
         // web services don't have layouts
         return null;
+    }
+
+    protected function validateSet(array $data, array $input, $name = null)
+    {
+        $validation_errors = [];
+        $invalid_fields = [];
+        $filtered_data = [];
+
+        foreach ($data as $field => $validation_details) {
+            $filtered_data[$field] = isset($input[$field]) ? $input[$field] : null;
+
+            $options = isset($validation_details['options']) ? $validation_details['options'] : [];
+            $is_split = isset($validation_details['options']);
+
+            $required = isset($options['required']) && $options['required'];
+
+            if ($is_split) {
+                $filters = isset($validation_details['filters']) ? $validation_details['filters'] : [];
+                $validators = isset($validation_details['validators']) ? $validation_details['validators'] : [];
+            } else {
+                $validators = $validation_details;
+                $required = $validation_details && !(isset($validation_details[0]['optional']) && $validation_details[0]['optional']);
+                $filters = [];
+            }
+
+            $should_test_validators = $required || isset($input[$field]);
+
+            // trim string values
+            if (isset($input[$field]) && is_string($input[$field])) {
+                $input[$field] = trim($input[$field]);
+            }
+
+            if ($required && (!isset($input[$field]) || is_null($input[$field]) || (is_string($input[$field]) && !strlen($input[$field])))) {
+                $validation_errors[] = new lcValidatorFailure($field, sprintf($this->t('Field \'%s\' is required'), $field));
+                $invalid_fields[] = $field;
+                $should_test_validators = false;
+            }
+
+            foreach ($filters as $filter) {
+                $filtered_data[$field] = $filter($filtered_data[$field]);
+                unset($filter);
+            }
+
+            if (!$filtered_data[$field]) {
+                continue;
+            }
+
+            if ($should_test_validators) {
+                $vdata = [];
+
+                foreach ($validators as $validator) {
+                    $vdata[] = [
+                        'name' => $field,
+                        'validator' => $validator['type'],
+                        'value' => $filtered_data[$field],
+                        'options' => isset($validator['options']) ? $validator['options'] : [],
+                        'fail' => isset($validator['message']) ? $validator['message'] :
+                            sprintf($this->t('Field \'%s\' is not valid'), $field),
+                    ];
+
+                    unset($validator);
+                }
+
+                $is_valid = $this->validateData($vdata, $validation_errors);
+
+                if (!$is_valid) {
+                    $invalid_fields[] = $field;
+                }
+            }
+
+            unset($field, $validation_details);
+        }
+
+        if (count($validation_errors)) {
+            $vex = new lcValidationException($this->t('Invalid request data'));
+            $vex->setValidationFailures($validation_errors);
+            throw $vex;
+        }
+
+        return $filtered_data;
+    }
+
+    protected function validateRequestData(array $data, lcApiWebRequest $request)
+    {
+        $request_data = (array)$request->getRequestData();
+        return $this->validateSet($data, $request_data);
+    }
+
+    protected function renderSuccess(array $data = null)
+    {
+        $this->renderRaw(json_encode(['data' => $data]), 'application/json');
+    }
+
+    protected function renderAppError($message, $domain = null, $code = null)
+    {
+        $this->response->setStatusCode(self::HTTP_CODE_APP_ERROR);
+
+        $this->renderRaw(json_encode(['error' => array_filter([
+            'message' => $message,
+            'domain' => $domain,
+            'code' => $code,
+        ])]), 'application/json');
     }
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)
