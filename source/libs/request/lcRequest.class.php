@@ -400,6 +400,25 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
             throw new lcInvalidRequestException('Invalid server environment');
         }
 
+        // fix specific handling of htaccess php redirection which for whatever reason does not work on some servers
+        if (isset($_SERVER['argv']) && $_SERVER['argv']) {
+            $p1 = $_SERVER['argv'][0];
+            $server_qstr = isset($_SERVER['QUERY_STRING']) ? $_SERVER['QUERY_STRING'] : null;
+
+            if ($server_qstr && $server_qstr[0] == '/') {
+                $requst_uri = $this->_env('REQUEST_URI');
+                $pout = @parse_url($requst_uri);
+
+                if ($pout) {
+                    $query_string = (isset($pout['query']) ? '?' . $pout['query'] : '');
+                    $_SERVER['ORIGINAL_REQUEST_URI'] = $requst_uri;
+                    $_SERVER['REQUEST_URI'] = $p1 . $query_string;
+                    $_SERVER['ORIGINAL_QUERY_STRING'] = $server_qstr;
+                    $_SERVER['QUERY_STRING'] = $query_string;
+                }
+            }
+        }
+
         // fix broken HTTP_AUTHORIZATION for phpfcgi
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             if (isset($_SERVER['Authorization']) && (strlen($_SERVER['Authorization']) > 0)) {
@@ -490,17 +509,14 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
                 if (!strpos($this->_env('SCRIPT_NAME'), '.php')) {
                     $offset = 4;
                 }
-                return substr($this->_env('SCRIPT_FILENAME'), 0, strlen($this->_env('SCRIPT_FILENAME')) - (strlen($this->env('SCRIPT_NAME')) + $offset));
-                break;
+                return substr($this->_env('SCRIPT_FILENAME'), 0,
+                    strlen($this->_env('SCRIPT_FILENAME')) - (strlen($this->env('SCRIPT_NAME')) + $offset));
             case 'PHP_SELF':
                 return r($this->_env('DOCUMENT_ROOT'), '', $this->_env('SCRIPT_FILENAME'));
-                break;
             case 'CGI_MODE':
                 return (substr(php_sapi_name(), 0, 3) == 'cgi');
-                break;
             case 'HTTP_BASE':
                 return preg_replace('/^([^.])*/i', null, $this->_env('HTTP_HOST'));
-                break;
             case 'PATH_INFO':
 
                 $request_uri = $this->_env('REQUEST_URI');
@@ -519,10 +535,8 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
                 }
 
                 return $request_uri;
-                break;
             case 'SCRIPT_URL':
                 return isset($_SERVER['SCRIPT_URL']) ? $_SERVER['SCRIPT_URL'] : $this->_env('REQUEST_URI');
-                break;
         }
 
         return $val;

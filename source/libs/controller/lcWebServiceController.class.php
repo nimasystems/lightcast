@@ -38,12 +38,19 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
     /** @var lcApiWebRequest */
     protected $request;
 
+    /**
+     * @var int
+     */
+    protected $member_id;
+
     public function initialize()
     {
         parent::initialize();
 
         $this->send_direct_response = isset($this->configuration['settings.send_direct_response']) ? (bool)$this->configuration['settings.send_direct_response'] : true;
         $this->send_server_timezone = isset($this->configuration['settings.send_server_timezone']) ? (bool)$this->configuration['settings.send_server_timezone'] : true;
+
+        $this->member_id = $this->user->getUserId();
     }
 
     /**
