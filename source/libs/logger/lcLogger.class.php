@@ -242,6 +242,11 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
         $this->log($message, self::LOG_DEBUG, $channel);
     }
 
+    public function flush()
+    {
+        //
+    }
+
     public function listenerLog(lcEvent $event)
     {
         $params = $event->getParams();

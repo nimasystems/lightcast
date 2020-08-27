@@ -1104,7 +1104,6 @@ class lcApp extends lcObj
         static $already_called;
 
         if ($already_called) {
-            assert(false);
             return;
         }
 
@@ -1215,19 +1214,19 @@ class lcApp extends lcObj
 //                    $logger->warn('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
 //                }
 
-                //if (DO_DEBUG) {
-                // this cannot be handled otherwise
-                // we cannot be certain of what will happen after all objects start taking off
-                // and if errorHandler is available at all
-                // so in release mode - we silently skip this error
-                //die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
-                //}
+                if (DO_DEBUG) {
+//                 this cannot be handled otherwise
+//                 we cannot be certain of what will happen after all objects start taking off
+//                 and if errorHandler is available at all
+//                 so in release mode - we silently skip this error
+                    die('Could not shutdown loaders properly (' . $obj_type . '): ' . $e->getMessage() . ': ' . $e->getTraceAsString());
+                }
             }
 
             unset($obj_type, $obj);
         }
 
-        $this->loader_instances = null;
+        $this->loader_instances = [];
     }
 
     public function dispatch()
@@ -1274,8 +1273,7 @@ class lcApp extends lcObj
     }
 
     /**
-     * @param Exception|Error $exception
-     * @throws Error
+     * @param Exception $exception
      * @throws Exception
      */
     public function handleException($exception)

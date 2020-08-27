@@ -413,7 +413,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $schema = null;
 
         if ($plugin_config) {
-            /** @noinspection PhpUndefinedMethodInspection */
             $schema = $plugin_config->getDatabaseMigrationSchema();
 
             if ($schema instanceof lcSysObj) {
@@ -677,7 +676,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     public function hasPlugin($plugin_name)
     {
         if (!isset($plugin_name)) {
-            assert(false);
             return false;
         }
 
@@ -741,7 +739,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         foreach ($requirements as $req) {
             // internal error
             if ($req == $plugin_name) {
-                assert(false);
                 continue;
             }
 
@@ -1060,7 +1057,6 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             $options = isset($details['options']) ? (array)$details['options'] : null;
 
             if (!$url) {
-                assert(false);
                 continue;
             }
 

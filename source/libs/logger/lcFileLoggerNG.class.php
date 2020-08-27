@@ -224,6 +224,11 @@ class lcFileLoggerNG extends lcLogger
         parent::onAppException($event);
     }
 
+    public function flush()
+    {
+        $this->flushLogs();
+    }
+
     public function flushLogs()
     {
         // write buffered logs
