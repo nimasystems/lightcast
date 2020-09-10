@@ -1795,9 +1795,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     public function setStatusCode($status_code, $reason_string = null)
     {
-        if (!$this->status_code = lcHttpStatusCode::getType($status_code)) {
-            throw new lcSystemException('Invalid HTTP Response Status Code');
-        }
+        $this->status_code = $status_code;
+
+//        if (!$this->status_code = lcHttpStatusCode::getType($status_code)) {
+//            throw new lcSystemException('Invalid HTTP Response Status Code');
+//        }
 
         !$reason_string ?
             $this->reason_string = lcHttpStatusCode::getMessage($status_code) :
