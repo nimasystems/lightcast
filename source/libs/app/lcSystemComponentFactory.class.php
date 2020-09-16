@@ -543,7 +543,11 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
     public function addActionForm($form_name, array $details)
     {
         if (isset($this->action_forms[$form_name])) {
-            assert(false);
+
+            if (DO_DEBUG) {
+                throw new lcSystemException('Action form is already registered: ' . $form_name);
+            }
+
             return;
         }
 
