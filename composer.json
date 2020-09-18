@@ -1,7 +1,11 @@
 {
   "name": "nimasystems/lightcast",
   "description": "Lightcast (TM) is a PHP MVC framework for developing applications from scratch",
-  "keywords" : ["mvc","framework","nimasystems"],
+  "keywords": [
+    "mvc",
+    "framework",
+    "nimasystems"
+  ],
   "homepage": "https://github.com/nimasystems/lightcast",
   "type": "library",
   "license": "GPL-3.0-or-later",
@@ -14,6 +18,6 @@
     }
   ],
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.1"
   }
 }
