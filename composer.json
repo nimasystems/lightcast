@@ -1,13 +1,15 @@
 {
-    "name": "nimasystems/lightcast",
-    "description": "Lightcast (TM) is a PHP MVC framework for developing applications from scratch",
-    "type": "library",
-    "license": "GNU GPLv3",
-    "authors": [
-        {
-            "name": "Martin Kovachev",
-            "email": "miracle@nimasystems.com"
-        }
-    ],
-    "require": {}
+  "name": "nimasystems/lightcast",
+  "description": "Lightcast (TM) is a PHP MVC framework for developing applications from scratch",
+  "type": "library",
+  "license": "GPL-3.0-or-later",
+  "authors": [
+    {
+      "name": "Martin Kovachev",
+      "email": "miracle@nimasystems.com",
+      "homepage": "https://www.nimasystems.com",
+      "role": "Developer"
+    }
+  ],
+  "require": {}
 }
