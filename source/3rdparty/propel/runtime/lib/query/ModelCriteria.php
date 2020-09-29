@@ -535,7 +535,11 @@ class ModelCriteria extends Criteria
             throw new PropelException(sprintf('Unknown model, alias or table "%s"', $prefix));
         }
 
-        if ($tableMap->hasColumnByPhpName($phpName)) {
+        // NIMA changes: this section was moved from the 3rd position to the first to fix an issue with sorting virtual columns
+        if (isset($this->asColumns[$phpName])) {
+            // aliased column
+            return [null, $phpName];
+        } else if ($tableMap->hasColumnByPhpName($phpName)) {
             $column = $tableMap->getColumnByPhpName($phpName);
             if (isset($this->aliases[$prefix])) {
                 $this->currentAlias = $prefix;
@@ -550,9 +554,6 @@ class ModelCriteria extends Criteria
             $realColumnName = $column->getFullyQualifiedName();
 
             return [$column, $realColumnName];
-        } else if (isset($this->asColumns[$phpName])) {
-            // aliased column
-            return [null, $phpName];
         } else if ($tableMap->hasColumnByInsensitiveCase($phpName)) {
             $column = $tableMap->getColumnByInsensitiveCase($phpName);
             $realColumnName = $column->getFullyQualifiedName();
