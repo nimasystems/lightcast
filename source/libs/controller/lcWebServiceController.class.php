@@ -77,7 +77,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
             $required = isset($options['required']) && $options['required'];
 
             if ($is_split) {
-                $filters = isset($validation_details['filters']) ? $validation_details['filters'] : [];
+                $filters = isset($validation_details['filters']) ? (array)$validation_details['filters'] : [];
                 $validators = isset($validation_details['validators']) ? $validation_details['validators'] : [];
             } else {
                 $validators = $validation_details;
@@ -111,10 +111,18 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
                 $vdata = [];
 
                 foreach ($validators as $validator) {
+                    $filters = isset($validator['filters']) ? (array)$validator['filters'] : [];
+                    $ffield_data = $filtered_data[$field];
+
+                    foreach ($filters as $filter) {
+                        $ffield_data = $filter($ffield_data);
+                        unset($filter);
+                    }
+
                     $vdata[] = [
                         'name' => $field,
                         'validator' => $validator['type'],
-                        'value' => $filtered_data[$field],
+                        'value' => $ffield_data,
                         'options' => isset($validator['options']) ? $validator['options'] : [],
                         'fail' => isset($validator['message']) ? $validator['message'] :
                             sprintf($this->t('Field \'%s\' is not valid'), $field),
