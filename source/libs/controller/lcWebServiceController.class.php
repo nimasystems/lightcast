@@ -62,6 +62,8 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         return null;
     }
 
+    const VALIDATOR_FILTERS_KEY = '_filters';
+
     protected function validateSet(array $data, array $input, $name = null)
     {
         $validation_errors = [];
@@ -69,6 +71,7 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
         $filtered_data = [];
 
         foreach ($data as $field => $validation_details) {
+
             $filtered_data[$field] = isset($input[$field]) ? $input[$field] : null;
 
             $options = isset($validation_details['options']) ? $validation_details['options'] : [];
@@ -118,6 +121,8 @@ abstract class lcWebServiceController extends lcWebBaseController implements iPl
                         $ffield_data = $filter($ffield_data);
                         unset($filter);
                     }
+
+                    $filtered_data[$field] = $ffield_data;
 
                     $vdata[] = [
                         'name' => $field,
