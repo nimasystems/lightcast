@@ -28,16 +28,6 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
     /** @var lcHTMLTemplateView */
     protected $view;
 
-    /** @var pCore */
-    protected $pcore;
-
-    public function initialize()
-    {
-        parent::initialize();
-
-        $this->pcore = lcApp::getInstance()->getPlugin('core');
-    }
-
     protected function getShouldApplyFilter()
     {
         // we support only lcHTMLTemplateView
@@ -268,6 +258,9 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         return $param_default;
     }
 
+    /** @var pCore */
+    private $pcore;
+
     public function parsedParamValue($name, $category, $default_value = null)
     {
         $ret = $default_value;
@@ -280,6 +273,10 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             }
         } else if ($category == 'res-img') {
             if ($ret) {
+                if (!$this->pcore) {
+                    $this->pcore = lcApp::getInstance()->getPlugin('core');
+                }
+
                 return $this->pcore->getImageResourceUrl($default_value);
             }
         } else if ($category == 'seopath') {
