@@ -40,6 +40,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
     protected $should_load_plugins = true;
     protected $should_use_default_loaders = false;
+    protected $should_disable_loaders = false;
     protected $should_disable_models = false;
     protected $should_disable_databases = false;
     protected $unique_id_suffix;
@@ -214,6 +215,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getShouldUseDefaultLoaders()
     {
         return $this->should_use_default_loaders;
+    }
+
+    public function getShouldDisableLoaders()
+    {
+        return $this->should_disable_loaders;
     }
 
     public function setShouldUseDefaultLoaders($use_default_loaders = false)

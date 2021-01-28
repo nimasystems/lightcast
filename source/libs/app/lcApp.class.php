@@ -86,17 +86,17 @@ class lcApp extends lcObj
     /**
      * @var lcSysObj[]
      */
-    protected $loader_instances;
+    protected $loader_instances = [];
 
     /**
      * @var lcSysObj[]
      */
-    protected $initialized_objects;
+    protected $initialized_objects = [];
 
     /**
      * @var array
      */
-    protected $platform_capabilities;
+    protected $platform_capabilities = [];
 
     /**
      * @var DateTimeZone

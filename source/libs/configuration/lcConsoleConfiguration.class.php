@@ -44,8 +44,12 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
                 $this->should_disable_databases = true;
             }
 
-            if (in_array('--disable-loaders', $_SERVER['argv'])) {
+            if (in_array('--use-default-loaders', $_SERVER['argv'])) {
                 $this->should_use_default_loaders = true;
+            }
+
+            if (in_array('--disable-loaders', $_SERVER['argv'])) {
+                $this->should_disable_loaders = true;
             }
 
             if (in_array('--disable-models', $_SERVER['argv'])) {
@@ -123,6 +127,18 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
             }
 
             unset($lhandler, $ldata);
+        } else if ($this->should_disable_loaders) {
+            $loader_requirements = lcLoadersConfigHandler::getLoaderRequirements();
+
+            $new_loaders = [];
+
+            foreach ($config_data['loaders'] as $loader => $cls) {
+                if (isset($loader_requirements[$loader]) && ($loader_requirements[$loader]['required'])) {
+                    $new_loaders[$loader] = $cls;
+                }
+            }
+
+            $config_data['loaders'] = $new_loaders;
         }
 
         // disable database configuration if requested
