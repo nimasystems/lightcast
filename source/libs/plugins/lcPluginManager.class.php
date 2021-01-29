@@ -571,6 +571,11 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function initializePlugin($plugin_name, $load_dependancies = true, $throw_if_missing = true)
     {
+        // TODO: rework this! Even if they do not start now the plugins must finish their initialization when manually called by getPlugin()
+        if (!$this->should_load_plugins) {
+            return null;
+        }
+
         if (!$plugin_name) {
             throw new lcInvalidArgumentException('Invalid plugin');
         }
@@ -645,30 +650,28 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 'plugin_instance' => &$plugin_object,
             ];
 
-            // TODO: rework this! Even if they do not start now the plugins must finish their initialization when manually called by getPlugin()
-            if ($this->should_load_plugins) {
-                if ($plugin_object instanceof lcResidentObj) {
-                    $plugin_object->attachRegisteredEvents();
-                }
-
-                // notify before the initialization
-                $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
-
-                // initialize it
-                $plugin_object->initialize();
-
-                // register object provider
-                $camelized_name = 'getPluginCallback';
-                $this->event_dispatcher->registerProvider('plugin.' . $plugin_name, $this, $camelized_name);
-
-                // notify about the initialization
-                $this->event_dispatcher->notify(new lcEvent('plugin.startup', $this, $plugin_params));
-                $this->event_dispatcher->notify(new lcEvent('plugin.' . $plugin_name . '.startup', $this, $plugin_params));
-
-                // now send the app initialization notification
-                // it will be handled only if the app is available and fully initialized
-                $this->notifyPluginOfAppInitialization($plugin_object);
+            if ($plugin_object instanceof lcResidentObj) {
+                $plugin_object->attachRegisteredEvents();
             }
+
+            // notify before the initialization
+            $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
+
+            // initialize it
+            $plugin_object->initialize();
+
+            // register object provider
+            $camelized_name = 'getPluginCallback';
+            $this->event_dispatcher->registerProvider('plugin.' . $plugin_name, $this, $camelized_name);
+
+            // notify about the initialization
+            $this->event_dispatcher->notify(new lcEvent('plugin.startup', $this, $plugin_params));
+            $this->event_dispatcher->notify(new lcEvent('plugin.' . $plugin_name . '.startup', $this, $plugin_params));
+
+            // now send the app initialization notification
+            // it will be handled only if the app is available and fully initialized
+            $this->notifyPluginOfAppInitialization($plugin_object);
+
 
             return $plugin_object;
         } catch (Exception $e) {

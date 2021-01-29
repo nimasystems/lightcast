@@ -621,7 +621,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         }
 
         // plugin dependancies
-        if ($this->plugin_manager) {
+        if ($this->plugin_manager && $this->plugin_manager->getShouldLoadPlugins()) {
             $plugins = [];
             $context_plugin_name = $this->context_name;
             $my_plugin = null;
