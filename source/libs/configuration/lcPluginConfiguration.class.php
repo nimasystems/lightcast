@@ -185,6 +185,11 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         return $this->getIdentifier();
     }
 
+    /**
+     * @return string
+     * @throws lcNotImplemented
+     * @noinspection PhpMissingReturnTypeInspection
+     */
     public function getIdentifier()
     {
         throw new lcNotImplemented($this->t('Plugin must define a correct unique identifier'));

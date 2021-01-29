@@ -111,7 +111,8 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                         $res = [
                             'is_default' => $db['is_default'],
                             'name' => $db['name'],
-                            'connection' => $db_object->getConnection(),
+                            // Removed as it causes a side effect - the db connection is initialized at all times, even if we don't need it
+                            //                            'connection' => $db_object->getConnection(),
                         ];
 
                         $connection = $this->dbs[$name];
@@ -155,9 +156,9 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
         if ($magic_quotes_gpc || $magic_quotes_sybase || $ze1_compatibility_mode) {
             throw new lcSystemException("Propel requires the following PHP settings:\n
-					- ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ")
-					- magic_quotes_sybase = Off (Currently: " . ($magic_quotes_sybase ? 'On' : 'Off') . ")
-					- magic_quotes_gpc = Off (Currently: " . ($magic_quotes_gpc ? 'On' : 'Off') . ")");
+                    - ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ")
+                    - magic_quotes_sybase = Off (Currently: " . ($magic_quotes_sybase ? 'On' : 'Off') . ")
+                    - magic_quotes_gpc = Off (Currently: " . ($magic_quotes_gpc ? 'On' : 'Off') . ")");
         }
         // @codingStandardsIgnoreEnd
 
@@ -223,7 +224,6 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                 $cfg = $this->getPropelConfigForDatabase($db);
 
                 if (!$cfg) {
-                    assert(false);
                     continue;
                 }
 
@@ -244,10 +244,9 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         $this->propel_config = $propel_config;
     }
 
-    private function getPropelConfigForDatabase(array $db_config)
+    private function getPropelConfigForDatabase(array $db_config): ?array
     {
         if (!isset($db_config['url']) || !isset($db_config['datasource'])) {
-            assert(false);
             return null;
         }
 
@@ -353,7 +352,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         return $this->migration_helper;
     }
 
-    public function getConnection($name = null)
+    public function getConnection($name = null): ?PDO
     {
         $db = $this->getDatabase($name);
 
@@ -368,7 +367,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
      * @param null $name
      * @return lcDatabase
      */
-    public function getDatabase($name = null)
+    public function getDatabase($name = null): ?lcDatabase
     {
         if (!isset($name)) {
             $name = $this->default_database;
@@ -412,12 +411,12 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
     #pragma mark - Propel
 
-    public function getCapabilities()
+    public function getCapabilities(): array
     {
         return ['database'];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'databases' => array_keys($this->dbs),
@@ -425,7 +424,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         $databases = $this->dbs;
 
@@ -456,7 +455,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         return $debug_info;
     }
 
-    public function getNames()
+    public function getNames(): array
     {
         return array_keys($this->dbs);
     }

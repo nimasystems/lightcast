@@ -106,14 +106,14 @@ class lcApp extends lcObj
     private $initialized;
     private $no_shutdown;
 
-    public static function bootstrap(lcApplicationConfiguration $configuration)
+    public static function bootstrap(lcApplicationConfiguration $configuration): lcApp
     {
         $app = lcApp::getInstance();
         $app->initialize($configuration);
         return $app;
     }
 
-    public static function getInstance()
+    public static function getInstance(): lcApp
     {
         if (!self::$app) {
             self::$app = new lcApp();
@@ -121,7 +121,7 @@ class lcApp extends lcObj
         return self::$app;
     }
 
-    public function initialize(lcApplicationConfiguration $configuration)
+    public function initialize(lcApplicationConfiguration $configuration): bool
     {
         if ($this->initialized) {
             return false;
@@ -290,7 +290,7 @@ class lcApp extends lcObj
     /**
      * @return DateTimeZone
      */
-    public function getDefaultTimezone()
+    public function getDefaultTimezone(): DateTimeZone
     {
         return $this->default_timezone;
     }
@@ -639,7 +639,7 @@ class lcApp extends lcObj
     {
         // set timezone
         $tz = $this->configuration['settings.timezone'] ?: lcVm::date_default_timezone_get();
-        return $this->setDefaultTimezone(new DateTimeZone($tz));
+        $this->setDefaultTimezone(new DateTimeZone($tz));
     }
 
     private function initDatabaseModelManager()
@@ -848,7 +848,7 @@ class lcApp extends lcObj
                         }
 
                         // if enabled - try go acquire an instance
-                        $plugin_instance = $plugin_manager->getPlugin($context_name, true);
+                        $plugin_instance = $plugin_manager->getPlugin($context_name);
 
                         if (!$plugin_instance) {
                             throw new lcSystemException('System loader (' . $loader . '): \'' . $class_name .
@@ -1043,7 +1043,7 @@ class lcApp extends lcObj
         return ($i18n ? $i18n->translateInContext($context_type, $context_name, $string, $translation_domain) : $string);
     }
 
-    public function getDelegate()
+    public function getDelegate(): iAppDelegate
     {
         return $this->delegate;
     }
@@ -1273,7 +1273,7 @@ class lcApp extends lcObj
     }
 
     /**
-     * @param Exception $exception
+     * @param Exception|Error $exception
      * @throws Exception
      */
     public function handleException($exception)
@@ -1318,7 +1318,7 @@ class lcApp extends lcObj
         }
     }
 
-    public function getDebugSnapshot($short = false)
+    public function getDebugSnapshot($short = false): array
     {
         $snapshot = [
             'is_debugging' => DO_DEBUG,
@@ -1365,6 +1365,7 @@ class lcApp extends lcObj
         return $snapshot;
     }
 
+    /** @noinspection PhpMissingReturnTypeInspection */
     public function __call($method, array $params = null)
     {
         // get an instance of a system object if available
@@ -1381,12 +1382,12 @@ class lcApp extends lcObj
         return parent::__call($method, $params);
     }
 
-    public function getEventDispatcher()
+    public function getEventDispatcher(): lcEventDispatcher
     {
         return $this->event_dispatcher;
     }
 
-    public function getProfiler()
+    public function getProfiler(): lcProfiler
     {
         return $this->profiler;
     }
@@ -1401,7 +1402,7 @@ class lcApp extends lcObj
         $this->configuration = $configuration;
     }
 
-    public function getPlugin($plugin_name)
+    public function getPlugin($plugin_name): ?lcPlugin
     {
         $plugin_manager = $this->getPluginManager();
         return $plugin_manager ? $plugin_manager->getPlugin($plugin_name) : null;
@@ -1410,17 +1411,17 @@ class lcApp extends lcObj
     /*
      * @deprecated The method is used by LC 1.4 projects
     */
-    public function getContext()
+    public function getContext(): lcApp
     {
         return $this;
     }
 
-    public function getSystemObjects()
+    public function getSystemObjects(): array
     {
         return $this->initialized_objects;
     }
 
-    public function getPlatformCapabilities()
+    public function getPlatformCapabilities(): array
     {
         return $this->platform_capabilities;
     }
@@ -1428,7 +1429,7 @@ class lcApp extends lcObj
     /*
      * @deprecated The method is used by LC 1.4 projects
     */
-    public function getLoaders()
+    public function getLoaders(): array
     {
         return $this->initialized_objects;
     }

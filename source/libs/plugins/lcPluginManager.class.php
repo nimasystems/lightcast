@@ -92,10 +92,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->enabled_plugins = array_unique((array)$this->configuration->getEnabledPlugins());
 
         $this->loadAutoloadPluginConfig();
-
-        if ($this->should_load_plugins) {
-            $this->initializeEnabledPlugins();
-        }
+        $this->initializeEnabledPlugins();
 
         // register local cache manager through event dispatcher
         //$this->event_dispatcher->notify(new lcEvent('local_cache.register', $this, array('key' => 'plugins')));
@@ -167,7 +164,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return null;
     }
 
-    public function getSystemComponentFactory()
+    public function getSystemComponentFactory(): lcSystemComponentFactory
     {
         return $this->system_component_factory;
     }
@@ -341,7 +338,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $cls_names;
     }
 
-    public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null)
+    public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null): ?lcPluginConfiguration
     {
         // new autoload files
         if ($this->configuration->isTargetingLC15()) {
@@ -353,7 +350,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
         if (!isset($this->included_plugin_classes[$plugin_name])) {
             // try to include and store the configuration
-            $class_name = $this->tryIncludePluginConfigurationFile($root_dir, $plugin_name, false);
+            $class_name = $this->tryIncludePluginConfigurationFile($root_dir, $plugin_name);
 
             if (!$class_name) {
                 return null;
@@ -391,7 +388,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             throw new lcSystemException('Plugin configuration is invalid - not inherited from lcPluginConfiguration');
         }
 
-        $configuration = !$configuration ? new lcPluginConfiguration() : $configuration;
+//        $configuration = !$configuration ? new lcPluginConfiguration() : $configuration;
 
         $configuration->setRootDir($root_dir);
         $configuration->setWebPath($web_path);
@@ -413,6 +410,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $schema = null;
 
         if ($plugin_config) {
+            // TODO: fixme - undefined
             $schema = $plugin_config->getDatabaseMigrationSchema();
 
             if ($schema instanceof lcSysObj) {
@@ -433,7 +431,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $schema;
     }
 
-    public function getPluginConfiguration($plugin_name)
+    public function getPluginConfiguration($plugin_name): ?lcPluginConfiguration
     {
         if (!isset($this->plugin_configurations[$plugin_name])) {
             $available_plugins = $this->system_component_factory->getAvailableSystemPlugins();
@@ -512,7 +510,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         // compile debug info
         $dbg = [];
@@ -531,9 +529,13 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $dbg;
     }
 
+    /**
+     * @return array|mixed|null
+     * @noinspection PhpMissingReturnTypeInspection
+     */
     public function getShortDebugInfo()
     {
-        return false;
+        return null;
     }
 
     public function willSendNotification(lcEventDispatcher $event_dispatcher, lcEvent $event, lcObj $invoker = null)
@@ -643,27 +645,30 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 'plugin_instance' => &$plugin_object,
             ];
 
-            if ($plugin_object instanceof lcResidentObj) {
-                $plugin_object->attachRegisteredEvents();
+            // TODO: rework this! Even if they do not start now the plugins must finish their initialization when manually called by getPlugin()
+            if ($this->should_load_plugins) {
+                if ($plugin_object instanceof lcResidentObj) {
+                    $plugin_object->attachRegisteredEvents();
+                }
+
+                // notify before the initialization
+                $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
+
+                // initialize it
+                $plugin_object->initialize();
+
+                // register object provider
+                $camelized_name = 'getPluginCallback';
+                $this->event_dispatcher->registerProvider('plugin.' . $plugin_name, $this, $camelized_name);
+
+                // notify about the initialization
+                $this->event_dispatcher->notify(new lcEvent('plugin.startup', $this, $plugin_params));
+                $this->event_dispatcher->notify(new lcEvent('plugin.' . $plugin_name . '.startup', $this, $plugin_params));
+
+                // now send the app initialization notification
+                // it will be handled only if the app is available and fully initialized
+                $this->notifyPluginOfAppInitialization($plugin_object);
             }
-
-            // notify before the initialization
-            $this->event_dispatcher->notify(new lcEvent('plugin.will_startup', $this, $plugin_params));
-
-            // initialize it
-            $plugin_object->initialize();
-
-            // register object provider
-            $camelized_name = 'getPluginCallback';
-            $this->event_dispatcher->registerProvider('plugin.' . $plugin_name, $this, $camelized_name);
-
-            // notify about the initialization
-            $this->event_dispatcher->notify(new lcEvent('plugin.startup', $this, $plugin_params));
-            $this->event_dispatcher->notify(new lcEvent('plugin.' . $plugin_name . '.startup', $this, $plugin_params));
-
-            // now send the app initialization notification
-            // it will be handled only if the app is available and fully initialized
-            $this->notifyPluginOfAppInitialization($plugin_object);
 
             return $plugin_object;
         } catch (Exception $e) {
@@ -673,7 +678,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
     }
 
-    public function hasPlugin($plugin_name)
+    public function hasPlugin($plugin_name): bool
     {
         if (!isset($plugin_name)) {
             return false;
@@ -682,7 +687,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return isset($this->plugins[$plugin_name]);
     }
 
-    public function validatePluginConfigMeetsPlatformConstraints(lcPluginConfiguration $plugin_configuration)
+    public function validatePluginConfigMeetsPlatformConstraints(lcPluginConfiguration $plugin_configuration): bool
     {
         // verify if the target / minimum versions are met
         $target_version = $plugin_configuration->getTargetFrameworkVersion();
@@ -830,7 +835,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
     }
 
-    public function getAppContext()
+    public function getAppContext(): lcApp
     {
         return $this->app_context;
     }
@@ -840,7 +845,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->app_context = $app_context;
     }
 
-    public function getDatabaseModelManager()
+    public function getDatabaseModelManager(): lcDatabaseModelManager
     {
         return $this->database_model_manager;
     }
@@ -850,7 +855,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->database_model_manager = $database_model_manager;
     }
 
-    public function getShouldLoadPlugins()
+    public function getShouldLoadPlugins(): bool
     {
         return $this->should_load_plugins;
     }
@@ -860,7 +865,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $this->should_load_plugins = $should_load_plugins;
     }
 
-    public function getPluginConfigurations()
+    public function getPluginConfigurations(): array
     {
         return $this->plugin_configurations;
     }
@@ -1089,7 +1094,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      * @throws lcInvalidArgumentException
      * @throws lcPluginException
      */
-    public function getPlugin($plugin_name, $try_initialize = true, $throw_if_missing = true)
+    public function getPlugin($plugin_name, $try_initialize = true, $throw_if_missing = true): ?lcPlugin
     {
         if (!isset($this->plugins[$plugin_name]) && $try_initialize) {
             // try to initialize it
@@ -1099,7 +1104,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
     }
 
-    public function getPlugins()
+    public function getPlugins(): array
     {
         return $this->plugins;
     }
@@ -1121,7 +1126,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return isset($this->plugins[$plugin]) ? $this->plugins[$plugin] : null;
     }
 
-    public function writeClassCache()
+    public function writeClassCache(): array
     {
         // we need to store them serialized and read them later on - when all classes are made available
         // otherwise when expanding them into objects - they won't be found!

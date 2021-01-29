@@ -21,6 +21,10 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * Class lcAppObj
+ * @property PDO $pdc
+ */
 abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggable
 {
     /**
@@ -71,12 +75,21 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
      */
     protected $dbc;
 
+    /** @noinspection PhpMissingReturnTypeInspection */
+    public function __get($property)
+    {
+        // @deprecated - 'dbc' has to be removed eventually someday!
+        if ($property === 'dbc') {
+            return $this->database_manager ? $this->database_manager->getConnection() : null;
+        }
+    }
+
     /**
      * Returns an instance of the Response loader
      *
      * @return lcRequest
      */
-    public function getRequest()
+    public function getRequest(): ?lcRequest
     {
         return $this->request;
     }
@@ -91,7 +104,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
      *
      * @return lcResponse
      */
-    public function getResponse()
+    public function getResponse(): ?lcResponse
     {
         return $this->response;
     }
@@ -115,7 +128,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcRouting
      */
-    public function getRouter()
+    public function getRouter(): ?lcRouting
     {
         return $this->getRouting();
     }
@@ -123,7 +136,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcRouting
      */
-    public function getRouting()
+    public function getRouting(): ?lcRouting
     {
         return $this->routing;
     }
@@ -139,7 +152,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcMailer
      */
-    public function getMailer()
+    public function getMailer(): ?lcMailer
     {
         return $this->mailer;
     }
@@ -152,7 +165,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcDatabaseManager
      */
-    public function getDatabaseManager()
+    public function getDatabaseManager(): ?lcDatabaseManager
     {
         return $this->database_manager;
     }
@@ -160,14 +173,13 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     public function setDatabaseManager(lcDatabaseManager $database_manager = null)
     {
         $this->database_manager = $database_manager;
-        $this->dbc = $this->database_manager ? $this->database_manager->getConnection() : null;
     }
 
     /**
      * @param null $name
      * @return PDO|null
      */
-    public function getDatabase($name = null)
+    public function getDatabase($name = null): ?PDO
     {
         return $this->database_manager->getConnection($name);
     }
@@ -175,7 +187,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcStorage
      */
-    public function getStorage()
+    public function getStorage(): ?lcStorage
     {
         return $this->storage;
     }
@@ -188,7 +200,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcAppSecurityUser
      */
-    public function getUser()
+    public function getUser(): ?lcAppSecurityUser
     {
         return $this->user;
     }
@@ -208,7 +220,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcDataStorage
      */
-    public function getDataStorage()
+    public function getDataStorage(): ?lcDataStorage
     {
         return $this->data_storage;
     }
@@ -221,7 +233,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     /**
      * @return lcCacheStore
      */
-    public function getCache()
+    public function getCache(): ?lcCacheStore
     {
         return $this->cache;
     }

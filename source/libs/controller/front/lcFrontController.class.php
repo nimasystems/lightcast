@@ -137,7 +137,6 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
                 $obj->initialize();
 
                 if ($obj instanceof lcViewFilter) {
-                    /** @var lcViewFilter $obj */
                     $this->view_filter_chain->addViewFilter($obj);
                 }
 
@@ -212,7 +211,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->forward($request_params['module'], $request_params['action'], ['request' => $request_params]);
     }
 
-    protected function fixDispatchParams(& $data)
+    protected function fixDispatchParams(&$data)
     {
         foreach ($data as $key => $val) {
             if ($key == 'module' || $key == 'action') {
@@ -330,12 +329,12 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         throw new lcControllerForwardException('Could not forward to controller action');
     }
 
-    public function getControllerStack()
+    public function getControllerStack(): lcControllerStack
     {
         return $this->controller_stack;
     }
 
-    public function getTopController()
+    public function getTopController(): ?lcController
     {
         if (!$this->controller_stack) {
             return null;
@@ -346,7 +345,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         return $controller_instance ? $controller_instance->getControllerInstance() : null;
     }
 
-    public function getLastController()
+    public function getLastController(): ?lcController
     {
         if (!$this->controller_stack) {
             return null;
@@ -374,7 +373,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         }
     }
 
-    protected static function forwardReservedParams()
+    protected static function forwardReservedParams(): array
     {
         return [
             'type',
@@ -382,7 +381,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         ];
     }
 
-    public function getSystemComponentFactory()
+    public function getSystemComponentFactory(): lcSystemComponentFactory
     {
         return $this->system_component_factory;
     }
@@ -392,7 +391,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->system_component_factory = $component_factory;
     }
 
-    public function getDatabaseModelManager()
+    public function getDatabaseModelManager(): lcDatabaseModelManager
     {
         return $this->database_model_manager;
     }
@@ -402,7 +401,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->database_model_manager = $database_model_manager;
     }
 
-    public function getPluginManager()
+    public function getPluginManager(): lcPluginManager
     {
         return $this->plugin_manager;
     }
