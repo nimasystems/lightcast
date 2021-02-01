@@ -70,11 +70,6 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
      */
     protected $mailer;
 
-    /**
-     * @var lcPropelConnection
-     */
-    protected $dbc;
-
     /** @noinspection PhpMissingReturnTypeInspection */
     public function __get($property)
     {
