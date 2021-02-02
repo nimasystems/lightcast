@@ -23,7 +23,7 @@
 
 /**
  * Class lcAppObj
- * @property PDO $pdc
+ * @property PDO $dbc
  */
 abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggable
 {
@@ -76,6 +76,15 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
         // @deprecated - 'dbc' has to be removed eventually someday!
         if ($property === 'dbc') {
             return $this->database_manager ? $this->database_manager->getConnection() : null;
+        }
+    }
+
+    public function __set($property, $value = null)
+    {
+        // @deprecated - 'dbc' has to be removed eventually someday!
+        /** @noinspection PhpStatementHasEmptyBodyInspection */
+        if ($property === 'dbc') {
+            //
         }
     }
 
