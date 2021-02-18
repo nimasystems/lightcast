@@ -21,6 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
+use Symfony\Component\Dotenv\Dotenv;
+
 class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels, iSupportsDbModelOperations,
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
@@ -95,6 +97,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function initialize()
     {
+        $this->loadEnvData();
+
         parent::initialize();
 
         if (!$this->app_root_dir) {
@@ -104,6 +108,29 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->tmp_dir = !$this->tmp_dir ? $this->getProjectDir() . DS . self::TMP_DIR_NAME : $this->tmp_dir;
 
         $this->set('settings.debug', $this->debugging);
+    }
+
+    protected function loadEnvData()
+    {
+        $dotenv = new Dotenv();
+        // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
+        $dotenv->loadEnv($this->getEnvFilename());
+        $this->updateSharedEnvVars();
+    }
+
+    protected function updateSharedEnvVars()
+    {
+        if ($_ENV) {
+            foreach ($_ENV as $key => $val) {
+                self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
+                unset($key, $val);
+            }
+        }
+    }
+
+    protected function getEnvFilename(): string
+    {
+        return $this->getProjectDir() . DS . '.env';
     }
 
     public function getProjectDir()
@@ -990,7 +1017,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     /**
      * @return array
      */
-    public function getConfigParserVars()
+    public function getConfigParserVars(): array
     {
         return [];
     }

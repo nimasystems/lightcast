@@ -41,6 +41,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         lcEnvConfigHandler::ENVIRONMENT_TESTING,
     ];
 
+    protected static $shared_config_parser_vars = [];
+
     public function initialize()
     {
         parent::initialize();
@@ -116,7 +118,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
             $handler->setEnvironments($this->environments);
 
             try {
-                $handler_configuration = $handler->getConfigurationData($config_key, $this->environment, $defaults, $this->getConfigParserVars());
+                $handler_configuration = $handler->getConfigurationData($config_key, $this->environment, $defaults, $this->getPreparedConfigParserVars());
             } catch (Exception $e) {
                 throw new lcConfigException('Error while loading configuration from handler: ' . $config_handler_type . ', Config Key: ' . $config_key . ': ' . $e->getMessage(), $e->getCode(), $e);
             }
@@ -138,6 +140,18 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         $configuration['debug'] = (bool)DO_DEBUG;
 
         return $configuration;
+    }
+
+    protected function getPreparedConfigParserVars(): array
+    {
+        $vars_prepared = [];
+        $vars = (array)$this->getConfigParserVars();
+
+        foreach ($vars as $key => $val) {
+            $vars_prepared['{{' . $key . '}}'] = $val;
+        }
+
+        return $vars_prepared + self::$shared_config_parser_vars;
     }
 
     /**

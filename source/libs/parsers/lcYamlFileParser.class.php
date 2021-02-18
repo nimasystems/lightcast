@@ -20,8 +20,6 @@
  * E-Mail: info@nimasystems.com
  */
 
-require_once('parsers' . DS . 'lcFileParser.class.php');
-
 class lcYamlFileParser extends lcFileParser
 {
     const DEFAULT_EXT = '.yml';
@@ -33,11 +31,11 @@ class lcYamlFileParser extends lcFileParser
      * @param array $vars
      * @return string
      */
-    protected function parseConfigVars($content, array $vars)
+    protected function parseConfigVars(string $content, array $vars): string
     {
         if ($vars) {
             foreach ($vars as $key => $value) {
-                $content = str_replace('{{' . $key . '}}', $value, $content);
+                $content = str_replace($key, $value, $content);
             }
         }
 
@@ -51,7 +49,7 @@ class lcYamlFileParser extends lcFileParser
         try {
             require_once(ROOT . DS . 'source' . DS . '3rdparty' . DS . 'spyc' . DS . DS . 'spyc.php');
 
-            $config_vars = isset($options['config_vars']) ? (array)$options['config_vars'] : array();
+            $config_vars = isset($options['config_vars']) ? (array)$options['config_vars'] : [];
 
             // syck / yaml are MUCH FASTER!
             if (function_exists('yaml_parse')) {
@@ -94,7 +92,7 @@ class lcYamlFileParser extends lcFileParser
         }
     }
 
-    private function fixSpycContent($yaml_content)
+    private function fixSpycContent($yaml_content): string
     {
         // iterate thru string
         $final = '';
@@ -116,7 +114,7 @@ class lcYamlFileParser extends lcFileParser
         return $final;
     }
 
-    public function writeData($data, array $options = null)
+    public function writeData($data, array $options = null): bool
     {
         $filename = $this->filename;
         $data = is_array($data) ? $data : null;

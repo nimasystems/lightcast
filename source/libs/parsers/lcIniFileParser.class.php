@@ -22,8 +22,6 @@
 
 */
 
-require_once 'parsers' . DS . 'lcFileParser.class.php';
-
 class lcIniFileParser extends lcFileParser
 {
     const DEFAULT_EXT = '.ini';
@@ -33,11 +31,11 @@ class lcIniFileParser extends lcFileParser
      * @param array $vars
      * @return string
      */
-    protected function parseConfigVars($content, array $vars)
+    protected function parseConfigVars(string $content, array $vars): string
     {
         if ($vars) {
             foreach ($vars as $key => $value) {
-                $content = str_replace('{{' . $key . '}}', $value, $content);
+                $content = str_replace($key, $value, $content);
             }
         }
 
@@ -54,7 +52,7 @@ class lcIniFileParser extends lcFileParser
             return false;
         }
 
-        $config_vars = isset($options['config_vars']) ? (array)$options['config_vars'] : array();
+        $config_vars = isset($options['config_vars']) ? (array)$options['config_vars'] : [];
 
         $data = $this->parseConfigVars($data, $config_vars);
 
@@ -92,7 +90,7 @@ class lcIniFileParser extends lcFileParser
         return $vals;
     }
 
-    public function writeData($data, array $options = null)
+    public function writeData($data, array $options = null): bool
     {
         $data = is_array($data) ? $data : null;
 

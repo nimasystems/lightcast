@@ -27,16 +27,16 @@ abstract class lcConfigHandler extends lcObj
     protected $data_provider;
 
     /** @var array */
-    protected $options;
+    protected $options = [];
 
-    protected $environments;
+    protected $environments = [];
 
     /**
      * @param $handler_type
      * @return lcConfigHandler
      * @throws lcSystemException
      */
-    public static function & getConfigHandler($handler_type)
+    public static function & getConfigHandler($handler_type): lcConfigHandler
     {
         $handler_type = lcInflector::camelize($handler_type, false);
 
@@ -58,7 +58,7 @@ abstract class lcConfigHandler extends lcObj
         return $handler;
     }
 
-    public function getDataProvider()
+    public function getDataProvider(): iConfigDataProvider
     {
         return $this->data_provider;
     }
@@ -68,7 +68,7 @@ abstract class lcConfigHandler extends lcObj
         $this->data_provider = $data_provider;
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -78,18 +78,16 @@ abstract class lcConfigHandler extends lcObj
         $this->options = $options;
     }
 
-    public function setEnvironments(array $environments = null)
+    public function setEnvironments(array $environments = [])
     {
         $this->environments = $environments;
     }
 
-    public function getConfigurationData($config_key, $environment, array $source_defaults = null, array $config_vars = null)
+    public function getConfigurationData($config_key, $environment, array $source_defaults = null, array $config_vars = []): array
     {
         if (!$this->data_provider) {
             throw new lcConfigException('No data provider set');
         }
-
-        assert(!is_null($environment));
 
         if ($environment == lcEnvConfigHandler::ENVIRONMENT_ALL) {
             throw new lcConfigException('Environment \'all\' is special and cannot be set as the currently active one!');
@@ -146,7 +144,6 @@ abstract class lcConfigHandler extends lcObj
         $data = (array)$this->postReadConfigData($environment, $data);
 
         $data = lcArrays::arrayFilterDeep($data, true);
-        $data = $data ? $data : null;
 
         return $data;
     }
@@ -156,11 +153,13 @@ abstract class lcConfigHandler extends lcObj
         return null;
     }
 
+    /** @noinspection PhpUnusedParameterInspection */
     protected function preReadConfigData($environment, array $data)
     {
         return $data;
     }
 
+    /** @noinspection PhpUnusedParameterInspection */
     protected function postReadConfigData($environment, array $data)
     {
         return $data;

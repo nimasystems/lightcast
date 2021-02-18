@@ -21,8 +21,6 @@
 
  */
 
-require_once 'parsers' . DS . 'lcIniFileParser.class.php';
-
 class lcIniConfigDataProvider extends lcObj implements iConfigDataProvider
 {
     const DEFAULT_EXT = '.ini';
@@ -39,11 +37,11 @@ class lcIniConfigDataProvider extends lcObj implements iConfigDataProvider
 
         $ini_parser = new lcIniFileParser($filename);
         return $ini_parser->parse([
-            'config_vars' => $config_vars
+            'config_vars' => $config_vars,
         ]);
     }
 
-    public function writeConfigData($config_key, array $config_data, array $options = null)
+    public function writeConfigData($config_key, array $config_data, array $options = null): bool
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
 
