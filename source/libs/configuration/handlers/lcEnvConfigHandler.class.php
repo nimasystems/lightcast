@@ -23,15 +23,15 @@
 
 abstract class lcEnvConfigHandler extends lcConfigHandler
 {
-    const ENVIRONMENT_ALL = 'all';
-    const ENVIRONMENT_DEBUG = 'debug';
-    const ENVIRONMENT_RELEASE = 'production';
-    const ENVIRONMENT_TESTING = 'testing';
+    const ENV_ALL = 'all';
+    const ENV_DEV = 'dev';
+    const ENV_PROD = 'prod';
+    const ENV_STAGING = 'stage';
 
-    protected function preReadConfigData($environment, array $data)
+    protected function preReadConfigData($environment, array $data): array
     {
         $env_data = ($environment && isset($data[$environment])) ? (array)$data[$environment] : [];
-        $all_data = isset($data[lcEnvConfigHandler::ENVIRONMENT_ALL]) ? (array)$data[lcEnvConfigHandler::ENVIRONMENT_ALL] : [];
+        $all_data = isset($data[lcEnvConfigHandler::ENV_ALL]) ? (array)$data[lcEnvConfigHandler::ENV_ALL] : [];
 
         if (!$env_data && !$all_data) {
             return $data;

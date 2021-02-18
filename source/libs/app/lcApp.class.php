@@ -1136,7 +1136,11 @@ class lcApp extends lcObj
             $this->shutdownLoaderInstances();
 
             // shutdown plugin manager and all plugins
-            $this->getPluginManager()->shutdown();
+            $plugin_manager = $this->getPluginManager();
+
+            if ($plugin_manager) {
+                $plugin_manager->shutdown();
+            }
 
             // disconnect all event dispatcher listeners / remove all observers
             if ($this->event_dispatcher) {

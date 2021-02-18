@@ -21,6 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
+use Symfony\Component\Dotenv\Dotenv;
+
 /**
  * @method getProjectDir()
  * @method getProjectName()
@@ -54,6 +56,9 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // may be overriden before initialization
         $this->project_configuration = $project_configuration ? $project_configuration : new lcProjectConfiguration();
         $this->project_configuration->setProjectDir($project_dir);
+
+        $this->initVendor();
+        $this->loadEnvData();
 
         parent::__construct();
     }
@@ -103,7 +108,49 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // pass the project base dir
         $this->base_config_dir = $this->project_configuration->getBaseConfigDir();
 
+        $this->prepareEnv();
+
         parent::initialize();
+    }
+
+    protected function updateSharedEnvVars()
+    {
+        if ($_ENV) {
+            foreach ($_ENV as $key => $val) {
+                self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
+                unset($key, $val);
+            }
+        }
+    }
+
+    protected function initVendor()
+    {
+        /** @noinspection PhpIncludeInspection */
+        include_once($this->getProjectDir() . DS . 'vendor' . DS . 'autoload.php');
+    }
+
+    protected function loadEnvData()
+    {
+        $dotenv = new Dotenv();
+        // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
+        $dotenv->loadEnv($this->project_configuration->getEnvFilename());
+
+        $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_PROD;
+        $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
+                $_ENV[lcProjectConfiguration::ENV_APP_DEBUG]);
+
+        define('DO_DEBUG', $is_debugging);
+        define('CONFIG_ENV', $env);
+        define('CONFIG_VARIATION', 'default');
+
+        $this->setIsDebugging($is_debugging);
+        $this->project_configuration->setConfigEnvironment(CONFIG_ENV);
+        $this->project_configuration->setConfigVariation(CONFIG_VARIATION);
+    }
+
+    protected function prepareEnv()
+    {
+        $this->updateSharedEnvVars();
     }
 
     public function shutdown()
@@ -178,13 +225,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     {
         if ($this->project_configuration) {
             $this->project_configuration->setIsDebugging($debug);
-        }
-
-        // disable caching the configuration if debugging
-        if ($debug) {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
-        } else {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
         }
     }
 

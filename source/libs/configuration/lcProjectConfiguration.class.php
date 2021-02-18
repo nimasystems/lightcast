@@ -21,8 +21,6 @@
 * E-Mail: info@nimasystems.com
 */
 
-use Symfony\Component\Dotenv\Dotenv;
-
 class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels, iSupportsDbModelOperations,
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
@@ -36,6 +34,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     const TMP_DIR_NAME = 'tmp';
     const MODELS_DIR_NAME = 'models';
     const CACHE_DIR_NAME = 'cache';
+
+    const ENV_APP_DEBUG = 'APP_DEBUG';
 
     /** @var iAppDelegate */
     protected $app_delegate;
@@ -97,8 +97,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function initialize()
     {
-        $this->loadEnvData();
-
         parent::initialize();
 
         if (!$this->app_root_dir) {
@@ -110,25 +108,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->set('settings.debug', $this->debugging);
     }
 
-    protected function loadEnvData()
-    {
-        $dotenv = new Dotenv();
-        // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
-        $dotenv->loadEnv($this->getEnvFilename());
-        $this->updateSharedEnvVars();
-    }
-
-    protected function updateSharedEnvVars()
-    {
-        if ($_ENV) {
-            foreach ($_ENV as $key => $val) {
-                self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
-                unset($key, $val);
-            }
-        }
-    }
-
-    protected function getEnvFilename(): string
+    public function getEnvFilename(): string
     {
         return $this->getProjectDir() . DS . '.env';
     }
@@ -948,7 +928,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         parent::setEnvironment($environment);
 
         // set debugging if environment = debug
-        $this->setIsDebugging(($environment == lcEnvConfigHandler::ENVIRONMENT_DEBUG));
+        $this->setIsDebugging($environment == lcEnvConfigHandler::ENV_DEV);
     }
 
     public function setIsDebugging($debug = true)
@@ -960,10 +940,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         // disable caching the configuration if debugging
         if ($debug) {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_DEBUG;
             $this->use_class_cache = false;
         } else {
-            $this->environment = lcEnvConfigHandler::ENVIRONMENT_RELEASE;
             $this->use_class_cache = true;
         }
     }
@@ -971,7 +949,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     protected function setupErrorReporting()
     {
         // setup error reporting
-        $display_errors = (int)$this->isDebugging();
+        $display_errors = $this->isDebugging();
 
         // setup error reporting
         if ($display_errors) {

@@ -57,7 +57,7 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
             }
 
             if (in_array('--debug', $_SERVER['argv'])) {
-                $this->project_configuration->setIsDebugging(true);
+                $this->project_configuration->setIsDebugging();
             }
 
 //            // pick a different environment

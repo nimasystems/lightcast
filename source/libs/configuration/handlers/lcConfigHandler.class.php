@@ -89,7 +89,7 @@ abstract class lcConfigHandler extends lcObj
             throw new lcConfigException('No data provider set');
         }
 
-        if ($environment == lcEnvConfigHandler::ENVIRONMENT_ALL) {
+        if ($environment == lcEnvConfigHandler::ENV_ALL) {
             throw new lcConfigException('Environment \'all\' is special and cannot be set as the currently active one!');
         }
 
@@ -137,7 +137,7 @@ abstract class lcConfigHandler extends lcObj
                 unset($env);
             }
 
-            unset($data[lcEnvConfigHandler::ENVIRONMENT_ALL]);
+            unset($data[lcEnvConfigHandler::ENV_ALL]);
         }
 
         // allow subclassers to alter it
