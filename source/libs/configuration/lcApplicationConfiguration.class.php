@@ -156,6 +156,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
         }
 
+        //
+
         $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_DIST;
         $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
                 $_ENV[lcProjectConfiguration::ENV_APP_DEBUG]);
