@@ -28,7 +28,7 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     /*
      * Default configuration environment
      */
-    protected $environment = lcEnvConfigHandler::ENV_PROD;
+    protected $environment = lcEnvConfigHandler::ENV_DIST;
 
     /*
      * Default configuration environments
@@ -37,8 +37,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     protected $base_config_dir;
     private $environments = [
         lcEnvConfigHandler::ENV_DEV,
-        lcEnvConfigHandler::ENV_PROD,
-        lcEnvConfigHandler::ENV_STAGING,
+        lcEnvConfigHandler::ENV_DIST,
+        lcEnvConfigHandler::ENV_TEST,
     ];
 
     protected static $shared_config_parser_vars = [];

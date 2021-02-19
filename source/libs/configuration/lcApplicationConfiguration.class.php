@@ -58,7 +58,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->project_configuration->setProjectDir($project_dir);
 
         $this->initVendor();
-        $this->loadEnvData();
 
         parent::__construct();
     }
@@ -129,13 +128,24 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         include_once($this->getProjectDir() . DS . 'vendor' . DS . 'autoload.php');
     }
 
-    protected function loadEnvData()
+    public function initializeEnvironment()
     {
+        $env_filename = $this->project_configuration->getEnvFilename();
+        $predefined_env = null;
+
+        if (defined('CONFIG_ENV')) {
+            $predefined_env = CONFIG_ENV;
+        } else if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV']) {
+            $predefined_env = $_ENV['APP_ENV'];
+        }
+
+        $env_filename .= $predefined_env ? '.' . $predefined_env : '';
+
         $dotenv = new Dotenv();
         // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
-        $dotenv->loadEnv($this->project_configuration->getEnvFilename());
+        $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
 
-        $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_PROD;
+        $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_DIST;
         $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
                 $_ENV[lcProjectConfiguration::ENV_APP_DEBUG]);
 

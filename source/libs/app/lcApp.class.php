@@ -142,6 +142,7 @@ class lcApp extends lcObj
 
         $this->configuration = $configuration;
         $this->configuration->initDefaultSystemObjects();
+        $this->configuration->initializeEnvironment();
 
         // assign the delegate
         $this->delegate = $this->configuration->getAppDelegate();
