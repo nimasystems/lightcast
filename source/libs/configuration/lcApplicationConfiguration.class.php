@@ -131,19 +131,30 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function initializeEnvironment()
     {
         $env_filename = $this->project_configuration->getEnvFilename();
-        $predefined_env = null;
+//        $predefined_env = null;
+//
+//        if (defined('CONFIG_ENV')) {
+//            $predefined_env = CONFIG_ENV;
+//        } else if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV']) {
+//            $predefined_env = $_ENV['APP_ENV'];
+//        }
+//
+//        //$env_filename .= $predefined_env ? '.' . $predefined_env : '';
 
-        if (defined('CONFIG_ENV')) {
-            $predefined_env = CONFIG_ENV;
-        } else if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV']) {
-            $predefined_env = $_ENV['APP_ENV'];
+        // Load cached env vars if the .env.local.php file exists
+        // Run "composer dump-env prod" to create it (requires symfony/flex >=1.2)
+        /** @noinspection PhpIncludeInspection */
+        if (is_array($env = @include $this->getProjectDir() . DS . '.env.local.php')) {
+            $_SERVER += $env;
+            $_ENV += $env;
+        } else if (!class_exists(Dotenv::class)) {
+            throw new RuntimeException('Please run "composer require symfony/dotenv" to load the ".env" files configuring the application.');
+        } else {
+            // load all the .env files
+            $dotenv = new Dotenv();
+            // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
+            $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
         }
-
-        $env_filename .= $predefined_env ? '.' . $predefined_env : '';
-
-        $dotenv = new Dotenv();
-        // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
-        $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
 
         $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_DIST;
         $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
@@ -152,6 +163,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         define('DO_DEBUG', $is_debugging);
         define('CONFIG_ENV', $env);
         define('CONFIG_VARIATION', 'default');
+
+        $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null) ?: 'dev';
+        $_SERVER['APP_DEBUG'] = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'prod' !== $_SERVER['APP_ENV'];
+        $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = (int)$_SERVER['APP_DEBUG'] || filter_var($_SERVER['APP_DEBUG'], FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
 
         $this->setIsDebugging($is_debugging);
         $this->project_configuration->setConfigEnvironment(CONFIG_ENV);
