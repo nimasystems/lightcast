@@ -25,7 +25,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
     const DEFAULT_BASE_CONFIG_DIR = 'default';
-    const DEFAULT_CONFIG_ENV = lcEnvConfigHandler::ENV_DIST;
+    const DEFAULT_CONFIG_ENV = lcEnvConfigHandler::ENV_PROD;
 
     const DEFAULT_PLUGINS_LOCATION = 'addons/plugins';
     const DEFAULT_PROJECT_NAME = 'default';

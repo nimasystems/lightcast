@@ -26,7 +26,7 @@ abstract class lcEnvConfigHandler extends lcConfigHandler
     const ENV_ALL = 'all';
 
     const ENV_DEV = 'dev';
-    const ENV_DIST = 'dist';
+    const ENV_PROD = 'prod';
     const ENV_TEST = 'test';
 
     protected function preReadConfigData($environment, array $data): array
