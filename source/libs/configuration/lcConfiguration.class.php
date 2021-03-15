@@ -72,6 +72,22 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
         }
     }
 
+    public function loadData($force = false)
+    {
+        // read the configuration (unless already loaded - by class cache for
+        // example)
+        if (!$this->configuration || $force) {
+            $this->configuration = $this->loadConfigurationData();
+        }
+
+        $this->executeAfterDataLoaded();
+    }
+
+    protected function executeAfterDataLoaded()
+    {
+        //
+    }
+
     protected function loadConfigurationData()
     {
         return $this->loadConfigurationFromHandleMap($this->getConfigHandleMap());

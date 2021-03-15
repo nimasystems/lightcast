@@ -128,6 +128,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         include_once($this->getProjectDir() . DS . 'vendor' . DS . 'autoload.php');
     }
 
+    public function loadData($force = false)
+    {
+        parent::loadData($force);
+
+        $this->project_configuration->executeAfterDataLoaded();
+    }
+
     public function initializeEnvironment()
     {
         $env_filename = $this->project_configuration->getEnvFilename();
@@ -169,6 +176,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = ($_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? null) ?: 'dev';
         $_SERVER['APP_DEBUG'] = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? 'prod' !== $_SERVER['APP_ENV'];
         $_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = (int)$_SERVER['APP_DEBUG'] || filter_var($_SERVER['APP_DEBUG'], FILTER_VALIDATE_BOOLEAN) ? '1' : '0';
+
+        $this->environment = CONFIG_ENV;
 
         $this->setIsDebugging($is_debugging);
         $this->project_configuration->setConfigEnvironment(CONFIG_ENV);

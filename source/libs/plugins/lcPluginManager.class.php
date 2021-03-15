@@ -398,6 +398,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $configuration->setEnvironments($this->configuration->getEnvironments());
 
         $configuration->initialize();
+        $configuration->loadData();
 
         return $configuration;
     }

@@ -228,28 +228,49 @@ class lcDirs
         } else if (!is_readable($directory)) {
             throw new lcIOException('Directory is not readable: ' . $directory);
         } else {
-            $handle = opendir($directory);
-
-            while (false !== ($item = readdir($handle))) {
-                if ($item != '.' && $item != '..') {
-                    if ($empty && $skipHidden && 0 === strpos($item, '.')) {
-                        continue;
-                    }
-
-                    $path = $directory . DS . $item;
-
-                    if (is_dir($path)) {
-                        # makes a recursion to get subfolders
-                        self::rmdirRecursive($path);
-                    } else {
-                        unlink($path);
-                    }
+            foreach (scandir($directory) as $item) {
+                if ($item == '.' || $item == '..') {
+                    continue;
                 }
 
-                unset($item, $path);
+                if ($empty && $skipHidden && 0 === strpos($item, '.')) {
+                    continue;
+                }
+
+                $path = $directory . DS . $item;
+
+                if (is_dir($path)) {
+                    # makes a recursion to get subfolders
+                    self::rmdirRecursive($path);
+                } else {
+                    unlink($path);
+                }
+
+                unset($item);
             }
 
-            closedir($handle);
+//            $handle = opendir($directory);
+//
+//            while (false !== ($item = readdir($handle))) {
+//                if ($item != '.' && $item != '..') {
+//                    if ($empty && $skipHidden && 0 === strpos($item, '.')) {
+//                        continue;
+//                    }
+//
+//                    $path = $directory . DS . $item;
+//
+//                    if (is_dir($path)) {
+//                        # makes a recursion to get subfolders
+//                        self::rmdirRecursive($path);
+//                    } else {
+//                        unlink($path);
+//                    }
+//                }
+//
+//                unset($item, $path);
+//            }
+//
+//            closedir($handle);
 
             if ($empty == false) {
                 if (!rmdir($directory)) {

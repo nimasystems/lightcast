@@ -613,6 +613,7 @@ class lcApp extends lcObj
         }
 
         $configuration->initialize();
+        $configuration->loadData();
 
         // set timezone from configuration
         $this->setSystemTimezone();
