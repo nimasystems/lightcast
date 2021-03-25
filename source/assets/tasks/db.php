@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,7 +23,7 @@
 
 class tDb extends lcTaskController
 {
-    public function executeTask()
+    public function executeTask(): bool
     {
         $action = $this->getRequest()->getParam('action');
 
@@ -37,7 +37,7 @@ class tDb extends lcTaskController
         }
     }
 
-    private function upgradeEncoding()
+    private function upgradeEncoding(): bool
     {
         $db_name = $this->getRequest()->getParam('db');
 
@@ -123,20 +123,17 @@ class tDb extends lcTaskController
         return true;
     }
 
-    public function getHelpInfo()
+    public function getHelpInfo(): string
     {
-        $help =
-            lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
+        return lcConsolePainter::formatColoredConsoleText('Database operations', 'green') . "\n" .
             lcConsolePainter::formatColoredConsoleText('--------------------', 'green') . "\n\n" .
             lcConsolePainter::formatColoredConsoleText('Schema:', 'cyan') . "\n\n" .
             'schema:upgrade_encoding - Upgrade the database and all tables to another encoding/collation (for example: UTF8MB4 / UT8MB4_UNICODE_CI)
-                --db - database name
-                --hostname=localhost
-                --user=root
-                --pass
-                --encoding=utf8m4
-                --collation=utf8mb4_unicode_ci';
-
-        return $help;
+            --db - database name
+            --hostname=localhost
+            --user=root
+            --pass
+            --encoding=utf8m4
+            --collation=utf8mb4_unicode_ci';
     }
 }

@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpComposerExtensionStubsInspection */
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,7 +23,7 @@
 
 /**
  * Class lcAppObj
- * @property PDO $dbc
+ * @property lcPropelConnection $dbc
  */
 abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggable
 {
@@ -53,7 +53,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     protected $storage;
 
     /**
-     * @var lcAppSecurityUser
+     * @var lcSecurityUser
      */
     protected $user;
 
@@ -202,9 +202,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     }
 
     /**
-     * @return lcAppSecurityUser
+     * @return lcSecurityUser
      */
-    public function getUser(): ?lcAppSecurityUser
+    public function getUser(): ?lcSecurityUser
     {
         return $this->user;
     }

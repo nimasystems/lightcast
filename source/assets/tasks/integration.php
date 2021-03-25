@@ -27,9 +27,10 @@ class tIntegration extends lcTaskController
     {
         switch ($this->getRequest()->getParam('action')) {
             case 'validate-php-files':
-                return $this->validatePhpFiles();
+                $this->validatePhpFiles();
+                break;
             default:
-                return $this->displayHelp();
+                $this->displayHelp();
         }
     }
 
@@ -50,18 +51,15 @@ class tIntegration extends lcTaskController
 
         $this->display('Validating PHP syntax in: ' . $root_dir);
 
-        lcDirs::recursiveFilesCallback($root_dir, [$this, '_validatePhpFiles'], [], true);
-
-        return true;
+        lcDirs::recursiveFilesCallback($root_dir, [$this, '_validatePhpFiles'], []);
     }
 
     private function displayHelp()
     {
         $this->consoleDisplay($this->getHelpInfo(), false);
-        return true;
     }
 
-    public function getHelpInfo()
+    public function getHelpInfo(): string
     {
         return
             'Possible commands:' . "\n\n" .

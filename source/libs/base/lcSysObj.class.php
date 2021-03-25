@@ -88,25 +88,25 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
 
         switch ($context_type_str) {
             case 'app':
-                {
-                    $context_type = self::CONTEXT_APP;
-                    break;
-                }
+            {
+                $context_type = self::CONTEXT_APP;
+                break;
+            }
             case 'framework':
-                {
-                    $context_type = self::CONTEXT_FRAMEWORK;
-                    break;
-                }
+            {
+                $context_type = self::CONTEXT_FRAMEWORK;
+                break;
+            }
             case 'plugin':
-                {
-                    $context_type = self::CONTEXT_PLUGIN;
-                    break;
-                }
+            {
+                $context_type = self::CONTEXT_PLUGIN;
+                break;
+            }
             case 'project':
-                {
-                    $context_type = self::CONTEXT_PROJECT;
-                    break;
-                }
+            {
+                $context_type = self::CONTEXT_PROJECT;
+                break;
+            }
         }
 
         return $context_type;
@@ -119,25 +119,25 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
 
         switch ($context_type) {
             case self::CONTEXT_APP:
-                {
-                    $str = 'app';
-                    break;
-                }
+            {
+                $str = 'app';
+                break;
+            }
             case self::CONTEXT_FRAMEWORK:
-                {
-                    $str = 'framework';
-                    break;
-                }
+            {
+                $str = 'framework';
+                break;
+            }
             case self::CONTEXT_PLUGIN:
-                {
-                    $str = 'plugin';
-                    break;
-                }
+            {
+                $str = 'plugin';
+                break;
+            }
             case self::CONTEXT_PROJECT:
-                {
-                    $str = 'project';
-                    break;
-                }
+            {
+                $str = 'project';
+                break;
+            }
         }
 
         return $str;

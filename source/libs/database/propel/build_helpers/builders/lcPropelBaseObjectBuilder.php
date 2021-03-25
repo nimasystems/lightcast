@@ -15,6 +15,175 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         }
     }
 
+    protected function addClassBody(&$script)
+    {
+        parent::addClassBody($script);
+
+        $this->addInserOrUpdate($script);
+    }
+
+    /**
+     * Adds the insertOrUpdate() method.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addInserOrUpdate(&$script)
+    {
+        $this->addInserOrUpdateComment($script);
+        $this->addInserOrUpdateOpen($script);
+        $this->addInserOrUpdateBody($script);
+        $this->addInserOrUpdateClose($script);
+    }
+
+    /**
+     * Adds the comment for the insertOrUpdate method
+     *
+     * @param string &$script The script will be modified in this method.
+     *
+     **/
+    protected function addInserOrUpdateComment(&$script)
+    {
+        $script .= "
+    /**
+     * Persists this object to the database (INSERT ON DUPLICATE KEY UPDATE)
+     *
+     * @param PropelPDO \$con
+     * @return " . $this->getClassname() . "
+     */";
+    }
+
+    /**
+     * Adds the function declaration for the insertOrUpdate method
+     *
+     * @param string &$script The script will be modified in this method.
+     *
+     **/
+    protected function addInserOrUpdateOpen(&$script)
+    {
+        $script .= "
+    public function insertOrUpdate(PropelPDO \$con = null)
+    {";
+    }
+
+    /**
+     * Adds the function body for the insertOrUpdate method
+     *
+     * @param string &$script The script will be modified in this method.
+     *
+     **/
+    protected function addInserOrUpdateBody(&$script)
+    {
+        $peer_name = $this->getPeerClassname();
+
+        $script .= "
+        if (\$this->isDeleted()) {
+            throw new PropelException(\"You cannot save an object that has been deleted.\");
+        }
+
+        if (\$con === null) {
+            \$con = Propel::getConnection(" . $peer_name . "::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }";
+
+        $script .= "
+        
+        \$modified_cols = \$this->getModifiedColumns();
+
+        if (!\$modified_cols) {
+            return \$this;
+        }
+
+        \$table_map = " . $peer_name . "::getTableMap();
+        \$table_name = \$table_map->getName();
+
+        /** @var lcColumnMap[] \$pks */
+        \$pks = \$table_map->getPrimaryKeys();
+
+        \$pks_names = [];
+
+        foreach (\$pks as \$pk) {
+            \$col_name = \$pk->getName();
+
+            /** @noinspection PhpUndefinedMethodInspection */
+            \$col_name = " . $peer_name . "::translateFieldName(\$col_name, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_PHPNAME);
+            \$pks_names[] = \$col_name;
+
+            unset(\$pk);
+        }
+
+        \$modified_cols = \$this->getModifiedColumns();
+
+        \$qcols = [];
+        \$qparams = [];
+        \$qup = [];
+        \$col_types = [];
+        \$qvals = [];
+
+        \$param_prefix = ':p';
+
+        \$i = 0;
+        foreach (\$modified_cols as \$original_col_name) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            \$col_name2 = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
+
+            \$col = \$table_map->getColumn(\$col_name2, false);
+            \$pdo_type = \$col->getPdoType();
+
+            \$qcoln = '`' . \$col_name2 . '`';
+            \$qcols[] = \$qcoln;
+
+            /** @noinspection PhpUndefinedMethodInspection */
+            \$col_name = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
+            \$qparams[] = \$param_prefix . \$i;
+            \$qvals[] = \$this->getByName(\$col_name);
+            \$col_types[] = \$pdo_type;
+
+            if (!in_array(\$col_name, \$pks_names)) {
+                \$i++;
+                \$qup[] = \$qcoln . ' = ' . \$param_prefix . \$i;
+                \$qvals[] = \$this->getByName(\$col_name);
+                \$col_types[] = \$pdo_type;
+            }
+
+            unset(\$original_col_name, \$col_name2, \$col, \$pdo_type, \$qcoln, \$col_name);
+            \$i++;
+        }
+
+        \$q = sprintf('INSERT INTO `%s` (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s',
+            \$table_name,
+            implode(',', \$qcols),
+            implode(',', \$qparams),
+            implode(',', \$qup)
+        );
+        \$stmt = \$con->prepare(\$q);
+
+        for (\$i = 0; \$i <= count(\$qvals) - 1; \$i++) {
+            \$stmt->bindValue(\$param_prefix . \$i, \$qvals[\$i], \$col_types[\$i]);
+            unset(\$col_type);
+        }
+
+        \$stmt->execute();
+
+        if (Propel::isInstancePoolingEnabled()) {
+            /** @noinspection PhpUndefinedMethodInspection */
+            " . $peer_name . "::addInstanceToPool(\$this);
+        }
+
+        return \$this;";
+    }
+
+    /**
+     * Adds the function close for the insertOrUpdate method
+     *
+     * @param string &$script The script will be modified in this method.
+     *
+     **/
+    protected function addInserOrUpdateClose(&$script)
+    {
+        $script .= "
+    }
+";
+    }
+
     /*
      * Override this method so we are able to define a new common location for
      * OM/MAP files

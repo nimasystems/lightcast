@@ -58,12 +58,12 @@ abstract class lcObj
         }
     }
 
-    public function methodExists($methodname)
+    public function methodExists($methodname): bool
     {
         return method_exists($this, $methodname);
     }
 
-    public function propertyExists($property)
+    public function propertyExists($property): bool
     {
         return property_exists($this, $property);
     }
@@ -78,17 +78,17 @@ abstract class lcObj
         return get_parent_class($this);
     }
 
-    public function isChildOf($classname)
+    public function isChildOf($classname): bool
     {
         return is_subclass_of($this, $classname);
     }
 
-    public function getClassInfo()
+    public function getClassInfo(): ReflectionClass
     {
         return $this->getReflection();
     }
 
-    public function getReflection()
+    public function getReflection(): ReflectionClass
     {
         $reflection = $this->_reflection ?: new ReflectionClass($this);
 
@@ -99,70 +99,67 @@ abstract class lcObj
         return $reflection;
     }
 
-    public function isFinal()
+    public function isFinal(): bool
     {
         return $this->getReflection()->isFinal();
     }
 
-    public function getClassFilename()
+    public function getClassFilename(): string
     {
         return $this->getReflection()->getFileName();
     }
 
-    public function getClassStartLine()
+    public function getClassStartLine(): int
     {
         return $this->getReflection()->getStartLine();
     }
 
-    public function getClassEndLine()
+    public function getClassEndLine(): int
     {
         return $this->getReflection()->getEndLine();
     }
 
-    public function getClassModifiers()
+    public function getClassModifiers(): int
     {
         return $this->getReflection()->getModifiers();
     }
 
-    public function getClassImplements()
+    public function getClassImplements(): array
     {
         return $this->getReflection()->getInterfaces();
     }
 
-    public function getClassConstants()
+    public function getClassConstants(): array
     {
         return $this->getReflection()->getConstants();
     }
 
-    public function getClassProperties()
+    public function getClassProperties(): array
     {
         return $this->getReflection()->getProperties();
     }
 
-    public function getClassMethods()
+    public function getClassMethods(): array
     {
         return $this->getReflection()->getMethods();
     }
 
-    public function implementsInterface($interface_name)
+    public function implementsInterface($interface_name): bool
     {
         return $this->getReflection()->implementsInterface($interface_name);
     }
 
-    public function assert($condition, $error_str = null)
+    public function assert($condition): bool
     {
-        if ($condition) {
-            return true;
-        }
-
         return assert($condition);
     }
 
-    public function description()
+    public function description(): string
     {
         return $this->__toString();
     }
 
+    /** @noinspection PhpMissingReturnTypeInspection */
     public function __toString()
     {
         return (string)e($this, true);

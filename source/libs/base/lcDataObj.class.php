@@ -35,7 +35,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
         $this->setData($data);
     }
 
-    public function __call($method, array $params = null)
+    public function __call($method, array $params = null): ?bool
     {
         $sub = substr($method, 0, 3);
 
@@ -43,7 +43,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
             $subp = lcInflector::underscore(substr($method, 3, strlen($method)));
 
             if ($sub == 'set') {
-                $value = isset($params[0]) && $params[0];
+                $value = isset($params[0]) && $params[0] ? $params[0] : null;
 
                 if ($value) {
                     $this->data[$subp] = $value;
@@ -60,8 +60,6 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
         }
 
         parent::__call($method, $params);
-
-        return true;
     }
 
     /**
@@ -76,7 +74,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
      * The return value will be casted to boolean if non-boolean was returned.
      * @since 5.0.0
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->data[$offset]);
     }
@@ -133,7 +131,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
      * which is a value of any type other than a resource.
      * @since 5.4.0
      */
-    function jsonSerialize()
+    function jsonSerialize(): array
     {
         return (array)$this->getData();
     }
@@ -141,6 +139,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
     /**
      * @param null $key
      * @return mixed
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function getData($key = null)
     {
@@ -151,6 +150,7 @@ class lcDataObj extends lcObj implements ArrayAccess, JsonSerializable
      * @param mixed $data
      * @param null $value
      * @return lcDataObj
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function setData($data = null, $value = null)
     {
