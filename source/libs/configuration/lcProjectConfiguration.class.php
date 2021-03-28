@@ -31,6 +31,10 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     const DEFAULT_PROJECT_NAME = 'default';
     const CLASS_CACHE_RESET_KEY_SUFFIX = '_should_reset';
 
+    const ENCRYPTION_KEY_FILENAME = 'secrets/.key';
+    const SECURE_UNENCRYPTED_FILENAME = '.env.secure.unencrypted';
+    const SECURE_ENCRYPTED_FILENAME = '.env.secure';
+
     const TMP_DIR_NAME = 'tmp';
     const MODELS_DIR_NAME = 'models';
     const CACHE_DIR_NAME = 'cache';
@@ -106,6 +110,16 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->tmp_dir = !$this->tmp_dir ? $this->getProjectDir() . DS . self::TMP_DIR_NAME : $this->tmp_dir;
 
         $this->set('settings.debug', $this->debugging);
+    }
+
+    public function getEncryptionKeyFilename(): string
+    {
+        return $this->getConfigDir() . DS . self::ENCRYPTION_KEY_FILENAME;
+    }
+
+    public function getSecureEnvFilename(): string
+    {
+        return $this->getProjectDir() . DS . self::SECURE_ENCRYPTED_FILENAME;
     }
 
     public function getEnvFilename(): string

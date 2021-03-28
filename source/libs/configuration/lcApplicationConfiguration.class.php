@@ -21,6 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
 use Symfony\Component\Dotenv\Dotenv;
 
 /**
@@ -47,6 +49,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     protected $should_disable_databases = false;
     protected $unique_id_suffix;
     private $project_dir;
+
+    private $secure_env_data = [];
 
     public function __construct($project_dir = null, lcProjectConfiguration $project_configuration = null)
     {
@@ -120,6 +124,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
                 unset($key, $val);
             }
         }
+
+        foreach ($this->secure_env_data as $key => $val) {
+            self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
+            unset($key, $val);
+        }
     }
 
     protected function initVendor()
@@ -137,7 +146,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
     public function initializeEnvironment()
     {
+        // protect against older app versions which still use the boot_config file
+        if (defined('CONFIG_ENV')) {
+            return;
+        }
+
         $env_filename = $this->project_configuration->getEnvFilename();
+
 //        $predefined_env = null;
 //
 //        if (defined('CONFIG_ENV')) {
@@ -154,13 +169,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         if (is_array($env = @include $this->getProjectDir() . DS . '.env.local.php')) {
             $_SERVER += $env;
             $_ENV += $env;
-        } else if (!class_exists(Dotenv::class)) {
-            throw new RuntimeException('Please run "composer require symfony/dotenv" to load the ".env" files configuring the application.');
         } else {
             // load all the .env files
             $dotenv = new Dotenv();
             // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
             $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
+
+            $this->secure_env_data = $this->parseSecureEnvData();
         }
 
         //
@@ -182,6 +197,34 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->setIsDebugging($is_debugging);
         $this->project_configuration->setConfigEnvironment(CONFIG_ENV);
         $this->project_configuration->setConfigVariation(CONFIG_VARIATION);
+    }
+
+    protected function parseSecureEnvData(): array
+    {
+        $secure_env_filename = $this->project_configuration->getSecureEnvFilename();
+        $key_filename = $this->project_configuration->getEncryptionKeyFilename();
+
+        // load all the .env files
+        $dotenv = new Dotenv();
+
+        // load secure envs
+        if (!$secure_env_filename || !$key_filename ||
+            !file_exists($secure_env_filename) || !is_readable($secure_env_filename) ||
+            !file_exists($key_filename) || !is_readable($key_filename)) {
+            return [];
+        }
+
+        $data = $dotenv->parse(file_get_contents($secure_env_filename));
+        $encryption_key = KeyFactory::loadEncryptionKey($key_filename);
+
+        $ndata = [];
+
+        foreach ($data as $key => $val) {
+            $ndata[$key] = Symmetric::decrypt($val, $encryption_key)->getString();
+            unset($key, $val);
+        }
+
+        return $ndata;
     }
 
     protected function prepareEnv()

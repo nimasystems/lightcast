@@ -20,13 +20,18 @@
 * E-Mail: info@nimasystems.com
 */
 
-require_once('parsers' . DS . 'lcYamlFileParser.class.php');
+use ParagonIE\Halite\HiddenString;
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
+use Symfony\Component\Dotenv\Dotenv;
+
+//require_once('parsers' . DS . 'lcYamlFileParser.class.php');
 
 class tSystem extends lcTaskController
 {
     const CFG_BACKUP_FILE_EXT = 'frz';
 
-    public function executeTask()
+    public function executeTask(): bool
     {
         switch ($this->getRequest()->getParam('action')) {
             case 'flush':
@@ -41,46 +46,46 @@ class tSystem extends lcTaskController
 
             case 'config':
                 return $this->configMain();
-                break;
 
             case 'config-freeze':
                 return $this->configFreeze();
-                break;
 
             case 'config-unfreeze':
                 return $this->configUnFreeze();
-                break;
 
             case 'config-clean':
                 return $this->configClean();
-                break;
 
             case 'config-list':
                 return $this->configList();
-                break;
 
             case 'config-load':
                 return $this->configLoad();
-                break;
 
             case 'config-backup':
                 return $this->configBackup();
-                break;
 
             case 'config-backup-view':
                 return $this->configBackupView();
-                break;
 
             case 'config-restore':
                 return $this->configRestore();
-                break;
+
+            case 'config-generate-encryption-key':
+                return $this->configGenerateEncryptionKey();
+
+            case 'config-encrypt-secure-data':
+                return $this->configEncryptSecureData();
+
+            case 'config-decrypt-secure-data':
+                return $this->configDecryptSecureData();
 
             default:
                 return $this->displayHelp();
         }
     }
 
-    private function flush()
+    private function flush(): bool
     {
         $this->clearTempDir();
         $this->clearCache();
@@ -89,27 +94,27 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function clearTempDir()
+    private function clearTempDir(): bool
     {
         return lcDirs::rmdirRecursive($this->configuration->getTempDir(), true);
     }
 
-    private function clearCache()
+    private function clearCache(): bool
     {
         return lcDirs::rmdirRecursive($this->configuration->getCacheDir(), true);
     }
 
-    private function clearSessionDir()
+    private function clearSessionDir(): bool
     {
         return lcDirs::rmdirRecursive($this->configuration->getSessionDir(), true);
     }
 
-    private function clearLogs()
+    private function clearLogs(): bool
     {
         return lcDirs::rmdirRecursive($this->configuration->getLogDir(), true);
     }
 
-    private function createWebsiteFromTemplate()
+    private function createWebsiteFromTemplate(): bool
     {
         $target_dir = $this->getRequest()->getParam('target-directory');
 
@@ -144,14 +149,14 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configMain()
+    private function configMain(): bool
     {
         $this->consoleDisplay($this->configHelpMenu(), false);
 
         return true;
     }
 
-    private function configHelpMenu()
+    private function configHelpMenu(): string
     {
 
         return
@@ -167,7 +172,7 @@ class tSystem extends lcTaskController
             lcConsolePainter::formatConsoleText('config-restore', 'info') . ' - Restore a single configuration file. Param: --file==yml_id (the number obtained by issuing the \'config_list\' action) ' . "\n";
     }
 
-    private function configFreeze()
+    private function configFreeze(): bool
     {
         $path = $this->getFreezeFileData();
 
@@ -215,19 +220,18 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function getFreezeFileData()
+    private function getFreezeFileData(): array
     {
         $filename = $this->getFrzFilename();
 
-        $ret = [
+        return [
             'path' => DIR_APP . DS . 'data' . DS . 'config_backups' . DS,
             'filename' => $filename,
             'backup_filename' => $filename,
         ];
-        return $ret;
     }
 
-    private function getFrzFilename()
+    private function getFrzFilename(): string
     {
         $filename = [
             $this->configuration->getProjectName(),
@@ -241,7 +245,7 @@ class tSystem extends lcTaskController
         return $filename;
     }
 
-    private function configUnFreeze()
+    private function configUnFreeze(): bool
     {
         $force = (bool)$this->getRequest()->getParam('force');
 
@@ -354,7 +358,7 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configClean()
+    private function configClean(): bool
     {
         $path = $this->getFreezeFileData();
 
@@ -388,7 +392,7 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configList()
+    private function configList(): bool
     {
         $files = lcFinder::search('files')->set_filter('*.' . self::CFG_BACKUP_FILE_EXT)->do_search_in(DIR_APP);
 
@@ -415,7 +419,7 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configLoad()
+    private function configLoad(): bool
     {
         $force = (bool)$this->getRequest()->getParam('force');
         $file_id = (int)$this->getRequest()->getParam('file');
@@ -534,7 +538,7 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configBackup()
+    private function configBackup(): bool
     {
         $path = $this->getFreezeFileData();
 
@@ -579,9 +583,9 @@ class tSystem extends lcTaskController
 
     }
 
-    private function getCfgFileSystemInfo()
+    private function getCfgFileSystemInfo(): array
     {
-        $ret = [
+        return [
             'project_name' => $this->configuration->getProjectName(),
             'version' => $this->configuration->getVersion(),
             'date_created' => date('Y-m-d H-i-s'),
@@ -590,10 +594,9 @@ class tSystem extends lcTaskController
             'machine' => php_uname('n'),
             'php_version' => phpversion(),
         ];
-        return $ret;
     }
 
-    private function configBackupView()
+    private function configBackupView(): bool
     {
         $path = $this->getFreezeFileData();
 
@@ -618,7 +621,81 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function configRestore()
+    private function configGenerateEncryptionKey(): bool
+    {
+        $filename = $this->getRequest()->getParam('filename');
+        $overwrite = (bool)$this->getRequest()->getParam('overwrite');
+        $filename = $filename ?: $this->getConfig()->getProjectConfiguration()->getConfigDir() . DS .
+            lcProjectConfiguration::ENCRYPTION_KEY_FILENAME;
+
+        if (file_exists($filename) && !$overwrite) {
+            throw new lcIOException('File already exists');
+        }
+
+        $encKey = KeyFactory::generateEncryptionKey();
+        KeyFactory::save($encKey, $filename);
+
+        return true;
+    }
+
+    private function configEncryptSecureData(): bool
+    {
+        return $this->configEncryptDecryptSecureData(true);
+    }
+
+    private function configDecryptSecureData(): bool
+    {
+        return $this->configEncryptDecryptSecureData(false);
+    }
+
+    private function configEncryptDecryptSecureData(bool $encrypt): bool
+    {
+        $key_filename = $this->getRequest()->getParam('key');
+        $key_filename = $key_filename ?: $this->getConfig()->getProjectConfiguration()->getConfigDir() . DS .
+            lcProjectConfiguration::ENCRYPTION_KEY_FILENAME;
+
+        $filename = $this->getRequest()->getParam('filename');
+        $filename = $filename ?: $this->getConfig()->getProjectDir() . DS .
+            ($encrypt ? lcProjectConfiguration::SECURE_UNENCRYPTED_FILENAME :
+                lcProjectConfiguration::SECURE_ENCRYPTED_FILENAME);
+
+        $output = $this->getRequest()->getParam('output');
+        $output = $output ?: $this->getConfig()->getProjectDir() . DS .
+            (!$encrypt ? lcProjectConfiguration::SECURE_UNENCRYPTED_FILENAME :
+                lcProjectConfiguration::SECURE_ENCRYPTED_FILENAME);
+
+        if (!is_readable($filename)) {
+            throw new lcIOException('Cannot open source file');
+        }
+
+        // load all the .env files
+        $dotenv = new Dotenv();
+        $data = $dotenv->parse(file_get_contents($filename));
+
+        $encryption_key = KeyFactory::loadEncryptionKey($key_filename);
+
+        $ndata = [];
+
+        foreach ($data as $key => $val) {
+            $message = new HiddenString($val);
+
+            if ($encrypt) {
+                $outtext = Symmetric::encrypt($message, $encryption_key);
+            } else {
+                $outtext = Symmetric::decrypt($val, $encryption_key)->getString();
+            }
+
+            $ndata[] = $key . '=' . '"' . $outtext . '"';
+
+            unset($key, $val);
+        }
+
+        file_put_contents($output, implode("\n", $ndata));
+
+        return true;
+    }
+
+    private function configRestore(): bool
     {
         $config_id = (int)$this->getRequest()->getParam('file');
 
@@ -654,18 +731,18 @@ class tSystem extends lcTaskController
         return true;
     }
 
-    private function displayHelp()
+    private function displayHelp(): bool
     {
         $this->consoleDisplay($this->getHelpInfo(), false);
 
         return true;
     }
 
-    public function getHelpInfo()
+    public function getHelpInfo(): string
     {
         return
             'Possible commands:' . "\n\n" .
-            'CONFIG:' . "\n" .
+            'CONFIG:' . "\n\n" .
             lcConsolePainter::formatConsoleText('config-freeze', 'info') . ' - Freezes current configuration files (yamls) ' . "\n" .
             lcConsolePainter::formatConsoleText('config-unfreeze', 'info') . ' - Restores freezed configurations, params --force (suppress errors)' . "\n" .
             lcConsolePainter::formatConsoleText('config-clean', 'info') . ' - cleanup all config files"' . "\n" .
@@ -675,17 +752,28 @@ class tSystem extends lcTaskController
             lcConsolePainter::formatConsoleText('config-backup-view', 'info') . ' - View stored configs in the freeze file' . "\n" .
             lcConsolePainter::formatConsoleText('config-restore', 'info') . ' - Restores single yml file. params --file==yml_id (you can see in in the backup-view cmd)' . "\n\n" .
 
-            'MAINTENANCE:' . "\n\n" .
+            lcConsolePainter::formatConsoleText('config-generate-encryption-key', 'info') . ' - Generate a new encryption key for configuration files' . "\n" .
+            ' --filename - Optional filename' . "\n" .
+
+            lcConsolePainter::formatConsoleText('config-encrypt-secure-data', 'info') . ' - Encrypts an unencrypted .env file' . "\n" .
+            ' --key - Optional key filename' . "\n" .
+            ' --filename - Optional source filename' . "\n" .
+            ' --output - Optional target encrypted filename' . "\n" .
+
+            lcConsolePainter::formatConsoleText('config-decrypt-secure-data', 'info') . ' - Decrypts an unencrypted .env file' . "\n" .
+            ' --key - Optional key filename' . "\n" .
+            ' --filename - Optional source filename' . "\n" .
+            ' --output - Optional target decrypted filename' . "\n" .
+
+            "\n" . 'MAINTENANCE:' . "\n\n" .
 
             lcConsolePainter::formatConsoleText('flush', 'info') . ' - clears all website caches, temporary files and sessions' . "\n" .
             lcConsolePainter::formatConsoleText('clear-cache', 'info') . ' - clears website caches only' . "\n" .
             lcConsolePainter::formatConsoleText('clear-logs', 'info') . ' - clears all logs' . "\n" .
 
-            'INITIALIZATION:' . "\n\n" .
+            "\n" . 'INITIALIZATION:' . "\n\n" .
 
             lcConsolePainter::formatConsoleText('create-website', 'info') . ' - initializes a new empty folder with the basic template structure of a lightcast website' .
-            ' The website target folder must be specified with --target-directory'
-
-            . "\n";
+            ' The website target folder must be specified with --target-directory';
     }
 }

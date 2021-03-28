@@ -20,6 +20,7 @@
   "require": {
     "php": ">=7.1",
     "symfony/dotenv": "^5.2",
+    "paragonie/halite": "^4",
     "ext-yaml": "*",
     "ext-json": "*"
   }
