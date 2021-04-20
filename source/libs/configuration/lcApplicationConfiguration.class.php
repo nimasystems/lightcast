@@ -120,6 +120,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     {
         if ($_SERVER) {
             foreach ($_SERVER as $key => $val) {
+                if (is_array($val)) {
+                    continue;
+                }
+
                 self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
                 unset($key, $val);
             }
