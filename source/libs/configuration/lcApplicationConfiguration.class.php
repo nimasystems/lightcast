@@ -118,6 +118,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
     protected function updateSharedEnvVars()
     {
+        if ($_SERVER) {
+            foreach ($_SERVER as $key => $val) {
+                self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
+                unset($key, $val);
+            }
+        }
+
         if ($_ENV) {
             foreach ($_ENV as $key => $val) {
                 self::$shared_config_parser_vars['env(' . $key . ')'] = $val;
