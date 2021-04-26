@@ -45,7 +45,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     private $is_debugging;
 
-    public function getListenerEvents()
+    public function getListenerEvents(): array
     {
         return [
             'app.startup' => 'onAppStartup',
@@ -70,7 +70,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         parent::shutdown();
     }
 
-    public function getCapabilities()
+    public function getCapabilities(): array
     {
         return [
             'error_handler',
@@ -97,6 +97,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
         $exception_min_severity = (int)$this->configuration['exceptions.mail.severity'];
 
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
         if ($should_send_email && (!$exception_min_severity || !($exception instanceof lcException) ||
                 ($exception instanceof lcException && $exception->getSeverity() <= $exception_min_severity))) {
             try {
@@ -136,14 +137,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
     public function emailException(Exception $exception)
     {
         if (!$exception) {
-            assert(false);
             return;
         }
 
         $configuration = $this->configuration;
 
         if (!$configuration) {
-            assert(false);
             return;
         }
 
@@ -211,7 +210,6 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         try {
             $debug_snapshot = $this->app_context ? $this->app_context->getDebugSnapshot(true) : null;
         } catch (Exception $e) {
-            assert(false);
             return;
         }
 
@@ -246,26 +244,24 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 @mail($recipient, $subject, $message, $headers);
             }
         } catch (Exception $e) {
-            assert(false);
             return;
         }
     }
 
-    private function getStackTrace(Exception $exception, array & $compiled_stack_trace)
+    private function getStackTrace(Exception $exception, array &$compiled_stack_trace): ?array
     {
         $previous = ($exception instanceof lcException) ? $exception->getCause() : null;
 
-        $trace = ($previous !== null) ? $this->getStackTrace($previous, $compiled_stack_trace) : $exception->getTrace();
+        $trace = ($previous !== null) ? $this->getStackTrace($previous, $compiled_stack_trace) :
+            $exception->getTrace();
 
         if (!$trace) {
             return null;
         }
 
-        if ($trace) {
-            foreach ($trace as $key => $trace1) {
-                array_push($compiled_stack_trace, $trace1);
-                unset($key, $trace1);
-            }
+        foreach ($trace as $key => $trace1) {
+            array_push($compiled_stack_trace, $trace1);
+            unset($key, $trace1);
         }
 
         return $trace;
@@ -291,7 +287,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return !$return_array ? implode("\n", $txt_trace) : $txt_trace;
     }
 
-    private function showTextTrace($_trace, $_i)
+    private function showTextTrace($_trace, $_i): string
     {
         $htmldoc = ' #' . $_i . ' ';
 
@@ -374,7 +370,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $htmldoc;
     }
 
-    private function getExceptionOverridenMessage(Exception $exception, $content_type = 'text/html')
+    private function getExceptionOverridenMessage(Exception $exception, $content_type = 'text/html'): string
     {
         $is_debugging = $this->is_debugging;
         $message = $exception->getMessage();
@@ -443,6 +439,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         $should_send_email = !DO_DEBUG && (bool)$this->configuration['exceptions.mail.enabled'];
         $exception_min_severity = (int)$this->configuration['exceptions.mail.severity'];
 
+        /** @noinspection PhpConditionAlreadyCheckedInspection */
         if ($should_send_email && (!$exception_min_severity || !($exception instanceof lcException) ||
                 ($exception instanceof lcException && $exception->getSeverity() <= $exception_min_severity))) {
             try {
@@ -534,7 +531,8 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             $exceptions_custom_action = (string)$configuration['exceptions.action'];
 
             if (!DO_DEBUG && $request && !$in_cli && $request instanceof lcWebRequest &&
-                $request->isGet() && !$response->getIsResponseSent() && $exceptions_custom_module && $exceptions_custom_action
+                $request->isGet() && (!$response || !$response->getIsResponseSent()) &&
+                $exceptions_custom_module && $exceptions_custom_action
             ) {
                 $front_controller = $this->controller;
 
@@ -569,7 +567,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 $exception_http_header = $configuration['settings.exception_http_header'];
 
                 if ($exception_http_header && is_array($exception_http_header)) {
-                    $is_enabled = isset($exception_http_header) && isset($exception_http_header['enabled']) ? (bool)$exception_http_header['enabled'] : false;
+                    $is_enabled = $exception_http_header && isset($exception_http_header['enabled']) ? (bool)$exception_http_header['enabled'] : false;
                     $exception_http_header_header = isset($exception_http_header['header']) ? (string)$exception_http_header['header'] : null;
 
                     if ($is_enabled && $exception_http_header_header) {
@@ -747,7 +745,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $error_output;
     }
 
-    public function getExceptionDetails(Exception $exception)
+    public function getExceptionDetails(Exception $exception): array
     {
         $configuration = $this->configuration;
 
@@ -850,7 +848,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return '<ol start="' . max($line - 6, 1) . '">' . implode("\n", $lines) . '</ol>';
     }
 
-    private function showTrace($_trace, $_i)
+    private function showTrace($_trace, $_i): string
     {
         $htmldoc = '<div><span style="font-size: 12px; font-weight: bold">#' . $_i . '</span> ';
 
@@ -928,7 +926,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $htmldoc;
     }
 
-    public function supportsAssertions()
+    public function supportsAssertions(): bool
     {
         return true;
     }
@@ -938,7 +936,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         throw new lcAssertException($file, $line, $code);
     }
 
-    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null)
+    public function handlePHPError($errno, $errmsg, $filename, $linenum, $vars = null): bool
     {
         if (error_reporting() == 0) {
             return true;
