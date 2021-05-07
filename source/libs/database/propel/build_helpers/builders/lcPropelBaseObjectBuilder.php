@@ -99,10 +99,16 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         \$pks = \$table_map->getPrimaryKeys();
 
         \$pks_names = [];
+        \$pk_up_name = '';
+        \$has_one_ok = count(\$pks) == 1;
 
         foreach (\$pks as \$pk) {
             \$col_name = \$pk->getName();
 
+            if (!\$pk_up_name) {
+                \$pk_up_name = \$col_name;
+            }
+            
             /** @noinspection PhpUndefinedMethodInspection */
             \$col_name = " . $peer_name . "::translateFieldName(\$col_name, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_PHPNAME);
             \$pks_names[] = \$col_name;
@@ -148,7 +154,12 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             \$i++;
         }
 
-        \$q = sprintf('INSERT INTO `%s` (%s) VALUES(%s) ON DUPLICATE KEY UPDATE %s',
+        if (count(\$qcols) < 1) {
+            return \$this;
+        }
+        
+        \$q = sprintf('INSERT INTO `%s` (%s) VALUES(%s) ON DUPLICATE KEY UPDATE ' .
+            (\$has_one_ok ? '`' . \$pk_up_name . '` = LAST_INSERT_ID(`' . \$pk_up_name . '`), ' : '') . '%s',
             \$table_name,
             implode(',', \$qcols),
             implode(',', \$qparams),
@@ -162,6 +173,22 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         }
 
         \$stmt->execute();
+
+        if (\$has_one_ok) {
+            \$pk = \$this->getPrimaryKey();
+
+            if (!\$pk) {
+                \$pk = \$con->lastInsertId();
+
+                if (\$pk) {
+                    \$this->setPrimaryKey(\$pk);
+                }
+            }
+
+            \$this->resetModified();
+            \$this->setNew(false);
+            \$this->reload();
+        }
 
         if (Propel::isInstancePoolingEnabled()) {
             /** @noinspection PhpUndefinedMethodInspection */
