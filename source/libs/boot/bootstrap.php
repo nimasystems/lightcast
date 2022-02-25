@@ -38,10 +38,10 @@ if (!version_compare(PHP_VERSION, '5.6.0', '>=')) {
 }
 
 // define the current lightcast version
-define('LIGHTCAST_VER', '1.5.2');
+define('LIGHTCAST_VER', '1.5.3');
 define('LC_VER_MAJOR', 1);
 define('LC_VER_MINOR', 5);
-define('LC_VER_BUILD', 2);
+define('LC_VER_BUILD', 3);
 define('LC_VER_REVISION', 1);
 define('LC_VER', LIGHTCAST_VER);
 
