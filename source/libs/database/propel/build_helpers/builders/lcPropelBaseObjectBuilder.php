@@ -125,7 +125,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         
         \$i = 0;
         foreach (\$pks_names as \$col_name) {
-            \$col_name1 = VMemberExercisePeer::translateFieldName(\$col_name,
+            \$col_name1 = " . $peer_name . "::translateFieldName(\$col_name,
                 BasePeer::TYPE_PHPNAME, BasePeer::TYPE_FIELDNAME);
             \$col = \$table_map->getColumn(\$col_name1, false);
             \$fqdn_name = \$col->getFullyQualifiedName();
