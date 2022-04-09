@@ -140,8 +140,8 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             unset(\$col_name, \$fqdn_name, \$pdo_type, \$col);
         }
 
+        \$vcols_added = false;
         foreach (\$modified_cols as \$original_col_name) {
-            /** @noinspection PhpUndefinedMethodInspection */
             \$col_name2 = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
 
             \$col = \$table_map->getColumn(\$col_name2, false);
@@ -164,6 +164,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             \$qup[] = \$qcoln . ' = ' . \$param_prefix . \$i;
             \$qvals[] = \$this->getByName(\$col_name);
             \$col_types[] = \$pdo_type;
+            \$vcols_added = true;
 
             unset(\$original_col_name, \$col_name2, \$col, \$pdo_type, \$qcoln, \$col_name);
             \$i++;
@@ -173,7 +174,10 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             return \$this;
         }
         
-        \$q = sprintf('INSERT INTO `%s` (%s) VALUES(%s) ON DUPLICATE KEY UPDATE ' .
+        // if \$vcols_added = false it means all columns are KEYS and we should do a REPLACE
+
+        \$q = sprintf((\$vcols_added ? 'INSERT' : 'REPLACE') . ' INTO `%s` (%s) VALUES(%s)' .
+            (\$vcols_added ? ' ON DUPLICATE KEY UPDATE ' : '').
             (\$has_one_ok ? '`' . \$pk_up_name . '` = LAST_INSERT_ID(`' . \$pk_up_name . '`), ' : '') . '%s',
             \$table_name,
             implode(',', \$qcols),
