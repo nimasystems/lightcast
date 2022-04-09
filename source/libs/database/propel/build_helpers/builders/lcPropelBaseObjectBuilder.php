@@ -109,14 +109,11 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
                 \$pk_up_name = \$col_name;
             }
             
-            /** @noinspection PhpUndefinedMethodInspection */
             \$col_name = " . $peer_name . "::translateFieldName(\$col_name, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_PHPNAME);
             \$pks_names[] = \$col_name;
 
             unset(\$pk);
         }
-
-        \$modified_cols = \$this->getModifiedColumns();
 
         \$qcols = [];
         \$qparams = [];
@@ -125,8 +122,24 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         \$qvals = [];
 
         \$param_prefix = ':p';
-
+        
         \$i = 0;
+        foreach (\$pks_names as \$col_name) {
+            \$col_name1 = VMemberExercisePeer::translateFieldName(\$col_name,
+                BasePeer::TYPE_PHPNAME, BasePeer::TYPE_FIELDNAME);
+            \$col = \$table_map->getColumn(\$col_name1, false);
+            \$fqdn_name = \$col->getFullyQualifiedName();
+            \$pdo_type = \$col->getPdoType();
+            \$qcoln = '`' . \$col_name1 . '`';
+            \$qcols[] = \$qcoln;
+            \$qparams[] = \$param_prefix . \$i;
+            \$qvals[] = \$this->getByName(\$col_name);
+            \$col_types[] = \$pdo_type;
+
+            \$i++;
+            unset(\$col_name, \$fqdn_name, \$pdo_type, \$col);
+        }
+
         foreach (\$modified_cols as \$original_col_name) {
             /** @noinspection PhpUndefinedMethodInspection */
             \$col_name2 = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME);
@@ -135,20 +148,22 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             \$pdo_type = \$col->getPdoType();
 
             \$qcoln = '`' . \$col_name2 . '`';
+            
+            \$col_name = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
+            
+            if (in_array(\$col_name, \$pks_names)) {
+                continue;
+            }
+            
             \$qcols[] = \$qcoln;
 
-            /** @noinspection PhpUndefinedMethodInspection */
-            \$col_name = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
             \$qparams[] = \$param_prefix . \$i;
             \$qvals[] = \$this->getByName(\$col_name);
             \$col_types[] = \$pdo_type;
 
-            if (!in_array(\$col_name, \$pks_names)) {
-                \$i++;
-                \$qup[] = \$qcoln . ' = ' . \$param_prefix . \$i;
-                \$qvals[] = \$this->getByName(\$col_name);
-                \$col_types[] = \$pdo_type;
-            }
+            \$qup[] = \$qcoln . ' = ' . \$param_prefix . \$i;
+            \$qvals[] = \$this->getByName(\$col_name);
+            \$col_types[] = \$pdo_type;
 
             unset(\$original_col_name, \$col_name2, \$col, \$pdo_type, \$qcoln, \$col_name);
             \$i++;
@@ -191,7 +206,6 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         }
 
         if (Propel::isInstancePoolingEnabled()) {
-            /** @noinspection PhpUndefinedMethodInspection */
             " . $peer_name . "::addInstanceToPool(\$this);
         }
 
