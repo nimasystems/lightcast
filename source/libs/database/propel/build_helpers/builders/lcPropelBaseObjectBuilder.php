@@ -154,7 +154,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             if (in_array(\$col_name, \$pks_names)) {
                 continue;
             }
-            
+
             \$qcols[] = \$qcoln;
 
             \$qparams[] = \$param_prefix . \$i;
@@ -162,8 +162,6 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             \$col_types[] = \$pdo_type;
 
             \$qup[] = \$qcoln . ' = ' . \$param_prefix . \$i;
-            \$qvals[] = \$this->getByName(\$col_name);
-            \$col_types[] = \$pdo_type;
             \$vcols_added = true;
 
             unset(\$original_col_name, \$col_name2, \$col, \$pdo_type, \$qcoln, \$col_name);
