@@ -201,11 +201,11 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
                     \$this->setPrimaryKey(\$pk);
                 }
             }
-
-            \$this->resetModified();
-            \$this->setNew(false);
-            \$this->reload();
         }
+        
+        \$this->resetModified();
+        \$this->setNew(false);
+        \$this->reload();
 
         if (Propel::isInstancePoolingEnabled()) {
             " . $peer_name . "::addInstanceToPool(\$this);
