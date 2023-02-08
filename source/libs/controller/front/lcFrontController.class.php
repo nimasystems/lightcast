@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,36 +22,39 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 abstract class lcFrontController extends lcAppObj implements iFrontController
 {
-    const DEFAULT_MAX_FORWARDS = 10;
-    const DEFAULT_HAS_LAYOUT = true;
+    public const DEFAULT_MAX_FORWARDS = 10;
+    public const DEFAULT_HAS_LAYOUT = true;
 
-    /** @var lcControllerStack */
-    protected $controller_stack;
+    /** @var ?lcControllerStack */
+    protected ?lcControllerStack $controller_stack = null;
 
-    /** @var lcActionFilterChain */
-    protected $action_filter_chain;
+    /** @var ?lcActionFilterChain */
+    protected ?lcActionFilterChain $action_filter_chain = null;
 
-    /** @var lcViewFilterChain */
-    protected $view_filter_chain;
+    /** @var ?lcViewFilterChain */
+    protected ?lcViewFilterChain $view_filter_chain = null;
 
-    protected $max_forwards;
-
-    /** @var array */
-    protected $enabled_modules;
+    protected int $max_forwards = self::DEFAULT_MAX_FORWARDS;
 
     /** @var array */
-    protected $disabled_modules;
+    protected array $enabled_modules = [];
 
-    /** @var lcSystemComponentFactory */
-    protected $system_component_factory;
+    /** @var array */
+    protected array $disabled_modules = [];
 
-    /** @var lcDatabaseModelManager */
-    protected $database_model_manager;
+    /** @var ?lcSystemComponentFactory */
+    protected ?lcSystemComponentFactory $system_component_factory = null;
 
-    /** @var lcPluginManager */
-    protected $plugin_manager;
+    /** @var ?lcDatabaseModelManager */
+    protected ?lcDatabaseModelManager $database_model_manager = null;
+
+    /** @var ?lcPluginManager */
+    protected $plugin_manager = null;
 
     protected $default_decorator;
 
@@ -165,9 +169,9 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             $this->controller_stack = null;
         }
 
-        $this->max_forwards =
         $this->enabled_modules =
-        $this->disabled_modules =
+        $this->disabled_modules = [];
+
         $this->database_model_manager =
         $this->plugin_manager =
         $this->system_component_factory = null;
@@ -211,6 +215,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->forward($request_params['module'], $request_params['action'], ['request' => $request_params]);
     }
 
+    /**
+     * @param $data
+     * @return mixed
+     */
     protected function fixDispatchParams(&$data)
     {
         foreach ($data as $key => $val) {
@@ -224,12 +232,38 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         return $data;
     }
 
+    /**
+     * @return mixed
+     */
     abstract protected function beforeDispatch();
 
+    /**
+     * @param lcRequest $request
+     * @return mixed
+     */
     abstract protected function prepareDispatchParams(lcRequest $request);
 
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param array|null $params
+     * @return mixed
+     */
     abstract protected function shouldDispatch($controller_name, $action_name, array $params = null);
 
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param array|null $action_params
+     * @return void
+     * @throws lcActionNotFoundException
+     * @throws lcControllerForwardException
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcLogicException
+     * @throws lcNotAvailableException
+     * @throws lcRenderException
+     */
     public function forward($controller_name, $action_name, array $action_params = null)
     {
         // validate and throw exception if not possible to forward
@@ -261,6 +295,14 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         }
     }
 
+    /**
+     * @param $action_name
+     * @param $controller_name
+     * @param array|null $custom_params
+     * @return void
+     * @throws lcLogicException
+     * @throws lcNotAvailableException
+     */
     public function validateForward($action_name, $controller_name, array $custom_params = null)
     {
         $disabled_modules = $this->disabled_modules;
@@ -280,8 +322,6 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // check max forwards
         $max_forwards = $this->max_forwards;
 
-        assert((int)$max_forwards);
-
         $controller_stack = $this->controller_stack;
 
         if ($max_forwards && $controller_stack && $controller_stack->size() >= $max_forwards) {
@@ -289,6 +329,19 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         }
     }
 
+    /**
+     * @param $controller_name
+     * @param null $action_name
+     * @param array|null $action_params
+     * @return void
+     * @throws lcActionNotFoundException
+     * @throws lcControllerForwardException
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcLogicException
+     * @throws lcNotAvailableException
+     * @throws lcRenderException
+     */
     protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null)
     {
         // loop protection
@@ -301,7 +354,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
             $this->event_dispatcher->notify(new lcEvent('controller.not_found', $this,
                 ['controller_name' => $controller_name,
                  'action_name' => $action_name,
-                 'action_type' => (isset($action_params['type']) ? $action_params['type'] : null),
+                 'action_type' => ($action_params['type'] ?? null),
                  'action_params' => $action_params,
                 ]
             ));
@@ -323,6 +376,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->handleControllerNotReachableAfter();
     }
 
+    /**
+     * @return mixed
+     * @throws lcControllerForwardException
+     */
     protected function handleControllerNotReachableAfter()
     {
         // final stop
@@ -411,6 +468,10 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->plugin_manager = $plugin_manager;
     }
 
+    /**
+     * @param $decorator
+     * @return void
+     */
     public function setDecorator($decorator)
     {
         $this->default_decorator = $decorator;
@@ -421,7 +482,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
      * first controller
      */
 
-    protected function prepareControllerInstance(lcBaseController $controller)
+    protected function prepareControllerInstance(lcController $controller)
     {
         $controller->setEventDispatcher($this->event_dispatcher);
         $controller->setConfiguration($this->configuration);

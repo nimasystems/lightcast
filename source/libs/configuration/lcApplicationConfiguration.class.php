@@ -217,7 +217,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
                 $_ENV[lcProjectConfiguration::ENV_APP_DEBUG]);
 
-        define('DO_DEBUG', $is_debugging);
+        if (!defined('DO_DEBUG')) {
+            define('DO_DEBUG', $is_debugging);
+        }
+
         define('CONFIG_ENV', $env);
         define('CONFIG_VARIATION', 'default');
 
@@ -409,14 +412,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function setShouldUseDefaultLoaders(bool $use_default_loaders = false)
     {
         $this->should_use_default_loaders = $use_default_loaders;
-    }
-
-    /**
-     * @return false
-     */
-    public function getShortDebugInfo(): bool
-    {
-        return false;
     }
 
     /**

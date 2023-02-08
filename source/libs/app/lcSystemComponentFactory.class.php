@@ -113,11 +113,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($locations) {
             foreach ($locations as $location) {
                 $path = $location['path'];
-
-                $found = lcComponentLocator::getPluginsInPath($path, $location);
-
+                $namespace = $location['namespace'];
+                $found = lcComponentLocator::getPluginsInPath($path, $namespace, $location);
                 $plugins = array_merge($plugins, $found);
-
                 unset($location, $found, $path);
             }
         }
@@ -131,13 +129,14 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
         $controllers = [];
 
-        $locations = $this->configuration->getControllerModuleLocations();
+        $locations = $this->configuration->getModuleLocations();
 
         if ($locations) {
             foreach ($locations as $location) {
                 $path = $location['path'];
+                $namespace = $location['namespace'];
 
-                $found = lcComponentLocator::getControllerModulesInPath($path, $location);
+                $found = lcComponentLocator::getControllerModulesInPath($path, $namespace, $location);
 
                 $controllers = array_merge($controllers, $found);
 
@@ -158,7 +157,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($locations) {
             foreach ($locations as $location) {
                 $path = $location['path'];
-                $found = lcComponentLocator::getControllerWebServicesInPath($path, $location);
+                $namespace = $location['namespace'];
+                $found = lcComponentLocator::getControllerWebServicesInPath($path, $namespace, $location);
                 $controllers = array_merge($controllers, $found);
 
                 unset($location, $found, $path);
@@ -178,10 +178,10 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
         if ($locations) {
             foreach ($locations as $location) {
-                $path = $location['path'];
-                $found = lcComponentLocator::getControllerTasksInPath($path, $location);
+                $found = lcComponentLocator::getControllerTasksInPath($location['path'],
+                    $location['namespace'], $location);
                 $controllers = array_merge($controllers, $found);
-                unset($location, $found, $path);
+                unset($location, $found);
             }
         }
 
@@ -199,7 +199,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($locations) {
             foreach ($locations as $location) {
                 $path = $location['path'];
-                $found = lcComponentLocator::getControllerComponentsInPath($path, $location);
+                $namespace = $location['namespace'];
+                $found = lcComponentLocator::getControllerComponentsInPath($path, $namespace, $location);
                 $controllers = array_merge($controllers, $found);
                 unset($location, $found, $path);
             }
@@ -219,7 +220,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($locations) {
             foreach ($locations as $location) {
                 $path = $location['path'];
-                $found = lcComponentLocator::getActionFormsInPath($path, $location);
+                $namespace = $location['namespace'];
+                $found = lcComponentLocator::getActionFormsInPath($path, $namespace, $location);
                 $forms = array_merge($forms, $found);
                 unset($location, $found, $path);
             }
@@ -280,19 +282,21 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
     public function onPluginConfigurationLoaded(lcEvent $event)
     {
-        $plugin_name = $event->params['name'] ?? null;
+        $plugin_name = $event->params['name'];
+        $plugin_namespace = $event->params['namespace'];
         $plugin_config = $event->params['configuration'] ?? null;
         $is_enabled = isset($event->params['is_enabled']) ? (bool)$event->params['is_enabled'] : null;
 
-        if (!$plugin_name || !$plugin_config) {
+        if (!$plugin_name || !$plugin_namespace || !$plugin_config) {
             return;
         }
 
-        $this->registerPluginClasses($plugin_name, $is_enabled, $plugin_config);
+        $this->registerPluginClasses($plugin_name, $plugin_namespace, $is_enabled, $plugin_config);
     }
 
     /**
      * @param $plugin_name
+     * @param string $plugin_namespace
      * @param $is_enabled
      * @param lcPluginConfiguration $plugin_config
      * @return void
@@ -300,7 +304,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
      * @throws lcLogicException
      * @throws lcSystemException
      */
-    protected function registerPluginClasses($plugin_name, $is_enabled, lcPluginConfiguration $plugin_config)
+    protected function registerPluginClasses($plugin_name, string $plugin_namespace,
+                                             $is_enabled, lcPluginConfiguration $plugin_config)
     {
         $class_autoloader = $this->class_autoloader;
         $plugin_dir = $plugin_config->getPluginDir();
@@ -393,7 +398,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 if ($web_modules && is_array($web_modules)) {
                     foreach ($web_modules as $web_module) {
                         $path = $plugin_dir . DS . lcPlugin::MODULES_PATH . DS . $web_module;
-                        $details = lcComponentLocator::getControllerModuleContextInfo($web_module, $path);
+                        $details = lcComponentLocator::getControllerModuleContextInfo($web_module,
+                            $plugin_namespace . '\\Modules',
+                            $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
@@ -413,7 +420,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 if ($provided_components && is_array($provided_components)) {
                     foreach ($provided_components as $provided_component) {
                         $path = $plugin_dir . DS . lcPlugin::COMPONENTS_PATH . DS . $provided_component;
-                        $details = lcComponentLocator::getControllerComponentContextInfo($provided_component, $path);
+                        $details = lcComponentLocator::getControllerComponentContextInfo($provided_component,
+                            $plugin_namespace . '\\Components',
+                            $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
@@ -434,7 +443,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 if ($provided_tasks) {
                     foreach ($provided_tasks as $provided_task) {
                         $path = $plugin_dir . DS . lcPlugin::TASKS_PATH;
-                        $details = lcComponentLocator::getControllerTaskContextInfo($provided_task, $path);
+                        $details = lcComponentLocator::getControllerTaskContextInfo($provided_task,
+                            $plugin_namespace . '\\Tasks',
+                            $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
@@ -454,7 +465,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 if ($provided_web_services && is_array($provided_web_services)) {
                     foreach ($provided_web_services as $provided_web_service) {
                         $path = $plugin_dir . DS . lcPlugin::WEB_SERVICES_PATH;
-                        $details = lcComponentLocator::getControllerWebServiceContextInfo($provided_web_service, $path);
+                        $details = lcComponentLocator::getControllerWebServiceContextInfo($provided_web_service,
+                            $plugin_namespace . '\\WebServices',
+                            $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
@@ -474,7 +487,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 if ($action_forms && is_array($action_forms)) {
                     foreach ($action_forms as $action_form) {
                         $path = $plugin_dir . DS . lcPlugin::ACTION_FORMS_PATH . DS . $action_form;
-                        $details = lcComponentLocator::getActionFormContextInfo($action_form, $path);
+                        $details = lcComponentLocator::getActionFormContextInfo($action_form,
+                            $plugin_namespace . '\\Forms',
+                            $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
@@ -644,8 +659,9 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($app_locations) {
             foreach ($app_locations as $location) {
                 $path = $location['path'];
+                $namespace = $location['namespace'];
 
-                $found_apps = lcComponentLocator::getProjectApplicationsInPath($path);
+                $found_apps = lcComponentLocator::getProjectApplicationsInPath($path, $namespace);
 
                 if ($found_apps) {
                     foreach ($found_apps as $app) {
@@ -931,8 +947,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
      */
     public function getControllerTaskInstance($controller_name, $context_type = null, $context_name = null): ?lcTaskController
     {
-        // TODO: LC 1.6 implementation pending - ability to specify controllers from specific contexts (plugins, etc)
-
         if (!$controller_name) {
             throw new lcInvalidArgumentException('Invalid controller name');
         }

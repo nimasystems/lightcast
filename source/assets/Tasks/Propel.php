@@ -1,5 +1,7 @@
 <?php
 
+namespace Lightcast\Assets\Tasks;
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -21,7 +23,15 @@
 * E-Mail: info@nimasystems.com
 */
 
-class tPropel extends lcTaskController
+use DOMXPath;
+use lcController;
+use lcDirs;
+use lcFiles;
+use lcInvalidArgumentException;
+use lcSysObj;
+use lcTaskController;
+
+class Propel extends lcTaskController
 {
     const SCHEMA_FILE = 'schema.xml';
     const PROPEL_REVERSE_PARSE_CLASS = 'lcPropelMysqlSchemaParser';
@@ -428,7 +438,7 @@ class tPropel extends lcTaskController
     private function getPluginConfig($plugin_name, $plugin_path)
     {
         if (!isset($this->plugin_configs[$plugin_name])) {
-            $pl_config = $this->getPluginManager()->getInstanceOfPluginConfiguration($plugin_path, $plugin_name, null);
+            $pl_config = $this->getPluginManager()->getInstanceOfPluginConfiguration($plugin_path, $plugin_name);
 
             if (!$pl_config) {
                 return null;
@@ -1428,7 +1438,7 @@ Possible commands:
 
 - insert-sql - builds and inserts the project\'s sql data into the database
 
-- build-sql - builds the project\'s sql data 
+- build-sql - builds the project\'s sql data
 
 - reverse - creates a SCHEMA file from a live database
 

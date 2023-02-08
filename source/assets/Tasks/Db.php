@@ -1,5 +1,7 @@
 <?php /** @noinspection PhpComposerExtensionStubsInspection */
 
+namespace Lightcast\Assets\Tasks;
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -21,7 +23,13 @@
 * E-Mail: info@nimasystems.com
 */
 
-class tDb extends lcTaskController
+use Exception;
+use lcInvalidArgumentException;
+use lcNotAvailableException;
+use lcTaskController;
+use PDO;
+
+class Db extends lcTaskController
 {
     public function executeTask(): bool
     {
@@ -88,7 +96,7 @@ class tDb extends lcTaskController
                     ) {
                         $this->display('Converting table: ' . $table . ':' . $col_name);
 
-                        $sql = 'ALTER TABLE `' . $table . '` CHANGE `' . $col_name . '` `' . $col_name . '` 
+                        $sql = 'ALTER TABLE `' . $table . '` CHANGE `' . $col_name . '` `' . $col_name . '`
                         ' . $type .
                             ' CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci' .
                             (!$can_be_null ? ' NOT NULL' : null) .

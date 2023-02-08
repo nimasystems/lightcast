@@ -32,7 +32,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     public const DEFAULT_CONFIG_ENV = lcEnvConfigHandler::ENV_PROD;
 
     public const DEFAULT_PLUGINS_LOCATION = 'Plugins';
-    public const DEFAULT_PROJECT_NAME = 'Default';
+    public const DEFAULT_PROJECT_NAME = 'Project';
+    public const DEFAULT_PROJECT_NAMESPACE = 'Project';
     public const CLASS_CACHE_RESET_KEY_SUFFIX = '_should_reset';
 
     public const ENCRYPTION_KEY_FILENAME = 'secrets/.key';
@@ -365,6 +366,15 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         // may be overriden by subclassers
         return self::DEFAULT_PROJECT_NAME;
+    }
+
+    /**
+     * @return string
+     */
+    public function getProjectNamespace(): string
+    {
+        // may be overriden by subclassers
+        return self::DEFAULT_PROJECT_NAMESPACE;
     }
 
     /**
@@ -757,7 +767,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
-                'path' => $this->getProjectDir() . DS . 'applications',
+                'path' => $this->getSrcDir('Applications'),
+                'namespace' => $this->getNamespacedClass('\\Applications'),
             ],
         ];
     }
@@ -776,6 +787,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
         $locations_new = [];
 
+        $ns = $this->getNamespacedClass('Plugins');
+
         foreach ($locations as $path) {
             $path = lcMisc::isPathAbsolute($path) ? $path : $this->getSrcDir($path);
 
@@ -784,6 +797,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
                 'path' => $path,
+                'namespace' => $ns,
                 // deprecated - no longer present
                 //                'web_path' => '/addons/plugins/',
             ];
@@ -802,6 +816,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'namespace' => '\\Lightcast\\Assets\\Forms',
                 'path' => $this->getAssetsDir() . DS . 'Forms',
             ],
             /* app modules to be overriden in the inherited app config class */
@@ -844,11 +859,12 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     /**
      * @return array[]
      */
-    public function getControllerModuleLocations(): array
+    public function getModuleLocations(): array
     {
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'namespace' => '\\Lightcast\\Assets\\Modules',
                 'path' => $this->getAssetsDir() . DS . 'Modules',
             ],
             /* app modules to be overriden in the inherited app config class */
@@ -863,22 +879,16 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'namespace' => '\\Lightcast\\Assets\\Components',
                 'path' => $this->getAssetsDir() . DS . 'Components',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
+                'namespace' => $this->getNamespacedClass('Components'),
                 'path' => $this->getSrcDir('Components'),
             ],
         ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getAddonsDir(): string
-    {
-        return $this->getProjectDir() . DS . 'addons';
     }
 
     /**
@@ -889,14 +899,21 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'namespace' => '\\Lightcast\\Assets\\Tasks',
                 'path' => $this->getAssetsDir() . DS . 'Tasks',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
+                'namespace' => $this->getNamespacedClass('Tasks'),
                 'path' => $this->getSrcDir('Tasks'),
             ],
         ];
+    }
+
+    public function getNamespacedClass(string $class): string
+    {
+        return '\\' . $this->getProjectNamespace() . '\\' . $class;
     }
 
     /**
@@ -907,11 +924,13 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
+                'namespace' => '\\Lightcast\\Assets\\WebServices',
                 'path' => $this->getAssetsDir() . DS . 'WebServices',
             ],
             [
                 'context_type' => lcSysObj::CONTEXT_PROJECT,
                 'context_name' => $this->getProjectName(),
+                'namespace' => $this->getNamespacedClass('WebServices'),
                 'path' => $this->getSrcDir('WebServices'),
             ],
         ];

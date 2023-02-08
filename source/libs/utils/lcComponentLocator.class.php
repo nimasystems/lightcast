@@ -28,12 +28,13 @@ declare(strict_types=1);
 class lcComponentLocator
 {
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getProjectApplicationsInPath($path, array $options = null): array
+    public static function getProjectApplicationsInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -45,7 +46,7 @@ class lcComponentLocator
 
         if ($subdirs) {
             foreach ($subdirs as $dir) {
-                $found = self::getProjectApplicationContextInfo($dir, $path . DS . $dir);
+                $found = self::getProjectApplicationContextInfo($dir, $namespace, $path . DS . $dir);
 
                 $applications[$dir] = $options ? array_merge($options, $found) : $found;
 
@@ -57,25 +58,28 @@ class lcComponentLocator
     }
 
     /**
-     * @param $application_name
-     * @param $path
+     * @param string $application_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getProjectApplicationContextInfo($application_name, $path): array
+    public static function getProjectApplicationContextInfo(string $application_name, string $namespace, string $path): array
     {
         return [
             'name' => $application_name,
+            'namespace' => $namespace,
             'path' => $path,
         ];
     }
 
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getPluginsInPath($path, array $options = null): array
+    public static function getPluginsInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -87,7 +91,7 @@ class lcComponentLocator
 
         if ($subdirs) {
             foreach ($subdirs as $dir) {
-                $found = self::getPluginContextInfo($dir, $path . DS . $dir);
+                $found = self::getPluginContextInfo($dir, $namespace, $path . DS . $dir);
                 $plugins[$dir] = $options ? array_merge($options, $found) : $found;
                 unset($dir);
             }
@@ -97,27 +101,29 @@ class lcComponentLocator
     }
 
     /**
-     * @param $plugin_name
-     * @param $path
+     * @param string $plugin_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getPluginContextInfo($plugin_name, $path): array
+    public static function getPluginContextInfo(string $plugin_name, string $namespace, string $path): array
     {
         return [
             'name' => $plugin_name,
             'path' => $path,
             'filename' => $plugin_name . '.php',
-            'class' => $plugin_name,
+            'class' => $namespace . '\\' . $plugin_name,
         ];
     }
 
     /**
      * @param $path
-     * @param array|null $options
+     * @par
+     * am array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getControllerComponentsInPath($path, array $options = null): array
+    public static function getControllerComponentsInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -139,7 +145,7 @@ class lcComponentLocator
 
                 // do not look for the file as the operation is way too expensive
                 // even if the module is invalid - if it is invoked the operation will fail later on
-                $found = self::getControllerComponentContextInfo($component_name, $fullpath);
+                $found = self::getControllerComponentContextInfo($component_name, $namespace, $fullpath);
 
                 $components[$component_name] = $options ? array_merge($options, $found) : $found;
 
@@ -151,27 +157,29 @@ class lcComponentLocator
     }
 
     /**
-     * @param $controller_name
-     * @param $path
+     * @param string $controller_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getControllerComponentContextInfo($controller_name, $path): array
+    public static function getControllerComponentContextInfo(string $controller_name, string $namespace, string $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => $controller_name,
+            'class' => $namespace . '\\' . $controller_name,
         ];
     }
 
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getActionFormsInPath($path, array $options = null): array
+    public static function getActionFormsInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -193,7 +201,7 @@ class lcComponentLocator
 
                 // do not look for the file as the operation is way too expensive
                 // even if the module is invalid - if it is invoked the operation will fail later on
-                $found = self::getActionFormContextInfo($form_name, $fullpath);
+                $found = self::getActionFormContextInfo($form_name, $namespace, $fullpath);
 
                 $forms[$form_name] = $options ? array_merge($options, $found) : $found;
 
@@ -205,27 +213,29 @@ class lcComponentLocator
     }
 
     /**
-     * @param $form_name
-     * @param $path
+     * @param string $form_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getActionFormContextInfo($form_name, $path): array
+    public static function getActionFormContextInfo(string $form_name, string $namespace, string $path): array
     {
         return [
             'name' => $form_name,
             'path' => $path,
             'filename' => $form_name . '.php',
-            'class' => $form_name,
+            'class' => $namespace . '\\' . $form_name,
         ];
     }
 
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getControllerModulesInPath($path, array $options = null): array
+    public static function getControllerModulesInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -247,7 +257,7 @@ class lcComponentLocator
 
                 // do not look for the file as the operation is way too expensive
                 // even if the module is invalid - if it is invoked the operation will fail later on
-                $found = self::getControllerModuleContextInfo($module_name, $fullpath);
+                $found = self::getControllerModuleContextInfo($module_name, $namespace, $fullpath);
 
                 $modules[$module_name] = $options ? array_merge($options, $found) : $found;
 
@@ -259,27 +269,29 @@ class lcComponentLocator
     }
 
     /**
-     * @param $controller_name
-     * @param $path
+     * @param string $controller_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getControllerModuleContextInfo($controller_name, $path): array
+    public static function getControllerModuleContextInfo(string $controller_name, string $namespace, string $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => $controller_name,
+            'class' => $namespace . '\\' . $controller_name,
         ];
     }
 
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getControllerWebServicesInPath($path, array $options = null): array
+    public static function getControllerWebServicesInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -309,7 +321,7 @@ class lcComponentLocator
 
                 // do not look for the file as the operation is way too expensive
                 // even if the module is invalid - if it is invoked the operation will fail later on
-                $found = self::getControllerWebServiceContextInfo($web_service_name, $fullpath);
+                $found = self::getControllerWebServiceContextInfo($web_service_name, $namespace, $fullpath);
 
                 $found = $options ? array_merge($options, $found) : $found;
                 $web_services[$web_service_name] = $found;
@@ -322,27 +334,29 @@ class lcComponentLocator
     }
 
     /**
-     * @param $controller_name
-     * @param $path
+     * @param string $controller_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getControllerWebServiceContextInfo($controller_name, $path): array
+    public static function getControllerWebServiceContextInfo(string $controller_name, string $namespace, string $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => $controller_name,
+            'class' => $namespace . '\\' . $controller_name,
         ];
     }
 
     /**
-     * @param $path
+     * @param string $path
+     * @param string $namespace
      * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
      */
-    public static function getControllerTasksInPath($path, array $options = null): array
+    public static function getControllerTasksInPath(string $path, string $namespace, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -372,7 +386,7 @@ class lcComponentLocator
 
                 // do not look for the file as the operation is way too expensive
                 // even if the module is invalid - if it is invoked the operation will fail later on
-                $found = self::getControllerTaskContextInfo($task_name, $fullpath);
+                $found = self::getControllerTaskContextInfo($task_name, $namespace, $fullpath);
 
                 $found = $options ? array_merge($options, $found) : $found;
                 $tasks[$task_name] = $found;
@@ -385,17 +399,18 @@ class lcComponentLocator
     }
 
     /**
-     * @param $controller_name
-     * @param $path
+     * @param string $controller_name
+     * @param string $namespace
+     * @param string $path
      * @return array
      */
-    public static function getControllerTaskContextInfo($controller_name, $path): array
+    public static function getControllerTaskContextInfo(string $controller_name, string $namespace, string $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => $controller_name,
+            'class' => $namespace . '\\' . $controller_name,
         ];
     }
 }

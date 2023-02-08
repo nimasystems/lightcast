@@ -1,5 +1,7 @@
 <?php
 
+namespace Lightcast\Assets\Tasks;
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -21,7 +23,15 @@
 * E-Mail: info@nimasystems.com
 */
 
-class tIntegration extends lcTaskController
+use lcConsolePainter;
+use lcDirs;
+use lcFiles;
+use lcInvalidArgumentException;
+use lcIOException;
+use lcSys;
+use lcTaskController;
+
+class Integration extends lcTaskController
 {
     public function executeTask()
     {

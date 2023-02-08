@@ -118,7 +118,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         $this->consoleDisplay($data, $prefixed, $return);
     }
 
-    public function getHelpInformation()
+    public function getHelpInformation(): ?string
     {
         // deprecated - for compatibility
         if (method_exists($this, 'getHelpInfo')) {
@@ -126,7 +126,7 @@ abstract class lcTaskController extends lcController implements iDebuggable
         }
 
         $this->consoleDisplay('No help information provided by: \'' . $this->getControllerName() . '\'');
-        return false;
+        return null;
     }
 
     protected function outputViewContents(lcController $controller, $content = null, $content_type = null)

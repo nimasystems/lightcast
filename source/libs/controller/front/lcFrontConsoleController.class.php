@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,22 +22,27 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcFrontConsoleController extends lcFrontController
 {
     /** @var lcConsoleResponse */
     protected $response;
 
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
+    /**
+     * @return void
+     */
     protected function beforeDispatch()
     {
         // custom code before dispatching
     }
 
-    protected function prepareDispatchParams(lcRequest $request)
+    /**
+     * @param lcRequest $request
+     * @return array
+     */
+    protected function prepareDispatchParams(lcRequest $request): array
     {
         $params = $request->getParams();
         $tmp = [];
@@ -57,7 +63,18 @@ class lcFrontConsoleController extends lcFrontController
         return $tmp;
     }
 
-    protected function shouldDispatch($controller_name, $action_name, array $params = null)
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param array|null $params
+     * @return bool
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
+    protected function shouldDispatch($controller_name, $action_name, array $params = null): bool
     {
         // handler called just before dispatching by front controller
         if (isset($params['help']) || ($controller_name && !$action_name)) {
@@ -72,6 +89,15 @@ class lcFrontConsoleController extends lcFrontController
         return true;
     }
 
+    /**
+     * @param $controller_name
+     * @return void
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
     protected function displayControllerHelp($controller_name)
     {
         $help_info = $this->getControllerHelpInformation($controller_name);
@@ -83,7 +109,16 @@ class lcFrontConsoleController extends lcFrontController
         $this->response->consoleDisplay($output, false);
     }
 
-    protected function getControllerHelpInformation($controller_name)
+    /**
+     * @param $controller_name
+     * @return string|null
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
+    protected function getControllerHelpInformation($controller_name): ?string
     {
         /** @var lcTaskController $controller */
         $controller = $this->getControllerInstance($controller_name);
@@ -101,6 +136,18 @@ class lcFrontConsoleController extends lcFrontController
         return $help;
     }
 
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param $action_type
+     * @param $context_type
+     * @param $context_name
+     * @return lcController|lcTaskController|null
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
     public function getControllerInstance($controller_name, $action_name = null, $action_type = null, $context_type = null, $context_name = null)
     {
         if (!$this->system_component_factory) {
@@ -131,7 +178,10 @@ class lcFrontConsoleController extends lcFrontController
         return $controller_instance;
     }
 
-    public function getConsoleIntro()
+    /**
+     * @return string
+     */
+    public function getConsoleIntro(): string
     {
         $ver = LIGHTCAST_VER;
         $lyear = date('Y');

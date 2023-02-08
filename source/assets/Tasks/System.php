@@ -20,6 +20,19 @@
 * E-Mail: info@nimasystems.com
 */
 
+namespace Lightcast\Assets\Tasks;
+
+use Exception;
+use lcConsolePainter;
+use lcDirs;
+use lcFiles;
+use lcFinder;
+use lcInvalidArgumentException;
+use lcIOException;
+use lcNotAvailableException;
+use lcProjectConfiguration;
+use lcTaskController;
+use lcYamlFileParser;
 use ParagonIE\Halite\HiddenString;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
@@ -27,7 +40,7 @@ use Symfony\Component\Dotenv\Dotenv;
 
 //require_once('parsers' . DS . 'lcYamlFileParser.class.php');
 
-class tSystem extends lcTaskController
+class System extends lcTaskController
 {
     const CFG_BACKUP_FILE_EXT = 'frz';
 

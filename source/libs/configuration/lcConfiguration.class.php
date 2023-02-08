@@ -51,8 +51,8 @@ abstract class lcConfiguration extends lcSysObj implements ArrayAccess, iCacheab
     {
         parent::initialize();
 
-        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'iConfigDataProvider.class.php';
-        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'config_providers' . DS . 'lcYamlConfigDataProvider.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'providers' . DS . 'iConfigDataProvider.class.php';
+        require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'providers' . DS . 'lcYamlConfigDataProvider.class.php';
 
         require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcConfigHandler.class.php';
         require_once ROOT . DS . 'source' . DS . 'libs' . DS . 'configuration' . DS . 'handlers' . DS . 'lcEnvConfigHandler.class.php';

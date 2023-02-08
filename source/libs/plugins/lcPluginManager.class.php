@@ -79,9 +79,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     {
         parent::initialize();
 
-        $this->plugins =
-            [];
-
+        $this->plugins = [];
         $this->plugin_configurations = [];
 
         $this->plugin_webpath = $this->configuration['plugins.webpath'];
@@ -133,7 +131,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return $this->plugin_autoload_configurations[$plugin_name];
         }
 
-        $filename = $root_dir . DS . 'config' . DS . 'autoload.php';
+        $filename = $root_dir . DS . 'Config' . DS . 'autoload.php';
 
         $autoload_file_exists_cached = isset($this->autoload_class_map_file_exists_map[$plugin_name]) &&
             $this->autoload_class_map_file_exists_map[$plugin_name];
@@ -221,12 +219,15 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     continue;
                 }
 
+                $plugin_namespace = $this->configuration->getNamespacedClass('\\Plugins\\' . $plugin_name);
+
                 // set / cache it
                 $this->plugin_configurations[$plugin_name] = $plugin_config;
 
                 // notify observers
                 $this->event_dispatcher->notify(new lcEvent('plugin_manager.plugin_configuration_loaded', $this, [
                     'name' => $plugin_name,
+                    'namespace' => $plugin_namespace,
                     'is_enabled' => $is_plugin_enabled,
                     'configuration' => &$plugin_config,
                 ]));
@@ -280,7 +281,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      */
     private function includePluginConfig($root_dir, $plugin_name, $verify)
     {
-        $filename = $root_dir . DS . 'config' . DS . 'config.php';
+        $filename = $root_dir . DS . 'Config' . DS . 'Configuration.php';
         $ret = null;
 
         if (!$verify) {
@@ -322,10 +323,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         }
 
         $cls_names = [
-            lcInflector::camelize($plugin_name . '_plugin_configuration', false),
-            lcInflector::camelize($plugin_name . '_config_configuration', false),
-            lcInflector::camelize($plugin_name . '_config', false),
-            lcfirst(lcInflector::camelize($plugin_name . '_config', false)),
+            $this->getPluginNamespacedClass($plugin_name . '\\Config\\Configuration'),
         ];
 
         // cache this so we don't need to call subcamelize several times
@@ -334,13 +332,18 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         return $cls_names;
     }
 
+    public function getPluginNamespacedClass(string $class): string
+    {
+        return '\\' . $this->configuration->getProjectNamespace() . '\\Plugins\\' . $class;
+    }
+
     /**
      * @param $root_dir
      * @param $plugin_name
      * @param $web_path
      * @return lcPluginConfiguration|null
      * @throws lcPluginException
-     * @throws lcSystemException
+     * @throws lcSystemException|lcConfigException
      */
     public function getInstanceOfPluginConfiguration($root_dir, $plugin_name, $web_path = null): ?lcPluginConfiguration
     {
@@ -438,7 +441,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
     /**
      * @param $plugin_name
      * @return lcPluginConfiguration|null
-     * @throws lcSystemException|lcPluginException
+     * @throws lcSystemException|lcPluginException|lcConfigException
      */
     public function getPluginConfiguration($plugin_name): ?lcPluginConfiguration
     {
@@ -1174,15 +1177,18 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         // otherwise when expanding them into objects - they won't be found!
         return [
             'plugin_configurations' => ($this->plugin_configurations ? serialize($this->plugin_configurations) : null),
-            'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ? serialize($this->plugin_autoload_configurations) : null),
+            'plugin_autoload_configurations' => ($this->plugin_autoload_configurations ?
+                serialize($this->plugin_autoload_configurations) : null),
             'autoload_class_map_file_exists_map' => $this->autoload_class_map_file_exists_map,
         ];
     }
 
     public function readClassCache(array $cached_data)
     {
-        $this->plugin_configurations = isset($cached_data['plugin_configurations']) ? unserialize($cached_data['plugin_configurations']) : null;
-        $this->plugin_autoload_configurations = isset($cached_data['plugin_autoload_configurations']) ? unserialize($cached_data['plugin_autoload_configurations']) : null;
+        $this->plugin_configurations = isset($cached_data['plugin_configurations']) ?
+            unserialize($cached_data['plugin_configurations']) : null;
+        $this->plugin_autoload_configurations = isset($cached_data['plugin_autoload_configurations']) ?
+            unserialize($cached_data['plugin_autoload_configurations']) : null;
         $this->autoload_class_map_file_exists_map = $cached_data['autoload_class_map_file_exists_map'] ?? null;
     }
 }

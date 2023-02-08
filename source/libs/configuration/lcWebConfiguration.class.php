@@ -158,7 +158,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
      */
     public function getControllerModuleLocations(): array
     {
-        $parent_locations = $this->project_configuration->getControllerModuleLocations();
+        $parent_locations = $this->project_configuration->getModuleLocations();
 
         // app modules
         $controller_locations = [[

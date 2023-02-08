@@ -179,9 +179,6 @@ require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 's
 require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'POP3.php';
 require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'PHPMailer' . DS . 'src' . DS . 'SMTP.php';
 
-// Browser Detection
-require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'browser_detection' . DS . 'Browser.php';
-
 // GlobToRegex
 require_once ROOT . DS . 'source' . DS . '3rdparty' . DS . 'GlobToRegex' . DS . 'sfGlobToRegex.class.php';
 

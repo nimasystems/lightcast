@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,11 +22,26 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcFrontWebController extends lcFrontController
 {
     /** @var lcWebRequest */
     protected $request;
 
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param $action_type
+     * @param $context_type
+     * @param $context_name
+     * @return lcController|lcWebController|null
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
     public function getControllerInstance($controller_name, $action_name = null, $action_type = null, $context_type = null, $context_name = null)
     {
         if (!$this->system_component_factory) {
@@ -63,18 +79,30 @@ class lcFrontWebController extends lcFrontController
         return $controller_instance;
     }
 
+    /**
+     * @return void
+     */
     protected function beforeDispatch()
     {
         // custom code before dispatching
     }
 
-    protected function shouldDispatch($controller_name, $action_name, array $params = null)
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param array|null $params
+     * @return bool
+     */
+    protected function shouldDispatch($controller_name, $action_name, array $params = null): bool
     {
         // handler called just before dispatching by front controller
         return $this->isRequestSuported();
     }
 
-    protected function isRequestSuported()
+    /**
+     * @return bool
+     */
+    protected function isRequestSuported(): bool
     {
         $request = $this->request;
 
@@ -82,7 +110,10 @@ class lcFrontWebController extends lcFrontController
         return in_array($request->getMethod(), $this->getSupportedRequestMethods());
     }
 
-    protected function getSupportedRequestMethods()
+    /**
+     * @return array
+     */
+    protected function getSupportedRequestMethods(): array
     {
         return [
             lcHttpMethod::METHOD_GET,
@@ -92,7 +123,11 @@ class lcFrontWebController extends lcFrontController
         ];
     }
 
-    protected function prepareDispatchParams(lcRequest $request)
+    /**
+     * @param lcRequest $request
+     * @return array
+     */
+    protected function prepareDispatchParams(lcRequest $request): array
     {
         // parse the request params and merge them
         // pass to forwarded method for easier access
@@ -176,6 +211,20 @@ class lcFrontWebController extends lcFrontController
         return $params;
     }
 
+    /**
+     * @param $controller_name
+     * @param $action_name
+     * @param array|null $action_params
+     * @param array|null $options
+     * @return void
+     * @throws lcActionNotFoundException
+     * @throws lcControllerForwardException
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcLogicException
+     * @throws lcNotAvailableException
+     * @throws lcRenderException
+     */
     protected function handleControllerNotReachable($controller_name, $action_name = null, array $action_params = null, array $options = null)
     {
         parent::handleControllerNotReachable($controller_name, $action_params, $options);
@@ -183,7 +232,7 @@ class lcFrontWebController extends lcFrontController
         /** @var lcWebResponse $response */
         $response = $this->response;
 
-        if ((bool)$this->configuration['routing.send_http_errors']) {
+        if ($this->configuration['routing.send_http_errors']) {
             $this->info('Sending a HTTP 404 because no suitable module/action were found for the request');
 
             $response->sendHttpNotFound();
@@ -193,6 +242,9 @@ class lcFrontWebController extends lcFrontController
         throw new lcControllerForwardException('Could not forward to controller action');
     }
 
+    /**
+     * @return void
+     */
     protected function handleControllerNotReachableAfter()
     {
         // don't throw here - but in handleControllerNotReachable

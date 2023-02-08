@@ -1,5 +1,7 @@
 <?php
 
+namespace Lightcast\Assets\Tasks;
+
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -21,7 +23,11 @@
 * E-Mail: info@nimasystems.com
 */
 
-class tMisc extends lcTaskController
+use lcDirs;
+use lcPlugin;
+use lcTaskController;
+
+class Misc extends lcTaskController
 {
     private $found_models;
     private $found_php_files;
