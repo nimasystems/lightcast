@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,48 +22,51 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbModelOperations, iSupportsComponentOperations
 {
-    const ASSETS_PATH = 'web';
-    const CONFIG_PATH = 'config';
-    const MODELS_PATH = 'models';
-    const MODULES_PATH = 'modules';
-    const ACTION_FORMS_PATH = 'forms';
-    const COMPONENTS_PATH = 'components';
-    const WEB_SERVICES_PATH = 'ws';
-    const TASKS_PATH = 'tasks';
+    public const ASSETS_PATH = 'web';
+    public const CONFIG_PATH = 'Config';
+    public const MODELS_PATH = 'Models';
+    public const MODULES_PATH = 'Modules';
+    public const ACTION_FORMS_PATH = 'Forms';
+    public const COMPONENTS_PATH = 'Components';
+    public const WEB_SERVICES_PATH = 'WebServices';
+    public const TASKS_PATH = 'Tasks';
 
-    /** @var lcApp */
-    protected $app_context;
+    /** @var ?lcApp */
+    protected ?lcApp $app_context = null;
 
-    protected $app_initialize_done;
+    protected bool $app_initialize_done = false;
 
-    /** @var lcDatabaseModelManager */
-    protected $database_model_manager;
+    /** @var ?lcDatabaseModelManager */
+    protected ?lcDatabaseModelManager $database_model_manager = null;
 
-    /** @var lcSystemComponentFactory */
-    protected $system_component_factory;
+    /** @var ?lcSystemComponentFactory */
+    protected ?lcSystemComponentFactory $system_component_factory = null;
 
-    /** @var lcPluginConfiguration */
-    protected $plugin_configuration;
-
-    /** @var array */
-    protected $use_models;
+    /** @var ?lcPluginConfiguration */
+    protected ?lcPluginConfiguration $plugin_configuration = null;
 
     /** @var array */
-    protected $use_components;
+    protected array $use_models = [];
+
+    /** @var array */
+    protected array $use_components = [];
 
     /** @var lcComponent[] */
-    protected $loaded_components;
+    protected array $loaded_components = [];
 
-    protected $controller_name;
-    protected $controller_filename;
+    protected ?string $controller_name = null;
+    protected ?string $controller_filename = null;
 
-    protected $context_type;
-    protected $context_name;
+    protected $context_type = null;
+    protected $context_name = null;
 
-    private $included_javascripts = [];
-    private $included_stylesheets = [];
+    private array $included_javascripts = [];
+    private array $included_stylesheets = [];
 
     public function initialize()
     {
@@ -146,7 +150,10 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->loaded_components = $loaded_components;
     }
 
-    protected function getRandomIdentifier()
+    /**
+     * @return string
+     */
+    protected function getRandomIdentifier(): string
     {
         return 'plugin_' . $this->getPluginName() . '_' . $this->getClassName() . '_' . lcStrings::randomString(15);
     }
@@ -154,7 +161,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     /**
      * @return array
      */
-    public function getIncludedJavascripts()
+    public function getIncludedJavascripts(): array
     {
         return $this->included_javascripts;
     }
@@ -162,7 +169,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     /**
      * @return array
      */
-    public function getIncludedStylesheets()
+    public function getIncludedStylesheets(): array
     {
         return $this->included_stylesheets;
     }
@@ -173,7 +180,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
      * @param null $tag
      * @return $this
      */
-    protected function includeJavascript($src, array $options = null, $tag = null)
+    protected function includeJavascript($src, array $options = null, $tag = null): lcPlugin
     {
         $tag = $tag ?: 'js_' . $this->getRandomIdentifier();
         $this->included_javascripts[$tag] = [
@@ -183,7 +190,13 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $this;
     }
 
-    protected function includeStylesheet($src, array $options = null, $tag = null)
+    /**
+     * @param $src
+     * @param array|null $options
+     * @param $tag
+     * @return $this
+     */
+    protected function includeStylesheet($src, array $options = null, $tag = null): lcPlugin
     {
         $tag = $tag ?: 'css_' . $this->getRandomIdentifier();
         $this->included_stylesheets[$tag] = [
@@ -193,7 +206,18 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $this;
     }
 
-    protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null)
+    /**
+     * @param $component_name
+     * @param $context_type
+     * @param $context_name
+     * @return lcComponent|null
+     * @throws lcInvalidArgumentException
+     * @throws lcLogicException
+     * @throws lcNotAvailableException
+     * @throws lcRequirementException
+     * @throws lcSystemException
+     */
+    protected function getComponentControllerInstance($component_name, $context_type = null, $context_name = null): ?lcComponent
     {
         if (!$this->app_context || !$this->app_context->getIsInitialized()) {
             throw new lcLogicException('App not available or not initialized yet');
@@ -238,7 +262,10 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $controller_instance;
     }
 
-    public function getHasAppInitialized()
+    /**
+     * @return bool
+     */
+    public function getHasAppInitialized(): bool
     {
         return $this->app_initialize_done;
     }
@@ -248,7 +275,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         // shutdown loaded components
         $loaded_components = $this->loaded_components;
 
-        if ($loaded_components && is_array($loaded_components)) {
+        if ($loaded_components) {
             foreach ($loaded_components as $idx => $component) {
                 $component->shutdown();
                 unset($this->loaded_components[$idx]);
@@ -260,39 +287,55 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->database_model_manager =
         $this->plugin_manager =
         $this->plugin_configuration =
+            null;
+
         $this->loaded_components =
         $this->use_components =
-        $this->use_models =
-            null;
+        $this->use_models = [];
 
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    /**
+     * @return array
+     */
+    public function getDebugInfo(): array
     {
         return [
             'name' => $this->controller_name,
-            'configuration' => ($this->plugin_configuration && $this->plugin_configuration instanceof iDebuggable ?
+            'configuration' => ($this->plugin_configuration instanceof iDebuggable ?
                 $this->plugin_configuration->getDebugInfo() : null),
         ];
     }
 
-    public function getShortDebugInfo()
+    /**
+     * @return false
+     */
+    public function getShortDebugInfo(): bool
     {
         return false;
     }
 
-    public function getUsedDbModels()
+    /**
+     * @return array
+     */
+    public function getUsedDbModels(): array
     {
         return $this->use_models;
     }
 
-    public function getUsedComponents()
+    /**
+     * @return array
+     */
+    public function getUsedComponents(): array
     {
         return $this->use_components;
     }
 
-    public function getDatabaseModelManager()
+    /**
+     * @return lcDatabaseModelManager
+     */
+    public function getDatabaseModelManager(): lcDatabaseModelManager
     {
         return $this->database_model_manager;
     }
@@ -302,7 +345,10 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->database_model_manager = $database_model_manager;
     }
 
-    public function getSystemComponentFactory()
+    /**
+     * @return lcSystemComponentFactory
+     */
+    public function getSystemComponentFactory(): lcSystemComponentFactory
     {
         return $this->system_component_factory;
     }
@@ -312,7 +358,10 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->system_component_factory = $component_factory;
     }
 
-    public function getPluginConfiguration()
+    /**
+     * @return lcPluginConfiguration
+     */
+    public function getPluginConfiguration(): lcPluginConfiguration
     {
         return $this->plugin_configuration;
     }
@@ -322,67 +371,109 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         $this->plugin_configuration = $configuration;
     }
 
-    public function getControllerName()
+    /**
+     * @return string|null
+     */
+    public function getControllerName(): ?string
     {
         return $this->controller_name;
     }
 
+    /**
+     * @param $controller_name
+     * @return void
+     */
     public function setControllerName($controller_name)
     {
         $this->controller_name = $controller_name;
     }
 
-    public function getControllerFilename()
+    /**
+     * @return string|null
+     */
+    public function getControllerFilename(): ?string
     {
         return $this->controller_filename;
     }
 
+    /**
+     * @param $controller_filename
+     * @return void
+     */
     public function setControllerFilename($controller_filename)
     {
         $this->controller_filename = $controller_filename;
     }
 
-    public function getName()
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
     {
         return $this->controller_name;
     }
 
-    public function getRootDir()
+    /**
+     * @return string
+     */
+    public function getRootDir(): string
     {
         return $this->getPluginDir();
     }
 
-    public function getPluginDir()
+    /**
+     * @return string
+     */
+    public function getPluginDir(): string
     {
         return $this->plugin_configuration->getPluginDir();
     }
 
-    public function getComponentsDir()
+    /**
+     * @return string
+     */
+    public function getComponentsDir(): string
     {
         return $this->getPluginDir() . DS . self::COMPONENTS_PATH;
     }
 
-    public function getModelsDir()
+    /**
+     * @return string
+     */
+    public function getModelsDir(): string
     {
         return $this->getPluginDir() . DS . self::MODELS_PATH;
     }
 
-    public function getModulesDir()
+    /**
+     * @return string
+     */
+    public function getModulesDir(): string
     {
         return $this->getPluginDir() . DS . self::MODULES_PATH;
     }
 
-    public function getAssetsPath()
+    /**
+     * @return string
+     */
+    public function getAssetsPath(): string
     {
         return $this->getPluginDir() . DS . self::ASSETS_PATH;
     }
 
-    public function getAssetsWebPath($type = null)
+    /**
+     * @param $type
+     * @return string
+     */
+    public function getAssetsWebPath($type = null): string
     {
         return $this->getWebPath() . self::ASSETS_PATH . '/' . ($type ? $type . '/' : null);
     }
 
-    public function getWebPath()
+    /**
+     * @return string
+     */
+    public function getWebPath(): string
     {
         return $this->plugin_configuration->getWebPath();
     }
@@ -418,46 +509,69 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
      * @deprecated The method is used by LC 1.4 projects
     */
 
-    protected function getPluginManager()
+    /**
+     * @return lcPluginManager
+     */
+    protected function getPluginManager(): lcPluginManager
     {
         return $this->plugin_manager;
     }
 
+    /**
+     * @return mixed
+     */
     public function getContextName()
     {
         return $this->context_name;
     }
 
+    /**
+     * @param $context_name
+     * @return void
+     */
     public function setContextName($context_name)
     {
         $this->context_name = $context_name;
     }
 
-    public function getContextType()
+    /**
+     * @return int
+     */
+    public function getContextType(): int
     {
         return $this->context_type;
     }
 
+    /**
+     * @param $context_type
+     * @return void
+     */
     public function setContextType($context_type)
     {
         $this->context_type = $context_type;
     }
 
-    public function getPluginName()
+    /**
+     * @return string|null
+     */
+    public function getPluginName(): ?string
     {
         return $this->controller_name;
     }
 
-    protected function getComponent($component_name)
+    /**
+     * @param $component_name
+     * @return lcComponent
+     * @throws lcComponentException
+     */
+    protected function getComponent($component_name): lcComponent
     {
-        $component_instance = null;
-
         try {
             if (!$this->app_initialize_done) {
                 throw new lcLogicException('Component is not available for usage until the app has been initialized');
             }
 
-            $component_instance = isset($this->loaded_components[$component_name]) ? $this->loaded_components[$component_name] : null;
+            $component_instance = $this->loaded_components[$component_name] ?? null;
 
             if (!$component_instance) {
                 throw new lcNotAvailableException('Component is not available (' . $component_name . ')');
@@ -472,12 +586,24 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
         return $component_instance;
     }
 
-    protected function tryPlugin($plugin_name)
+    /**
+     * @param $plugin_name
+     * @return lcPlugin|null
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     */
+    protected function tryPlugin($plugin_name): ?lcPlugin
     {
         return $this->plugin_manager->getPlugin($plugin_name, true, false);
     }
 
-    protected function getPlugin($plugin_name)
+    /**
+     * @param $plugin_name
+     * @return lcPlugin|null
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     */
+    protected function getPlugin($plugin_name): ?lcPlugin
     {
         return $this->plugin_manager->getPlugin($plugin_name);
     }

@@ -50,7 +50,7 @@ abstract class lcSysObj extends lcObj implements iLoggable, iI18nProvider
     protected $log_channel;
 
     /**
-     * @var lcDbLanguageSystem
+     * @var lcI18n
      */
     protected $i18n;
     /**

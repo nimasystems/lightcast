@@ -26,29 +26,21 @@ declare(strict_types=1);
 /**
  *
  */
-class lcAppSecurityConfigHandler extends lcEnvConfigHandler
+interface iConfigDataProvider
 {
     /**
-     * @return array[]
+     * @param $config_key
+     * @param array|null $options
+     * @param array|null $config_vars
+     * @return mixed
      */
-    public function getDefaultValues(): array
-    {
-        return ['security' => [
-            'is_secure' => false,
-            'login_module' => 'members',
-            'login_action' => 'login',
-            'logout_module' => 'members',
-            'logout_action' => 'logout',
-            'login_action_url' => '/members/login',
-            'logout_action_url' => '/members/logout',
-            'credentials_module' => 'members',
-            'credentials_action' => 'no_access',
-            'secure_login' => false,
-            'password' => [
-                'encryption' => 'sha1',
-                'salt' => '',
-            ],
-        ]];
-    }
+    public function readConfigData($config_key, array $options = null, array $config_vars = null);
 
+    /**
+     * @param $config_key
+     * @param array $config_data
+     * @param array|null $options
+     * @return mixed
+     */
+    public function writeConfigData($config_key, array $config_data, array $options = null);
 }

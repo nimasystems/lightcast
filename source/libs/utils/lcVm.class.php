@@ -53,30 +53,7 @@ class lcVm
 
     public static function json_encode($data, $unescaped_unicode = false)
     {
-        if (PHP_GREATER_EQUAL_54) {
-            return json_encode($data, ($unescaped_unicode ? JSON_UNESCAPED_UNICODE : 0));
-        } else {
-            $data = json_encode($data);
-
-            $str = $data;
-
-            if ($unescaped_unicode) {
-                // <= 5.3 support for JSON_UNESCAPED_UNICODE
-                $str = preg_replace_callback(
-                    '/\\\\u([0-9a-f]{4})/i',
-                    function ($matches) {
-                        return mb_convert_encoding(
-                            pack('H*', $matches[1]),
-                            'UTF-8',
-                            'UTF-16'
-                        );
-                    },
-                    $data
-                );
-            }
-
-            return $str;
-        }
+        return json_encode($data, ($unescaped_unicode ? JSON_UNESCAPED_UNICODE : 0));
     }
 
     // php log event

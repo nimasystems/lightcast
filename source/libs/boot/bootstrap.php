@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -24,24 +25,24 @@
 if (defined('DO_DEBUG')) {
     // Enable showing all errors until app boots
     error_reporting(E_ALL);
-    ini_set('display_errors', 1);
+    ini_set('display_errors', '1');
 } else {
     // Disable showing all errors until app boots
     error_reporting(0);
-    ini_set('display_errors', 0);
+    ini_set('display_errors', '0');
 }
 
 // check the PHP Version Requirement
-if (!version_compare(PHP_VERSION, '5.6.0', '>=')) {
-    echo 'Lightcast PHP Framework requires PHP Version 5.6.0 or higher';
+if (!version_compare(PHP_VERSION, '7.4', '>=')) {
+    echo 'Lightcast PHP Framework requires PHP Version 7.4 or higher';
     exit(2);
 }
 
 // define the current lightcast version
-define('LIGHTCAST_VER', '1.5.3');
-define('LC_VER_MAJOR', 1);
-define('LC_VER_MINOR', 5);
-define('LC_VER_BUILD', 3);
+define('LIGHTCAST_VER', '2.0.0');
+define('LC_VER_MAJOR', 2);
+define('LC_VER_MINOR', 0);
+define('LC_VER_BUILD', 0);
 define('LC_VER_REVISION', 1);
 define('LC_VER', LIGHTCAST_VER);
 
@@ -69,8 +70,6 @@ if (!defined('PHP_VERSION_ID')) {
     $version = explode('.', PHP_VERSION);
     define('PHP_VERSION_ID', $version[0] * 10000 + $version[1] * 100 + $version[2]);
 }
-
-define('PHP_GREATER_EQUAL_54', PHP_VERSION_ID >= 50400);
 
 // default timezone
 date_default_timezone_set('UTC');

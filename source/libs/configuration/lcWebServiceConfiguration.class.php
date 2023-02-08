@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,26 +22,41 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 class lcWebServiceConfiguration extends lcApplicationConfiguration
 {
-    const DEFAULT_APP_NAME = 'ws';
+    public const DEFAULT_APP_NAME = 'ws';
 
-    public function getApplicationName()
+    /**
+     * @return string
+     */
+    public function getApplicationName(): string
     {
         return self::DEFAULT_APP_NAME;
     }
 
-    public function getApiLevel()
+    /**
+     * @return int
+     */
+    public function getApiLevel(): int
     {
         return 1;
     }
 
+    /**
+     * @return null
+     */
     public function getProjectConfigDir()
     {
         return null;
     }
 
-    public function getConfigHandleMap()
+    /**
+     * @return array|array[]|null
+     */
+    public function getConfigHandleMap(): ?array
     {
         $parent_map = (array)parent::getConfigHandleMap();
 
@@ -71,7 +87,10 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
-    public function getConfigDir()
+    /**
+     * @return string
+     */
+    public function getConfigDir(): string
     {
         return $this->getProjectDir() . DS . 'config';
     }
@@ -79,7 +98,7 @@ class lcWebServiceConfiguration extends lcApplicationConfiguration
     /**
      * @return array
      */
-    public function getConfigParserVars()
+    public function getConfigParserVars(): array
     {
         return [];
     }

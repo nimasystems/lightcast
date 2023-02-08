@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -22,11 +23,17 @@
 
  */
 
+/**
+ *
+ */
 class lcDatabasesConfigHandler extends lcEnvConfigHandler
 {
-    const DEFAULT_PRIMARY_ADAPTER_NAME = 'primary';
+    public const DEFAULT_PRIMARY_ADAPTER_NAME = 'primary';
 
-    public function getDefaultValues()
+    /**
+     * @return array[]
+     */
+    public function getDefaultValues(): array
     {
         return ['db' => [
             'use_database' => false,

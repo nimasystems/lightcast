@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,12 +22,14 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 abstract class lcWebConfiguration extends lcApplicationConfiguration
 {
-    const CONTROLLER_ASSETS_DIR = 'templates';
-    const DEFAULT_CHARSET = 'utf-8';
+    public const CONTROLLER_ASSETS_DIR = 'templates';
+    public const DEFAULT_CHARSET = 'utf-8';
 
-    protected $unique_id_suffix;
     protected $app_dir;
 
     public function initialize()
@@ -47,33 +50,46 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    /**
+     * @return array|array[]
+     */
+    public function getDebugInfo(): array
     {
-        $debug_parent = (array)parent::getDebugInfo();
+        $debug_parent = parent::getDebugInfo();
 
         $debug = ['app_dir' => $this->app_dir];
 
-        $debug = array_merge($debug_parent, $debug);
-
-        return $debug;
+        return array_merge($debug_parent, $debug);
     }
 
-    public function getConfigDir()
+    /**
+     * @return string
+     */
+    public function getConfigDir(): string
     {
         return $this->getAppConfigDir();
     }
 
-    public function getAppConfigDir()
+    /**
+     * @return string
+     */
+    public function getAppConfigDir(): string
     {
         return $this->app_dir . DS . 'config';
     }
 
-    public function getProjectConfigDir()
+    /**
+     * @return string
+     */
+    public function getProjectConfigDir(): string
     {
         return 'applications' . DS . $this->getApplicationName();
     }
 
-    public function getConfigHandleMap()
+    /**
+     * @return array|array[]|null
+     */
+    public function getConfigHandleMap(): ?array
     {
         $parent_map = (array)parent::getConfigHandleMap();
 
@@ -112,14 +128,20 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
-    public function getClientsideJavascript()
+    /**
+     * @return bool
+     */
+    public function getClientsideJavascript(): bool
     {
         return (bool)$this['view.clientside_js'];
     }
 
-    public function getActionFormLocations()
+    /**
+     * @return array[]
+     */
+    public function getActionFormLocations(): array
     {
-        $parent_locations = $this->project_configuration ? $this->project_configuration->getActionFormLocations() : [];
+        $parent_locations = $this->project_configuration->getActionFormLocations();
 
         // app modules
         $controller_locations = [[
@@ -128,12 +150,15 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
                                      'path' => $this->app_dir . DS . 'forms',
                                  ],];
 
-        return array_merge((array)$parent_locations, $controller_locations);
+        return array_merge($parent_locations, $controller_locations);
     }
 
-    public function getControllerModuleLocations()
+    /**
+     * @return array[]
+     */
+    public function getControllerModuleLocations(): array
     {
-        $parent_locations = $this->project_configuration ? $this->project_configuration->getControllerModuleLocations() : [];
+        $parent_locations = $this->project_configuration->getControllerModuleLocations();
 
         // app modules
         $controller_locations = [[
@@ -142,19 +167,30 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
                                      'path' => $this->app_dir . DS . 'modules',
                                  ],];
 
-        return array_merge((array)$parent_locations, $controller_locations);
+        return array_merge($parent_locations, $controller_locations);
     }
 
+    /**
+     * @return mixed
+     */
     public function getAppDir()
     {
         return $this->app_dir;
     }
 
-    public function getLayoutsDir()
+    /**
+     * @return string
+     */
+    public function getLayoutsDir(): string
     {
         return $this->app_dir . DS . 'layouts';
     }
 
+    /**
+     * @return array|false|mixed
+     * @throws lcConfigException
+     * @throws lcSystemException
+     */
     protected function loadConfigurationData()
     {
         // read the configuration
@@ -165,7 +201,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
             $lhandler = new lcLoadersConfigHandler();
             $ldata = $lhandler->getDefaultValues();
 
-            if ($ldata && is_array($ldata) && isset($config_data['loaders'])) {
+            if ($ldata && isset($config_data['loaders'])) {
                 $config_data['loaders'] = $ldata;
             }
 

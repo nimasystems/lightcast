@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,10 +22,18 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 class lcConsoleConfiguration extends lcApplicationConfiguration
 {
-    const DEFAULT_APP_NAME = 'console';
+    public const DEFAULT_APP_NAME = 'console';
 
+    /**
+     * @param $project_dir
+     * @param lcProjectConfiguration|null $project_configuration
+     * @throws lcInvalidArgumentException
+     */
     public function __construct($project_dir = null, lcProjectConfiguration $project_configuration = null)
     {
         if (!$project_dir) {
@@ -33,32 +42,31 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
 
         parent::__construct($project_dir, $project_configuration);
 
-        if ($this->project_configuration) {
-            // shortcuts to enable debugging / disable plugins / disable loaders
-            // / disable db while in CLI
-            if (in_array('--disable-plugins', $_SERVER['argv'])) {
-                $this->setShouldLoadPlugins(false);
-            }
+        // shortcuts to enable debugging / disable plugins / disable loaders
+        // / disable db while in CLI
+        if (in_array('--disable-plugins', $_SERVER['argv'])) {
+            $this->setShouldLoadPlugins(false);
+        }
 
-            if (in_array('--disable-db', $_SERVER['argv'])) {
-                $this->should_disable_databases = true;
-            }
+        if (in_array('--disable-db', $_SERVER['argv'])) {
+            $this->should_disable_databases = true;
+        }
 
-            if (in_array('--use-default-loaders', $_SERVER['argv'])) {
-                $this->should_use_default_loaders = true;
-            }
+        if (in_array('--use-default-loaders', $_SERVER['argv'])) {
+            $this->should_use_default_loaders = true;
+        }
 
-            if (in_array('--disable-loaders', $_SERVER['argv'])) {
-                $this->should_disable_loaders = true;
-            }
+        if (in_array('--disable-loaders', $_SERVER['argv'])) {
+            $this->should_disable_loaders = true;
+        }
 
-            if (in_array('--disable-models', $_SERVER['argv'])) {
-                $this->should_disable_models = true;
-            }
+        if (in_array('--disable-models', $_SERVER['argv'])) {
+            $this->should_disable_models = true;
+        }
 
-            if (in_array('--debug', $_SERVER['argv'])) {
-                $this->project_configuration->setIsDebugging();
-            }
+        if (in_array('--debug', $_SERVER['argv'])) {
+            $this->project_configuration->setIsDebugging();
+        }
 
 //            // pick a different environment
 //            foreach ((array)$_SERVER['argv'] as $v) {
@@ -73,20 +81,28 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
 //                }
 //                unset($v);
 //            }
-        }
     }
 
-    public function getApplicationName()
+    /**
+     * @return string
+     */
+    public function getApplicationName(): string
     {
         return self::DEFAULT_APP_NAME;
     }
 
+    /**
+     * @return null
+     */
     public function getProjectConfigDir()
     {
         return null;
     }
 
-    public function getConfigHandleMap()
+    /**
+     * @return array|array[]|null
+     */
+    public function getConfigHandleMap(): ?array
     {
         $parent_map = (array)parent::getConfigHandleMap();
 
@@ -107,11 +123,19 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
         return $app_map;
     }
 
-    public function getConfigDir()
+    /**
+     * @return string
+     */
+    public function getConfigDir(): string
     {
         return $this->getProjectDir() . DS . 'config';
     }
 
+    /**
+     * @return array|false|mixed
+     * @throws lcConfigException
+     * @throws lcSystemException
+     */
     protected function loadConfigurationData()
     {
         // read the configuration
@@ -122,7 +146,7 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
             $lhandler = new lcConsoleConfigHandler();
             $ldata = $lhandler->getDefaultValues();
 
-            if ($ldata && is_array($ldata) && isset($config_data['loaders']) && $config_data['loaders']) {
+            if ($ldata && isset($config_data['loaders']) && $config_data['loaders']) {
                 $config_data['loaders'] = $ldata['loaders'];
             }
 
@@ -152,7 +176,7 @@ class lcConsoleConfiguration extends lcApplicationConfiguration
     /**
      * @return array
      */
-    public function getConfigParserVars()
+    public function getConfigParserVars(): array
     {
         return [];
     }

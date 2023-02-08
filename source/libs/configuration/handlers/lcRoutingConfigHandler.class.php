@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,9 +22,15 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 class lcRoutingConfigHandler extends lcEnvConfigHandler
 {
-    public function getDefaultValues()
+    /**
+     * @return array[]
+     */
+    public function getDefaultValues(): array
     {
         return ['routing' => [
             'send_http_errors' => true,
@@ -32,7 +39,12 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
         ]];
     }
 
-    protected function postReadConfigData($environment, array $data)
+    /**
+     * @param $environment
+     * @param array $data
+     * @return array
+     */
+    protected function postReadConfigData($environment, array $data): array
     {
         // there is a problem with defaults merging here (order is broken)
         // so we add the default routes ONLY if there are no other routes
@@ -45,7 +57,10 @@ class lcRoutingConfigHandler extends lcEnvConfigHandler
         return $data;
     }
 
-    public function getDefaultRoutes()
+    /**
+     * @return array
+     */
+    public function getDefaultRoutes(): array
     {
         return [
             'view_item' => [

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * Lightcast - A PHP MVC Framework
  * Copyright (C) 2005 Nimasystems Ltd
@@ -20,12 +21,23 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
 {
-    const DEFAULT_EXT = '.yml';
-    const INDENT_VALUE = 2;
-    const WORD_WRAP_VALUE = 0;
+    public const DEFAULT_EXT = '.yml';
+    public const INDENT_VALUE = 2;
+    public const WORD_WRAP_VALUE = 0;
 
+    /**
+     * @param $config_key
+     * @param array|null $options
+     * @param array|null $config_vars
+     * @return array|false|mixed|null
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
     public function readConfigData($config_key, array $options = null, array $config_vars = null)
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
@@ -42,6 +54,14 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
         ]);
     }
 
+    /**
+     * @param $config_key
+     * @param array $config_data
+     * @param array|null $options
+     * @return bool
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
     public function writeConfigData($config_key, array $config_data, array $options = null): bool
     {
         $dir = isset($options['dir']) ? (string)$options['dir'] : null;
@@ -50,8 +70,8 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
             throw new lcInvalidArgumentException('Invalid config file / directory');
         }
 
-        $indent = isset($options['indent']) ? $options['indent'] : self::INDENT_VALUE;
-        $word_wrap = isset($options['word_wrap']) ? $options['word_wrap'] : self::WORD_WRAP_VALUE;
+        $indent = $options['indent'] ?? self::INDENT_VALUE;
+        $word_wrap = $options['word_wrap'] ?? self::WORD_WRAP_VALUE;
 
         $filename = $dir . DS . $config_key . self::DEFAULT_EXT;
 
@@ -62,15 +82,17 @@ class lcYamlConfigDataProvider extends lcObj implements iConfigDataProvider
         ]);
     }
 
+    /**
+     * @param $val
+     * @return array|string
+     */
     protected function trimYamlValue($val)
     {
         if (is_array($val)) {
             return $val;
         }
 
-        $val = trim($val);
-
-        return $val;
+        return trim($val);
     }
 
 }

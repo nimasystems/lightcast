@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,14 +22,22 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 abstract class lcEnvConfigHandler extends lcConfigHandler
 {
-    const ENV_ALL = 'all';
+    public const ENV_ALL = 'all';
 
-    const ENV_DEV = 'dev';
-    const ENV_PROD = 'prod';
-    const ENV_TEST = 'test';
+    public const ENV_DEV = 'dev';
+    public const ENV_PROD = 'prod';
+    public const ENV_TEST = 'test';
 
+    /**
+     * @param $environment
+     * @param array $data
+     * @return array
+     */
     protected function preReadConfigData($environment, array $data): array
     {
         $env_data = ($environment && isset($data[$environment])) ? (array)$data[$environment] : [];
@@ -38,8 +47,6 @@ abstract class lcEnvConfigHandler extends lcConfigHandler
             return $data;
         }
 
-        $env_data = lcArrays::mergeRecursiveDistinct($all_data, $env_data);
-
-        return $env_data;
+        return lcArrays::mergeRecursiveDistinct($all_data, $env_data);
     }
 }

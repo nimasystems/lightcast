@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,6 +22,9 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 abstract class lcWebManagementConfiguration extends lcWebConfiguration
 {
 }

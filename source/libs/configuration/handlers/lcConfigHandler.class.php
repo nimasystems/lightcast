@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,15 +22,18 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 abstract class lcConfigHandler extends lcObj
 {
-    /** @var iConfigDataProvider */
-    protected $data_provider;
+    /** @var ?iConfigDataProvider */
+    protected ?iConfigDataProvider $data_provider = null;
 
     /** @var array */
-    protected $options = [];
+    protected array $options = [];
 
-    protected $environments = [];
+    protected array $environments = [];
 
     /**
      * @param $handler_type
@@ -48,7 +52,7 @@ abstract class lcConfigHandler extends lcObj
             throw new lcSystemException('Config Handler ' . $handler_type . ' does not exist');
         }
 
-        $handler = new $clname;
+        $handler = new $clname();
 
         // check class type
         if (!$handler instanceof lcConfigHandler) {
@@ -83,6 +87,14 @@ abstract class lcConfigHandler extends lcObj
         $this->environments = $environments;
     }
 
+    /**
+     * @param $config_key
+     * @param $environment
+     * @param array|null $source_defaults
+     * @param array $config_vars
+     * @return array
+     * @throws lcConfigException
+     */
     public function getConfigurationData($config_key, $environment, array $source_defaults = null, array $config_vars = []): array
     {
         if (!$this->data_provider) {
@@ -93,7 +105,7 @@ abstract class lcConfigHandler extends lcObj
             throw new lcConfigException('Environment \'all\' is special and cannot be set as the currently active one!');
         }
 
-        if ($environment && (!is_array($this->environments) || !in_array($environment, $this->environments))) {
+        if ($environment && (!in_array($environment, $this->environments))) {
             throw new lcConfigException('Environment \'' . $environment . '\' was set as the currently active one but it is not defined in configuration');
         }
 
@@ -122,10 +134,10 @@ abstract class lcConfigHandler extends lcObj
             }
         }
 
-        $data = $data ? $data : [];
+        $data = $data ?: [];
 
         // allow subclassers to alter it
-        $data = (array)$this->preReadConfigData($environment, $data);
+        $data = $this->preReadConfigData($environment, $data);
 
         // merge with source defaults / subclasser defaults
         $data = (array)lcArrays::mergeRecursiveDistinct($source_defaults, $defaults, $data);
@@ -141,26 +153,37 @@ abstract class lcConfigHandler extends lcObj
         }
 
         // allow subclassers to alter it
-        $data = (array)$this->postReadConfigData($environment, $data);
+        $data = $this->postReadConfigData($environment, $data);
 
-        $data = lcArrays::arrayFilterDeep($data, true);
-
-        return $data;
+        return lcArrays::arrayFilterDeep($data, true);
     }
 
+    /**
+     * @return null
+     */
     public function getDefaultValues()
     {
         return null;
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    protected function preReadConfigData($environment, array $data)
+    /**
+     * @param $environment
+     * @param array $data
+     * @return array
+     */
+    protected function preReadConfigData($environment, array $data): array
     {
         return $data;
     }
 
     /** @noinspection PhpUnusedParameterInspection */
-    protected function postReadConfigData($environment, array $data)
+    /**
+     * @param $environment
+     * @param array $data
+     * @return array
+     */
+    protected function postReadConfigData($environment, array $data): array
     {
         return $data;
     }

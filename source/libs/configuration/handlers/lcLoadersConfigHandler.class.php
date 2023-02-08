@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,10 +22,16 @@
  * E-Mail: info@nimasystems.com
  */
 
+/**
+ *
+ */
 class lcLoadersConfigHandler extends lcEnvConfigHandler
 {
     // TODO: think of a better place for this method
-    public static function getLoadingOrderConfig()
+    /**
+     * @return string[]
+     */
+    public static function getLoadingOrderConfig(): array
     {
         return [
             'logger',
@@ -43,7 +50,11 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
     }
 
     // TODO: think of a better place for this method
-    public static function getLoaderRequirements()
+
+    /**
+     * @return array[]
+     */
+    public static function getLoaderRequirements(): array
     {
         return [
             'logger' => [
@@ -103,7 +114,10 @@ class lcLoadersConfigHandler extends lcEnvConfigHandler
         ];
     }
 
-    public function getDefaultValues()
+    /**
+     * @return array[]
+     */
+    public function getDefaultValues(): array
     {
         return ['loaders' => [
             'logger' => 'lcFileLoggerNG',

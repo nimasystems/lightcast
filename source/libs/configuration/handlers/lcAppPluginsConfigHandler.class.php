@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,9 +22,15 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcAppPluginsConfigHandler extends lcEnvConfigHandler
 {
-    public function getDefaultValues()
+    /**
+     * @return array[]
+     */
+    public function getDefaultValues(): array
     {
         return [
             'plugins' => [

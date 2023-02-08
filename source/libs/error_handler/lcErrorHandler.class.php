@@ -597,9 +597,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
         assert($exit_code > 0);
 
-        if (PHP_GREATER_EQUAL_54) {
-            http_response_code($status_code);
-        }
+        http_response_code($status_code);
 
         if ($response) {
             // this might be an exception raised in the response send final moments

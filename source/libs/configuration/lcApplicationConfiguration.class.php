@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -37,28 +38,33 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     /**
      * @var lcProjectConfiguration
      */
-    protected $project_configuration;
+    protected lcProjectConfiguration $project_configuration;
 
-    protected $use_classes;
-    protected $use_models;
+    protected array $use_classes = [];
+    protected array $use_models = [];
 
-    protected $should_load_plugins = true;
-    protected $should_use_default_loaders = false;
-    protected $should_disable_loaders = false;
-    protected $should_disable_models = false;
-    protected $should_disable_databases = false;
-    protected $unique_id_suffix;
-    private $project_dir;
+    protected ?string $unique_id_suffix = null;
 
-    private $secure_env_data = [];
+    protected bool $should_load_plugins = true;
+    protected bool $should_use_default_loaders = false;
+    protected bool $should_disable_loaders = false;
+    protected bool $should_disable_models = false;
+    protected bool $should_disable_databases = false;
+    private string $project_dir;
 
+    private array $secure_env_data = [];
+
+    /**
+     * @param $project_dir
+     * @param lcProjectConfiguration|null $project_configuration
+     */
     public function __construct($project_dir = null, lcProjectConfiguration $project_configuration = null)
     {
         $this->project_dir = $project_dir;
 
         // create the default instance of project configuration which
         // may be overriden before initialization
-        $this->project_configuration = $project_configuration ? $project_configuration : new lcProjectConfiguration();
+        $this->project_configuration = $project_configuration ?: new lcProjectConfiguration();
         $this->project_configuration->setProjectDir($project_dir);
 
         $this->initVendor();
@@ -66,35 +72,38 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         parent::__construct();
     }
 
-    public function __call($func, array $args = null)
+    /**
+     * @param $method
+     * @param array|null $params
+     * @return mixed
+     * @throws Exception
+     */
+    public function __call($method, array $params = null)
     {
-        if ($this->project_configuration) {
-            // up to 5 params use the fast calls, more than that - use
-            // call_user_func_array which is slower
-            if (!method_exists($this->project_configuration, $func)) {
-                parent::__call($func, $args);
-            }
-
-            switch (count($args)) {
-                case 0 :
-                    return $this->project_configuration->$func();
-                case 1 :
-                    return $this->project_configuration->$func($args[0]);
-                case 2 :
-                    return $this->project_configuration->$func($args[0], $args[1]);
-                case 3 :
-                    return $this->project_configuration->$func($args[0], $args[1], $args[2]);
-                case 4 :
-                    return $this->project_configuration->$func($args[0], $args[1], $args[2], $args[3]);
-                case 5 :
-                    return $this->project_configuration->$func($args[0], $args[1], $args[2], $args[3], $args[4]);
-                default :
-                    /** @noinspection PhpParamsInspection */
-                    return call_user_func_array($this->project_configuration->$func, $args);
-            }
+        // up to 5 params use the fast calls, more than that - use
+        // call_user_func_array which is slower
+        if (!method_exists($this->project_configuration, $method)) {
+            parent::__call($method, $params);
         }
 
-        parent::__call($func, $args);
+        switch (count($params)) {
+            case 0 :
+                return $this->project_configuration->$method();
+            case 1 :
+                return $this->project_configuration->$method($params[0]);
+            case 2 :
+                return $this->project_configuration->$method($params[0], $params[1]);
+            case 3 :
+                return $this->project_configuration->$method($params[0], $params[1], $params[2]);
+            case 4 :
+                return $this->project_configuration->$method($params[0], $params[1], $params[2], $params[3]);
+            case 5 :
+                return $this->project_configuration->$method($params[0], $params[1], $params[2], $params[3], $params[4]);
+            default :
+                /** @noinspection PhpParamsInspection */
+                /** @noinspection PhpVariableVariableInspection */
+                return call_user_func_array($this->project_configuration->$method, $params);
+        }
     }
 
     public function initialize()
@@ -104,9 +113,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
 
         // initialize project configuration first
-        if ($this->project_configuration) {
-            $this->project_configuration->initialize();
-        }
+        $this->project_configuration->initialize();
 
         // pass the project base dir
         $this->base_config_dir = $this->project_configuration->getBaseConfigDir();
@@ -156,7 +163,13 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         include_once($this->getProjectDir() . DS . 'vendor' . DS . 'autoload.php');
     }
 
-    public function loadData($force = false)
+    /**
+     * @param bool $force
+     * @return void
+     * @throws lcConfigException
+     * @throws lcSystemException
+     */
+    public function loadData(bool $force = false)
     {
         parent::loadData($force);
 
@@ -185,6 +198,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // Load cached env vars if the .env.local.php file exists
         // Run "composer dump-env prod" to create it (requires symfony/flex >=1.2)
         /** @noinspection PhpIncludeInspection */
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         if (is_array($env = @include $this->getProjectDir() . DS . '.env.local.php')) {
             $_SERVER += $env;
             $_ENV += $env;
@@ -199,7 +213,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
         //
 
-        $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : lcEnvConfigHandler::ENV_PROD;
+        $env = $_ENV['APP_ENV'] ?? lcEnvConfigHandler::ENV_PROD;
         $is_debugging = $env == lcEnvConfigHandler::ENV_DEV || (isset($_ENV[lcProjectConfiguration::ENV_APP_DEBUG]) &&
                 $_ENV[lcProjectConfiguration::ENV_APP_DEBUG]);
 
@@ -254,19 +268,19 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function shutdown()
     {
         // shutdown project_configuration
-        if ($this->project_configuration) {
-            $this->project_configuration->shutdown();
-        }
-
-        $this->use_models = $this->project_configuration = null;
+        $this->project_configuration->shutdown();
+        $this->use_models = [];
 
         parent::shutdown();
     }
 
-    public function getConfigHandleMap()
+    /**
+     * @return array|array[]|null
+     */
+    public function getConfigHandleMap(): ?array
     {
         // we load the project's config map ourselves
-        return $this->project_configuration ? $this->project_configuration->getConfigHandleMap() : [];
+        return $this->project_configuration->getConfigHandleMap();
     }
 
     public function executeBefore()
@@ -281,7 +295,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // initialization of the config
     }
 
-    public function getAutoloadClasses()
+    /**
+     * @return array
+     */
+    public function getAutoloadClasses(): array
     {
         // subclassers may override this method to return an array of classes
         // which should
@@ -299,78 +316,113 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         // construction of urls
     }
 
-    public function getUsedDbModels()
+    /**
+     * @return array
+     */
+    public function getUsedDbModels(): array
     {
-        $project_models = ($this->project_configuration && $this->project_configuration instanceof iSupportsDbModelOperations) ? $this->project_configuration->getUsedDbModels() : [];
-
-        return array_unique(array_merge((array)$this->use_models, (array)$project_models));
+        $project_models = $this->project_configuration->getUsedDbModels();
+        return array_unique(array_merge($this->use_models, $project_models));
     }
 
-    public function getDebugInfo()
+    /**
+     * @return array|array[]
+     */
+    public function getDebugInfo(): array
     {
-        $debug_parent = (array)parent::getDebugInfo();
+        $debug_parent = parent::getDebugInfo();
 
         $debug = ['application_name' => $this->getApplicationName()];
 
-        $debug = array_merge($debug_parent, $debug);
-
-        return $debug;
+        return array_merge($debug_parent, $debug);
     }
 
+    /**
+     * @return mixed
+     */
     abstract public function getApplicationName();
 
-    public function setIsDebugging($debug = true)
+    /**
+     * @param bool $debug
+     * @return void
+     */
+    public function setIsDebugging(bool $debug = true)
     {
-        if ($this->project_configuration) {
-            $this->project_configuration->setIsDebugging($debug);
-        }
+        $this->project_configuration->setIsDebugging($debug);
     }
 
+    /**
+     * @param $environment
+     * @return void
+     */
     public function setEnvironment($environment)
     {
-        if ($this->project_configuration) {
-            $this->project_configuration->setEnvironment($environment);
-        }
-
+        $this->project_configuration->setEnvironment($environment);
         $this->environment = $environment;
     }
 
-    public function getShouldLoadPlugins()
+    /**
+     * @return bool
+     */
+    public function getShouldLoadPlugins(): bool
     {
         return $this->should_load_plugins;
     }
 
-    public function setShouldLoadPlugins($should_load_plugins = true)
+    /**
+     * @param bool $should_load_plugins
+     * @return void
+     */
+    public function setShouldLoadPlugins(bool $should_load_plugins = true)
     {
         $this->should_load_plugins = $should_load_plugins;
     }
 
-    public function getShouldDisableModels()
+    /**
+     * @return bool
+     */
+    public function getShouldDisableModels(): bool
     {
         return $this->should_disable_models;
     }
 
-    public function getShouldUseDefaultLoaders()
+    /**
+     * @return bool
+     */
+    public function getShouldUseDefaultLoaders(): bool
     {
         return $this->should_use_default_loaders;
     }
 
-    public function getShouldDisableLoaders()
+    /**
+     * @return bool
+     */
+    public function getShouldDisableLoaders(): bool
     {
         return $this->should_disable_loaders;
     }
 
-    public function setShouldUseDefaultLoaders($use_default_loaders = false)
+    /**
+     * @param bool $use_default_loaders
+     * @return void
+     */
+    public function setShouldUseDefaultLoaders(bool $use_default_loaders = false)
     {
         $this->should_use_default_loaders = $use_default_loaders;
     }
 
-    public function getShortDebugInfo()
+    /**
+     * @return false
+     */
+    public function getShortDebugInfo(): bool
     {
         return false;
     }
 
-    public function getEventDispatcher()
+    /**
+     * @return lcEventDispatcher|null
+     */
+    public function getEventDispatcher(): ?lcEventDispatcher
     {
         return $this->project_configuration->getEventDispatcher();
     }
@@ -381,7 +433,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->project_configuration->setEventDispatcher($event_dispatcher);
     }
 
-    public function getClassAutoloader()
+    /**
+     * @return lcClassAutoloader|null
+     */
+    public function getClassAutoloader(): ?lcClassAutoloader
     {
         return $this->project_configuration->getClassAutoloader();
     }
@@ -392,7 +447,10 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->project_configuration->setClassAutoloader($class_autoloader);
     }
 
-    public function getProjectConfiguration()
+    /**
+     * @return lcProjectConfiguration
+     */
+    public function getProjectConfiguration(): lcProjectConfiguration
     {
         return $this->project_configuration;
     }
@@ -406,63 +464,76 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         }
     }
 
-    public function getAdminEmail()
+    /**
+     * @return string
+     */
+    public function getAdminEmail(): string
     {
         $email = $this->get('admin_email');
         $email = !$email ? $this->get('settings.admin_email') : $email;
         $email = !$email ? ini_get('sendmail_from') : $email;
         $email = !$email ? get_current_user() . '@' . php_uname('n') : $email;
-        $email = !$email ? 'root@localhost' : $email;
-        return $email;
+        return !$email ? 'root@localhost' : $email;
     }
 
-    public function getDefaultEmailSender()
+    /**
+     * @return string
+     */
+    public function getDefaultEmailSender(): string
     {
         $email = ini_get('sendmail_from');
         $email = !$email ? get_current_user() . '@' . php_uname('n') : $email;
-        $email = !$email ? 'root@localhost' : $email;
-        return $email;
+        return !$email ? 'root@localhost' : $email;
     }
 
-    public function getUniqueProjectId()
+    /**
+     * @return string
+     */
+    public function getUniqueProjectId(): string
     {
         // default unique id is composed of project_name, application_name,
         // is_debugging setting
         // it is used as the unique cache key
         $ret = $this->getProjectName() .
-            ($this->project_configuration ? $this->project_configuration->getVersion() : null) .
+            ($this->project_configuration->getVersion()) .
             $this->getEnvironment() .
             $this->getConfigEnvironment() .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+            ($this->unique_id_suffix ?: null);
 
-        $ret = md5($ret);
-
-        return $ret;
+        return md5($ret);
     }
 
-    public function getUniqueId()
+    /**
+     * @return string
+     */
+    public function getUniqueId(): string
     {
         // default unique id is composed of project_name, application_name,
         // is_debugging setting
         // it is used as the unique cache key
         $ret = $this->getProjectAppName($this->getApplicationName()) .
-            ($this->project_configuration ? $this->project_configuration->getVersion() : null) .
+            ($this->project_configuration->getVersion()) .
             $this->getEnvironment() .
             $this->getConfigEnvironment() .
             $this->project_configuration->getProjectDir() .
-            ($this->unique_id_suffix ? $this->unique_id_suffix : null);
+            ($this->unique_id_suffix ?: null);
 
-        $ret = md5($ret);
-
-        return $ret;
+        return md5($ret);
     }
 
-    public function getUniqueIdSuffix()
+    /**
+     * @return string|null
+     */
+    public function getUniqueIdSuffix(): ?string
     {
         return $this->unique_id_suffix;
     }
 
+    /**
+     * @param $unique_id_suffx
+     * @return void
+     */
     public function setUniqueIdSuffix($unique_id_suffx)
     {
         // override the automatically generated unique_id with an appended suffix
@@ -472,20 +543,29 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->unique_id_suffix = $unique_id_suffx;
     }
 
-    public function getApplicationCacheDir()
+    /**
+     * @return string
+     */
+    public function getApplicationCacheDir(): string
     {
         return $this->project_configuration->getCacheDir() . DS . 'applications' . DS . $this->getApplicationName();
     }
 
+    /**
+     * @return mixed
+     */
     public function getEnabledPlugins()
     {
         return $this['plugins.enabled'];
     }
 
-    public function writeClassCache()
+    /**
+     * @return array
+     */
+    public function writeClassCache(): array
     {
-        $parent_cache = (array)parent::writeClassCache();
-        $project_cache = ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) ? $this->project_configuration->writeClassCache() : [];
+        $parent_cache = parent::writeClassCache();
+        $project_cache = $this->project_configuration->writeClassCache();
 
         return [
             'parent_cache' => $parent_cache,
@@ -499,17 +579,18 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             parent::readClassCache($cached_data['parent_cache']);
         }
 
-        if ($this->project_configuration && ($this->project_configuration instanceof iCacheable)) {
-            if (isset($cached_data['project_cache'])) {
-                $this->project_configuration->readClassCache($cached_data['project_cache']);
-            }
+        if (isset($cached_data['project_cache'])) {
+            $this->project_configuration->readClassCache($cached_data['project_cache']);
         }
     }
 
     // TODO: Remove this when Configurations are combined
     // it is here because it's a frequently accessed method and it is slow
     // to call it with magic
-    public function getGenDir()
+    /**
+     * @return string
+     */
+    public function getGenDir(): string
     {
         return $this->project_configuration->getGenDir();
     }
@@ -517,7 +598,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     /**
      * @return array
      */
-    public function getConfigParserVars()
+    public function getConfigParserVars(): array
     {
         return [];
     }

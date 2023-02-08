@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -22,12 +23,18 @@
 
  */
 
+/**
+ *
+ */
 class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 {
-    private $config_namespaces;
-    private $idx;
+    private array $config_namespaces = [];
+    private array $idx = [];
 
-    public function getNamespaces()
+    /**
+     * @return int[]|string[]|null
+     */
+    public function getNamespaces(): ?array
     {
         if (!$this->config_namespaces) {
             return null;
@@ -36,23 +43,33 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         return array_keys($this->config_namespaces);
     }
 
-    public function getAll()
+    /**
+     * @return array
+     */
+    public function getAll(): array
     {
         return $this->config_namespaces;
     }
 
+    /**
+     * @param $namespace
+     * @param $name
+     * @return mixed|null
+     */
     public function get($namespace, $name)
     {
         return isset($this->config_namespaces[$namespace]) && isset($this->config_namespaces[$namespace][$name]) ? $this->config_namespaces[$namespace][$name] : null;
     }
 
-    public function set($namespace, $name, $value = null)
+    /**
+     * @param $namespace
+     * @param $name
+     * @param $value
+     * @return true
+     */
+    public function set($namespace, $name, $value = null): bool
     {
-        if (!isset($this->config_namespaces[$namespace], $this->config_namespaces[$namespace][$name])) {
-            $this->config_namespaces[$namespace][$name] = $value;
-        } else {
-            $this->config_namespaces[$namespace][$name] = $value;
-        }
+        $this->config_namespaces[$namespace][$name] = $value;
 
         $this->idx[$namespace . '.' . $name] = [
             $namespace,
@@ -62,9 +79,14 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         return true;
     }
 
+    /**
+     * @param $namespace
+     * @param array|null $values
+     * @return void
+     */
     public function setNamespace($namespace, array $values = null)
     {
-        $this->config_namespaces[$namespace] = $values ? $values : [];
+        $this->config_namespaces[$namespace] = $values ?: [];
 
         if (null !== $values) {
             foreach ($values as $key => $val) {
@@ -78,6 +100,11 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         }
     }
 
+    /**
+     * @param $namespace
+     * @param $name
+     * @return void
+     */
     public function remove($namespace, $name)
     {
         if (!isset($this->config_namespaces[$namespace])) {
@@ -89,44 +116,68 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
 
     public function clear()
     {
-        $this->config_namespaces = null;
-        $this->idx = null;
+        $this->config_namespaces =
+        $this->idx = [];
     }
 
+    /**
+     * @param $namespace
+     * @return mixed|null
+     */
     public function getNamespace($namespace)
     {
-        return isset($this->config_namespaces[$namespace]) ? $this->config_namespaces[$namespace] : null;
+        return $this->config_namespaces[$namespace] ?? null;
     }
 
-    public function offsetGet($short_config_name)
+    /**
+     * @param $offset
+     * @return mixed|null
+     */
+    public function offsetGet($offset)
     {
-        if (!$this->offsetExists($short_config_name)) {
+        if (!$this->offsetExists($offset)) {
             return null;
         }
 
-        return $this->config_namespaces[$this->idx[$short_config_name][0]][$this->idx[$short_config_name][1]];
+        return $this->config_namespaces[$this->idx[$offset][0]][$this->idx[$offset][1]];
     }
 
-    public function offsetExists($short_config_name)
+    /**
+     * @param $offset
+     * @return bool
+     */
+    public function offsetExists($offset): bool
     {
-        if (!isset($this->idx[$short_config_name])) {
+        if (!isset($this->idx[$offset])) {
             return false;
         }
 
         return true;
     }
 
-    public function offsetSet($short_config_name, $value)
+    /**
+     * @param $offset
+     * @param $value
+     * @return false
+     */
+    public function offsetSet($offset, $value): bool
     {
         return false;
     }
 
-    public function offsetUnset($short_config_name)
+    /**
+     * @param $offset
+     * @return false
+     */
+    public function offsetUnset($offset): bool
     {
         return false;
     }
 
-    public function serialize()
+    /**
+     * @return string|null
+     */
+    public function serialize(): ?string
     {
         $tmp = [
             $this->config_namespaces,
@@ -136,9 +187,13 @@ class lcConfigurationHolder extends lcObj implements ArrayAccess, Serializable
         return serialize($tmp);
     }
 
-    public function unserialize($serialized)
+    /**
+     * @param $data
+     * @return void
+     */
+    public function unserialize($data)
     {
-        list($this->config_namespaces, $this->idx) = unserialize($serialized);
+        [$this->config_namespaces, $this->idx] = unserialize($data);
     }
 
 }

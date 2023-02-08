@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,15 +22,18 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcComponentLocator
 {
-    const PLUGIN_CLASS_PREFIX = 'p';
-    const COMPONENT_CLASS_PREFIX = 'component';
-    const MODULE_CLASS_PREFIX = 'c';
-    const WEB_SERVICE_CLASS_PREFIX = 'ws';
-    const TASK_CLASS_PREFIX = 't';
-
-    public static function getProjectApplicationsInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getProjectApplicationsInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -52,7 +56,12 @@ class lcComponentLocator
         return $applications;
     }
 
-    public static function getProjectApplicationContextInfo($application_name, $path)
+    /**
+     * @param $application_name
+     * @param $path
+     * @return array
+     */
+    public static function getProjectApplicationContextInfo($application_name, $path): array
     {
         return [
             'name' => $application_name,
@@ -60,7 +69,13 @@ class lcComponentLocator
         ];
     }
 
-    public static function getPluginsInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getPluginsInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -73,14 +88,7 @@ class lcComponentLocator
         if ($subdirs) {
             foreach ($subdirs as $dir) {
                 $found = self::getPluginContextInfo($dir, $path . DS . $dir);
-
-                // apply the assets webpath
-                if (isset($options['web_path'])) {
-                    $found['web_path'] = $options['web_path'] . $dir . '/';
-                }
-
                 $plugins[$dir] = $options ? array_merge($options, $found) : $found;
-
                 unset($dir);
             }
         }
@@ -88,18 +96,28 @@ class lcComponentLocator
         return $plugins;
     }
 
-    public static function getPluginContextInfo($plugin_name, $path)
+    /**
+     * @param $plugin_name
+     * @param $path
+     * @return array
+     */
+    public static function getPluginContextInfo($plugin_name, $path): array
     {
         return [
             'name' => $plugin_name,
             'path' => $path,
             'filename' => $plugin_name . '.php',
-            'additional_filenames' => ['plugin.php'],
-            'class' => self::PLUGIN_CLASS_PREFIX . lcInflector::camelize($plugin_name, false),
+            'class' => $plugin_name,
         ];
     }
 
-    public static function getControllerComponentsInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getControllerComponentsInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -132,17 +150,28 @@ class lcComponentLocator
         return $components;
     }
 
-    public static function getControllerComponentContextInfo($controller_name, $path)
+    /**
+     * @param $controller_name
+     * @param $path
+     * @return array
+     */
+    public static function getControllerComponentContextInfo($controller_name, $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
-            'filename' => $controller_name . '.class.php',
-            'class' => self::COMPONENT_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
+            'filename' => $controller_name . '.php',
+            'class' => $controller_name,
         ];
     }
 
-    public static function getActionFormsInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getActionFormsInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -175,17 +204,28 @@ class lcComponentLocator
         return $forms;
     }
 
-    public static function getActionFormContextInfo($form_name, $path)
+    /**
+     * @param $form_name
+     * @param $path
+     * @return array
+     */
+    public static function getActionFormContextInfo($form_name, $path): array
     {
         return [
             'name' => $form_name,
             'path' => $path,
             'filename' => $form_name . '.php',
-            'class' => lcInflector::camelize($form_name, false) . 'Form',
+            'class' => $form_name,
         ];
     }
 
-    public static function getControllerModulesInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getControllerModulesInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -218,17 +258,28 @@ class lcComponentLocator
         return $modules;
     }
 
-    public static function getControllerModuleContextInfo($controller_name, $path)
+    /**
+     * @param $controller_name
+     * @param $path
+     * @return array
+     */
+    public static function getControllerModuleContextInfo($controller_name, $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::MODULE_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
+            'class' => $controller_name,
         ];
     }
 
-    public static function getControllerWebServicesInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getControllerWebServicesInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -270,17 +321,28 @@ class lcComponentLocator
         return $web_services;
     }
 
-    public static function getControllerWebServiceContextInfo($controller_name, $path)
+    /**
+     * @param $controller_name
+     * @param $path
+     * @return array
+     */
+    public static function getControllerWebServiceContextInfo($controller_name, $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::WEB_SERVICE_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
+            'class' => $controller_name,
         ];
     }
 
-    public static function getControllerTasksInPath($path, array $options = null)
+    /**
+     * @param $path
+     * @param array|null $options
+     * @return array
+     * @throws lcInvalidArgumentException
+     */
+    public static function getControllerTasksInPath($path, array $options = null): array
     {
         if (!$path) {
             throw new lcInvalidArgumentException('Invalid path');
@@ -322,13 +384,18 @@ class lcComponentLocator
         return $tasks;
     }
 
-    public static function getControllerTaskContextInfo($controller_name, $path)
+    /**
+     * @param $controller_name
+     * @param $path
+     * @return array
+     */
+    public static function getControllerTaskContextInfo($controller_name, $path): array
     {
         return [
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => self::TASK_CLASS_PREFIX . lcInflector::camelize($controller_name, false),
+            'class' => $controller_name,
         ];
     }
 }

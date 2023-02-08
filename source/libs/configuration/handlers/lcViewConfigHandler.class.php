@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -22,9 +23,15 @@
 
  */
 
+/**
+ *
+ */
 class lcViewConfigHandler extends lcEnvConfigHandler
 {
-    public function getDefaultValues()
+    /**
+     * @return array[]
+     */
+    public function getDefaultValues(): array
     {
         return ['view' => [
             'filters' => [],
