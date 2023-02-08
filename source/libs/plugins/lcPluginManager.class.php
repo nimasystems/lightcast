@@ -206,7 +206,10 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     continue;
                 }
 
-                $is_plugin_enabled = in_array($plugin_name, $this->enabled_plugins);
+                $underscored_plugin_name = ctype_upper($plugin_name[0]) ? lcInflector::underscore($plugin_name) :
+                    $plugin_name;
+
+                $is_plugin_enabled = in_array($underscored_plugin_name, $this->enabled_plugins);
                 $path = $plugin_details['path'];
                 $web_path = $this->plugin_webpath ? $this->plugin_webpath . $plugin_name . '/' :
                     ($plugin_details['web_path'] ?? null);
@@ -219,7 +222,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     continue;
                 }
 
-                $plugin_namespace = $this->configuration->getNamespacedClass('\\Plugins\\' . $plugin_name);
+                $plugin_namespace = $this->configuration->getNamespacedClass('Plugins\\' . $plugin_name);
 
                 // set / cache it
                 $this->plugin_configurations[$plugin_name] = $plugin_config;
@@ -611,6 +614,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                 return true;
             }
 
+            $underscored_plugin_name = ctype_upper($plugin_name[0]) ? lcInflector::underscore($plugin_name) :
+                $plugin_name;
+
             // check if initialized
             $plugin_configuration = $this->plugin_configurations[$plugin_name] ?? null;
 
@@ -623,7 +629,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             }
 
             // check if enabled
-            if (!in_array($plugin_name, $this->enabled_plugins)) {
+            if (!in_array($underscored_plugin_name, $this->enabled_plugins)) {
                 if (!$throw_if_missing) {
                     return false;
                 }
@@ -1068,8 +1074,12 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $plugin_configurations = $this->plugin_configurations;
 
         foreach ($plugin_configurations as $plugin_name => $plugin_configuration) {
+
+            $underscored_plugin_name = ctype_upper($plugin_name[0]) ? lcInflector::underscore($plugin_name) :
+                $plugin_name;
+
             // skip disabled plugins
-            if (!in_array($plugin_name, $this->enabled_plugins)) {
+            if (!in_array($underscored_plugin_name, $this->enabled_plugins)) {
                 continue;
             }
 

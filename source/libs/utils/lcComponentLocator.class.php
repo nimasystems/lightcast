@@ -112,16 +112,18 @@ class lcComponentLocator
             'name' => $plugin_name,
             'path' => $path,
             'filename' => $plugin_name . '.php',
-            'class' => $namespace . '\\' . $plugin_name,
+            'class' => $namespace . '\\' . $plugin_name . '\\' . $plugin_name,
         ];
     }
 
     /**
-     * @param $path
-     * @par
-     * am array|null $options
+     * @param string $path
+     * @param string $namespace
+     * @param array|null $options
      * @return array
      * @throws lcInvalidArgumentException
+     * @par
+     * am array|null $options
      */
     public static function getControllerComponentsInPath(string $path, string $namespace, array $options = null): array
     {
