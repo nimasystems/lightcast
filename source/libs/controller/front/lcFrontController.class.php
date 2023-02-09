@@ -194,8 +194,11 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
 
         $this->fixDispatchParams($request_params);
 
+        $module = lcInflector::camelize($request_params['module']);
+        $action = lcInflector::camelize($request_params['action']);
+
         // allow customized functionality before dispatching
-        if (!$this->shouldDispatch($request_params['module'], $request_params['action'], $request_params)) {
+        if (!$this->shouldDispatch($module, $action, $request_params)) {
             return;
         }
 
@@ -204,15 +207,15 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         // but an access denied instead.
 
         $this->event_dispatcher->notify(new lcEvent('front_controller.dispatch', $this, [
-            'module_name' => $request_params['module'],
-            'action_name' => $request_params['action'],
+            'module_name' => $module,
+            'action_name' => $action,
             'request_params' => (array)$request_params,
         ]));
 
         $request->setRequestData($request_params);
 
         // forward the request
-        $this->forward($request_params['module'], $request_params['action'], ['request' => $request_params]);
+        $this->forward($module, $action, ['request' => $request_params]);
     }
 
     /**

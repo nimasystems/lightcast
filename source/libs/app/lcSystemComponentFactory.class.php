@@ -385,18 +385,16 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             if ($plugin_config instanceof iWebModuleProvider) {
                 $web_modules = $plugin_config->getControllerModules();
 
-                if ($web_modules && is_array($web_modules)) {
+                if ($web_modules) {
                     foreach ($web_modules as $web_module) {
-                        $web_module_camelized = !ctype_upper($web_module[0]) ? lcInflector::camelize($web_module) :
-                            $web_module;
-                        $path = $plugin_dir . DS . lcPlugin::MODULES_PATH . DS . $web_module_camelized;
-                        $details = lcComponentLocator::getControllerModuleContextInfo($web_module_camelized,
+                        $path = $plugin_dir . DS . lcPlugin::MODULES_PATH . DS . $web_module;
+                        $details = lcComponentLocator::getControllerModuleContextInfo($web_module,
                             $plugin_namespace . '\\Modules',
                             $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
-                        $this->addControllerModule($web_module_camelized, $details);
+                        $this->addControllerModule($web_module, $details);
 
                         unset($path, $details, $web_module, $web_module_camelized);
                     }
@@ -409,18 +407,16 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             if ($plugin_config instanceof iComponentProvider) {
                 $provided_components = $plugin_config->getControllerComponents();
 
-                if ($provided_components && is_array($provided_components)) {
+                if ($provided_components) {
                     foreach ($provided_components as $provided_component) {
-                        $provided_component_camelized = !ctype_upper($provided_component[0]) ? lcInflector::camelize($provided_component) :
-                            $provided_component;
-                        $path = $plugin_dir . DS . lcPlugin::COMPONENTS_PATH . DS . $provided_component_camelized;
-                        $details = lcComponentLocator::getControllerComponentContextInfo($provided_component_camelized,
+                        $path = $plugin_dir . DS . lcPlugin::COMPONENTS_PATH . DS . $provided_component;
+                        $details = lcComponentLocator::getControllerComponentContextInfo($provided_component,
                             $plugin_namespace . '\\Components',
                             $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
-                        $this->addControllerComponent($provided_component_camelized, $details);
+                        $this->addControllerComponent($provided_component, $details);
 
                         unset($path, $details, $provided_component, $provided_component_camelized);
                     }
@@ -436,16 +432,14 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
                 if ($provided_tasks) {
                     foreach ($provided_tasks as $provided_task) {
-                        $provided_task_camelized = !ctype_upper($provided_task[0]) ? lcInflector::camelize($provided_task) :
-                            $provided_task;
                         $path = $plugin_dir . DS . lcPlugin::TASKS_PATH;
-                        $details = lcComponentLocator::getControllerTaskContextInfo($provided_task_camelized,
+                        $details = lcComponentLocator::getControllerTaskContextInfo($provided_task,
                             $plugin_namespace . '\\Tasks',
                             $path);
                         $details['context_type'] = lcSysObj::CONTEXT_PLUGIN;
                         $details['context_name'] = $plugin_name;
 
-                        $this->addControllerTask($provided_task_camelized, $details);
+                        $this->addControllerTask($provided_task, $details);
 
                         unset($path, $details, $provided_task, $provided_task_camelized);
                     }
@@ -776,11 +770,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             throw new lcInvalidArgumentException('Invalid controller name');
         }
 
-        $controller_name_camelized = ctype_upper($controller_name[0]) ? $controller_name :
-            lcInflector::camelize($controller_name);
-
         // first check config, then others
-        $details = $this->config_controller_modules[$controller_name_camelized] ?? ($this->controllers[$controller_name_camelized] ?? null);
+        $details = $this->config_controller_modules[$controller_name] ?? ($this->controllers[$controller_name] ?? null);
 
         if (!$details) {
             return null;
@@ -950,11 +941,8 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             throw new lcInvalidArgumentException('Invalid controller name');
         }
 
-        $camelized_controller_name = !ctype_upper($controller_name[0]) ? lcInflector::camelize($controller_name) :
-            $controller_name;
-
         // first check config, then others
-        $details = $this->config_controller_tasks[$camelized_controller_name] ?? ($this->tasks[$camelized_controller_name] ?? null);
+        $details = $this->config_controller_tasks[$controller_name] ?? ($this->tasks[$controller_name] ?? null);
 
         if (!$details) {
             return null;
