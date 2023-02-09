@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lightcast\Assets\Tasks;
 
@@ -23,30 +24,52 @@ namespace Lightcast\Assets\Tasks;
 * E-Mail: info@nimasystems.com
 */
 
+use DOMDocument;
+use DOMElement;
+use DOMException;
 use DOMXPath;
+use Exception;
+use iSupportsDbModels;
+use iSupportsDbViews;
+use lcBasePeer;
+use lcConfigException;
+use lcConsolePainter;
 use lcController;
 use lcDirs;
 use lcFiles;
+use lcInflector;
 use lcInvalidArgumentException;
+use lcIOException;
+use lcPluginConfiguration;
+use lcPluginException;
+use lcProjectConfiguration;
+use lcPropel;
 use lcSysObj;
+use lcSystemException;
 use lcTaskController;
+use lcYamlFileParser;
+use OutputStream;
+use Phing;
+use PropelPhing;
 
+/**
+ *
+ */
 class Propel extends lcTaskController
 {
-    const SCHEMA_FILE = 'schema.xml';
-    const PROPEL_REVERSE_PARSE_CLASS = 'lcPropelMysqlSchemaParser';
-    const PROPEL_GENERATOR_CONFIG = 'build.properties';
-    const DEFAULT_REVERSE_TARGET_NAME = 'reversed-schema';
-    const DEFAULT_REVERSE_TARGET_FOLDER = 'data/db';
-    const DEFAULT_BUILD_PROPERTIES_STATIC = 'shell/build_static.properties';
+    public const SCHEMA_FILE = 'schema.xml';
+    public const PROPEL_REVERSE_PARSE_CLASS = 'lcPropelMysqlSchemaParser';
+    public const PROPEL_GENERATOR_CONFIG = 'build.properties';
+    public const DEFAULT_REVERSE_TARGET_NAME = 'reversed-schema';
+    public const DEFAULT_REVERSE_TARGET_FOLDER = 'data/db';
+    public const DEFAULT_BUILD_PROPERTIES_STATIC = 'shell/build_static.properties';
 
-    const PROJECT_PREFIX = 'project_';
+    public const PROJECT_PREFIX = 'project_';
 
-    private $schema_files_tmp;
-    private $schemas_initialized;
-    private $work_dir;
-    private $phing_has_error;
-    private $plugin_configs = [];
+    private array $schema_files_tmp = [];
+    private bool $schemas_initialized = false;
+    private ?string $work_dir = null;
+    private array $plugin_configs = [];
 
     public function initialize()
     {
@@ -103,7 +126,11 @@ class Propel extends lcTaskController
         require_once 'phing/listener/AnsiColorLogger.php';
     }
 
-    private function createWorkingDirectory()
+    /**
+     * @return true
+     * @throws lcIOException
+     */
+    private function createWorkingDirectory(): bool
     {
         if ($this->work_dir) {
             return true;
@@ -122,21 +149,31 @@ class Propel extends lcTaskController
         // cleanup in case the script failed
         $this->phingCleanUp();
 
-        spl_autoload_unregister([
-            $this,
-            'phingAutoloadClass',
-        ]);
+//        spl_autoload_unregister([
+//            $this,
+//            'phingAutoloadClass',
+//        ]);
 
         parent::shutdown();
     }
 
     private function phingCleanUp()
     {
-        $this->schema_files_tmp = null;
+        $this->schema_files_tmp = [];
         $this->work_dir = null;
     }
 
-    public function executeTask()
+    /**
+     * @return bool
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     * @noinspection PhpUnreachableStatementInspection
+     */
+    public function executeTask(): bool
     {
         // check necessary requirements
         $this->precheck();
@@ -219,16 +256,28 @@ class Propel extends lcTaskController
         }
     }
 
-    private function propelOm()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
+    private function propelOm(): ?bool
     {
         $this->propelFlush();
         $this->propelInitSchemas();
-        $ret = $this->phingExecute('om');
-        return $ret;
+        return $this->phingExecute('om');
     }
 
     /* Remove propel temporary stuff, oms, maps, sql files */
-    private function propelFlush()
+    /**
+     * @return true
+     * @throws lcIOException
+     */
+    private function propelFlush(): bool
     {
         if (!$this->request->getIsSilent()) {
             $this->display('Flushing runtime data...');
@@ -271,13 +320,23 @@ class Propel extends lcTaskController
         return true;
     }
 
+    /**
+     * @param $ent
+     * @return bool|void
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
     private function propelInitSchemas($ent = null)
     {
         if ($this->schemas_initialized) {
             return false;
         }
 
-        $this->schema_files_tmp = null;
+        $this->schema_files_tmp = [];
 
         // only specific entities
         if (!isset($ent)) {
@@ -356,7 +415,10 @@ class Propel extends lcTaskController
         return true;
     }
 
-    private function getPrimaryDatabaseConfig()
+    /**
+     * @return array
+     */
+    private function getPrimaryDatabaseConfig(): array
     {
         $config = [];
 
@@ -365,11 +427,11 @@ class Propel extends lcTaskController
                 $d = $d['primary'];
 
                 $config = [
-                    'propel.project' => @$d['datasource'],
-                    'propel.database.buildUrl' => @$d['url'],
-                    'propel.database.user' => @$d['user'],
-                    'propel.database.password' => @$d['password'],
-                    'propel.database.encoding' => @$d['charset'],
+                    'propel.project' => $d['datasource'] ?? null,
+                    'propel.database.buildUrl' => $d['url'] ?? null,
+                    'propel.database.user' => $d['user'] ?? null,
+                    'propel.database.password' => $d['password'] ?? null,
+                    'propel.database.encoding' => $d['charset'] ?? null,
                 ];
             }
 
@@ -379,7 +441,14 @@ class Propel extends lcTaskController
         return $config;
     }
 
-    private function getSchemaDetails(array $only_entities = null)
+    /**
+     * @param array|null $only_entities
+     * @return array
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function getSchemaDetails(array $only_entities = null): array
     {
         // holder for all folders containing schemas
         // all schemas will be looked up - *-schema.xml, schema.xml
@@ -422,19 +491,38 @@ class Propel extends lcTaskController
         return $schemas;
     }
 
-    private function getProjectModels()
+    /**
+     * @return array|null
+     */
+    private function getProjectModels(): ?array
     {
         /** @noinspection PhpUndefinedMethodInspection */
         return ($this->configuration->getProjectConfiguration() instanceof iSupportsDbModels ? $this->configuration->getProjectConfiguration()->getDbModels() : null);
     }
 
+    /**
+     * @param $plugin_name
+     * @param $plugin_path
+     * @return null
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
     private function getPluginModels($plugin_name, $plugin_path)
     {
         $plcfg = $this->getPluginConfig($plugin_name, $plugin_path);
 
-        return ($plcfg && $plcfg instanceof iSupportsDbModels ? $plcfg->getDbModels() : null);
+        return ($plcfg instanceof iSupportsDbModels ? $plcfg->getDbModels() : null);
     }
 
+    /**
+     * @param $plugin_name
+     * @param $plugin_path
+     * @return lcPluginConfiguration|mixed|null
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
     private function getPluginConfig($plugin_name, $plugin_path)
     {
         if (!isset($this->plugin_configs[$plugin_name])) {
@@ -450,11 +538,19 @@ class Propel extends lcTaskController
         return $this->plugin_configs[$plugin_name];
     }
 
-    private function getDefaultSchemaContent()
+    /**
+     * @return string
+     */
+    private function getDefaultSchemaContent(): string
     {
         return '<?xml version="1.0" encoding="utf-8"?><database package="models" defaultIdMethod="native" baseClass="lcBasePropelObject" defaultTranslateMethod="$this-&gt;translate"></database>';
     }
 
+    /**
+     * @param $filename
+     * @return void
+     * @throws lcIOException
+     */
     private function fixWindowsUppercaseRestrictions($filename)
     {
         $rep = [
@@ -474,15 +570,22 @@ class Propel extends lcTaskController
         unset($f);
     }
 
+    /**
+     * @param $filename
+     * @param array $options
+     * @param array $supported_models
+     * @return void
+     * @throws DOMException
+     */
     private function fixSchema($filename, array $options, array $supported_models)
     {
-        $fdata = @file_get_contents($filename);
+        $fdata = file_exists($filename) && is_readable($filename) ? file_get_contents($filename) : null;
 
         if (!$fdata) {
             return;
         }
 
-        $pXml = new DOMDocument;
+        $pXml = new DOMDocument();
         $pXml->loadXML($fdata);
 
         $element = $pXml->documentElement;
@@ -549,7 +652,7 @@ class Propel extends lcTaskController
             }
 
             if (!$found) {
-                $tmp = $pXml->createElement("table");
+                $tmp = $pXml->createElement('table');
                 $tmp->setAttribute('name', $model_name);
                 $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
                 $tmp->setAttribute('idMethod', 'native');
@@ -605,14 +708,24 @@ class Propel extends lcTaskController
         $pXml->save($filename);
     }
 
-    private function phingExecute($cmd, array $custom_properties = null, array $custom_args = null, $exit = false, $work_dir = null)
+    /**
+     * @param $cmd
+     * @param array|null $custom_properties
+     * @param array|null $custom_args
+     * @param bool $exit
+     * @param $work_dir
+     * @return bool|void
+     * @throws lcIOException
+     * @throws lcSystemException
+     */
+    private function phingExecute($cmd, array $custom_properties = null, array $custom_args = null, bool $exit = false, $work_dir = null)
     {
         $request = $this->getRequest();
 
         /** @noinspection PhpUndefinedMethodInspection */
         $projectPath = $this->configuration->getRootDir() . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'propel';
 
-        $wd = $work_dir ? $work_dir : (realpath($this->work_dir) . DS);
+        $wd = $work_dir ?: (realpath($this->work_dir) . DS);
 
         /** @noinspection PhpUndefinedMethodInspection */
         $properties = [
@@ -654,7 +767,7 @@ class Propel extends lcTaskController
             echo print_r($build_properties_contents, true);
         }*/
 
-        if (!@file_put_contents($build_properties_filename, $build_properties_str)) {
+        if (!file_put_contents($build_properties_filename, $build_properties_str)) {
             throw new lcIOException('Could not copy the generated build.properties file: ' . $build_properties_filename);
         }
 
@@ -665,7 +778,7 @@ class Propel extends lcTaskController
         $args = [];
 
         // add project arg
-        $args[] = "-Dproject.dir=" . $wd;
+        $args[] = '-Dproject.dir=' . $wd;
 
         // custom arguments
         if (isset($custom_args)) {
@@ -745,8 +858,8 @@ class Propel extends lcTaskController
             $stream_ok->close();
             $stream_err->close();
 
-            @fclose($descr_ok);
-            @fclose($descr_err);
+            fclose($descr_ok);
+            fclose($descr_err);
 
             $captured_errors = PropelPhing::getCapturedPhpErrors();
 
@@ -754,8 +867,6 @@ class Propel extends lcTaskController
             $success = true;
             $exit_code = 0;
         } catch (Exception $e) {
-
-            $this->phing_has_error = true;
 
             throw new lcSystemException('Phing command failed: ' . $e->getMessage() . ' (' . implode(' ', $args) . ')', $e->getCode(), $e);
         }
@@ -767,10 +878,10 @@ class Propel extends lcTaskController
             $this->consoleDisplay(lcConsolePainter::formatConsoleText('Propel phing command has internal errors:', 'error') . "\n\n");
 
             foreach ($captured_errors as $error) {
-                $message = isset($error['message']) ? $error['message'] : 'unknown error';
+                $message = $error['message'] ?? 'unknown error';
                 //$level = isset($error['level']) ? $error['level'] : '-';
-                $line = isset($error['line']) ? $error['line'] : '-';
-                $file = isset($error['file']) ? $error['file'] : '-';
+                $line = $error['line'] ?? '-';
+                $file = $error['file'] ?? '-';
 
                 $errmsg = '> ' . lcConsolePainter::formatColoredConsoleText('[PHP Error] ' . $message . '[line ' . $line . ' of ' . $file . ']', 'magenta');
 
@@ -790,36 +901,91 @@ class Propel extends lcTaskController
         }
     }
 
-    private function propelSql()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelSql(): ?bool
     {
         $this->propelInitSchemas();
         return $this->phingExecute('sql');
     }
 
-    private function propelGraphviz()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelGraphviz(): ?bool
     {
         $this->propelInitSchemas();
         return $this->phingExecute('graphviz');
     }
 
-    private function propelCreateDb()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelCreateDb(): ?bool
     {
         $this->propelInitSchemas();
         return $this->phingExecute('create-db');
     }
 
-    private function propelInsertSql()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelInsertSql(): ?bool
     {
         $this->propelInitSchemas();
         return $this->phingExecute('insert-sql');
     }
 
-    private function propelBuildSql()
+    /**
+     * @return bool|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelBuildSql(): ?bool
     {
         $this->propelInitSchemas();
         return $this->phingExecute('build-sql');
     }
 
+    /**
+     * @param null $output_filename
+     * @return bool|void|null
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
     private function propelReverse($output_filename = null)
     {
         $this->propelInitSchemas();
@@ -848,10 +1014,19 @@ class Propel extends lcTaskController
             'propel.schema.dir' => $dir,
         ];
 
-        return $this->phingExecute('reverse', $properties, null, null);
+        return $this->phingExecute('reverse', $properties);
     }
 
-    private function propelRebuild()
+    /**
+     * @return bool
+     * @throws DOMException
+     * @throws lcConfigException
+     * @throws lcIOException
+     * @throws lcInvalidArgumentException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function propelRebuild(): bool
     {
         $fix_plugin_schemas = $this->getRequest()->getParam('with-plugins');
 
@@ -915,7 +1090,6 @@ class Propel extends lcTaskController
                     }
                 } catch (Exception $e) {
                     $this->consoleDisplay('Plugin schema rebuild failed: ' . $e->getMessage());
-                    assert(false);
                     continue;
                 }
 
@@ -940,7 +1114,13 @@ class Propel extends lcTaskController
         return true;
     }
 
-    private function getPluginSchemas()
+    /**
+     * @return array
+     * @throws lcConfigException
+     * @throws lcPluginException
+     * @throws lcSystemException
+     */
+    private function getPluginSchemas(): array
     {
         $schemas = [];
 
@@ -951,7 +1131,7 @@ class Propel extends lcTaskController
 
                 $plconf = $this->getPluginConfig($plugin_name, $plugin_data['path']);
 
-                if ($plconf && $plconf instanceof iSupportsDbModels) {
+                if ($plconf instanceof iSupportsDbModels) {
                     $schemas[$plugin_data['name']] = [
                         'plugin_data' => $plugin_data,
                         'schema_filename' => $plugin_data['path'] . DS . 'config' . DS . self::SCHEMA_FILE,
@@ -967,6 +1147,12 @@ class Propel extends lcTaskController
         return $schemas;
     }
 
+    /**
+     * @param $plugin_path
+     * @return mixed|null
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
     private function getPluginPropelSchemaConfig($plugin_path)
     {
         $cfg_filename = $plugin_path . DS . 'config' . DS . 'propel.yml';
@@ -985,8 +1171,6 @@ class Propel extends lcTaskController
 
         $data = $data['schemas'];
         $ak = array_keys($data);
-        $data = $data[$ak[0]];
-
         /*if ($schema_name) {
             if (!isset($data['schemas'][$schema_name])) {
                 return;
@@ -995,15 +1179,26 @@ class Propel extends lcTaskController
             $data = $data['schemas'][$schema_name];
         }*/
 
-        return $data;
+        return $data[$ak[0]];
     }
 
+    /**
+     * @param $reversed_schema_filename
+     * @param $plugin_name
+     * @param $plugin_schema_filename
+     * @param $temp_plugin_schema_filename
+     * @param array $plugin_tables
+     * @param array|null $propel_config_schema
+     * @return void
+     * @throws lcIOException
+     * @throws lcSystemException
+     */
     private function pluginSchemaCleanup($reversed_schema_filename, $plugin_name, $plugin_schema_filename, $temp_plugin_schema_filename, array $plugin_tables, array $propel_config_schema = null)
     {
         $this->consoleDisplay('Rebuilding plugin schema: ' . $plugin_name);
 
         // remove all previous tables
-        $pXml = new DOMDocument;
+        $pXml = new DOMDocument();
         $pXml->loadXML(file_get_contents($temp_plugin_schema_filename));
         $element = $pXml->documentElement;
 
@@ -1016,13 +1211,14 @@ class Propel extends lcTaskController
             $element->removeChild($result->item($i));
         }
 
+        /** @var DOMElement $pXmlDatabaseNode */
         $pXmlDatabaseNode = $pXml->getElementsByTagName('database')->item(0);
         /** @noinspection PhpUndefinedMethodInspection */
         $pXmlDatabaseNode->removeAttribute('name');
 
         // add plugin tables from main reversed schema
         if ($plugin_tables) {
-            $pXmlMain = new DOMDocument;
+            $pXmlMain = new DOMDocument();
             $pXmlMain->loadXML(file_get_contents($reversed_schema_filename));
             $mainSchemaXpath = new Domxpath($pXmlMain);
 
@@ -1052,6 +1248,12 @@ class Propel extends lcTaskController
         lcFiles::copy($temp_plugin_schema_filename, $plugin_schema_filename);
     }
 
+    /**
+     * @param $schemaPath
+     * @param array|null $propel_config_schema
+     * @return void
+     * @throws lcSystemException
+     */
     private function fixViews($schemaPath, array $propel_config_schema = null)
     {
         $this->consoleDisplay('Fixing VIEWs of schema: ' . $schemaPath);
@@ -1089,7 +1291,7 @@ class Propel extends lcTaskController
                 foreach ($itm->getElementsByTagName('column') as $col) {
                     /** @var DomElement $col */
 
-                    $tbl_config = (isset($overriden_view_config[$tbl_name]['primary_keys']) ? $overriden_view_config[$tbl_name]['primary_keys'] : null);
+                    $tbl_config = ($overriden_view_config[$tbl_name]['primary_keys'] ?? null);
 
                     if (!$tbl_config || !is_array($tbl_config)) {
                         continue;
@@ -1149,6 +1351,12 @@ class Propel extends lcTaskController
         $mainSchema->save($schemaPath);
     }
 
+    /**
+     * @param $original_schema_path
+     * @param $reversed_schema_path
+     * @return void
+     * @throws lcSystemException
+     */
     private function fixCopyValidatorsFromOriginalToReversedSchema($original_schema_path, $reversed_schema_path)
     {
         $this->consoleDisplay('Copying back custom validators from original schema: ' . $original_schema_path);
@@ -1186,6 +1394,7 @@ class Propel extends lcTaskController
 
         foreach ($result as $dom_elem) {
             /** @var DomElement $dom_elem */
+            /** @noinspection PhpPossiblePolymorphicInvocationInspection */
             $table_name = $dom_elem->parentNode->getAttribute('name');
             $validator_column = $dom_elem->getAttribute('column');
 
@@ -1213,6 +1422,12 @@ class Propel extends lcTaskController
         $reversed_schema->save($reversed_schema_path);
     }
 
+    /**
+     * @param $original_schema_path
+     * @param $reversed_schema_path
+     * @return void
+     * @throws lcSystemException
+     */
     private function fixCopyCustomAttributes($original_schema_path, $reversed_schema_path)
     {
         $this->consoleDisplay('Copying back custom attributes from original schema: ' . $original_schema_path);
@@ -1290,13 +1505,14 @@ class Propel extends lcTaskController
                     $column_name = $col_dom_elem->getAttribute('name');
                     $lc_col_title = $col_dom_elem->getAttribute(lcBasePeer::ATTR_TABLE_LC_TITLE);
 
-                    if ($column_name && $lc_table_title) {
+                    if ($column_name) {
                         $res_rev = new DOMXPath($reversed_schema);
                         $result2 = $res_rev->query('/database/table[@name=\'' . $table_name . '\']/column[@name=\'' . $column_name . '\']');
 
                         if ($result2->length) {
                             $this->consoleDisplay('Copying table column (' . $column_name . ') custom attribute: ' . lcBasePeer::ATTR_TABLE_LC_TITLE . ':' . $lc_col_title);
 
+                            /** @var DOMElement $new_node */
                             $new_node = $result2->item(0);
                             $new_node->setAttribute(lcBasePeer::ATTR_TABLE_LC_TITLE, $lc_col_title);
                         }
@@ -1316,6 +1532,11 @@ class Propel extends lcTaskController
         $reversed_schema->save($reversed_schema_path);
     }
 
+    /**
+     * @return array|mixed|null
+     * @throws lcInvalidArgumentException
+     * @throws lcSystemException
+     */
     private function getMainPropelSchemaConfig()
     {
         $cfg_filename = $this->configuration->getBaseConfigDir() . DS . 'propel.yml';
@@ -1357,13 +1578,21 @@ class Propel extends lcTaskController
         return $data;
     }
 
+    /**
+     * @param $reversed_schema_filename
+     * @param array $plugin_tables
+     * @param array|null $propel_config_schema
+     * @return void
+     * @throws lcIOException
+     * @throws lcSystemException
+     */
     private function mainSchemaCleanup($reversed_schema_filename, array $plugin_tables, array $propel_config_schema = null)
     {
         $this->consoleDisplay('Fixing main schema...');
 
         // remove plugin tables from main schema
         if ($plugin_tables) {
-            $pXml = new DOMDocument;
+            $pXml = new DOMDocument();
             $pXml->loadXML(file_get_contents($reversed_schema_filename));
             $element = $pXml->documentElement;
 
@@ -1400,11 +1629,18 @@ class Propel extends lcTaskController
         lcFiles::copy($reversed_schema_filename, $original_schema_path);
     }
 
-    private function getProjectSchema()
+    /**
+     * @return string
+     */
+    private function getProjectSchema(): string
     {
         return $this->configuration->getConfigDir() . DS . self::SCHEMA_FILE;
     }
 
+    /**
+     * @return mixed
+     * @throws lcSystemException
+     */
     private function propelMigrate()
     {
         throw new lcSystemException('Unimplemented');
@@ -1413,16 +1649,22 @@ class Propel extends lcTaskController
         return $this->phingExecute('migrate');*/
     }
 
-    private function displayHelp()
+    /**
+     * @return true
+     */
+    private function displayHelp(): bool
     {
         $this->consoleDisplay($this->getHelpInfo(), false);
 
         return true;
     }
 
-    public function getHelpInfo()
+    /**
+     * @return string
+     */
+    public function getHelpInfo(): string
     {
-        $help_info = <<<EOD
+        return <<<EOD
 Possible commands:
 
 - models - builds/rebuilds all models schemas into objects
@@ -1449,7 +1691,6 @@ Possible commands:
 
 if any of the options is skipped - the current website\'s ones gets used.
 EOD;
-        return $help_info;
     }
 
 }

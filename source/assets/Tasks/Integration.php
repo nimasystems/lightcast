@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lightcast\Assets\Tasks;
 
@@ -31,6 +32,9 @@ use lcIOException;
 use lcSys;
 use lcTaskController;
 
+/**
+ *
+ */
 class Integration extends lcTaskController
 {
     public function executeTask()
@@ -79,6 +83,10 @@ class Integration extends lcTaskController
             "\n";
     }
 
+    /**
+     * @param $filename
+     * @return void
+     */
     public function _validatePhpFiles($filename)
     {
         if (lcFiles::getFileExt($filename) != '.php') {

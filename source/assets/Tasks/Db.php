@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpComposerExtensionStubsInspection */
+<?php
+declare(strict_types=1);
+/** @noinspection PhpComposerExtensionStubsInspection */
 
 namespace Lightcast\Assets\Tasks;
 
@@ -24,11 +26,15 @@ namespace Lightcast\Assets\Tasks;
 */
 
 use Exception;
+use lcConsolePainter;
 use lcInvalidArgumentException;
 use lcNotAvailableException;
 use lcTaskController;
 use PDO;
 
+/**
+ *
+ */
 class Db extends lcTaskController
 {
     public function executeTask(): bool

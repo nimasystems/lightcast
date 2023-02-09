@@ -161,7 +161,7 @@ class lcAutoloadCacheTool extends lcObj
         return $found_classes_all;
     }
 
-    protected function parseDir($initial_directory_path, $directory_path, array & $found_classes)
+    protected function parseDir($initial_directory_path, $directory_path, array &$found_classes)
     {
         assert(isset($directory_path));
         $directory_path = (string)$directory_path;
@@ -283,8 +283,8 @@ class lcAutoloadCacheTool extends lcObj
 <?php
 // Lightcast $ver autoload class cache
 // Generated at: $generate_time
-\$[$cache_version_suffix] = $cache_version;
-\$[$cache_var_name] = array($class_array_data);
+\$$cache_version_suffix = $cache_version;
+\$$cache_var_name = [$class_array_data];
 EOT;
         lcFiles::putFile($full_path, $php_data);
     }

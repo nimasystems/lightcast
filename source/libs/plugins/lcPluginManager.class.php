@@ -336,7 +336,7 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
 
     public function getPluginNamespacedClass(string $class): string
     {
-        return '\\' . $this->configuration->getProjectNamespace() . '\\Plugins\\' . $class;
+        return $this->configuration->getProjectNamespace() . '\\Plugins\\' . $class;
     }
 
     /**

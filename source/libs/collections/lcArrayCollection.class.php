@@ -33,18 +33,18 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 
         if (null !== $values) {
             foreach ($values as $key => $val) {
-                $this->append($key, $val);
+                $this->append((string)$key, $val);
                 unset($key, $val);
             }
         }
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed $value
      * @return void
      */
-    public function append($key, $value = null)
+    public function append(string $key, $value = null)
     {
         if (!$this->setPositionByKey($key)) {
             parent::appendColl(new lcNameValuePair($key, $value));
@@ -54,10 +54,10 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return bool
      */
-    private function setPositionByKey($key): bool
+    private function setPositionByKey(string $key): bool
     {
         $this->first();
 
@@ -77,10 +77,10 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return bool
      */
-    public function has($key): bool
+    public function has(string $key): bool
     {
         return $this->setPositionByKey($key);
     }
@@ -95,13 +95,13 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     }
 
     /**
-     * @param $key
-     * @param $value
+     * @param  $value
+     * @param  $offset
      * @return void
      */
-    public function set($key, $value = null)
+    public function set($value, $offset = null)
     {
-        $this->append($key, $value);
+        $this->append((string)$value, $offset);
     }
 
     /**
@@ -114,10 +114,10 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
     }
 
     /**
-     * @param $key
+     * @param string $key
      * @return null
      */
-    public function get($key)
+    public function get(string $key)
     {
         if (!$this->setPositionByKey($key)) {
             return null;

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Lightcast\Assets\Tasks;
 
@@ -27,12 +28,18 @@ use lcDirs;
 use lcPlugin;
 use lcTaskController;
 
+/**
+ *
+ */
 class Misc extends lcTaskController
 {
-    private $found_models;
-    private $found_php_files;
+    private array $found_models = [];
+    private array $found_php_files = [];
 
-    public function executeTask()
+    /**
+     * @return true
+     */
+    public function executeTask(): bool
     {
         switch ($this->getRequest()->getParam('action')) {
             case 'find-models':
@@ -42,7 +49,10 @@ class Misc extends lcTaskController
         }
     }
 
-    public function findModels()
+    /**
+     * @return true
+     */
+    public function findModels(): bool
     {
         $this->consoleDisplay('Find models started');
 
@@ -87,7 +97,7 @@ class Misc extends lcTaskController
                 // plugin tasks
                 $tasks_path = $info['path'] . DS . lcPlugin::TASKS_PATH;
 
-                $tasks = lcDirs::searchDir($tasks_path, true);
+                $tasks = lcDirs::searchDir($tasks_path);
 
                 if ($tasks) {
                     foreach ($tasks as $task_name) {
@@ -101,7 +111,7 @@ class Misc extends lcTaskController
                 // web services
                 $ws_path = $info['path'] . DS . lcPlugin::WEB_SERVICES_PATH;
 
-                $web_services = lcDirs::searchDir($ws_path, true);
+                $web_services = lcDirs::searchDir($ws_path);
 
                 if ($web_services) {
                     foreach ($web_services as $web_service_name) {
@@ -114,7 +124,7 @@ class Misc extends lcTaskController
 
                 // models
                 $models_path = $info['path'] . DS . lcPlugin::MODELS_PATH;
-                $models_ = lcDirs::searchDir($models_path, true);
+                $models_ = lcDirs::searchDir($models_path);
 
                 if ($models_) {
                     foreach ($models_ as $m) {
@@ -160,7 +170,7 @@ class Misc extends lcTaskController
         // project tasks
         $tasks_path = DIR_APP . DS . 'tasks';
 
-        $tasks = lcDirs::searchDir($tasks_path, true);
+        $tasks = lcDirs::searchDir($tasks_path);
 
         if ($tasks) {
             $php_files = [];
@@ -179,7 +189,7 @@ class Misc extends lcTaskController
         // project web services
         $ws_path = DIR_APP . DS . 'ws';
 
-        $web_services = lcDirs::searchDir($ws_path, true);
+        $web_services = lcDirs::searchDir($ws_path);
 
         if ($web_services) {
             $php_files = [];
@@ -198,7 +208,7 @@ class Misc extends lcTaskController
         // project models
         $models_path = DIR_APP . DS . 'models';
 
-        $models_ = lcDirs::searchDir($models_path, true);
+        $models_ = lcDirs::searchDir($models_path);
 
         if ($models_) {
             $models = [];
@@ -217,14 +227,14 @@ class Misc extends lcTaskController
     private function detectDbModelsInFile(array $models, array $files)
     {
         foreach ($files as $filename) {
-            $fdata = @file_get_contents($filename);
+            $fdata = file_exists($filename) && is_readable($filename) ? file_get_contents($filename) : null;
 
             if (!$fdata) {
                 continue;
             }
 
             foreach ($models as $model) {
-                if (preg_match("/\b" . preg_quote($model) . "\b/", $fdata)) {
+                if (preg_match('/\b' . preg_quote($model) . '\b/', $fdata)) {
                     $this->consoleDisplay($filename . ': ' . $model, false);
                 }
 
@@ -235,13 +245,19 @@ class Misc extends lcTaskController
         }
     }
 
-    public function displayHelp()
+    /**
+     * @return true
+     */
+    public function displayHelp(): bool
     {
-        $this->consoleDisplay($this->getHelpInfo(), false, false);
+        $this->consoleDisplay($this->getHelpInfo(), false);
         return true;
     }
 
-    public function getHelpInfo()
+    /**
+     * @return string
+     */
+    public function getHelpInfo(): string
     {
         return "\n" . '--find-models - Detect all used models in the project by scanning all php plugin / module files' . "\n";
     }

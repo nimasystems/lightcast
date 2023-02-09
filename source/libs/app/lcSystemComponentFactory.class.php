@@ -180,6 +180,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             foreach ($locations as $location) {
                 $found = lcComponentLocator::getControllerTasksInPath($location['path'],
                     $location['namespace'], $location);
+
                 $controllers = array_merge($controllers, $found);
                 unset($location, $found);
             }

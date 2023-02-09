@@ -897,7 +897,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'namespace' => '\\Lightcast\\Assets\\Tasks',
+                'namespace' => 'Lightcast\\Assets\\Tasks',
                 'path' => $this->getAssetsDir() . DS . 'Tasks',
             ],
             [
@@ -911,7 +911,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
 
     public function getNamespacedClass(string $class): string
     {
-        return '\\' . $this->getProjectNamespace() . '\\' . $class;
+        return $this->getProjectNamespace() . '\\' . $class;
     }
 
     /**

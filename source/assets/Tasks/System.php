@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /*
  * Lightcast - A PHP MVC Framework
 * Copyright (C) 2005 Nimasystems Ltd
@@ -33,16 +34,19 @@ use lcNotAvailableException;
 use lcProjectConfiguration;
 use lcTaskController;
 use lcYamlFileParser;
-use ParagonIE\Halite\HiddenString;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
+use ParagonIE\HiddenString\HiddenString;
 use Symfony\Component\Dotenv\Dotenv;
 
 //require_once('parsers' . DS . 'lcYamlFileParser.class.php');
 
+/**
+ *
+ */
 class System extends lcTaskController
 {
-    const CFG_BACKUP_FILE_EXT = 'frz';
+    public const CFG_BACKUP_FILE_EXT = 'frz';
 
     public function executeTask(): bool
     {
@@ -225,7 +229,7 @@ class System extends lcTaskController
             unset($file_path, $content);
         }
 
-        @mkdir($path['path'], 0755, true);
+        mkdir($path['path'], 0755, true);
         lcFiles::putFile($path['path'] . $path['filename'], serialize($tmp));
 
         $this->consoleDisplay(lcConsolePainter::formatConsoleText('"' . count($files) . '" files frozen.! Filename " ' . $path['filename'] . '"', 'warning'));
@@ -253,9 +257,7 @@ class System extends lcTaskController
             'by_' . get_current_user(),
             php_uname('n'),
         ];
-        $filename = implode('_', $filename) . '.' . self::CFG_BACKUP_FILE_EXT;
-
-        return $filename;
+        return implode('_', $filename) . '.' . self::CFG_BACKUP_FILE_EXT;
     }
 
     private function configUnFreeze(): bool
@@ -724,7 +726,6 @@ class System extends lcTaskController
         $file_data = unserialize($file_data);
 
         $j = 0;
-        $parser = null;
 
         foreach ($file_data['configs'] as $file_path => $data) {
             $j++;
