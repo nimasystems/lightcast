@@ -2,8 +2,6 @@
 all:
   view:
     filters:
-      - lcHTMLTemplateViewFilter
-      - languagesI18nViewFilter
     content_type: text/html
     charset: utf-8
     metatags:

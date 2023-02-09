@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,13 +22,15 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcValueCollection extends lcBaseCollection
 {
-    public function offsetUnset($index)
-    {
-        parent::offsetUnset($index);
-    }
-
+    /**
+     * @param $value
+     * @return false|mixed
+     */
     public function get($value)
     {
         $this->first();
@@ -47,15 +50,5 @@ class lcValueCollection extends lcBaseCollection
         unset($all);
 
         return false;
-    }
-
-    public function delete($offset = null)
-    {
-        parent::delete($offset);
-    }
-
-    public function clear()
-    {
-        parent::clear();
     }
 }

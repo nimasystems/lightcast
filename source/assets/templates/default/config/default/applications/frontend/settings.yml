@@ -19,7 +19,6 @@ all:
       frontend.access.log: info
   controller:
     filters:
-      - lcAppSecurityActionFilter
     max_forwards: 10
   storage:
     enabled: true

@@ -66,7 +66,12 @@ class lcCookiesCollection extends lcBaseCollection
         return null;
     }
 
-    public function set(lcCookie $value, $offset = null)
+    /**
+     * @param lcCookie $value
+     * @param $offset
+     * @return void
+     */
+    public function set($value, $offset = null)
     {
         parent::setColl($value, $offset);
     }

@@ -34,8 +34,8 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
 
     public function initialize()
     {
-        $this->app_dir = $this->project_configuration->getProjectDir() . DS . 'Applications' . DS .
-            lcInflector::camelize($this->getApplicationName());
+        $this->app_dir = $this->project_configuration->getSrcDir('Applications' . DS .
+            lcInflector::camelize($this->getApplicationName()));
 
         parent::initialize();
 
@@ -158,7 +158,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
     /**
      * @return array[]
      */
-    public function getControllerModuleLocations(): array
+    public function getModuleLocations(): array
     {
         $parent_locations = $this->project_configuration->getModuleLocations();
 
@@ -166,7 +166,8 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
         $controller_locations = [[
                                      'context_type' => lcSysObj::CONTEXT_APP,
                                      'context_name' => $this->getApplicationName(),
-                                     'path' => $this->app_dir . DS . 'modules',
+                                     'namespace' => $this->getNamespacedClass('Modules'),
+                                     'path' => $this->app_dir . DS . 'Modules',
                                  ],];
 
         return array_merge($parent_locations, $controller_locations);

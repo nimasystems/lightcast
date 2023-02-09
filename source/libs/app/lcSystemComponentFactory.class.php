@@ -776,8 +776,11 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
             throw new lcInvalidArgumentException('Invalid controller name');
         }
 
+        $controller_name_camelized = ctype_upper($controller_name[0]) ? $controller_name :
+            lcInflector::camelize($controller_name);
+
         // first check config, then others
-        $details = $this->config_controller_modules[$controller_name] ?? ($this->controllers[$controller_name] ?? null);
+        $details = $this->config_controller_modules[$controller_name_camelized] ?? ($this->controllers[$controller_name_camelized] ?? null);
 
         if (!$details) {
             return null;

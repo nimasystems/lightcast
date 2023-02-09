@@ -282,7 +282,7 @@ class lcComponentLocator
             'name' => $controller_name,
             'path' => $path,
             'filename' => $controller_name . '.php',
-            'class' => $namespace . '\\' . $controller_name,
+            'class' => $namespace . '\\' . $controller_name . '\\' . $controller_name,
         ];
     }
 

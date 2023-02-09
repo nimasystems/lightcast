@@ -69,14 +69,14 @@ class lcRouteCollection extends lcBaseCollection implements ArrayAccess
         return null;
     }
 
-    public function offsetExists($name)
+    public function offsetExists($offset): bool
     {
         $this->first();
 
         $all = $this->getAll();
 
         foreach ($all as $route) {
-            if ($route->getName() == $name) {
+            if ($route->getName() == $offset) {
                 return true;
             }
             unset($route);
@@ -87,14 +87,14 @@ class lcRouteCollection extends lcBaseCollection implements ArrayAccess
         return false;
     }
 
-    public function offsetGet($name)
+    public function offsetGet($offset)
     {
         $this->first();
 
         $all = $this->getAll();
 
         foreach ($all as $route) {
-            if ($route->getName() == $name) {
+            if ($route->getName() == $offset) {
                 return $route;
             }
             unset($route);
@@ -105,12 +105,12 @@ class lcRouteCollection extends lcBaseCollection implements ArrayAccess
         return null;
     }
 
-    public function offsetSet($name, $value)
+    public function offsetSet($offset, $value)
     {
         throw new lcUnsupportedException('Cannot change collection params');
     }
 
-    public function offsetUnset($name)
+    public function offsetUnset($offset)
     {
         throw new lcUnsupportedException('Cannot change collection params');
     }

@@ -784,7 +784,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
      */
     protected function getPlugin($plugin_name, $optional = false)
     {
-        $plugin = isset($this->plugins[$plugin_name]) ? $this->plugins[$plugin_name] : null;
+        $plugin = $this->plugins[$plugin_name] ?? null;
 
         if (!$plugin) {
             $plugin = $this->internalLoadPlugin($plugin_name, !$optional);

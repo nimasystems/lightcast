@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,6 +22,9 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 {
     public function __construct(array $values = null)
@@ -35,6 +39,11 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         }
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return void
+     */
     public function append($key, $value = null)
     {
         if (!$this->setPositionByKey($key)) {
@@ -44,7 +53,11 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         }
     }
 
-    private function setPositionByKey($key)
+    /**
+     * @param $key
+     * @return bool
+     */
+    private function setPositionByKey($key): bool
     {
         $this->first();
 
@@ -63,14 +76,13 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         return false;
     }
 
-    public function has($key)
+    /**
+     * @param $key
+     * @return bool
+     */
+    public function has($key): bool
     {
         return $this->setPositionByKey($key);
-    }
-
-    public function clear()
-    {
-        parent::clear();
     }
 
     public function mergeWithCollection(lcArrayCollection $collection)
@@ -82,16 +94,29 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         }
     }
 
+    /**
+     * @param $key
+     * @param $value
+     * @return void
+     */
     public function set($key, $value = null)
     {
         $this->append($key, $value);
     }
 
-    public function offsetExists($name)
+    /**
+     * @param $offset
+     * @return bool
+     */
+    public function offsetExists($offset): bool
     {
-        return $this->get($name) ? true : false;
+        return (bool)$this->get($offset);
     }
 
+    /**
+     * @param $key
+     * @return null
+     */
     public function get($key)
     {
         if (!$this->setPositionByKey($key)) {
@@ -101,36 +126,59 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         return $this->current()->getValue();
     }
 
-    public function offsetGet($name)
+    /**
+     * @param $offset
+     * @return mixed|null
+     */
+    public function offsetGet($offset)
     {
-        return $this->get($name);
+        return $this->get($offset);
     }
 
-    public function offsetSet($name, $value)
+    /**
+     * @param $offset
+     * @param $value
+     * @return void
+     */
+    public function offsetSet($offset, $value)
     {
-        $this->set($name, $value);
+        $this->set($offset, $value);
     }
 
-    public function offsetUnset($name)
+    /**
+     * @param $offset
+     * @return void
+     */
+    public function offsetUnset($offset)
     {
-        $this->delete($name);
+        $this->delete($offset);
     }
 
-    public function delete($key = null)
+    /**
+     * @param $offset
+     * @return void
+     */
+    protected function delete($offset = null)
     {
-        if (!$this->setPositionByKey($key)) {
+        if (!$this->setPositionByKey($offset)) {
             return;
         }
 
         parent::delete($this->key());
     }
 
-    public function toArray()
+    /**
+     * @return array
+     */
+    public function toArray(): array
     {
         return $this->getKeyValueArray();
     }
 
-    public function getKeyValueArray()
+    /**
+     * @return array
+     */
+    public function getKeyValueArray(): array
     {
         $out = [];
 
@@ -152,6 +200,9 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
         return $out;
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         $out = '';
@@ -178,6 +229,6 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
             unset($a, $all);
         }
 
-        return (string)$out;
+        return $out;
     }
 }

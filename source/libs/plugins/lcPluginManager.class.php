@@ -222,7 +222,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
                     continue;
                 }
 
-                $plugin_namespace = $this->configuration->getNamespacedClass('Plugins\\' . $plugin_name);
+                $plugin_namespace = $this->configuration
+                    ->getProjectConfiguration()
+                    ->getNamespacedClass('Plugins\\' . $plugin_name);
 
                 // set / cache it
                 $this->plugin_configurations[$plugin_name] = $plugin_config;

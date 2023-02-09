@@ -336,7 +336,8 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
 
     public function getNamespacedClass(string $class = null): string
     {
-        return $this->getProjectConfiguration()->getNamespacedClass(lcInflector::camelize($this->getApplicationName()) .
+        return $this->getProjectConfiguration()->getNamespacedClass('Applications\\' .
+            lcInflector::camelize($this->getApplicationName()) .
             ($class ? '\\' . $class : ''));
     }
 

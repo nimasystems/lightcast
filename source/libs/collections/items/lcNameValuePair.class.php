@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,12 +24,23 @@
 
 */
 
+/**
+ *
+ */
 class lcNameValuePair extends lcObj
 {
-    protected $name;
+    protected string $name;
+
+    /**
+     * @var mixed
+     */
     protected $value;
 
-    public function __construct($name, $value = null)
+    /**
+     * @param string $name
+     * @param null $value
+     */
+    public function __construct(string $name, $value = null)
     {
         parent::__construct();
 
@@ -39,21 +51,35 @@ class lcNameValuePair extends lcObj
         }
     }
 
-    public function getName()
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * @param $name
+     * @return void
+     */
     public function setName($name)
     {
         $this->name = $name;
     }
 
+    /**
+     * @return mixed
+     */
     public function getValue()
     {
         return $this->value;
     }
 
+    /**
+     * @param $value
+     * @return void
+     */
     public function setValue($value = null)
     {
         $this->value = $value;
