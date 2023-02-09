@@ -25,7 +25,7 @@ declare(strict_types=1);
 /**
  *
  */
-class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels, iSupportsDbModelOperations,
+class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModels,
     iSupportsAutoload, iAppDelegate, iSupportsVersions
 {
     public const DEFAULT_BASE_CONFIG_DIR = 'default';
@@ -73,7 +73,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     /** @var ?iDatabaseModelManager */
     protected ?iDatabaseModelManager $database_model_manager = null;
 
-    protected array $use_models = [];
     protected array $use_classes = [];
 
     protected bool $use_class_cache = true;
@@ -182,7 +181,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         $this->database_model_manager =
             null;
 
-        $this->use_models =
         $this->project_db_models =
             [];
 
@@ -934,20 +932,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
                 'path' => $this->getSrcDir('WebServices'),
             ],
         ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getUsedDbModels(): array
-    {
-        if (!$this->use_models) {
-            if ($this->getDatabaseModelManager()) {
-                return $this->getDatabaseModelManager()->getRegisteredModelNames();
-            }
-        }
-
-        return $this->use_models;
     }
 
     /**

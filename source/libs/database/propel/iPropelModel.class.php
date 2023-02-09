@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -25,7 +26,7 @@
 
 interface iPropelModel
 {
-    static function _getPossibleValues($type_id = null);
+    public static function _getPossibleValues($type_id = null);
 
-    static function _getColumnHumanizedTitle($column_name);
+    public static function _getColumnHumanizedTitle($column_name);
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * Data object to describe a join between two tables, for example
@@ -32,12 +33,12 @@ class CustomJoin extends Join
      * @internal param string $right The right column of the join condition
      *                         (may contain an alias name)
      */
-    public function addRightValueCondition($left, $value, $operator = self::EQUAL)
+    public function addRightValueCondition(string $left, $value, string $operator = self::EQUAL)
     {
         $i = count($this->left);
 
         if ($pos = strrpos($left, '.')) {
-            list($this->leftTableName, $this->left[$i]) = explode('.', $left);
+            [$this->leftTableName, $this->left[$i]] = explode('.', $left);
         } else {
             $this->left[$i] = $left;
         }
@@ -54,6 +55,7 @@ class CustomJoin extends Join
      * @param array &$params
      *
      * @return string SQL join clause with join condition
+     * @throws PropelException
      * @example
      * <code>
      * $join = new Join();
@@ -62,9 +64,8 @@ class CustomJoin extends Join
      * echo $j->getClause($params);
      * // 'LEFT JOIN author ON (book.AUTHOR_ID=author.ID)'
      * </code>
-     *
      */
-    public function getClause(&$params)
+    public function getClause(&$params): string
     {
         if (null === $this->joinCondition) {
             $conditions = [];

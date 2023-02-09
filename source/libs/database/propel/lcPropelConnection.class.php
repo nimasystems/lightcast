@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -24,10 +25,10 @@
 class lcPropelConnection extends PropelPDO
 {
     // override propel's default logging methods
-    const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
-    const QUERY_CACHE_TIMEOUT_MINUTE = 60;    // in seconds
-    const QUERY_CACHE_TIMEOUT_DAY = 86400;
-    const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
+    public const QUERY_CACHE_TIMEOUT_DEFAULT = 600;
+    public const QUERY_CACHE_TIMEOUT_MINUTE = 60;    // in seconds
+    public const QUERY_CACHE_TIMEOUT_DAY = 86400;
+    public const DEFAULT_CACHE_NAMESPACE = 'propel_pdo';
     protected static $defaultLogMethods = [
         'PropelPDO::exec',
         'PropelPDO::query',
@@ -65,7 +66,7 @@ class lcPropelConnection extends PropelPDO
         $this->is_php53_or_lower = (version_compare(PHP_VERSION, '5.3.0') <= 0);
     }
 
-    public function getLightcastConfiguration()
+    public function getLightcastConfiguration(): lcApplicationConfiguration
     {
         return $this->lc_configuration;
     }
@@ -75,7 +76,7 @@ class lcPropelConnection extends PropelPDO
         $this->lc_configuration = $configuration;
     }
 
-    public function getEventDispatcher()
+    public function getEventDispatcher(): lcEventDispatcher
     {
         return $this->event_dispatcher;
     }
@@ -87,7 +88,7 @@ class lcPropelConnection extends PropelPDO
 
     #pragma mark - Overriden methods
 
-    public function execTransactionWithLock(array $statements, array $locked_tables)
+    public function execTransactionWithLock(array $statements, array $locked_tables): bool
     {
         if (!$statements || !$locked_tables) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -111,7 +112,7 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
-    public function lockTablesInTransaction(array $tables)
+    public function lockTablesInTransaction(array $tables): bool
     {
         if (!$tables) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -203,7 +204,7 @@ class lcPropelConnection extends PropelPDO
 
     #pragma mark - Caching
 
-    public function commitAndUnlockTables()
+    public function commitAndUnlockTables(): bool
     {
         parent::commit();
 
@@ -215,7 +216,7 @@ class lcPropelConnection extends PropelPDO
         return true;
     }
 
-    public function rollbackAndUnlockTables()
+    public function rollbackAndUnlockTables(): bool
     {
         parent::rollBack();
 
@@ -254,7 +255,7 @@ class lcPropelConnection extends PropelPDO
         return $this->exec('UNLOCK TABLES');
     }
 
-    public function prepare($sql, /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */ $driver_options = [])
+    public function prepare($sql, /** @noinspection PhpSignatureMismatchDuringInheritanceInspection */ $driver_options = []): PDOStatement
     {
         if (!$sql) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -270,7 +271,7 @@ class lcPropelConnection extends PropelPDO
         $this->query_cache_backend = $query_cache_backend;
     }
 
-    public function getQueryCacheEnabled()
+    public function getQueryCacheEnabled(): bool
     {
         return $this->query_cache_enabled;
     }
@@ -280,17 +281,17 @@ class lcPropelConnection extends PropelPDO
         $this->query_cache_enabled = $enabled;
     }
 
-    public function getQueryCacheBackend()
+    public function getQueryCacheBackend(): iDatabaseCacheProvider
     {
         return $this->query_cache_backend;
     }
 
-    public function getCachedQueryCount()
+    public function getCachedQueryCount(): int
     {
         return $this->cached_query_count;
     }
 
-    public function getCacheTimeout()
+    public function getCacheTimeout(): int
     {
         return self::QUERY_CACHE_TIMEOUT_DEFAULT;
     }
@@ -317,12 +318,12 @@ class lcPropelConnection extends PropelPDO
      * Logs the method call or SQL using the Propel::log() method or a registered logger class.
      *
      * @param string $msg Message to log.
-     * @param integer $level Log level to use; will use self::setLogLevel() specified level by default.
-     * @param string $methodName Name of the method whose execution is being logged.
-     * @param array $debugSnapshot Previous return value from self::getDebugSnapshot().
+     * @param null $level Log level to use; will use self::setLogLevel() specified level by default.
+     * @param null $methodName Name of the method whose execution is being logged.
+     * @param array|null $debugSnapshot Previous return value from self::getDebugSnapshot().
+     * @throws PropelException
      * @uses      self::getLogPrefix()
      * @see       self::setLogger()
-     *
      */
     public function log($msg, $level = null, $methodName = null, array $debugSnapshot = null)
     {
@@ -342,9 +343,9 @@ class lcPropelConnection extends PropelPDO
         }
 
         // Determine if this query is slow enough to warrant logging
-        if ($this->getLoggingConfig("onlyslow", self::DEFAULT_ONLYSLOW_ENABLED)) {
+        if ($this->getLoggingConfig('onlyslow', self::DEFAULT_ONLYSLOW_ENABLED)) {
             $now = $this->getDebugSnapshot();
-            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig("details.slow.threshold", self::DEFAULT_SLOW_THRESHOLD)) {
+            if ($now['microtime'] - $debugSnapshot['microtime'] < $this->getLoggingConfig('details.slow.threshold', self::DEFAULT_SLOW_THRESHOLD)) {
                 return;
             }
         }
@@ -390,6 +391,10 @@ class lcPropelConnection extends PropelPDO
     For locking reads (SELECT with FOR UPDATE or LOCK IN SHARE MODE), InnoDB locks only index records, not the gaps before them, and thus permits the free insertion of new records next to locked records. For UPDATE and DELETE statements, locking depends on whether the statement uses a unique index with a unique search condition (such as WHERE id = 100), or a range-type search condition (such as WHERE id > 100). For a unique index with a unique search condition, InnoDB locks only the index record found, not the gap before it. For range-type searches, InnoDB locks the index range scanned, using gap locks or next-key (gap plus index-record) locks to block insertions by other sessions into the gaps covered by the range. This is necessary because “phantom rows” must be blocked for MySQL replication and recovery to work.
     */
 
+    /**
+     * @param $cache_label
+     * @return string|void|null
+     */
     private function computeCacheKey($cache_label)
     {
         assert(isset($cache_label));
@@ -398,16 +403,11 @@ class lcPropelConnection extends PropelPDO
             return null;
         }
 
-        $cache_key = null;
-
         if (!$cache_label) {
-            assert(false);
-            return $cache_key;
+            return null;
         }
 
-        $cache_key = $this->cache_prefix . $cache_label;
-
-        return $cache_key;
+        return $this->cache_prefix . $cache_label;
     }
 
     /*
@@ -439,13 +439,13 @@ class lcPropelConnection extends PropelPDO
      * @return array|null
      * @throws lcInvalidArgumentException
      */
-    public function cachedQueryRows($query, $cache_label, $namespace = null, $timeout = self::QUERY_CACHE_TIMEOUT_DEFAULT, $enable_cache = true, &$is_cached = false)
+    public function cachedQueryRows($query, $cache_label, $namespace = null, int $timeout = self::QUERY_CACHE_TIMEOUT_DEFAULT, bool $enable_cache = true, bool &$is_cached = false): ?array
     {
         $query = (string)$query;
         $cache_label = (string)$cache_label;
         $namespace = isset($namespace) ? (string)$namespace : self::DEFAULT_CACHE_NAMESPACE;
-        $timeout = isset($timeout) && $timeout ? (int)$timeout : self::QUERY_CACHE_TIMEOUT_DEFAULT;
-        $enable_cache = (bool)$enable_cache;
+        $timeout = isset($timeout) && $timeout ? $timeout : self::QUERY_CACHE_TIMEOUT_DEFAULT;
+        $enable_cache = $enable_cache;
         $is_cached = false;
 
         if (!$query || ($enable_cache && !$cache_label)) {
@@ -541,7 +541,7 @@ class lcPropelConnection extends PropelPDO
         $this->log('Cache store: \'' . $namespace . ':' . $cache_key . ', timeout: ' . $timeout, null, 'PropelPDO::query');
     }
 
-    public function getQueryCount()
+    public function getQueryCount(): int
     {
         return $this->query_count;
     }
@@ -596,7 +596,7 @@ class lcPropelConnection extends PropelPDO
         return $this->exec('SET FOREIGN_KEY_CHECKS = 1');
     }
 
-    public function quoteTableName($string)
+    public function quoteTableName($string): string
     {
         return '`' . $string . '`';
     }
@@ -609,8 +609,6 @@ class lcPropelConnection extends PropelPDO
             return null;
         }
 
-        $quoted = substr($quoted, 1, -1);
-
-        return $quoted;
+        return substr($quoted, 1, -1);
     }
 }

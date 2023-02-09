@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 class lcPropelBaseQueryBuilder extends QueryBuilder
 {
@@ -10,7 +11,7 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
      * This is necessary for plugins - so their package remains intact and
      * read-only.
      */
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
 
@@ -111,7 +112,7 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
         \$tblm = \$this->getTableMap();
         return \$tblm->translate(\$value);
     }
-    
+
     /**
      * Translate a string in the context of the model
      * @param     string \$value String to translate

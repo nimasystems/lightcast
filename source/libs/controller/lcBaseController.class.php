@@ -21,8 +21,8 @@
 * E-Mail: info@nimasystems.com
 */
 
-abstract class lcBaseController extends lcAppObj implements iProvidesCapabilities, iDebuggable, iCacheable, iPluginContained,
-    iSupportsDbModelOperations, iSupportsPluginOperations, iSupportsComponentOperations
+abstract class lcBaseController extends lcAppObj implements iProvidesCapabilities, iDebuggable, iCacheable,
+    iPluginContained, iSupportsPluginOperations, iSupportsComponentOperations
 {
     const RENDER_NONE = 2;
     const RENDER_VIEW = 3;
@@ -57,11 +57,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     /**
      * @var array
      */
-    protected $use_models = [];
-
-    /**
-     * @var array
-     */
     protected $use_components = [];
 
     /**
@@ -72,7 +67,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     /**
      * @var array
      */
-    protected $dependancies_loaded = [];
+    protected $dependencies_loaded = [];
 
     /**
      * @var lcPlugin[]
@@ -120,7 +115,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             null;
 
         $this->use_plugins =
-        $this->use_models =
         $this->use_components =
         $this->plugins =
         $this->loaded_components =
@@ -573,7 +567,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
         // resolve dependancies
         try {
-            $controller_instance->loadDependancies();
+            $controller_instance->loadDependencies();
         } catch (Exception $e) {
             throw new lcRequirementException('Component dependancies could not be loaded (' . $component_name . '): ' .
                 $e->getMessage(),
@@ -614,9 +608,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $controller->setSystemComponentFactory($this->system_component_factory);
     }
 
-    public function loadDependancies()
+    public function loadDependencies()
     {
-        if ($this->dependancies_loaded) {
+        if ($this->dependencies_loaded) {
             return;
         }
 
@@ -719,23 +713,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $this->loaded_components_usage = $loaded_components_usage;
         }
 
-        // db model dependancies
-        if ($this->database_model_manager) {
-            $used_models = $this->getUsedDbModels();
-
-            if ($used_models && is_array($used_models)) {
-                try {
-                    $this->database_model_manager->useModels($used_models);
-                } catch (Exception $e) {
-                    throw new lcRequirementException('Could not include database model dependancies: ' .
-                        $e->getMessage(),
-                        $e->getCode(),
-                        $e);
-                }
-            }
-        }
-
-        $this->dependancies_loaded = true;
+        $this->dependencies_loaded = true;
     }
 
     public function getUsedPlugins()
@@ -786,11 +764,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         // for example - web management modules should require the base app
         // configuration to match lcWebManagementConfiguration
         return true;
-    }
-
-    public function getUsedDbModels()
-    {
-        return $this->use_models;
     }
 
     protected function flash($flash)

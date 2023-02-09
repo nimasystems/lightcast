@@ -29,6 +29,7 @@
  * @method lcLogger getLogger
  * @method iCacheStore getCache
  * @method lcRouting getRouter
+ * @method lcRequest getRequest
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj
@@ -731,11 +732,6 @@ class lcApp extends lcObj
                     $e);
             }
         }
-
-        // use application/project-wide models if configuration supports it
-        if ($this->configuration instanceof iSupportsDbModelOperations) {
-            $db_manager->useModels($this->configuration->getUsedDbModels());
-        }
     }
 
     protected function startRuntimePlugins()
@@ -870,18 +866,6 @@ class lcApp extends lcObj
                 // register into local class cache
                 if ($local_cache_manager && ($obj instanceof iCacheable)) {
                     $local_cache_manager->registerCacheableObject($obj, self::LOADERS_OBJECT_CACHE_PREFIX . $loader);
-                }
-
-                // db models usage
-                if ($db_manager && $obj instanceof iSupportsDbModelOperations) {
-                    /** @var iSupportsDbModelOperations $obj */
-                    $models = $obj->getUsedDbModels();
-
-                    if ($models && is_array($models)) {
-                        $db_manager->useModels($models);
-                    }
-
-                    unset($models);
                 }
 
                 // provided capabilities

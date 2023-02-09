@@ -33,7 +33,7 @@ use Symfony\Component\Dotenv\Dotenv;
  * @method getDefaultTimezone()
  * @method getProjectAppName($getApplicationName)
  */
-abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsDbModelOperations, iSupportsAutoload
+abstract class lcApplicationConfiguration extends lcConfiguration implements iSupportsAutoload
 {
     /**
      * @var lcProjectConfiguration
@@ -41,7 +41,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     protected lcProjectConfiguration $project_configuration;
 
     protected array $use_classes = [];
-    protected array $use_models = [];
 
     protected ?string $unique_id_suffix = null;
 
@@ -272,7 +271,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     {
         // shutdown project_configuration
         $this->project_configuration->shutdown();
-        $this->use_models = [];
 
         parent::shutdown();
     }
@@ -320,15 +318,6 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     }
 
     /**
-     * @return array
-     */
-    public function getUsedDbModels(): array
-    {
-        $project_models = $this->project_configuration->getUsedDbModels();
-        return array_unique(array_merge($this->use_models, $project_models));
-    }
-
-    /**
      * @return array|array[]
      */
     public function getDebugInfo(): array
@@ -344,6 +333,12 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
      * @return mixed
      */
     abstract public function getApplicationName();
+
+    public function getNamespacedClass(string $class = null): string
+    {
+        return $this->getProjectConfiguration()->getNamespacedClass(lcInflector::camelize($this->getApplicationName()) .
+            ($class ? '\\' . $class : ''));
+    }
 
     /**
      * @param bool $debug

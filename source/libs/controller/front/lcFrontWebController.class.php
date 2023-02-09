@@ -67,7 +67,7 @@ class lcFrontWebController extends lcFrontController
 
         // resolve dependancies
         try {
-            $controller_instance->loadDependancies();
+            $controller_instance->loadDependencies();
         } catch (Exception $e) {
             throw new lcRequirementException('Web controller dependancies could not be loaded (' . $controller_instance->getControllerName() . '): ' .
                 $e->getMessage(),

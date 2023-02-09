@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -25,11 +26,11 @@
 
 class lcBasePeer extends BasePeer
 {
-    const ATTR_TABLE_LC_TITLE = 'lcTitle';
+    public const ATTR_TABLE_LC_TITLE = 'lcTitle';
 
     /**
      * lcTitle type - human friendly title of a column
      * e.g. 'Author Id'
      */
-    const TYPE_LC_TITLE = 'lcTitle';
+    public const TYPE_LC_TITLE = 'lcTitle';
 }

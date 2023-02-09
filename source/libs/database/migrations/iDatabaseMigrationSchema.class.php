@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,22 +24,22 @@
 
 interface iDatabaseMigrationSchema
 {
-    const ACTION_MIGRATE_UP = 'migrate_up';
-    const ACTION_MIGRATE_DOWN = 'migrate_down';
-    const ACTION_SCHEMA_INSTALL = 'schema_install';
-    const ACTION_SCHEMA_UNINSTALL = 'schema_uninstall';
-    const ACTION_DATA_INSTALL = 'data_install';
-    const ACTION_DATA_UNINSTALL = 'data_uninstall';
+    public const ACTION_MIGRATE_UP = 'migrate_up';
+    public const ACTION_MIGRATE_DOWN = 'migrate_down';
+    public const ACTION_SCHEMA_INSTALL = 'schema_install';
+    public const ACTION_SCHEMA_UNINSTALL = 'schema_uninstall';
+    public const ACTION_DATA_INSTALL = 'data_install';
+    public const ACTION_DATA_UNINSTALL = 'data_uninstall';
 
     /**
      * @return string
      */
-    public function getSchemaIdentifier();
+    public function getSchemaIdentifier(): string;
 
     /**
      * @return int
      */
-    public function getSchemaVersion();
+    public function getSchemaVersion(): int;
 
     /**
      * @param lcPropelConnection $db
@@ -46,7 +47,7 @@ interface iDatabaseMigrationSchema
      * @param int $to_version
      * @return bool
      */
-    public function migrateUp(lcPropelConnection $db, $from_version, $to_version);
+    public function migrateUp(lcPropelConnection $db, int $from_version, int $to_version): bool;
 
     /**
      * @param lcPropelConnection $db
@@ -54,41 +55,41 @@ interface iDatabaseMigrationSchema
      * @param int $to_version
      * @return bool
      */
-    public function migrateDown(lcPropelConnection $db, $from_version, $to_version);
+    public function migrateDown(lcPropelConnection $db, int $from_version, int $to_version): bool;
 
     /**
      * @param lcPropelConnection $db
      * @return bool
      */
-    public function schemaInstall(lcPropelConnection $db);
+    public function schemaInstall(lcPropelConnection $db): bool;
 
     /**
      * @param lcPropelConnection $db
      * @return bool
      */
-    public function schemaUninstall(lcPropelConnection $db);
+    public function schemaUninstall(lcPropelConnection $db): bool;
 
     /**
      * @param lcPropelConnection $db
      * @return bool
      */
-    public function dataInstall(lcPropelConnection $db);
+    public function dataInstall(lcPropelConnection $db): bool;
 
     /**
      * @param lcPropelConnection $db
      * @return bool
      */
-    public function dataUninstall(lcPropelConnection $db);
+    public function dataUninstall(lcPropelConnection $db): bool;
 
     /**
      * @param lcPropelConnection $db
      * @param string $action
      */
-    public function beforeExecute(lcPropelConnection $db, $action);
+    public function beforeExecute(lcPropelConnection $db, string $action);
 
     /**
      * @param lcPropelConnection $db
      * @param string $action
      */
-    public function afterExecute(lcPropelConnection $db, $action);
+    public function afterExecute(lcPropelConnection $db, string $action);
 }

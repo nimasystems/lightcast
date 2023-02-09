@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -24,36 +25,30 @@
 abstract class lcDatabase extends lcSysObj
 {
     /**
-     * @var lcDatabaseManager
+     * @var ?lcDatabaseManager
      */
-    protected $database_manager;
+    protected ?lcDatabaseManager $database_manager = null;
 
     /**
      * @var array
      */
-    protected $options;
-
-    public function initialize()
-    {
-        parent::initialize();
-    }
+    protected array $options = [];
 
     public function shutdown()
     {
-        $this->database_manager =
-        $this->options =
-            null;
+        $this->database_manager = null;
+        $this->options = [];
 
         parent::shutdown();
     }
 
-    public function setDatabaseManager(lcDatabaseManager $database_manager)
+    public function setDatabaseManager(lcDatabaseManager $database_manager): lcDatabase
     {
         $this->database_manager = $database_manager;
         return $this;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): lcDatabase
     {
         $this->options = $options;
         return $this;
@@ -62,7 +57,7 @@ abstract class lcDatabase extends lcSysObj
     /**
      * @return PDO
      */
-    public function connect()
+    public function connect(): PDO
     {
         return $this->getConnection();
     }
@@ -70,7 +65,7 @@ abstract class lcDatabase extends lcSysObj
     /**
      * @return PDO
      */
-    abstract public function getConnection();
+    abstract public function getConnection(): PDO;
 
     /**
      * @return void
@@ -80,10 +75,10 @@ abstract class lcDatabase extends lcSysObj
     /**
      * @return bool
      */
-    abstract public function isConnected();
+    abstract public function isConnected(): bool;
 
     /**
      * @return int
      */
-    abstract public function getSQLCount();
+    abstract public function getSQLCount(): int;
 }

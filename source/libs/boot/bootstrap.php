@@ -120,7 +120,6 @@ require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iRequiresCapabi
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'base' . DS . 'iSupportsComposer.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'logger' . DS . 'iLoggable.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'i18n' . DS . 'iI18nProvider.class.php';
-require ROOT . DS . 'source' . DS . 'libs' . DS . 'database' . DS . 'iSupportsDbModelOperations.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'caching' . DS . 'iCacheable.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iAppDelegate.class.php';
 require ROOT . DS . 'source' . DS . 'libs' . DS . 'app' . DS . 'iSupportsVersions.class.php';

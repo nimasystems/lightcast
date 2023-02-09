@@ -55,7 +55,7 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
      * @param int $to_version
      * @return bool
      */
-    public function migrateUp(lcPropelConnection $db, $from_version, $to_version)
+    public function migrateUp(lcPropelConnection $db, int $from_version, int $to_version)
     {
         $method_name = 'migrateUp_' . $to_version;
 
@@ -72,7 +72,7 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
      * @param int $to_version
      * @return bool
      */
-    public function migrateDown(lcPropelConnection $db, $from_version, $to_version)
+    public function migrateDown(lcPropelConnection $db, int $from_version, int $to_version)
     {
         $method_name = 'migrateDown_' . $to_version;
 
@@ -127,7 +127,7 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
      * @param lcPropelConnection $db
      * @param string $action
      */
-    public function beforeExecute(lcPropelConnection $db, $action)
+    public function beforeExecute(lcPropelConnection $db, string $action)
     {
         $this->info('beforeExecute: ' . $action);
 
@@ -138,7 +138,7 @@ abstract class lcPackageDatabaseMigrationSchema extends lcSysObj implements iDat
      * @param lcPropelConnection $db
      * @param string $action
      */
-    public function afterExecute(lcPropelConnection $db, $action)
+    public function afterExecute(lcPropelConnection $db, string $action)
     {
         $this->info('afterExecute: ' . $action);
 

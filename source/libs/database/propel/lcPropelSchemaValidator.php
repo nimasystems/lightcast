@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -34,7 +35,7 @@ class lcPropelSchemaValidator
         $this->xsd_filename = $xsd_filename;
     }
 
-    public function validate()
+    public function validate(): bool
     {
         if (!class_exists('DOMDocument', false)) {
             throw new lcSystemException('You need DOM XML to validate the schema');

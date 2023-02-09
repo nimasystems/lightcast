@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -25,26 +26,17 @@
 
 class lcPropelLogger extends lcSysObj
 {
-    public function initialize()
-    {
-        parent::initialize();
-    }
-
-    public function shutdown()
-    {
-        parent::shutdown();
-    }
 
     public function log($message, $level = null, $channel = null)
     {
-        $level = $level ? $level : Propel::LOG_DEBUG;
+        $level = $level ?: Propel::LOG_DEBUG;
 
         $logger_severity = $this->getInternalLoggerSeverity($level);
 
         parent::log($message, $logger_severity, 'database');
     }
 
-    private function getInternalLoggerSeverity($propel_severity)
+    private function getInternalLoggerSeverity($propel_severity): int
     {
         $propel_severity = (int)$propel_severity;
 

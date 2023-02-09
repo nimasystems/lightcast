@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 abstract class lcBasePropelObject extends BaseObject
 {
@@ -25,7 +26,7 @@ abstract class lcBasePropelObject extends BaseObject
         $this->event_dispatcher = $this->application_configuration->getEventDispatcher();
     }
 
-    protected function getDateTimeWithClientTimezone(DateTime $date_time)
+    protected function getDateTimeWithClientTimezone(DateTime $date_time): DateTime
     {
         if ($this->client_timezone) {
             $date_time->setTimezone($this->client_timezone);
@@ -37,7 +38,7 @@ abstract class lcBasePropelObject extends BaseObject
     {
         if (preg_match('/set(\w+)/', $name, $matches)) {
             $virtualColumn = $matches[1];
-            $value = isset($params[0]) ? $params[0] : true;
+            $value = $params[0] ?? true;
 
             return $this->setVirtualColumn($virtualColumn, $value);
         } else {
@@ -82,7 +83,7 @@ abstract class lcBasePropelObject extends BaseObject
     /**
      * @return DateTimeZone
      */
-    public function getClientTimezone()
+    public function getClientTimezone(): DateTimeZone
     {
         return $this->client_timezone;
     }
@@ -104,7 +105,7 @@ abstract class lcBasePropelObject extends BaseObject
         }
     }
 
-    public function preInsert(PropelPDO $con = null)
+    public function preInsert(PropelPDO $con = null): bool
     {
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('data_model.before_create', $this));
@@ -122,7 +123,7 @@ abstract class lcBasePropelObject extends BaseObject
         }
     }
 
-    public function preUpdate(PropelPDO $con = null)
+    public function preUpdate(PropelPDO $con = null): bool
     {
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('data_model.before_update', $this));
@@ -140,7 +141,7 @@ abstract class lcBasePropelObject extends BaseObject
         }
     }
 
-    public function preDelete(PropelPDO $con = null)
+    public function preDelete(PropelPDO $con = null): bool
     {
         if ($this->event_dispatcher) {
             $this->event_dispatcher->notify(new lcEvent('data_model.before_delete', $this));
@@ -158,7 +159,7 @@ abstract class lcBasePropelObject extends BaseObject
         }
     }
 
-    public function getFormattedTitle()
+    public function getFormattedTitle(): string
     {
         return '#' . $this->getPrimaryKey();
     }
@@ -177,7 +178,7 @@ abstract class lcBasePropelObject extends BaseObject
     {
         // no exceptions at this point
         // overriden for this purpose
-        return (isset($this->virtualColumns[$name]) ? $this->virtualColumns[$name] : null);
+        return ($this->virtualColumns[$name] ?? null);
     }
 
     protected function log($msg, $priority = Propel::LOG_INFO)
@@ -186,22 +187,22 @@ abstract class lcBasePropelObject extends BaseObject
         lcApp::getInstance()->getLogger()->log($msg, $priority);
     }
 
-    protected function logError($msg)
+    protected function logError($msg): ?bool
     {
         return $this->log($msg, Propel::LOG_ERR);
     }
 
-    protected function logInfo($msg)
+    protected function logInfo($msg): ?bool
     {
-        return $this->log($msg, Propel::LOG_INFO);
+        return $this->log($msg);
     }
 
-    protected function logWarn($msg)
+    protected function logWarn($msg): ?bool
     {
         return $this->log($msg, Propel::LOG_WARNING);
     }
 
-    protected function logDebug($msg)
+    protected function logDebug($msg): ?bool
     {
         return $this->log($msg, Propel::LOG_DEBUG);
     }

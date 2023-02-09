@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -25,8 +26,8 @@
 
 class lcPDODatabase extends lcDatabase
 {
-    const DEFAULT_CHARSET = 'utf8';
-    const DEFAULT_COLLATION = 'utf8_general_ci';
+    public const DEFAULT_CHARSET = 'utf8';
+    public const DEFAULT_COLLATION = 'utf8_general_ci';
 
     protected $charset = self::DEFAULT_CHARSET;
     protected $collation = self::DEFAULT_COLLATION;
@@ -75,17 +76,18 @@ class lcPDODatabase extends lcDatabase
         parent::shutdown();
     }
 
-    public function getSQLCount()
+    public function getSQLCount(): int
     {
-        return false;
+        return 0;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): lcDatabase
     {
         $this->options = $options;
+        return $this;
     }
 
-    public function getOptions()
+    public function getOptions(): array
     {
         return $this->options;
     }
@@ -162,15 +164,15 @@ class lcPDODatabase extends lcDatabase
         $this->password = $password;
     }
 
-    public function getConnection()
+    public function getConnection(): PDO
     {
         return $this->connect();
     }
 
-    public function connect()
+    public function connect(): PDO
     {
         if ($this->conn) {
-            return true;
+            return $this->conn;
         }
 
         assert($this->options);
@@ -203,9 +205,9 @@ class lcPDODatabase extends lcDatabase
         return $this->conn;
     }
 
-    public function isConnected()
+    public function isConnected(): bool
     {
-        return $this->conn ? true : false;
+        return (bool)$this->conn;
     }
 
     public function reconnect()
@@ -215,7 +217,7 @@ class lcPDODatabase extends lcDatabase
         return $this->connect();
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
         if (!$this->conn) {
             return true;

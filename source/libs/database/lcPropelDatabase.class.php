@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,10 +24,10 @@
 
 class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithCache
 {
-    const PROPEL_CONNECTION_CLASS = 'lcPropelConnection';
+    public const PROPEL_CONNECTION_CLASS = 'lcPropelConnection';
 
-    const DEFAULT_CHARSET = 'utf8';
-    const DEFAULT_COLLATION = 'utf8_general_ci';
+    public const DEFAULT_CHARSET = 'utf8';
+    public const DEFAULT_COLLATION = 'utf8_general_ci';
 
     /** @var lcPropelConnection */
     protected $conn;
@@ -52,7 +53,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         parent::shutdown();
     }
 
-    public function disconnect()
+    public function disconnect(): bool
     {
         if (!$this->conn) {
             return true;
@@ -67,7 +68,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         return true;
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'sql_count' => $this->getSQLCount(),
@@ -77,14 +78,14 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         ];
     }
 
-    public function getSQLCount()
+    public function getSQLCount(): int
     {
         $this->connect();
 
         return $this->conn->getQueryCount();
     }
 
-    public function connect()
+    public function connect(): PDO
     {
         if ($this->conn) {
             return $this->conn;
@@ -95,7 +96,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
             // debugging
             if (DO_DEBUG) {
-                $this->conn->useDebug(true);
+                $this->conn->useDebug();
             }
 
             if ($this->propel_logger) {
@@ -124,8 +125,8 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
             $this->conn->setLightcastConfiguration($this->configuration);
 
             // cache enabled or not
-            if (isset($this->options['caching']) && (bool)$this->options['caching']) {
-                $this->conn->setQueryCacheEnabled(true);
+            if (isset($this->options['caching']) && $this->options['caching']) {
+                $this->conn->setQueryCacheEnabled();
             }
 
             if ($this->db_cache && $this->db_cache instanceof iDatabaseCacheProvider) {
@@ -138,22 +139,22 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         }
     }
 
-    public function getCachedSQLCount()
+    public function getCachedSQLCount(): int
     {
         return $this->conn->getCachedQueryCount();
     }
 
-    public function getIsCacheEnabled()
+    public function getIsCacheEnabled(): bool
     {
         return $this->conn->getQueryCacheEnabled();
     }
 
-    public function getCacheTimeout()
+    public function getCacheTimeout(): int
     {
         return $this->conn->getCacheTimeout();
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return [
             'sql_count' => $this->getSQLCount(),
@@ -187,7 +188,7 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
 
     #pragma mark - iDatabaseWithCache methods
 
-    public function getConnection()
+    public function getConnection(): lcPropelConnection
     {
         if (!$this->conn) {
             $this->connect();
@@ -196,9 +197,9 @@ class lcPropelDatabase extends lcDatabase implements iDebuggable, iDatabaseWithC
         return $this->conn;
     }
 
-    public function isConnected()
+    public function isConnected(): bool
     {
-        return $this->conn ? true : false;
+        return (bool)$this->conn;
     }
 
     public function reconnect()

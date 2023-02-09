@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,19 +24,22 @@
 
 class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, iDatabaseManager, iDebuggable
 {
-    const DEFAULT_DB = 'primary';
+    public const DEFAULT_DB = 'primary';
 
-    /** @var lcLogger */
-    protected $propel_logger;
-    protected $propel_config;
+    /** @var ?lcPropelLogger */
+    protected ?lcPropelLogger $propel_logger = null;
+
+    protected array $propel_config = [];
+
     /**
-     * @var lcDatabaseMigrationsHelper
+     * @var ?lcDatabaseMigrationsHelper
      */
-    protected $migration_helper;
+    protected ?lcDatabaseMigrationsHelper $migration_helper = null;
+
     /** @var array lcDatabase[] */
-    private $dbs = [];
-    private $default_database = self::DEFAULT_DB;
-    private $propel_initialized;
+    private array $dbs = [];
+    private string $default_database = self::DEFAULT_DB;
+    private bool $propel_initialized = false;
 
     public function initialize()
     {
@@ -58,7 +62,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         // default database
         if (isset($this->configuration['db.default_database'])) {
             $this->default_database = (string)$this->configuration['db.default_database'];
-            $this->default_database = $this->default_database ? $this->default_database : self::DEFAULT_DB;
+            $this->default_database = $this->default_database ?: self::DEFAULT_DB;
         }
 
         // propel usage
@@ -102,7 +106,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                     }
 
                     // try to connect if option set
-                    if (isset($db['autoconnect']) && (bool)$db['autoconnect']) {
+                    if (isset($db['autoconnect']) && $db['autoconnect']) {
                         $db_object->connect();
                     }
 
@@ -148,24 +152,24 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
 
         // required by Propel
         // @codingStandardsIgnoreStart
-        $magic_quotes_gpc = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_gpc');
+        $magic_quotes_gpc = !version_compare(PHP_VERSION, '5.3.0') && ini_get('magic_quotes_gpc');
         // magic quotes are deprecated from 5.3.x up
-        $magic_quotes_sybase = version_compare(PHP_VERSION, '5.3.0') ? false : (bool)ini_get('magic_quotes_sybase');
+        $magic_quotes_sybase = !version_compare(PHP_VERSION, '5.3.0') && ini_get('magic_quotes_sybase');
         // magic quotes are deprecated from 5.3.x up
         $ze1_compatibility_mode = (bool)ini_get('ze1_compatibility_mode');
 
         if ($magic_quotes_gpc || $magic_quotes_sybase || $ze1_compatibility_mode) {
             throw new lcSystemException("Propel requires the following PHP settings:\n
-                    - ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ")
-                    - magic_quotes_sybase = Off (Currently: " . ($magic_quotes_sybase ? 'On' : 'Off') . ")
-                    - magic_quotes_gpc = Off (Currently: " . ($magic_quotes_gpc ? 'On' : 'Off') . ")");
+                    - ze1_compatibility_mode = Off (Currently: " . ($ze1_compatibility_mode ? 'On' : 'Off') . ')
+                    - magic_quotes_sybase = Off (Currently: ' . ($magic_quotes_sybase ? 'On' : 'Off') . ')
+                    - magic_quotes_gpc = Off (Currently: ' . ($magic_quotes_gpc ? 'On' : 'Off') . ')');
         }
         // @codingStandardsIgnoreEnd
 
         $this->makePropelConfig();
 
         // instance pooling - we disable it by default from LC 1.5
-        $enable_instance_pooling = isset($this->propel_config['instance_pooling']) ? (bool)$this->propel_config['instance_pooling'] : false;
+        $enable_instance_pooling = isset($this->propel_config['instance_pooling']) && $this->propel_config['instance_pooling'];
 
         if ($enable_instance_pooling) {
             Propel::enableInstancePooling();
@@ -269,8 +273,8 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         $options = [];
         $attributes = [];
 
-        $persistent_connections = isset($db_config['persistent_connections']) ? (bool)$db_config['persistent_connections'] : true;
-        $emulated_prepare_statements = isset($db_config['emulate_prepares']) ? (bool)$db_config['emulate_prepares'] : false;
+        $persistent_connections = !isset($db_config['persistent_connections']) || $db_config['persistent_connections'];
+        $emulated_prepare_statements = isset($db_config['emulate_prepares']) && $db_config['emulate_prepares'];
 
         // persistent connections are now enabled by default from LC 1.5
         if ($persistent_connections) {
@@ -285,7 +289,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         }
 
         $username = isset($db_config['user']) ? (string)$db_config['user'] : null;
-        $password = isset($db_config['password']) ? $db_config['password'] : null;
+        $password = $db_config['password'] ?? null;
 
         $params['username'] = $username;
         $params['password'] = $password;
@@ -305,12 +309,17 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
                     'classname' => $propel_class,
                     'options' => $options,
                     'attributes' => $attributes,
-                    'settings' => ['charset' => ['value' => isset($db_config['charset']) ? $db_config['charset'] : lcPropelDatabase::DEFAULT_CHARSET]],
+                    'settings' => ['charset' => ['value' => $db_config['charset'] ?? lcPropelDatabase::DEFAULT_CHARSET]],
                 ],
             ],
         ];
     }
 
+    /**
+     * @return lcDatabaseMigrationsHelper|lcSysObj
+     * @throws lcConfigException
+     * @throws lcSystemException
+     */
     public function getMigrationsHelper()
     {
         if (!$this->migration_helper) {
@@ -329,7 +338,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
             // init it
             $manager = new $clname();
 
-            if (!$manager || !($manager instanceof lcSysObj)) {
+            if (!($manager instanceof lcSysObj)) {
                 throw new lcSystemException('Migrations helper is not a valid object');
             }
 
@@ -352,6 +361,10 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         return $this->migration_helper;
     }
 
+    /**
+     * @param $name
+     * @return PDO|null
+     */
     public function getConnection($name = null): ?PDO
     {
         $db = $this->getDatabase($name);
@@ -373,13 +386,13 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
             $name = $this->default_database;
         }
 
-        return isset($this->dbs[$name]) ? $this->dbs[$name] : null;
+        return $this->dbs[$name] ?? null;
     }
 
     public function shutdown()
     {
         // shutdown databases
-        if ($this->dbs && is_array($this->dbs)) {
+        if ($this->dbs) {
             foreach ($this->dbs as $name => $obj) {
                 /** @var lcDatabase $obj */
 
@@ -393,7 +406,7 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
             }
         }
 
-        $this->dbs = null;
+        $this->dbs = [];
 
         // shutdown the Propel logger
         if ($this->propel_logger) {

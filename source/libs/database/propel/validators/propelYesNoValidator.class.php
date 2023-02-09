@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  *  $Id: propelYesNoValidator.class.php 1325 2013-06-22 14:46:08Z mkovachev $

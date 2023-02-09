@@ -165,7 +165,7 @@ class lcFrontConsoleController extends lcFrontController
 
         // resolve dependancies
         try {
-            $controller_instance->loadDependancies();
+            $controller_instance->loadDependencies();
         } catch (Exception $e) {
             throw new lcRequirementException('Console task controller dependancies could not be loaded (' . $controller_name . '): ' .
                 $e->getMessage(),

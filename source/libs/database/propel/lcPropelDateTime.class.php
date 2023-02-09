@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 class lcPropelDateTime extends PropelDateTime
 {
@@ -6,7 +7,7 @@ class lcPropelDateTime extends PropelDateTime
      * Factory method to get a DateTime object from a temporal input
      *
      * @param mixed $value The value to convert (can be a string, a timestamp, or another DateTime)
-     * @param DateTimeZone $timeZone (optional) timezone
+     * @param DateTimeZone|null $timeZone (optional) timezone
      * @param string $dateTimeClass The class of the object to create, defaults to DateTime
      *
      * @return mixed null, or an instance of $dateTimeClass

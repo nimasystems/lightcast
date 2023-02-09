@@ -25,7 +25,7 @@ declare(strict_types=1);
 /**
  *
  */
-abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbModelOperations, iSupportsComponentOperations
+abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsComponentOperations
 {
     public const ASSETS_PATH = 'web';
     public const CONFIG_PATH = 'Config';
@@ -49,9 +49,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
 
     /** @var ?lcPluginConfiguration */
     protected ?lcPluginConfiguration $plugin_configuration = null;
-
-    /** @var array */
-    protected array $use_models = [];
 
     /** @var array */
     protected array $use_components = [];
@@ -249,7 +246,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
 
         // resolve dependancies
         try {
-            $controller_instance->loadDependancies();
+            $controller_instance->loadDependencies();
         } catch (Exception $e) {
             throw new lcRequirementException('Component dependancies could not be loaded (' . $component_name . '): ' .
                 $e->getMessage(),
@@ -290,8 +287,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
             null;
 
         $this->loaded_components =
-        $this->use_components =
-        $this->use_models = [];
+        $this->use_components = [];
 
         parent::shutdown();
     }
@@ -314,14 +310,6 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsDbMode
     public function getShortDebugInfo(): bool
     {
         return false;
-    }
-
-    /**
-     * @return array
-     */
-    public function getUsedDbModels(): array
-    {
-        return $this->use_models;
     }
 
     /**

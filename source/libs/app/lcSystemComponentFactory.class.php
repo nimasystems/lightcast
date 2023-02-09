@@ -264,16 +264,6 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 $models = (array)$plcfg->getDbModels();
             }
 
-            // check the plugin itself
-            if ($plugin instanceof iSupportsDbModelOperations) {
-                $models = array_unique(array_merge($models, $plugin->getUsedDbModels()));
-            }
-
-            if ($models) {
-                // notify to anyone who is able to use models
-                $this->event_dispatcher->filter(new lcEvent('database_model_manager.use_models', $this), $models);
-            }
-
             unset($models);
 
             // instantiate the plugin's components

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,8 +24,8 @@
 
 class lcDatabaseMigrationsHelper extends lcSysObj
 {
-    const DEFAULT_DB_SCHEMA_TABLE = 'core_db_schema';
-    const DEFAULT_DB_MIGRATIONS_HISTORY_TABLE = 'core_db_migration_history';
+    public const DEFAULT_DB_SCHEMA_TABLE = 'core_db_schema';
+    public const DEFAULT_DB_MIGRATIONS_HISTORY_TABLE = 'core_db_migration_history';
 
     protected $schema_table_name = self::DEFAULT_DB_SCHEMA_TABLE;
     protected $schema_migrations_history_table_name = self::DEFAULT_DB_MIGRATIONS_HISTORY_TABLE;
@@ -39,7 +40,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $this->dbc = $dbc;
     }
 
-    public function uninstallSchema(iDatabaseMigrationSchema $target)
+    public function uninstallSchema(iDatabaseMigrationSchema $target): bool
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -90,7 +91,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
      * @return bool
      * @throws Exception
      */
-    protected function createSchemaTables()
+    protected function createSchemaTables(): bool
     {
         // schema
         $schemac = $this->createTableFromDDL(
@@ -144,7 +145,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
      * @return lcDatabaseMigrationsHelper
      * @throws lcSystemException
      */
-    protected function prepareTarget(iDatabaseMigrationSchema $target)
+    protected function prepareTarget(iDatabaseMigrationSchema $target): lcDatabaseMigrationsHelper
     {
         // validate it
         $this->validateMigrationsTarget($target);
@@ -157,9 +158,9 @@ class lcDatabaseMigrationsHelper extends lcSysObj
      * @return lcDatabaseMigrationsHelper
      * @throws lcSystemException
      */
-    protected function validateMigrationsTarget(iDatabaseMigrationSchema $target)
+    protected function validateMigrationsTarget(iDatabaseMigrationSchema $target): lcDatabaseMigrationsHelper
     {
-        $valid = ($target->getSchemaIdentifier() && (int)$target->getSchemaVersion());
+        $valid = ($target->getSchemaIdentifier() && $target->getSchemaVersion());
 
         if (!$valid) {
             throw new lcSystemException('Database schema is not valid');
@@ -168,17 +169,17 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return $this;
     }
 
-    public function isSchemaInstalled(iDatabaseMigrationSchema $target)
+    public function isSchemaInstalled(iDatabaseMigrationSchema $target): bool
     {
         return ((bool)$this->getSchemaInstalledVersion($target));
     }
 
-    public function getSchemaInstalledVersion(iDatabaseMigrationSchema $target)
+    public function getSchemaInstalledVersion(iDatabaseMigrationSchema $target): ?int
     {
         return $this->getSchemaVersionFromMigrationTable($target->getSchemaIdentifier());
     }
 
-    protected function getSchemaVersionFromMigrationTable($schema_identifier)
+    protected function getSchemaVersionFromMigrationTable($schema_identifier): ?int
     {
         $info = $this->getSchemaInfoFromMigrationTable($schema_identifier);
         return ($info && (int)$info['schema_version'] ? (int)$info['schema_version'] : null);
@@ -191,12 +192,12 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return $this->dbc->query($sql)->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function uninstallData(iDatabaseMigrationSchema $target)
+    public function uninstallData(iDatabaseMigrationSchema $target): bool
     {
         return $this->installUninstallData($target, false);
     }
 
-    protected function installUninstallData(iDatabaseMigrationSchema $target, $install = true)
+    protected function installUninstallData(iDatabaseMigrationSchema $target, $install = true): bool
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -251,7 +252,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return true;
     }
 
-    public function installSchema(iDatabaseMigrationSchema $target)
+    public function installSchema(iDatabaseMigrationSchema $target): bool
     {
         // check and create migration table if missing
         $this->createSchemaTables();
@@ -264,7 +265,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         }
 
         $new_version = $target->getSchemaVersion();
-        $new_version = $new_version ? $new_version : 1;
+        $new_version = $new_version ?: 1;
 
         $this->info('Installing schema (' . $target->getSchemaIdentifier() . '): initial version: ' . $new_version);
 
@@ -338,9 +339,9 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         return $schema_id;
     }
 
-    public function installData(iDatabaseMigrationSchema $target)
+    public function installData(iDatabaseMigrationSchema $target): bool
     {
-        return $this->installUninstallData($target, true);
+        return $this->installUninstallData($target);
     }
 
     protected function updateSchemaDataInstalledToMigrationTable($schema_id, $schema_identifier, $data_installed)
@@ -355,7 +356,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
             data_installed = \'' . ($data_installed ? 'yes' : 'no') . '\',
             last_updated = Now()
-            WHERE 
+            WHERE
             schema_id = ' . $schema_id;
             $this->dbc->exec($sql);
 
@@ -384,7 +385,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             (int)$schema_id . ', ' .
             'Now(), ' .
             $this->dbc->quote($update_type) . ', ' .
-            ((int)$from_ver ? (int)$from_ver : 'NULL') . ', ' .
+            ((int)$from_ver ?: 'NULL') . ', ' .
             ((int)$to_ver ? (int)$to_ver : 'NULL') . ' ' .
             ')';
         $this->dbc->exec($sql);
@@ -412,7 +413,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         }
     }
 
-    public function migrateSchema(iDatabaseMigrationSchema $target, $to_custom_schema_version = null)
+    public function migrateSchema(iDatabaseMigrationSchema $target, $to_custom_schema_version = null): bool
     {
         $to_custom_schema_version = isset($to_custom_schema_version) ? (int)$to_custom_schema_version : null;
 
@@ -431,7 +432,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
         $schema_id = (int)$schema_info['schema_id'];
 
         $current_schema_version = (int)$schema_info['schema_version'];
-        $target_schema_version = ($to_custom_schema_version ? $to_custom_schema_version : $target->getSchemaVersion());
+        $target_schema_version = ($to_custom_schema_version ?: $target->getSchemaVersion());
 
         if ($current_schema_version == $target_schema_version) {
             return true;
@@ -551,7 +552,7 @@ class lcDatabaseMigrationsHelper extends lcSysObj
             $sql = 'UPDATE ' . $this->dbc->quoteTableName($this->schema_table_name) . ' SET ' . '
             schema_version = ' . $to_version . ',
             last_updated = Now()
-            WHERE 
+            WHERE
             schema_id = ' . $schema_id;
             $this->dbc->exec($sql);
 

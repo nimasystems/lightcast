@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -25,14 +26,14 @@ require_once('lcPropelDateTime.class.php');
 
 class lcPropel extends Propel
 {
-    const TRANSLATION_DOMAIN = 'database_models';
+    public const TRANSLATION_DOMAIN = 'database_models';
 
-    const BASE_CLASS = 'lcBasePropelObject';
-    const BASE_QUERY_CLASS = 'lcBaseQueryObject';
-    const BASE_PEER_CLASS = 'lcBasePeer';
+    public const BASE_CLASS = 'lcBasePropelObject';
+    public const BASE_QUERY_CLASS = 'lcBaseQueryObject';
+    public const BASE_PEER_CLASS = 'lcBasePeer';
 
-    const CONTEXT_TYPE_ATTR = 'lcContextType';
-    const CONTEXT_NAME_ATTR = 'lcContextName';
+    public const CONTEXT_TYPE_ATTR = 'lcContextType';
+    public const CONTEXT_NAME_ATTR = 'lcContextName';
 
     /** @var iCacheStore */
     protected static $cache;
@@ -89,7 +90,7 @@ class lcPropel extends Propel
 
     public static function translateTableMapString($string, lcTableMap $map_object)
     {
-        if (!$string || !$map_object) {
+        if (!$string) {
             return $string;
         }
 
@@ -99,7 +100,7 @@ class lcPropel extends Propel
 
         // extract context info
         $context_type = $map_object->getLcContextType();
-        $context_type = $context_type ? $context_type : 'project';
+        $context_type = $context_type ?: 'project';
         $context_type = lcController::getContextTypeAsConst($context_type);
 
         $context_name = $map_object->getLcContextName();

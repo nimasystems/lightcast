@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -24,24 +25,24 @@
 class lcPropelMysqlSchemaParser extends MysqlSchemaParser
 {
     // we need to redefine this method so VIEWs are also parsed
-    public function parse(Database $database, Task $task = null)
+    public function parse(Database $database, Task $task = null): int
     {
         $this->addVendorInfo = $this->getGeneratorConfig()->getBuildProperty('addVendorInfo');
 
-        $stmt = $this->dbh->query("SHOW FULL TABLES");
+        $stmt = $this->dbh->query('SHOW FULL TABLES');
 
         // First load the tables (important that this happen before filling out details of tables)
         $tables = [];
 
         if ($task) {
-            $task->log("Reverse Engineering Tables", Project::MSG_VERBOSE);
+            $task->log('Reverse Engineering Tables', Project::MSG_VERBOSE);
         }
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $name = $row[0];
             $type = $row[1];
 
-            if ($name == $this->getMigrationTable() || ($type != "BASE TABLE" && $type != "VIEW")) {
+            if ($name == $this->getMigrationTable() || ($type != 'BASE TABLE' && $type != 'VIEW')) {
                 continue;
             }
 
@@ -57,7 +58,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
 
         // Now populate only columns.
         if ($task) {
-            $task->log("Reverse Engineering Columns", Project::MSG_VERBOSE);
+            $task->log('Reverse Engineering Columns', Project::MSG_VERBOSE);
         }
 
         foreach ($tables as $table) {
@@ -70,7 +71,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
 
         // Now add indices and constraints.
         if ($task) {
-            $task->log("Reverse Engineering Indices And Constraints", Project::MSG_VERBOSE);
+            $task->log('Reverse Engineering Indices And Constraints', Project::MSG_VERBOSE);
         }
 
         foreach ($tables as $table) {
@@ -100,7 +101,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
      *
      * @return Column
      */
-    public function getColumnFromRow($row, Table $table)
+    public function getColumnFromRow($row, Table $table): Column
     {
         $row['Type'] = preg_replace(
             '@(/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/)|((?<!:)//.*)|[\t\r\n]@i',
@@ -112,7 +113,6 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
         $is_nullable = ($row['Null'] == 'YES');
         $autoincrement = (strpos($row['Extra'], 'auto_increment') !== false);
         $size = null;
-        $precision = null;
         $scale = null;
         $sqlType = false;
         $desc = $row['Comment'];
@@ -130,7 +130,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
             if ($matches[2]) {
                 if (($cpos = strpos($matches[2], ',')) !== false) {
                     $size = (int)substr($matches[2], 0, $cpos);
-                    $precision = $size;
+//                    $precision = $size;
                     $scale = (int)substr($matches[2], $cpos + 1);
                 } else {
                     $size = (int)$matches[2];
@@ -142,7 +142,6 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
             foreach (self::$defaultTypeSizes as $type => $defaultSize) {
                 if ($nativeType == $type && $size == $defaultSize && $scale === null) {
                     $size = null;
-                    continue;
                 }
             }
         } else if (preg_match('/^(\w+)\(/', $row['Type'], $matches)) {
@@ -162,7 +161,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
         if (!$propelType) {
             $propelType = Column::DEFAULT_TYPE;
             $sqlType = $row['Type'];
-            $this->warn("Column [" . $table->getName() . "." . $name . "] has a column type (" . $nativeType . ") that Propel does not support.");
+            $this->warn('Column [' . $table->getName() . '.' . $name . '] has a column type (' . $nativeType . ') that Propel does not support.');
         }
 
         // Special case for TINYINT(1) which is a BOOLEAN
@@ -187,7 +186,7 @@ class lcPropelMysqlSchemaParser extends MysqlSchemaParser
                     $default = 'false';
                 }
             }
-            if (in_array($default, ['CURRENT_TIMESTAMP'])) {
+            if ($default == 'CURRENT_TIMESTAMP') {
                 $type = ColumnDefaultValue::TYPE_EXPR;
             } else {
                 $type = ColumnDefaultValue::TYPE_VALUE;

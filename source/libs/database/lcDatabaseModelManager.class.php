@@ -45,7 +45,6 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
         // observe use_models filter
         $this->event_dispatcher->connect('database_model_manager.register_models', $this, 'onRegisterModels');
-        $this->event_dispatcher->connect('database_model_manager.use_models', $this, 'onUseModels');
     }
 
     public function shutdown()
@@ -57,11 +56,11 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function onRegisterModels(lcEvent $event, $models)
     {
-        $path_to_models = isset($event->params['path_to_models']) ? $event->params['path_to_models'] : null;
+        $path_to_models = $event->params['path_to_models'] ?? null;
 
         if ($path_to_models && $models && is_array($models)) {
             $this->registerModelClasses($path_to_models, $models);
-            $event->setProcessed(true);
+            $event->setProcessed();
         }
 
         return $models;
@@ -102,7 +101,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
     {
         if ($models && is_array($models)) {
             $this->useModels($models);
-            $event->setProcessed(true);
+            $event->setProcessed();
         }
 
         return $models;
@@ -121,7 +120,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         }
     }
 
-    public function useModel($model_name)
+    public function useModel($model_name): bool
     {
         if (!$model_name) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -156,7 +155,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         ];
 
         // use custom gen dir or in place with models
-        $path_to_gen_classes = $this->models_gen_dir ? $this->models_gen_dir : $path_to_model;
+        $path_to_gen_classes = $this->models_gen_dir ?: $path_to_model;
 
         $gen_classes = [
             'Base' . $model_inf => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . '.php',
@@ -208,7 +207,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         }
     }
 
-    public function getRegisteredModelNames()
+    public function getRegisteredModelNames(): array
     {
         return array_keys((array)$this->registered_models);
     }
@@ -218,7 +217,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         return $this->registered_models;
     }
 
-    public function getUsedModels()
+    public function getUsedModels(): array
     {
         return $this->used_models;
     }
@@ -226,10 +225,10 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
     public function getQuerySelectColumns($container_identifier, $query_identifier)
     {
         $mappings = $this->getDbSelectColumnMappings();
-        return (isset($mappings[$container_identifier][$query_identifier]) ? $mappings[$container_identifier][$query_identifier] : null);
+        return ($mappings[$container_identifier][$query_identifier] ?? null);
     }
 
-    public function getDbSelectColumnMappings()
+    public function getDbSelectColumnMappings(): array
     {
         if (empty($this->db_select_column_mappings)) {
 
@@ -269,7 +268,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         return $this->db_select_column_mappings;
     }
 
-    public function writeClassCache()
+    public function writeClassCache(): array
     {
         return [
             'db_select_column_mappings' => $this->db_select_column_mappings,
@@ -278,6 +277,6 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function readClassCache(array $cached_data)
     {
-        $this->db_select_column_mappings = isset($cached_data['db_select_column_mappings']) ? $cached_data['db_select_column_mappings'] : null;
+        $this->db_select_column_mappings = $cached_data['db_select_column_mappings'] ?? null;
     }
 }

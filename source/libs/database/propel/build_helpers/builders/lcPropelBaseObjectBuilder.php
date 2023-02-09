@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 
 class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
 {
-    public static $disable_path_override;
+    public static bool $disable_path_override = false;
 
-    public function getClassFilePath()
+    public function getClassFilePath(): string
     {
         $overriden_path = self::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
 
@@ -15,6 +16,12 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         }
     }
 
+    /**
+     * Specifies the methods that are added as part of the basic OM class.
+     * This can be overridden by subclasses that wish to add more methods.
+     *
+     * @see        ObjectBuilder::addClassBody()
+     */
     protected function addClassBody(&$script)
     {
         parent::addClassBody($script);
@@ -27,7 +34,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      *
      * @param string &$script The script will be modified in this method.
      */
-    protected function addInserOrUpdate(&$script)
+    protected function addInserOrUpdate(string &$script)
     {
         $this->addInserOrUpdateComment($script);
         $this->addInserOrUpdateOpen($script);
@@ -41,15 +48,15 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      *
      **/
-    protected function addInserOrUpdateComment(&$script)
+    protected function addInserOrUpdateComment(string &$script)
     {
         $script .= "
     /**
      * Persists this object to the database (INSERT ON DUPLICATE KEY UPDATE)
      *
      * @param PropelPDO \$con
-     * @return " . $this->getClassname() . "
-     */";
+     * @return " . $this->getClassname() . '
+     */';
     }
 
     /**
@@ -58,7 +65,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      *
      **/
-    protected function addInserOrUpdateOpen(&$script)
+    protected function addInserOrUpdateOpen(string &$script)
     {
         $script .= "
     public function insertOrUpdate(PropelPDO \$con = null)
@@ -71,7 +78,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      *
      **/
-    protected function addInserOrUpdateBody(&$script)
+    protected function addInserOrUpdateBody(string &$script)
     {
         $peer_name = $this->getPeerClassname();
 
@@ -81,11 +88,11 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         }
 
         if (\$con === null) {
-            \$con = Propel::getConnection(" . $peer_name . "::DATABASE_NAME, Propel::CONNECTION_WRITE);
-        }";
+            \$con = Propel::getConnection(" . $peer_name . '::DATABASE_NAME, Propel::CONNECTION_WRITE);
+        }';
 
         $script .= "
-        
+
         \$modified_cols = \$this->getModifiedColumns();
 
         if (!\$modified_cols) {
@@ -108,7 +115,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             if (!\$pk_up_name) {
                 \$pk_up_name = \$col_name;
             }
-            
+
             \$col_name = " . $peer_name . "::translateFieldName(\$col_name, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_PHPNAME);
             \$pks_names[] = \$col_name;
 
@@ -122,7 +129,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         \$qvals = [];
 
         \$param_prefix = ':p';
-        
+
         \$i = 0;
         foreach (\$pks_names as \$col_name) {
             \$col_name1 = " . $peer_name . "::translateFieldName(\$col_name,
@@ -148,9 +155,9 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             \$pdo_type = \$col->getPdoType();
 
             \$qcoln = '`' . \$col_name2 . '`';
-            
+
             \$col_name = " . $peer_name . "::translateFieldName(\$original_col_name, BasePeer::TYPE_COLNAME, BasePeer::TYPE_PHPNAME);
-            
+
             if (in_array(\$col_name, \$pks_names)) {
                 continue;
             }
@@ -171,7 +178,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         if (count(\$qcols) < 1) {
             return \$this;
         }
-        
+
         // if \$vcols_added = false it means all columns are KEYS and we should do a REPLACE
 
         \$q = sprintf((\$vcols_added ? 'INSERT' : 'REPLACE') . ' INTO `%s` (%s) VALUES(%s)' .
@@ -202,7 +209,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
                 }
             }
         }
-        
+
         \$this->resetModified();
         \$this->setNew(false);
         \$this->reload();
@@ -220,11 +227,11 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      *
      **/
-    protected function addInserOrUpdateClose(&$script)
+    protected function addInserOrUpdateClose(string &$script)
     {
-        $script .= "
+        $script .= '
     }
-";
+';
     }
 
     /*
@@ -236,7 +243,13 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * read-only.
      */
 
-    public static function getOverridenClassFilePath($prefix, GeneratorConfig $generator_config, $class_name)
+    /**
+     * @param $prefix
+     * @param GeneratorConfig $generator_config
+     * @param $class_name
+     * @return string|null
+     */
+    public static function getOverridenClassFilePath($prefix, GeneratorConfig $generator_config, $class_name): ?string
     {
         if (self::$disable_path_override) {
             return null;
@@ -261,6 +274,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      * @param Column $col The current column.
      *
+     * @throws Exception
      * @see        parent::addColumnMutators()
      */
     protected function addTemporalMutator(&$script, Column $col)
@@ -300,10 +314,10 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
 
         $script .= "
                 \$this->$clo = \$newDateAsString;
-                \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ";
+                \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ';
             }
         } // if either are not null
-";
+';
         $this->addMutatorClose($script, $col);
     }
 
@@ -314,6 +328,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * @param string &$script The script will be modified in this method.
      * @param Column $col The current column.
      *
+     * @throws Exception
      * @see        parent::addColumnMutators()
      */
     protected function addDefaultMutator(&$script, Column $col)
@@ -338,9 +353,9 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         $script .= "
         if (\$this->$clo !== \$v) {
             \$this->$clo = \$v;
-            \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ";
+            \$this->modifiedColumns[] = " . $this->getColumnConstant($col) . ';
         }
-";
+';
         $this->addMutatorClose($script, $col);
     }
 
@@ -379,9 +394,9 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
      * Get the [optionally formatted] temporal [$clo] column value.
      * " . $col->getDescription();
         if (!$useDateTime) {
-            $script .= "
+            $script .= '
      * This accessor only only work with unix epoch dates.  Consider enabling the propel.useDateTimeClass
-     * option in order to avoid conversions to integers (which are limited in the dates they can express).";
+     * option in order to avoid conversions to integers (which are limited in the dates they can express).';
         }
         $script .= "
      *
@@ -392,12 +407,12 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             $script .= "
      * @return mixed Formatted date/time value as string or $dateTimeClass object (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
         } else {
-            $script .= "
-     * @return mixed Formatted date/time value as string or (integer) unix timestamp (if format is null), null if column is null" . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
+            $script .= '
+     * @return mixed Formatted date/time value as string or (integer) unix timestamp (if format is null), null if column is null' . ($handleMysqlDate ? ', and 0 if column value is ' . $mysqlInvalidDateString : '');
         }
-        $script .= "
+        $script .= '
      * @throws PropelException - if unable to parse/validate the date/time value.
-     */";
+     */';
     }
 
     /**
@@ -430,8 +445,8 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             $defaultfmt = var_export($defaultfmt, true);
         }
 
-        $script .= "
-    " . $visibility . " function get$cfc(\$format = " . $defaultfmt . "";
+        $script .= '
+    ' . $visibility . " function get$cfc(\$format = " . $defaultfmt;
         if ($col->isLazyLoad()) {
             $script .= ", \$con = null";
         }
@@ -458,20 +473,20 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
             $dateTimeClass = 'DateTime';
         }
         $this->declareClasses($dateTimeClass);
-        $defaultfmt = null;
-
-        // Default date/time formatter strings are specified in build.properties
-        if ($col->getType() === PropelTypes::DATE) {
-            $defaultfmt = $this->getBuildProperty('defaultDateFormat');
-        } else if ($col->getType() === PropelTypes::TIME) {
-            $defaultfmt = $this->getBuildProperty('defaultTimeFormat');
-        } else if ($col->getType() === PropelTypes::TIMESTAMP) {
-            $defaultfmt = $this->getBuildProperty('defaultTimeStampFormat');
-        }
-
-        if (empty($defaultfmt)) {
-            $defaultfmt = null;
-        }
+//        $defaultfmt = null;
+//
+//        // Default date/time formatter strings are specified in build.properties
+//        if ($col->getType() === PropelTypes::DATE) {
+//            $defaultfmt = $this->getBuildProperty('defaultDateFormat');
+//        } else if ($col->getType() === PropelTypes::TIME) {
+//            $defaultfmt = $this->getBuildProperty('defaultTimeFormat');
+//        } else if ($col->getType() === PropelTypes::TIMESTAMP) {
+//            $defaultfmt = $this->getBuildProperty('defaultTimeStampFormat');
+//        }
+//
+//        if (empty($defaultfmt)) {
+//            $defaultfmt = null;
+//        }
 
         $mysqlInvalidDateString = '';
         $handleMysqlDate = false;
@@ -505,11 +520,11 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
 
         try {
             \$dt = \$this->getDateTimeWithClientTimezone(new $dateTimeClass(\$this->$clo));
-            
+
             if (\$timezone) {
                 \$dt->setTimezone(\$timezone);
             }
-            
+
         } catch (Exception \$x) {
             throw new PropelException(\"Internally stored date/time/timestamp value could not be converted to $dateTimeClass: \" . var_export(\$this->$clo, true), \$x);
         }
