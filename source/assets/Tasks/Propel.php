@@ -82,7 +82,8 @@ class Propel extends lcTaskController
     private function initPropelGenerator()
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        set_include_path(get_include_path() . PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'propel' . DS . 'generator' . DS . 'lib' .
+        set_include_path(get_include_path() . PATH_SEPARATOR . $this->configuration->getThirdPartyDir()
+            . DS . 'propel' . DS . 'generator' . DS . 'lib' .
             PATH_SEPARATOR . $this->configuration->getThirdPartyDir() . DS . 'phing' . DS . 'classes');
 
         $this->includePhing();
@@ -137,7 +138,7 @@ class Propel extends lcTaskController
         }
 
         /** @noinspection PhpUndefinedMethodInspection */
-        $this->work_dir = $this->configuration->getGenDir() . DS . 'propel';
+        $this->work_dir = $this->configuration->getGenDir() . DS . 'Propel';
 
         lcDirs::mkdirRecursive($this->work_dir);
 
@@ -289,7 +290,7 @@ class Propel extends lcTaskController
         $gen_dir = $cfg->getGenDir();
 
         // remove generated model om/map files
-        lcDirs::rmdirRecursive($gen_dir . DS . 'propel', true);
+        lcDirs::rmdirRecursive($gen_dir . DS . 'Propel', true);
 
         lcDirs::rmdirRecursive($dir . DS . 'data' . DS . 'graphviz');
         lcDirs::rmdirRecursive($dir . DS . 'data' . DS . 'sql');
@@ -298,16 +299,16 @@ class Propel extends lcTaskController
         // @compatibility - remove map/om files from models/ plugin/models/ dirs
         // which were used by previous LC versions
         // remove map/om files
-        lcDirs::rmdirRecursive($dir . DS . 'models' . DS . 'map');
-        lcDirs::rmdirRecursive($dir . DS . 'models' . DS . 'om');
+        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'map');
+        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'om');
 
         // remove from plugins
         $plugins = $this->system_component_factory->getSystemPluginDetails();
 
         if ($plugins) {
             foreach ($plugins as $plugin_name => $plugin_data) {
-                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'models' . DS . 'map');
-                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'models' . DS . 'om');
+                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'map');
+                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'om');
 
                 unset($plugin_data, $plugin_name);
             }
@@ -398,7 +399,7 @@ class Propel extends lcTaskController
                 $options['context_name'] = (is_numeric($name) ? '' : $name);
 
                 // if a plugin - set package, otherwise 'models'
-                $options['package'] = ($type_name == 'plugin') ? 'addons.plugins.' . htmlspecialchars($name) . '.models' : 'models';
+                $options['package'] = ($type_name == 'plugin') ? 'plugins.' . htmlspecialchars(lcInflector::underscore($name)) . '.models' : 'models';
 
                 $this->fixSchema($target_filename, $options, (array)$schema_details['models']);
 
@@ -497,7 +498,8 @@ class Propel extends lcTaskController
     private function getProjectModels(): ?array
     {
         /** @noinspection PhpUndefinedMethodInspection */
-        return ($this->configuration->getProjectConfiguration() instanceof iSupportsDbModels ? $this->configuration->getProjectConfiguration()->getDbModels() : null);
+        return ($this->configuration->getProjectConfiguration() instanceof iSupportsDbModels ?
+            $this->configuration->getProjectConfiguration()->getDbModels() : null);
     }
 
     /**
@@ -616,7 +618,7 @@ class Propel extends lcTaskController
                 $table_name = $table->getAttribute('name');
 
                 // remove if not in supported models
-                if (!in_array($table_name, $supported_models)) {
+                if (!in_array(lcInflector::camelize($table_name), $supported_models)) {
                     $table->parentNode->removeChild($table);
                 }
 
@@ -634,6 +636,7 @@ class Propel extends lcTaskController
 
         // add the missing ones
         foreach ($supported_models as $model_name) {
+            $underscored_model_name = lcInflector::underscore($model_name);
 
             $found = false;
 
@@ -641,6 +644,10 @@ class Propel extends lcTaskController
                 foreach ($tables_dom as $table) {
 
                     $table_name = $table->getAttribute('name');
+
+                    ee($table_name);
+                    ee($model_name);
+                    ee('---');
 
                     if ($table_name == $model_name) {
                         $found = true;
@@ -653,8 +660,8 @@ class Propel extends lcTaskController
 
             if (!$found) {
                 $tmp = $pXml->createElement('table');
-                $tmp->setAttribute('name', $model_name);
-                $tmp->setAttribute('phpName', lcInflector::camelize($model_name));
+                $tmp->setAttribute('name', $underscored_model_name);
+                $tmp->setAttribute('phpName', $model_name);
                 $tmp->setAttribute('idMethod', 'native');
                 $db_q->item(0)->appendChild($tmp);
             }
@@ -858,8 +865,10 @@ class Propel extends lcTaskController
             $stream_ok->close();
             $stream_err->close();
 
-            fclose($descr_ok);
-            fclose($descr_err);
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @fclose($descr_ok);
+            /** @noinspection PhpUsageOfSilenceOperatorInspection */
+            @fclose($descr_err);
 
             $captured_errors = PropelPhing::getCapturedPhpErrors();
 
@@ -868,7 +877,8 @@ class Propel extends lcTaskController
             $exit_code = 0;
         } catch (Exception $e) {
 
-            throw new lcSystemException('Phing command failed: ' . $e->getMessage() . ' (' . implode(' ', $args) . ')', $e->getCode(), $e);
+            throw new lcSystemException('Phing command failed: ' . $e->getMessage() .
+                ' (' . implode(' ', $args) . ')', $e->getCode(), $e);
         }
 
         if ($captured_errors) {
@@ -883,7 +893,8 @@ class Propel extends lcTaskController
                 $line = $error['line'] ?? '-';
                 $file = $error['file'] ?? '-';
 
-                $errmsg = '> ' . lcConsolePainter::formatColoredConsoleText('[PHP Error] ' . $message . '[line ' . $line . ' of ' . $file . ']', 'magenta');
+                $errmsg = '> ' . lcConsolePainter::formatColoredConsoleText('[PHP Error] ' .
+                        $message . '[line ' . $line . ' of ' . $file . ']', 'magenta');
 
                 $this->consoleDisplay($errmsg, false);
                 unset($error, $errmsg);
@@ -991,7 +1002,8 @@ class Propel extends lcTaskController
         $this->propelInitSchemas();
 
         // default storage dir / filename
-        $dir = $this->getRequest()->getParam('store-in') ? $this->getRequest()->getParam('store-in') : self::DEFAULT_REVERSE_TARGET_FOLDER;
+        $dir = $this->getRequest()->getParam('store-in') ? $this->getRequest()->getParam('store-in') :
+            self::DEFAULT_REVERSE_TARGET_FOLDER;
         $filename = self::DEFAULT_REVERSE_TARGET_NAME . '-' . date('Y_m_d_H_i_s');
 
         /** @noinspection PhpUndefinedMethodInspection */

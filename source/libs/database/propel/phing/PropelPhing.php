@@ -1512,9 +1512,9 @@ class PropelPhing
      * or Ant.
      *
      * @param string $propName
-     * @return string Value of found property (or null, if none found).
+     * @return mixed Value of found property (or null, if none found).
      */
-    public static function getProperty(string $propName): ?string
+    public static function getProperty(string $propName)
     {
 
         // some properties are detemined on each access
@@ -1540,9 +1540,9 @@ class PropelPhing
     /**
      * @param $propName
      * @param $propValue
-     * @return string
+     * @return mixed
      */
-    public static function setProperty($propName, $propValue): ?string
+    public static function setProperty($propName, $propValue)
     {
         $propName = (string)$propName;
         $oldValue = self::getProperty($propName);
@@ -1624,7 +1624,7 @@ class PropelPhing
                     error_reporting($settingValue);
                     break;
                 default:
-                    ini_set($settingName, $settingValue);
+                    ini_set($settingName, (string)$settingValue);
             }
         }
     }

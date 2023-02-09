@@ -862,7 +862,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'namespace' => '\\Lightcast\\Assets\\Modules',
+                'namespace' => 'Lightcast\\Assets\\Modules',
                 'path' => $this->getAssetsDir() . DS . 'Modules',
             ],
             /* app modules to be overriden in the inherited app config class */
@@ -877,7 +877,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'namespace' => '\\Lightcast\\Assets\\Components',
+                'namespace' => 'Lightcast\\Assets\\Components',
                 'path' => $this->getAssetsDir() . DS . 'Components',
             ],
             [
@@ -922,7 +922,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
         return [
             [
                 'context_type' => lcSysObj::CONTEXT_FRAMEWORK,
-                'namespace' => '\\Lightcast\\Assets\\WebServices',
+                'namespace' => 'Lightcast\\Assets\\WebServices',
                 'path' => $this->getAssetsDir() . DS . 'WebServices',
             ],
             [
@@ -1004,7 +1004,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
      */
     public function getGenDir(): string
     {
-        return $this->getProjectDir() . DS . 'gen';
+        return $this->getProjectDir() . DS . 'Gen';
     }
 
     /**
