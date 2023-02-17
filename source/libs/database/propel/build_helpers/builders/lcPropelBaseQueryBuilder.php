@@ -13,13 +13,28 @@ class lcPropelBaseQueryBuilder extends QueryBuilder
      */
     public function getClassFilePath(): string
     {
-        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
+        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath($this->getGeneratorConfig()->getBuildProperty('namespaceOm'),
+            $this->getGeneratorConfig(), $this->getClassname());
 
         if ($overriden_path) {
             return $overriden_path;
         }
 
         return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
+    }
+
+    public function getNamespace(): string
+    {
+        return 'Gen\\Propel\\Models\\Om';
+    }
+
+    /**
+     * @param $builder
+     * @return void
+     */
+    public function declareClassFromBuilder($builder)
+    {
+        //$this->declareClassNamespace('Base' . $builder->getClassname(), $builder->getNamespace());
     }
 
     protected function addClassBody(&$script)

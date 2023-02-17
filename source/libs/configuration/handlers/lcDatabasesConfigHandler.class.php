@@ -57,8 +57,8 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
             ],
             'propel_custom' => [
                 'propel.lightcastOverrideBuildPath' => true,
-                'propel.lightcastBuildPath' => 'gen/propel/models/',
-                'gen_dir' => 'propel',
+                'propel.lightcastBuildPath' => 'Gen/Propel/Models/',
+                'gen_dir' => 'Propel',
             ],
             'models' => [],
             'views' => [],
@@ -81,6 +81,8 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                 'propel.schema.validate' => true,
                 'propel.defaultTimeStampFormat' => 'Y-m-d H:i:s',
                 'propel.defaultTimeFormat' => '%X',
+                'propel.namespace.om' => 'Om',
+                'propel.namespace.map' => 'Map',
 
                 /* It is important to leave the following setting like this
                  * (aka: %Y-%m-%d)

@@ -18,13 +18,29 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
      */
     public function getClassFilePath(): string
     {
-        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
+        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath(
+            $this->getGeneratorConfig()->getBuildProperty('namespaceOm'),
+            $this->getGeneratorConfig(), $this->getClassname());
 
         if ($overriden_path) {
             return $overriden_path;
         } else {
             return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
+    }
+
+    public function getNamespace(): string
+    {
+        return 'Gen\\Propel\\Models\\Om';
+    }
+
+    /**
+     * @param $builder
+     * @return void
+     */
+    public function declareClassFromBuilder($builder)
+    {
+        //$this->declareClassNamespace('Base' . $builder->getClassname(), $builder->getNamespace());
     }
 
     /**
@@ -146,10 +162,10 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
 
         $script .= "
 	/** the context type in which the model is located (Lightcast customization) */
-	const LC_CONTEXT_TYPE = '" . addslashes($this->getDatabase()->getAttribute(self::LC_DB_CONTEXT_TYPE_ATTR)) . "';
+	const LC_CONTEXT_TYPE = '" . addslashes($this->getTable()->getAttribute(self::LC_DB_CONTEXT_TYPE_ATTR)) . "';
 
 	/** the context name in which the model is located (Lightcast customization) */
-	const LC_CONTEXT_NAME = '" . addslashes($this->getDatabase()->getAttribute(self::LC_DB_CONTEXT_NAME_ATTR)) . "';
+	const LC_CONTEXT_NAME = '" . addslashes($this->getTable()->getAttribute(self::LC_DB_CONTEXT_NAME_ATTR)) . "';
 
 	/** the localized table name - singular (Lightcast customization) */
 	const LC_TITLE = '" . addslashes($lc_title) . "';

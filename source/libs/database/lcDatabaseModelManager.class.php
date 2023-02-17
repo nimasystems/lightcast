@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -22,13 +23,25 @@
 
  */
 
+/**
+ *
+ */
 class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, iCacheable
 {
-    protected $model_paths = [];
-    protected $registered_models = [];
+    protected array $model_paths = [];
+    protected array $registered_models = [];
+
+    /**
+     * @var mixed
+     */
     protected $db_select_column_mappings;
-    private $used_models = [];
-    private $models_gen_dir;
+
+    private array $used_models = [];
+    private ?string $models_gen_dir = null;
+
+    public const DEFAULT_NAMESPACE = 'Gen\\Propel\\Models';
+
+    protected string $model_namespace = self::DEFAULT_NAMESPACE;
 
     public function initialize()
     {
@@ -40,7 +53,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         $propel_custom_gen_dir = (string)$cfg['db.propel_custom.gen_dir'];
 
         if ($propel_custom_gen_dir) {
-            $this->models_gen_dir = $cfg->getGenDir() . DS . $propel_custom_gen_dir . DS . 'models';
+            $this->models_gen_dir = $cfg->getGenDir() . DS . $propel_custom_gen_dir . DS . 'Models';
         }
 
         // observe use_models filter
@@ -49,24 +62,40 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function shutdown()
     {
-        $this->registered_models = $this->model_paths = $this->used_models = null;
+        $this->registered_models = $this->model_paths = $this->used_models = [];
 
         parent::shutdown();
     }
 
+    /**
+     * @param lcEvent $event
+     * @param $models
+     * @return mixed
+     * @throws lcDatabaseException
+     * @throws lcInvalidArgumentException
+     */
     public function onRegisterModels(lcEvent $event, $models)
     {
         $path_to_models = $event->params['path_to_models'] ?? null;
+        $namespace = $event->params['namespace'] ?? '';
 
         if ($path_to_models && $models && is_array($models)) {
-            $this->registerModelClasses($path_to_models, $models);
+            $this->registerModelClasses($path_to_models, $namespace, $models);
             $event->setProcessed();
         }
 
         return $models;
     }
 
-    public function registerModelClasses($path_to_models, array $models)
+    /**
+     * @param string $path_to_models
+     * @param string $namespace
+     * @param array $models
+     * @return void
+     * @throws lcDatabaseException
+     * @throws lcInvalidArgumentException
+     */
+    public function registerModelClasses(string $path_to_models, string $namespace, array $models)
     {
         if (!$path_to_models || !$models) {
             throw new lcInvalidArgumentException('Invalid path / models');
@@ -82,12 +111,18 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         }
 
         foreach ($models as $model) {
-            if (isset($this->registered_models[$model])) {
+            $namespaced_model = ($namespace ? $namespace . '\\' : '') . $model;
+
+            if (isset($this->registered_models[$namespaced_model])) {
                 throw new lcDatabaseException('Duplicate model registration (' . $model . ' / ' . $path_to_models . '), ' .
-                    'previously declared in: ' . $this->model_paths[$this->registered_models[$model]]);
+                    'previously declared in: ' . $this->model_paths[$this->registered_models[$namespaced_model]]);
             }
 
-            $this->registered_models[$model] = $path_index;
+            $this->registered_models[$namespaced_model] = [
+                'index' => $path_index,
+                'model' => $model,
+                'namespace' => $namespace,
+            ];
 
             unset($model);
         }
@@ -97,6 +132,12 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         }
     }
 
+    /**
+     * @param lcEvent $event
+     * @param $models
+     * @return mixed
+     * @throws lcDatabaseException
+     */
     public function onUseModels(lcEvent $event, $models)
     {
         if ($models && is_array($models)) {
@@ -113,38 +154,56 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
             try {
                 $this->useModel($model_name);
             } catch (Exception $e) {
-                throw new lcDatabaseException('Could not use model \'' . $model_name . '\': ' . $e->getMessage(), $e->getCode(), $e);
+                throw new lcDatabaseException('Could not use model \'' . $model_name .
+                    '\': ' . $e->getMessage(), $e->getCode(), $e);
             }
 
             unset($model_name);
         }
     }
 
-    public function useModel($model_name): bool
+    /**
+     * @param string $namespace
+     * @param string $model_name
+     * @return bool
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     */
+    public function useModel(string $namespace, string $model_name): bool
     {
         if (!$model_name) {
             throw new lcInvalidArgumentException('Invalid params');
         }
 
+        $namespaced_model = ($namespace ? $namespace . '\\' : '') . $model_name;
+
         // check if already used
-        if (in_array($model_name, $this->used_models)) {
+        if (in_array($namespaced_model, $this->used_models)) {
             return true;
         }
 
-        if (!isset($this->registered_models[$model_name])) {
+        if (!isset($this->registered_models[$namespaced_model])) {
             throw new lcNotAvailableException('Model not available');
         }
 
-        $this->_useModel($model_name);
+        $this->_useModel($namespace, $model_name);
 
         return true;
     }
 
-    protected function _useModel($model_name, $already_camelized = false)
+    /**
+     * @param string $namespace
+     * @param string $model_name
+     * @param bool $already_camelized
+     * @return void
+     */
+    protected function _useModel(string $namespace, string $model_name, bool $already_camelized = false)
     {
         assert(!is_null($model_name));
 
-        $path_to_model = $this->model_paths[$this->registered_models[$model_name]];
+        $namespaced_model = ($namespace ? $namespace . '\\' : '') . $model_name;
+
+        $path_to_model = $this->model_paths[$this->registered_models[$namespaced_model]];
 
         $model_inf = !$already_camelized ? lcInflector::camelize($model_name, false) : $model_name;
 
@@ -209,10 +268,10 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
     public function getRegisteredModelNames(): array
     {
-        return array_keys((array)$this->registered_models);
+        return array_keys($this->registered_models);
     }
 
-    public function getRegisteredModels()
+    public function getRegisteredModels(): array
     {
         return $this->registered_models;
     }
@@ -222,6 +281,11 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
         return $this->used_models;
     }
 
+    /**
+     * @param $container_identifier
+     * @param $query_identifier
+     * @return mixed|null
+     */
     public function getQuerySelectColumns($container_identifier, $query_identifier)
     {
         $mappings = $this->getDbSelectColumnMappings();

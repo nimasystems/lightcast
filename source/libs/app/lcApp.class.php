@@ -710,7 +710,8 @@ class lcApp extends lcObj
     {
         // add propel model classes to autoloader
         // for objects which support iSupportsPropelDb
-        $db_manager = isset($this->initialized_objects['database_model_manager']) ? $this->initialized_objects['database_model_manager'] : null;
+        $db_manager = isset($this->initialized_objects['database_model_manager']) ?
+            $this->initialized_objects['database_model_manager'] : null;
 
         if (!$db_manager || !($db_manager instanceof iDatabaseModelManager)) {
             return;

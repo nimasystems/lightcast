@@ -7,13 +7,28 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
 
     public function getClassFilePath(): string
     {
-        $overriden_path = self::getOverridenClassFilePath('om', $this->getGeneratorConfig(), $this->getClassname());
+        $overriden_path = self::getOverridenClassFilePath($this->getGeneratorConfig()->getBuildProperty('namespaceOm'),
+            $this->getGeneratorConfig(), $this->getClassname());
 
         if ($overriden_path) {
             return $overriden_path;
         } else {
             return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
+    }
+
+    public function getNamespace(): string
+    {
+        return 'Gen\\Propel\\Models\\Om';
+    }
+
+    /**
+     * @param $builder
+     * @return void
+     */
+    public function declareClassFromBuilder($builder)
+    {
+        //$this->declareClassNamespace('Base' . $builder->getClassname(), $builder->getNamespace());
     }
 
     /**

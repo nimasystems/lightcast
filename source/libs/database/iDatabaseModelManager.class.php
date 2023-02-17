@@ -24,9 +24,12 @@ declare(strict_types=1);
 
 */
 
+/**
+ *
+ */
 interface iDatabaseModelManager
 {
-    public function registerModelClasses($path_to_models, array $models);
+    public function registerModelClasses(string $path_to_models, string $namespace, array $models);
 
     public function getRegisteredModels();
 
@@ -34,5 +37,10 @@ interface iDatabaseModelManager
 
     public function useModels(array $models);
 
-    public function useModel($model_name);
+    /**
+     * @param string $namespace
+     * @param string $model_name
+     * @return mixed
+     */
+    public function useModel(string $namespace, string $model_name): bool;
 }

@@ -444,7 +444,7 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
      */
     public function getBaseConfigDir(): string
     {
-        return $this->getConfigDir() . DS . ($this->config_variation ?: 'config');
+        return $this->getConfigDir() . DS . ($this->config_variation ?: 'Config');
     }
 
     /**

@@ -15,13 +15,29 @@ class lcPropelTableMapBuilder extends PHP5TableMapBuilder
      */
     public function getClassFilePath(): string
     {
-        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath('map', $this->getGeneratorConfig(), $this->getClassname());
+        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath(
+            $this->getGeneratorConfig()->getBuildProperty('namespaceMap'),
+            $this->getGeneratorConfig(), $this->getClassname());
 
         if ($overriden_path) {
             return $overriden_path;
         } else {
             return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
         }
+    }
+
+    public function getNamespace(): string
+    {
+        return 'Gen\\Propel\\Models\\Map';
+    }
+
+    /**
+     * @param $builder
+     * @return void
+     */
+    public function declareClassFromBuilder($builder)
+    {
+        //$this->declareClassNamespace('Base' . $builder->getClassname(), $builder->getNamespace());
     }
 
     /**
@@ -121,6 +137,8 @@ class ' . $this->getClassname() . ' extends ' . self::LC_TABLE_MAP_CLASS_NAME . 
     protected function addClassBody(&$script)
     {
         parent::addClassBody($script);
+
+        $this->declareClasses('lcTableMap');
 
         // define the foreign tables
         $fkt = $this->getTable()->getForeignTableNames();

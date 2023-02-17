@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /**
  * This file is part of the Propel package.
@@ -25,8 +26,8 @@
  */
 class PropelSchemaValidator
 {
-    protected $appData;
-    protected $errors = [];
+    protected AppData $appData;
+    protected array $errors = [];
 
     public function __construct(AppData $appData)
     {
@@ -34,9 +35,9 @@ class PropelSchemaValidator
     }
 
     /**
-     * @return boolean true if valid, false otherwise
+     * @return bool true if valid, false otherwise
      */
-    public function validate()
+    public function validate(): bool
     {
         foreach ($this->appData->getDatabases() as $database) {
             $this->validateDatabaseTables($database);
@@ -104,7 +105,7 @@ class PropelSchemaValidator
     /**
      * @return array A list of error messages
      */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }

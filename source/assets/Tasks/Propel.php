@@ -299,16 +299,16 @@ class Propel extends lcTaskController
         // @compatibility - remove map/om files from models/ plugin/models/ dirs
         // which were used by previous LC versions
         // remove map/om files
-        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'map');
-        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'om');
+        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'Map');
+        lcDirs::rmdirRecursive($dir . DS . 'Models' . DS . 'Om');
 
         // remove from plugins
         $plugins = $this->system_component_factory->getSystemPluginDetails();
 
         if ($plugins) {
             foreach ($plugins as $plugin_name => $plugin_data) {
-                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'map');
-                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'om');
+                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'Map');
+                lcDirs::rmdirRecursive($plugin_data['path'] . DS . 'Models' . DS . 'Om');
 
                 unset($plugin_data, $plugin_name);
             }
@@ -370,9 +370,10 @@ class Propel extends lcTaskController
 
             foreach ($schema_item_details as $name => $schema_details) {
                 $path = $schema_details['path'];
+                $name_underscored = lcInflector::underscore($name);
 
                 $source_filename = $path . DS . self::SCHEMA_FILE;
-                $rf = $type_name . '_' . $name . '-' . self::SCHEMA_FILE;
+                $rf = $type_name . '_' . $name_underscored . '-' . self::SCHEMA_FILE;
                 $target_filename = $this->work_dir . DS . $rf;
 
                 if (file_exists($source_filename)) {
@@ -396,14 +397,14 @@ class Propel extends lcTaskController
                 $options['context_type'] = $type_name;
 
                 // project name workaround
-                $options['context_name'] = (is_numeric($name) ? '' : $name);
+                $options['context_name'] = (is_numeric($name_underscored) ? '' : $name_underscored);
 
                 // if a plugin - set package, otherwise 'models'
-                $options['package'] = ($type_name == 'plugin') ? 'plugins.' . htmlspecialchars(lcInflector::underscore($name)) . '.models' : 'models';
+                $options['package'] = ($type_name == 'plugin') ? 'plugins.' . htmlspecialchars($name_underscored) . '.models' : 'models';
 
                 $this->fixSchema($target_filename, $options, (array)$schema_details['models']);
 
-                unset($name, $schema_details, $path, $source_filename, $target_filename, $rf, $options);
+                unset($name, $name_underscored, $schema_details, $path, $source_filename, $target_filename, $rf, $options);
             }
 
             unset($type, $type_name, $schema_paths);
@@ -480,7 +481,7 @@ class Propel extends lcTaskController
                     continue;
                 }
 
-                $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']]['path'] = $plugin_data['path'] . DS . 'config';
+                $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']]['path'] = $plugin_data['path'] . DS . 'Config';
                 $schemas[lcSysObj::CONTEXT_PLUGIN][$plugin_data['name']]['models'] = $models;
 
                 unset($plugin_data, $plugin_name);
@@ -645,11 +646,7 @@ class Propel extends lcTaskController
 
                     $table_name = $table->getAttribute('name');
 
-                    ee($table_name);
-                    ee($model_name);
-                    ee('---');
-
-                    if ($table_name == $model_name) {
+                    if ($table_name == $underscored_model_name) {
                         $found = true;
                         break;
                     }
@@ -1097,8 +1094,9 @@ class Propel extends lcTaskController
                     if ($fix_plugin_schemas && ((is_array($fix_plugin_schemas) && in_array($plugin_name, $fix_plugin_schemas)) || is_bool($fix_plugin_schemas))) {
                         $this->consoleDisplay('Fixing plugin schema (' . $plugin_name . '), tables: ' . implode(', ', $plugin_tables));
 
-                        $temp_rebuilt_schema_filename = $this->work_dir . DS . 'plugin_' . $plugin_name . '-schema.xml';
-                        $this->pluginSchemaCleanup($reversedSchemaFile, $plugin_name, $cPath, $temp_rebuilt_schema_filename, $plugin_tables, $plugin_propel_schema);
+                        $temp_rebuilt_schema_filename = $this->work_dir . DS . 'plugin_' . lcInflector::underscore($plugin_name) . '-schema.xml';
+                        $this->pluginSchemaCleanup($reversedSchemaFile, $plugin_name, $cPath,
+                            $temp_rebuilt_schema_filename, $plugin_tables, $plugin_propel_schema);
                     }
                 } catch (Exception $e) {
                     $this->consoleDisplay('Plugin schema rebuild failed: ' . $e->getMessage());
@@ -1146,7 +1144,7 @@ class Propel extends lcTaskController
                 if ($plconf instanceof iSupportsDbModels) {
                     $schemas[$plugin_data['name']] = [
                         'plugin_data' => $plugin_data,
-                        'schema_filename' => $plugin_data['path'] . DS . 'config' . DS . self::SCHEMA_FILE,
+                        'schema_filename' => $plugin_data['path'] . DS . 'Config' . DS . self::SCHEMA_FILE,
                     ];
                 }
 
@@ -1167,7 +1165,7 @@ class Propel extends lcTaskController
      */
     private function getPluginPropelSchemaConfig($plugin_path)
     {
-        $cfg_filename = $plugin_path . DS . 'config' . DS . 'propel.yml';
+        $cfg_filename = $plugin_path . DS . 'Config' . DS . 'propel.yml';
 
         if (!file_exists($cfg_filename)) {
             return null;
@@ -1240,7 +1238,9 @@ class Propel extends lcTaskController
             for ($i = 0; $i < $len; $i++) {
                 /** @var DomElement $rel */
                 $rel = $result2->item($i);
-                if (in_array($rel->getAttribute('name'), $plugin_tables)) {
+                $inflected_rel_name = lcInflector::camelize($rel->getAttribute('name'));
+
+                if (in_array($inflected_rel_name, $plugin_tables)) {
                     // copy into plugin schema
                     $node = $pXml->importNode($result2->item($i), true);
                     $pXmlDatabaseNode->appendChild($node);
@@ -1294,16 +1294,16 @@ class Propel extends lcTaskController
             $itm = $result->item($i);
 
             $tbl_name = $itm->getAttribute('name');
-            $sub = substr($tbl_name, 0, 5);
+            $inflected_tbl_name = lcInflector::camelize($tbl_name);
 
-            $is_view = ($overriden_view_config && is_array($overriden_view_config) && isset($overriden_view_config[$tbl_name]));
+            $is_view = ($overriden_view_config && is_array($overriden_view_config) && isset($overriden_view_config[$inflected_tbl_name]));
 
             //fix view's buggy primary keys - requirement by propel
             if ($is_view) {
                 foreach ($itm->getElementsByTagName('column') as $col) {
                     /** @var DomElement $col */
 
-                    $tbl_config = ($overriden_view_config[$tbl_name]['primary_keys'] ?? null);
+                    $tbl_config = ($overriden_view_config[$inflected_tbl_name]['primary_keys'] ?? null);
 
                     if (!$tbl_config || !is_array($tbl_config)) {
                         continue;
@@ -1356,7 +1356,7 @@ class Propel extends lcTaskController
                 }
             }
 
-            unset($tbl_name, $sub, $aForeignKeys, $sForeignKeysLen);
+            unset($tbl_name, $inflected_tbl_name, $aForeignKeys, $sForeignKeysLen);
             //end fix propel foreign key bug
         }
 
