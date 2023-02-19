@@ -559,7 +559,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . "
         }
         $script .= "
             \$stmt->execute();
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             Propel::log(\$e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute SELECT statement [%s]', \$sql), \$e);
         }

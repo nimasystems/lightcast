@@ -35,6 +35,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public const DB_MIGRATIONS_FILENAME = 'db_migrations.php';
 
     protected ?string $name = null;
+    protected ?string $namespace = null;
     protected ?string $root_dir = null;
     protected ?string $web_path = null;
 
@@ -114,6 +115,17 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
         // which - when observed in the system - will automatically boot the
         // plugin prior the event!
         return null;
+    }
+
+    public function getNamespacedClass(string $class_name): string
+    {
+        $namespace = $this->getNamespace();
+
+        if (!$namespace) {
+            return $class_name;
+        }
+
+        return $namespace . '\\' . $class_name;
     }
 
     /**
@@ -393,6 +405,24 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
     public function getSupportedLocales(): array
     {
         return ['en_US'];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNamespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    /**
+     * @param string|null $namespace
+     * @return lcPluginConfiguration
+     */
+    public function setNamespace(?string $namespace): lcPluginConfiguration
+    {
+        $this->namespace = $namespace;
+        return $this;
     }
 
     /**

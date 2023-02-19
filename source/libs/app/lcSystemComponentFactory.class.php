@@ -265,6 +265,13 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 $models = (array)$plcfg->getDbModels();
             }
 
+            if ($models) {
+                // notify to anyone who is able to use models
+                $this->event_dispatcher->filter(new lcEvent('database_model_manager.use_models', $this, [
+                    'namespace' => $plcfg->getNamespacedClass('Models'),
+                ]), $models);
+            }
+
             unset($models);
 
             // instantiate the plugin's components
@@ -346,6 +353,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
                 // notify to anyone who is able to register models
                 $this->event_dispatcher->filter(new lcEvent('database_model_manager.register_models', $this, [
                     'path_to_models' => $path_to_models,
+                    'namespace' => $plugin_config->getNamespacedClass('Models'),
                 ]), $models);
 
                 unset($path_to_models);

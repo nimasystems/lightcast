@@ -45,6 +45,21 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
     }
 
     /**
+     * Adds any constants to the class.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addConstants(&$script)
+    {
+        $script .= "
+    /**
+     * Peer class name
+     */
+    const PEER = '" . addslashes($this->getPeerBuilder()->getFullyQualifiedClassname()) . "';
+";
+    } // addIncludes()
+
+    /**
      * Adds the insertOrUpdate() method.
      *
      * @param string &$script The script will be modified in this method.
@@ -88,6 +103,89 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
     }
 
     /**
+     * Shortcut method to return the [stub] peer classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the peer classes.
+     *
+     * @return string (e.g. 'BaseMyPeer')
+     * @see        StubPeerBuilder::getClassname()
+     */
+    public function getPeerClassname()
+    {
+        return $this->getPeerBuilder()->getClassname();
+    }
+
+    /**
+     * Returns the object classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the object classes.
+     *
+     * @return string (e.g. 'My')
+     * @see        StubPeerBuilder::getClassname()
+     */
+    public function getObjectClassname()
+    {
+        return $this->getObjectBuilder()->getClassname();
+    }
+
+    public function getPeerActualClassname()
+    {
+        return $this->getStubPeerBuilder()->getActualClassname();
+    }
+
+    public function getPeerFullyQualifiedActualClassname()
+    {
+        return $this->getStubPeerBuilder()->getFullyQualifiedActualClassname();
+    }
+
+    /**
+     * Add the comment for the getPeer method
+     *
+     * @param string &$script The script will be modified in this method.
+     **/
+    protected function addGetPeerComment(&$script)
+    {
+        $script .= "
+    /**
+     * Returns a peer instance associated with this om.
+     *
+     * Since Peer classes are not to have any instance attributes, this method returns the
+     * same instance for all member of this class. The method could therefore
+     * be static, but this would prevent one from overriding the behavior.
+     *
+     * @return " . $this->getPeerFullyQualifiedActualClassname() . "
+     */";
+    }
+
+    /**
+     * Adds the body of the getPeer method
+     *
+     * @param string &$script The script will be modified in this method.
+     **/
+    protected function addGetPeerFunctionBody(&$script)
+    {
+        $script .= "
+        if (self::\$peer === null) {
+            " . $this->buildObjectInstanceCreationCode('self::$peer', $this->getPeerFullyQualifiedActualClassname()) . "
+        }
+
+        return self::\$peer;";
+    } // addDelete()
+
+    /**
+     * Shortcut method to return the [stub] query classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the query classes.
+     *
+     * @return string (e.g. 'Myquery')
+     * @see        StubQueryBuilder::getClassname()
+     */
+    public function getQueryClassname()
+    {
+        return $this->getQueryBuilder()->getClassname();
+    }
+
+    /**
      * Adds the function body for the insertOrUpdate method
      *
      * @param string &$script The script will be modified in this method.
@@ -117,7 +215,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         \$table_map = " . $peer_name . "::getTableMap();
         \$table_name = \$table_map->getName();
 
-        /** @var lcColumnMap[] \$pks */
+        /** @var \lcColumnMap[] \$pks */
         \$pks = \$table_map->getPrimaryKeys();
 
         \$pks_names = [];

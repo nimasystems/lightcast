@@ -39,9 +39,9 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
     private array $used_models = [];
     private ?string $models_gen_dir = null;
 
-    public const DEFAULT_NAMESPACE = 'Gen\\Propel\\Models';
+    public const DEFAULT_BASE_MODEL_NAMESPACE = 'Gen\\Propel\\Models';
 
-    protected string $model_namespace = self::DEFAULT_NAMESPACE;
+    protected string $base_model_namespace = self::DEFAULT_BASE_MODEL_NAMESPACE;
 
     public function initialize()
     {
@@ -58,6 +58,7 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
 
         // observe use_models filter
         $this->event_dispatcher->connect('database_model_manager.register_models', $this, 'onRegisterModels');
+        $this->event_dispatcher->connect('database_model_manager.use_models', $this, 'onUseModels');
     }
 
     public function shutdown()
@@ -140,21 +141,24 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
      */
     public function onUseModels(lcEvent $event, $models)
     {
+        $namespace = $event['namespace'] ?? '';
+
         if ($models && is_array($models)) {
-            $this->useModels($models);
+            $this->useModels($namespace, $models);
             $event->setProcessed();
         }
 
         return $models;
     }
 
-    public function useModels(array $models)
+    public function useModels(string $namespace, array $models)
     {
         foreach ($models as $model_name) {
             try {
-                $this->useModel($model_name);
+                $this->useModel($namespace, $model_name);
             } catch (Exception $e) {
-                throw new lcDatabaseException('Could not use model \'' . $model_name .
+                throw new lcDatabaseException('Could not use model \'' .
+                    ($namespace ? $namespace . '\\' : '') . $model_name .
                     '\': ' . $e->getMessage(), $e->getCode(), $e);
             }
 
@@ -197,30 +201,32 @@ class lcDatabaseModelManager extends lcSysObj implements iDatabaseModelManager, 
      * @param bool $already_camelized
      * @return void
      */
-    protected function _useModel(string $namespace, string $model_name, bool $already_camelized = false)
+    protected function _useModel(string $namespace, string $model_name)
     {
         assert(!is_null($model_name));
 
         $namespaced_model = ($namespace ? $namespace . '\\' : '') . $model_name;
 
-        $path_to_model = $this->model_paths[$this->registered_models[$namespaced_model]];
-
-        $model_inf = !$already_camelized ? lcInflector::camelize($model_name, false) : $model_name;
+        $path_to_model = $this->model_paths[$this->registered_models[$namespaced_model]['index']];
 
         $classes = [
-            $model_inf => $path_to_model . DS . $model_inf . '.php',
-            $model_inf . 'Peer' => $path_to_model . DS . $model_inf . 'Peer.php',
-            $model_inf . 'Query' => $path_to_model . DS . $model_inf . 'Query.php',
+            $namespaced_model => $path_to_model . DS . $model_name . '.php',
+            $namespaced_model . 'Peer' => $path_to_model . DS . $model_name . 'Peer.php',
+            $namespaced_model . 'Query' => $path_to_model . DS . $model_name . 'Query.php',
         ];
 
         // use custom gen dir or in place with models
         $path_to_gen_classes = $this->models_gen_dir ?: $path_to_model;
 
         $gen_classes = [
-            'Base' . $model_inf => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . '.php',
-            'Base' . $model_inf . 'Peer' => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . 'Peer.php',
-            'Base' . $model_inf . 'Query' => $path_to_gen_classes . DS . 'om' . DS . 'Base' . $model_inf . 'Query.php',
-            $model_inf . 'TableMap' => $path_to_gen_classes . DS . 'map' . DS . $model_inf . 'TableMap.php',
+            $this->base_model_namespace . '\\Om\\Base' . $model_name => $path_to_gen_classes . DS . 'Om' . DS .
+                'Base' . $model_name . '.php',
+            $this->base_model_namespace . '\\Om\\Base' . $model_name . 'Peer' => $path_to_gen_classes . DS . 'Om' .
+                DS . 'Base' . $model_name . 'Peer.php',
+            $this->base_model_namespace . '\\Om\\Base' . $model_name . 'Query' => $path_to_gen_classes . DS . 'Om' .
+                DS . 'Base' . $model_name . 'Query.php',
+            $this->base_model_namespace . '\\Map\\Base' . $model_name . 'TableMap' => $path_to_gen_classes . DS . 'Map' .
+                DS . 'Base' . $model_name . 'TableMap.php',
         ];
 
         $classes = array_merge($classes, $gen_classes);

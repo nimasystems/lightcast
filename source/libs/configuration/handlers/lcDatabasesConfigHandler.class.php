@@ -92,11 +92,16 @@ class lcDatabasesConfigHandler extends lcEnvConfigHandler
                  */
                 'propel.defaultDateFormat' => '%F',
                 'propel.builder.query.class' => 'lcPropelBaseQueryBuilder',
+                //                'propel.builder.queryinheritance.class' => 'lcPropelQueryInheritanceBuilder',
                 'propel.builder.peer.class' => 'lcPropelBasePeerBuilder',
                 'propel.builder.object.class' => 'lcPropelBaseObjectBuilder',
                 'propel.builder.objectstub.class' => 'lcPropelObjectStubBuilder',
                 'propel.builder.peerstub.class' => 'lcPropelPeerStubBuilder',
                 'propel.builder.tablemap.class' => 'lcPropelTableMapBuilder',
+
+                'propel.builder.querystub.class' => 'lcPropelBaseExtensionQueryBuilder',
+                'propel.builder.queryinheritancestub.class' => 'lcPropelBaseExtensionQueryInheritanceBuilder',
+
                 'propel.builder.addIncludes' => false,
                 'propel.builder.addComments' => true,
                 'propel.builder.addBehaviors' => true,

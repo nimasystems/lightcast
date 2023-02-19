@@ -43,7 +43,7 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
                 ],
             ],
             'tools' => ['htmldoc' => '/usr/bin/htmldoc'],
-            'plugins' => ['locations' => ['addons/plugins']],
+            'plugins' => ['locations' => ['Plugins']],
             'exceptions' => [
                 'module' => null,
                 'action' => null,

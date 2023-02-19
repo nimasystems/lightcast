@@ -95,6 +95,10 @@ class Propel extends lcTaskController
         /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5ExtensionPeerBuilder.php';
         /** @noinspection PhpIncludeInspection */
+        require_once 'builder/om/ExtensionQueryBuilder.php';
+        /** @noinspection PhpIncludeInspection */
+        require_once 'builder/om/ExtensionQueryInheritanceBuilder.php';
+        /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5ExtensionObjectBuilder.php';
         /** @noinspection PhpIncludeInspection */
         require_once 'builder/om/PHP5TableMapBuilder.php';
@@ -400,7 +404,9 @@ class Propel extends lcTaskController
                 $options['context_name'] = (is_numeric($name_underscored) ? '' : $name_underscored);
 
                 // if a plugin - set package, otherwise 'models'
-                $options['package'] = ($type_name == 'plugin') ? 'plugins.' . htmlspecialchars($name_underscored) . '.models' : 'models';
+                $options['package'] =
+                    lcInflector::underscore($this->configuration->getProjectConfiguration()->getProjectNamespace()) . '.' .
+                    (($type_name == 'plugin') ? 'plugins.' . htmlspecialchars($name_underscored) . '.models' : 'models');
 
                 $this->fixSchema($target_filename, $options, (array)$schema_details['models']);
 

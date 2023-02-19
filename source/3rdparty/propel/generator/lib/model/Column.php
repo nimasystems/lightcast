@@ -87,8 +87,8 @@ class Column extends XMLElement
     private $inheritanceType;
     private $isInheritance;
     private $isEnumeratedClasses;
-        private $inheritanceList; //maybe this can be retrieved from vendorSpecificInfo
-private $needsTransactionInPostgres;
+    private $inheritanceList; //maybe this can be retrieved from vendorSpecificInfo
+    private $needsTransactionInPostgres;
     /**
      * The domain object associated with this Column.
      *
@@ -305,7 +305,9 @@ private $needsTransactionInPostgres;
      */
     public function getConstantName()
     {
-        $classname = $this->getTable()->getPhpName() . 'Peer';
+        // NIMA CHANGES - namespaced constants should use the BASE class!
+        // TODO: move out of here and make overridable
+        $classname = 'Base' . $this->getTable()->getPhpName() . 'Peer';
         $const = $this->getConstantColumnName();
 
         return $classname . '::' . $const;

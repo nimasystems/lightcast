@@ -230,14 +230,14 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->database_model_manager = $database_model_manager;
     }
 
-    public function useModel($model_name)
+    public function useModel(string $namespace, string $model_name)
     {
-        $this->database_model_manager->useModel($model_name);
+        $this->database_model_manager->useModel($namespace, $model_name);
     }
 
-    public function useModels(array $models)
+    public function useModels(string $namespace, array $models)
     {
-        $this->database_model_manager->useModels($models);
+        $this->database_model_manager->useModels($namespace, $models);
     }
 
     public function getViewFilterChain()
@@ -426,7 +426,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $data_name = isset($options['name']) ? $options['name'] : $data_name;
 
             if (!$validator_name || !$data_name) {
-                assert(false);
                 $is_validated = false;
                 continue;
             }
@@ -435,7 +434,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $cl_name = 'lc' . lcInflector::camelize($validator_name, false) . 'Validator';
 
             if (!class_exists($cl_name)) {
-                assert(false);
                 $is_validated = false;
                 continue;
             }
@@ -443,7 +441,6 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
             $validator = new $cl_name();
 
             if (!($validator instanceof lcValidator)) {
-                assert(false);
                 $is_validated = false;
                 continue;
             }

@@ -24,6 +24,9 @@ declare(strict_types=1);
 
 */
 
+/**
+ *
+ */
 interface iSupportsDbModels
 {
     public function getDbModels();

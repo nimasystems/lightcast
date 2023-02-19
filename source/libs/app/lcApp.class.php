@@ -690,7 +690,7 @@ class lcApp extends lcObj
     private function initPluginManager()
     {
         /** @var lcPluginManager $plugin_manager */
-        $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
+        $plugin_manager = $this->initialized_objects['plugin_manager'] ?? null;
 
         if (!$plugin_manager) {
             return;
@@ -710,35 +710,35 @@ class lcApp extends lcObj
     {
         // add propel model classes to autoloader
         // for objects which support iSupportsPropelDb
-        $db_manager = isset($this->initialized_objects['database_model_manager']) ?
-            $this->initialized_objects['database_model_manager'] : null;
+        $db_manager = $this->initialized_objects['database_model_manager'] ?? null;
 
-        if (!$db_manager || !($db_manager instanceof iDatabaseModelManager)) {
+        if (!($db_manager instanceof iDatabaseModelManager)) {
             return;
         }
 
         /** @var lcProjectConfiguration $project_configuration */
         $project_configuration = $this->configuration->getProjectConfiguration();
 
-        if ($project_configuration instanceof iSupportsDbModels) {
-            try {
-                $models = $project_configuration->getDbModels();
+        try {
+            $models = $project_configuration->getDbModels();
 
-                if ($models && is_array($models)) {
-                    $db_manager->registerModelClasses($project_configuration->getModelsDir(), $models);
-                }
-            } catch (Exception $e) {
-                throw new lcDatabaseException('Could not register database models from project: ' . $e->getMessage(),
-                    $e->getCode(),
-                    $e);
+            if ($models && is_array($models)) {
+                $db_manager->registerModelClasses(
+                    $project_configuration->getModelsDir(),
+                    $project_configuration->getNamespacedClass('Models'),
+                    $models);
             }
+        } catch (Exception $e) {
+            throw new lcDatabaseException('Could not register database models from project: ' . $e->getMessage(),
+                $e->getCode(),
+                $e);
         }
     }
 
     protected function startRuntimePlugins()
     {
         /** @var lcPluginManager $plugin_manager */
-        $plugin_manager = isset($this->initialized_objects['plugin_manager']) ? $this->initialized_objects['plugin_manager'] : null;
+        $plugin_manager = $this->initialized_objects['plugin_manager'] ?? null;
 
         if (!$plugin_manager) {
             return;

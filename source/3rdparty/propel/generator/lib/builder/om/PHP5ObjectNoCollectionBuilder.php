@@ -139,7 +139,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
 
         $script .= "
             \$this->" . $clo . "_isLoaded = true;
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             throw new PropelException(\"Error loading value for [$clo] column on demand.\", \$e);
         }";
     }
@@ -370,7 +370,7 @@ class PHP5ObjectNoCollectionBuilder extends PHP5ObjectBuilder
         }
 
         $script .= "
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }";

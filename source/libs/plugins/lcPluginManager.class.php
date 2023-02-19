@@ -396,6 +396,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
         $configuration->setRootDir($root_dir);
         $configuration->setWebPath($web_path);
         $configuration->setName($plugin_name);
+        $configuration->setNamespace($this->configuration->getProjectConfiguration()
+            ->getNamespacedClass('Plugins\\' . $plugin_name));
         $configuration->setBaseConfigDir($this->configuration->getBaseConfigDir());
         $configuration->setEnvironment($this->configuration->getEnvironment());
         $configuration->setEnvironments($this->configuration->getEnvironments());

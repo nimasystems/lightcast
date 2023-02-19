@@ -35,7 +35,7 @@ interface iDatabaseModelManager
 
     public function getUsedModels();
 
-    public function useModels(array $models);
+    public function useModels(string $namespace, array $models);
 
     /**
      * @param string $namespace

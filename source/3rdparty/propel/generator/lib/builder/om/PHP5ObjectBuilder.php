@@ -1081,7 +1081,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
 
             return \$startcol + $n; // $n = " . $this->getPeerClassname() . "::NUM_HYDRATE_COLUMNS.
 
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             throw new PropelException(\"Error populating " . $this->getStubObjectBuilder()->getClassname() . " object\", \$e);
         }";
     }
@@ -1357,7 +1357,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         }
 
         $script .= "
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }";
@@ -1567,7 +1567,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         }
 
         $script .= "
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }";
@@ -1977,7 +1977,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
             try {";
             $script .= $platform->getIdentifierPhp('$this->' . $columnProperty, '$con', $primaryKeyMethodInfo, '				');
             $script .= "
-            } catch (Exception \$e) {
+            } catch (\\Exception \$e) {
                 throw new PropelException('Unable to get sequence id.', \$e);
             }
         }
@@ -2020,7 +2020,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
                 }
             }
             \$stmt->execute();
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             Propel::log(\$e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', \$sql), \$e);
         }
@@ -2034,7 +2034,7 @@ abstract class " . $this->getClassname() . " extends " . $parentClass . " ";
         try {";
             $script .= $platform->getIdentifierPhp('$pk', '$con', $primaryKeyMethodInfo);
             $script .= "
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             throw new PropelException('Unable to get autoincrement id.', \$e);
         }";
             if ($table->isAllowPkInsert()) {
@@ -4818,7 +4818,7 @@ protected function addFromArray(&$script)
 
         try {
             \$dt = new $dateTimeClass(\$this->$clo);
-        } catch (Exception \$x) {
+        } catch (\\Exception \$x) {
             throw new PropelException(\"Internally stored date/time/timestamp value could not be converted to $dateTimeClass: \" . var_export(\$this->$clo, true), \$x);
         }
 ";
@@ -4827,7 +4827,7 @@ protected function addFromArray(&$script)
 
         try {
             \$dt = new $dateTimeClass(\$this->$clo);
-        } catch (Exception \$x) {
+        } catch (\\Exception \$x) {
             throw new PropelException(\"Internally stored date/time/timestamp value could not be converted to $dateTimeClass: \" . var_export(\$this->$clo, true), \$x);
         }
 ";
@@ -5293,7 +5293,7 @@ protected function addFromArray(&$script)
 
         $script .= "
             \$this->" . $clo . "_isLoaded = true;
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             throw new PropelException(\"Error loading value for [$clo] column on demand.\", \$e);
         }";
     }

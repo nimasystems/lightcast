@@ -15,15 +15,15 @@ class lcPropelTableMapBuilder extends PHP5TableMapBuilder
      */
     public function getClassFilePath(): string
     {
-        $overriden_path = lcPropelBaseObjectBuilder::getOverridenClassFilePath(
+      return lcPropelBaseObjectBuilder::getOverridenClassFilePath(
             $this->getGeneratorConfig()->getBuildProperty('namespaceMap'),
             $this->getGeneratorConfig(), $this->getClassname());
 
-        if ($overriden_path) {
-            return $overriden_path;
-        } else {
-            return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
-        }
+//        if ($overriden_path) {
+//            return $overriden_path;
+//        } else {
+//            return ClassTools::createFilePath($this->getPackagePath(), $this->getClassname());
+//        }
     }
 
     public function getNamespace(): string
@@ -74,6 +74,11 @@ class lcPropelTableMapBuilder extends PHP5TableMapBuilder
 class ' . $this->getClassname() . ' extends ' . self::LC_TABLE_MAP_CLASS_NAME . '
 {
 ';
+    }
+
+    public function getClassname()
+    {
+        return 'Base' . $this->prefixClassname($this->getUnprefixedClassname());
     }
 
     /**

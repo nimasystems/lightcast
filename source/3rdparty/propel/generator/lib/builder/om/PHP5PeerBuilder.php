@@ -1350,7 +1350,7 @@ protected function addTranslateFieldName(&$script)
 ";
         }
         $script .= "
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             throw new PropelException('Unable to get OM class.', \$e);
         }
 
@@ -1474,7 +1474,7 @@ protected function addTranslateFieldName(&$script)
             \$con->beginTransaction();
             \$pk = " . $this->basePeerClassname . "::doInsert(\$criteria, \$con);
             \$con->commit();
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }
@@ -1585,7 +1585,7 @@ protected function addTranslateFieldName(&$script)
             \$con->commit();
 
             return \$affectedRows;
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }
@@ -1747,7 +1747,7 @@ protected function addTranslateFieldName(&$script)
             \$con->commit();
 
             return \$affectedRows;
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }
@@ -2119,7 +2119,7 @@ protected function addTranslateFieldName(&$script)
     /**
      * Returns the TableMap related to this peer.
      * This method is not needed for general use but a specific application could have a need.
-     * @return TableMap
+     * @return \TableMap
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */

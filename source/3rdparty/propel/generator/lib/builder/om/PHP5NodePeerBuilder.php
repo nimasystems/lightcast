@@ -309,7 +309,7 @@ abstract class " . $this->getClassname() . " {
             \$obj->save(\$con);
 
             \$con->commit();
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }
@@ -358,7 +358,7 @@ abstract class " . $this->getClassname() . " {
             $nodePeerClassname::moveNodeSubTree('0', '1' . self::NPATH_SEP . '1', \$con);
 
             \$con->commit();
-        } catch (Exception \$e) {
+        } catch (\\Exception \$e) {
             \$con->rollBack();
             throw \$e;
         }

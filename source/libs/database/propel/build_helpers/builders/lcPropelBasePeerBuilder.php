@@ -29,9 +29,36 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
         }
     }
 
+    /**
+     * Shortcut method to return the [stub] peer classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the peer classes.
+     *
+     * @return string (e.g. 'BaseMyPeer')
+     * @see        StubPeerBuilder::getClassname()
+     */
+    public function getPeerClassname()
+    {
+        return $this->getPeerBuilder()->getClassname();
+    }
+
     public function getNamespace(): string
     {
         return 'Gen\\Propel\\Models\\Om';
+    }
+
+    public function getTableMapClass(): string
+    {
+        return $this->getStubObjectBuilder()->getTableMapNamespace() . '\\' . $this->getObjectClassname() . 'TableMap';
+
+//        // Trim first backslash for php 5.3.{0,1,2} compatibility
+//        $fullyQualifiedClassname = ltrim($this->getStubObjectBuilder()->getFullyQualifiedClassname(), '\\');
+//
+//        if (($pos = strrpos($fullyQualifiedClassname, '\\')) !== false) {
+//            return substr_replace($fullyQualifiedClassname, '\\Map\\', $pos, 1) . 'TableMap';
+//        } else {
+//            return $fullyQualifiedClassname . 'TableMap';
+//        }
     }
 
     /**
@@ -62,6 +89,32 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
 ';
             }
         }
+    }
+
+    /**
+     * Returns the object classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the object classes.
+     *
+     * @return string (e.g. 'My')
+     * @see        StubPeerBuilder::getClassname()
+     */
+    public function getObjectClassname()
+    {
+        return $this->getObjectBuilder()->getClassname();
+    }
+
+    /**
+     * Shortcut method to return the [stub] query classname for current table.
+     * This is the classname that is used whenever object or peer classes want
+     * to invoke methods of the query classes.
+     *
+     * @return string (e.g. 'Myquery')
+     * @see        StubQueryBuilder::getClassname()
+     */
+    public function getQueryClassname()
+    {
+        return $this->getQueryBuilder()->getClassname();
     }
 
     /**
@@ -102,7 +155,7 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
      */
     public static function getValueSetsFormatted()
     {
-        /** @var lcTableMap \$tableMap */
+        /** @var \lcTableMap \$tableMap */
         \$tableMap = self::getTableMap();
 
         return array(" . implode(",\n", $d) . ');
@@ -160,6 +213,8 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
         $lc_title_plural = $this->getTable()->getAttribute(self::LC_TITLE_PLURAL_ATTR);
         $lc_title_plural = $lc_title_plural ?: $php_name_title_pl;
 
+        $tablePhpActualName = addslashes($this->getStubObjectBuilder()->getFullyQualifiedActualClassname());
+
         $script .= "
 	/** the context type in which the model is located (Lightcast customization) */
 	const LC_CONTEXT_TYPE = '" . addslashes($this->getTable()->getAttribute(self::LC_DB_CONTEXT_TYPE_ATTR)) . "';
@@ -172,9 +227,167 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
 
 	/** the localized table name - plural (Lightcast customization) */
 	const LC_TITLE_PLURAL = '" . addslashes($lc_title_plural) . "';
+
+    /** the related Propel class for this table */
+    const OM_ACTUAL_CLASS = '$tablePhpActualName';
+
 	";
 
         parent::addConstantsAndAttributes($script);
+    }
+
+    /**
+     * Adds the populateObject() method.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addPopulateObject(&$script)
+    {
+        $table = $this->getTable();
+        $script .= "
+    /**
+     * Populates an object of the default type or an object that inherit from the default.
+     *
+     * @param      array \$row PropelPDO resultset row.
+     * @param      int \$startcol The 0-based offset for reading from the resultset row.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     * @return array (" . $this->getStubObjectBuilder()->getFullyQualifiedActualClassname() . " object, last column rank)
+     */
+    public static function populateObject(\$row, \$startcol = 0)
+    {
+        \$key = " . $this->getPeerClassname() . "::getPrimaryKeyHashFromRow(\$row, \$startcol);
+        if (null !== (\$obj = " . $this->getPeerClassname() . "::getInstanceFromPool(\$key))) {
+            // We no longer rehydrate the object, since this can cause data loss.
+            // See http://www.propelorm.org/ticket/509
+            // \$obj->hydrate(\$row, \$startcol, true); // rehydrate
+            \$col = \$startcol + " . $this->getPeerClassname() . "::NUM_HYDRATE_COLUMNS;";
+        if ($table->isAbstract()) {
+            $script .= "
+        } elseif (null == \$key) {
+            // empty resultset, probably from a left join
+            // since this table is abstract, we can't hydrate an empty object
+            \$obj = null;
+            \$col = \$startcol + " . $this->getPeerClassname() . "::NUM_HYDRATE_COLUMNS;";
+        }
+        $script .= "
+        } else {";
+        if (!$table->getChildrenColumn()) {
+            $script .= "
+            \$cls = " . $this->getPeerClassname() . "::OM_ACTUAL_CLASS;";
+        } else {
+            $script .= "
+            \$cls = " . $this->getPeerClassname() . "::getOMActualClass(\$row, \$startcol);";
+        }
+        $script .= "
+            \$obj = new \$cls();
+            \$col = \$obj->hydrate(\$row, \$startcol);
+            " . $this->getPeerClassname() . "::addInstanceToPool(\$obj, \$key);
+        }
+
+        return array(\$obj, \$col);
+    }
+";
+    }
+
+    /**
+     * Adds a getOMClass() for non-abstract tables that do note use inheritance.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addGetOMClass_NoInheritance(&$script)
+    {
+        $script .= "
+    /**
+     * The class that the Peer will make instances of.
+     *
+     *
+     * @return string ClassName
+     */
+    public static function getOMClass(\$row = 0, \$colnum = 0)
+    {
+        return " . $this->getPeerClassname() . "::OM_CLASS;
+    }
+";
+
+        $script .= "
+    /**
+     * The class that the Peer will make instances of.
+     *
+     *
+     * @return string ClassName
+     */
+    public static function getOMActualClass(\$row = 0, \$colnum = 0)
+    {
+        return " . $this->getPeerClassname() . "::OM_ACTUAL_CLASS;
+    }
+";
+    }
+
+    /**
+     * Adds the populateObjects() method.
+     *
+     * @param string &$script The script will be modified in this method.
+     */
+    protected function addPopulateObjects(&$script)
+    {
+        $table = $this->getTable();
+        $script .= "
+    /**
+     * The returned array will contain objects of the default type or
+     * objects that inherit from the default.
+     *
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function populateObjects(PDOStatement \$stmt)
+    {
+        \$results = array();
+    ";
+        if (!$table->getChildrenColumn()) {
+            $script .= "
+        // set the class once to avoid overhead in the loop
+        \$cls = " . $this->getPeerClassname() . "::getOMActualClass();";
+        }
+
+        $script .= "
+        // populate the object(s)
+        while (\$row = \$stmt->fetch(PDO::FETCH_NUM)) {
+            \$key = " . $this->getPeerClassname() . "::getPrimaryKeyHashFromRow(\$row, 0);
+            if (null !== (\$obj = " . $this->getPeerClassname() . "::getInstanceFromPool(\$key))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // \$obj->hydrate(\$row, 0, true); // rehydrate
+                \$results[] = \$obj;
+            } else {";
+        if ($table->getChildrenColumn()) {
+            $script .= "
+                // class must be set each time from the record row
+                \$cls = " . $this->getPeerClassname() . "::getOMActualClass(\$row, 0);
+                \$cls = substr('.'.\$cls, strrpos('.'.\$cls, '.') + 1);
+                " . $this->buildObjectInstanceCreationCode('$obj', '$cls') . "
+                \$obj->hydrate(\$row);
+                \$results[] = \$obj;
+                " . $this->getPeerClassname() . "::addInstanceToPool(\$obj, \$key);";
+        } else {
+            $script .= "
+                " . $this->buildObjectInstanceCreationCode('$obj', '$cls') . "
+                \$obj->hydrate(\$row);
+                \$results[] = \$obj;
+                " . $this->getPeerClassname() . "::addInstanceToPool(\$obj, \$key);";
+        }
+        $script .= "
+            } // if key exists
+        }
+        \$stmt->closeCursor();
+
+        return \$results;
+    }";
+    } // addGetPrimaryKeyFromRow
+
+    public function getPeerActualClassname()
+    {
+        return $this->getStubPeerBuilder()->getActualClassname();
     }
 
     /*
