@@ -53,7 +53,7 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     protected $storage;
 
     /**
-     * @var lcSecurityUser
+     * @var lcUser
      */
     protected $user;
 
@@ -202,9 +202,9 @@ abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggabl
     }
 
     /**
-     * @return lcSecurityUser
+     * @return lcUser
      */
-    public function getUser(): ?lcSecurityUser
+    public function getUser(): ?lcUser
     {
         return $this->user;
     }

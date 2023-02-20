@@ -248,7 +248,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
     }
 
-    private function getStackTrace(Exception $exception, array &$compiled_stack_trace): ?array
+    /**
+     * @param Exception|Error $exception
+     * @param array $compiled_stack_trace
+     * @return array|null
+     */
+    private function getStackTrace($exception, array &$compiled_stack_trace): ?array
     {
         $previous = ($exception instanceof lcException) ? $exception->getCause() : null;
 
@@ -370,7 +375,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $htmldoc;
     }
 
-    private function getExceptionOverridenMessage(Exception $exception, $content_type = 'text/html'): string
+    /**
+     * @param Exception|Error $exception
+     * @param $content_type
+     * @return string
+     */
+    private function getExceptionOverridenMessage($exception, $content_type = 'text/html'): string
     {
         $is_debugging = $this->is_debugging;
         $message = $exception->getMessage();
@@ -422,15 +432,16 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
     public function handleException($exception)
     {
         // PHP7 compat
-        if (!($exception instanceof Exception)) {
-            $exception = new ErrorException(
-                $exception->getMessage(),
-                $exception->getCode(),
-                E_ERROR,
-                $exception->getFile(),
-                $exception->getLine()
-            );
-        }
+//        if (!($exception instanceof Exception)) {
+//            $exception = new ErrorException(
+//                $exception->getMessage(),
+//                $exception->getCode(),
+//                E_ERROR,
+//                $exception->getFile(),
+//                $exception->getLine(),
+//                $exception->getPrevious()
+//            );
+//        }
 
         $this->event_dispatcher->notify(new lcEvent('error_handler.exception', $this, [
             'exception' => $exception,
@@ -637,7 +648,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         exit($exit_code);
     }
 
-    private function prepareErrorOutput(Exception $exception, $content_type)
+    /**
+     * @param Exception|Error $exception
+     * @param $content_type
+     * @return array|false|int|string|string[]|void
+     */
+    private function prepareErrorOutput($exception, $content_type)
     {
         $in_cli = lcSys::isRunningCLI();
 
@@ -774,7 +790,13 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $details;
     }
 
-    public function processTemplate(Exception $exception, $template_data, $content_type = 'text/html')
+    /**
+     * @param Exception|Error $exception
+     * @param $template_data
+     * @param $content_type
+     * @return array|string|string[]|null
+     */
+    public function processTemplate($exception, $template_data, $content_type = 'text/html')
     {
         $configuration = $this->configuration;
         $data = $template_data;
