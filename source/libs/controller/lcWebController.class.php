@@ -577,7 +577,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         $call_params = $action_params;
 
-        if ($should_use_reqresp) {
+        if ($should_use_reqresp && $action_type == 'action') {
             $reqr = clone $req;
             $reqr->setCallStyle(lcController::CALL_STYLE_REQRESP);
             $call_params = [$reqr];

@@ -434,8 +434,8 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
     {
         // maps the configuration values to handlers
         return [
-            ['handler' => 'project', 'dirs' => [$this->getBaseConfigDir(), $this->getConfigDir()], 'config_key' => 'project'],
-            ['handler' => 'databases', 'dirs' => [$this->getBaseConfigDir(), $this->getConfigDir()], 'config_key' => 'databases'],
+            ['handler' => 'project', 'dirs' => [$this->getBaseConfigDir()/*, $this->getConfigDir()*/], 'config_key' => 'project'],
+            ['handler' => 'databases', 'dirs' => [$this->getBaseConfigDir()/*, $this->getConfigDir()*/], 'config_key' => 'databases'],
         ];
     }
 
