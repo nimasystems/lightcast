@@ -191,6 +191,8 @@ abstract class lcController extends lcBaseController
 
     public function getPartial($action_name, $module, array $params = null, $return_params = false)
     {
+        $module_camelized = lcInflector::camelize($module);
+
         $params = [
             'request' => array_merge(
                 [
@@ -209,7 +211,7 @@ abstract class lcController extends lcBaseController
         try {
             // get an instance of the controller first
             /** @var lcWebController $controller_instance */
-            $controller_instance = $this->getControllerInstance($module);
+            $controller_instance = $this->getControllerInstance($module_camelized);
 
             if (!$controller_instance) {
                 throw new lcControllerNotFoundException('Controller \'' . $module . ' / ' . $action_name . '\' not found');
@@ -327,7 +329,7 @@ abstract class lcController extends lcBaseController
 
         // execute the request
         $action_result = null;
-        $action_params = $action_params ? $action_params : [];
+        $action_params = $action_params ?: [];
 
         $this->event_dispatcher->notify(new lcEvent('controller.will_render_action', $controller, [
             'action_params' => $action_params,
@@ -343,7 +345,7 @@ abstract class lcController extends lcBaseController
         $view = $controller->getView();
         $rendered_view_contents = null;
 
-        if (!$view || (int)$action_result == (int)lcBaseController::RENDER_NONE) {
+        if (!$view || (int)$action_result == lcBaseController::RENDER_NONE) {
             // if user specified render none - don't render anything!
             $controller->unsetView();
         } else if ($view) {
@@ -554,8 +556,8 @@ abstract class lcController extends lcBaseController
     */
 
     public function forwardToControllerAction(lcController $controller_instance,
-                                              $action_name,
-                                              array $action_params = null,
+                                                           $action_name,
+                                              array        $action_params = null,
                                               lcController $parent_controller = null)
     {
         if (!$controller_instance || !$action_name) {
@@ -580,7 +582,7 @@ abstract class lcController extends lcBaseController
         $action_params = array_merge((array)$this->dispatch_params, (array)$action_params);
 
         // set the action type if missing
-        $action_params['type'] = isset($action_params['type']) ? $action_params['type'] : self::TYPE_ACTION;
+        $action_params['type'] = $action_params['type'] ?? self::TYPE_ACTION;
 
         // set params
         $this->prepareControllerInstance($controller_instance);
@@ -606,12 +608,13 @@ abstract class lcController extends lcBaseController
             'action_name' => $action_name,
             'params' => $action_params,
         ];
-        $this->event_dispatcher->filter(new lcEvent('controller.change_action', $this, $notification_params), $notification_params);
+        $this->event_dispatcher->filter(new lcEvent('controller.change_action',
+            $this, $notification_params), $notification_params);
 
         $should_execute = true;
 
         $ctrl_view = $controller_instance->getView();
-        $ctrl_view = $ctrl_view ? $ctrl_view : $controller_instance->getDefaultViewInstance();
+        $ctrl_view = $ctrl_view ?: $controller_instance->getDefaultViewInstance();
 
         $content_type = $ctrl_view ? $ctrl_view->getContentType() : null;
         $content = null;
@@ -872,8 +875,8 @@ abstract class lcController extends lcBaseController
     }
 
     protected function executeControllerFilterChain($controller_name, $controller_filename, $controller_context_type,
-                                                    $controller_context_name, $controller_parent_plugin_name,
-                                                    $action_name, array $action_params = null,
+        $controller_context_name, $controller_parent_plugin_name,
+        $action_name, array $action_params = null,
                                                     array $skip_filter_categories = null)
     {
         return $this->action_filter_chain->execute($this, $controller_name, $action_name, $action_params, [

@@ -306,7 +306,7 @@ class lcPropelBasePeerBuilder extends PHP5PeerBuilder
      */
     public static function getOMClass(\$row = 0, \$colnum = 0)
     {
-        return " . $this->getPeerClassname() . "::OM_CLASS;
+        return " . $this->getPeerClassname() . "::OM_ACTUAL_CLASS;
     }
 ";
 

@@ -229,6 +229,13 @@ class lcStrings
             || null !== parse_url($file, PHP_URL_SCHEME);
     }
 
+    /**
+     * @param $string
+     * @param $min_word_len
+     * @param $max_words
+     * @param $imploded
+     * @return array|string
+     */
     public static function getTopKeywords($string, $min_word_len = 3, $max_words = 30, $imploded = false)
     {
         $skipwords = [
@@ -285,9 +292,7 @@ class lcStrings
                 unset($k, $v);
             }
 
-            $str = substr($str, 0, strlen($str) - 1);
-
-            return $str;
+            return (string)substr($str, 0, strlen($str) - 1);
         }
 
         return $narr;
@@ -307,13 +312,19 @@ class lcStrings
 
     # prepare a string for javascript
 
+    /**
+     * @param $string
+     * @return array|string|string[]|null
+     */
     public static function unhtmlentities($string)
     {
         $trans_tbl = get_html_translation_table(HTML_ENTITIES);
         $trans_tbl = array_flip($trans_tbl);
         $ret = strtr($string, $trans_tbl);
 
-        return preg_replace('/&#(\d+);/me', "chr('\\1')", $ret);
+        return preg_replace_callback('/&#(\d+);/m', function ($r) {
+            return chr($r);
+        }, $ret);
     }
 
     // stripslashes - recursive on arrays

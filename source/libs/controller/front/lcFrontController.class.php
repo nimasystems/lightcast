@@ -195,7 +195,7 @@ abstract class lcFrontController extends lcAppObj implements iFrontController
         $this->fixDispatchParams($request_params);
 
         $module = lcInflector::camelize($request_params['module']);
-        $action = lcInflector::camelize($request_params['action']);
+        $action = $request_params['action'];
 
         // allow customized functionality before dispatching
         if (!$this->shouldDispatch($module, $action, $request_params)) {
