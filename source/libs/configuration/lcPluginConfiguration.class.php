@@ -322,7 +322,7 @@ class lcPluginConfiguration extends lcConfiguration implements iSupportsVersions
             return null;
         }
 
-        return 'plugins' . DS . $plugin_name;
+        return 'plugins' . DS . lcInflector::underscore($plugin_name);
     }
 
     /**

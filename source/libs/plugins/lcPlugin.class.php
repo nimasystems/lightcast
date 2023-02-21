@@ -461,7 +461,7 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsCompon
             return null;
         }
 
-        return $webpath . self::ASSETS_PATH . '/' . ($type ? $type . '/' : null);
+        return $webpath . '/' . ($type ? $type . '/' : null);
     }
 
     /**

@@ -86,7 +86,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         }
     }
 
-    public function notifyOfException(Exception $exception)
+    /**
+     * @param Exception|Error $exception
+     * @return void
+     * @throws lcInvalidArgumentException
+     */
+    public function notifyOfException($exception)
     {
         if (!$exception) {
             throw new lcInvalidArgumentException('Invalid params');
@@ -134,7 +139,12 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             ]));
     }
 
-    public function emailException(Exception $exception)
+    /**
+     * @param Exception|Error $exception
+     * @return void
+     * @throws Exception
+     */
+    public function emailException($exception)
     {
         if (!$exception) {
             return;
@@ -759,7 +769,11 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
         return $error_output;
     }
 
-    public function getExceptionDetails(Exception $exception): array
+    /**
+     * @param Exception|Error $exception
+     * @return array
+     */
+    public function getExceptionDetails($exception): array
     {
         $configuration = $this->configuration;
 

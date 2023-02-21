@@ -313,12 +313,8 @@ abstract class lcController extends lcBaseController
         $view->setController($this);
     }
 
-    public function renderControllerAction(lcController $controller, $action_name, array $action_params = null)
+    public function renderControllerAction(lcController $controller, string $action_name, array $action_params = null)
     {
-        if (!$controller || !$action_name) {
-            throw new lcInvalidArgumentException('Invalid controller / action');
-        }
-
         //$this->info('Rendering action (' . $controller->getControllerName() . '/' .
         // $action_name . ': ' . "\n\n" . print_r($action_params, true) . "\n\n");
 
@@ -496,7 +492,17 @@ abstract class lcController extends lcBaseController
         }
     }
 
-    public function forward($action_name, $controller_name = null, array $action_params = null)
+    /**
+     * @param string $action_name
+     * @param string $controller_name
+     * @param mixed $action_params
+     * @return void
+     * @throws lcControllerNotFoundException
+     * @throws lcInvalidArgumentException
+     * @throws lcNotAvailableException
+     * @throws lcRenderException
+     */
+    public function forward(string $action_name, string $controller_name = null, $action_params = null)
     {
         $controller_name = !$controller_name ? $this->controller_name : $controller_name;
 
@@ -515,20 +521,17 @@ abstract class lcController extends lcBaseController
 
         $controller_instance->setDispatchParams($this->dispatch_params);
 
-        $action_params['module'] = $controller_name;
-        $action_params['action'] = $action_name;
-
-        $action_params = [
-            'request' => (array)$action_params,
-            'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION),
-        ];
-
         // override the web controller's forward for the sake of using this method within
         // the context of the root view controller
         $this->forwardToControllerAction(
             $controller_instance,
             $action_name,
-            $action_params,
+            [
+                'module' => $controller_name,
+                'action' => $action_name,
+                'request' => $action_params['request'] ?? $action_params,
+                'type' => (isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION),
+            ],
             $this
         );
     }
@@ -556,14 +559,10 @@ abstract class lcController extends lcBaseController
     */
 
     public function forwardToControllerAction(lcController $controller_instance,
-                                                           $action_name,
-                                              array        $action_params = null,
+                                              string       $action_name,
+                                                           $action_params = null,
                                               lcController $parent_controller = null)
     {
-        if (!$controller_instance || !$action_name) {
-            throw new lcInvalidArgumentException('Invalid controller / action');
-        }
-
         // mark the start of the forward
         $this->render_time = microtime(true);
 
@@ -579,7 +578,9 @@ abstract class lcController extends lcBaseController
             ' to: ' . $controller_name . '/' . $action_name);
 
         // merge action_params with dispatch_params
-        $action_params = array_merge((array)$this->dispatch_params, (array)$action_params);
+        if (is_array($action_params)) {
+            $action_params = array_merge($this->dispatch_params, (array)$action_params);
+        }
 
         // set the action type if missing
         $action_params['type'] = $action_params['type'] ?? self::TYPE_ACTION;

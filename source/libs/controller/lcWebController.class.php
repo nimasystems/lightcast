@@ -540,7 +540,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     protected function execute($action_name, array $action_params)
     {
         $action_type = isset($action_params['type']) ? (string)$action_params['type'] : lcController::TYPE_ACTION;
-        $action_params['request'] = isset($action_params['request']) ? (array)$action_params['request'] : [];
+        $action_params['request'] = $action_params['request'] ?? null;
         $action_params['type'] = isset($action_params['type']) ? (string)$action_params['type'] : $action_type;
 
         $this->action_name = $action_name;
@@ -575,7 +575,7 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         $should_use_reqresp = self::checkShouldUseRequestArgument($this, $action, 'lcWebRequest');
 
-        $call_params = $action_params;
+        $call_params = is_object($action_params['request']) ? [$action_params['request']] : $action_params;
 
         if ($should_use_reqresp && $action_type == 'action') {
             $reqr = clone $req;
