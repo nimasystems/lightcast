@@ -151,7 +151,7 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = (array)parent::getDebugInfo();
 
@@ -164,9 +164,9 @@ class lcCommandParamsRouting extends lcRouting implements iDebuggable
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function onFilterParameters(lcEvent $event, $params)

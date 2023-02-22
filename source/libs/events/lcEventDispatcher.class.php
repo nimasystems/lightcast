@@ -115,7 +115,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         $this->listener_events = null;
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'notifications_sent' => $this->total_notifications_sent,
@@ -124,7 +124,7 @@ class lcEventDispatcher extends lcSysObj implements iDebuggable
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return [
             'notifications_sent' => $this->total_notifications_sent,

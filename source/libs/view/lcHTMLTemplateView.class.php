@@ -77,7 +77,7 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return 'Template filename: ' . $this->template_filename;
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = (array)parent::getDebugInfo();
 
@@ -90,9 +90,9 @@ class lcHTMLTemplateView extends lcHTMLView implements ArrayAccess, iDebuggable,
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getControllerActionsToDecorate()

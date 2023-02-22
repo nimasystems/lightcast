@@ -60,7 +60,7 @@ abstract class lcRouting extends lcResidentObj implements iProvidesCapabilities,
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'default_module' => $this->default_module,
@@ -68,8 +68,8 @@ abstract class lcRouting extends lcResidentObj implements iProvidesCapabilities,
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 }

@@ -41,14 +41,14 @@ class lcInternalStorage extends lcStorage implements iDebuggable
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getSessionId()

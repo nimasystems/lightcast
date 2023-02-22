@@ -124,7 +124,7 @@ class lcSessionStorage extends lcStorage implements iDebuggable
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $parent_debug = parent::getDebugInfo();
 
@@ -141,9 +141,9 @@ class lcSessionStorage extends lcStorage implements iDebuggable
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getSessionId()

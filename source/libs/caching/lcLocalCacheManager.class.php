@@ -132,7 +132,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'cache_type' => ($this->cache ? get_class($this->cache) : null),
@@ -140,7 +140,7 @@ class lcLocalCacheManager extends lcSysObj implements iDebuggable, iProvidesCapa
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return false;
     }

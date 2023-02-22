@@ -305,11 +305,11 @@ abstract class lcPlugin extends lcAppObj implements iDebuggable, iSupportsCompon
     }
 
     /**
-     * @return false
+     * @return array
      */
-    public function getShortDebugInfo(): bool
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     /**

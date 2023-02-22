@@ -203,7 +203,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         // compile cookies
         $cc1 = $this->cookies;
@@ -237,9 +237,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     #pragma mark - iKeyValueProvider
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getAllKeys()

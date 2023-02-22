@@ -72,7 +72,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         return setlocale(LC_ALL, null);
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = (array)parent::getDebugInfo();
 
@@ -88,9 +88,9 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        false;
+        return [];
     }
 
     public function getDomainPath()

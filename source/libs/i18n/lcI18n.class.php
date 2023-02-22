@@ -40,7 +40,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'locale' => $this->getLocale(),
@@ -55,7 +55,7 @@ abstract class lcI18n extends lcResidentObj implements iProvidesCapabilities, iK
 
     abstract public function getCountryCode();
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return [
             'locale' => $this->getLocale(),

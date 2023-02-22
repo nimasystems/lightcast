@@ -52,7 +52,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $attributes = $this->getAttributes();
 
@@ -94,9 +94,9 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
         $this->attributes = isset($attributes) ? $attributes : [];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function unsetAttributes()

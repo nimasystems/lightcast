@@ -115,7 +115,7 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 
     /**
      * @param string $key
-     * @return null
+     * @return mixed
      */
     public function get(string $key)
     {
@@ -128,7 +128,7 @@ class lcArrayCollection extends lcBaseCollection implements ArrayAccess
 
     /**
      * @param $offset
-     * @return mixed|null
+     * @return mixed
      */
     public function offsetGet($offset)
     {

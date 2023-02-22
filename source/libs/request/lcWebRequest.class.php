@@ -161,7 +161,7 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
 
     #pragma mark - iKeyValueProvider
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = parent::getDebugInfo();
 
@@ -206,9 +206,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getAllKeys()
@@ -226,8 +226,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getFullHostname()
     {
         return $this->getProtoPrefix() .
-        $this->getHostname() .
-        $this->prefix;
+            $this->getHostname() .
+            $this->prefix;
     }
 
     public function getProtoPrefix()
@@ -324,8 +324,8 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             $this->accept_encoding,
             $this->accept_charset,
             $this->cookies,
-            $this->context
-            ] = unserialize($serialized);
+            $this->context,
+        ] = unserialize($serialized);
     }
 
     public function onRouterDetectParameters(lcEvent $event)

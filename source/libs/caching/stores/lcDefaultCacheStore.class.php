@@ -79,14 +79,14 @@ class lcDefaultCacheStore extends lcCacheStore implements iDatabaseCacheProvider
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'namespace_prefix' => $this->namespace_prefix,
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return false;
     }

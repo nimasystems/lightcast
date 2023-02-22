@@ -41,7 +41,7 @@ class lcRawContentView extends lcView
         return null;
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = (array)parent::getDebugInfo();
 
@@ -55,9 +55,9 @@ class lcRawContentView extends lcView
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function setContent($content)

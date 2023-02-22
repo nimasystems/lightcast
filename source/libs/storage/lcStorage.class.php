@@ -70,7 +70,7 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $namespaces = $this->getNamespaces();
 
@@ -116,9 +116,9 @@ abstract class lcStorage extends lcResidentObj implements iProvidesCapabilities,
 
     abstract public function getAll($namespace = null);
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function setIgnoreTimeTracking($ignore_time_tracking = false)

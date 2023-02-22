@@ -549,9 +549,9 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
      * @return array|mixed|null
      * @noinspection PhpMissingReturnTypeInspection
      */
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return null;
+        return [];
     }
 
     public function willSendNotification(lcEventDispatcher $event_dispatcher, lcEvent $event, lcObj $invoker = null)

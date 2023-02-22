@@ -50,7 +50,7 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'argv' => $this->argv,
@@ -59,9 +59,9 @@ class lcConsoleRequest extends lcRequest implements iDebuggable
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function onRouterDetectParameters(lcEvent $event)

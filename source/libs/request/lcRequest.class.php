@@ -64,7 +64,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'env' => $this->env,
@@ -73,9 +73,9 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function __toString()

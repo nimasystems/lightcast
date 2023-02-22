@@ -392,7 +392,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = (array)parent::getDebugInfo();
 
@@ -408,7 +408,7 @@ class lcPatternRouting extends lcRouting implements iRouteBasedRouting, iCacheab
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         $debug_parent = (array)parent::getShortDebugInfo();
 

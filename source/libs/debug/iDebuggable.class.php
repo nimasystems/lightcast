@@ -23,7 +23,7 @@
 
 interface iDebuggable
 {
-    public function getDebugInfo();
+    public function getDebugInfo(): array;
 
-    public function getShortDebugInfo();
+    public function getShortDebugInfo(): array;
 }

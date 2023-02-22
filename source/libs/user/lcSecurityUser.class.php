@@ -298,7 +298,7 @@ abstract class lcSecurityUser extends lcUser
         parent::shutdown();
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         $debug_parent = parent::getDebugInfo();
 
@@ -315,9 +315,9 @@ abstract class lcSecurityUser extends lcUser
         return $debug;
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
-        return false;
+        return [];
     }
 
     public function getUserId()

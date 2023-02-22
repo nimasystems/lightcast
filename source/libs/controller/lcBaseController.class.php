@@ -148,7 +148,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         ];
     }
 
-    public function getDebugInfo()
+    public function getDebugInfo(): array
     {
         return [
             'translation_context_type' => $this->translation_context_type,
@@ -156,7 +156,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         ];
     }
 
-    public function getShortDebugInfo()
+    public function getShortDebugInfo(): array
     {
         return false;
     }
