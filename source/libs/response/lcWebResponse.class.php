@@ -341,6 +341,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->custom_headers->set('Content-Disposition', $content_disposition);
     }
 
+    protected bool $filters_disabled = false;
+
+    public function setFiltersDisabled(bool $filters_disabled) {
+        $this->filters_disabled = $filters_disabled;
+    }
+
     public function sendResponse()
     {
         if ($this->headersSent()) {
@@ -351,16 +357,18 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             return;
         }
 
-        // check if response sending is allowed
-        $event = $this->event_dispatcher->filter(
-            new lcEvent('response.should_send_response', $this, []), []);
+        if (!$this->filters_disabled) {
+            // check if response sending is allowed
+            $event = $this->event_dispatcher->filter(
+                new lcEvent('response.should_send_response', $this, []), []);
 
-        if ($event->isProcessed()) {
-            $should_send_response = (bool)$event->getReturnValue();
+            if ($event->isProcessed()) {
+                $should_send_response = (bool)$event->getReturnValue();
 
-            if (!$should_send_response) {
-                $this->info('Response sending stopped by event - caller: ' . get_class($event->subject));
-                return;
+                if (!$should_send_response) {
+                    $this->info('Response sending stopped by event - caller: ' . get_class($event->subject));
+                    return;
+                }
             }
         }
 

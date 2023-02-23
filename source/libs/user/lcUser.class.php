@@ -121,8 +121,7 @@ abstract class lcUser extends lcResidentObj implements iProvidesCapabilities, Ar
 
     public function getAttribute($name)
     {
-        return isset($this->attributes[$name]) ?
-            $this->attributes[$name] : null;
+        return $this->attributes[$name] ?? null;
     }
 
     public function offsetSet($offset, $value)

@@ -639,6 +639,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
                 $response->clear();
                 $response->setExitCode($exit_code);
                 $response->setContent($content);
+                $response->setFiltersDisabled(true);
                 $response->setContentType($content_type);
                 $response->sendResponse();
             } catch (Exception $e) {

@@ -400,7 +400,7 @@ class lcPropelBaseObjectBuilder extends PHP5ObjectBuilder
         if (!$dateTimeClass) {
             $dateTimeClass = 'DateTime';
         }
-        $this->declareClasses($dateTimeClass, 'DateTimeZone', 'PropelDateTime');
+        $this->declareClasses($dateTimeClass, 'DateTimeZone', 'lcPropelDateTime');
 
         $this->addTemporalMutatorComment($script, $col);
         $this->addMutatorOpenOpen($script, $col);

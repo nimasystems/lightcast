@@ -1272,7 +1272,6 @@ class lcApp extends lcObj
         // notify listeners - allow them to intercept the exception and
         // do something else
         $should_be_handled = true;
-        $event = null;
 
         try {
             $event = $this->event_dispatcher->filter(new lcEvent('app.exception', $this,
