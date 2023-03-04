@@ -191,6 +191,9 @@ abstract class lcController extends lcBaseController
 
     public function getPartial($action_name, $module, array $params = null, $return_params = false)
     {
+        // for compatibility with old versions
+        $module = !$module ? $this->getControllerName() : $module;
+
         $module_camelized = lcInflector::camelize($module);
 
         $params = [

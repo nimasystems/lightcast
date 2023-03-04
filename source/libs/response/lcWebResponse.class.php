@@ -1661,6 +1661,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->content_should_be_processed = false;
 
         $this->sendResponse();
+
+        // just in case - we need to always stop processing here!
+        exit();
     }
 
     /*

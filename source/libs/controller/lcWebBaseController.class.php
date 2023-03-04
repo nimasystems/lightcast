@@ -106,7 +106,10 @@ abstract class lcWebBaseController extends lcController
             $allow_redirect = $v && ((isset($v['allow_redirect']) && (bool)$v['allow_redirect']) || !isset($v['allow_redirect']));
 
             if (!$allow_redirect) {
-                return;
+                // stop processing right away to prevent side effects and tricking the static analyzer
+                // failig to detect properly the followig lines of code without this
+                exit();
+//                return;
             }
 
             $http_code = isset($v['http_code']) ? (string)$v['http_code'] : $http_code;
@@ -115,6 +118,10 @@ abstract class lcWebBaseController extends lcController
 
         $this->last_redirect_url = $url;
         $this->response->redirect($url, $http_code);
+
+        // stop processing right away to prevent side effects and tricking the static analyzer
+        // failig to detect properly the followig lines of code without this
+        exit();
     }
 
     public function permanentRedirect($url)

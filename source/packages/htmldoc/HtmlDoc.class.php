@@ -1,41 +1,49 @@
 <?php
-
 /*
- * Lightcast - A PHP MVC Framework
-* Copyright (C) 2005 Nimasystems Ltd
-*
-* This program is NOT free software; you cannot redistribute and/or modify
-* it's sources under any circumstances without the explicit knowledge and
-* agreement of the rightful owner of the software - Nimasystems Ltd.
-*
-* This program is distributed WITHOUT ANY WARRANTY; without even the
-* implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
-* PURPOSE.  See the LICENSE.txt file for more information.
-*
-* You should have received a copy of LICENSE.txt file along with this
-* program; if not, write to:
-* NIMASYSTEMS LTD
-* Plovdiv, Bulgaria
-* ZIP Code: 4000
-* Address: 95 "Kapitan Raycho" Str.
-* E-Mail: info@nimasystems.com
-*/
+ * Lightcast - A Complete MVC/PHP/XSLT based Framework
+ * Copyright (C) 2005-2008 Nimasystems Ltd
+ *
+ * This program is NOT free software; you cannot redistribute and/or modify
+ * it's sources under any circumstances without the explicit knowledge and
+ * agreement of the rightful owner of the software - Nimasystems Ltd.
+ *
+ * This program is distributed WITHOUT ANY WARRANTY; without even the
+ * implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+ * PURPOSE.  See the LICENSE.txt file for more information.
+ *
+ * You should have received a copy of LICENSE.txt file along with this
+ * program; if not, write to:
+ * NIMASYSTEMS LTD
+ * Plovdiv, Bulgaria
+ * ZIP Code: 4000
+ * Address: 17 "Tcanko Diustabanov" Str., 2nd Floor
+ * General E-Mail: info@nimasystems.com
+ */
 
+/**
+ * File Description
+ * @package File Category
+ * @subpackage File Subcategory
+ * @author Nimasystems Ltd <support@nimasystems.com>
+ * @version $Revision: 0 $
+ */
 class HtmlDoc extends lcObj
 {
     const HTMLDOCPATH = '/usr/bin/htmldoc';
+
     const DEFAULT_PAGE_FORMAT = 'a4';
     const DEFAULT_CHARSET = 'cp-1251';
+
     const DEFAULT_HEADER = '...';
     const DEFAULT_FOOTER = '...';
-    const DEFAULT_JPEG_QUALITY = 80;
 
     # up to 100
+    const DEFAULT_JPEG_QUALITY = 80;
+
     const DEFAULT_LEFT_MARGIN = 10;
     const DEFAULT_RIGHT_MARGIN = 10;
     const DEFAULT_TOP_MARGIN = 10;
     const DEFAULT_BOTTOM_MARGIN = 10;
-    protected $configuration;
 
     # htmldoc command
     private $htmldoc_cmd = self::HTMLDOCPATH;
@@ -108,22 +116,13 @@ class HtmlDoc extends lcObj
         if ($this->generated_fpointer) {
             fclose($this->generated_fpointer);
 
-            if (file_exists($this->generated_filename)) {
+            try {
                 lcFiles::rm($this->generated_filename);
+            } catch (Exception $e) {
             }
         }
 
         parent::__destruct();
-    }
-
-    public function getConfiguration()
-    {
-        return $this->configuration;
-    }
-
-    public function setConfiguration(lcConfiguration $configuration)
-    {
-        $this->configuration = $configuration;
     }
 
     public function setHtmlDocument($htmlfile, $fname = null)
@@ -138,6 +137,50 @@ class HtmlDoc extends lcObj
 
         $this->pdf_filename = lcFiles::splitFileName($this->pdf_filename);
         $this->pdf_filename = $this->pdf_filename['name'] . '.pdf';
+    }
+
+    public function generatePDF()
+    {
+        $configuration = lcApp::getInstance()->getConfiguration();
+
+        $this->generated_filename = $configuration->getTempDir() . DS .
+            lcStrings::randomString(20) . '.pdf';
+
+        $cmd = [];
+        $cmd[] = $this->htmldoc_cmd;
+        $cmd[] = '--no-compression';
+        $cmd[] = '--bodyfont times';
+        $cmd[] = '-t pdf14';
+        $cmd[] = '--quiet';
+        $cmd[] = '--jpeg=' . $this->jpeg_quality;
+        $cmd[] = '--charset ' . $this->charset;
+        $cmd[] = '--webpage';
+        $cmd[] = '--header ' . $this->pheader;
+        $cmd[] = '--footer ' . $this->pfooter;
+        $cmd[] = '--referer' . $this->referrer;
+        $cmd[] = '--size ' . $this->page_format;
+        $cmd[] = '--left ' . $this->lmargin . 'mm';
+        $cmd[] = '--right ' . $this->rmargin . 'mm';
+        $cmd[] = '--top ' . $this->tmargin . 'mm';
+        $cmd[] = '--bottom ' . $this->bmargin . 'mm';
+        $cmd[] = $this->html_doc;
+        $cmd[] = ' > ' . $this->generated_filename;
+
+        $cmd = implode(' ', $cmd);
+
+        # generate it
+        passthru($cmd, $res);
+
+        if (!$res) {
+            throw new lcSystemException('Cannot generated the PDF - Parser returned errors');
+        }
+
+        # get the generated data
+        if (!$this->generated_fpointer = fopen($this->generated_filename, 'rb')) {
+            throw new lcSystemException('Cannot write generated PDF file');
+        }
+
+        return $this->generated_fpointer;
     }
 
     public function getPDFPointer()
@@ -194,26 +237,6 @@ class HtmlDoc extends lcObj
         $this->pfooter = $value;
     }
 
-    private function checkHeaderFooterSyntax($value)
-    {
-        # Defines the valid characters for the format string
-        $validchars = './:1aAcCdDhiIltT';
-
-        # The format string must have a length of 3 chars
-        if (strlen($value) <> 3) {
-            return false;
-        }
-
-        if (!strstr($validchars, substr($value, 0, 1)) ||
-            !strstr($validchars, substr($value, 1, 1)) ||
-            !strstr($validchars, substr($value, 2, 1))
-        ) {
-            return false;
-        }
-
-        return true;
-    }
-
     public function setPageHeader($value)
     {
         if (!$this->checkHeaderFooterSyntax($value)) {
@@ -228,30 +251,41 @@ class HtmlDoc extends lcObj
         $this->pdf_filename = $filename;
     }
 
+    private function checkHeaderFooterSyntax($value)
+    {
+        # Defines the valid characters for the format string
+        $validchars = './:1aAcCdDhiIltT';
+
+        # The format string must have a length of 3 chars
+        if (strlen($value) <> 3) {
+            return false;
+        }
+
+        if (!strstr($validchars, substr($value, 0, 1)) ||
+            !strstr($validchars, substr($value, 1, 1)) ||
+            !strstr($validchars, substr($value, 2, 1))) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function outputPdf($download = false)
     {
-        if (!$this->generated_fpointer) {
-            $this->generatePDF();
-        }
+        if (!$this->generated_fpointer) $this->generatePDF();
 
         header('Content-Type: application/pdf');
-
-        if ($download) {
-            header('Content-Disposition: attachment; filename=' . $this->pdf_filename);
-        }
+        header('Content-Disposition: attachment; filename=' . $this->pdf_filename);
 
         fpassthru($this->generated_fpointer);
     }
 
-    public function generatePDF()
+    public function savePdf($fname = null)
     {
-        // TODO: wrong implementation. Needs workaround!
-        $configuration = $this->configuration;
+        if (!$fname) $fname = $this->pdf_filename;
+        $configuration = lcApp::getInstance()->getConfiguration();
 
-        assert(isset($configuration));
-
-        $this->generated_filename = $configuration->getTempDir() . DS .
-            lcStrings::randomString(20) . '.pdf';
+        $this->generated_filename = $configuration->getTempDir() . DS . $fname;
 
         $cmd = [];
         $cmd[] = $this->htmldoc_cmd;
@@ -282,11 +316,11 @@ class HtmlDoc extends lcObj
             throw new lcSystemException('Cannot generated the PDF - Parser returned errors');
         }
 
-        # get the generated data
-        if (!$this->generated_fpointer = fopen($this->generated_filename, 'rb')) {
+        # check the generated flle
+        if (!lcFiles::exists($this->generated_filename)) {
             throw new lcSystemException('Cannot write generated PDF file');
         }
 
-        return $this->generated_fpointer;
+        return $this->generated_filename;
     }
 }

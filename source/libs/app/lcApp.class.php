@@ -30,6 +30,7 @@
  * @method iCacheStore getCache
  * @method lcRouting getRouter
  * @method lcRequest getRequest
+ * @method lcStorage getStorage
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj
