@@ -27,7 +27,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
     const DEFAULT_LOCALE_WIN = 'us';
     const DEFAULT_CATEGORY = [LC_COLLATE, LC_CTYPE, LC_MONETARY, LC_TIME, LC_MESSAGES];
     const DEFAULT_CHARSET = 'UTF-8';
-    protected $locale;
+    protected ?string $locale = null;
     protected $charset = self::DEFAULT_CHARSET;
     protected $category = self::DEFAULT_CATEGORY;
     protected $domain_path;
@@ -108,7 +108,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
         return $this->locale;
     }
 
-    public function setLocale($locale)
+    public function setLocale(string $locale)
     {
         $locale = (string)$locale;
 

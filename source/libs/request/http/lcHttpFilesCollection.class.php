@@ -60,6 +60,29 @@ class lcHttpFilesCollection extends lcBaseCollection implements ArrayAccess
         parent::clear();
     }
 
+    // TODO - copied from DC
+    public function getByFieldName($name)
+    {
+        $this->first();
+
+        $res = [];
+
+        foreach ($this->list as $el) {
+            if ($el->getFieldName() == $name) {
+                $res[] = $el;
+            }
+        }
+
+        if (!count($res)) {
+            return null;
+        } else
+            if (count($res) > 1) {
+                return $res;
+            } else {
+                return $res[0];
+            }
+    }
+
     public function getByFormFieldName($name)
     {
         $this->first();

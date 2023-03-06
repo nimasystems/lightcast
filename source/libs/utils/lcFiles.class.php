@@ -65,6 +65,17 @@ class lcFiles
         return true;
     }
 
+    public static function setFileChmod($filename, $mode = self::DEFAULT_FILE_MODE)
+    {
+        try {
+            $fdata = chmod($filename, $mode);
+        } catch (Exception $e) {
+            throw new lcIOException($e->getMessage(), null, $e);
+        }
+
+        return $fdata;
+    }
+
     public static function deleteFilesByGlob($glob_criteria)
     {
         if ($t = glob($glob_criteria)) {

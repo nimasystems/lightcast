@@ -38,6 +38,8 @@ class lcPHPMailer extends lcMailer
     protected $alt_body;
     private $last_error;
     private $enable_debugging;
+    protected ?string $smtp_user = null;
+    protected ?string $smtp_pass = null;
 
     public function initialize()
     {
@@ -78,6 +80,34 @@ class lcPHPMailer extends lcMailer
     public function setAltBody($alt_body)
     {
         $this->alt_body = $alt_body;
+    }
+
+    /**
+     * @param $smtp_user
+     * @return void
+     */
+    public function setSmtpUser($smtp_user)
+    {
+        $this->smtp_user = $smtp_user;
+    }
+
+    public function getSmtpUser(): ?string
+    {
+        return $this->smtp_user;
+    }
+
+    /**
+     * @param $smtp_pass
+     * @return void
+     */
+    public function setSmtpPass($smtp_pass)
+    {
+        $this->smtp_pass = $smtp_pass;
+    }
+
+    public function getSmtpPass(): ?string
+    {
+        return $this->smtp_pass;
     }
 
     public function clear()
@@ -175,13 +205,13 @@ class lcPHPMailer extends lcMailer
             $mailer->Port = isset($this->configuration['mailer.smtp_port']) && $this->configuration['mailer.smtp_port'] ?
                 (int)$this->configuration['mailer.smtp_port'] : self::DEFAULT_SMTP_PORT;
 
-            if (isset($this->configuration['mailer.smtp_user']) && $this->configuration['mailer.smtp_user']) {
-                $mailer->SMTPAuth = true;
-                $mailer->Username = (string)$this->configuration['mailer.smtp_user'];
+            $username = $this->smtp_user ?: (string)$this->configuration['mailer.smtp_user'];
+            $password = $this->smtp_pass ?: (string)$this->configuration['mailer.smtp_pass'];
 
-                // check if there is an username which is required in this case
-                $mailer->Password = $mailer->Username && isset($this->configuration['mailer.smtp_pass']) && ($this->configuration['mailer.smtp_pass']) ?
-                    (string)$this->configuration['mailer.smtp_pass'] : null;
+            if ($username) {
+                $mailer->SMTPAuth = true;
+                $mailer->Username = $username;
+                $mailer->Password = $password;
             }
         }
 

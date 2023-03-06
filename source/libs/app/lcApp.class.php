@@ -25,12 +25,16 @@
  * Class lcApp
  * @method lcPluginManager getPluginManager
  * @method lcController getController
+ * @method lcFrontController getFrontController
  * @method lcI18n getI18n
  * @method lcLogger getLogger
  * @method iCacheStore getCache
  * @method lcRouting getRouter
  * @method lcRequest getRequest
+ * @method lcResponse getResponse
  * @method lcStorage getStorage
+ * @method lcMailer getMailer
+ * @method lcDatabaseManager getDatabaseManager
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj
@@ -956,6 +960,32 @@ class lcApp extends lcObj
         }
 
         $this->event_dispatcher->notify(new lcEvent('app.loaders_initialized', $this));
+    }
+
+    /**
+     * Sends an email
+     * TODO: remove from here
+     * @param array $to
+     * @param $message
+     * @param $subject
+     * @param $from
+     * @return bool
+     */
+    public function sendMail(array $to, $message, $subject = null, $from = null): bool
+    {
+        if (!$mailer = $this->getMailer()) return false;
+        $mailer->clear();
+
+        foreach ($to as $email) {
+            $mailer->addRecipient(new lcMailRecipient($email));
+            unset($email);
+        }
+
+        $mailer->setBody($message);
+        $mailer->setSubject($subject);
+        $mailer->setSender(new lcMailRecipient($from ?: $this->configuration['settings.admin_email']));
+
+        return $mailer->send();
     }
 
     public function setLoadersOntoObject(lcSysObj $app_obj)
