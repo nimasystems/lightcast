@@ -43,9 +43,9 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
     protected $database_model_manager;
 
     /**
-     * @var lcView
+     * @var ?lcView
      */
-    protected $view;
+    protected ?lcView $view = null;
 
     /**
      * @var lcViewFilterChain
@@ -173,7 +173,7 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
 
     abstract protected function renderControllerView(lcBaseController $controller, lcView $view);
 
-    public function getView()
+    public function getView(): ?lcView
     {
         return $this->view;
     }

@@ -189,7 +189,7 @@ abstract class lcController extends lcBaseController
         return $this->getPartial($action_name, $module, $params);
     }
 
-    public function getPartial($action_name, $module, array $params = null, $return_params = false)
+    public function getPartial($action_name, $module = null, array $params = null, $return_params = false)
     {
         // for compatibility with old versions
         $module = !$module ? $this->getControllerName() : $module;
@@ -340,14 +340,15 @@ abstract class lcController extends lcBaseController
         // set back to controller
         $controller->action_result = $action_result;
 
-        // view rendering
-        $view = $controller->getView();
         $rendered_view_contents = null;
+
+        // view rendering - only if the current action did not invoke a forward
+        $view = $controller->getView();
 
         if (!$view || (int)$action_result == lcBaseController::RENDER_NONE) {
             // if user specified render none - don't render anything!
             $controller->unsetView();
-        } else if ($view) {
+        } else {
             // set the result
             $view->setActionResult($action_result);
 
@@ -366,7 +367,8 @@ abstract class lcController extends lcBaseController
                 'action_name' => $action_name,
                 'params' => $action_params,
             ];
-            $this->event_dispatcher->filter(new lcEvent('controller.did_render_action', $this, $notification_params), $notification_params);
+            $this->event_dispatcher->filter(new lcEvent('controller.did_render_action',
+                $this, $notification_params), $notification_params);
             unset($notification_params);
 
             // shutdown the view after rendering to preserve memory
@@ -497,11 +499,10 @@ abstract class lcController extends lcBaseController
 
     /**
      * @param string $action_name
-     * @param string $controller_name
+     * @param string|null $controller_name
      * @param mixed $action_params
      * @return void
      * @throws lcControllerNotFoundException
-     * @throws lcInvalidArgumentException
      * @throws lcNotAvailableException
      * @throws lcRenderException
      */
@@ -626,13 +627,15 @@ abstract class lcController extends lcBaseController
         $notification_params['content_type'] = $content_type;
 
         // this is the new filter which we use
-        $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action', $this, $notification_params), [
+        $execute_action_event = $this->event_dispatcher->filter(new lcEvent('controller.execute_action',
+            $this, $notification_params), [
             'should_execute' => true,
         ]);
 
         if ($execute_action_event->isProcessed()) {
             $event_params = $execute_action_event->getReturnValue();
-            $should_execute = (isset($event_params['should_execute']) && $event_params['should_execute']) || !isset($event_params['should_execute']);
+            $should_execute = (isset($event_params['should_execute']) && $event_params['should_execute']) ||
+                !isset($event_params['should_execute']);
         }
 
         if ($should_execute) {
@@ -839,15 +842,16 @@ abstract class lcController extends lcBaseController
     {
         $controller_name = get_class($controller);
 
-        if (!isset(self::$req_arguments_chk[$controller_name])) {
+        if (!isset(self::$req_arguments_chk[$controller_name][$action])) {
             $r = new ReflectionMethod($controller_name, $action);
             $params = $r->getParameters();
             $ptype = $params ? $params[0]->getType() : null;
-            self::$req_arguments_chk[$controller_name] =
+
+            self::$req_arguments_chk[$controller_name][$action] =
                 $params && $ptype && $ptype->getName() == $request_cls_name;
         }
 
-        return self::$req_arguments_chk[$controller_name];
+        return self::$req_arguments_chk[$controller_name][$action];
     }
 
     public function shouldApplyActionFilters($action_name, $action_type)
@@ -913,9 +917,9 @@ abstract class lcController extends lcBaseController
         if ($event->isProcessed()) {
             $r = $event->getReturnValue();
 
-            $use_layout = isset($r['use_layout']) ? (bool)$r['use_layout'] : true;
-            $layout_content = isset($r['content']) ? $r['content'] : null;
-            $layout_content_type = isset($r['content_type']) ? $r['content_type'] : null;
+            $use_layout = !isset($r['use_layout']) || $r['use_layout'];
+            $layout_content = $r['content'] ?? null;
+            $layout_content_type = $r['content_type'] ?? null;
 
             if (!$use_layout) {
                 // layout decoration not allowed
@@ -969,12 +973,9 @@ abstract class lcController extends lcBaseController
     protected function renderControllerView(lcBaseController $controller, lcView $view)
     {
         /** @var lcController $controller */
-        if (!$controller || !$view || !($controller instanceof lcController)) {
+        if (!($controller instanceof lcController)) {
             return null;
         }
-
-        $content_type = null;
-        $output = null;
 
         $controller_name = $controller->getControllerName();
         $action_name = $controller->getActionName();

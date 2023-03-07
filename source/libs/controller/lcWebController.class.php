@@ -30,9 +30,9 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
     const ASSETS_DIR = 'templates';
 
     /**
-     * @var lcHtmlTemplateView
+     * @var ?lcHtmlTemplateView
      */
-    protected $view;
+    protected ?lcView $view = null;
 
     private $included_javascripts = [];
     private $included_stylesheets = [];

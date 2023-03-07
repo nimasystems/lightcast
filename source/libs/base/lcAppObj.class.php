@@ -23,7 +23,6 @@
 
 /**
  * Class lcAppObj
- * @property lcPropelConnection $dbc
  */
 abstract class lcAppObj extends lcResidentObj implements iI18nProvider, iLoggable
 {

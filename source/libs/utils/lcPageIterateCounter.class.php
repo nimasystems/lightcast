@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,17 +24,15 @@
 
 */
 
+/**
+ *
+ */
 class lcPageIterateCounter
 {
-    const DEFAULT_GROUP_LIMIT = 10;
+    public const DEFAULT_GROUP_LIMIT = 10;
 
-    public static function getStats($numHits, $limit, $page, $group_limiter = self::DEFAULT_GROUP_LIMIT)
+    public static function getStats(int $numHits, int $limit, int $page, int $group_limiter = self::DEFAULT_GROUP_LIMIT): array
     {
-        $numHits = (int)$numHits;
-        $limit = (int)$limit;
-        $page = (int)$page;
-        $group_limiter = (int)$group_limiter;
-
         if (!$limit || !$page || !$group_limiter) {
             throw new lcInvalidArgumentException('Invalid params');
         }
@@ -51,19 +50,15 @@ class lcPageIterateCounter
             return $default;
         }
 
-        // if $numHits = 0
-        $numHits = $numHits ? $numHits : 0;
-
-        $total = (int)$numHits;
-        $limit = max((int)$limit, 1);
-        $page = (int)$page;
+        $total = $numHits;
+        $limit = max($limit, 1);
         $num_pages = ceil($numHits / $limit);
         $page = min(max($page, 1), $num_pages);
         $offset = ($page - 1) * $limit;
 
         $count = 0;
 
-        if ($group_limiter) {
+        if ($group_limiter > 0) {
             $cur_page = $page;
             $cur_page = max($cur_page - floor($group_limiter / 2), 1);
             $cur_page = min($cur_page, $num_pages - $group_limiter + 1);
