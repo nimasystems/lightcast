@@ -29,6 +29,11 @@
  * @method lcLogger getLogger
  * @method iCacheStore getCache
  * @method lcRouting getRouter
+ * @method lcMailer getMailer
+ * @method lcRequest getRequest
+ * @method lcResponse getResponse
+ * @method lcStorage getStorage
+ * @method lcDatabaseManager getDatabaseManager
  * @method lcDatabaseModelManager getDatabaseModelManager
  */
 class lcApp extends lcObj

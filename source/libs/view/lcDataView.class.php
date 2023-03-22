@@ -32,7 +32,7 @@ class lcDataView extends lcRawContentView
     {
         $content = $this->content;
 
-        if (!$content) {
+        if ($content === null) {
             return null;
         }
 
