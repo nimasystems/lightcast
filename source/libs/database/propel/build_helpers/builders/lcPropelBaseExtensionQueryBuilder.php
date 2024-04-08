@@ -1,10 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- *
- */
-class lcPropelBaseExtensionQueryBuilder extends \ExtensionQueryBuilder
+class lcPropelBaseExtensionQueryBuilder extends ExtensionQueryBuilder
 {
     /**
      * Returns the prefixed classname that is being built by the current class.

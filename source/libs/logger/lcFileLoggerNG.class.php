@@ -58,7 +58,7 @@ class lcFileLoggerNG extends lcLogger
             $logs = array_filter((array)$this->configuration['logger.log_files']);
 
             // walk log files
-            if ($logs && is_array($logs)) {
+            if ($logs) {
                 $this->setupLogFiles($logs);
 
                 if (isset($this->logs) && is_array($this->logs) && count($this->logs)) {

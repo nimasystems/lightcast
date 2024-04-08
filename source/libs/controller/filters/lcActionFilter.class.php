@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -21,10 +22,13 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ *
+ */
 abstract class lcActionFilter extends lcSysObj
 {
-    /** @var lcActionFilter|null */
-    protected $next;
+    /** @var ?lcActionFilter|null */
+    protected ?lcActionFilter $next = null;
 
     public function shutdown()
     {
@@ -42,8 +46,9 @@ abstract class lcActionFilter extends lcSysObj
         $this->next = $filter;
     }
 
-    public function filterAction(lcController $parent_controller, $controller_name, $action_name,
-                                 array $request_params = null, array $controller_context = null, array $skip_filter_categories = null)
+    public function filterAction(lcController $parent_controller, string $controller_name, string $action_name,
+                                 array        $request_params = null, array $controller_context = null,
+                                 array        $skip_filter_categories = null): array
     {
         $filter_category = $this->getFilterCategory();
         $filter_result = null;
@@ -84,5 +89,15 @@ abstract class lcActionFilter extends lcSysObj
 
     abstract protected function getShouldApplyFilter();
 
-    abstract protected function applyFilter(lcController $parent_controller, $controller_name, $action_name, array $request_params = null, array $controller_context = null);
+    /**
+     * @param lcController $parent_controller
+     * @param string $controller_name
+     * @param string $action_name
+     * @param array|null $request_params
+     * @param array|null $controller_context
+     * @return mixed
+     */
+    abstract protected function applyFilter(lcController $parent_controller, string $controller_name,
+                                            string       $action_name, array $request_params = null,
+                                            array        $controller_context = null);
 }

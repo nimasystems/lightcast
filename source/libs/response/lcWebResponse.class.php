@@ -53,35 +53,45 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      */
     protected $add_ref_canonical = true;
 
-    protected $content;
+    protected ?string $content = null;
     protected $output_content;
     /**
      * @var array
      */
-    protected $javascripts;
-    protected $js_at_end_forced;
-    protected $css_at_end_forced;
+    protected array $javascripts = [];
+
+    protected bool $js_at_end_forced = false;
+    protected bool $css_at_end_forced = false;
+
+    protected bool $js_at_start_forced = false;
+    protected bool $css_at_start_forced = false;
+
+    /**
+     * @var string|null
+     */
+    protected $res_url_webpath = null;
+
     protected $javascripts_async;
     protected $no_scripts;
     /**
      * @var array
      */
-    protected $javascripts_end;
-    protected $javascript_code;
-    protected $javascript_code_before;
-    protected $javascript_code_after;
+    protected array $javascripts_end = [];
+    protected array $javascript_code = [];
+    protected ?string $javascript_code_before = '';
+    protected ?string $javascript_code_after = '';
 
-    protected $view_javascripts_enabled = true;
-    protected $view_stylesheets_enabled = true;
+    protected bool $view_javascripts_enabled = true;
+    protected bool $view_stylesheets_enabled = true;
 
     /**
      * @var array
      */
-    protected $stylesheets;
+    protected array $stylesheets = [];
     /**
      * @var array
      */
-    protected $metatags;
+    protected array $metatags = [];
     /**
      * @var array
      */
@@ -146,19 +156,27 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         $this->js_at_end_forced = (bool)$this->configuration['view.javascripts_at_end'];
         $this->css_at_end_forced = (bool)$this->configuration['view.stylesheets_at_end'];
+        $this->js_at_start_forced = (bool)$this->configuration['view.javascripts_at_start'];
+        $this->css_at_start_forced = (bool)$this->configuration['view.stylesheets_at_start'];
         $this->javascripts_async = (bool)$this->configuration['view.javascripts_async'];
         $this->no_scripts = (bool)$this->configuration['view.no_scripts'];
         $this->javascript_code_before = $this->configuration['view.javascript_code_before'];
         $this->javascript_code_after = $this->configuration['view.javascript_code_after'];
 
+        $this->res_url_webpath = $this->configuration['view.res_url_webpath'];
+
         // dir
         $this->lang_dir = (string)$this->configuration['view.dir'];
 
         // allowances
-        $this->allow_javascripts = (bool)$this->configuration['view.allow_javascripts'];
-        $this->allow_stylesheets = (bool)$this->configuration['view.allow_stylesheets'];
-        $this->allow_rss_feeds = (bool)$this->configuration['view.allow_rss_feeds'];
-        $this->allow_metatags = (bool)$this->configuration['view.allow_metatags'];
+        $this->allow_javascripts = isset($this->configuration['view.allow_javascripts']) ?
+            $this->configuration['view.allow_javascripts'] : true;
+        $this->allow_stylesheets = isset($this->configuration['view.allow_stylesheets']) ?
+            $this->configuration['view.allow_stylesheets'] : true;
+        $this->allow_rss_feeds = isset($this->configuration['view.allow_rss_feeds']) ?
+            $this->configuration['view.allow_rss_feeds'] : true;
+        $this->allow_metatags = isset($this->configuration['view.allow_metatags']) ?
+            $this->configuration['view.allow_metatags'] : true;
 
         $this->clientside_js = (bool)$this->configuration['view.clientside_js'];
 
@@ -183,10 +201,10 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             return;
         }
 
-        $this->javascripts = null;
-        $this->javascripts_end = null;
-        $this->stylesheets = null;
-        $this->metatags = null;
+        $this->javascripts = [];
+        $this->javascripts_end = [];
+        $this->stylesheets = [];
+        $this->metatags = [];
         $this->rssfeeds = null;
         $this->icon = null;
         $this->html_base = null;
@@ -343,7 +361,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
     protected bool $filters_disabled = false;
 
-    public function setFiltersDisabled(bool $filters_disabled) {
+    public function setFiltersDisabled(bool $filters_disabled)
+    {
         $this->filters_disabled = $filters_disabled;
     }
 
@@ -463,7 +482,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             // disable all scripts
             if ($this->content_type == 'text/html') {
                 if ($this->no_scripts) {
-                    $content = preg_replace("#<script(.*?)>(.*?)</script>#is", '', $content);
+                    $content = preg_replace('#<script(.*?)>(.*?)</script>#is', '', $content);
                 }
             }
 
@@ -652,7 +671,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             foreach ($stylesheets as $href => $data) {
                 $head[] =
                     '<link rel="stylesheet" type="' . $data['type'] . '" ' .
-                    'href="' . $data['href'] . '" media="' . $data['media'] . '" />';
+                    'href="' . (strstr($data['href'], '//') === false ? $this->res_url_webpath : '') .
+                    $data['href'] . '" media="' . $data['media'] . '" />';
 
                 unset($href, $data);
             }
@@ -671,13 +691,15 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $javascripts = $event->getReturnValue();
         }
 
+        usort($javascripts, [$this, 'sortJavascripts']);
+
         unset($event);
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
                 $oattr = [];
-                if (isset($data['other_attribs']) && $data['other_attribs']) {
-                    foreach ($data['other_attribs'] as $key => $v) {
+                if (isset($data['attributes']) && $data['attributes']) {
+                    foreach ($data['attributes'] as $key => $v) {
                         $oattr[] = $key . '="' . htmlspecialchars($v) . '"';
                         unset($key, $v);
                     }
@@ -687,7 +709,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     $oattr[] = 'async';
                 }
 
-                $scr = '<script type="' . $data['type'] . '" src="' . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
+                $scr = '<script type="' . $data['type'] . '" src="' .
+                    (strstr($data['src'], '//') === false ? $this->res_url_webpath : '') .
+                    $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $head[] = $scr;
 
                 unset($src, $data, $oattr);
@@ -705,11 +729,13 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $javascripts = $event->getReturnValue();
         }
 
+        usort($javascripts, [$this, 'sortJavascripts']);
+
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
                 $oattr = [];
-                if (isset($data['other_attribs']) && $data['other_attribs']) {
-                    foreach ($data['other_attribs'] as $key => $v) {
+                if (isset($data['attributes']) && $data['attributes']) {
+                    foreach ($data['attributes'] as $key => $v) {
                         $oattr[] = $key . '="' . htmlspecialchars($v) . '"';
                         unset($key, $v);
                     }
@@ -719,7 +745,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                     $oattr[] = 'async';
                 }
 
-                $scr = '<script type="' . $data['type'] . '" src="' . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
+                $scr = '<script type="' . $data['type'] . '" src="' .
+                    (strstr($data['src'], '//') === false ? $this->res_url_webpath : '')
+                    . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $this->html_body_custom['end'][] = $scr;
 
                 unset($src, $data);
@@ -878,17 +906,22 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace("/<body(.*?)>/i", '<body>' . "\n" . $start, $content);
+                $content = preg_replace('/<body(.*?)>/i', '<body>' . "\n" . $start, $content);
             }
 
             if ($end) {
-                $content = preg_replace("/<\/body>/i", $end . "\n" . '</body>', $content);
+                $content = preg_replace('/<\/body>/i', $end . "\n" . '</body>', $content);
             }
 
             unset($start, $end);
         }
 
         return $content;
+    }
+
+    protected function sortJavascripts(array $js, array $js2): int
+    {
+        return (($js['order'] ?? 0) < ($js2['order'] ?? 0)) ? -1 : 1;
     }
 
     private function processViewConfiguration()
@@ -1295,7 +1328,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     * <base href="" />
     */
 
-    public function removeJavascript($js_src)
+    /**
+     * @param string $js_src
+     * @return void
+     */
+    public function removeJavascript(string $js_src)
     {
         if (isset($this->javascripts[$js_src])) {
             unset($this->javascripts[$js_src]);
@@ -1306,85 +1343,175 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         }
     }
 
-    public function getJavascriptCode($combined = true)
+    /**
+     * @param bool $combined
+     * @return string|null
+     */
+    public function getJavascriptCode(bool $combined = true): ?string
     {
         if ($combined) {
             $jscode = is_array($this->javascript_code) ? implode("\n", array_filter(array_values($this->javascript_code))) : $this->javascript_code;
-            $jscode = $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
-            return $jscode;
+            return $jscode ? trim(preg_replace('/^\h*\v+/m', '', $jscode)) : null;
         } else {
             return $this->javascript_code;
         }
     }
 
-    public function setJavascriptCode($code, $tag = null)
+    /**
+     * @param string $code
+     * @param string|null $tag
+     * @return void
+     */
+    public function setJavascriptCode(string $code, string $tag = null)
     {
-        $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
+        $tag = $tag ?: 'js_' . lcStrings::randomString(20);
         $this->javascript_code = [$tag => $code];
     }
 
-    public function addJavascriptCode($code, $tag = null)
+    /**
+     * @param string $code
+     * @param string|null $tag
+     * @return void
+     */
+    public function addJavascriptCode(string $code, string $tag = null)
     {
         $tag = $tag ? $tag : 'js_' . lcStrings::randomString(20);
         $this->javascript_code[$tag] = $code;
     }
 
-    public function removeStylesheet($css_src)
+    /**
+     * @param string $css_src
+     * @return void
+     */
+    public function removeStylesheet(string $css_src)
     {
         if (isset($this->stylesheets[$css_src])) {
             unset($this->stylesheets[$css_src]);
         }
     }
 
-    public function javascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
+    /**
+     * @param $src
+     * @param null $type
+     * @param null $language
+     * @param bool $at_end
+     * @param array|null $other_attribs
+     * @return void
+     */
+    public function javascript($src, $type = null, $language = null, bool $at_end = false, array $other_attribs = null)
     {
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
-
-        $this->setJavascript($src, $type, $language, $at_end, $other_attribs);
+        $at_end = !$this->js_at_start_forced && ($at_end || $this->js_at_end_forced);
+        $this->setJs($src, [
+            'type' => $type,
+            'language' => $language,
+            'at_end' => $at_end,
+            'attributes' => $other_attribs,
+        ]);
     }
 
-    public function setJavascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
+    /**
+     * @param $src
+     * @param $type
+     * @param $language
+     * @param $at_end
+     * @param array|null $attributes
+     * @return void
+     */
+    public function setJavascript($src, $type = null, $language = null, $at_end = false, array $attributes = null)
     {
-        $type = $type ?: 'text/javascript';
-        $language = $language ?: 'javascript';
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
+        $this->setJs($src, [
+            'type' => $type,
+            'language' => $language,
+            'at_end' => $at_end,
+            'attributes' => $attributes,
+        ]);
+    }
 
-        if (is_array($src)) {
-            foreach ($src as $s) {
-                $this->setJavascript($s, $type, $language, $at_end, $other_attribs);
-                unset($s);
-            }
-        } else {
+    /**
+     * @param $src
+     * @param array|null $options
+     * @return void
+     */
+    public function setJs($src, array $options = null)
+    {
+        $type = $options['type'] ?? 'text/javascript';
+        $language = $options['language'] ?? 'javascript';
+        $at_end = !$this->js_at_start_forced && (($options['at_end'] ?? false) || $this->js_at_end_forced);
+        $other_attribs = $options['attributes'] ?? null;
+        $order = $options['order'] ?? 0;
+        $prepend = $options['prepend'] ?? false;
+
+        $new = [];
+        $new[$src] = ['src' => $src,
+                      'type' => $type,
+                      'language' => $language,
+                      'attributes' => $other_attribs,
+                      'order' => $order,
+        ];
+
+        if (!is_array($src) && $prepend) {
             if ($at_end) {
-                $this->javascripts_end[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
+                $this->javascripts_end = array_merge($new, $this->javascripts_end);
             } else {
-                $this->javascripts[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
+                $this->javascripts = array_merge($new, $this->javascripts);
             }
 
             if (DO_DEBUG) {
-                $this->debug('set javascript: ' . $src);
+                $this->debug('prepend js: ' . $src);
+            }
+        } else {
+            if (is_array($src)) {
+                $i = 0;
+                $base_order = $options['order'] ?? 0;
+
+                foreach ($src as $s) {
+                    $optsn = $options;
+                    $optsn['order'] = $base_order + $i;
+                    $this->setJs($s, $optsn);
+                    $i++;
+                    unset($s);
+                }
+            } else {
+                if ($at_end) {
+                    $this->javascripts_end[$src] = ['src' => $src,
+                                                    'type' => $type,
+                                                    'language' => $language,
+                                                    'attributes' => $other_attribs,
+                                                    'order' => $order,
+                    ];
+                } else {
+                    $this->javascripts[$src] = ['src' => $src,
+                                                'type' => $type,
+                                                'language' => $language,
+                                                'attributes' => $other_attribs,
+                                                'order' => $order,
+                    ];
+                }
+
+                if (DO_DEBUG) {
+                    $this->debug('set js: ' . $src);
+                }
             }
         }
     }
 
-    public function prependJavascript($src, $type = null, $language = null, $at_end = false, array $other_attribs = null)
+    /**
+     * @param $src
+     * @param null $type
+     * @param null $language
+     * @param bool $at_end
+     * @param array|null $other_attribs
+     * @return void
+     */
+    public function prependJavascript($src, $type = null, $language = null, bool $at_end = false, array $other_attribs = null)
     {
-        $type = $type ?: 'text/javascript';
-        $language = $language ?: 'javascript';
-        $at_end = ($this->js_at_end_forced ? true : $at_end);
-
-        $new = [];
-        $new[$src] = ['src' => $src, 'type' => $type, 'language' => $language, 'other_attribs' => $other_attribs];
-
-        if ($at_end) {
-            $this->javascripts_end = array_merge($new, (array)$this->javascripts_end);
-        } else {
-            $this->javascripts = array_merge($new, (array)$this->javascripts);
-        }
-
-        if (DO_DEBUG) {
-            $this->debug('prepend javascript: ' . $src);
-        }
+        $this->setJs($src, array_filter([
+            'prepend' => true,
+            'type' => $type,
+            'language' => $language,
+            'at_end' => $at_end,
+            'attributes' => $other_attribs,
+        ]));
     }
 
     /**

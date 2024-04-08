@@ -39,7 +39,7 @@ abstract class lcTranslationsParser extends lcObj
         ],
     ];
 
-    protected $results;
+    protected array $results = [];
 
     public function __construct(lcEventDispatcher $event_dispatcher, lcConfiguration $configuration, $base_dir)
     {

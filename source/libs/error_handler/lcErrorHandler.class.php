@@ -79,7 +79,7 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
 
     public function onExceptionNotificationReported(lcEvent $event)
     {
-        $exception = isset($event->params['exception']) ? $event->params['exception'] : null;
+        $exception = $event->params['exception'] ?? null;
 
         if ($exception) {
             $this->notifyOfException($exception);
@@ -633,13 +633,13 @@ class lcErrorHandler extends lcResidentObj implements iProvidesCapabilities, iEr
             try {
                 if ($response instanceof lcWebResponse) {
                     $response->setStatusCode($status_code);
+                    $response->setFiltersDisabled(true);
                 }
 
                 $response->removeObservers();
                 $response->clear();
                 $response->setExitCode($exit_code);
                 $response->setContent($content);
-                $response->setFiltersDisabled(true);
                 $response->setContentType($content_type);
                 $response->sendResponse();
             } catch (Exception $e) {

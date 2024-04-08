@@ -58,22 +58,29 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         $this->attachments = [];
     }
 
+    /**
+     * @return void|null
+     */
     public function parseDefaultSender()
     {
-        $sender = $this->configuration->get('mailer.default_sender');
-        $email = null;
+        $sender = $this->configuration['mailer.default_sender'];
+
         $name = null;
+        $email = null;
 
         if ($sender) {
             $sender = lcStrings::splitEmail($sender);
 
             if ($sender) {
-                $email = (isset($sender['email']) ? $sender['email'] : null);
-                $name = (isset($sender['name']) ? $sender['name'] : null);
+                $email = ($sender['email'] ?? null);
+                $name = ($sender['name'] ?? null);
             }
+        } else {
+            $name = $this->configuration['mailer.default_sender_name'];
+            $email = $this->configuration['mailer.default_sender_email'];
         }
 
-        $email = $email ? $email : $this->configuration->getDefaultEmailSender();
+        $email = $email ?: $this->configuration->getDefaultEmailSender();
 
         if (!$email) {
             return null;
@@ -98,7 +105,7 @@ abstract class lcMailer extends lcResidentObj implements iProvidesCapabilities
         ];
     }
 
-    public function getRecipients()
+    public function getRecipients(): ?array
     {
         if (!count($this->recipients)) {
             return null;

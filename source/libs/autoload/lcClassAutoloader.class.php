@@ -51,14 +51,6 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
         return $registered;
     }
 
-    public function shutdown()
-    {
-        // unregister from system
-        $this->splUnregister();
-
-        parent::shutdown();
-    }
-
     public function splUnregister()
     {
         if (!$this->spl_registered) {
@@ -75,6 +67,14 @@ class lcClassAutoloader extends lcSysObj implements iCacheable
     public function isSplRegistered()
     {
         return $this->spl_registered;
+    }
+
+    public function shutdown()
+    {
+        // unregister from system
+        $this->splUnregister();
+
+        parent::shutdown();
     }
 
     public function addClasses(array $classes)

@@ -35,13 +35,13 @@ class lcPluginTranslationsParser extends lcProjectTranslationsParser
     public function getDirsToParse()
     {
         return [
-            'lib',
-            'components',
-            'tasks',
-            'forms',
-            'modules',
-            'models',
-            'ws',
+            'Lib',
+            'Components',
+            'Tasks',
+            'Forms',
+            'Modules',
+            'Models',
+            'Ws',
         ];
     }
 }

@@ -22,7 +22,6 @@
  * Address: 95 "Kapitan Raycho" Str.
  * General E-Mail: info@nimasystems.com
  *
- * $HeadURL: https://svn.nimasystems.com/ogledai-web/trunk/addons/plugins/forms/lib/action_forms/lcActionFormValidationFailure.class.php $
  * $Revision: 443 $
  * $Author: mkovachev $
  * $Date: 2014-05-17 17:22:03 +0300 (Сб , 17 Май 2014) $

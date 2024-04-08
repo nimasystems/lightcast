@@ -182,7 +182,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function offsetExists($name)
     {
         if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
-            return isset($this->request_data[$name]);
+            return isset($this->request_data[$name]) || $this->params->has($name);
         } else {
             return isset($this->env[$name]);
         }
@@ -199,7 +199,7 @@ abstract class lcRequest extends lcResidentObj implements iProvidesCapabilities,
     public function offsetGet($name)
     {
         if ($this->call_style == lcController::CALL_STYLE_REQRESP) {
-            return isset($this->request_data[$name]) ? $this->request_data[$name] : null;
+            return $this->request_data[$name] ?? $this->params->get($name);
         } else {
             return $this->env($name);
         }

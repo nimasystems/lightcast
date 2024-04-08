@@ -33,14 +33,14 @@ interface iDatabaseModelManager
 
     public function getRegisteredModels();
 
-    public function getUsedModels();
+//    public function getUsedModels();
 
-    public function useModels(string $namespace, array $models);
-
-    /**
-     * @param string $namespace
-     * @param string $model_name
-     * @return mixed
-     */
-    public function useModel(string $namespace, string $model_name): bool;
+//    public function useModels(string $namespace, array $models);
+//
+//    /**
+//     * @param string $namespace
+//     * @param string $model_name
+//     * @return mixed
+//     */
+//    public function useModel(string $namespace, string $model_name): bool;
 }

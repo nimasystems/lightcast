@@ -24,7 +24,6 @@
  * Class lcWebRequest
  *
  * @method string getRemoteAddr()
- * @method getHttpUserAgent()
  * @method getRequestMethod()
  * @method getRequestTime()
  * @method getQueryString()
@@ -99,12 +98,15 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function initialize()
     {
         parent::initialize();
+
+        $this->event_dispatcher->connect('controller.redirect', $this, 'onControllerRedirect');
     }
 
     public function getListenerEvents()
     {
         return [
             'router.detect_parameters' => 'onRouterDetectParameters',
+            'controller.redirect' => 'onControllerRedirect',
         ];
     }
 
@@ -122,6 +124,28 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
             null;
 
         parent::shutdown();
+    }
+
+    /**
+     * @param lcEvent $event
+     * @param $content
+     * @return string
+     */
+    public function onControllerRedirect(lcEvent $event, $content): string
+    {
+        $url = $content;
+
+        if ($url && $url[0] == '/') {
+            // local path
+            $has_prefix = substr($url, 0, strlen($this->prefix)) == $this->prefix;
+
+            if (!$has_prefix) {
+                $url = $this->prefix . $url;
+                $event->setProcessed();
+            }
+        }
+
+        return $url;
     }
 
     public function getCustomRequestClone(array $get = null, array $post = null, array $user_params = null, array $cookies = null, array $files = null)
@@ -387,6 +411,23 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     public function getRequestUri()
     {
         return $this->context['request_uri'];
+    }
+
+    /**
+     * @return array|mixed
+     */
+    public function getRequestUriOriginal()
+    {
+        return $this->env('REQUEST_URI_ORIGINAL') ?: $this->getRequestUri();
+    }
+
+    /**
+     * @return array|mixed|null
+     * TODO: remove from here
+     */
+    public function getHttpUserAgent()
+    {
+        return $this->env('HTTP_USER_AGENT');
     }
 
     public function setRequestMethod($request_method)

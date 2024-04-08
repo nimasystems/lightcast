@@ -25,12 +25,12 @@
 
 class lcApplicationTranslationsParser extends lcProjectTranslationsParser
 {
-    public function getDirsToParse()
+    public function getDirsToParse(): array
     {
         return [
             'layouts',
-            'modules',
-            'ws',
+            'Modules',
+            'Ws',
         ];
     }
 }

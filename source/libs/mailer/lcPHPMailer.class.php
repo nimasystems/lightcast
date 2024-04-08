@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 /*
  * Lightcast - A PHP MVC Framework
@@ -23,41 +24,55 @@
 
 use PHPMailer\PHPMailer\PHPMailer;
 
+/**
+ *
+ */
 class lcPHPMailer extends lcMailer
 {
-    const DEFAULT_LANGUAGE = 'en';
-    const DEFAULT_SMTP_HOST = '127.0.0.1';
-    const DEFAULT_SMTP_PORT = 25;
+    public const DEFAULT_LANGUAGE = 'en';
+    public const DEFAULT_SMTP_HOST = '127.0.0.1';
+    public const DEFAULT_SMTP_PORT = 25;
+
     /** @var lcMailRecipient[] */
-    protected $cc_recipients;
+    protected array $cc_recipients = [];
+
     /** @var lcMailRecipient[] */
-    protected $bcc_recipients;
-    /** @var lcMailRecipient */
-    protected $reply_to_address;
+    protected array $bcc_recipients = [];
+
+    /** @var ?lcMailRecipient */
+    protected ?lcMailRecipient $reply_to_address = null;
+
     /** @var string */
-    protected $alt_body;
-    private $last_error;
-    private $enable_debugging;
-    protected ?string $smtp_user = null;
-    protected ?string $smtp_pass = null;
+    protected string $alt_body = '';
+
+    /**
+     * @var string|null
+     */
+    private ?string $last_error = null;
+    protected bool $last_is_successful = false;
+    private bool $enable_debugging = false;
 
     public function initialize()
     {
         parent::initialize();
 
-        if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        if (!class_exists('\PHPMailer\PHPMailer\PHPMailer')) {
             throw new lcSystemException('SystemMailer requires PHPMailer');
         }
 
         $this->enable_debugging = (bool)$this->configuration['mailer.debug'];
     }
 
-    public function setEnableDebugging($enabled = true)
+    /**
+     * @param bool $enabled
+     * @return void
+     */
+    public function setEnableDebugging(bool $enabled = true)
     {
         $this->enable_debugging = $enabled;
     }
 
-    public function getLastError()
+    public function getLastError(): ?string
     {
         return $this->last_error;
     }
@@ -77,50 +92,31 @@ class lcPHPMailer extends lcMailer
         $this->reply_to_address = $recipient;
     }
 
+    public function getReplyTo(): ?lcMailRecipient
+    {
+        return $this->reply_to_address;
+    }
+
+    /**
+     * @param $alt_body
+     * @return void
+     */
     public function setAltBody($alt_body)
     {
         $this->alt_body = $alt_body;
-    }
-
-    /**
-     * @param $smtp_user
-     * @return void
-     */
-    public function setSmtpUser($smtp_user)
-    {
-        $this->smtp_user = $smtp_user;
-    }
-
-    public function getSmtpUser(): ?string
-    {
-        return $this->smtp_user;
-    }
-
-    /**
-     * @param $smtp_pass
-     * @return void
-     */
-    public function setSmtpPass($smtp_pass)
-    {
-        $this->smtp_pass = $smtp_pass;
-    }
-
-    public function getSmtpPass(): ?string
-    {
-        return $this->smtp_pass;
     }
 
     public function clear()
     {
         parent::clear();
 
-        $this->cc_recipients = null;
-        $this->bcc_recipients = null;
+        $this->cc_recipients = [];
+        $this->bcc_recipients = [];
         $this->reply_to_address = null;
-        $this->alt_body = null;
+        $this->alt_body = '';
     }
 
-    protected function sendMailInternal()
+    protected function sendMailInternal(): bool
     {
         if (!$this->getRecipients()) {
             throw new lcMailException('No Recipients set');
@@ -131,7 +127,7 @@ class lcPHPMailer extends lcMailer
         }
 
         // check if in testing mode
-        if ((bool)$this->configuration['mailer.testing_mode']) {
+        if ($this->configuration['mailer.testing_mode']) {
             return true;
         }
 
@@ -139,7 +135,7 @@ class lcPHPMailer extends lcMailer
         $mailer = new PHPMailer(true /* exceptions instead of echo - die; */);
 
         if (isset($this->configuration['mailer.language']) && ($this->configuration['mailer.language'])) {
-            $mailer->SetLanguage(
+            $mailer->setLanguage(
                 (string)$this->configuration['mailer.language'],
                 $this->configuration->getThirdPartyDir() . DS .
                 'PHPMailer' . DS . 'language' . DS);
@@ -162,17 +158,16 @@ class lcPHPMailer extends lcMailer
         $mailer->Sender = $this->getSender()->getEmail();
         $mailer->FromName = $this->getSender()->getName();
         $mailer->Subject = $this->getSubject();
-        $mailer->IsHTML(true);
-        $mailer->AltBody = ($this->alt_body ? $this->alt_body : strip_tags($this->getBody()));
+        // TODO: do we break something here?
+//        $mailer->IsHTML();
+        $mailer->AltBody = ($this->alt_body ?: strip_tags($this->getBody()));
 
         $mailer_type = $this->getMailerType();
-        $mailer_type = $mailer_type == 'php' || $mailer_type == 'phpmail' ? 'mail' : $mailer_type;
+        $mailer_type = $mailer_type == 'php' || $mailer_type == 'mail' || $mailer_type == 'phpmail' ? 'mail' : $mailer_type;
         $mailer->Mailer = $mailer_type;
 
         // check mail type
         if ($mailer->Mailer == 'smtp' && !function_exists('socket_create')) {
-            $this->warning('Mailer was unable to use SMTP mode as there is no PHP sockets support on this system - falling back to default php mail function');
-
             $mailer->Mailer = 'mail';
         }
 
@@ -186,18 +181,13 @@ class lcPHPMailer extends lcMailer
 
         // obtain the hostname
         $hostname = lcSys::getHostname();
-
-        assert(!empty($hostname));
-
-        if ($hostname) {
-            $mailer->Hostname = $hostname;
-            $mailer->Helo = $hostname;
-        }
+        $mailer->Hostname = $hostname;
+        $mailer->Helo = $hostname;
 
         if ($mailer->Mailer == 'smtp') {
             // set security
             $mailer->SMTPSecure = isset($this->configuration['mailer.security']) && is_string($this->configuration['mailer.security']) ?
-                (string)$this->configuration['mailer.security'] :
+                $this->configuration['mailer.security'] :
                 null;
 
             $mailer->Host = isset($this->configuration['mailer.smtp_host']) && $this->configuration['mailer.smtp_host'] ?
@@ -205,13 +195,13 @@ class lcPHPMailer extends lcMailer
             $mailer->Port = isset($this->configuration['mailer.smtp_port']) && $this->configuration['mailer.smtp_port'] ?
                 (int)$this->configuration['mailer.smtp_port'] : self::DEFAULT_SMTP_PORT;
 
-            $username = $this->smtp_user ?: (string)$this->configuration['mailer.smtp_user'];
-            $password = $this->smtp_pass ?: (string)$this->configuration['mailer.smtp_pass'];
-
-            if ($username) {
+            if (isset($this->configuration['mailer.smtp_user']) && $this->configuration['mailer.smtp_user']) {
                 $mailer->SMTPAuth = true;
-                $mailer->Username = $username;
-                $mailer->Password = $password;
+                $mailer->Username = (string)$this->configuration['mailer.smtp_user'];
+
+                // check if there is a username which is required in this case
+                $mailer->Password = $mailer->Username && isset($this->configuration['mailer.smtp_pass']) && ($this->configuration['mailer.smtp_pass']) ?
+                    (string)$this->configuration['mailer.smtp_pass'] : null;
             }
         }
 
@@ -224,7 +214,7 @@ class lcPHPMailer extends lcMailer
                 'base64';
 
             foreach ($attachments as $attachment) {
-                $mailer->AddAttachment(
+                $mailer->addAttachment(
                     $attachment->getFilePath(),
                     $attachment->getFilename(),
                     $attachment_encoding,
@@ -241,7 +231,7 @@ class lcPHPMailer extends lcMailer
         $recipients = $this->getRecipients();
 
         foreach ($recipients as $recipient) {
-            $mailer->AddAddress($recipient->getEmail(), $recipient->getName());
+            $mailer->addAddress($recipient->getEmail(), $recipient->getName());
 
             unset($recipient);
         }
@@ -272,20 +262,32 @@ class lcPHPMailer extends lcMailer
         // PHPMail outputs raw content in case of errors! we must hide it
         ob_start();
 
+        $this->last_is_successful = false;
+        $this->last_error = null;
+
         // send the email
-        $ret = $mailer->Send();
+        try {
+            $this->last_is_successful = $mailer->send();
+            $this->last_error = $mailer->ErrorInfo;
+        } catch (Exception $e) {
+            throw new lcMailException($e->getMessage(), null, $e);
+        }
 
         ob_end_clean();
 
-        $this->last_error = $mailer->ErrorInfo;
-
-        unset($mailer);
-
-        return $ret;
+        return $this->last_is_successful;
     }
 
-    private function getMailerType()
+    public function getLastIsSuccessful(): bool
     {
-        return $this->configuration['mailer.use'] ? $this->configuration['mailer.use'] : 'mail';
+        return $this->last_is_successful;
+    }
+
+    /**
+     * @return string
+     */
+    private function getMailerType(): string
+    {
+        return $this->configuration['mailer.use'] ?: 'mail';
     }
 }

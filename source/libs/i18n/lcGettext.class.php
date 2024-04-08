@@ -110,8 +110,6 @@ abstract class lcGettext extends lcI18n implements iDebuggable
 
     public function setLocale(string $locale)
     {
-        $locale = (string)$locale;
-
         if (!$locale) {
             throw new lcInvalidArgumentException('Invalid locale');
         }

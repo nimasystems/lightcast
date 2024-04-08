@@ -85,27 +85,9 @@ class lcAppSettingsConfigHandler extends lcEnvConfigHandler
                     ],
                 ],
                 'skip_append_for' => [
-                    '^\/img',
-                    '^\/files',
-                    '^\/images',
-                    '^\/vfs',
                 ],
                 'lang_code_match' => '^\/(([a-z]{2}(_[A-Z]{2})?\/)|([a-z]{2}(_[A-Z]{2})?)$)\/*',
                 'autodetect' => true,
-            ],
-            'mailer' => [
-                'charset' => 'UTF-8',
-                'content_type' => 'text/html',
-                'encoding' => '8bit',
-                'attachment_encoding' => 'base64',
-                'testing_mode' => false,
-                'use' => 'mail',
-                'debug' => false,
-                'smtp_host' => 'localhost',
-                'smtp_port' => 25,
-                'security' => null,
-                'smtp_user' => null,
-                'smtp_pass' => null,
             ],
         ];
     }

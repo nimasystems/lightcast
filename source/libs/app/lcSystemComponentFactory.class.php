@@ -312,7 +312,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($plugin_config instanceof iSupportsAutoload) {
             $autoload_classes = $plugin_config->getAutoloadClasses();
 
-            if ($autoload_classes && is_array($autoload_classes)) {
+            if ($autoload_classes) {
                 $autoload_classes_ = [];
 
                 foreach ($autoload_classes as $class => $filename) {
@@ -333,7 +333,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
 
                     $autoload_classes_[$class] = $filename_;
 
-                    unset($filename, $filename, $class);
+                    unset($filename, $class);
                 }
 
                 unset($autoload_classes_);
@@ -366,7 +366,7 @@ class lcSystemComponentFactory extends lcSysObj implements iCacheable
         if ($plugin_config instanceof iSystemLoaderProvider) {
             $loaders = $plugin_config->getSystemLoaders();
 
-            if ($loaders && is_array($loaders)) {
+            if ($loaders) {
                 foreach ($loaders as $loader) {
                     $ld = is_array($loader) ? $loader : [$loader];
 

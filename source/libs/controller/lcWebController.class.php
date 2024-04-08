@@ -166,8 +166,8 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
                 foreach ($controllers as $controller_info) {
                     $controller_content = null;
 
-                    $tag_name = isset($controller_info['tag_name']) ? $controller_info['tag_name'] : null;
-                    $route = isset($controller_info['route']) ? $controller_info['route'] : null;
+                    $tag_name = $controller_info['tag_name'] ?? null;
+                    $route = $controller_info['route'] ?? null;
                     $action_type = isset($controller_info['action_type']) ? (string)$controller_info['action_type'] : null;
 
                     $has_error = false;
@@ -368,11 +368,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
 
         // do not enable decorator by default on ajax requests
         if ($has_layout && !$this->request->isAjax()) {
-            $this->setDecorator($this->default_decorator, $this->default_decorator_extension);
+            $this->setDecorator($this->default_decorator, $this->default_decorator_extension, true);
         }
     }
 
-    public function setDecorator($decorator_template_name = null, $extension = 'htm')
+    public function setDecorator($decorator_template_name = null, $extension = 'htm', $is_default = false)
     {
         if (!$decorator_template_name) {
             $this->unsetDecoratorView();
@@ -390,6 +390,11 @@ abstract class lcWebController extends lcWebBaseController implements iKeyValueP
         }
 
         $view->setTemplateFilename($full_template_name);
+
+        if (!$is_default && DO_DEBUG) {
+            $log_str = $this->controller_name . '/' . $this->action_name . ' set decorator to: ' . $decorator_template_name;
+            $this->notice($log_str);
+        }
 
         $this->setDecoratorView($view);
     }

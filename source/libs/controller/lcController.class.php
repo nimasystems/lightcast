@@ -593,8 +593,8 @@ abstract class lcController extends lcBaseController
         $this->prepareControllerInstance($controller_instance);
         $controller_instance->setActionFilterChain($this->action_filter_chain);
         $controller_instance->setParentController($parent_controller);
-        $controller_instance->setDecoratorView($this->layout_view);
         $controller_instance->setActionName($action_name);
+        $controller_instance->setDecoratorView($this->layout_view);
 
         // initialize the controller now
         $controller_instance->initialize();
@@ -696,9 +696,12 @@ abstract class lcController extends lcBaseController
             'view' => $view,
         ];
 
-        $full_template_name = null;
+        if ($view === $this->layout_view) {
+            return;
+        }
 
-        if ($view && $view instanceof lcHTMLTemplateView) {
+        if ($view instanceof lcHTMLTemplateView &&
+            (!$this->layout_view || $view->getTemplateFilename() != $this->layout_view->getTemplateFilename())) {
             $full_template_name = $view->getTemplateFilename();
 
             if ($full_template_name) {
@@ -707,7 +710,8 @@ abstract class lcController extends lcBaseController
             }
 
             // send a filtering event to allow / disallow changing the decorator
-            $event = $this->event_dispatcher->filter(new lcEvent('view.set_decorator', $this, $params), $full_template_name);
+            $event = $this->event_dispatcher->filter(new lcEvent('view.set_decorator', $this, $params),
+                $full_template_name);
 
             if ($event->isProcessed()) {
                 $return_value = $event->getReturnValue();
@@ -724,11 +728,6 @@ abstract class lcController extends lcBaseController
 
         // set the new one
         $this->layout_view = $view;
-
-        if (DO_DEBUG) {
-            $log_str = $this->controller_name . '/' . $this->action_name . ' set decorator to: ' . (string)$view;
-            $this->notice($log_str);
-        }
     }
 
     public function unsetDecoratorView()

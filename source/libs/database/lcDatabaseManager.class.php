@@ -284,9 +284,14 @@ class lcDatabaseManager extends lcResidentObj implements iProvidesCapabilities, 
         // emulated prepared statements - as of 1.5 it's disabled by default
         // http://stackoverflow.com/questions/10113562/pdo-mysql-use-pdoattr-emulate-prepares-or-not
 
-        if ($emulated_prepare_statements) {
-            $attributes = ['ATTR_EMULATE_PREPARES' => ['value' => true,],];
-        }
+        $attributes = [
+            'ATTR_EMULATE_PREPARES' => ['value' => $emulated_prepare_statements,],
+            'ATTR_STRINGIFY_FETCHES' => ['value' => false],
+        ];
+
+//        if ($emulated_prepare_statements) {
+//            $attributes = ['ATTR_EMULATE_PREPARES' => ['value' => true,],];
+//        }
 
         $username = isset($db_config['user']) ? (string)$db_config['user'] : null;
         $password = $db_config['password'] ?? null;

@@ -33,10 +33,10 @@ class lcProjectTranslationsParser extends lcTranslationsParser
     public function getDirsToParse()
     {
         return [
-            'extensions',
-            'models',
-            'tasks',
-            'ws',
+            'Extensions',
+            'Models',
+            'Tasks',
+            'Ws',
         ];
     }
 }

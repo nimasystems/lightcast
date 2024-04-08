@@ -307,14 +307,12 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         return $this->use_classes;
     }
 
-    /**
-     * @deprecated Not to be used any more - use core base_url website config
-     */
-    public function getPathInfoPrefix()
+    public function getPathInfoPrefix(): string
     {
         // subclassers may override this method to return a web path prefix which
         // should be used in the
         // construction of urls
+        return '';
     }
 
     /**
@@ -337,7 +335,7 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
     public function getNamespacedClass(string $class = null): string
     {
         return $this->getProjectConfiguration()->getNamespacedClass('Applications\\' .
-            lcInflector::camelize($this->getApplicationName()) .
+            $this->getApplicationName() .
             ($class ? '\\' . $class : ''));
     }
 

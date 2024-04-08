@@ -230,15 +230,15 @@ abstract class lcBaseController extends lcAppObj implements iProvidesCapabilitie
         $this->database_model_manager = $database_model_manager;
     }
 
-    public function useModel(string $namespace, string $model_name)
-    {
-        $this->database_model_manager->useModel($namespace, $model_name);
-    }
-
-    public function useModels(string $namespace, array $models)
-    {
-        $this->database_model_manager->useModels($namespace, $models);
-    }
+//    public function useModel(string $namespace, string $model_name)
+//    {
+//        $this->database_model_manager->useModel($namespace, $model_name);
+//    }
+//
+//    public function useModels(string $namespace, array $models)
+//    {
+//        $this->database_model_manager->useModels($namespace, $models);
+//    }
 
     public function getViewFilterChain()
     {

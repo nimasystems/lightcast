@@ -797,7 +797,6 @@ class lcProjectConfiguration extends lcConfiguration implements iSupportsDbModel
                 'path' => $path,
                 'namespace' => $ns,
                 // deprecated - no longer present
-                //                'web_path' => '/addons/plugins/',
             ];
 
             unset($path);

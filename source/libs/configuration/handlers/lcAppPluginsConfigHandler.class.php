@@ -34,7 +34,6 @@ class lcAppPluginsConfigHandler extends lcEnvConfigHandler
     {
         return [
             'plugins' => [
-                'webpath' => '/plugins',
                 'enabled' => [],
             ],
         ];

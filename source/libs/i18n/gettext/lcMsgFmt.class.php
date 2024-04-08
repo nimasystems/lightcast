@@ -23,7 +23,7 @@
 
 class lcMsgFmt extends lcObj
 {
-    const SHELL_CMD = 'msgfmt -c %s -o %s';
+    const SHELL_CMD = 'msgfmt -c %s -o %s -f';
 
     public function process($filepath, $target_filename = null)
     {
@@ -51,7 +51,8 @@ class lcMsgFmt extends lcObj
 
         unset($f);
 
-        exec(sprintf(self::SHELL_CMD, $filepath, $mo_filename), $output, $return);
+        $cmd = sprintf(self::SHELL_CMD, $filepath, $mo_filename);
+        exec($cmd, $output, $return);
 
         if ($return !== 0 && !empty($output)) {
             throw new lcIOException(implode("\n", $output));

@@ -252,7 +252,6 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
         $params = $event->getParams();
 
         if (!isset($params['message'])) {
-            assert(false);
             return;
         }
 
@@ -279,8 +278,8 @@ abstract class lcLogger extends lcResidentObj implements iLoggable, iProvidesCap
             $cleartext = true;
         }
 
-        $filename = isset($params['filename']) ? $params['filename'] : null;
-        $ignore_severity_check = isset($params['ignore_severity_check']) ? true : false;
+        $filename = $params['filename'] ?? null;
+        $ignore_severity_check = $params['ignore_severity_check'] ?? false;
 
         $this->logExtended(
             $message,

@@ -193,7 +193,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
 
         $self = $this;
         $tmp_node_params = $tmp_node_params1;
-        $template = preg_replace_callback(["/{{(.*?)}}/i", "/{[\$]([\w\d\s:]+)}/i"], function ($m) use ($self, $tmp_node_params) {
+        $template = preg_replace_callback(["/{{(.*?)}}/i", "/{[\$]([\w\d\s.:]+)}/i"], function ($m) use ($self, $tmp_node_params) {
             return $m && isset($m[0]) && isset($m[1]) ? $self->parseParam($m[0], $m[1], $tmp_node_params) : null;
         }, $template);
 
@@ -274,7 +274,7 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
         } else if ($category == 'res-img') {
             if ($ret) {
                 if (!$this->pcore) {
-                    $this->pcore = lcApp::getInstance()->getPlugin('core');
+                    $this->pcore = lcApp::getInstance()->getPlugin('Core');
                 }
 
                 return $this->pcore->getImageResourceUrl($default_value);

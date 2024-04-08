@@ -43,7 +43,25 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
                 ],
             ],
             'tools' => ['htmldoc' => '/usr/bin/htmldoc'],
-            'plugins' => ['locations' => ['Plugins']],
+            'plugins' => [
+                'locations' => [
+                    'Plugins',
+                ],
+            ],
+            'mailer' => [
+                'charset' => 'UTF-8',
+                'content_type' => 'text/html',
+                'encoding' => '8bit',
+                'attachment_encoding' => 'base64',
+                'testing_mode' => false,
+                'use' => 'mail',
+                'debug' => false,
+                'smtp_host' => 'localhost',
+                'smtp_port' => 25,
+                'security' => null,
+                'smtp_user' => null,
+                'smtp_pass' => null,
+            ],
             'exceptions' => [
                 'module' => null,
                 'action' => null,

@@ -91,7 +91,7 @@ abstract class lcSecurityUser extends lcUser
         }
     }
 
-    protected function checkAndExpireIfNecessary()
+    protected function checkAndExpireIfNecessary(): bool
     {
         $this->diff_to_expire = 0;
 

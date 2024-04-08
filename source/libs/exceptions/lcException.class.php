@@ -36,6 +36,11 @@ class lcException extends Exception implements iDomainException
     protected $extra_data;
 
     /**
+     * @var bool
+     */
+    protected $log_to_sentry = false;
+
+    /**
      * @var int
      */
     protected $severity = self::SEVERITY_LEVEL_CRIT;
@@ -45,7 +50,7 @@ class lcException extends Exception implements iDomainException
      */
     protected $options;
 
-    public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null)
+    public function __construct($message = null, $code = null, Exception $cause = null, $extra_data = null, $domain = null, $log_to_sentry = true)
     {
         $message = $message ? $message : '';
         $code = $code ? $code : 0;
@@ -61,6 +66,8 @@ class lcException extends Exception implements iDomainException
         }
 
         $this->domain = isset($domain) ? $domain : self::DEFAULT_DOMAIN;
+
+        $this->log_to_sentry = $log_to_sentry;
 
         if (version_compare(PHP_VERSION, '5.3.0', '>=')) {
             parent::__construct($message, $code, $cause);
@@ -81,10 +88,28 @@ class lcException extends Exception implements iDomainException
      * @param array $options
      * @return lcException
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): lcException
     {
         $this->options = $options;
         return $this;
+    }
+
+    /**
+     * @param bool $log_to_sentry
+     * @return lcException
+     */
+    public function setLogToSentry($log_to_sentry): lcException
+    {
+        $this->log_to_sentry = $log_to_sentry;
+        return $this;
+    }
+
+    /**
+     * @return bool|mixed
+     */
+    public function getLogToSentry()
+    {
+        return $this->log_to_sentry;
     }
 
     public function getDomain()

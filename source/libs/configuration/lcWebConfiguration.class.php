@@ -35,7 +35,7 @@ abstract class lcWebConfiguration extends lcApplicationConfiguration
     public function initialize()
     {
         $this->app_dir = $this->project_configuration->getSrcDir('Applications' . DS .
-            lcInflector::camelize($this->getApplicationName()));
+            $this->getApplicationName());
 
         parent::initialize();
 

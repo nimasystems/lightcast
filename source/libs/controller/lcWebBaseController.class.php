@@ -103,17 +103,22 @@ abstract class lcWebBaseController extends lcController
 
         if ($evn->isProcessed()) {
             $v = $evn->getReturnValue();
-            $allow_redirect = $v && ((isset($v['allow_redirect']) && (bool)$v['allow_redirect']) || !isset($v['allow_redirect']));
 
-            if (!$allow_redirect) {
-                // stop processing right away to prevent side effects and tricking the static analyzer
-                // failig to detect properly the followig lines of code without this
-                exit();
+            if (is_string($v)) {
+                $url = $v;
+            } else {
+                $allow_redirect = $v && ((isset($v['allow_redirect']) && (bool)$v['allow_redirect']) || !isset($v['allow_redirect']));
+
+                if (!$allow_redirect) {
+                    // stop processing right away to prevent side effects and tricking the static analyzer
+                    // failig to detect properly the followig lines of code without this
+                    exit();
 //                return;
-            }
+                }
 
-            $http_code = isset($v['http_code']) ? (string)$v['http_code'] : $http_code;
-            $url = isset($v['url']) ? (string)$v['url'] : $url;
+                $http_code = isset($v['http_code']) ? (string)$v['http_code'] : $http_code;
+                $url = isset($v['url']) ? (string)$v['url'] : $url;
+            }
         }
 
         $this->last_redirect_url = $url;
