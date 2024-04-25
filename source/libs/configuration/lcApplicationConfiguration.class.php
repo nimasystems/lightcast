@@ -207,7 +207,11 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
             // loads .env, .env.local, and .env.$APP_ENV.local or .env.$APP_ENV
             $dotenv->loadEnv($env_filename, null, lcEnvConfigHandler::ENV_DEV, []);
 
-            $this->secure_env_data = $this->parseSecureEnvData();
+            try {
+                $this->secure_env_data = $this->parseSecureEnvData();
+            } catch (Exception $e) {
+                throw new lcSystemException('Could not decrypt config data: ' . $e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         //

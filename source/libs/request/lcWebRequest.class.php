@@ -129,9 +129,9 @@ class lcWebRequest extends lcRequest implements Serializable, iDebuggable, iKeyV
     /**
      * @param lcEvent $event
      * @param $content
-     * @return string
+     * @return ?string
      */
-    public function onControllerRedirect(lcEvent $event, $content): string
+    public function onControllerRedirect(lcEvent $event, $content): ?string
     {
         $url = $content;
 

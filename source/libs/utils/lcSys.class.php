@@ -246,7 +246,7 @@ class lcSys
             return $var;
         }
 
-        return '/tmp';
+        return '/var';
     }
 
     public static function getScriptOwner()

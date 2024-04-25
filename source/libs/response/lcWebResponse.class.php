@@ -125,6 +125,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     protected $content_hreflangs;
 
     /**
+     * @var ?string
+     */
+    private $cache_version = null;
+
+    /**
      * @var lcCookiesCollection
      */
     private $cookies;
@@ -162,6 +167,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $this->no_scripts = (bool)$this->configuration['view.no_scripts'];
         $this->javascript_code_before = $this->configuration['view.javascript_code_before'];
         $this->javascript_code_after = $this->configuration['view.javascript_code_after'];
+
+        $this->cache_version = $this->configuration['view.cache_version'] ?? null;
 
         $this->res_url_webpath = $this->configuration['view.res_url_webpath'];
 
@@ -558,7 +565,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $metatags = $this->metatags;
 
         // title
-        $title = $this->title ? $this->title : (isset($metatags['title']) ? $metatags['title'] : null);
+        $title = $this->title ?: ($metatags['title'] ?? null);
 
         if ($title) {
             $head[] = '<title>' . htmlspecialchars($title . $this->title_suffix) . '</title>';
@@ -672,7 +679,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 $head[] =
                     '<link rel="stylesheet" type="' . $data['type'] . '" ' .
                     'href="' . (strstr($data['href'], '//') === false ? $this->res_url_webpath : '') .
-                    $data['href'] . '" media="' . $data['media'] . '" />';
+                    $data['href'] .
+                    ($this->cache_version ? (stristr($data['href'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    '" media="' . $data['media'] . '" />';
 
                 unset($href, $data);
             }
@@ -711,7 +720,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
                 $scr = '<script type="' . $data['type'] . '" src="' .
                     (strstr($data['src'], '//') === false ? $this->res_url_webpath : '') .
-                    $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
+                    $data['src'] .
+                    ($this->cache_version ? (stristr($data['src'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $head[] = $scr;
 
                 unset($src, $data, $oattr);
@@ -747,7 +758,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
                 $scr = '<script type="' . $data['type'] . '" src="' .
                     (strstr($data['src'], '//') === false ? $this->res_url_webpath : '')
-                    . $data['src'] . '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
+                    . $data['src'] .
+                    ($this->cache_version ? (stristr($data['src'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $this->html_body_custom['end'][] = $scr;
 
                 unset($src, $data);
@@ -842,7 +855,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $imploded = implode("\n", $head);
 
         if ($imploded) {
-            $content = preg_replace("/<head>/i", '<head>' . $imploded, $content);
+            $content = preg_replace('/<head>/i', '<head>' . $imploded, $content);
         }
 
         unset($head);
@@ -859,7 +872,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 unset($name, $value);
             }
 
-            $content = preg_replace("/<body/i", '<body ' . implode(' ', $body_tags), $content);
+            $content = preg_replace('/<body/i', '<body ' . implode(' ', $body_tags), $content);
 
             unset($body_tags);
         }
@@ -879,11 +892,11 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace("/<head>/i", '<head>' . $start, $content);
+                $content = preg_replace('/<head>/i', '<head>' . $start, $content);
             }
 
             if ($end) {
-                $content = preg_replace("/<\/head>/i", $end . '</head>', $content);
+                $content = preg_replace('/<\/head>/i', $end . '</head>', $content);
             }
 
             unset($start, $end);

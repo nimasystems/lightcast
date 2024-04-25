@@ -216,9 +216,7 @@ abstract class lcGettext extends lcI18n implements iDebuggable
             return $string;
         }
 
-        $string = gettext($string);
-
-        return $string;
+        return gettext($string);
     }
 
     private function setEnv($locale)
