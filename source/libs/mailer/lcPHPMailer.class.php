@@ -45,6 +45,10 @@ class lcPHPMailer extends lcMailer
     /** @var string */
     protected string $alt_body = '';
 
+    protected ?string $smtp_user = null;
+
+    protected ?string $smtp_pass = null;
+
     /**
      * @var string|null
      */
@@ -61,6 +65,26 @@ class lcPHPMailer extends lcMailer
         }
 
         $this->enable_debugging = (bool)$this->configuration['mailer.debug'];
+    }
+
+    public function getSmtpUser(): ?string
+    {
+        return $this->smtp_user;
+    }
+
+    public function setSmtpUser(?string $smtp_user): void
+    {
+        $this->smtp_user = $smtp_user;
+    }
+
+    public function getSmtpPass(): ?string
+    {
+        return $this->smtp_pass;
+    }
+
+    public function setSmtpPass(?string $smtp_pass): void
+    {
+        $this->smtp_pass = $smtp_pass;
     }
 
     /**
@@ -195,7 +219,11 @@ class lcPHPMailer extends lcMailer
             $mailer->Port = isset($this->configuration['mailer.smtp_port']) && $this->configuration['mailer.smtp_port'] ?
                 (int)$this->configuration['mailer.smtp_port'] : self::DEFAULT_SMTP_PORT;
 
-            if (isset($this->configuration['mailer.smtp_user']) && $this->configuration['mailer.smtp_user']) {
+            if ($this->smtp_user) {
+                $mailer->SMTPAuth = true;
+                $mailer->Username = $this->smtp_user;
+                $mailer->Password = $this->smtp_pass;
+            } else if (isset($this->configuration['mailer.smtp_user']) && $this->configuration['mailer.smtp_user']) {
                 $mailer->SMTPAuth = true;
                 $mailer->Username = (string)$this->configuration['mailer.smtp_user'];
 
