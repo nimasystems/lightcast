@@ -33,6 +33,8 @@ class lcPageIterateCounter
 
     public static function getStats(int $numHits, int $limit, int $page, int $group_limiter = self::DEFAULT_GROUP_LIMIT): array
     {
+        $page = $page ?: 1;
+
         if (!$limit || !$page || !$group_limiter) {
             throw new lcInvalidArgumentException('Invalid params');
         }

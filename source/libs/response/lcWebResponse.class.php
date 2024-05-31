@@ -855,7 +855,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $imploded = implode("\n", $head);
 
         if ($imploded) {
-            $content = preg_replace('/<head>/i', '<head>' . $imploded, $content);
+            $content = preg_replace('/<head(.*?)>/i', '<head$1>' . $imploded, $content);
         }
 
         unset($head);
@@ -892,7 +892,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace('/<head>/i', '<head>' . $start, $content);
+                $content = preg_replace('/<head(.*?)>/i', '<head$1>' . $start, $content);
             }
 
             if ($end) {
@@ -919,7 +919,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace('/<body(.*?)>/i', '<body>' . "\n" . $start, $content);
+                $content = preg_replace('/<body(.*?)>/i', '<body$1>' . "\n" . $start, $content);
             }
 
             if ($end) {

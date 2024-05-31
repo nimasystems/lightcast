@@ -1098,6 +1098,8 @@ class lcPluginManager extends lcSysObj implements iCacheable, iDebuggable, iEven
             return;
         }
 
+        $plugin_routes = array_reverse($plugin_routes);
+
         $current_app_name = $this->configuration->getApplicationName();
 
         foreach ($plugin_routes as $name => $details) {
