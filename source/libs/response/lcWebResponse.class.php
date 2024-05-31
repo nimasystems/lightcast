@@ -848,14 +848,14 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         // that there is no <body> tag usually in there.. this must be fixed!
 
         if (isset($html_body_custom['end'])) {
-            $content = preg_replace("/<\/body>/i", "\n" . implode("\n", $html_body_custom['end']) . "\n" . '</body>', $content);
+            $content = preg_replace('/<\/body>/i', "\n" . implode("\n", $html_body_custom['end']) . "\n" . '</body>', $content);
         }
 
         // head parts
         $imploded = implode("\n", $head);
 
         if ($imploded) {
-            $content = preg_replace('/<head(.*?)>/i', '<head$1>' . $imploded, $content);
+            $content = preg_replace('/<head>/i', '<head>' . $imploded, $content);
         }
 
         unset($head);
@@ -892,7 +892,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             }
 
             if ($start) {
-                $content = preg_replace('/<head(.*?)>/i', '<head$1>' . $start, $content);
+                $content = preg_replace('/<head>/i', '<head>' . $start, $content);
             }
 
             if ($end) {
