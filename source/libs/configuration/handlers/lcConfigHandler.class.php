@@ -105,9 +105,9 @@ abstract class lcConfigHandler extends lcObj
             throw new lcConfigException('Environment \'all\' is special and cannot be set as the currently active one!');
         }
 
-        if ($environment && (!in_array($environment, $this->environments))) {
-            throw new lcConfigException('Environment \'' . $environment . '\' was set as the currently active one but it is not defined in configuration');
-        }
+//        if ($environment && (!in_array($environment, $this->environments))) {
+//            throw new lcConfigException('Environment \'' . $environment . '\' was set as the currently active one but it is not defined in configuration');
+//        }
 
         // get defaults and merge both
         $defaults = (array)$this->getDefaultValues();
