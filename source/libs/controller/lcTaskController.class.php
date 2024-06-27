@@ -155,6 +155,10 @@ abstract class lcTaskController extends lcController implements iDebuggable
 
     protected function execute($action_name, array $action_params)
     {
+        if ($this->configuration['tasks.execution.forbidden']) {
+            throw new lcTaskException('Task execution is forbidden');
+        }
+
         $this->action_name = $action_name;
         $this->action_params = $action_params;
 

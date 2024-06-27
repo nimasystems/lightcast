@@ -120,6 +120,17 @@ abstract class lcApplicationConfiguration extends lcConfiguration implements iSu
         $this->prepareEnv();
 
         parent::initialize();
+
+        $this->updateDirs();
+    }
+
+    protected function updateDirs()
+    {
+        $var_dir = $this->configuration['dirs']['var'] ?? null;
+
+        if ($var_dir) {
+            $this->project_configuration->setVarDir($var_dir);
+        }
     }
 
     protected function updateSharedEnvVars()
