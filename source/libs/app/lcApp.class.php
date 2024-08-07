@@ -437,7 +437,7 @@ class lcApp extends lcObj
 
             // in debugging mode we check the cache version against the LC revision number
             // if they are different we recreate the cache
-            if (DO_DEBUG && $should_recreate_cache) {
+            if ($should_recreate_cache) {
                 $this->recreateFrameworkAutoloadCache();
 
                 // reread the file
