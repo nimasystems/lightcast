@@ -374,6 +374,9 @@ class lcSessionStorage extends lcStorage implements iDebuggable
         }
     }
 
+    /**
+     * @return false|float|int
+     */
     private function calculateTimeoutInSeconds()
     {
         $timeout = (int)$this->timeout;

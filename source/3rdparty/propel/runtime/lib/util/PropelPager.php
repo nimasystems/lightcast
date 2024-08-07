@@ -140,7 +140,7 @@ class PropelPager implements Countable, Iterator
         $selectMethod = $this->getPeerSelectMethod();
         if ($selectMethod == 'doSelect') {
             $countMethod = 'doCount';
-        } else if (($pos = stripos($selectMethod, 'doSelectJoin')) === 0) {
+        } else if ((stripos($selectMethod, 'doSelectJoin')) === 0) {
             $countMethod = 'doCount' . substr($selectMethod, strlen('doSelect'));
         } else {
             // we will fall back to doCount() if we don't understand the join

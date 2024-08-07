@@ -26,6 +26,7 @@
 class lcCookie extends lcObj
 {
     const DEFAULT_PATH = '/';
+    const DEFAULT_SAME_SITE_VALUE = 'Strict';
 
     protected $name;
     protected $value;
@@ -33,8 +34,10 @@ class lcCookie extends lcObj
     protected $domain;
     protected $expires;
     protected $secure;
+    protected $same_site;
 
-    public function __construct($name, $value = null, $path = self::DEFAULT_PATH, $domain = null, $expires = null, $secure = false)
+    public function __construct($name, $value = null, $path = self::DEFAULT_PATH, $domain = null, $expires = null, $secure = null,
+                                $same_site = null)
     {
         parent::__construct();
 
@@ -44,7 +47,8 @@ class lcCookie extends lcObj
         $path = isset($path) ? (string)$path : self::DEFAULT_PATH;
         $domain = isset($domain) ? (string)$domain : null;
         $expires = isset($expires) ? (int)$expires : null;
-        $secure = isset($secure) ? (bool)$secure : false;
+        $secure = !isset($secure) || $secure;
+        $same_site = $same_site ?: self::DEFAULT_SAME_SITE_VALUE;
 
         $this->name = $name;
         $this->value = $value;
@@ -52,6 +56,7 @@ class lcCookie extends lcObj
         $this->domain = $domain;
         $this->expires = $expires;
         $this->secure = $secure;
+        $this->same_site = $same_site;
     }
 
     public function getName()
@@ -62,6 +67,16 @@ class lcCookie extends lcObj
     public function setName($name)
     {
         $this->name = $name;
+    }
+
+    public function getSameSite()
+    {
+        return $this->same_site;
+    }
+
+    public function setSameSite($value)
+    {
+        $this->same_site = $value;
     }
 
     public function getValue()

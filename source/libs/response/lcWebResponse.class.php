@@ -1079,14 +1079,27 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $log = [];
             $cookies = $cookies->getAll();
 
+            /** @var lcCookie $sl */
             foreach ($cookies as $sl) {
                 $set = setcookie(
                     $sl->getName(),
-                    $sl->getValue(),
-                    ($sl->getExpiration() ? $sl->getExpiration() : null),
-                    $sl->getPath(),
-                    $sl->getDomain(),
-                    $sl->IsSecure());
+                    $sl->getValue(), array_filter([
+                        'expires' => ($sl->getExpiration() ?: null),
+                        'path' => $sl->getPath(),
+                        'domain' => $sl->getDomain(),
+                        'secure' => $sl->isSecure(),
+                        'httponly' => true,
+                        'samesite' => $sl->getSameSite(),
+                    ])
+                );
+
+//                $set = setcookie(
+//                    $sl->getName(),
+//                    $sl->getValue(),
+//                    ($sl->getExpiration() ? $sl->getExpiration() : null),
+//                    $sl->getPath(),
+//                    $sl->getDomain(),
+//                    $sl->IsSecure());
 
                 if (!$set && DO_DEBUG) {
                     throw new lcSystemException('Could not set cookie ' . $sl->getName());
