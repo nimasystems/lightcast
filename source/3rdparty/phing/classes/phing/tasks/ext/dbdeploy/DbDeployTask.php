@@ -174,8 +174,8 @@ class DbDeployTask extends Task
             $dbh = new PDO($this->url, $this->userid, $this->password);
             $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->dbmsSyntax->applyAttributes($dbh);
-            $sql = "SELECT *
-                    FROM " . DbDeployTask::$TABLE_NAME . "
+            $sql = 'SELECT *
+                    FROM ' . DbDeployTask::$TABLE_NAME . "
                     WHERE delta_set = '$this->deltaSet'
                     ORDER BY change_number";
             foreach ($dbh->query($sql) as $change) {
