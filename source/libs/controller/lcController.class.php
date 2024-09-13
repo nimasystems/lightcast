@@ -850,7 +850,7 @@ abstract class lcController extends lcBaseController
 
             if ($ptype_matches) {
                 self::$req_arguments_chk[$controller_name][$action] = true;
-            } else {
+            } else if ($ptype) {
                 // check parent
                 $r = new ReflectionClass($ptype->getName());
                 $parent = $r->getParentClass();
@@ -858,9 +858,9 @@ abstract class lcController extends lcBaseController
 
                 $ptype_matches = $parent_name && $parent_name == $request_cls_name;
 
-                if ($ptype_matches) {
-                    self::$req_arguments_chk[$controller_name][$action] = true;
-                }
+                self::$req_arguments_chk[$controller_name][$action] = $ptype_matches;
+            } else {
+                self::$req_arguments_chk[$controller_name][$action] = false;
             }
         }
 
