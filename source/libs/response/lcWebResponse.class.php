@@ -307,10 +307,15 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             header('Content-Disposition: attachment; filename=' . $options['attachment']['filename']);
         }
 
+        $should_flush = ob_get_level() > 0;
+
         while (!feof($handle)) {
             $buffer = fread($handle, $chunk_size);
             echo $buffer;
-            ob_flush();
+
+            if ($should_flush) {
+                ob_flush();
+            }
 
             $cnt += strlen($buffer);
         }
