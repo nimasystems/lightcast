@@ -78,6 +78,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
      */
     protected array $javascripts_end = [];
     protected array $javascript_code = [];
+
     protected ?string $javascript_code_before = '';
     protected ?string $javascript_code_after = '';
 
@@ -135,6 +136,16 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     private $cookies;
     private $content_should_be_processed;
 
+    /**
+     * @var bool
+     */
+    protected bool $minify_js = false;
+
+    /**
+     * @var bool
+     */
+    protected bool $minify_css = false;
+
     /*
      * Response initialization
     */
@@ -186,6 +197,9 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
             $this->configuration['view.allow_metatags'] : true;
 
         $this->clientside_js = (bool)$this->configuration['view.clientside_js'];
+
+        $this->minify_js = (bool)$this->configuration['webres.minify.js'];
+        $this->minify_css = (bool)$this->configuration['webres.minify.css'];
 
         unset($js_path);
     }
@@ -302,6 +316,32 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         if (DO_DEBUG) {
             $this->debug('set title: ' . $title);
         }
+    }
+
+    protected function getMinifySuffix(string $type = 'js'): string
+    {
+        return ($this->{'minify_' . $type}) ? '.min' : '';
+    }
+
+    protected function getFormattedJs(string $js): string
+    {
+        // if js is a full url - return it as is
+        if (lcStrings::endsWith($js, '.js')) {
+            return $js;
+        }
+
+        // otherwise - add minify suffix
+        return $js . $this->getMinifySuffix('js') . '.js';
+    }
+
+    protected function getFormattedCss(string $css): string
+    {
+        // if js is a full url - return it as is
+        if (lcStrings::endsWith($css, '.css')) {
+            return $css;
+        }
+
+        return $css . $this->getMinifySuffix('css') . '.css';
     }
 
     /**
@@ -676,11 +716,13 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($stylesheets) {
             foreach ($stylesheets as $href => $data) {
+                $hreff = $this->getFormattedCss($data['href']);
+
                 $head[] =
                     '<link rel="stylesheet" type="' . $data['type'] . '" ' .
-                    'href="' . (strstr($data['href'], '//') === false ? $this->res_url_webpath : '') .
-                    $data['href'] .
-                    ($this->cache_version ? (stristr($data['href'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    'href="' . (strstr($hreff, '//') === false ? $this->res_url_webpath : '') .
+                    $hreff .
+                    ($this->cache_version ? (stristr($hreff, '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
                     '" media="' . $data['media'] . '" />';
 
                 unset($href, $data);
@@ -706,6 +748,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
+                $srcc = $this->getFormattedJs($data['src']);
+
                 $oattr = [];
                 if (isset($data['attributes']) && $data['attributes']) {
                     foreach ($data['attributes'] as $key => $v) {
@@ -719,13 +763,13 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 }
 
                 $scr = '<script type="' . $data['type'] . '" src="' .
-                    (strstr($data['src'], '//') === false ? $this->res_url_webpath : '') .
-                    $data['src'] .
-                    ($this->cache_version ? (stristr($data['src'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    (strstr($srcc, '//') === false ? $this->res_url_webpath : '') .
+                    $srcc .
+                    ($this->cache_version ? (stristr($srcc, '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
                     '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $head[] = $scr;
 
-                unset($src, $data, $oattr);
+                unset($src, $srcc, $data, $oattr);
             }
         }
 
@@ -744,6 +788,8 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
 
         if ($javascripts) {
             foreach ($javascripts as $src => $data) {
+                $srcc = $this->getFormattedJs($data['src']);
+
                 $oattr = [];
                 if (isset($data['attributes']) && $data['attributes']) {
                     foreach ($data['attributes'] as $key => $v) {
@@ -757,13 +803,13 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
                 }
 
                 $scr = '<script type="' . $data['type'] . '" src="' .
-                    (strstr($data['src'], '//') === false ? $this->res_url_webpath : '')
-                    . $data['src'] .
-                    ($this->cache_version ? (stristr($data['src'], '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
+                    (strstr($srcc, '//') === false ? $this->res_url_webpath : '')
+                    . $srcc .
+                    ($this->cache_version ? (stristr($srcc, '?') === false ? '?' : '&') . 'v=' . $this->cache_version : '') .
                     '"' . ($oattr ? ' ' . implode(' ', $oattr) : null) . '></script>';
                 $this->html_body_custom['end'][] = $scr;
 
-                unset($src, $data);
+                unset($src, $srcc, $data);
             }
         }
 

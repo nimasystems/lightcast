@@ -36,7 +36,7 @@ class lcProjectConfigHandler extends lcEnvConfigHandler
             'project' => ['project_name' => 'Lightcast project'],
 
             'settings' => [
-                'timezone' => 'Europe/Sofia',
+                'timezone' => 'UTC',
                 'exception_http_header' => [
                     'enabled' => false,
                     'header' => 'HTTP/1.1 500 Internal Server Error',
