@@ -21,6 +21,15 @@
 * E-Mail: info@nimasystems.com
 */
 
+/**
+ * Redis cache backend on top of predis/predis.
+ *
+ * Works with predis ^1.1 and ^2.0: everything used here (the Client constructor taking connection
+ * parameters + an options array, get / set / setex / del / flushall) has the same signature and
+ * return types in both majors (predis 2 requires PHP >= 7.2; its breaking changes - removed
+ * Autoloader / Profile classes, PHP 5 support, deprecated commands - do not touch this class).
+ * Security audit 2026-08-14, V15.2.1 (F108): predis 1 is end-of-life.
+ */
 class lcRedis extends lcCacheStore
 {
     /**
@@ -51,21 +60,51 @@ class lcRedis extends lcCacheStore
         return $this->servers[] = $connect_string;
     }
 
+    /**
+     * Returns the predis client, created on first use.
+     *
+     * A single server is passed as one connection string; several are passed as an array, which
+     * predis 1 and 2 both treat as a client-side sharded cluster.
+     *
+     * @return Predis\Client
+     * @throws lcConfigException When no Redis server is configured.
+     */
     public function getBackend()
     {
         if (!$this->backend) {
             $config_servers = isset($this->options['servers']) ? (array)$this->options['servers'] : [];
-            $servers = array_merge((array)$this->servers, $config_servers);
+            $servers = array_values(array_filter(array_merge((array)$this->servers, $config_servers)));
+
+            if (!$servers) {
+                throw new lcConfigException('No Redis server configured (cache.servers)');
+            }
+
             $this->backend = new Predis\Client(count($servers) > 1 ? $servers : $servers[0],
                 (isset($this->options['backend_options']) ? $this->options['backend_options'] : null));
         }
         return $this->backend;
     }
 
+    /**
+     * Stores a value.
+     *
+     * @param string $key Cache key.
+     * @param mixed $value Value (serialized; falsy values are stored as an empty string).
+     * @param array $options `lifetime` in seconds; missing or <= 0 means no expiry.
+     * @return mixed The predis status response (truthy on success).
+     */
     public function set($key, $value = null, array $options = [])
     {
-        $lifetime = isset($options['lifetime']) ? $options['lifetime'] : null;
-        return $this->getBackend()->setex($key, $lifetime, $value ? serialize($value) : '');
+        $lifetime = isset($options['lifetime']) ? (int)$options['lifetime'] : 0;
+        $value = $value ? serialize($value) : '';
+
+        // SETEX rejects a non-positive TTL ("invalid expire time"), which used to make every
+        // write without a lifetime fail; store those without an expiry instead
+        if ($lifetime > 0) {
+            return $this->getBackend()->setex($key, $lifetime, $value);
+        }
+
+        return $this->getBackend()->set($key, $value);
     }
 
     public function remove($key)

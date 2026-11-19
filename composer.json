@@ -23,5 +23,8 @@
     "paragonie/halite": "^4",
     "ext-yaml": "*",
     "ext-json": "*"
+  },
+  "suggest": {
+    "predis/predis": "^1.1 || ^2.0, for the lcRedis cache backend"
   }
 }
