@@ -1,5 +1,13 @@
 LIGHTCAST CHANGELOG:
 
+2.0.0 /unreleased - security hardening (DesignConnected audit 2026-08-14)/
+
+- RESPONSE (F002, ASVS V4.1.1): lcWebResponse appends `; charset=<view.charset>` to the Content-Type of every text-based media type: text/*, application/xml, application/javascript (and ecmascript / x-javascript) and any `+xml` type. application/json is left without one on purpose (RFC 8259 defines no charset). A content type that already names a charset is no longer given a second one. New static helper: lcWebResponse::buildContentTypeHeaderValue().
+- VIEW (F057/F067, ASVS V1.2.1/V1.2.3): `{$var}` and `{$var:sp}` escape with htmlspecialchars(ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'). Single quotes are now encoded (&#039;), and a value with invalid UTF-8 renders with U+FFFD instead of disappearing. Visible change: a `{$var}` inside a JS string now shows &#039; for an apostrophe instead of breaking the script; switch such sites to `:js`.
+- VIEW: new `{$var:js}` modifier escapes a value for use inside a quoted JavaScript string literal (in <script> or an on* attribute). Backed by the new lcStrings::escapeJsString() (json_encode with JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP, without the surrounding quotes). Documented in CLAUDE.md and DEV.md.
+- CACHE (F108, ASVS V15.2.1): lcRedis supports predis/predis ^2.0 as well as ^1.1 (the API it uses is unchanged between them). A set() without a positive lifetime now stores the value without expiry instead of failing on SETEX. A missing server configuration throws lcConfigException instead of an undefined-index notice.
+- TESTS: tests/security/ holds plain-PHP regression checks for the above (`php tests/security/run.php`; the predis check needs LC_TEST_REDIS and LC_TEST_PREDIS_AUTOLOAD).
+
 1.5.1.1470 /17.11.2013/
 
 - CONFIG: Added a new db config property in lcDatabasesConfigHandler: 'propel_custom.gen_dir' - which should be set to the 'gen' folder where the om/map files have been generated. If ommited the previous implementation is used (OM/MAP in the same dir as models)
