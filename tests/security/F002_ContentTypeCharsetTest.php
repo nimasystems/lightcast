@@ -15,8 +15,8 @@ $cases = [
     ['application/xhtml+xml', 'application/xhtml+xml; charset=utf-8'],
     ['image/svg+xml', 'image/svg+xml; charset=utf-8'],
     ['APPLICATION/XML', 'APPLICATION/XML; charset=utf-8'],
-    // RFC 8259: application/json has no charset parameter
-    ['application/json', 'application/json'],
+    // audit V4.1.1 verification expects a charset on JSON too (harmless per RFC 8259)
+    ['application/json', 'application/json; charset=utf-8'],
     ['application/x-www-form-urlencoded', 'application/x-www-form-urlencoded'],
     ['application/pdf', 'application/pdf'],
     ['application/binary', 'application/binary'],

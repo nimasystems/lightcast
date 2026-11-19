@@ -28,10 +28,12 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     /**
      * Media types (other than text/*) that carry text and get an explicit charset parameter.
      *
-     * application/json is deliberately absent: RFC 8259 defines no charset parameter for it (JSON
-     * is always UTF-8) and section 11 says adding one has no effect on compliant recipients.
+     * application/json is included although RFC 8259 defines no charset parameter for it (JSON is
+     * always UTF-8; compliant recipients ignore the parameter). The 2026-08-14 audit's V4.1.1
+     * verification step expects `application/json; charset=utf-8`, and the parameter is harmless.
      */
     const CHARSET_MEDIA_TYPES = [
+        'application/json',
         'application/xml',
         'application/javascript',
         'application/ecmascript',
