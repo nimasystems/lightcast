@@ -26,6 +26,19 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
     const TR_MULTILINE_DETECT_REP = '-----rtn----';
 
     /**
+     * Media types (other than text/*) that carry text and get an explicit charset parameter.
+     *
+     * application/json is deliberately absent: RFC 8259 defines no charset parameter for it (JSON
+     * is always UTF-8) and section 11 says adding one has no effect on compliant recipients.
+     */
+    const CHARSET_MEDIA_TYPES = [
+        'application/xml',
+        'application/javascript',
+        'application/ecmascript',
+        'application/x-javascript',
+    ];
+
+    /**
      * @var lcWebRequest
      */
     protected $request;
@@ -1168,6 +1181,41 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         return $sent_cookies;
     }
 
+    /**
+     * Builds the value of the Content-Type header for a response.
+     *
+     * Appends `; charset=<charset>` to every text-based media type: text/*, application/xml,
+     * application/javascript and any structured `+xml` type (application/rss+xml, image/svg+xml,
+     * application/xhtml+xml...). Security audit 2026-08-14, V4.1.1 (F002): before this only text/*
+     * received a charset, so XML responses left the decoding to the client's guess.
+     *
+     * A content type that already names a charset is returned unchanged, so a caller that sets
+     * e.g. `text/html; charset=iso-8859-1` no longer receives a second, contradictory parameter.
+     *
+     * @param string $content_type Media type, optionally with parameters (e.g. `text/xml`).
+     * @param string $charset Charset to declare (the response's server charset).
+     * @return string The header value (without the `Content-Type: ` prefix).
+     */
+    public static function buildContentTypeHeaderValue($content_type, $charset)
+    {
+        $content_type = trim((string)$content_type);
+        $charset = trim((string)$charset);
+
+        if ($content_type === '' || $charset === '' || stripos($content_type, 'charset=') !== false) {
+            return $content_type;
+        }
+
+        // match on the bare media type, ignoring any parameters and case
+        $parts = explode(';', $content_type, 2);
+        $media_type = strtolower(trim($parts[0]));
+
+        $needs_charset = strncmp($media_type, 'text/', 5) === 0 ||
+            in_array($media_type, self::CHARSET_MEDIA_TYPES, true) ||
+            (strlen($media_type) > 4 && substr($media_type, -4) === '+xml');
+
+        return $needs_charset ? $content_type . '; charset=' . $charset : $content_type;
+    }
+
     protected function sendHeaders()
     {
         $prepared_headers = [];
@@ -1195,9 +1243,7 @@ class lcWebResponse extends lcResponse implements iKeyValueProvider, iDebuggable
         $server_charset = $this->server_charset;
 
         if ($content_type) {
-            $txt_based_header = 'text/';
-            $is_text_based_content = substr($content_type, 0, strlen($txt_based_header)) == $txt_based_header;
-            $header = 'Content-Type: ' . $content_type . ($is_text_based_content ? '; charset=' . $server_charset : null);
+            $header = 'Content-Type: ' . self::buildContentTypeHeaderValue((string)$content_type, (string)$server_charset);
             $prepared_headers[] = $header;
             unset($header);
         }
