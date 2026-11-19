@@ -79,13 +79,19 @@ YAML config files live at `config/default/applications/{App}/*.yml`. Keys: `load
 Built-in, not Twig. Template files: `templates/{action_name}.htm`.
 
 ```html
-{$variable}            <!-- escaped -->
+{$variable}            <!-- HTML-escaped (ENT_QUOTES | ENT_SUBSTITUTE, UTF-8) -->
 {$variable:asis}       <!-- raw -->
+{$variable:js}         <!-- escaped for a quoted JS string: var s = '{$variable:js}'; -->
 {t}Translate{/t}       <!-- i18n -->
 <!-- BEGIN block_name --> ... <!-- END block_name -->   <!-- conditional -->
 <!-- PARTIAL module/partial -->                          <!-- include -->
 [PAGE_CONTENT]                                          <!-- layout slot -->
 ```
+
+Output context decides the modifier. `{$var}` is only for HTML element content and quoted attributes.
+Inside `<script>` or an `on*=` attribute use `'{$var:js}'` (always inside quotes: it escapes a
+string body, it does not produce a JS value). Use `:asis` only for markup the controller has already
+made safe. An unknown modifier outputs the raw value, so check the spelling.
 
 ### Plugin System
 

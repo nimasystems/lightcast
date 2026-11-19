@@ -203,6 +203,17 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
     }
 
     /**
+     * HTML-escapes a template value for element content and quoted attributes.
+     *
+     * @param mixed $value Scalar value to escape.
+     * @return string The escaped value (ENT_QUOTES | ENT_SUBSTITUTE, UTF-8).
+     */
+    public static function escapeHtml($value)
+    {
+        return htmlspecialchars((string)$value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    }
+
+    /**
      * @param $query
      * @param $param
      * @param array|null $all_params
@@ -231,7 +242,10 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
                 $val = null;
 
                 if (!is_array($param_one_set)) {
-                    $val = !$param_two ? htmlspecialchars($param_one_set) : $param_one_set;
+                    // ENT_QUOTES so a value can never close a single-quoted attribute either,
+                    // ENT_SUBSTITUTE so invalid UTF-8 degrades to U+FFFD instead of silently
+                    // blanking the whole value (security audit 2026-08-14, V1.2.1, F057/F067)
+                    $val = !$param_two ? self::escapeHtml($param_one_set) : $param_one_set;
                     $val = $this->debug ? '{' . $val . '}' : $val;
                 }
 
@@ -288,9 +302,15 @@ class lcHTMLTemplateViewFilter extends lcViewFilter
             }
         } else if ($category == 'sp') {
             if ($ret) {
-                $ret = htmlspecialchars($ret);
+                $ret = self::escapeHtml($ret);
                 return $ret;
             }
+        } else if ($category == 'js') {
+            // {$var:js} - the value escaped for use inside a quoted JavaScript string literal
+            // ('{$var:js}' or "{$var:js}"), in a <script> block or an inline event handler.
+            // Unlike the default HTML escaping, it cannot be decoded back into a quote by the
+            // HTML parser before the JS parser sees it. Security audit 2026-08-14, F057/F067.
+            return lcStrings::escapeJsString($ret);
         } else if ($category == '*') {
             return '*';
         } else if ($category == 'urlencode' || $category == 'encode') {

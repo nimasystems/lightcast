@@ -341,6 +341,42 @@ class lcStrings
         return $narr;
     }
 
+    /**
+     * Escapes a value for use inside a JavaScript string literal (single- or double-quoted).
+     *
+     * The result is the body of a JSON string without its surrounding quotes, with every character
+     * that could end the string, the enclosing <script> element or an HTML attribute encoded as a
+     * \uXXXX escape: quotes (JSON_HEX_QUOT / JSON_HEX_APOS), < and > (JSON_HEX_TAG, so
+     * `</script>` and `<!--` cannot appear), & (JSON_HEX_AMP), backslashes and control characters
+     * (always escaped by json_encode), and U+2028 / U+2029 (escaped by default since PHP 7.1).
+     * That makes it safe both in a <script> block and in an inline event-handler attribute.
+     * Security audit 2026-08-14, V1.2.1 / V1.2.3 (F057, F067).
+     *
+     * Invalid UTF-8 is replaced with U+FFFD rather than making the whole value disappear.
+     * Arrays, objects and null produce an empty string; booleans produce "1" or "" (PHP casting).
+     *
+     * @param mixed $value Value to escape.
+     * @return string Escaped string, without surrounding quotes.
+     */
+    public static function escapeJsString($value)
+    {
+        if (is_array($value) || is_object($value) || $value === null) {
+            return '';
+        }
+
+        $json = json_encode((string)$value,
+            JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP |
+            JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
+
+        if (!is_string($json) || strlen($json) < 2) {
+            // cannot happen for a string with JSON_INVALID_UTF8_SUBSTITUTE; fail closed
+            return '';
+        }
+
+        // strip the surrounding double quotes added by json_encode
+        return substr($json, 1, -1);
+    }
+
     // addslashes - recursive on arrays
 
     public static function slashJs($string)

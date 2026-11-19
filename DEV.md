@@ -460,6 +460,9 @@ Where `{action_name}` is the method name without the `action` prefix, converted 
 <!-- Raw / unescaped output -->
 {$html_content:asis}
 
+<!-- Inside a JavaScript string literal (in <script> or an on* attribute), always quoted -->
+<script>var name = '{$member_name:js}';</script>
+
 <!-- Config / view-level variable -->
 {$view.res_url_webpath:config}
 
@@ -477,6 +480,21 @@ Where `{action_name}` is the method name without the `action` prefix, converted 
 <!-- PARTIAL home/footer -->
 <!-- PARTIAL banner/banner -->
 ```
+
+#### Output modifiers
+
+| Syntax | Output | Use for |
+|--------|--------|---------|
+| `{$v}` | `htmlspecialchars($v, ENT_QUOTES \| ENT_SUBSTITUTE, 'UTF-8')` | HTML text and quoted attributes |
+| `{$v:js}` | `lcStrings::escapeJsString($v)`: the JSON string body without its quotes, with `' " < > &` as `\u00XX` escapes | inside `'...'` / `"..."` in `<script>` or `on*=` attributes |
+| `{$v:asis}` | raw value | markup the controller already made safe |
+| `{$v:sp}` | HTML-escaped like `{$v}` (empty values render nothing) | legacy |
+| `{$v:keylink}`, `{$v:seopath}` | slug-style transformations | URLs |
+| `{$k:config}`, `{$k:request}`, `{$k:env}`, `{$k:controller}` | a value looked up by key (not escaped) | framework values |
+
+`{$v:js}` escapes a string *body*: always put it between quotes. For a whole object or array, pass
+`json_encode($data, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP)` from the
+controller and print it with `:asis`. An unknown modifier prints the raw value.
 
 ### Passing data to templates
 
